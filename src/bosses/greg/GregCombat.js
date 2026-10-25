@@ -16,7 +16,7 @@ import { texte, voile } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
-import { IDENTITE, REGLAGES as R, ATTAQUES, ATTAQUES_PAR_ROUND, CONSEILS, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
+import { IDENTITE, REGLAGES as R, ATTAQUES, ENCHAINEMENTS, CONSEILS, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
 import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from './effets.js';
 import { jouerClip } from '../../core/clips.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
@@ -26,7 +26,8 @@ const entre = (min, max) => min + Math.random() * (max - min);
 // Pose de Greg au moment où il frappe
 const POSE_FRAPPE = { jab: 'jab', crochet: 'crochet', corps: 'corps', rafale: 'jab', smash: 'uppercut' };
 const POSE_PREPA = { tete: 'prepare', corps: 'prepare_bas', smash: 'prepare_smash' };
-const COULEUR_ALERTE = { tete: '#ffd84a', corps: '#5ad1ff', smash: '#ff3b3b' };
+// couleurs des alertes (corps en violet pour ne pas confondre avec le cadre de garde)
+const COULEUR_ALERTE = { tete: '#ffd84a', corps: '#c77dff', smash: '#ff3b3b' };
 // Points d'impact à l'écran
 const VISAGE_GREG = { x: R.centreX, y: 140 };
 const CORPS_GREG = { x: R.centreX, y: 215 };
@@ -48,6 +49,8 @@ export class GregCombat extends BossScene {
     this.ralenti = 1; this.ralentiTemps = 0;
     this.horloge = 0;
     this.stats = { donnes: 0, recus: 0 };
+    this.statsRound = this.nouvellesStatsRound();
+    this.arret = 0;   // hit-stop : image figée un instant à l'impact
     this.smashAnnonce = false;
     this.roundsJoues = 0;
 
@@ -57,14 +60,14 @@ export class GregCombat extends BossScene {
     this.j = {
       vie: 100, souffle: 100, esprit: 0, downs: 0,
       action: null, esquive: null, esquivePause: 0, garde: false, sonne: 0,
-      contreJusqua: -1, reposSouffle: 0, dempsey: null, decalage: 0, tremble: 0,
+      contreJusqua: -1, reposSouffle: 0, dempsey: null, decalage: 0, tremble: 0, finEsquive: -9,
       sprite: this.add.image(R.centreX, R.piedsJoueur, 'heros_boxe_garde').setOrigin(0.5, 1).setDepth(10)
         .setScale(R.tailleJoueur).setAlpha(R.transparenceJoueur),   // transparent pour bien voir Greg
     };
     this.g = {
       vie: 100, souffle: 100, downs: 0, fureur: 1, secousse: 0, combo: 0, couvert: 0,
       etat: 'garde', t: 0, attaque: null, coupIndex: 0, garde: 'haute',
-      gardeTimer: entre(...R.changementGarde), pause: 1.5, poseForcee: null,
+      seqIndex: 0, seqPas: 0, finSeq: true, pause: 1.5, poseForcee: null,
       sprite: this.add.image(R.centreX, R.piedsGreg, 'greg_garde').setOrigin(0.5, 1).setDepth(9),
       vis: { dx: 0, dy: 0, echelle: 1, angle: 0 },   // mouvements de l'illustration
     };
@@ -105,8 +108,9 @@ export class GregCombat extends BossScene {
   // =================================================================
   update(temps, delta) {
     if (this.termine) return;
-    this.lireTouches();
     const reel = delta / 1000;
+    if (this.arret > 0) { this.arret -= reel; return; }   // hit-stop
+    this.lireTouches();
 
     if (this.gel > 0) {
       this.gel -= reel;
@@ -142,6 +146,9 @@ export class GregCombat extends BossScene {
   }
 
   figer(secondes, ensuite) { this.gel = secondes; this.apresGel = ensuite || null; }
+  // Hit-stop : fige l'image un court instant à l'impact (séparé de figer, qui sert aux encarts)
+  arreter(secondes) { this.arret = Math.max(this.arret, secondes); }
+  nouvellesStatsRound() { return { tete: 0, corps: 0, smash: 0, tropTot: 0, mauvaisCote: 0 }; }
   ralentir(facteur, secondes) { this.ralenti = facteur; this.ralentiTemps = secondes; }
 
   // =================================================================
@@ -177,7 +184,7 @@ export class GregCombat extends BossScene {
       j.esquive.t += dt;
       const contrePossible = this.horloge < j.contreJusqua;
       if (contrePossible && (a.espace || a.z)) { j.esquive = null; this.frapper(this.choixCoup(a)); return; }
-      if (j.esquive.t >= R.esquiveDuree) { j.esquive = null; j.esquivePause = R.esquivePause; }
+      if (j.esquive.t >= R.esquiveDuree) { j.esquive = null; j.esquivePause = R.esquivePause; j.finEsquive = this.horloge; }
       return;
     }
 
@@ -241,10 +248,13 @@ export class GregCombat extends BossScene {
       lignesImpact(this, xImpact, yImpact, 0xffd84a, 26, 240);
       onomatopee(this, xImpact, yImpact - 50, 'CONTRE !!', 52, '#ff8a3d');
       this.cameras.main.shake(180, 0.012);
+      this.arreter(R.arretImpact.contre);
+      this.tweens.add({ targets: this.cameras.main, zoom: 1.04, duration: 80, hold: 60, yoyo: true });
     } else {
       onomatopee(this, xImpact, yImpact, c.cible === 'corps' ? ONO.corps : ONO.fort, 40, c.cible === 'corps' ? '#5ad1ff' : '#ffffff');
       lignesImpact(this, xImpact, yImpact, 0xffffff, 14, 140);
       this.cameras.main.shake(70, 0.005);
+      this.arreter(R.arretImpact.coup);
     }
     jouerSon(this, contre ? 'greg_coup_fort' : 'greg_coup');
     j.esprit = Math.min(100, j.esprit + R.esprit.coupPorte);
@@ -272,8 +282,6 @@ export class GregCombat extends BossScene {
       if (g.etat === 'prepare') onomatopee(this, R.centreX + 170, 60, 'Interrompu !', 22, '#7fff7f');
       g.etat = 'touche'; g.t = 0; g.attaque = null;
       this.alerte.setVisible(false);
-      // Greg apprend : il protège parfois l'endroit touché
-      if (Math.random() < 0.35) g.garde = c.cible === 'corps' ? 'basse' : 'haute';
     }
   }
 
@@ -301,11 +309,6 @@ export class GregCombat extends BossScene {
     switch (g.etat) {
       case 'garde': {
         g.souffle = Math.min(100, g.souffle + R.souffleGregRecup * dt);
-        g.gardeTimer -= dt;
-        if (g.gardeTimer <= 0) {
-          g.garde = g.garde === 'haute' ? 'basse' : 'haute';
-          g.gardeTimer = entre(...R.changementGarde);
-        }
         g.pause -= dt;
         if (g.pause <= 0) this.choisirAttaque();
         break;
@@ -317,7 +320,7 @@ export class GregCombat extends BossScene {
         if (g.t >= 0.14) {
           const at = g.attaque;
           if (at.coups && g.coupIndex < at.coups) {
-            g.etat = 'prepare'; g.t = 0; g.prepa = at.entre * g.fureur;
+            g.etat = 'prepare'; g.t = 0; g.prepa = at.entre * g.fureur * R.vitesseRound[this.round - 1];
             at.cote = this.coteAuHasard(at);
             this.montrerAlerte();
           }
@@ -340,22 +343,36 @@ export class GregCombat extends BossScene {
     const g = this.g;
     const [min, max] = R.pauseAttaque[this.round - 1];
     g.etat = 'garde'; g.t = 0; g.attaque = null;
-    g.pause = pauseMin !== undefined ? entre(pauseMin, pauseMin + 0.6) : entre(min, max);
+    if (pauseMin !== undefined) g.pause = entre(pauseMin, pauseMin + 0.6);
+    else if (!g.finSeq) g.pause = entre(0.35, 0.55);   // il enchaîne
+    else { g.pause = entre(min, max); g.garde = g.garde === 'haute' ? 'basse' : 'haute'; }   // fin d'enchaînement
   }
 
   choisirAttaque() {
     const g = this.g;
-    const nom = auHasard(ATTAQUES_PAR_ROUND[this.round - 1]);
+    // Greg joue ses enchaînements dans l'ordre (voir ENCHAINEMENTS dans reglages.js)
+    const liste = ENCHAINEMENTS[this.round - 1];
+    const seq = liste[g.seqIndex % liste.length];
+    const [nom, cote] = seq[g.seqPas].split(' ');
+    g.seqPas++;
+    g.finSeq = g.seqPas >= seq.length;
+    if (g.finSeq) { g.seqPas = 0; g.seqIndex++; }
     const at = ATTAQUES[nom];
-    g.attaque = { id: nom, ...at, cote: this.coteAuHasard(at) };
+    g.attaque = { id: nom, ...at, cote: at.cible === 'smash' ? 'centre' : (cote || this.coteAuHasard(at)) };
     g.coupIndex = 0; g.combo = 0;
-    g.etat = 'prepare'; g.t = 0; g.prepa = at.prepa * g.fureur;
+    g.etat = 'prepare'; g.t = 0; g.prepa = at.prepa * g.fureur * R.vitesseRound[this.round - 1];
     g.souffle -= at.souffle;
     this.montrerAlerte();
-    if (at.cible === 'smash' && !this.smashAnnonce) {
-      this.smashAnnonce = true;
-      const e = encart(this, 'SMASH !!', 'Greg arme son uppercut... ESQUIVE sur le côté !', '#ff3b3b', 0x2a0000, 'greg_visage');
-      this.figer(1.0, () => e.fermer());
+    if (at.cible === 'smash') {
+      // son "tell" : il tape ses gants l'un contre l'autre avant le SMASH
+      onomatopee(this, R.centreX - 120, 120, 'TAP !', 30, '#ff8a3d');
+      this.time.delayedCall(180, () => onomatopee(this, R.centreX + 120, 110, 'TAP !', 30, '#ff8a3d'));
+      jouerSon(this, 'greg_bloque'); this.time.delayedCall(180, () => jouerSon(this, 'greg_bloque'));
+      if (!this.smashAnnonce) {
+        this.smashAnnonce = true;
+        const e = encart(this, 'SMASH !!', 'Quand il tape ses gants... ESQUIVE sur le côté !', '#ff3b3b', 0x2a0000, 'greg_visage');
+        this.figer(1.0, () => e.fermer());
+      }
     }
   }
 
@@ -394,7 +411,15 @@ export class GregCombat extends BossScene {
     // esquive réussie = partir du côté OPPOSÉ au coup (coup venant de gauche => esquive à droite)
     const bonCote = at.cote === 'centre' || !at.cote || (j.esquive && j.esquive.cote === (at.cote === 'g' ? 1 : -1));
     const esquive = j.esquive && j.esquive.t <= R.esquiveProtege && bonCote;
-    if (j.esquive && !bonCote && at.cible !== 'corps') onomatopee(this, R.centreX, TETE_JOUEUR_Y - 70, 'Mauvais côté !', 26, '#ff6b6b');
+    if (j.esquive && !bonCote && at.cible !== 'corps') {
+      onomatopee(this, R.centreX, TETE_JOUEUR_Y - 70, 'Mauvais côté !', 26, '#ff6b6b');
+      this.statsRound.mauvaisCote++;
+    }
+    // esquive déjà finie juste avant le coup : on le dit au joueur
+    if (!j.esquive && !j.garde && at.cible !== 'corps' && this.horloge - j.finEsquive < R.tropTot) {
+      onomatopee(this, R.centreX, TETE_JOUEUR_Y - 70, 'Trop tôt !', 28, '#ff6b6b');
+      this.statsRound.tropTot++;
+    }
     if (esquive && at.cible !== 'corps') {
       jouerSon(this, 'greg_esquive');
       onomatopee(this, R.centreX - j.esquive.cote * 60, yImpact - 40, ONO.esquive, 34, '#aaffff');
@@ -409,9 +434,17 @@ export class GregCombat extends BossScene {
     if (j.garde && at.cible !== 'smash') {
       degats *= R.garde;
       j.souffle = Math.max(0, j.souffle - R.gardeSouffle);
-      jouerSon(this, 'greg_bloque');
-      onomatopee(this, xImpact, yImpact, ONO.bloque, 28, '#cccccc');
-      j.tremble = 0.1;
+      if (j.souffle <= 0) {   // plus de souffle : la garde cède
+        degats = at.degats * 0.5;
+        j.garde = false; j.sonne = R.gardeBriseeSonne; j.tremble = 0.3;
+        onomatopee(this, xImpact, yImpact - 30, 'Garde brisée !', 32, '#ff6b6b');
+        this.cameras.main.shake(200, 0.015);
+        jouerSon(this, 'greg_coup_fort');
+      } else {
+        jouerSon(this, 'greg_bloque');
+        onomatopee(this, xImpact, yImpact, ONO.bloque, 28, '#cccccc');
+        j.tremble = 0.1;
+      }
     } else if (j.garde && at.cible === 'smash') {
       degats *= at.gardeCassee;
       j.garde = false; j.sonne = 0.6;
@@ -430,6 +463,9 @@ export class GregCombat extends BossScene {
       this.cameras.main.shake(enorme ? 300 : 120, enorme ? 0.02 : 0.008);
       if (enorme) flash(this, 0.8, 0xff3b3b);
       jouerSon(this, 'greg_coup_fort');
+      this.arreter(R.arretImpact.recu);
+      this.statsRound[at.cible === 'tete' ? 'tete' : at.cible]++;
+      if (navigator.vibrate) navigator.vibrate(enorme ? 120 : 40);
     }
     this.blesserJoueur(degats);
   }
@@ -527,7 +563,6 @@ export class GregCombat extends BossScene {
     // Greg contre : il faut freiner avec la garde (▼) au bon moment
     if (d.contre) {
       if (a.bas && !d.touche) {
-        if (ecart > D.bien) { this.contreDempsey(); return; }
         d.touche = true; d.contre = false;
         this.alerte.setVisible(false);
         onomatopee(this, R.centreX, 300, 'FREIN !', 46, '#7fff7f');
@@ -656,7 +691,7 @@ export class GregCombat extends BossScene {
     gr.fillStyle(d.contre ? 0xff3b3b : 0xffffff, 1).fillCircle(cx + p.x * ax, cy + p.y * ay, 14);
     gr.lineStyle(3, 0x1a1014, 1).strokeCircle(cx + p.x * ax, cy + p.y * ay, 14);
     // compteur de coups
-    this.texteCombo.setVisible(d.coups > 0).setText(`${d.coups} COUPS !`).setScale(1 + d.coups * 0.04);
+    this.texteCombo.setVisible(d.coups > 0).setText(`${d.coups} COUP${d.coups > 1 ? 'S' : ''} !`).setScale(1 + d.coups * 0.04);
   }
 
   // =================================================================
@@ -847,7 +882,10 @@ export class GregCombat extends BossScene {
       el.push(texte(this, 580, 400,
         `Ta vie remonte (+${R.soinEntreRounds}).   Coups donnés : ${Math.round(this.stats.donnes)}   reçus : ${Math.round(this.stats.recus)}`,
         16, '#7fff7f').setDepth(101));
+      // le coach commente ce que tu as raté pendant le round
+      el.push(texte(this, 580, 435, 'Coach : « ' + this.remarqueCoach() + ' »', 18, '#ffd84a', { wordWrap: { width: 640 } }).setDepth(101));
     }
+    this.statsRound = this.nouvellesStatsRound();
     el.push(texte(this, LARGEUR / 2, HAUTEUR - 50, (estTactile() ? 'OK' : 'ESPACE') + ' : on y va !', 22, '#7fff7f').setDepth(101));
     this.time.delayedCall(400, () => {
       this.input.keyboard.once('keydown-SPACE', () => {
@@ -858,12 +896,24 @@ export class GregCombat extends BossScene {
     });
   }
 
+  // Remarque du coach selon les erreurs du round
+  remarqueCoach() {
+    const s = this.statsRound;
+    if (s.tropTot >= 3) return `${s.tropTot} esquives trop tôt ! Attends que son coup PARTE, petit !`;
+    if (s.mauvaisCote >= 3) return `${s.mauvaisCote} fois du mauvais côté... Coup de gauche = esquive à DROITE !`;
+    if (s.corps >= 3) return `${s.corps} coups au foie encaissés ! Le « ! » violet, c'est la GARDE (▼) !`;
+    if (s.smash >= 1) return 'Tu as mangé son SMASH... Quand il tape ses gants, ESQUIVE !';
+    if (s.tete >= 4) return `${s.tete} coups au visage, tu dors ? Esquive et CONTRE !`;
+    return 'Pas mal, petit ! Continue à esquiver et à contrer !';
+  }
+
   debutRound() {
     etiquettesTactiles({ ...ETIQUETTES_COMBAT, x: null });
     this.boutonDempsey = false;
     const j = this.j;
     j.souffle = 100; this.g.souffle = 100;
     j.action = null; j.esquive = null; j.sonne = 0; j.contreJusqua = -1;
+    const g = this.g; g.seqIndex = 0; g.seqPas = 0; g.finSeq = true;   // ses enchaînements repartent du début
     this.retourGardeGreg(1.2);
     this.tempsRound = R.dureeRound;
     this.smashAnnonce = false;
@@ -957,7 +1007,7 @@ export class GregCombat extends BossScene {
     else g.sprite.clearTint();
     }
 
-    this.flecheEsquive.setVisible(this.etat === 'combat' && g.etat === 'prepare' && !j.dempsey
+    this.flecheEsquive.setVisible(this.etat === 'combat' && g.etat === 'prepare' && !j.dempsey && R.aideFleche[this.round - 1]
       && Math.floor(this.time.now / 140) % 4 !== 0);   // clignote
     const contre = this.horloge < j.contreJusqua && this.etat === 'combat';
     this.aideContre.setVisible(contre).setPosition(R.centreX + j.decalage, 250);
@@ -1006,14 +1056,14 @@ export class GregCombat extends BossScene {
           dy = c === 'smash' ? 30 - elan * 40 : elan * 10;
         }
       }
-      if (Math.floor(this.horloge * 10) % 2) teinte = c === 'smash' ? 0xff7070 : (c === 'corps' ? 0x8fd6ff : 0xfff0a0);
+      if (c === 'smash' && Math.floor(this.horloge * 10) % 2) teinte = 0xff7070;
     }
     else if (g.etat === 'frappe' || (g.etat === 'recup' && g.t < 0.15 && g.attaque && g.attaque.cible)) {
       pose = imageCoup(g.attaque.cible); echelle = 1.1; dy = g.attaque.cible === 'smash' ? -15 : (g.attaque.cible === 'corps' ? 30 : 14); rapide = true;
       angle = g.attaque.id === 'crochet' ? -6 : 0;
     }
-    else if (g.etat === 'essouffle' || g.etat === 'recup') { pose = repos; dy = 14 + Math.sin(t / 140) * 4; echelle = 0.98; teinte = 0xd8d0e8; }
-    else if (this.etat === 'fin' && this.j.downs >= R.knockdownsMax) { pose = repos; dy = -10 + Math.sin(t / 160) * 6; echelle = 1.04; }
+    else if (g.etat === 'essouffle' || g.etat === 'recup') { pose = existe(haute) ? haute : repos; dy = 14 + Math.sin(t / 140) * 4; echelle = 0.98; teinte = 0xd8d0e8; }
+    else if (this.etat === 'fin' && this.j.downs >= R.knockdownsMax) { pose = existe(haute) ? haute : repos; dy = -10 + Math.sin(t / 160) * 6; echelle = 1.04; }
     else { dx = Math.sin(t / 400) * 12; dy = Math.sin(t / 300) * 2; }     // en garde : il se balance et respire
     if (!existe(pose)) pose = repos;
 
@@ -1054,11 +1104,11 @@ export class GregCombat extends BossScene {
       const haut = g.garde === 'haute';
       const x = R.centreX + v.dx, y = haut ? VISAGE_GREG.y : CORPS_GREG.y + 10, l = haut ? 120 : 150, h = haut ? 100 : 90;
       const pulse = 0.5 + Math.sin(t / 200) * 0.2;
-      z.fillStyle(0x5ad1ff, 0.22 * pulse + 0.12).fillRoundedRect(x - l / 2, y - h / 2, l, h, 18);
-      z.lineStyle(5, 0x9fe6ff, 0.5 + pulse * 0.5).strokeRoundedRect(x - l / 2, y - h / 2, l, h, 18);
+      z.fillStyle(0xffffff, 0.16 * pulse + 0.08).fillRoundedRect(x - l / 2, y - h / 2, l, h, 18);
+      z.lineStyle(5, 0xffffff, 0.5 + pulse * 0.5).strokeRoundedRect(x - l / 2, y - h / 2, l, h, 18);
       // petit bouclier sur le côté de la zone protégée
       const bx = x + l / 2 + 4, by = y - 14;
-      z.fillStyle(0x9fe6ff, 0.95).beginPath();
+      z.fillStyle(0xffffff, 0.95).beginPath();
       z.moveTo(bx, by); z.lineTo(bx + 22, by); z.lineTo(bx + 22, by + 14); z.lineTo(bx + 11, by + 28); z.lineTo(bx, by + 14);
       z.closePath(); z.fillPath();
     }
@@ -1070,18 +1120,20 @@ export class GregCombat extends BossScene {
     c.clear(); a.clear();
     if (this.etat !== 'combat' || g.etat !== 'prepare' || !g.attaque || this.j.dempsey) return;
     const at = g.attaque, avance = Phaser.Math.Clamp(g.t / g.prepa, 0, 1);
-    const couleur = at.cible === 'corps' ? 0x5ad1ff : (at.cible === 'smash' ? 0xff3b3b : 0xffd84a);
+    const couleur = at.cible === 'corps' ? 0xc77dff : (at.cible === 'smash' ? 0xff3b3b : 0xffd84a);
     const x = R.centreX, y = at.cible === 'corps' ? TETE_JOUEUR_Y + VENTRE_JOUEUR : TETE_JOUEUR_Y - 10;
     const r = 24 + 80 * (1 - avance);
+    if (R.aideCible[this.round - 1]) {
     c.lineStyle(5, couleur, 0.9).strokeCircle(x, y, r);
     c.lineStyle(2, couleur, 0.9).strokeCircle(x, y, 20);
     c.lineBetween(x - r - 10, y, x - r + 14, y).lineBetween(x + r - 14, y, x + r + 10, y)
      .lineBetween(x, y - r - 10, x, y - r + 14).lineBetween(x, y + r - 14, x, y + r + 10);
+    }
     if (at.cible === 'corps') {
       // aura bleue qui pulse autour de Greg + traits qui montent
       const pulse = 0.5 + Math.sin(t / 70) * 0.5;
-      a.fillStyle(0x5ad1ff, 0.12 + pulse * 0.12).fillEllipse(R.centreX + this.g.vis.dx, 290, 280, 430);
-      a.lineStyle(3, 0x9fe6ff, 0.6);
+      a.fillStyle(0xc77dff, 0.12 + pulse * 0.12).fillEllipse(R.centreX + this.g.vis.dx, 290, 280, 430);
+      a.lineStyle(3, 0xe0b8ff, 0.6);
       for (let k = 0; k < 10; k++) {
         const lx = R.centreX - 150 + ((k * 37 + t / 3) % 300), ly = 380 - ((t / 2 + k * 53) % 220);
         a.lineBetween(lx, ly, lx, ly - 40);

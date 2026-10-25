@@ -28,7 +28,7 @@
   coup au visage `greg_coup_visage.png`, K.O. `greg_ko.png` (originaux dans `assets_inbox/`).
   Chaque image est calée sur la tête (réglages `illustre` dans `src/bosses/greg/reglages.js`).
   Greg est vu en entier : garde (haute ET basse) = `greg_garde_pied.png` (en pied, gants levés),
-  un cadre bleu + bouclier montre la zone protégée (visage ou ventre) ;
+  un cadre blanc + bouclier montre la zone protégée (visage ou ventre) ;
   garde basse / touché / essoufflé = image complète `greg_entier.png` ;
   pour la garde haute et les coups, le haut du corps est coupé à la ceinture (gants gardés) et
   posé sur les jambes `greg_jambes.png` (réglages `ceinture` dans `src/bosses/greg/reglages.js`).
@@ -45,9 +45,15 @@
   - Les coups au visage partent de GAUCHE ou de DROITE (le « ! », Greg et l'image du coup sont de ce côté) :
     il faut esquiver du côté OPPOSÉ ; une flèche « ESQUIVE » l'indique. Le SMASH part du centre.
   - Greg prévient avant de frapper : « ! » jaune = visage (esquive ou garde),
-    « ! ▼ » bleu = corps (garde seulement), « !! » rouge = SMASH (esquive seulement, round 3).
+    « ! ▼ » violet = corps (garde seulement), « !! » rouge = SMASH (esquive seulement, round 3).
   - Esquive réussie = fenêtre de CONTRE (dégâts x2). Garde de Greg haute = vise le corps, basse = le visage.
   - 3 coups encaissés d'affilée : Greg se couvre puis riposte.
+  - Greg joue des ENCHAÎNEMENTS écrits par round (`ENCHAINEMENTS` dans reglages.js), dans l'ordre,
+    et change de garde à la fin de chacun. Avant le SMASH, il tape ses gants (« TAP ! TAP ! »).
+  - Aides : flèche ESQUIVE/GARDE au round 1 seulement, cible qui se resserre aux rounds 1-2.
+  - Esquive : protège 0,45 s ; « Trop tôt ! » / « Mauvais côté ! » s'affichent ; le coach commente
+    tes erreurs entre les rounds. Garde avec souffle à 0 = garde brisée.
+  - Hit-stop (image figée 60-150 ms) à chaque impact, zoom sur les contres, vibration sur mobile.
   - Coups au corps = vident le souffle de Greg ; à bout de souffle, il est grand ouvert.
   - Jauge d'esprit combatif pleine : DEMPSEY ROLL = jeu de rythme. La boule attend dans le cercle de droite :
     ▶ lance le roll, puis ◀ quand elle arrive à gauche, ▶ à droite (PARFAIT / BIEN). Chaque coup accélère
