@@ -31,6 +31,8 @@
   L'illustration complète sert aussi pour la présentation (`greg_portrait`) et l'annonce du SMASH (`greg_visage`).
 - Bruitages du combat : générés par `outils/generer_sons.py` (Python + numpy) dans `assets/audio/`.
 - Rendu lissé (`pixelArt: false` dans `src/main.js`).
+- Combat de Greg inspiré de Super Punch-Out (SNES) : bandeau avec portraits et « VS », public dense,
+  tapis bleu avec logo, ton boxeur petit et transparent (réglages `tailleJoueur`, `transparenceJoueur`).
 - **Greg** (`src/bosses/greg/`) : combat de boxe en 3 rounds de 60 s.
   - Commandes : ◀ ▶ esquive, Espace = coup au visage, Z = coup au corps, Bas (maintenu) = garde,
     X = Dempsey Roll (quand la jauge d'esprit est pleine).

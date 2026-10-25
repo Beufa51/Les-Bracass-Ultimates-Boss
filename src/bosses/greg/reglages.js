@@ -13,7 +13,7 @@ export const REGLAGES = {
   // ---------- Écran (vue Punch-Out : on voit ton boxeur de dos) ----------
   centreX: 480,                // milieu du ring
   piedsGreg: 440,              // bas du dessin de Greg
-  piedsJoueur: 575,            // bas du dessin du joueur (coupé par le bas de l'écran)
+  piedsJoueur: 552,            // bas du dessin du joueur (coupé par le bas de l'écran)
   decalageEsquive: 120,        // de combien ton boxeur part sur le côté en esquivant
   tailleGreg: 0.9,             // 1 = taille du dessin
   // Greg en illustrations : chaque image est placée pour que sa TÊTE tombe en (teteX, teteY).
@@ -31,7 +31,8 @@ export const REGLAGES = {
     debutElan: 0.2,    // à partir de ce moment de la préparation, on voit le coup partir
     debutElanCorps: 0.4,   // pour le coup au corps : il plonge d'abord bas plus longtemps
   },
-  tailleJoueur: 0.85,
+  tailleJoueur: 0.62,          // petit et transparent, comme dans Super Punch-Out
+  transparenceJoueur: 0.6,
 
   // ---------- Joueur ----------
   souffleRecup: 22,            // souffle regagné par seconde quand on ne frappe pas

@@ -633,86 +633,119 @@ function dosAuSol(ctx, p, peau) {
 //  RING (vu depuis ton coin, face aux cordes du fond)
 // =====================================================================
 function ring(ctx, w, h) {
+  // Inspiré de Super Punch-Out (SNES) : public dense et coloré, tapis bleu vu d'en haut, grand logo
   const alea = hasard(42);
-  // salle sombre
-  ctx.fillStyle = degrade(ctx, 0, 0, 0, h * 0.62, [[0, '#05050d'], [0.6, '#151530'], [1, '#262447']]);
+  ctx.fillStyle = degrade(ctx, 0, 0, 0, 340, [[0, '#07060f'], [1, '#1b1730']]);
   ctx.fillRect(0, 0, w, h);
-  // rampe de projecteurs
-  ctx.fillStyle = '#1c1c28'; ctx.fillRect(0, 14, w, 10);
-  for (let x = 40; x < w; x += 80) {
-    const halo = ctx.createRadialGradient(x, 30, 2, x, 30, 46);
-    halo.addColorStop(0, 'rgba(255,248,220,0.9)'); halo.addColorStop(0.2, 'rgba(255,240,190,0.35)'); halo.addColorStop(1, 'rgba(255,240,190,0)');
-    ctx.fillStyle = halo; ctx.fillRect(x - 46, 0, 92, 80);
-    ctx.fillStyle = '#fffbe8'; ctx.beginPath(); ctx.arc(x, 30, 6, 0, Math.PI * 2); ctx.fill();
+  // projecteurs
+  for (let x = 60; x < w; x += 140) {
+    const halo = ctx.createRadialGradient(x, 18, 2, x, 18, 70);
+    halo.addColorStop(0, 'rgba(255,250,225,0.95)'); halo.addColorStop(0.25, 'rgba(255,240,190,0.3)'); halo.addColorStop(1, 'rgba(255,240,190,0)');
+    ctx.fillStyle = halo; ctx.fillRect(x - 70, 0, 140, 100);
   }
-  // public (4 rangées de silhouettes, les plus proches plus claires)
-  for (let rang = 0; rang < 5; rang++) {
-    const y = 120 + rang * 34, base = 26 + rang * 12;
-    for (let x = -20 + (rang % 2) * 15; x < w + 30; x += 30) {
-      const v = base + Math.floor(alea() * 18);
-      ctx.fillStyle = `rgb(${v},${v - 4},${v + 22})`;
-      const tx = x + alea() * 6, ty = y + alea() * 6;
-      ctx.beginPath(); ctx.arc(tx, ty, 11, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(tx, ty + 30, 17, 20, 0, Math.PI, 0); ctx.fill();
-      ctx.fillRect(tx - 17, ty + 30, 34, 10);
+  // public : rangées de petits spectateurs colorés (plus clairs et plus gros vers l'avant)
+  const peaux = ['#f2c9a0', '#d9a77c', '#a8714f', '#7a4e33', '#ffdcb8'];
+  const cheveux = ['#1a1410', '#4a2c18', '#7a5a30', '#d8c070', '#2a2a2a', '#a03020', '#dddddd'];
+  const habits = ['#c0392b', '#2980b9', '#27ae60', '#f39c12', '#8e44ad', '#ecf0f1', '#34495e', '#e67e22', '#16a085', '#d35400'];
+  for (let rang = 0; rang < 15; rang++) {
+    const y = 96 + rang * 16, r = 5 + rang * 0.35, lum = 0.35 + rang * 0.045;
+    for (let x = -10 + (rang % 2) * 9; x < w + 12; x += r * 2.3) {
+      const xx = x + (alea() - 0.5) * 3, yy = y + (alea() - 0.5) * 3;
+      ctx.globalAlpha = Math.min(1, lum);
+      ctx.fillStyle = habits[Math.floor(alea() * habits.length)];
+      ctx.beginPath(); ctx.ellipse(xx, yy + r * 1.7, r * 1.25, r * 1.1, 0, Math.PI, 0); ctx.fill();
+      ctx.fillRect(xx - r * 1.25, yy + r * 1.7, r * 2.5, r);
+      ctx.fillStyle = peaux[Math.floor(alea() * peaux.length)];
+      ctx.beginPath(); ctx.arc(xx, yy, r, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = cheveux[Math.floor(alea() * cheveux.length)];
+      ctx.beginPath(); ctx.arc(xx, yy - r * 0.3, r, Math.PI, 0); ctx.fill();
+      if (alea() < 0.12) {   // bras levés
+        ctx.fillStyle = peaux[Math.floor(alea() * peaux.length)];
+        ctx.fillRect(xx - r * 1.6, yy - r * 2.2, r * 0.6, r * 2); ctx.fillRect(xx + r, yy - r * 2.2, r * 0.6, r * 2);
+      }
     }
   }
+  ctx.globalAlpha = 1;
   // flashs d'appareils photo
-  for (let i = 0; i < 6; i++) {
-    const x = alea() * w, y = 110 + alea() * 160, r = 2 + alea() * 3;
-    const f = ctx.createRadialGradient(x, y, 0, x, y, r * 3);
+  for (let i = 0; i < 7; i++) {
+    const x = alea() * w, y = 110 + alea() * 170;
+    const f = ctx.createRadialGradient(x, y, 0, x, y, 12);
     f.addColorStop(0, 'rgba(255,255,255,0.95)'); f.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = f; ctx.fillRect(x - r * 3, y - r * 3, r * 6, r * 6);
-    ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(x - r * 1.6, y); ctx.lineTo(x + r * 1.6, y); ctx.moveTo(x, y - r * 1.6); ctx.lineTo(x, y + r * 1.6); ctx.stroke();
+    ctx.fillStyle = f; ctx.fillRect(x - 12, y - 12, 24, 24);
   }
-  // tapis du ring en perspective
-  ctx.beginPath(); ctx.moveTo(108, 330); ctx.lineTo(w - 108, 330); ctx.lineTo(w + 40, 505); ctx.lineTo(-40, 505); ctx.closePath();
-  ctx.fillStyle = degrade(ctx, 0, 330, 0, 505, [[0, '#7f95ad'], [1, '#c9d7e6']]); ctx.fill();
-  const flaque = ctx.createRadialGradient(w / 2, 420, 20, w / 2, 420, 330);
-  flaque.addColorStop(0, 'rgba(255,255,240,0.45)'); flaque.addColorStop(1, 'rgba(255,255,240,0)');
-  ctx.fillStyle = flaque; ctx.fill();
-  // logo au centre du tapis
-  ctx.save(); ctx.translate(w / 2, 420); ctx.scale(1, 0.28);
-  ctx.strokeStyle = 'rgba(40,60,110,0.45)'; ctx.lineWidth = 10;
-  ctx.beginPath(); ctx.arc(0, 0, 200, 0, Math.PI * 2); ctx.stroke();
-  ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0, 0, 170, 0, Math.PI * 2); ctx.stroke();
-  ctx.restore();
-  ctx.fillStyle = 'rgba(40,60,110,0.45)'; ctx.font = 'bold italic 34px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText("BRACASS' GYM", w / 2, 422);
+  // tapis bleu vu d'en haut (en perspective)
+  ctx.beginPath(); ctx.moveTo(80, 330); ctx.lineTo(w - 80, 330); ctx.lineTo(w + 120, h); ctx.lineTo(-120, h); ctx.closePath();
+  ctx.fillStyle = degrade(ctx, 0, 330, 0, h, [[0, '#2a55b0'], [1, '#4f8ce6']]); ctx.fill();
+  const lumiere = ctx.createRadialGradient(w / 2, 450, 30, w / 2, 450, 420);
+  lumiere.addColorStop(0, 'rgba(255,255,255,0.28)'); lumiere.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = lumiere; ctx.fill();
+  // grand logo circulaire au centre du tapis
+  const cx = w / 2, cy = 455, rx = 300, ry = 78;
+  ctx.fillStyle = 'rgba(20,40,110,0.45)';
+  ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 6;
+  ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(cx, cy, rx - 46, ry - 14, 0, 0, Math.PI * 2); ctx.stroke();
+  // texte en arc : "BRACASS' CIRCUIT"
+  const mot = "BRACASS'  CIRCUIT";
+  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 26px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (let k = 0; k < mot.length; k++) {
+    const a = Math.PI * 1.18 + (k / (mot.length - 1)) * Math.PI * 0.64;
+    const x = cx + Math.cos(a) * (rx - 23), y = cy + Math.sin(a) * (ry - 7);
+    // lettre posée sur l'ellipse, tournée selon la courbe (aplatie par la perspective)
+    const angle = Math.atan2(Math.cos(a) * ry, -Math.sin(a) * rx) + Math.PI;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(angle * 0.5); ctx.scale(1, 0.7); ctx.fillText(mot[k], 0, 0); ctx.restore();
+  }
+  // étoiles dans le logo
+  ctx.fillStyle = '#ffd84a';
+  for (const [x, y] of [[cx - 120, cy + 30], [cx, cy + 40], [cx + 120, cy + 30]]) {
+    ctx.beginPath();
+    for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 5 : 12; ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r * 0.6); }
+    ctx.closePath(); ctx.fill();
+  }
+  // bord du ring (le "tablier" du fond)
+  ctx.fillStyle = degrade(ctx, 0, 318, 0, 334, [[0, '#d8dde8'], [1, '#8a93a8']]);
+  ctx.fillRect(80, 320, w - 160, 12);
   // poteaux et coussins de coin
-  for (const [x, couleur] of [[104, '#c0392b'], [w - 104, '#2c6fbf']]) {
-    ctx.beginPath(); ctx.roundRect(x - 9, 190, 18, 148, 4);
-    remplir(ctx, degrade(ctx, x - 9, 0, x + 9, 0, [[0, '#888'], [0.4, '#eee'], [1, '#555']]), 2);
-    ctx.beginPath(); ctx.roundRect(x - 15, 200, 30, 112, 10);
-    remplir(ctx, degrade(ctx, x - 15, 0, x + 15, 0, [[0, teinte(couleur, -0.4)], [0.4, teinte(couleur, 0.3)], [1, teinte(couleur, -0.5)]]), 2);
+  for (const [x, couleur] of [[78, '#d0302a'], [w - 78, '#2c6fd0']]) {
+    ctx.beginPath(); ctx.roundRect(x - 11, 170, 22, 165, 5);
+    remplir(ctx, degrade(ctx, x - 11, 0, x + 11, 0, [[0, '#777'], [0.4, '#f2f2f2'], [1, '#444']]), 2);
+    ctx.beginPath(); ctx.roundRect(x - 17, 185, 34, 120, 12);
+    remplir(ctx, degrade(ctx, x - 17, 0, x + 17, 0, [[0, teinte(couleur, -0.45)], [0.4, teinte(couleur, 0.35)], [1, teinte(couleur, -0.5)]]), 2);
   }
-  // cordes (cylindres légèrement détendus)
-  ['#e74c3c', '#f2f2f2', '#2f86d6'].forEach((c, i) => {
-    const y = 216 + i * 36;
+  // cordes (blanche, rose, blanche), légèrement détendues
+  ['#f4f4f4', '#ff6f9a', '#f4f4f4'].forEach((c, i) => {
+    const y = 200 + i * 38;
     ctx.lineCap = 'round';
-    ctx.strokeStyle = CONTOUR; ctx.lineWidth = 9;
-    ctx.beginPath(); ctx.moveTo(118, y); ctx.quadraticCurveTo(w / 2, y + 7, w - 118, y); ctx.stroke();
-    ctx.strokeStyle = c; ctx.lineWidth = 6; ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(118, y - 2); ctx.quadraticCurveTo(w / 2, y + 5, w - 118, y - 2); ctx.stroke();
+    ctx.strokeStyle = CONTOUR; ctx.lineWidth = 11;
+    ctx.beginPath(); ctx.moveTo(94, y); ctx.quadraticCurveTo(w / 2, y + 9, w - 94, y); ctx.stroke();
+    ctx.strokeStyle = c; ctx.lineWidth = 7; ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(94, y - 2); ctx.quadraticCurveTo(w / 2, y + 7, w - 94, y - 2); ctx.stroke();
   });
-  // tablier du ring (devant)
-  ctx.fillStyle = degrade(ctx, 0, 500, 0, h, [[0, '#2f47a8'], [1, '#14215c']]); ctx.fillRect(0, 500, w, h - 500);
-  ctx.fillStyle = '#ffd84a'; ctx.fillRect(0, 500, w, 4);
-  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 18px monospace';
-  ctx.fillText("BRACASS' BOXING CLUB  ·  CHAMPIONNAT DES BOSS", w / 2, 526);
-  // cônes de lumière
-  ctx.save(); ctx.globalCompositeOperation = 'lighter';
-  for (const x of [220, 480, 740]) {
-    ctx.fillStyle = degrade(ctx, 0, 0, 0, h, [[0, 'rgba(255,245,200,0.13)'], [1, 'rgba(255,245,200,0.02)']]);
-    ctx.beginPath(); ctx.moveTo(x - 18, 24); ctx.lineTo(x + 18, 24); ctx.lineTo(x + 190, h); ctx.lineTo(x - 190, h); ctx.fill();
-  }
-  ctx.restore();
   // vignette
-  const v = ctx.createRadialGradient(w / 2, h * 0.55, h * 0.35, w / 2, h * 0.55, w * 0.7);
-  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.55)');
+  const v = ctx.createRadialGradient(w / 2, h * 0.6, h * 0.4, w / 2, h * 0.6, w * 0.75);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.45)');
   ctx.fillStyle = v; ctx.fillRect(0, 0, w, h);
+}
+
+// Portrait du héros pour le bandeau du haut (vu de face)
+function portraitHeros(ctx, w, h) {
+  const peau = '#f2c9a0';
+  ctx.fillStyle = degrade(ctx, 0, 0, 0, h, [[0, '#1d6fd1'], [1, '#0b2a5c']]); ctx.fillRect(0, 0, w, h);
+  const cx = w / 2, cy = h * 0.56;
+  ctx.beginPath(); ctx.ellipse(cx, cy, w * 0.3, h * 0.34, 0, 0, Math.PI * 2);
+  const g = ctx.createRadialGradient(cx - 6, cy - 8, 2, cx, cy, w * 0.4);
+  g.addColorStop(0, '#ffe3c6'); g.addColorStop(1, '#d9a77c'); remplir(ctx, g, 2.5);
+  cheveuxPics(ctx, cx, cy - h * 0.12, w * 0.31, '#5a3418', 8, true);
+  ctx.fillStyle = CONTOUR;
+  for (const s of [-1, 1]) {
+    ctx.fillRect(cx + s * w * 0.12 - 3, cy - 2, 6, 7);
+    ctx.fillRect(cx + s * w * 0.12 - 6, cy - 8, 12, 3);
+  }
+  ctx.strokeStyle = CONTOUR; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(cx - 6, cy + h * 0.2); ctx.lineTo(cx + 6, cy + h * 0.19); ctx.stroke();
+  ctx.strokeStyle = '#ffd84a'; ctx.lineWidth = 3; ctx.strokeRect(1.5, 1.5, w - 3, h - 3);
 }
 
 // =====================================================================
@@ -866,4 +899,4 @@ function gantSeul(ctx, w, h, p) {
   gant(ctx, w / 2, h * 0.44, w * 0.36, p.gants, Math.PI / 2, p.poignets, 1, p.croix);
 }
 
-export const FORMES = { gantSeul, rect, cercle, badge, perso, porte, dalle, mur, boxeurFace, boxeurDos, ring, coach };
+export const FORMES = { portraitHeros, gantSeul, rect, cercle, badge, perso, porte, dalle, mur, boxeurFace, boxeurDos, ring, coach };

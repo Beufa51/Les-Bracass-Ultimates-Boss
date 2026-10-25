@@ -30,7 +30,8 @@ const COULEUR_ALERTE = { tete: '#ffd84a', corps: '#5ad1ff', smash: '#ff3b3b' };
 // Points d'impact à l'écran
 const VISAGE_GREG = { x: R.centreX, y: 150 };
 const CORPS_GREG = { x: R.centreX, y: 270 };
-const TETE_JOUEUR_Y = 330;
+const TETE_JOUEUR_Y = 405;       // tête de ton boxeur à l'écran
+const VENTRE_JOUEUR = 70;        // le ventre est un peu plus bas
 // Boutons tactiles : pendant le combat / sur les écrans à valider
 const ETIQUETTES_COMBAT = { haut: null, bas: '▼\nGarde', espace: 'Visage', z: 'Corps', x: 'Dempsey' };
 const ETIQUETTES_OK = { haut: null, bas: null, gauche: null, droite: null, espace: 'OK', z: null, x: null };
@@ -58,7 +59,7 @@ export class GregCombat extends BossScene {
       action: null, esquive: null, esquivePause: 0, garde: false, sonne: 0,
       contreJusqua: -1, reposSouffle: 0, dempsey: null, decalage: 0, tremble: 0,
       sprite: this.add.image(R.centreX, R.piedsJoueur, 'heros_boxe_garde').setOrigin(0.5, 1).setDepth(10)
-        .setScale(R.tailleJoueur).setAlpha(0.88),   // un peu transparent pour bien voir Greg
+        .setScale(R.tailleJoueur).setAlpha(R.transparenceJoueur),   // transparent pour bien voir Greg
     };
     this.g = {
       vie: 100, souffle: 100, downs: 0, fureur: 1, secousse: 0, combo: 0, couvert: 0,
@@ -384,7 +385,7 @@ export class GregCombat extends BossScene {
     // gant blanc qui fonce vers l'écran (seulement s'il n'y a pas d'image de coup)
     if (this.illustre && !this.textures.exists('greg_coup_visage')) this.gantVolant(at, j.esquive && j.esquive.t <= R.esquiveProtege && at.cible !== 'corps' ? j.esquive.cote : 0);
     this.alerte.setVisible(false);
-    const xImpact = R.centreX + j.decalage, yImpact = at.cible === 'corps' ? TETE_JOUEUR_Y + 90 : TETE_JOUEUR_Y;
+    const xImpact = R.centreX + j.decalage, yImpact = at.cible === 'corps' ? TETE_JOUEUR_Y + VENTRE_JOUEUR : TETE_JOUEUR_Y;
 
     // esquive réussie = partir du côté OPPOSÉ au coup (coup venant de gauche => esquive à droite)
     const bonCote = at.cote === 'centre' || !at.cote || (j.esquive && j.esquive.cote === (at.cote === 'g' ? 1 : -1));
@@ -432,7 +433,7 @@ export class GregCombat extends BossScene {
   // Le gros gant blanc de Greg qui fonce vers l'écran (vue Punch-Out)
   gantVolant(at, esquive) {
     const depart = at.cible === 'smash' ? [R.centreX + 30, 330] : (at.cible === 'corps' ? [R.centreX + 70, 290] : [R.centreX + 80, 170]);
-    const arrivee = at.cible === 'corps' ? [R.centreX, 430] : [R.centreX, TETE_JOUEUR_Y - (at.cible === 'smash' ? 40 : 0)];
+    const arrivee = at.cible === 'corps' ? [R.centreX, TETE_JOUEUR_Y + VENTRE_JOUEUR] : [R.centreX, TETE_JOUEUR_Y - (at.cible === 'smash' ? 40 : 0)];
     // si tu as esquivé, le gant passe à côté (du côté opposé)
     if (esquive) arrivee[0] -= esquive * 260;
     const gt = this.add.image(depart[0], depart[1], 'greg_gant').setDepth(20).setScale(0.35)
@@ -1004,7 +1005,7 @@ export class GregCombat extends BossScene {
     if (this.etat !== 'combat' || g.etat !== 'prepare' || !g.attaque || this.j.dempsey) return;
     const at = g.attaque, avance = Phaser.Math.Clamp(g.t / g.prepa, 0, 1);
     const couleur = at.cible === 'corps' ? 0x5ad1ff : (at.cible === 'smash' ? 0xff3b3b : 0xffd84a);
-    const x = R.centreX, y = at.cible === 'corps' ? TETE_JOUEUR_Y + 95 : TETE_JOUEUR_Y - 10;
+    const x = R.centreX, y = at.cible === 'corps' ? TETE_JOUEUR_Y + VENTRE_JOUEUR : TETE_JOUEUR_Y - 10;
     const r = 24 + 80 * (1 - avance);
     c.lineStyle(5, couleur, 0.9).strokeCircle(x, y, r);
     c.lineStyle(2, couleur, 0.9).strokeCircle(x, y, 20);
@@ -1027,12 +1028,16 @@ export class GregCombat extends BossScene {
     this.grVitesse = this.add.graphics().setDepth(5);
     this.grDempsey = this.add.graphics().setDepth(35);
     this.texteCombo = texte(this, R.centreX, 370, '', 30, '#ffd84a').setDepth(36).setVisible(false);
-    texte(this, 30, 22, 'TOI', 18, '#3fa7ff').setOrigin(0, 0.5).setDepth(41);
-    texte(this, LARGEUR - 30, 22, 'GREG', 18, '#ff5a6e').setOrigin(1, 0.5).setDepth(41);
-    this.texteRound = texte(this, LARGEUR / 2, 20, '', 18, '#ffffff').setDepth(41);
-    this.texteTemps = texte(this, LARGEUR / 2, 50, '', 30, '#ffd84a').setDepth(41);
+    // portraits (façon Super Punch-Out)
+    this.add.image(38, 38, 'heros_portrait').setDepth(41).setDisplaySize(60, 60);
+    this.add.image(LARGEUR - 38, 38, 'greg_visage').setDepth(41).setDisplaySize(60, 60);
+    this.hudCadre = this.add.graphics().setDepth(42);
+    this.hudCadre.lineStyle(3, 0xffd84a, 1).strokeRect(LARGEUR - 68, 8, 60, 60);
+    texte(this, LARGEUR / 2, 24, 'VS', 30, '#ffd84a', { fontStyle: 'bold italic', stroke: '#b3202c', strokeThickness: 6 }).setDepth(41);
+    this.texteTemps = texte(this, LARGEUR / 2, 56, '', 24, '#ffffff').setDepth(41);
+    this.texteRound = texte(this, LARGEUR / 2, 80, '', 13, '#cccccc').setDepth(41);
     this.texteGarde = texte(this, LARGEUR - 30, 92, '', 14, '#cccccc').setOrigin(1, 0.5).setDepth(41);
-    texte(this, 30, 62, 'ESPRIT', 12, '#ffd84a').setOrigin(0, 0.5).setDepth(41);
+    texte(this, 120, 76, 'ESPRIT', 12, '#ffd84a').setOrigin(1, 0.5).setDepth(41);
     this.texteDempsey = texte(this, 80, 98, estTactile() ? 'Dempsey : DEMPSEY ROLL !' : 'X : DEMPSEY ROLL !', 18, '#ffd84a').setOrigin(0, 0.5).setDepth(41).setVisible(false);
   }
 
@@ -1046,6 +1051,7 @@ export class GregCombat extends BossScene {
       h.fillStyle(couleur, 1).fillRect(versGauche ? x + l * (1 - part) : x, y, l * part, hauteur);
     };
     const couleurVie = (v) => v > 50 ? 0x4cd964 : (v > 25 ? 0xffcc00 : 0xff3b30);
+    h.fillStyle(0x000000, 0.6).fillRect(0, 0, LARGEUR, 90);   // bandeau du haut
     barre(80, 14, 300, 18, j.vie / 100, couleurVie(j.vie), false);
     barre(80, 38, 300, 7, j.souffle / 100, 0x5ad1ff, false);
     barre(LARGEUR - 380, 14, 300, 18, g.vie / 100, couleurVie(g.vie), true);
@@ -1056,7 +1062,7 @@ export class GregCombat extends BossScene {
 
     const plein = j.esprit >= 100;
     const clignote = plein && Math.floor(this.time.now / 150) % 2;
-    barre(80, 55, 300, 13, j.esprit / 100, clignote ? 0xffffff : 0xffd84a, false);
+    barre(128, 70, 252, 12, j.esprit / 100, clignote ? 0xffffff : 0xffd84a, false);
     const dempseyPret = plein && this.etat === 'combat' && !j.dempsey;
     this.texteDempsey.setVisible(dempseyPret);
     // sur mobile, le bouton Dempsey n'apparaît que quand la jauge est pleine
@@ -1066,7 +1072,8 @@ export class GregCombat extends BossScene {
     }
 
     this.texteRound.setText(`ROUND ${this.round} / ${R.nbRounds}`);
-    this.texteTemps.setText(String(Math.max(0, Math.ceil(this.tempsRound ?? R.dureeRound))));
+    const reste = Math.max(0, Math.ceil(this.tempsRound ?? R.dureeRound));
+    this.texteTemps.setText(`TIME ${Math.floor(reste / 60)}'${String(reste % 60).padStart(2, '0')}`);
     this.texteGarde.setText(g.etat === 'garde' ? `Garde ${g.garde === 'haute' ? 'HAUTE : vise le corps' : 'BASSE : vise la tête'}` : '');
   }
 }
