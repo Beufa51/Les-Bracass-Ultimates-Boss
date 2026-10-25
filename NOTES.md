@@ -50,7 +50,14 @@
   - 3 coups encaissés d'affilée : Greg se couvre puis riposte.
   - Greg joue des ENCHAÎNEMENTS écrits par round (`ENCHAINEMENTS` dans reglages.js), dans l'ordre,
     et change de garde à la fin de chacun. Avant le SMASH, il tape ses gants (« TAP ! TAP ! »).
-  - Aides : flèche ESQUIVE/GARDE au round 1 seulement, cible qui se resserre aux rounds 1-2.
+  - Aides : flèche ESQUIVE/GARDE et cible qui se resserre, à tous les rounds (réglables : aideFleche, aideCible).
+  - Jauge d'esprit : ne se remplit QU'avec les esquives réussies.
+  - Dempsey Roll : deux cibles ◀ / ▶, un anneau blanc se resserre sur celle à frapper, bip au bon moment ;
+    3 ratés pardonnés.
+  - Moment secret : à 32 s de la fin de chaque round, Greg baisse la garde et nargue (« Allez, frappe ! »).
+    Le frapper à ce moment = COUP SECRET (tapis direct) la 1re fois, puis dégâts x3.
+  - Au tapis : alterner ◀ ▶ pour se relever.
+  - Fin : classement S/A/B/C (coups reçus, tapis, temps) + record gardé dans le navigateur.
   - Esquive : protège 0,45 s ; « Trop tôt ! » / « Mauvais côté ! » s'affichent ; le coach commente
     tes erreurs entre les rounds. Garde avec souffle à 0 = garde brisée.
   - Hit-stop (image figée 60-150 ms) à chaque impact, zoom sur les contres, vibration sur mobile.

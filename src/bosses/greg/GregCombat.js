@@ -51,6 +51,7 @@ export class GregCombat extends BossScene {
     this.stats = { donnes: 0, recus: 0 };
     this.statsRound = this.nouvellesStatsRound();
     this.arret = 0;   // hit-stop : image figée un instant à l'impact
+    this.tempsTotal = 0; this.secretFait = false; this.nargueRound = 0;
     this.smashAnnonce = false;
     this.roundsJoues = 0;
 
@@ -98,8 +99,8 @@ export class GregCombat extends BossScene {
       '◀ / ▶ : esquive du côté OPPOSÉ au coup (puis frappe vite = CONTRE !)',
       tactile ? 'Visage : coup au visage      Corps : coup au corps' : 'Espace : coup au VISAGE      Z : coup au CORPS',
       tactile ? '▼ Garde (maintenu) : garde' : 'Bas (maintenu) : garde',
-      tactile ? 'Jauge d\'esprit pleine : Dempsey = DEMPSEY ROLL' : 'Jauge d\'esprit pleine : X = DEMPSEY ROLL',
-      tactile ? 'Au tapis : tape vite sur Visage !' : 'Au tapis : martèle Espace !',
+      tactile ? 'Esquives réussies => jauge d\'esprit => bouton Dempsey' : 'Esquives réussies => jauge d\'esprit => X = DEMPSEY ROLL',
+      'Au tapis : alterne ◀ ▶ très vite pour te relever !',
     ], () => this.presentation(() => this.ouvrirCoin()));
   }
 
@@ -126,6 +127,7 @@ export class GregCombat extends BossScene {
     if (this.etat === 'combat') {
       this.horloge += dt;
       this.tempsRound -= dt;
+      this.tempsTotal += dt;
       if (this.j.dempsey) this.majDempsey(dt);
       else { this.majJoueur(dt); this.majGreg(dt); }
       if (this.etat === 'combat' && this.tempsRound <= 0) this.finDuRound();
@@ -239,6 +241,20 @@ export class GregCombat extends BossScene {
     }
 
     let degats = c.degats;
+    if (g.etat === 'nargue') {
+      if (!this.secretFait) {   // COUP SECRET : il tombe direct
+        this.secretFait = true;
+        flash(this, 0.9, 0xffd84a);
+        this.arreter(0.25);
+        onomatopee(this, R.centreX, 200, 'COUP SECRET !!', 60, '#ffd84a');
+        jouerSon(this, 'greg_coup_fort', { rate: 0.7 });
+        this.blesserGreg(g.vie);
+        return;
+      }
+      degats *= R.nargue.multiplicateur;
+      onomatopee(this, xImpact, yImpact - 50, 'BIEN VU !!', 46, '#ffd84a');
+      this.arreter(R.arretImpact.contre);
+    }
     if (contre) {
       degats *= R.contreMultiplicateur;
       j.contreJusqua = -1;
@@ -310,11 +326,17 @@ export class GregCombat extends BossScene {
       case 'garde': {
         g.souffle = Math.min(100, g.souffle + R.souffleGregRecup * dt);
         g.pause -= dt;
-        if (g.pause <= 0) this.choisirAttaque();
+        if (g.pause <= 0) {
+          if (this.nargueRound !== this.round && this.tempsRound <= R.nargue.aSeconde && g.finSeq) this.narguer();
+          else this.choisirAttaque();
+        }
         break;
       }
       case 'prepare':
         if (g.t >= g.prepa) this.impactGreg();
+        break;
+      case 'nargue':
+        if (g.t >= R.nargue.duree) this.retourGardeGreg();
         break;
       case 'frappe':   // très court : on montre le coup, puis la suite
         if (g.t >= 0.14) {
@@ -374,6 +396,16 @@ export class GregCombat extends BossScene {
         this.figer(1.0, () => e.fermer());
       }
     }
+  }
+
+  // Moment secret : il baisse la garde et te nargue. Frappe-le maintenant !
+  narguer() {
+    const g = this.g;
+    this.nargueRound = this.round;
+    g.etat = 'nargue'; g.t = 0; g.attaque = null;
+    this.alerte.setVisible(false);
+    bulle(this, R.centreX + 210, 120, 'Greg : « Allez, vas-y, frappe ! »', R.nargue.duree * 1000);
+    onomatopee(this, R.centreX - 160, 150, 'Hé hé...', 26, '#ffd84a');
   }
 
   // De quel côté de l'écran part le coup : 'g' (gauche), 'd' (droite) ; le SMASH part du centre
@@ -519,7 +551,7 @@ export class GregCombat extends BossScene {
     if (!this.texteAideDempsey) {
       this.texteAideDempsey = texte(this, R.centreX, 375, '', 20, '#ffd84a', { lineSpacing: 4 }).setDepth(46);
     }
-    this.texteAideDempsey.setText('Appuie sur ▶ pour lancer le roll !\nEnsuite : ◀ quand la boule arrive à GAUCHE, ▶ à DROITE').setVisible(true);
+    this.texteAideDempsey.setText('Appuie sur ▶ pour lancer le roll !\nPuis frappe ◀ / ▶ quand l\'anneau blanc touche la cible (au bip)').setVisible(true);
   }
 
   // Le "∞" : x de -1 à 1, droite quand phi = 0, gauche quand phi = PI
@@ -559,6 +591,10 @@ export class GregCombat extends BossScene {
     const coteDemi = d.demi % 2 === 0 ? 'd' : 'g';
     const centre = coteDemi === 'd' ? 0 : Math.PI;
     const ecart = Math.abs(Phaser.Math.Angle.Wrap(d.phi - centre));
+    if (d.bip !== d.demi && Phaser.Math.Angle.Wrap(d.phi - centre) >= 0) {   // bip du métronome
+      d.bip = d.demi;
+      jouerSon(this, 'greg_compte', { rate: 1.4 });
+    }
 
     // Greg contre : il faut freiner avec la garde (▼) au bon moment
     if (d.contre) {
@@ -656,6 +692,7 @@ export class GregCombat extends BossScene {
     const gr = this.grDempsey, fond = this.grVitesse, d = this.j.dempsey;
     gr.clear(); fond.clear();
     this.texteCombo.setVisible(false);
+    if (this.texteFlechesDempsey) this.texteFlechesDempsey.forEach(f => f.setVisible(false));
     if (!d || this.etat !== 'combat') return;
     // lignes de vitesse de plus en plus intenses
     const intensite = Math.min(1, 0.25 + d.coups * 0.08);
@@ -664,32 +701,32 @@ export class GregCombat extends BossScene {
       const ang = Math.random() * Math.PI * 2, r1 = 150 + Math.random() * 80, r2 = 600;
       fond.lineBetween(R.centreX + Math.cos(ang) * r1, 240 + Math.sin(ang) * r1, R.centreX + Math.cos(ang) * r2, 240 + Math.sin(ang) * r2);
     }
-    // piste en "∞"
-    const cx = R.centreX, cy = 455, ax = 210, ay = 140;
-    gr.fillStyle(0x000000, 0.45).fillRoundedRect(cx - ax - 50, cy - 60, (ax + 50) * 2, 120, 20);
-    gr.lineStyle(6, 0xffffff, 0.35).beginPath();
-    for (let t = 0; t <= Math.PI * 2 + 0.05; t += 0.05) {
-      const p = GregCombat.infini(t);
-      t === 0 ? gr.moveTo(cx + p.x * ax, cy + p.y * ay) : gr.lineTo(cx + p.x * ax, cy + p.y * ay);
-    }
-    gr.strokePath();
-    // zones de frappe (celle à viser brille)
+    // deux grosses cibles G / D : un anneau se resserre sur la cible à frapper (frappe quand il la touche)
+    const cx = R.centreX, cy = 455, ecartX = 210;
     const coteDemi = d.demi % 2 === 0 ? 'd' : 'g';
     // erreurs restantes (petits coeurs)
     for (let k = 0; k <= R.dempsey.erreursPermises; k++) {
-      gr.fillStyle(k < R.dempsey.erreursPermises + 1 - d.erreurs ? 0xff5a6e : 0x444444, 1).fillCircle(cx - 20 + k * 20, cy - 46, 6);
+      gr.fillStyle(k < R.dempsey.erreursPermises + 1 - d.erreurs ? 0xff5a6e : 0x444444, 1).fillCircle(cx - 20 + k * 20, cy - 70, 6);
     }
     for (const cote of ['g', 'd']) {
-      const x = cx + (cote === 'd' ? ax : -ax) * 0.98;
+      const x = cx + (cote === 'd' ? ecartX : -ecartX);
       const active = cote === coteDemi && (!d.touche || d.attente > 0);
       const couleur = d.contre && active ? 0xff3b3b : 0xffd84a;
-      gr.lineStyle(4, couleur, active ? 1 : 0.35).strokeCircle(x, cy, 30);
-      gr.fillStyle(couleur, active ? 0.3 : 0.08).fillCircle(x, cy, 30);
+      gr.fillStyle(0x000000, 0.5).fillCircle(x, cy, 46);
+      gr.lineStyle(5, couleur, active ? 1 : 0.3).strokeCircle(x, cy, 40);
+      gr.fillStyle(couleur, active ? 0.35 : 0.08).fillCircle(x, cy, 40);
+      if (active) {
+        const centre = cote === 'd' ? 0 : Math.PI;
+        const avant = Phaser.Math.Angle.Wrap(centre - d.phi);   // > 0 : pas encore arrivé
+        const r = d.attente > 0 ? 40 : 40 + Math.max(0, avant) * 70;
+        gr.lineStyle(6, 0xffffff, 0.95).strokeCircle(x, cy, r);
+        gr.fillStyle(0x1a1014, 1);
+      }
     }
-    // la boule
-    const p = GregCombat.infini(d.phi);
-    gr.fillStyle(d.contre ? 0xff3b3b : 0xffffff, 1).fillCircle(cx + p.x * ax, cy + p.y * ay, 14);
-    gr.lineStyle(3, 0x1a1014, 1).strokeCircle(cx + p.x * ax, cy + p.y * ay, 14);
+    const fleches = this.texteFlechesDempsey || (this.texteFlechesDempsey = [
+      texte(this, cx - ecartX, cy, '◀', 34, '#ffffff').setDepth(36), texte(this, cx + ecartX, cy, '▶', 34, '#ffffff').setDepth(36)]);
+    fleches.forEach(f => f.setVisible(true));
+    if (d.contre) { fleches[coteDemi === 'g' ? 0 : 1].setText('▼'); } else { fleches[0].setText('◀'); fleches[1].setText('▶'); }
     // compteur de coups
     this.texteCombo.setVisible(d.coups > 0).setText(`${d.coups} COUP${d.coups > 1 ? 'S' : ''} !`).setScale(1 + d.coups * 0.04);
   }
@@ -741,7 +778,7 @@ export class GregCombat extends BossScene {
     }
     if (qui === 'joueur') {
       this.barreReleve = this.add.graphics().setDepth(45);
-      this.texteCompte2.setText(estTactile() ? 'VISAGE ! VISAGE ! VISAGE !' : 'ESPACE ! ESPACE ! ESPACE !').setColor('#7fff7f');
+      this.texteCompte2.setText('◀ ▶ ◀ ▶  RELÈVE-TOI !').setColor('#7fff7f');
     }
   }
 
@@ -750,7 +787,8 @@ export class GregCombat extends BossScene {
     c.t += dt;
     if (c.qui === 'joueur') {
       const besoin = R.appuisPourSeRelever[Math.min(this.j.downs, R.appuisPourSeRelever.length) - 1];
-      if (this.appuis.espace) { c.appuis++; this.j.tremble = 0.08; }
+      const cote = this.appuis.gauche ? 'g' : (this.appuis.droite ? 'd' : null);
+      if (cote && cote !== c.dernier) { c.dernier = cote; c.appuis++; this.j.tremble = 0.08; }
       this.barreReleve.clear();
       this.barreReleve.fillStyle(0x000000, 0.7).fillRect(LARGEUR / 2 - 160, 265, 320, 22);
       this.barreReleve.fillStyle(0x7fff7f, 1).fillRect(LARGEUR / 2 - 157, 268, 314 * Math.min(1, c.appuis / besoin), 16);
@@ -769,7 +807,7 @@ export class GregCombat extends BossScene {
       }
       if (c.n >= 10) {
         this.etat = 'fin';
-        if (c.qui === 'greg') this.time.delayedCall(1200, () => this.victoire('K.O. !! Greg reste au tapis. Le Dempsey Roll a parlé !'));
+        if (c.qui === 'greg') this.time.delayedCall(1200, () => this.victoire(this.classement('K.O. !! Greg reste au tapis !', true)));
         else this.time.delayedCall(1200, () => this.defaite('K.O. ! Tu n\'as pas pu te relever avant 10...'));
       }
     }
@@ -896,6 +934,32 @@ export class GregCombat extends BossScene {
     });
   }
 
+  // Classement de fin : rang S / A / B / C + record gardé dans le navigateur
+  classement(debut, ko) {
+    const minutes = Math.floor(this.tempsTotal / 60), sec = Math.floor(this.tempsTotal % 60);
+    let score = 100;
+    score -= Math.min(40, this.stats.recus * 0.4);          // coups reçus
+    score -= this.j.downs * 15;                              // passages au tapis
+    score -= Math.max(0, this.tempsTotal - 60) * 0.15;       // lenteur (après 1 minute)
+    if (!ko) score -= 20;
+    const rang = R.rangs.find(r => score >= r.seuil).rang;
+    const ordre = R.rangs.map(r => r.rang);
+    let record = null;
+    try {
+      const cle = 'bracass_greg_record';
+      record = JSON.parse(localStorage.getItem(cle) || 'null');
+      if (!record || ordre.indexOf(rang) < ordre.indexOf(record.rang) ||
+          (rang === record.rang && this.tempsTotal < record.temps)) {
+        record = { rang, temps: this.tempsTotal };
+        localStorage.setItem(cle, JSON.stringify(record));
+      }
+    } catch (e) { /* ignoré */ }
+    const t = (x) => `${Math.floor(x / 60)}'${String(Math.floor(x % 60)).padStart(2, '0')}`;
+    return `${debut}\nRANG ${rang}   -   temps ${minutes}'${String(sec).padStart(2, '0')}` +
+      (record ? `\nRecord : rang ${record.rang} en ${t(record.temps)}` : '') +
+      (this.secretFait ? '\n(Coup secret trouvé !)' : '');
+  }
+
   // Remarque du coach selon les erreurs du round
   remarqueCoach() {
     const s = this.statsRound;
@@ -949,7 +1013,7 @@ export class GregCombat extends BossScene {
     const e = encart(this, 'DÉCISION DES JUGES...', `Toi : ${Math.round(pointsJoueur)} pts   -   Greg : ${Math.round(pointsGreg)} pts`, '#ffffff', 0x000000);
     this.time.delayedCall(2200, () => {
       e.fermer();
-      if (pointsJoueur > pointsGreg) this.victoire('Victoire aux points ! Greg n\'en revient pas.');
+      if (pointsJoueur > pointsGreg) this.victoire(this.classement('Victoire aux points ! Greg n\'en revient pas.', false));
       else this.defaite('Défaite aux points... Il faut le mettre K.O. !');
     });
   }
@@ -1036,7 +1100,8 @@ export class GregCombat extends BossScene {
       return;
     }
     g.sprite.setVisible(true);
-    if (forcee === 'touche' || g.etat === 'touche') { pose = repos; dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }
+    if (g.etat === 'nargue') { pose = repos; dy = Math.sin(t / 110) * 5; dx = Math.sin(t / 220) * 8; }
+    else if (forcee === 'touche' || g.etat === 'touche') { pose = repos; dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }
     else if (forcee === 'bloque') { pose = existe(haute) ? haute : repos; echelle = 0.97; teinte = 0xc8d4ff; rapide = true; }
     else if (forcee === 'uppercut') { pose = 'visage'; echelle = 1.12; dy = 20; rapide = true; }
     else if (g.etat === 'prepare') {

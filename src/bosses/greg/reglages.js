@@ -60,18 +60,19 @@ export const REGLAGES = {
   contreMultiplicateur: 2.5,   // dégâts du contre : c'est LA stratégie
 
   // ---------- Esprit combatif (jauge du Dempsey Roll) ----------
-  esprit: { coupPorte: 3, esquive: 10, contre: 15, releve: 25 },
-  // Dempsey Roll = jeu de rythme : une boule parcourt un "∞" (le balancement du buste).
-  // Appuie sur ◀ quand elle arrive à gauche, ▶ quand elle arrive à droite.
+  // la jauge ne se remplit QU'avec les esquives réussies (environ 8 esquives pour un Dempsey)
+  esprit: { coupPorte: 0, esquive: 13, contre: 0, releve: 0 },
+  // Dempsey Roll = jeu de rythme : deux cibles ◀ / ▶ ; un anneau se resserre sur celle à frapper,
+  // frappe quand il la touche (un bip marque le bon moment). Ton boxeur balance en "∞".
   // Chaque coup réussi accélère le rythme et frappe plus fort.
   dempsey: {
     coupsMax: 10,              // le 10e coup est le coup final
-    periodeDepart: 1.7,        // secondes pour un tour complet du "∞" au début
+    periodeDepart: 2.0,        // secondes pour un tour complet du "∞" au début
     acceleration: 0.95,        // chaque coup réussi : le tour dure 5 % de moins
-    periodeMin: 0.8,
+    periodeMin: 1.0,
     parfait: 0.45,             // tolérance (en "angle") pour un PARFAIT
     bien: 1.15,                // ... et pour un BIEN (au-delà : raté)
-    erreursPermises: 2,        // ratés pardonnés ; le suivant arrête le roll
+    erreursPermises: 3,        // ratés pardonnés ; le suivant arrête le roll
     attenteMax: 6,             // secondes pour donner le 1er coup (▶) avant que le roll s'annule
     degatsParfait: 3,
     degatsBien: 2,
@@ -83,7 +84,7 @@ export const REGLAGES = {
 
   // ---------- Au tapis ----------
   secondeCompte: 0.9,          // durée d'un chiffre du compte de l'arbitre
-  appuisPourSeRelever: [12, 18, 26],   // 1er, 2e, 3e passage au tapis
+  appuisPourSeRelever: [10, 14, 20],   // alternances ◀ ▶ à faire : 1er, 2e, 3e passage au tapis
   vieApresRelevee: [55, 40, 30],
   knockdownsMax: 3,            // au 3e tapis... c'est fini (pour toi comme pour Greg)
   vieGregApresRelevee: [80, 60],
@@ -103,8 +104,18 @@ export const REGLAGES = {
   // Chaque fois que Greg se relève, il prépare ses coups plus vite
   fureur: 0.92,
   // Aides visuelles par round (round 1 = tutoriel)
-  aideFleche: [true, false, false],   // flèche "ESQUIVE / GARDE"
-  aideCible: [true, true, false],     // cercle qui se resserre là où le coup va frapper
+  aideFleche: [true, true, true],     // flèche "ESQUIVE / GARDE"
+  aideCible: [true, true, true],      // cercle qui se resserre là où le coup va frapper
+
+  // ---------- Moment secret : Greg te nargue, garde baissée ----------
+  // Une fois par round, quand il reste 'aSeconde' secondes : frappe-le pendant qu'il nargue !
+  // La 1re fois du combat = COUP SECRET (il tombe direct) ; ensuite = dégâts x3.
+  nargue: { aSeconde: 32, duree: 1.4, multiplicateur: 3 },
+
+  // ---------- Classement de fin (temps de K.O. + coups reçus + tapis) ----------
+  rangs: [ // du meilleur au moins bon : il faut un score >= au seuil
+    { rang: 'S', seuil: 90 }, { rang: 'A', seuil: 70 }, { rang: 'B', seuil: 45 }, { rang: 'C', seuil: 0 },
+  ],
 
   // ---------- Coups / garde : finitions ----------
   arretImpact: { coup: 0.06, contre: 0.12, recu: 0.15 },   // "hit-stop" : l'image se fige un instant
@@ -158,14 +169,15 @@ export const CONSEILS = [
   ],
   [
     'Son coup part de GAUCHE ? Esquive à DROITE (et inversement) !',
-    'Et il répète toujours les mêmes enchaînements : apprends-les !',
+    'Il répète toujours les mêmes enchaînements : apprends-les !',
+    'Et s\'il baisse la garde pour te narguer... FRAPPE !',
     '...et tu CONTRES tout de suite derrière : dégâts x2 !',
-    'Jauge d\'esprit pleine ? DEMPSEY ROLL : frappe ◀ ▶ au rythme de la boule !',
+    'Chaque esquive réussie remplit ta jauge d\'esprit. Pleine ? DEMPSEY ROLL !',
   ],
   [
     'Attention à son SMASH (le gros "!!" rouge) :',
     'ESQUIVE sur le côté ! La garde ne suffit pas.',
-    'Dempsey Roll : s\'il contre (boule ROUGE), GARDE (▼) pour freiner net !',
+    'Dempsey Roll : s\'il contre (cible ROUGE ▼), GARDE (▼) pour freiner net !',
   ],
 ];
 

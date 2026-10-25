@@ -59,7 +59,7 @@ export class BossScene extends Phaser.Scene {
     voile(this, 0.8).setDepth(1000);
     texte(this, LARGEUR / 2, 170, titre, 56, couleur).setDepth(1001);
     texte(this, LARGEUR / 2, 270, message, 24, '#ffffff', { wordWrap: { width: 800 } }).setDepth(1001);
-    if (gagne) this.add.image(LARGEUR / 2, 360, 'badge_' + this.identite.id).setScale(2).setDepth(1001);
+    if (gagne) this.add.image(LARGEUR / 2, 400, 'badge_' + this.identite.id).setScale(2).setDepth(1001);
     texte(this, LARGEUR / 2, HAUTEUR - 60, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, 20, '#aaaaaa').setDepth(1001);
     // petit délai pour ne pas sauter l'écran par accident
     this.time.delayedCall(600, () => {
