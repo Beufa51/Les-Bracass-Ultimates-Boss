@@ -27,6 +27,8 @@
   garde basse `greg_combat.png`, garde haute `greg_garde_haute.png`, coup au corps `greg_coup_corps.png`,
   coup au visage `greg_coup_visage.png`, K.O. `greg_ko.png` (originaux dans `assets_inbox/`).
   Chaque image est calée sur la tête (réglages `illustre` dans `src/bosses/greg/reglages.js`).
+  Greg est vu en entier : ses jambes (`greg_jambes.png`, tirées de `assets_inbox/greg_entier.jpg`)
+  restent posées sur le tapis sous le haut du corps.
   Quand il prépare un coup, on voit l'image du coup grossir vers toi avant l'impact.
   L'illustration complète sert aussi pour la présentation (`greg_portrait`) et l'annonce du SMASH (`greg_visage`).
 - Bruitages du combat : générés par `outils/generer_sons.py` (Python + numpy) dans `assets/audio/`.

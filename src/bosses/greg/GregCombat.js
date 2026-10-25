@@ -28,8 +28,8 @@ const POSE_FRAPPE = { jab: 'jab', crochet: 'crochet', corps: 'corps', rafale: 'j
 const POSE_PREPA = { tete: 'prepare', corps: 'prepare_bas', smash: 'prepare_smash' };
 const COULEUR_ALERTE = { tete: '#ffd84a', corps: '#5ad1ff', smash: '#ff3b3b' };
 // Points d'impact à l'écran
-const VISAGE_GREG = { x: R.centreX, y: 150 };
-const CORPS_GREG = { x: R.centreX, y: 270 };
+const VISAGE_GREG = { x: R.centreX, y: 140 };
+const CORPS_GREG = { x: R.centreX, y: 215 };
 const TETE_JOUEUR_Y = 405;       // tête de ton boxeur à l'écran
 const VENTRE_JOUEUR = 70;        // le ventre est un peu plus bas
 // Boutons tactiles : pendant le combat / sur les écrans à valider
@@ -71,6 +71,10 @@ export class GregCombat extends BossScene {
     // Si l'illustration détourée de Greg existe, on l'utilise (sinon : les poses dessinées par le code)
     this.illustre = this.textures.exists('greg_combat');
     if (this.illustre) this.g.sprite.setTexture('greg_combat');
+    // jambes de Greg (posées sur le tapis, sous le haut du corps)
+    const J = R.illustre.jambes;
+    this.g.jambes = this.illustre && this.textures.exists(J.cle)
+      ? this.add.image(R.centreX, J.y, J.cle).setOrigin(J.origine[0], J.origine[1]).setScale(J.taille).setDepth(8.9) : null;
     this.zoneGarde = this.add.graphics().setDepth(9.5);
     this.aura = this.add.graphics().setDepth(8);        // aura bleue derrière Greg (coup au corps)
     this.cible = this.add.graphics().setDepth(25);      // cible qui se resserre là où le coup va frapper
@@ -983,6 +987,10 @@ export class GregCombat extends BossScene {
     if (pose === 'ko') sp.setPosition(R.centreX, I.yAuSol).setScale(P.taille).setAngle(0);
     else sp.setPosition(I.teteX + v.dx + secousse, I.teteY + v.dy).setScale(P.taille * v.echelle).setAngle(v.angle);
     if (teinte) sp.setTint(teinte); else sp.clearTint();
+    if (g.jambes) {   // les jambes suivent un peu le buste, mais restent plantées
+      g.jambes.setVisible(pose !== 'ko').setX(I.teteX + v.dx * 0.35 + secousse * 0.3);
+      if (teinte) g.jambes.setTint(teinte); else g.jambes.clearTint();
+    }
 
     this.dessinerCibleEtAura();
 
@@ -1014,7 +1022,7 @@ export class GregCombat extends BossScene {
     if (at.cible === 'corps') {
       // aura bleue qui pulse autour de Greg + traits qui montent
       const pulse = 0.5 + Math.sin(t / 70) * 0.5;
-      a.fillStyle(0x5ad1ff, 0.12 + pulse * 0.12).fillEllipse(R.centreX + this.g.vis.dx, 270, 330, 300);
+      a.fillStyle(0x5ad1ff, 0.12 + pulse * 0.12).fillEllipse(R.centreX + this.g.vis.dx, 290, 280, 430);
       a.lineStyle(3, 0x9fe6ff, 0.6);
       for (let k = 0; k < 10; k++) {
         const lx = R.centreX - 150 + ((k * 37 + t / 3) % 300), ly = 380 - ((t / 2 + k * 53) % 220);
@@ -1051,7 +1059,7 @@ export class GregCombat extends BossScene {
       h.fillStyle(couleur, 1).fillRect(versGauche ? x + l * (1 - part) : x, y, l * part, hauteur);
     };
     const couleurVie = (v) => v > 50 ? 0x4cd964 : (v > 25 ? 0xffcc00 : 0xff3b30);
-    h.fillStyle(0x000000, 0.6).fillRect(0, 0, LARGEUR, 90);   // bandeau du haut
+    h.fillStyle(0x000000, 0.6).fillRect(0, 0, LARGEUR, 86);   // bandeau du haut
     barre(80, 14, 300, 18, j.vie / 100, couleurVie(j.vie), false);
     barre(80, 38, 300, 7, j.souffle / 100, 0x5ad1ff, false);
     barre(LARGEUR - 380, 14, 300, 18, g.vie / 100, couleurVie(g.vie), true);

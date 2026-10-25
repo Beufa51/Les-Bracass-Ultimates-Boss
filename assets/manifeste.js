@@ -63,6 +63,7 @@ export const MANIFESTE = {
     greg_garde_haute: { fichier: 'sprites/greg/greg_garde_haute.png', largeur: 343, hauteur: 517, images: 1, vitesse: 1 },
     greg_coup_corps:  { fichier: 'sprites/greg/greg_coup_corps.png', largeur: 380, hauteur: 519, images: 1, vitesse: 1 },
     greg_coup_visage: { fichier: 'sprites/greg/greg_coup_visage.png', largeur: 439, hauteur: 524, images: 1, vitesse: 1 },
+    greg_jambes:      { fichier: 'sprites/greg/greg_jambes.png', largeur: 327, hauteur: 359, images: 1, vitesse: 1 },
     greg_ko:          { fichier: 'sprites/greg/greg_ko.png', largeur: 341, hauteur: 410, images: 1, vitesse: 1 },
     greg_gant:     { fichier: null, largeur: 220, hauteur: 220, images: 1, vitesse: 1,
       provisoire: { forme: 'gantSeul', gants: '#f4f4f4', poignets: '#f4f4f4', croix: true } },

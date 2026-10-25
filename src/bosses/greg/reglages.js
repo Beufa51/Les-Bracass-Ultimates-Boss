@@ -20,12 +20,15 @@ export const REGLAGES = {
   //   origine = position de la tête dans l'image (0 à 1), taille = grossissement à l'écran
   illustre: {
     //   cote = côté de l'écran d'où part le gant sur l'image (elle est retournée pour l'autre côté)
-    teteX: 480, teteY: 122, yAuSol: 285,
+    // Greg est vu EN ENTIER (comme dans Punch-Out) : le haut du corps change selon l'action,
+    // les jambes (greg_jambes) restent posées sur le tapis en dessous.
+    teteX: 480, teteY: 118, yAuSol: 285,
+    jambes: { cle: 'greg_jambes', origine: [0.461, 1], taille: 0.70, y: 500 },
     poses: {
-      basse:  { cle: 'greg_combat',      origine: [0.467, 0.134], taille: 0.74 },
-      haute:  { cle: 'greg_garde_haute', origine: [0.584, 0.18],  taille: 0.69 },
-      corps:  { cle: 'greg_coup_corps',  origine: [0.3, 0.154],   taille: 0.61, cote: 'd' },
-      visage: { cle: 'greg_coup_visage', origine: [0.633, 0.19],  taille: 0.54, cote: 'g' },
+      basse:  { cle: 'greg_combat',      origine: [0.467, 0.134], taille: 0.382 },
+      haute:  { cle: 'greg_garde_haute', origine: [0.584, 0.18],  taille: 0.368 },
+      corps:  { cle: 'greg_coup_corps',  origine: [0.3, 0.154],   taille: 0.355, cote: 'd' },
+      visage: { cle: 'greg_coup_visage', origine: [0.633, 0.19],  taille: 0.40,  cote: 'g' },
       ko:     { cle: 'greg_ko',          origine: [0.5, 0.5],     taille: 0.52 },
     },
     debutElan: 0.2,    // à partir de ce moment de la préparation, on voit le coup partir
