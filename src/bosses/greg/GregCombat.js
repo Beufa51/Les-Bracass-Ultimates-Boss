@@ -28,7 +28,7 @@ const POSE_FRAPPE = { jab: 'jab', crochet: 'crochet', corps: 'corps', rafale: 'j
 const POSE_PREPA = { tete: 'prepare', corps: 'prepare_bas', smash: 'prepare_smash' };
 const COULEUR_ALERTE = { tete: '#ffd84a', corps: '#5ad1ff', smash: '#ff3b3b' };
 // Points d'impact à l'écran
-const VISAGE_GREG = { x: R.centreX, y: 140 };
+const VISAGE_GREG = { x: R.centreX, y: 150 };
 const CORPS_GREG = { x: R.centreX, y: 270 };
 const TETE_JOUEUR_Y = 330;
 // Boutons tactiles : pendant le combat / sur les écrans à valider
@@ -72,6 +72,8 @@ export class GregCombat extends BossScene {
     if (this.illustre) this.g.sprite.setTexture('greg_combat');
     this.zoneGarde = this.add.graphics().setDepth(9.5);
     this.alerte = texte(this, R.centreX + 150, 150, '!', 60, '#ffd84a').setDepth(30).setVisible(false);
+    // grosse flèche "où esquiver" pendant que Greg prépare son coup
+    this.flecheEsquive = texte(this, R.centreX, 300, '', 40, '#ffd84a', { lineSpacing: 2 }).setDepth(31).setVisible(false);
     this.aideContre = texte(this, R.centreX, 250, 'CONTRE !', 28, '#ff8a3d').setDepth(30).setVisible(false);
 
     this.creerHud();
@@ -83,7 +85,7 @@ export class GregCombat extends BossScene {
     etiquettesTactiles(ETIQUETTES_OK);
     const tactile = estTactile();
     this.afficherIntro('GREG - Le Boxeur', [
-      '◀ / ▶ : esquive (puis frappe vite = CONTRE !)',
+      '◀ / ▶ : esquive du côté OPPOSÉ au coup (puis frappe vite = CONTRE !)',
       tactile ? 'Visage : coup au visage      Corps : coup au corps' : 'Espace : coup au VISAGE      Z : coup au CORPS',
       tactile ? '▼ Garde (maintenu) : garde' : 'Bas (maintenu) : garde',
       tactile ? 'Jauge d\'esprit pleine : Dempsey = DEMPSEY ROLL' : 'Jauge d\'esprit pleine : X = DEMPSEY ROLL',
@@ -307,7 +309,11 @@ export class GregCombat extends BossScene {
       case 'frappe':   // très court : on montre le coup, puis la suite
         if (g.t >= 0.14) {
           const at = g.attaque;
-          if (at.coups && g.coupIndex < at.coups) { g.etat = 'prepare'; g.t = 0; g.prepa = at.entre * g.fureur; this.montrerAlerte(); }
+          if (at.coups && g.coupIndex < at.coups) {
+            g.etat = 'prepare'; g.t = 0; g.prepa = at.entre * g.fureur;
+            at.cote = this.coteAuHasard(at);
+            this.montrerAlerte();
+          }
           else { g.etat = 'recup'; g.t = 0; }
         }
         break;
@@ -334,7 +340,7 @@ export class GregCombat extends BossScene {
     const g = this.g;
     const nom = auHasard(ATTAQUES_PAR_ROUND[this.round - 1]);
     const at = ATTAQUES[nom];
-    g.attaque = { id: nom, ...at };
+    g.attaque = { id: nom, ...at, cote: this.coteAuHasard(at) };
     g.coupIndex = 0; g.combo = 0;
     g.etat = 'prepare'; g.t = 0; g.prepa = at.prepa * g.fureur;
     g.souffle -= at.souffle;
@@ -346,10 +352,24 @@ export class GregCombat extends BossScene {
     }
   }
 
+  // De quel côté de l'écran part le coup : 'g' (gauche), 'd' (droite) ; le SMASH part du centre
+  coteAuHasard(at) {
+    return at.cible === 'smash' ? 'centre' : (Math.random() < 0.5 ? 'g' : 'd');
+  }
+
   montrerAlerte() {
     const at = this.g.attaque;
+    // le "!" apparaît du côté d'où part le coup
+    const x = at.cote === 'g' ? R.centreX - 170 : (at.cote === 'd' ? R.centreX + 170 : R.centreX + 150);
     this.alerte.setText(at.cible === 'smash' ? '!!' : (at.cible === 'corps' ? '!\n▼' : '!'))
-      .setColor(COULEUR_ALERTE[at.cible]).setVisible(true).setScale(0.4);
+      .setColor(COULEUR_ALERTE[at.cible]).setVisible(true).setScale(0.4).setPosition(x, 150);
+    // la flèche montre quoi faire
+    const f = this.flecheEsquive;
+    if (at.cible === 'corps') f.setText('▼\nGARDE').setPosition(R.centreX, 285);
+    else if (at.cible === 'smash') f.setText('◀   ▶\nESQUIVE').setPosition(R.centreX, 285);
+    else if (at.cote === 'g') f.setText('▶▶\nESQUIVE').setPosition(R.centreX + 190, 285);
+    else f.setText('◀◀\nESQUIVE').setPosition(R.centreX - 190, 285);
+    f.setColor(COULEUR_ALERTE[at.cible]);
     this.tweens.add({ targets: this.alerte, scale: 1, duration: 120, ease: 'Back.Out' });
     jouerSon(this, 'greg_alerte');
   }
@@ -364,7 +384,10 @@ export class GregCombat extends BossScene {
     this.alerte.setVisible(false);
     const xImpact = R.centreX + j.decalage, yImpact = at.cible === 'corps' ? TETE_JOUEUR_Y + 90 : TETE_JOUEUR_Y;
 
-    const esquive = j.esquive && j.esquive.t <= R.esquiveProtege;
+    // esquive réussie = partir du côté OPPOSÉ au coup (coup venant de gauche => esquive à droite)
+    const bonCote = at.cote === 'centre' || !at.cote || (j.esquive && j.esquive.cote === (at.cote === 'g' ? 1 : -1));
+    const esquive = j.esquive && j.esquive.t <= R.esquiveProtege && bonCote;
+    if (j.esquive && !bonCote && at.cible !== 'corps') onomatopee(this, R.centreX, TETE_JOUEUR_Y - 70, 'Mauvais côté !', 26, '#ff6b6b');
     if (esquive && at.cible !== 'corps') {
       jouerSon(this, 'greg_esquive');
       onomatopee(this, R.centreX - j.esquive.cote * 60, yImpact - 40, ONO.esquive, 34, '#aaffff');
@@ -486,7 +509,7 @@ export class GregCombat extends BossScene {
       d.contre = d.coups === d.contreA;
       if (d.contre) {
         d.contreA = -1;   // un seul contre par Dempsey Roll
-        this.alerte.setText('!!\nGARDE !').setColor('#ff3b3b').setVisible(true);
+        this.alerte.setText('!!\nGARDE !').setColor('#ff3b3b').setVisible(true).setPosition(R.centreX + 170, 150);
         jouerSon(this, 'greg_alerte');
       }
     }
@@ -895,6 +918,8 @@ export class GregCombat extends BossScene {
     else g.sprite.clearTint();
     }
 
+    this.flecheEsquive.setVisible(this.etat === 'combat' && g.etat === 'prepare' && !j.dempsey
+      && Math.floor(this.time.now / 140) % 4 !== 0);   // clignote
     const contre = this.horloge < j.contreJusqua && this.etat === 'combat';
     this.aideContre.setVisible(contre).setPosition(R.centreX + j.decalage, 250);
     this.dessinerDempsey();
@@ -915,14 +940,14 @@ export class GregCombat extends BossScene {
     else if (forcee === 'bloque') { pose = existe('haute') ? 'haute' : 'basse'; echelle = 0.97; teinte = 0xc8d4ff; rapide = true; }
     else if (forcee === 'uppercut') { pose = 'visage'; echelle = 1.12; dy = 20; rapide = true; }
     else if (g.etat === 'prepare') {
-      const c = g.attaque.cible, avance = g.t / g.prepa;
-      if (avance < I.debutElan) {      // il arme son coup : il recule
-        if (c === 'tete') { dx = 26; angle = 5; echelle = 0.96; }
-        else if (c === 'corps') { dx = 20; dy = 16; angle = 3; echelle = 0.96; }
-        else { dy = 34; echelle = 0.93; angle = -3; }
-      } else {                          // le coup part : l'image du coup grossit vers toi
+      const c = g.attaque.cible, avance = g.t / g.prepa, sens = g.attaque.cote === 'g' ? -1 : (g.attaque.cote === 'd' ? 1 : 0);
+      if (avance < I.debutElan) {      // il arme son coup : il penche du côté d'où il va frapper
+        if (c === 'smash') { dy = 34; echelle = 0.93; angle = -3; }
+        else { dx = sens * 34; dy = c === 'corps' ? 16 : 0; angle = sens * 6; echelle = 0.96; }
+      } else {                          // le coup part : l'image du coup grossit vers toi, du bon côté
         const elan = (avance - I.debutElan) / (1 - I.debutElan);
-        pose = imageCoup(c); echelle = 0.85 + elan * 0.2; dy = c === 'smash' ? 30 - elan * 40 : elan * 10; rapide = true;
+        pose = imageCoup(c); echelle = 0.82 + elan * 0.25; dx = sens * 30 * (1 - elan);
+        dy = c === 'smash' ? 30 - elan * 40 : elan * 10; rapide = true;
       }
       if (Math.floor(this.horloge * 10) % 2) teinte = c === 'smash' ? 0xff7070 : (c === 'corps' ? 0xa8e8ff : 0xfff0a0);
     }
@@ -941,7 +966,10 @@ export class GregCombat extends BossScene {
     const secousse = g.secousse > 0 ? Phaser.Math.Between(-8, 8) : 0;
 
     const P = I.poses[pose], sp = g.sprite;
-    sp.setTexture(P.cle).setOrigin(P.origine[0], P.origine[1]);
+    // les images de coup sont retournées si le coup part de l'autre côté
+    const coteCoup = g.attaque && g.attaque.cote;
+    const retourne = !!(P.cote && coteCoup && coteCoup !== 'centre' && coteCoup !== P.cote);
+    sp.setTexture(P.cle).setFlipX(retourne).setOrigin(retourne ? 1 - P.origine[0] : P.origine[0], P.origine[1]);
     if (pose === 'ko') sp.setPosition(R.centreX, I.yAuSol).setScale(P.taille).setAngle(0);
     else sp.setPosition(I.teteX + v.dx + secousse, I.teteY + v.dy).setScale(P.taille * v.echelle).setAngle(v.angle);
     if (teinte) sp.setTint(teinte); else sp.clearTint();

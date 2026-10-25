@@ -34,6 +34,8 @@
 - **Greg** (`src/bosses/greg/`) : combat de boxe en 3 rounds de 60 s.
   - Commandes : ◀ ▶ esquive, Espace = coup au visage, Z = coup au corps, Bas (maintenu) = garde,
     X = Dempsey Roll (quand la jauge d'esprit est pleine).
+  - Les coups au visage partent de GAUCHE ou de DROITE (le « ! », Greg et l'image du coup sont de ce côté) :
+    il faut esquiver du côté OPPOSÉ ; une flèche « ESQUIVE » l'indique. Le SMASH part du centre.
   - Greg prévient avant de frapper : « ! » jaune = visage (esquive ou garde),
     « ! ▼ » bleu = corps (garde seulement), « !! » rouge = SMASH (esquive seulement, round 3).
   - Esquive réussie = fenêtre de CONTRE (dégâts x2). Garde de Greg haute = vise le corps, basse = le visage.

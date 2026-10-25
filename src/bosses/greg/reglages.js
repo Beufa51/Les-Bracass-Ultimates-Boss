@@ -19,15 +19,16 @@ export const REGLAGES = {
   // Greg en illustrations : chaque image est placée pour que sa TÊTE tombe en (teteX, teteY).
   //   origine = position de la tête dans l'image (0 à 1), taille = grossissement à l'écran
   illustre: {
-    teteX: 480, teteY: 97, yAuSol: 330,
+    //   cote = côté de l'écran d'où part le gant sur l'image (elle est retournée pour l'autre côté)
+    teteX: 480, teteY: 122, yAuSol: 345,
     poses: {
-      basse:  { cle: 'greg_combat',      origine: [0.467, 0.134], taille: 0.93 },
-      haute:  { cle: 'greg_garde_haute', origine: [0.584, 0.18],  taille: 0.86 },
-      corps:  { cle: 'greg_coup_corps',  origine: [0.3, 0.154],   taille: 0.76 },
-      visage: { cle: 'greg_coup_visage', origine: [0.633, 0.19],  taille: 0.67 },
-      ko:     { cle: 'greg_ko',          origine: [0.5, 0.5],     taille: 1.15 },
+      basse:  { cle: 'greg_combat',      origine: [0.467, 0.134], taille: 0.74 },
+      haute:  { cle: 'greg_garde_haute', origine: [0.584, 0.18],  taille: 0.69 },
+      corps:  { cle: 'greg_coup_corps',  origine: [0.3, 0.154],   taille: 0.61, cote: 'd' },
+      visage: { cle: 'greg_coup_visage', origine: [0.633, 0.19],  taille: 0.54, cote: 'g' },
+      ko:     { cle: 'greg_ko',          origine: [0.5, 0.5],     taille: 0.72 },
     },
-    debutElan: 0.55,   // à partir de ce moment de la préparation, on voit le coup partir
+    debutElan: 0.2,    // à partir de ce moment de la préparation, on voit le coup partir
   },
   tailleJoueur: 0.85,
 
@@ -94,15 +95,15 @@ export const REGLAGES = {
 };
 
 // Attaques de Greg.
-//  cible 'tete'  : esquive (Gauche/Droite) ou garde (Bas)
+//  cible 'tete'  : esquive du côté OPPOSÉ au coup (coup de gauche => ▶) ou garde (Bas)
 //  cible 'corps' : garde (Bas) seulement
 //  cible 'smash' : esquive (Gauche/Droite) ! La garde ne protège qu'à moitié.
 export const ATTAQUES = {
-  jab:     { nom: 'Jab',          cible: 'tete',  prepa: 0.45, degats: 6,  recup: 0.4, souffle: 4 },
-  crochet: { nom: 'Crochet',      cible: 'tete',  prepa: 0.70, degats: 12, recup: 0.7, souffle: 8 },
-  corps:   { nom: 'Coup au foie', cible: 'corps', prepa: 0.60, degats: 10, recup: 0.6, souffle: 8, souffleJoueur: 25 },
-  rafale:  { nom: 'Flicker',      cible: 'tete',  prepa: 0.50, degats: 4,  recup: 0.8, souffle: 12, coups: 3, entre: 0.26 },
-  smash:   { nom: 'SMASH',        cible: 'smash', prepa: 0.95, degats: 28, recup: 1.2, souffle: 20, gardeCassee: 0.5 },
+  jab:     { nom: 'Jab',          cible: 'tete',  prepa: 0.6,  degats: 6,  recup: 0.4, souffle: 4 },
+  crochet: { nom: 'Crochet',      cible: 'tete',  prepa: 0.85, degats: 12, recup: 0.7, souffle: 8 },
+  corps:   { nom: 'Coup au foie', cible: 'corps', prepa: 0.75, degats: 10, recup: 0.6, souffle: 8, souffleJoueur: 25 },
+  rafale:  { nom: 'Flicker',      cible: 'tete',  prepa: 0.6,  degats: 4,  recup: 0.8, souffle: 12, coups: 3, entre: 0.4 },
+  smash:   { nom: 'SMASH',        cible: 'smash', prepa: 1.1,  degats: 28, recup: 1.2, souffle: 20, gardeCassee: 0.5 },
 };
 
 // Attaques possibles selon le round (plusieurs fois le même nom = plus fréquent)
@@ -121,7 +122,7 @@ export const CONSEILS = [
     'Son coup au foie (« ! » bleu) : seule la GARDE marche.',
   ],
   [
-    'Ses coups au visage, tu les ESQUIVES (Gauche / Droite)...',
+    'Son coup part de GAUCHE ? Esquive à DROITE (et inversement) !',
     '...et tu CONTRES tout de suite derrière : dégâts x2 !',
     'Jauge d\'esprit pleine ? DEMPSEY ROLL : frappe ◀ ▶ au rythme de la boule !',
   ],
