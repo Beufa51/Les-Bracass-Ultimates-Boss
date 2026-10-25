@@ -970,7 +970,8 @@ export class GregCombat extends BossScene {
     const g = this.g, v = g.vis, I = R.illustre, t = this.time.now;
     const existe = (nom) => this.textures.exists(I.poses[nom].cle);
     const repos = existe('entier') ? 'entier' : 'basse';   // image complète si elle existe
-    const garde = g.garde === 'haute' && existe('haute') ? 'haute' : repos;
+    const haute = existe('gardePied') ? 'gardePied' : 'haute';
+    const garde = g.garde === 'haute' && existe(haute) ? haute : repos;
     const imageCoup = (cible) => (cible === 'corps' ? 'corps' : 'visage');
     let pose = garde, dx = 0, dy = 0, echelle = 1, angle = 0, teinte = null, rapide = false;
     const forcee = g.poseForcee ? g.poseForcee.nom : null;
@@ -983,7 +984,7 @@ export class GregCombat extends BossScene {
     }
     g.sprite.setVisible(true);
     if (forcee === 'touche' || g.etat === 'touche') { pose = repos; dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }
-    else if (forcee === 'bloque') { pose = existe('haute') ? 'haute' : 'basse'; echelle = 0.97; teinte = 0xc8d4ff; rapide = true; }
+    else if (forcee === 'bloque') { pose = existe(haute) ? haute : repos; echelle = 0.97; teinte = 0xc8d4ff; rapide = true; }
     else if (forcee === 'uppercut') { pose = 'visage'; echelle = 1.12; dy = 20; rapide = true; }
     else if (g.etat === 'prepare') {
       const c = g.attaque.cible, avance = g.t / g.prepa, sens = g.attaque.cote === 'g' ? -1 : (g.attaque.cote === 'd' ? 1 : 0);
@@ -1023,7 +1024,7 @@ export class GregCombat extends BossScene {
     const coteCoup = g.attaque && g.attaque.cote;
     const retourne = !!(P.cote && coteCoup && coteCoup !== 'centre' && coteCoup !== P.cote);
     sp.setTexture(P.cle).setFlipX(retourne).setOrigin(retourne ? 1 - P.origine[0] : P.origine[0], P.origine[1]);
-    sp.setPosition(I.teteX + v.dx + secousse, I.teteY + v.dy).setScale(P.taille * v.echelle).setAngle(v.angle);
+    sp.setPosition(I.teteX + v.dx + secousse, I.teteY + v.dy + (P.decalY || 0)).setScale(P.taille * v.echelle).setAngle(v.angle);
     if (teinte) sp.setTint(teinte); else sp.clearTint();
     // jambes : posées juste sous la ceinture de l'image du haut (seulement pour les poses coupées)
     if (g.jambes) {

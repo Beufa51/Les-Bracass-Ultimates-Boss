@@ -28,6 +28,8 @@ export const REGLAGES = {
     jambes: { cle: 'greg_jambes', ceintureX: 163.5, largeur: 132.6 },
     poses: {
       entier: { cle: 'greg_entier',      origine: [0.461, 0.082], taille: 0.64 },
+      // garde (en pied, gants levés) ; decalY = descendre l'image pour que les pieds touchent le tapis
+      gardePied: { cle: 'greg_garde_pied', origine: [0.423, 0.085], taille: 0.6, decalY: -21 },
       basse:  { cle: 'greg_combat',      origine: [0.467, 0.134], taille: 0.382 },
       haute:  { cle: 'greg_garde_haute', origine: [0.584, 0.18],  taille: 0.368, ceinture: [205, 414, 192] },
       corps:  { cle: 'greg_coup_corps',  origine: [0.3, 0.154],   taille: 0.355, ceinture: [190, 392, 215], cote: 'd' },
