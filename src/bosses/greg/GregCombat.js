@@ -76,6 +76,7 @@ export class GregCombat extends BossScene {
     this.g.jambes = this.illustre && this.textures.exists(J.cle)
       ? this.add.image(R.centreX, J.y, J.cle).setOrigin(J.origine[0], J.origine[1]).setScale(J.taille).setDepth(8.9) : null;
     this.zoneGarde = this.add.graphics().setDepth(9.5);
+    this.ombreKO = this.add.graphics().setDepth(8.5);
     this.aura = this.add.graphics().setDepth(8);        // aura bleue derrière Greg (coup au corps)
     this.cible = this.add.graphics().setDepth(25);      // cible qui se resserre là où le coup va frapper
     this.alerte = texte(this, R.centreX + 150, 150, '!', 60, '#ffd84a').setDepth(30).setVisible(false);
@@ -664,7 +665,7 @@ export class GregCombat extends BossScene {
   // =================================================================
   gregAuTapis() {
     const g = this.g;
-    g.downs++; g.etat = 'sol'; g.attaque = null; g.poseForcee = null;
+    g.downs++; g.etat = 'sol'; g.attaque = null; g.poseForcee = null; g.solDepuis = this.time.now;
     this.j.action = null; this.j.dempsey = null; this.j.esquive = null;
     this.alerte.setVisible(false);
     flash(this, 0.9);
@@ -900,6 +901,8 @@ export class GregCombat extends BossScene {
     const tremble = j.tremble > 0 ? Phaser.Math.Between(-6, 6) : 0;
     // petit rebond sur place, comme dans Punch-Out
     const rebond = pj === 'garde' ? Math.sin(this.time.now / 180) * 3 : 0;
+    // pendant que Greg est au tapis, ton boxeur s'efface un peu pour qu'on le voie bien
+    j.sprite.setAlpha(this.g.etat === 'sol' ? R.transparenceJoueur * 0.5 : R.transparenceJoueur);
     j.sprite.setPosition(R.centreX + j.decalage + tremble, R.piedsJoueur + rebond + (pj === 'sol' ? -30 : 0));
 
     // ---- Greg (de face) ----
@@ -984,9 +987,15 @@ export class GregCombat extends BossScene {
     const coteCoup = g.attaque && g.attaque.cote;
     const retourne = !!(P.cote && coteCoup && coteCoup !== 'centre' && coteCoup !== P.cote);
     sp.setTexture(P.cle).setFlipX(retourne).setOrigin(retourne ? 1 - P.origine[0] : P.origine[0], P.origine[1]);
-    if (pose === 'ko') sp.setPosition(R.centreX, I.yAuSol).setScale(P.taille).setAngle(0);
+    if (pose === 'ko') {
+      // il bascule en arrière et s'écrase à plat sur le tapis (vu en perspective), avec son ombre
+      const f = Math.min(1, (this.time.now - (g.solDepuis || 0)) / 350);
+      sp.setPosition(R.centreX, I.koY).setScale(P.taille, P.taille * (1 - f * (1 - P.aplati))).setAngle(0);
+    }
     else sp.setPosition(I.teteX + v.dx + secousse, I.teteY + v.dy).setScale(P.taille * v.echelle).setAngle(v.angle);
     if (teinte) sp.setTint(teinte); else sp.clearTint();
+    this.ombreKO.clear();
+    if (pose === 'ko') this.ombreKO.fillStyle(0x000000, 0.35).fillEllipse(R.centreX, I.koY - 40, 300, 70);
     if (g.jambes) {   // les jambes suivent un peu le buste, mais restent plantées
       g.jambes.setVisible(pose !== 'ko').setX(I.teteX + v.dx * 0.35 + secousse * 0.3);
       if (teinte) g.jambes.setTint(teinte); else g.jambes.clearTint();

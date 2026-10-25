@@ -529,12 +529,12 @@ function faceAuSol(ctx, p, peau) {
 //  TON BOXEUR, VU DE DOS
 // =====================================================================
 const POSES_DOS = {
-  garde:     { g: [-60, -228, 27], d: [60, -228, 27] },
+  garde:     { g: [-32, -242, 31], d: [32, -240, 31] },     // gants devant la tête (façon Super Punch-Out)
   jab:       { g: [-22, -298, 21], d: [58, -226, 27], dx: -6 },
   crochet:   { g: [-60, -226, 27], d: [14, -286, 23], dx: 10 },
   corps:     { g: [-60, -220, 27], d: [10, -232, 23], dx: 8, dy: 14 },
-  esquive:   { g: [-52, -206, 27], d: [52, -206, 27], dy: 26 },
-  bloque:    { g: [-25, -238, 30], d: [25, -238, 30], dy: 4 },
+  esquive:   { g: [-38, -216, 29], d: [38, -214, 29], dy: 26 },
+  bloque:    { g: [-21, -252, 33], d: [21, -250, 33], dy: 4 },
   touche:    { g: [-88, -206, 27], d: [84, -202, 27], dy: -6, tete: 10 },
   victoire:  { g: [-80, -306, 27], d: [80, -306, 27] },
   dempsey_g: { g: [-10, -276, 24], d: [62, -206, 27], dx: -36, dy: 34 },
@@ -601,11 +601,17 @@ function boxeurDos(ctx, w, h, p) {
   }
   ctx.beginPath(); ctx.ellipse(hx, hy, 30, 33, 0, 0, Math.PI * 2);
   remplir(ctx, degrade(ctx, hx - 30, hy - 30, hx + 30, hy + 30, [[0, teinte(p.cheveux, 0.3)], [0.6, p.cheveux], [1, teinte(p.cheveux, -0.4)]]));
-  cheveuxPics(ctx, hx, hy + 4, 31, p.cheveux, 7, false);
-  // pointes sur la nuque
-  ctx.beginPath(); ctx.moveTo(hx - 24, hy + 18);
-  for (let i = 0; i <= 6; i++) ctx.lineTo(hx - 24 + i * 8, hy + (i % 2 ? 36 : 22));
-  ctx.closePath(); remplir(ctx, p.cheveux, 2.5);
+  if (p.coiffure === 'court') {
+    // cheveux courts : juste un reflet et une nuque bien dégagée
+    ctx.strokeStyle = teinte(p.cheveux, 0.35); ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(hx - 6, hy - 6, 18, Math.PI * 1.1, Math.PI * 1.6); ctx.stroke();
+  } else {
+    cheveuxPics(ctx, hx, hy + 4, 31, p.cheveux, 7, false);
+    // pointes sur la nuque
+    ctx.beginPath(); ctx.moveTo(hx - 24, hy + 18);
+    for (let i = 0; i <= 6; i++) ctx.lineTo(hx - 24 + i * 8, hy + (i % 2 ? 36 : 22));
+    ctx.closePath(); remplir(ctx, p.cheveux, 2.5);
+  }
 
   // bras + gants (vus de dos : on voit le dessus des gants)
   const dessinerBras = (epX, [gx, gy, r], cote) => {
@@ -732,12 +738,12 @@ function ring(ctx, w, h) {
 // Portrait du héros pour le bandeau du haut (vu de face)
 function portraitHeros(ctx, w, h) {
   const peau = '#f2c9a0';
-  ctx.fillStyle = degrade(ctx, 0, 0, 0, h, [[0, '#1d6fd1'], [1, '#0b2a5c']]); ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = degrade(ctx, 0, 0, 0, h, [[0, '#3c9a3c'], [1, '#14421a']]); ctx.fillRect(0, 0, w, h);
   const cx = w / 2, cy = h * 0.56;
   ctx.beginPath(); ctx.ellipse(cx, cy, w * 0.3, h * 0.34, 0, 0, Math.PI * 2);
   const g = ctx.createRadialGradient(cx - 6, cy - 8, 2, cx, cy, w * 0.4);
   g.addColorStop(0, '#ffe3c6'); g.addColorStop(1, '#d9a77c'); remplir(ctx, g, 2.5);
-  cheveuxPics(ctx, cx, cy - h * 0.12, w * 0.31, '#5a3418', 8, true);
+  cheveuxPics(ctx, cx, cy - h * 0.12, w * 0.31, '#151515', 8, true);
   ctx.fillStyle = CONTOUR;
   for (const s of [-1, 1]) {
     ctx.fillRect(cx + s * w * 0.12 - 3, cy - 2, 6, 7);

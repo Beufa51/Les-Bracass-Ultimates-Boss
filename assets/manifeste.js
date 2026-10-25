@@ -13,7 +13,9 @@
 // =====================================================================
 
 // Couleurs des boxeurs provisoires
-const HEROS_BOXE = { couleur: '#1f8a4c', gants: '#c8102e', poignets: '#1f8a4c', cheveux: '#5a3418' };
+// Ton boxeur, façon Super Punch-Out : cheveux noirs courts, gants verts, short sombre, en pixel art
+const HEROS_BOXE = { couleur: '#26263c', gants: '#6ab04c', poignets: '#2d6a1f', cheveux: '#151515', coiffure: 'court',
+  peau: '#e8b48a', pixel: 3 };
 // Greg d'après son illustration (assets_inbox/greg_manga.jpg) : afro, barbe, torse en sueur,
 // tatouages de personnages sur les bras, short bleu marine à bandes rouges, ceinture à l'épée, gants blancs à croix.
 const GREG = { couleur: '#2a4d8f', bandes: '#b3202c', ceinture: '#1d2f63', embleme: 'epee',
