@@ -13,7 +13,8 @@
 import { BossScene } from '../../core/BossScene.js';
 import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { texte, voile } from '../../core/ui.js';
-import { jouerSon, jouerMusique } from '../../core/ressources.js';
+import { jouerSon } from '../../core/ressources.js';
+import { jouerMusique } from '../../core/musique.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { IDENTITE, REGLAGES as R, ATTAQUES, ATTAQUES_PAR_ROUND, CONSEILS, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
 import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from './effets.js';

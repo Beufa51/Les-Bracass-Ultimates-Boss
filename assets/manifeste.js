@@ -101,7 +101,7 @@ export const MANIFESTE = {
     ui_defaite: { fichier: null, provisoire: { frequence: 160, duree: 0.35 } },
     hub_porte:  { fichier: null, provisoire: { frequence: 440, duree: 0.12 } },
     // Greg (boxe)
-    // musique: true => chargée seulement au début du combat ; volume de 0 à 1
+    // musique: true => musique de fond (jouée par src/core/musique.js) ; volume de 0 à 1
     greg_musique:    { fichier: 'audio/greg_musique.mp3', musique: true, volume: 0.45 },
     greg_coup:       { fichier: null, provisoire: { frequence: 220, duree: 0.06 } },
     greg_coup_fort:  { fichier: null, provisoire: { frequence: 110, duree: 0.16 } },

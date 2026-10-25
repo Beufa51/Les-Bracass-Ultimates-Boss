@@ -7,6 +7,7 @@ import { HubScene } from './hub/HubScene.js';
 import { BOSS, MODELE } from './bosses/liste.js';
 import { installerTactile } from './core/tactile.js';
 import { verifierClips } from './core/clips.js';
+import { installerMusiques } from './core/musique.js';
 
 const scenesDesBoss = [...BOSS, MODELE].flatMap(b => b.scenes);
 
@@ -34,5 +35,6 @@ window.addEventListener('keydown', (e) => {
 // Boutons tactiles (seulement sur smartphone / tablette)
 installerTactile();
 verifierClips();
+installerMusiques();
 
 window.jeu = jeu;
