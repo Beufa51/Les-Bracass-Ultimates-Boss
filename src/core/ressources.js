@@ -9,7 +9,8 @@ export function chargerFichiers(scene) {
     if (e.fichier) scene.load.spritesheet(cle, 'assets/' + e.fichier, { frameWidth: e.largeur, frameHeight: e.hauteur });
   }
   for (const [cle, e] of Object.entries(MANIFESTE.sons)) {
-    if (e.fichier) scene.load.audio(cle, 'assets/' + e.fichier);
+    // les musiques sont chargées plus tard, seulement quand on en a besoin (fichiers lourds)
+    if (e.fichier && !e.musique) scene.load.audio(cle, 'assets/' + e.fichier);
   }
 }
 
@@ -44,6 +45,24 @@ export function jouerSon(scene, cle) {
   osc.connect(vol).connect(ctx.destination);
   osc.start();
   osc.stop(ctx.currentTime + e.provisoire.duree);
+}
+
+// Musique de fond : chargée à la demande (sans bloquer le jeu), jouée en boucle,
+// et arrêtée automatiquement quand on quitte la scène.
+export function jouerMusique(scene, cle) {
+  const e = MANIFESTE.sons[cle];
+  if (!e || !e.fichier) return;
+  let arretee = false, musique = null;
+  const lancer = () => {
+    if (arretee) return;
+    musique = scene.sound.add(cle, { loop: true, volume: e.volume ?? 0.5 });
+    musique.play();
+  };
+  scene.events.once('shutdown', () => { arretee = true; if (musique) musique.destroy(); });
+  if (scene.cache.audio.exists(cle)) { lancer(); return; }
+  scene.load.audio(cle, 'assets/' + e.fichier);
+  scene.load.once('complete', lancer);
+  scene.load.start();
 }
 
 // ---------- Formes provisoires (dessinées dans dessins.js) ----------

@@ -13,7 +13,7 @@
 import { BossScene } from '../../core/BossScene.js';
 import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { texte, voile } from '../../core/ui.js';
-import { jouerSon } from '../../core/ressources.js';
+import { jouerSon, jouerMusique } from '../../core/ressources.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { IDENTITE, REGLAGES as R, ATTAQUES, ATTAQUES_PAR_ROUND, CONSEILS, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
 import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from './effets.js';
@@ -70,6 +70,8 @@ export class GregCombat extends BossScene {
 
     this.creerHud();
     this.touches = creerTouches(this);
+    // musique de fond (Hajime no Ippo, opening 2) : chargée pendant l'écran des commandes
+    jouerMusique(this, 'greg_musique');
     this.afficher();
 
     etiquettesTactiles(ETIQUETTES_OK);
