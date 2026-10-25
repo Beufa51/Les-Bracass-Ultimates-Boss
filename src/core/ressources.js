@@ -55,9 +55,29 @@ function dessinerProvisoire(scene, cle, e) {
   for (let i = 0; i < n; i++) {
     ctx.save();
     ctx.translate(i * w, 0);
-    (FORMES[p.forme] || FORMES.rect)(ctx, w, h, p, { i, n });
+    if (p.pixel) dessinerEnPixels(ctx, w, h, p, { i, n });
+    else (FORMES[p.forme] || FORMES.rect)(ctx, w, h, p, { i, n });
     ctx.restore();
     tex.add(i, 0, i * w, 0, w, h);
   }
   tex.refresh();
+}
+
+// Style "pixel art" : on dessine en petit (1 / p.pixel), on nettoie la transparence
+// et on réduit le nombre de couleurs, puis on agrandit sans lisser.
+function dessinerEnPixels(ctx, w, h, p, image) {
+  const k = p.pixel, pw = Math.ceil(w / k), ph = Math.ceil(h / k);
+  const petit = document.createElement('canvas');
+  petit.width = pw; petit.height = ph;
+  const c = petit.getContext('2d');
+  c.scale(1 / k, 1 / k);
+  (FORMES[p.forme] || FORMES.rect)(c, w, h, p, image);
+  const img = c.getImageData(0, 0, pw, ph), d = img.data;
+  for (let o = 0; o < d.length; o += 4) {
+    d[o + 3] = d[o + 3] > 110 ? 255 : 0;
+    for (let v = 0; v < 3; v++) d[o + v] = Math.min(255, Math.round(d[o + v] / 28) * 28);
+  }
+  c.putImageData(img, 0, 0);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(petit, 0, 0, pw, ph, 0, 0, pw * k, ph * k);
 }

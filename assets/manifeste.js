@@ -13,8 +13,12 @@
 // =====================================================================
 
 // Couleurs des boxeurs provisoires
-const HEROS_BOXE = { couleur: '#2f7fe0', gants: '#f4f4f4', poignets: '#2f7fe0', cheveux: '#5a3418' };
-const GREG = { couleur: '#d4143c', gants: '#c8102e', poignets: '#ffd84a', cheveux: '#17171f', peau: '#e3ad80', ceinture: '#ffd84a', nom: 'GREG' };
+const HEROS_BOXE = { couleur: '#1f8a4c', gants: '#f4f4f4', poignets: '#1f8a4c', cheveux: '#5a3418', pixel: 3 };
+// Greg d'après son sprite (assets_inbox/greg_reference.jpg) : peau mate, cheveux bouclés, barbe,
+// bras tatoués, couleurs de sa tunique (bleu à bordure rouge).
+const GREG = { couleur: '#3f78c0', bandes: '#b8233a', ceinture: '#b8233a', texteCeinture: '#ffffff', nom: 'GREG',
+  gants: '#b8233a', poignets: '#1c1c1c', peau: '#b27651', cheveux: '#221a12', coiffure: 'boucles', barbe: '#16120d',
+  yeux: '#4a2a14', tatouage: ['#6f8a2e', '#b8a23a', '#3f5a22', '#8a9a3a'], pixel: 3 };
 
 export const MANIFESTE = {
   images: {
@@ -87,7 +91,7 @@ export const MANIFESTE = {
   // Clips (GIF, MP4 ou WEBM) joués par-dessus le jeu (durée en secondes).
   // Si le fichier n'existe pas (ou fichier: null), le jeu joue son animation dessinée par le code.
   clips: {
-    greg_dempsey: { fichier: 'sprites/greg/dempsey.gif', duree: 2.5 },   // lancement du Dempsey Roll
+    greg_dempsey: { fichier: 'sprites/greg/dempsey.gif', duree: 2.46 },   // lancement du Dempsey Roll (2 boucles du GIF)
   },
 
   // Sons : fichier null => petit "bip" provisoire (fréquence en Hz, durée en secondes)

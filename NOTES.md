@@ -22,6 +22,8 @@
   Le menu de test (F1) n'existe que sur ordinateur.
 - Manifeste unique des visuels/sons : `assets/manifeste.js`. Tant qu'un visuel n'a pas de fichier,
   il est dessiné par le code dans `src/core/dessins.js` (style manga : contours, ombres, reflets).
+  Avec `pixel: 3` dans ses réglages, le dessin est fait en petit puis agrandi (style pixel art) :
+  c'est le cas des deux boxeurs. Greg est dessiné d'après `assets_inbox/greg_reference.jpg`.
 - Rendu lissé (`pixelArt: false` dans `src/main.js`).
 - **Greg** (`src/bosses/greg/`) : combat de boxe en 3 rounds de 60 s.
   - Commandes : ◀ ▶ esquive, Espace = coup au visage, Z = coup au corps, Bas (maintenu) = garde,

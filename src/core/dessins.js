@@ -35,7 +35,7 @@ function degrade(ctx, x0, y0, x1, y1, arrets) {
 }
 
 // Bras avec biceps : de l'épaule (sx, sy) au poignet (gx, gy)
-function bras(ctx, sx, sy, gx, gy, largeurEpaule, largeurPoignet, peau) {
+function bras(ctx, sx, sy, gx, gy, largeurEpaule, largeurPoignet, peau, tatouage) {
   const dx = gx - sx, dy = gy - sy, L = Math.hypot(dx, dy) || 1;
   const nx = -dy / L, ny = dx / L;
   const mx = sx + dx * 0.4, my = sy + dy * 0.4, b = largeurEpaule * 0.68;
@@ -47,6 +47,65 @@ function bras(ctx, sx, sy, gx, gy, largeurEpaule, largeurPoignet, peau) {
   ctx.closePath();
   remplir(ctx, degrade(ctx, mx + nx * b, my + ny * b, mx - nx * b, my - ny * b,
     [[0, teinte(peau, 0.25)], [0.45, peau], [1, teinte(peau, -0.35)]]));
+  if (!tatouage) return;
+  // manche de tatouages : taches de couleur à l'intérieur du bras
+  ctx.save(); ctx.clip();
+  const alea = hasard(Math.round(Math.abs(sx * 7 + sy * 3)) + 11);
+  for (let k = 0; k < 46; k++) {
+    const t = 0.12 + alea() * 0.86, cote = (alea() - 0.5) * largeurEpaule;
+    ctx.fillStyle = tatouage[Math.floor(alea() * tatouage.length)];
+    ctx.globalAlpha = 0.55 + alea() * 0.35;
+    ctx.beginPath(); ctx.arc(sx + dx * t + nx * cote, sy + dy * t + ny * cote, 3 + alea() * 5, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+  ctx.strokeStyle = CONTOUR; ctx.lineWidth = 3; ctx.stroke();
+}
+
+// Cheveux bouclés (coupe afro courte), vus de face
+function cheveuxBoucles(ctx, hx, hy, couleur) {
+  ctx.beginPath();
+  ctx.moveTo(hx - 44, hy + 6);
+  ctx.quadraticCurveTo(hx - 54, hy - 60, hx, hy - 66);
+  ctx.quadraticCurveTo(hx + 54, hy - 60, hx + 44, hy + 6);
+  ctx.lineTo(hx + 38, hy + 6); ctx.lineTo(hx + 36, hy - 24);
+  ctx.quadraticCurveTo(hx, hy - 36, hx - 36, hy - 24);
+  ctx.lineTo(hx - 38, hy + 6); ctx.closePath();
+  remplir(ctx, degrade(ctx, hx, hy - 66, hx, hy, [[0, teinte(couleur, 0.1)], [1, couleur]]));
+  // bord bosselé : une boucle tous les ~20°
+  for (let a = Math.PI * 1.02; a <= Math.PI * 1.98; a += Math.PI / 9) {
+    const x = hx + Math.cos(a) * 44, y = hy - 22 + Math.sin(a) * 40;
+    ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI * 2);
+    remplir(ctx, degrade(ctx, x - 8, y - 8, x + 8, y + 8, [[0, teinte(couleur, 0.14)], [1, couleur]]), 2.5);
+  }
+  // petites boucles à l'intérieur
+  ctx.strokeStyle = teinte(couleur, 0.18); ctx.lineWidth = 2;
+  const alea = hasard(5);
+  for (let k = 0; k < 16; k++) {
+    const x = hx - 30 + alea() * 60, y = hy - 56 + alea() * 26;
+    ctx.beginPath(); ctx.arc(x, y, 4, Math.PI * 0.9, Math.PI * 2.1); ctx.stroke();
+  }
+}
+
+// Barbe courte qui couvre la mâchoire, avec moustache
+function barbe(ctx, hx, hy, couleur) {
+  ctx.beginPath();
+  ctx.moveTo(hx - 42, hy - 6);
+  ctx.quadraticCurveTo(hx - 46, hy + 24, hx - 32, hy + 42);
+  ctx.quadraticCurveTo(hx - 16, hy + 64, hx, hy + 64);
+  ctx.quadraticCurveTo(hx + 16, hy + 64, hx + 32, hy + 42);
+  ctx.quadraticCurveTo(hx + 46, hy + 24, hx + 42, hy - 6);
+  ctx.lineTo(hx + 36, hy - 4);
+  ctx.quadraticCurveTo(hx + 32, hy + 14, hx + 18, hy + 22);
+  ctx.quadraticCurveTo(hx, hy + 16, hx - 18, hy + 22);
+  ctx.quadraticCurveTo(hx - 32, hy + 14, hx - 36, hy - 4);
+  ctx.closePath();
+  remplir(ctx, degrade(ctx, hx, hy, hx, hy + 64, [[0, teinte(couleur, 0.15)], [1, couleur]]), 2.5);
+  ctx.strokeStyle = teinte(couleur, 0.35); ctx.lineWidth = 1.5;
+  const alea = hasard(9);
+  for (let k = 0; k < 14; k++) {
+    const x = hx - 30 + alea() * 60, y = hy + 26 + alea() * 30;
+    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 1.4); ctx.stroke();
+  }
 }
 
 // Gant de boxe : (x, y) = centre, r = taille, versBras = angle vers le coude
@@ -161,7 +220,7 @@ function boxeurFace(ctx, w, h, p) {
   ctx.lineTo(96, -24); ctx.lineTo(10, -20); ctx.lineTo(0, -36); ctx.lineTo(-10, -20); ctx.lineTo(-96, -24);
   ctx.closePath();
   remplir(ctx, degrade(ctx, -96, 0, 96, 0, [[0, teinte(p.couleur, -0.45)], [0.3, teinte(p.couleur, 0.15)], [0.45, teinte(p.couleur, 0.4)], [0.6, p.couleur], [1, teinte(p.couleur, -0.5)]]));
-  ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 5;       // bandes latérales
+  ctx.strokeStyle = p.bandes || 'rgba(255,255,255,0.85)'; ctx.lineWidth = 6;       // bandes latérales
   ctx.beginPath(); ctx.moveTo(ax + 4, ay + 12); ctx.lineTo(-90, -26); ctx.moveTo(bx - 4, by + 12); ctx.lineTo(90, -26); ctx.stroke();
   ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.lineWidth = 2;             // plis
   ctx.beginPath(); ctx.moveTo(-40 + dx * 0.4, -90 + dy); ctx.quadraticCurveTo(-48, -60, -44, -30);
@@ -169,7 +228,7 @@ function boxeurFace(ctx, w, h, p) {
   // ceinture
   ctx.beginPath(); ctx.roundRect(ax - 2, ay - 14, bx - ax + 4, 18, 4);
   remplir(ctx, degrade(ctx, 0, ay - 14, 0, ay + 4, [[0, teinte(p.ceinture, 0.4)], [0.5, p.ceinture], [1, teinte(p.ceinture, -0.35)]]));
-  ctx.fillStyle = '#1a1014'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillStyle = p.texteCeinture || '#1a1014'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(p.nom || '', (ax + bx) / 2, ay - 5);
 
   // torse
@@ -231,7 +290,7 @@ function boxeurFace(ctx, w, h, p) {
   // bras + gants (le plus gros gant, le plus "proche", en dernier)
   const dessinerBras = (epX, [gx, gy, r], cote) => {
     const sx = epX + dx, sy = -240 + dy, x = gx + dx, y = gy + dy;
-    bras(ctx, sx, sy, x, y, 36, 24, peau);
+    bras(ctx, sx, sy, x, y, 36, 24, peau, p.tatouage);
     gant(ctx, x, y, r, p.gants, Math.atan2(sy - y, sx - x), p.poignets || '#ffffff', cote);
   };
   if (P.g[2] >= P.d[2]) { dessinerBras(84, P.d, -1); dessinerBras(-84, P.g, 1); }
@@ -264,6 +323,8 @@ function visageGreg(ctx, hx, hy, peau, p, expression) {
   ctx.beginPath(); ctx.moveTo(hx + 36, hy + 18); ctx.quadraticCurveTo(hx + 26, hy + 30, hx + 16, hy + 50);
   ctx.quadraticCurveTo(hx + 30, hy + 44, hx + 36, hy + 18); ctx.fill();
 
+  if (p.barbe) barbe(ctx, hx, hy, p.barbe);
+
   ctx.strokeStyle = CONTOUR; ctx.fillStyle = CONTOUR; ctx.lineCap = 'round';
   if (expression === 'ko') {
     // yeux en spirale
@@ -290,7 +351,8 @@ function visageGreg(ctx, hx, hy, peau, p, expression) {
       ctx.moveTo(hx + s * 30, hy - 6); ctx.quadraticCurveTo(hx + s * 19, hy - 12, hx + s * 9, hy - 3);
       ctx.quadraticCurveTo(hx + s * 19, hy + 3, hx + s * 30, hy - 6); ctx.closePath();
       remplir(ctx, '#ffffff', 2);
-      ctx.fillStyle = CONTOUR; ctx.beginPath(); ctx.arc(hx + s * 17, hy - 4, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = p.yeux || CONTOUR; ctx.beginPath(); ctx.arc(hx + s * 17, hy - 4, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = CONTOUR; ctx.beginPath(); ctx.arc(hx + s * 17, hy - 4, 2, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = '#ffffff'; ctx.fillRect(hx + s * 17 - 2, hy - 7, 2, 2);
     }
     // bouche
@@ -301,6 +363,7 @@ function visageGreg(ctx, hx, hy, peau, p, expression) {
       ctx.beginPath(); ctx.moveTo(hx - 18, hy + 28); ctx.quadraticCurveTo(hx, hy + 48, hx + 18, hy + 28); ctx.closePath();
       remplir(ctx, '#ffffff', 2.5);
     } else {
+      if (p.barbe) { ctx.fillStyle = '#9a5444'; ctx.beginPath(); ctx.ellipse(hx, hy + 33, 13, 4, 0, 0, Math.PI * 2); ctx.fill(); }
       ctx.beginPath(); ctx.moveTo(hx - 15, hy + 34); ctx.quadraticCurveTo(hx, hy + 30, hx + 15, hy + 32); ctx.stroke();
       ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(hx - 8, hy + 41); ctx.lineTo(hx + 8, hy + 41); ctx.stroke();
     }
@@ -309,11 +372,13 @@ function visageGreg(ctx, hx, hy, peau, p, expression) {
   ctx.strokeStyle = 'rgba(90,40,15,0.7)'; ctx.lineWidth = 2.5;
   ctx.beginPath(); ctx.moveTo(hx + 2, hy - 2); ctx.quadraticCurveTo(hx + 6, hy + 14, hx + 1, hy + 18); ctx.lineTo(hx - 6, hy + 17); ctx.stroke();
   // pansement sur la joue (boxeur de manga !)
+  if (p.pansement) {
   ctx.save(); ctx.translate(hx + 26, hy + 14); ctx.rotate(-0.5);
   ctx.beginPath(); ctx.roundRect(-11, -5, 22, 10, 3); remplir(ctx, '#f6efe2', 1.5);
   ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(-3, -3); ctx.lineTo(3, 3); ctx.moveTo(3, -3); ctx.lineTo(-3, 3); ctx.stroke();
   ctx.restore();
+  }
   // gouttes de sueur quand il est essoufflé
   if (expression === 'souffle') {
     ctx.fillStyle = '#bfe8ff';
@@ -322,8 +387,8 @@ function visageGreg(ctx, hx, hy, peau, p, expression) {
       ctx.quadraticCurveTo(hx + x - 6, hy + y + 2, hx + x, hy + y - 9); remplir(ctx, '#bfe8ff', 1.5);
     }
   }
-  // cheveux en pics
-  cheveuxPics(ctx, hx, hy - 16, 44, p.cheveux || '#111', 9, true);
+  if (p.coiffure === 'boucles') cheveuxBoucles(ctx, hx, hy, p.cheveux || '#111');
+  else cheveuxPics(ctx, hx, hy - 16, 44, p.cheveux || '#111', 9, true);
 }
 
 function faceAuSol(ctx, p, peau) {
