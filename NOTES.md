@@ -23,9 +23,11 @@
 - Manifeste unique des visuels/sons : `assets/manifeste.js`. Tant qu'un visuel n'a pas de fichier,
   il est dessiné par le code dans `src/core/dessins.js` (style manga : contours, ombres, reflets).
   Option `pixel: 3` possible (dessin fait en petit puis agrandi, style pixel art).
-  Greg en combat = son illustration détourée (`assets/sprites/greg/greg_combat.png`, fond retiré avec rembg
-  modèle isnet-anime), animée par le jeu (balancement, armé, coup vers l'écran + gant blanc, touché, K.O.).
-  Une zone bleue montre où est sa garde. Sans ce fichier, le jeu reprend les poses dessinées par le code.
+  Greg en combat = ses illustrations détourées (fond retiré avec rembg, modèle u2net / isnet-anime) :
+  garde basse `greg_combat.png`, garde haute `greg_garde_haute.png`, coup au corps `greg_coup_corps.png`,
+  coup au visage `greg_coup_visage.png`, K.O. `greg_ko.png` (originaux dans `assets_inbox/`).
+  Chaque image est calée sur la tête (réglages `illustre` dans `src/bosses/greg/reglages.js`).
+  Quand il prépare un coup, on voit l'image du coup grossir vers toi avant l'impact.
   L'illustration complète sert aussi pour la présentation (`greg_portrait`) et l'annonce du SMASH (`greg_visage`).
 - Bruitages du combat : générés par `outils/generer_sons.py` (Python + numpy) dans `assets/audio/`.
 - Rendu lissé (`pixelArt: false` dans `src/main.js`).

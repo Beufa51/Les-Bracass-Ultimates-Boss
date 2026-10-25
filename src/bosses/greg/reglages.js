@@ -16,8 +16,19 @@ export const REGLAGES = {
   piedsJoueur: 575,            // bas du dessin du joueur (coupé par le bas de l'écran)
   decalageEsquive: 120,        // de combien ton boxeur part sur le côté en esquivant
   tailleGreg: 0.9,             // 1 = taille du dessin
-  // Greg en illustration (assets/sprites/greg/greg_combat.png)
-  illustre: { taille: 0.93, pieds: 475, yAuSol: 395 },
+  // Greg en illustrations : chaque image est placée pour que sa TÊTE tombe en (teteX, teteY).
+  //   origine = position de la tête dans l'image (0 à 1), taille = grossissement à l'écran
+  illustre: {
+    teteX: 480, teteY: 97, yAuSol: 330,
+    poses: {
+      basse:  { cle: 'greg_combat',      origine: [0.467, 0.134], taille: 0.93 },
+      haute:  { cle: 'greg_garde_haute', origine: [0.584, 0.18],  taille: 0.86 },
+      corps:  { cle: 'greg_coup_corps',  origine: [0.3, 0.154],   taille: 0.76 },
+      visage: { cle: 'greg_coup_visage', origine: [0.633, 0.19],  taille: 0.67 },
+      ko:     { cle: 'greg_ko',          origine: [0.5, 0.5],     taille: 1.15 },
+    },
+    debutElan: 0.55,   // à partir de ce moment de la préparation, on voit le coup partir
+  },
   tailleJoueur: 0.85,
 
   // ---------- Joueur ----------

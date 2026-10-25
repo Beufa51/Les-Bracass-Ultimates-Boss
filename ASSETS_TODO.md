@@ -32,7 +32,11 @@ Ton boxeur : vu de dos, cheveux bruns en pics, short vert, gants blancs.
 
 | Nom du fichier | Taille d'une case | Images | Statut | Description pour le générateur d'images |
 |---|---|---|---|---|
-| greg_combat.png | 274x470 | 1 | **définitif** | Illustration de Greg détourée (fond transparent), utilisée pour toutes ses actions |
+| greg_combat.png | 274x470 | 1 | **définitif** | Greg garde basse (illustration détourée) |
+| greg_garde_haute.png | 343x517 | 1 | **définitif** | Greg garde haute / bloque / touché |
+| greg_coup_corps.png | 380x519 | 1 | **définitif** | Greg envoie un coup au corps |
+| greg_coup_visage.png | 439x524 | 1 | **définitif** | Greg envoie un coup au visage (et le SMASH) |
+| greg_ko.png | 341x410 | 1 | **définitif** | Greg K.O. au tapis |
 | greg_ring.png | 960x540 | 1 | provisoire | Ring de boxe vu depuis un coin (face aux cordes du fond), public dans l'ombre, projecteurs, tapis bleu clair, style manga |
 | greg_coach.png | 160x160 | 1 | provisoire | Portrait d'un vieux coach de boxe chauve à moustache blanche, avec une canne, style manga |
 | heros_boxe_garde.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, en garde, les deux gants levés de chaque côté de la tête, fond transparent |
