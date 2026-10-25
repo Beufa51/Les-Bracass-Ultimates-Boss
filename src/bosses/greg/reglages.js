@@ -20,15 +20,18 @@ export const REGLAGES = {
   //   origine = position de la tête dans l'image (0 à 1), taille = grossissement à l'écran
   illustre: {
     //   cote = côté de l'écran d'où part le gant sur l'image (elle est retournée pour l'autre côté)
-    // Greg est vu EN ENTIER (comme dans Punch-Out) : le haut du corps change selon l'action,
-    // les jambes (greg_jambes) restent posées sur le tapis en dessous.
+    // Greg est vu EN ENTIER (comme dans Punch-Out) :
+    //  - en garde / touché / essoufflé : l'image complète greg_entier ;
+    //  - garde haute et coups : le haut du corps (coupé à la ceinture) + les jambes greg_jambes,
+    //    posées sous la ceinture. ceinture = [x du milieu, y du haut, largeur] dans l'image du haut.
     teteX: 480, teteY: 118,   // au K.O. : case de manga avec l'image greg_ko
-    jambes: { cle: 'greg_jambes', origine: [0.461, 1], taille: 0.70, y: 500 },
+    jambes: { cle: 'greg_jambes', ceintureX: 163.5, largeur: 132.6 },
     poses: {
+      entier: { cle: 'greg_entier',      origine: [0.461, 0.082], taille: 0.64 },
       basse:  { cle: 'greg_combat',      origine: [0.467, 0.134], taille: 0.382 },
-      haute:  { cle: 'greg_garde_haute', origine: [0.584, 0.18],  taille: 0.368 },
-      corps:  { cle: 'greg_coup_corps',  origine: [0.3, 0.154],   taille: 0.355, cote: 'd' },
-      visage: { cle: 'greg_coup_visage', origine: [0.633, 0.19],  taille: 0.40,  cote: 'g' },
+      haute:  { cle: 'greg_garde_haute', origine: [0.584, 0.18],  taille: 0.368, ceinture: [205, 414, 192] },
+      corps:  { cle: 'greg_coup_corps',  origine: [0.3, 0.154],   taille: 0.355, ceinture: [190, 392, 215], cote: 'd' },
+      visage: { cle: 'greg_coup_visage', origine: [0.633, 0.19],  taille: 0.40,  ceinture: [225, 474, 240], cote: 'g' },
     },
     debutElan: 0.2,    // à partir de ce moment de la préparation, on voit le coup partir
     debutElanCorps: 0.4,   // pour le coup au corps : il plonge d'abord bas plus longtemps

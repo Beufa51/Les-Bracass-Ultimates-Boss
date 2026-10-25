@@ -27,8 +27,9 @@
   garde basse `greg_combat.png`, garde haute `greg_garde_haute.png`, coup au corps `greg_coup_corps.png`,
   coup au visage `greg_coup_visage.png`, K.O. `greg_ko.png` (originaux dans `assets_inbox/`).
   Chaque image est calée sur la tête (réglages `illustre` dans `src/bosses/greg/reglages.js`).
-  Greg est vu en entier : ses jambes (`greg_jambes.png`, tirées de `assets_inbox/greg_entier.jpg`)
-  restent posées sur le tapis sous le haut du corps.
+  Greg est vu en entier : en garde / touché / essoufflé, image complète `greg_entier.png` ;
+  pour la garde haute et les coups, le haut du corps est coupé à la ceinture (gants gardés) et
+  posé sur les jambes `greg_jambes.png` (réglages `ceinture` dans `src/bosses/greg/reglages.js`).
   Quand il prépare un coup, on voit l'image du coup grossir vers toi avant l'impact.
   Au tapis : Greg disparaît du ring et une case de manga (greg_ko) s'affiche pendant le compte.
   L'illustration complète sert aussi pour la présentation (`greg_portrait`) et l'annonce du SMASH (`greg_visage`).

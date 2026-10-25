@@ -74,7 +74,7 @@ export class GregCombat extends BossScene {
     // jambes de Greg (posées sur le tapis, sous le haut du corps)
     const J = R.illustre.jambes;
     this.g.jambes = this.illustre && this.textures.exists(J.cle)
-      ? this.add.image(R.centreX, J.y, J.cle).setOrigin(J.origine[0], J.origine[1]).setScale(J.taille).setDepth(8.9) : null;
+      ? this.add.image(R.centreX, 0, J.cle).setDepth(8.9) : null;
     this.zoneGarde = this.add.graphics().setDepth(9.5);
     this.aura = this.add.graphics().setDepth(8);        // aura bleue derrière Greg (coup au corps)
     this.cible = this.add.graphics().setDepth(25);      // cible qui se resserre là où le coup va frapper
@@ -969,7 +969,8 @@ export class GregCombat extends BossScene {
   afficherGregIllustre(reel) {
     const g = this.g, v = g.vis, I = R.illustre, t = this.time.now;
     const existe = (nom) => this.textures.exists(I.poses[nom].cle);
-    const garde = g.garde === 'haute' && existe('haute') ? 'haute' : 'basse';
+    const repos = existe('entier') ? 'entier' : 'basse';   // image complète si elle existe
+    const garde = g.garde === 'haute' && existe('haute') ? 'haute' : repos;
     const imageCoup = (cible) => (cible === 'corps' ? 'corps' : 'visage');
     let pose = garde, dx = 0, dy = 0, echelle = 1, angle = 0, teinte = null, rapide = false;
     const forcee = g.poseForcee ? g.poseForcee.nom : null;
@@ -981,7 +982,7 @@ export class GregCombat extends BossScene {
       return;
     }
     g.sprite.setVisible(true);
-    if (forcee === 'touche' || g.etat === 'touche') { pose = existe('haute') ? 'haute' : 'basse'; dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }
+    if (forcee === 'touche' || g.etat === 'touche') { pose = repos; dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }
     else if (forcee === 'bloque') { pose = existe('haute') ? 'haute' : 'basse'; echelle = 0.97; teinte = 0xc8d4ff; rapide = true; }
     else if (forcee === 'uppercut') { pose = 'visage'; echelle = 1.12; dy = 20; rapide = true; }
     else if (g.etat === 'prepare') {
@@ -1007,10 +1008,10 @@ export class GregCombat extends BossScene {
       pose = imageCoup(g.attaque.cible); echelle = 1.1; dy = g.attaque.cible === 'smash' ? -15 : (g.attaque.cible === 'corps' ? 30 : 14); rapide = true;
       angle = g.attaque.id === 'crochet' ? -6 : 0;
     }
-    else if (g.etat === 'essouffle' || g.etat === 'recup') { pose = 'basse'; dy = 14 + Math.sin(t / 140) * 4; echelle = 0.98; teinte = 0xd8d0e8; }
-    else if (this.etat === 'fin' && this.j.downs >= R.knockdownsMax) { pose = 'basse'; dy = -10 + Math.sin(t / 160) * 6; echelle = 1.04; }
+    else if (g.etat === 'essouffle' || g.etat === 'recup') { pose = repos; dy = 14 + Math.sin(t / 140) * 4; echelle = 0.98; teinte = 0xd8d0e8; }
+    else if (this.etat === 'fin' && this.j.downs >= R.knockdownsMax) { pose = repos; dy = -10 + Math.sin(t / 160) * 6; echelle = 1.04; }
     else { dx = Math.sin(t / 400) * 12; dy = Math.sin(t / 300) * 2; }     // en garde : il se balance et respire
-    if (!existe(pose)) pose = 'basse';
+    if (!existe(pose)) pose = repos;
 
     const k = rapide ? 1 : Math.min(1, reel * 12);
     v.dx += (dx - v.dx) * k; v.dy += (dy - v.dy) * k; v.echelle += (echelle - v.echelle) * k; v.angle += (angle - v.angle) * k;
@@ -1024,9 +1025,20 @@ export class GregCombat extends BossScene {
     sp.setTexture(P.cle).setFlipX(retourne).setOrigin(retourne ? 1 - P.origine[0] : P.origine[0], P.origine[1]);
     sp.setPosition(I.teteX + v.dx + secousse, I.teteY + v.dy).setScale(P.taille * v.echelle).setAngle(v.angle);
     if (teinte) sp.setTint(teinte); else sp.clearTint();
-    if (g.jambes) {   // les jambes suivent un peu le buste, mais restent plantées
-      g.jambes.setVisible(true).setX(I.teteX + v.dx * 0.35 + secousse * 0.3);
-      if (teinte) g.jambes.setTint(teinte); else g.jambes.clearTint();
+    // jambes : posées juste sous la ceinture de l'image du haut (seulement pour les poses coupées)
+    if (g.jambes) {
+      const C = P.ceinture;
+      g.jambes.setVisible(!!C);
+      if (C) {
+        const echelle = P.taille * v.echelle;
+        let ox = (C[0] - P.origine[0] * sp.width) * echelle * (retourne ? -1 : 1);
+        let oy = (C[1] - P.origine[1] * sp.height) * echelle;
+        const a = Phaser.Math.DegToRad(v.angle), cs = Math.cos(a), sn = Math.sin(a);
+        [ox, oy] = [ox * cs - oy * sn, ox * sn + oy * cs];
+        g.jambes.setPosition(sp.x + ox, sp.y + oy).setScale(echelle * C[2] / I.jambes.largeur)
+          .setOrigin(I.jambes.ceintureX / g.jambes.width, 0).setAngle(v.angle);
+        if (teinte) g.jambes.setTint(teinte); else g.jambes.clearTint();
+      }
     }
 
     this.dessinerCibleEtAura();
