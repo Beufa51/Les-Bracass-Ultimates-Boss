@@ -20,15 +20,16 @@ export const REGLAGES = {
   //   origine = position de la tête dans l'image (0 à 1), taille = grossissement à l'écran
   illustre: {
     //   cote = côté de l'écran d'où part le gant sur l'image (elle est retournée pour l'autre côté)
-    teteX: 480, teteY: 122, yAuSol: 345,
+    teteX: 480, teteY: 122, yAuSol: 285,
     poses: {
       basse:  { cle: 'greg_combat',      origine: [0.467, 0.134], taille: 0.74 },
       haute:  { cle: 'greg_garde_haute', origine: [0.584, 0.18],  taille: 0.69 },
       corps:  { cle: 'greg_coup_corps',  origine: [0.3, 0.154],   taille: 0.61, cote: 'd' },
       visage: { cle: 'greg_coup_visage', origine: [0.633, 0.19],  taille: 0.54, cote: 'g' },
-      ko:     { cle: 'greg_ko',          origine: [0.5, 0.5],     taille: 0.72 },
+      ko:     { cle: 'greg_ko',          origine: [0.5, 0.5],     taille: 0.52 },
     },
     debutElan: 0.2,    // à partir de ce moment de la préparation, on voit le coup partir
+    debutElanCorps: 0.4,   // pour le coup au corps : il plonge d'abord bas plus longtemps
   },
   tailleJoueur: 0.85,
 
@@ -102,7 +103,7 @@ export const ATTAQUES = {
   jab:     { nom: 'Jab',          cible: 'tete',  prepa: 0.6,  degats: 6,  recup: 0.4, souffle: 4 },
   crochet: { nom: 'Crochet',      cible: 'tete',  prepa: 0.85, degats: 12, recup: 0.7, souffle: 8 },
   corps:   { nom: 'Coup au foie', cible: 'corps', prepa: 0.75, degats: 10, recup: 0.6, souffle: 8, souffleJoueur: 25 },
-  rafale:  { nom: 'Flicker',      cible: 'tete',  prepa: 0.6,  degats: 4,  recup: 0.8, souffle: 12, coups: 3, entre: 0.4 },
+  rafale:  { nom: 'Flicker',      cible: 'tete',  prepa: 0.7,  degats: 4,  recup: 0.8, souffle: 12, coups: 3, entre: 0.75 },
   smash:   { nom: 'SMASH',        cible: 'smash', prepa: 1.1,  degats: 28, recup: 1.2, souffle: 20, gardeCassee: 0.5 },
 };
 

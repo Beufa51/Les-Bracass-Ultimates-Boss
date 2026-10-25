@@ -71,6 +71,8 @@ export class GregCombat extends BossScene {
     this.illustre = this.textures.exists('greg_combat');
     if (this.illustre) this.g.sprite.setTexture('greg_combat');
     this.zoneGarde = this.add.graphics().setDepth(9.5);
+    this.aura = this.add.graphics().setDepth(8);        // aura bleue derrière Greg (coup au corps)
+    this.cible = this.add.graphics().setDepth(25);      // cible qui se resserre là où le coup va frapper
     this.alerte = texte(this, R.centreX + 150, 150, '!', 60, '#ffd84a').setDepth(30).setVisible(false);
     // grosse flèche "où esquiver" pendant que Greg prépare son coup
     this.flecheEsquive = texte(this, R.centreX, 300, '', 40, '#ffd84a', { lineSpacing: 2 }).setDepth(31).setVisible(false);
@@ -941,18 +943,25 @@ export class GregCombat extends BossScene {
     else if (forcee === 'uppercut') { pose = 'visage'; echelle = 1.12; dy = 20; rapide = true; }
     else if (g.etat === 'prepare') {
       const c = g.attaque.cible, avance = g.t / g.prepa, sens = g.attaque.cote === 'g' ? -1 : (g.attaque.cote === 'd' ? 1 : 0);
-      if (avance < I.debutElan) {      // il arme son coup : il penche du côté d'où il va frapper
+      const debut = c === 'corps' ? I.debutElanCorps : I.debutElan;
+      if (avance < debut) {             // il arme son coup
         if (c === 'smash') { dy = 34; echelle = 0.93; angle = -3; }
-        else { dx = sens * 34; dy = c === 'corps' ? 16 : 0; angle = sens * 6; echelle = 0.96; }
+        else if (c === 'corps') { dy = 46; echelle = 0.9; dx = sens * 20; angle = sens * 4; }   // il plonge bas
+        else { dx = sens * 34; angle = sens * 6; echelle = 0.96; }
       } else {                          // le coup part : l'image du coup grossit vers toi, du bon côté
-        const elan = (avance - I.debutElan) / (1 - I.debutElan);
-        pose = imageCoup(c); echelle = 0.82 + elan * 0.25; dx = sens * 30 * (1 - elan);
-        dy = c === 'smash' ? 30 - elan * 40 : elan * 10; rapide = true;
+        const elan = (avance - debut) / (1 - debut);
+        pose = imageCoup(c); rapide = true;
+        if (c === 'corps') {            // coup au corps : il remonte d'en bas, en tournant
+          echelle = 0.84 + elan * 0.24; dx = sens * 26 * (1 - elan); dy = 60 - elan * 30; angle = sens * 10 * (1 - elan);
+        } else {
+          echelle = 0.82 + elan * 0.25; dx = sens * 30 * (1 - elan);
+          dy = c === 'smash' ? 30 - elan * 40 : elan * 10;
+        }
       }
-      if (Math.floor(this.horloge * 10) % 2) teinte = c === 'smash' ? 0xff7070 : (c === 'corps' ? 0xa8e8ff : 0xfff0a0);
+      if (Math.floor(this.horloge * 10) % 2) teinte = c === 'smash' ? 0xff7070 : (c === 'corps' ? 0x8fd6ff : 0xfff0a0);
     }
     else if (g.etat === 'frappe' || (g.etat === 'recup' && g.t < 0.15 && g.attaque && g.attaque.cible)) {
-      pose = imageCoup(g.attaque.cible); echelle = 1.1; dy = g.attaque.cible === 'smash' ? -15 : 14; rapide = true;
+      pose = imageCoup(g.attaque.cible); echelle = 1.1; dy = g.attaque.cible === 'smash' ? -15 : (g.attaque.cible === 'corps' ? 30 : 14); rapide = true;
       angle = g.attaque.id === 'crochet' ? -6 : 0;
     }
     else if (g.etat === 'essouffle' || g.etat === 'recup') { pose = 'basse'; dy = 14 + Math.sin(t / 140) * 4; echelle = 0.98; teinte = 0xd8d0e8; }
@@ -974,6 +983,8 @@ export class GregCombat extends BossScene {
     else sp.setPosition(I.teteX + v.dx + secousse, I.teteY + v.dy).setScale(P.taille * v.echelle).setAngle(v.angle);
     if (teinte) sp.setTint(teinte); else sp.clearTint();
 
+    this.dessinerCibleEtAura();
+
     // sans l'image "garde haute", une zone bleue montre ce qu'il protège
     const z = this.zoneGarde;
     z.clear();
@@ -983,6 +994,31 @@ export class GregCombat extends BossScene {
       const pulse = 0.5 + Math.sin(t / 200) * 0.2;
       z.fillStyle(0x5ad1ff, 0.16 * pulse + 0.06).fillRoundedRect(x - l / 2, y - h / 2, l, h, 18);
       z.lineStyle(3, 0x9fe6ff, pulse).strokeRoundedRect(x - l / 2, y - h / 2, l, h, 18);
+    }
+  }
+
+  // Cible qui se resserre sur toi (là où le coup va frapper) + aura bleue du coup au corps
+  dessinerCibleEtAura() {
+    const g = this.g, c = this.cible, a = this.aura, t = this.time.now;
+    c.clear(); a.clear();
+    if (this.etat !== 'combat' || g.etat !== 'prepare' || !g.attaque || this.j.dempsey) return;
+    const at = g.attaque, avance = Phaser.Math.Clamp(g.t / g.prepa, 0, 1);
+    const couleur = at.cible === 'corps' ? 0x5ad1ff : (at.cible === 'smash' ? 0xff3b3b : 0xffd84a);
+    const x = R.centreX, y = at.cible === 'corps' ? TETE_JOUEUR_Y + 95 : TETE_JOUEUR_Y - 10;
+    const r = 24 + 80 * (1 - avance);
+    c.lineStyle(5, couleur, 0.9).strokeCircle(x, y, r);
+    c.lineStyle(2, couleur, 0.9).strokeCircle(x, y, 20);
+    c.lineBetween(x - r - 10, y, x - r + 14, y).lineBetween(x + r - 14, y, x + r + 10, y)
+     .lineBetween(x, y - r - 10, x, y - r + 14).lineBetween(x, y + r - 14, x, y + r + 10);
+    if (at.cible === 'corps') {
+      // aura bleue qui pulse autour de Greg + traits qui montent
+      const pulse = 0.5 + Math.sin(t / 70) * 0.5;
+      a.fillStyle(0x5ad1ff, 0.12 + pulse * 0.12).fillEllipse(R.centreX + this.g.vis.dx, 270, 330, 300);
+      a.lineStyle(3, 0x9fe6ff, 0.6);
+      for (let k = 0; k < 10; k++) {
+        const lx = R.centreX - 150 + ((k * 37 + t / 3) % 300), ly = 380 - ((t / 2 + k * 53) % 220);
+        a.lineBetween(lx, ly, lx, ly - 40);
+      }
     }
   }
 
