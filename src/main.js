@@ -15,7 +15,9 @@ const jeu = new Phaser.Game({
   width: LARGEUR,
   height: HAUTEUR,
   backgroundColor: '#111111',
-  pixelArt: true,
+  // dessins lissés (mettre pixelArt: true seulement si TOUS les visuels deviennent du pixel art)
+  pixelArt: false,
+  antialias: true,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   scene: [ChargementScene, HubScene, BientotScene, MenuTestScene, ...scenesDesBoss],
 });

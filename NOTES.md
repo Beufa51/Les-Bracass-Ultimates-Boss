@@ -20,7 +20,9 @@
 - **Smartphone / tablette** : boutons tactiles à l'écran (`src/core/tactile.js`), qui "appuient" sur
   les touches du clavier. Chaque scène choisit le texte de ses boutons (`etiquettesTactiles`).
   Le menu de test (F1) n'existe que sur ordinateur.
-- Manifeste unique des visuels/sons : `assets/manifeste.js` (formes provisoires dessinées par le code).
+- Manifeste unique des visuels/sons : `assets/manifeste.js`. Tant qu'un visuel n'a pas de fichier,
+  il est dessiné par le code dans `src/core/dessins.js` (style manga : contours, ombres, reflets).
+- Rendu lissé (`pixelArt: false` dans `src/main.js`).
 - **Greg** (`src/bosses/greg/`) : combat de boxe en 3 rounds de 60 s.
   - Commandes : ◀ ▶ esquive, Espace = coup au visage, Z = coup au corps, Bas (maintenu) = garde,
     X = Dempsey Roll (quand la jauge d'esprit est pleine).

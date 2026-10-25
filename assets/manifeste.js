@@ -13,8 +13,8 @@
 // =====================================================================
 
 // Couleurs des boxeurs provisoires
-const HEROS_BOXE = { couleur: '#3fa7ff', gants: '#f4f4f4', gantsOmbre: '#c9c9c9', cheveux: '#3b2416' };
-const GREG = { couleur: '#e6194b', gants: '#b3122f', gantsOmbre: '#7d0c20', cheveux: '#111111', coiffure: 'pics', peau: '#e8b58a', peauOmbre: '#c98f63', ceinture: '#ffd84a' };
+const HEROS_BOXE = { couleur: '#2f7fe0', gants: '#f4f4f4', poignets: '#2f7fe0', cheveux: '#5a3418' };
+const GREG = { couleur: '#d4143c', gants: '#c8102e', poignets: '#ffd84a', cheveux: '#17171f', peau: '#e3ad80', ceinture: '#ffd84a', nom: 'GREG' };
 
 export const MANIFESTE = {
   images: {
