@@ -76,7 +76,6 @@ export class GregCombat extends BossScene {
     this.g.jambes = this.illustre && this.textures.exists(J.cle)
       ? this.add.image(R.centreX, J.y, J.cle).setOrigin(J.origine[0], J.origine[1]).setScale(J.taille).setDepth(8.9) : null;
     this.zoneGarde = this.add.graphics().setDepth(9.5);
-    this.ombreKO = this.add.graphics().setDepth(8.5);
     this.aura = this.add.graphics().setDepth(8);        // aura bleue derrière Greg (coup au corps)
     this.cible = this.add.graphics().setDepth(25);      // cible qui se resserre là où le coup va frapper
     this.alerte = texte(this, R.centreX + 150, 150, '!', 60, '#ffd84a').setDepth(30).setVisible(false);
@@ -665,7 +664,7 @@ export class GregCombat extends BossScene {
   // =================================================================
   gregAuTapis() {
     const g = this.g;
-    g.downs++; g.etat = 'sol'; g.attaque = null; g.poseForcee = null; g.solDepuis = this.time.now;
+    g.downs++; g.etat = 'sol'; g.attaque = null; g.poseForcee = null;
     this.j.action = null; this.j.dempsey = null; this.j.esquive = null;
     this.alerte.setVisible(false);
     flash(this, 0.9);
@@ -700,6 +699,11 @@ export class GregCombat extends BossScene {
     this.compte = { qui, n: 0, t: -0.6, appuis: 0, monologue: false, coach: false };
     this.texteCompte = texte(this, LARGEUR / 2, 150, '', 96, '#ffffff').setDepth(45);
     this.texteCompte2 = texte(this, LARGEUR / 2, 240, '', 22, '#ffffff').setDepth(45);
+    if (qui === 'greg' && this.illustre && this.textures.exists('greg_ko')) {
+      // le compte se met à gauche, la case de manga du K.O. à droite
+      this.texteCompte.setPosition(250, 220); this.texteCompte2.setPosition(250, 310);
+      this.caseKO = this.ouvrirCaseKO();
+    }
     if (qui === 'joueur') {
       this.barreReleve = this.add.graphics().setDepth(45);
       this.texteCompte2.setText(estTactile() ? 'VISAGE ! VISAGE ! VISAGE !' : 'ESPACE ! ESPACE ! ESPACE !').setColor('#7fff7f');
@@ -736,7 +740,32 @@ export class GregCombat extends BossScene {
     }
   }
 
+  // Grande case de manga : Greg au tapis (son illustration), sur fond de lignes de vitesse
+  ouvrirCaseKO() {
+    const x = 680, y = 318, l = 380, h = 420;
+    const c = this.add.container(x, y).setDepth(44);
+    const fond = this.add.graphics();
+    fond.fillStyle(0xf4f0e6, 1).fillRect(-l / 2, -h / 2, l, h);
+    fond.lineStyle(2, 0x1a1014, 0.55);
+    for (let k = 0; k < 70; k++) {   // lignes qui partent du centre
+      const a = (k / 70) * Math.PI * 2, r1 = 80 + (k % 3) * 25, cx = Math.cos(a), sy = Math.sin(a);
+      const r2 = Math.min((l / 2 - 4) / Math.abs(cx || 1e-6), (h / 2 - 4) / Math.abs(sy || 1e-6));   // s'arrête au bord
+      fond.lineBetween(cx * r1, sy * r1, cx * r2, sy * r2);
+    }
+    const img = this.add.image(0, 10, 'greg_ko');
+    img.setScale(Math.min((l - 30) / img.width, (h - 30) / img.height));
+    const cadre = this.add.graphics();
+    cadre.lineStyle(8, 0x1a1014, 1).strokeRect(-l / 2, -h / 2, l, h);
+    const mot = texte(this, -l / 2 + 70, -h / 2 + 40, 'DOWN !!', 40, '#ffd84a', { fontStyle: 'bold italic', stroke: '#b3202c', strokeThickness: 8 }).setAngle(-12);
+    c.add([fond, img, cadre, mot]);
+    // la case "claque" à l'écran
+    c.setScale(0.2).setAngle(8);
+    this.tweens.add({ targets: c, scale: 1, angle: -2, duration: 220, ease: 'Back.Out' });
+    return c;
+  }
+
   finCompte() {
+    if (this.caseKO) { this.caseKO.destroy(); this.caseKO = null; }
     this.texteCompte.destroy(); this.texteCompte2.destroy();
     if (this.barreReleve) { this.barreReleve.destroy(); this.barreReleve = null; }
     this.compte = null;
@@ -945,8 +974,14 @@ export class GregCombat extends BossScene {
     let pose = garde, dx = 0, dy = 0, echelle = 1, angle = 0, teinte = null, rapide = false;
     const forcee = g.poseForcee ? g.poseForcee.nom : null;
 
-    if (g.etat === 'sol') pose = 'ko';
-    else if (forcee === 'touche' || g.etat === 'touche') { pose = existe('haute') ? 'haute' : 'basse'; dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }
+    // au tapis, Greg est montré dans une case de manga (voir ouvrirCaseKO) : on le cache sur le ring
+    if (g.etat === 'sol') {
+      g.sprite.setVisible(false); if (g.jambes) g.jambes.setVisible(false);
+      this.zoneGarde.clear(); this.dessinerCibleEtAura();
+      return;
+    }
+    g.sprite.setVisible(true);
+    if (forcee === 'touche' || g.etat === 'touche') { pose = existe('haute') ? 'haute' : 'basse'; dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }
     else if (forcee === 'bloque') { pose = existe('haute') ? 'haute' : 'basse'; echelle = 0.97; teinte = 0xc8d4ff; rapide = true; }
     else if (forcee === 'uppercut') { pose = 'visage'; echelle = 1.12; dy = 20; rapide = true; }
     else if (g.etat === 'prepare') {
@@ -987,17 +1022,10 @@ export class GregCombat extends BossScene {
     const coteCoup = g.attaque && g.attaque.cote;
     const retourne = !!(P.cote && coteCoup && coteCoup !== 'centre' && coteCoup !== P.cote);
     sp.setTexture(P.cle).setFlipX(retourne).setOrigin(retourne ? 1 - P.origine[0] : P.origine[0], P.origine[1]);
-    if (pose === 'ko') {
-      // il bascule en arrière et s'écrase à plat sur le tapis (vu en perspective), avec son ombre
-      const f = Math.min(1, (this.time.now - (g.solDepuis || 0)) / 350);
-      sp.setPosition(R.centreX, I.koY).setScale(P.taille, P.taille * (1 - f * (1 - P.aplati))).setAngle(0);
-    }
-    else sp.setPosition(I.teteX + v.dx + secousse, I.teteY + v.dy).setScale(P.taille * v.echelle).setAngle(v.angle);
+    sp.setPosition(I.teteX + v.dx + secousse, I.teteY + v.dy).setScale(P.taille * v.echelle).setAngle(v.angle);
     if (teinte) sp.setTint(teinte); else sp.clearTint();
-    this.ombreKO.clear();
-    if (pose === 'ko') this.ombreKO.fillStyle(0x000000, 0.35).fillEllipse(R.centreX, I.koY - 40, 300, 70);
     if (g.jambes) {   // les jambes suivent un peu le buste, mais restent plantées
-      g.jambes.setVisible(pose !== 'ko').setX(I.teteX + v.dx * 0.35 + secousse * 0.3);
+      g.jambes.setVisible(true).setX(I.teteX + v.dx * 0.35 + secousse * 0.3);
       if (teinte) g.jambes.setTint(teinte); else g.jambes.clearTint();
     }
 

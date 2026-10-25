@@ -30,6 +30,7 @@
   Greg est vu en entier : ses jambes (`greg_jambes.png`, tirées de `assets_inbox/greg_entier.jpg`)
   restent posées sur le tapis sous le haut du corps.
   Quand il prépare un coup, on voit l'image du coup grossir vers toi avant l'impact.
+  Au tapis : Greg disparaît du ring et une case de manga (greg_ko) s'affiche pendant le compte.
   L'illustration complète sert aussi pour la présentation (`greg_portrait`) et l'annonce du SMASH (`greg_visage`).
 - Bruitages du combat : générés par `outils/generer_sons.py` (Python + numpy) dans `assets/audio/`.
 - Rendu lissé (`pixelArt: false` dans `src/main.js`).
