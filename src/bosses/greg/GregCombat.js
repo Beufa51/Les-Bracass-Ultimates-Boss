@@ -16,7 +16,8 @@ import { texte, voile } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { IDENTITE, REGLAGES as R, ATTAQUES, ATTAQUES_PAR_ROUND, CONSEILS, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
-import { lignesImpact, onomatopee, flash, encart, bulle, gouttes } from './effets.js';
+import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from './effets.js';
+import { jouerClip } from '../../core/clips.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 
 const auHasard = (liste) => liste[Math.floor(Math.random() * liste.length)];
@@ -404,76 +405,177 @@ export class GregCombat extends BossScene {
   //  DEMPSEY ROLL
   // =================================================================
   lancerDempsey() {
-    const j = this.j, g = this.g;
-    j.esprit = 0; j.esquive = null; j.garde = false;
-    j.dempsey = { coups: 0, dernier: null, delai: R.dempsey.delaiMax + 0.8, cote: 'g', contre: null, contreTente: false };
+    const j = this.j, g = this.g, D = R.dempsey;
+    j.esprit = 0; j.esquive = null; j.garde = false; j.action = null;
+    const [cmin, cmax] = D.contreEntre;
+    j.dempsey = {
+      phi: -Math.PI * 0.9,          // position de la boule sur le "∞" (part de la gauche, vers la droite)
+      periode: D.periodeDepart,
+      coups: 0, demi: -1, touche: true, cote: 'd',
+      contreA: this.round >= 3 ? Phaser.Math.Between(cmin, cmax) : -1, contre: false,
+    };
     g.etat = 'touche'; g.t = 0; g.attaque = null; this.alerte.setVisible(false);
-    const e = encart(this, 'DEMPSEY ROLL !!', 'Alterne ◀ / ▶ le plus vite possible !', '#ffd84a', 0x101a40);
-    this.figer(1.1, () => e.fermer());
+    jouerSon(this, 'greg_alerte');
+    // Le clip (GIF / vidéo) s'il existe dans le manifeste, sinon l'animation dessinée par le code
+    const clip = jouerClip(this, 'greg_dempsey');
+    if (clip) { this.figer(clip.duree, () => { clip.fermer(); this.aideDempsey(); }); return; }
+    const e = encartDempsey(this);
+    this.figer(1.8, () => { e.fermer(); this.aideDempsey(); });
+  }
+
+  aideDempsey() {
+    if (this.aideDempseyVue) return;
+    this.aideDempseyVue = true;
+    const t = texte(this, R.centreX, 400, '◀ quand la boule est à GAUCHE, ▶ quand elle est à DROITE !', 20, '#ffd84a').setDepth(46);
+    this.tweens.add({ targets: t, alpha: 0, delay: 2200, duration: 400, onComplete: () => t.destroy() });
+  }
+
+  // Le "∞" : x de -1 à 1, droite quand phi = 0, gauche quand phi = PI
+  static infini(phi) {
+    const s = Math.sin(phi), c = Math.cos(phi), k = 1 + s * s;
+    return { x: c / k, y: s * c / k };
   }
 
   majDempsey(dt) {
     const j = this.j, g = this.g, d = j.dempsey, a = this.appuis, D = R.dempsey;
     g.t = 0;   // Greg reste sonné tant que le roll continue
+    d.phi += (Math.PI * 2 / d.periode) * dt;
 
-    // Greg tente un contre (à partir du round 3)
-    if (d.contre !== null) {
-      d.contre -= dt;
-      if (a.bas) {   // la garde sert de frein
-        d.contre = null;
-        onomatopee(this, R.centreX, 300, 'FREIN !', 44, '#7fff7f');
+    // Chaque demi-tour du "∞" = un côté (pair : droite, impair : gauche) = un coup à placer
+    const demi = Math.floor((d.phi + Math.PI / 2) / Math.PI);
+    if (demi !== d.demi) {
+      if (!d.touche) {   // la boule est passée sans qu'on frappe
+        if (d.contre) this.contreDempsey(); else this.casserDempsey('Trop tard !');
+        return;
+      }
+      d.demi = demi; d.touche = false;
+      d.contre = d.coups === d.contreA;
+      if (d.contre) {
+        d.contreA = -1;   // un seul contre par Dempsey Roll
+        this.alerte.setText('!!\nGARDE !').setColor('#ff3b3b').setVisible(true);
+        jouerSon(this, 'greg_alerte');
+      }
+    }
+    const coteDemi = d.demi % 2 === 0 ? 'd' : 'g';
+    const centre = coteDemi === 'd' ? 0 : Math.PI;
+    const ecart = Math.abs(Phaser.Math.Angle.Wrap(d.phi - centre));
+
+    // Greg contre : il faut freiner avec la garde (▼) au bon moment
+    if (d.contre) {
+      if (a.bas && !d.touche) {
+        if (ecart > D.bien) { this.contreDempsey(); return; }
+        d.touche = true; d.contre = false;
+        this.alerte.setVisible(false);
+        onomatopee(this, R.centreX, 300, 'FREIN !', 46, '#7fff7f');
         onomatopee(this, R.centreX + 170, 60, 'Dans le vide !', 24, '#ffffff');
         jouerSon(this, 'greg_esquive');
-        this.alerte.setVisible(false);
-        d.delai = D.delaiMax;
-      } else if (d.contre <= 0) {
-        this.alerte.setVisible(false);
-        j.dempsey = null;
-        g.etat = 'recup'; g.t = 0; g.attaque = { recup: 0.6 };
-        g.poseForcee = { nom: 'uppercut', t: 0.3 };
-        j.sonne = 0.8; j.tremble = 0.3;
-        flash(this, 0.8, 0xff3b3b);
-        lignesImpact(this, R.centreX, TETE_JOUEUR_Y, 0xff3b3b, 30, 280);
-        onomatopee(this, R.centreX, TETE_JOUEUR_Y, 'CONTRE DE GREG !!', 42, '#ff3b3b');
-        this.cameras.main.shake(300, 0.02);
-        jouerSon(this, 'greg_coup_fort');
-        this.blesserJoueur(D.degatsContre);
+        this.ralentir(0.4, 0.3);
+        d.cote = coteDemi;
+      } else if (a.gauche || a.droite) {
+        this.contreDempsey();
       }
       return;
     }
 
-    d.delai -= dt;
     const appui = a.gauche ? 'g' : (a.droite ? 'd' : null);
-    if (appui && appui !== d.dernier) {
-      d.dernier = appui; d.cote = appui; d.coups++;
-      d.delai = D.delaiMax;
-      const final = d.coups >= D.coupsMax;
-      const xImpact = R.centreX + (appui === 'g' ? -40 : 40), yImpact = VISAGE_GREG.y + Phaser.Math.Between(-10, 20);
-      onomatopee(this, xImpact, yImpact, final ? ONO.enorme : ONO.fort, final ? 60 : 40, final ? '#ffd84a' : '#ffffff');
-      lignesImpact(this, xImpact, yImpact, 0xffd84a, final ? 30 : 14, final ? 280 : 150);
-      gouttes(this, xImpact, yImpact, appui === 'g' ? 1 : -1);
-      this.cameras.main.shake(final ? 250 : 80, final ? 0.018 : 0.007);
-      jouerSon(this, 'greg_coup_fort');
-      g.poseForcee = { nom: 'touche', t: 0.2 };
-      g.secousse = 0.2;
-      this.blesserGreg(final ? D.degatsFinal : D.degats);
-      if (g.etat === 'sol') { j.dempsey = null; return; }
-      if (final) { this.finDempsey(); return; }
-      if (this.round >= 3 && !d.contreTente && d.coups >= D.contreAuCoup && Math.random() < 0.8) {
-        d.contreTente = true;
-        d.contre = D.reflexe;
-        this.alerte.setText('!!\nGARDE !').setColor('#ff3b3b').setVisible(true);
-        jouerSon(this, 'greg_alerte');
-        this.ralentir(0.5, 0.4);
-      }
+    if (!appui) return;
+    if (appui !== coteDemi || d.touche) { this.casserDempsey('Mauvais côté !'); return; }
+    if (ecart > D.bien) { this.casserDempsey(Phaser.Math.Angle.Wrap(d.phi - centre) < 0 ? 'Trop tôt !' : 'Trop tard !'); return; }
+
+    // Coup réussi !
+    const parfait = ecart <= D.parfait;
+    d.touche = true; d.cote = appui; d.coups++;
+    d.periode = Math.max(D.periodeMin, d.periode * D.acceleration);
+    const final = d.coups >= D.coupsMax;
+    const combo = 1 + D.bonusCombo * (d.coups - 1);
+    const degats = final ? D.degatsFinal * combo : (parfait ? D.degatsParfait : D.degatsBien) * combo;
+    const xImpact = R.centreX + (appui === 'g' ? -50 : 50), yImpact = VISAGE_GREG.y + Phaser.Math.Between(-10, 30);
+    const taille = Math.min(70, 32 + d.coups * 4);
+    onomatopee(this, xImpact, yImpact, final ? ONO.enorme : ONO.fort, final ? 72 : taille, final ? '#ffd84a' : '#ffffff');
+    const note = texte(this, R.centreX + (appui === 'g' ? -250 : 250), 400, parfait ? 'PARFAIT !' : 'BIEN', parfait ? 30 : 22, parfait ? '#ffd84a' : '#ffffff').setDepth(46);
+    this.tweens.add({ targets: note, alpha: 0, y: 370, duration: 450, onComplete: () => note.destroy() });
+    lignesImpact(this, xImpact, yImpact, 0xffd84a, final ? 34 : 10 + d.coups * 2, final ? 320 : 120 + d.coups * 15);
+    gouttes(this, xImpact, yImpact, appui === 'g' ? 1 : -1);
+    this.cameras.main.shake(final ? 350 : 60 + d.coups * 15, final ? 0.025 : 0.004 + d.coups * 0.0012);
+    jouerSon(this, 'greg_coup_fort');
+    if (parfait) flash(this, 0.15 + d.coups * 0.03);
+    g.poseForcee = { nom: 'touche', t: 0.25 };
+    g.secousse = 0.25;
+    this.blesserGreg(degats);
+    if (g.etat === 'sol') { j.dempsey = null; return; }
+    if (final) {
+      flash(this, 0.9);
+      onomatopee(this, R.centreX, 230, 'FINISH !!', 64, '#ff8a3d');
+      this.ralentir(0.25, 0.5);
+      this.finDempsey();
     }
-    if (d.delai <= 0) this.finDempsey();
+  }
+
+  casserDempsey(raison) {
+    onomatopee(this, R.centreX, 300, raison, 32, '#ff6b6b');
+    onomatopee(this, R.centreX, 350, 'Le rythme est cassé...', 22, '#ffffff');
+    this.finDempsey();
+  }
+
+  contreDempsey() {
+    const j = this.j, g = this.g;
+    this.alerte.setVisible(false);
+    j.dempsey = null;
+    g.etat = 'recup'; g.t = 0; g.attaque = { recup: 0.6 };
+    g.poseForcee = { nom: 'uppercut', t: 0.3 };
+    j.sonne = 0.8; j.tremble = 0.3;
+    flash(this, 0.8, 0xff3b3b);
+    lignesImpact(this, R.centreX, TETE_JOUEUR_Y, 0xff3b3b, 30, 280);
+    onomatopee(this, R.centreX, TETE_JOUEUR_Y, 'CONTRE DE GREG !!', 42, '#ff3b3b');
+    this.cameras.main.shake(300, 0.02);
+    jouerSon(this, 'greg_coup_fort');
+    this.blesserJoueur(R.dempsey.degatsContre);
   }
 
   finDempsey() {
     const g = this.g;
     this.j.dempsey = null;
-    if (g.etat !== 'sol') { g.etat = 'touche'; g.t = -0.5; }
+    this.alerte.setVisible(false);
+    if (g.etat !== 'sol') { g.etat = 'touche'; g.t = -0.6; }
+  }
+
+  // Le "∞" à l'écran, la boule, les zones de frappe et les lignes de vitesse
+  dessinerDempsey() {
+    const gr = this.grDempsey, fond = this.grVitesse, d = this.j.dempsey;
+    gr.clear(); fond.clear();
+    this.texteCombo.setVisible(false);
+    if (!d || this.etat !== 'combat') return;
+    // lignes de vitesse de plus en plus intenses
+    const intensite = Math.min(1, 0.25 + d.coups * 0.08);
+    fond.lineStyle(3, 0xffffff, 0.12 + intensite * 0.25);
+    for (let k = 0; k < 30; k++) {
+      const ang = Math.random() * Math.PI * 2, r1 = 150 + Math.random() * 80, r2 = 600;
+      fond.lineBetween(R.centreX + Math.cos(ang) * r1, 240 + Math.sin(ang) * r1, R.centreX + Math.cos(ang) * r2, 240 + Math.sin(ang) * r2);
+    }
+    // piste en "∞"
+    const cx = R.centreX, cy = 455, ax = 210, ay = 140;
+    gr.fillStyle(0x000000, 0.45).fillRoundedRect(cx - ax - 50, cy - 60, (ax + 50) * 2, 120, 20);
+    gr.lineStyle(6, 0xffffff, 0.35).beginPath();
+    for (let t = 0; t <= Math.PI * 2 + 0.05; t += 0.05) {
+      const p = GregCombat.infini(t);
+      t === 0 ? gr.moveTo(cx + p.x * ax, cy + p.y * ay) : gr.lineTo(cx + p.x * ax, cy + p.y * ay);
+    }
+    gr.strokePath();
+    // zones de frappe (celle à viser brille)
+    const coteDemi = d.demi % 2 === 0 ? 'd' : 'g';
+    for (const cote of ['g', 'd']) {
+      const x = cx + (cote === 'd' ? ax : -ax) * 0.98;
+      const active = cote === coteDemi && !d.touche;
+      const couleur = d.contre && active ? 0xff3b3b : 0xffd84a;
+      gr.lineStyle(4, couleur, active ? 1 : 0.35).strokeCircle(x, cy, 30);
+      gr.fillStyle(couleur, active ? 0.3 : 0.08).fillCircle(x, cy, 30);
+    }
+    // la boule
+    const p = GregCombat.infini(d.phi);
+    gr.fillStyle(d.contre ? 0xff3b3b : 0xffffff, 1).fillCircle(cx + p.x * ax, cy + p.y * ay, 14);
+    gr.lineStyle(3, 0x1a1014, 1).strokeCircle(cx + p.x * ax, cy + p.y * ay, 14);
+    // compteur de coups
+    this.texteCombo.setVisible(d.coups > 0).setText(`${d.coups} COUPS !`).setScale(1 + d.coups * 0.04);
   }
 
   // =================================================================
@@ -667,7 +769,7 @@ export class GregCombat extends BossScene {
     if (this.compte && this.compte.qui === 'joueur') pj = 'sol';
     else if (this.etat === 'fin' && j.downs >= R.knockdownsMax) pj = 'sol';
     else if (this.etat === 'fin' && g.etat === 'sol') pj = 'victoire';
-    else if (j.dempsey) pj = j.dempsey.cote === 'g' ? 'dempsey_g' : 'dempsey_d';
+    else if (j.dempsey) pj = Math.cos(j.dempsey.phi) < 0 ? 'dempsey_g' : 'dempsey_d';
     else if (j.sonne > 0) pj = 'touche';
     else if (j.action) pj = j.action.pose;
     else if (j.esquive) pj = 'esquive';
@@ -676,7 +778,7 @@ export class GregCombat extends BossScene {
     // l'esquive fait glisser le boxeur sur le côté
     let cible = 0;
     if (j.esquive) cible = j.esquive.cote * R.decalageEsquive;
-    else if (j.dempsey) cible = j.dempsey.cote === 'g' ? -50 : 50;
+    else if (j.dempsey) cible = GregCombat.infini(j.dempsey.phi).x * 90;
     j.decalage += (cible - j.decalage) * Math.min(1, reel * 22);
     j.tremble = Math.max(0, j.tremble - reel);
     const tremble = j.tremble > 0 ? Phaser.Math.Between(-6, 6) : 0;
@@ -706,11 +808,15 @@ export class GregCombat extends BossScene {
 
     const contre = this.horloge < j.contreJusqua && this.etat === 'combat';
     this.aideContre.setVisible(contre).setPosition(R.centreX + j.decalage, 250);
+    this.dessinerDempsey();
     this.majHud();
   }
 
   creerHud() {
     this.hud = this.add.graphics().setDepth(40);
+    this.grVitesse = this.add.graphics().setDepth(5);
+    this.grDempsey = this.add.graphics().setDepth(35);
+    this.texteCombo = texte(this, R.centreX, 370, '', 30, '#ffd84a').setDepth(36).setVisible(false);
     texte(this, 30, 22, 'TOI', 18, '#3fa7ff').setOrigin(0, 0.5).setDepth(41);
     texte(this, LARGEUR - 30, 22, 'GREG', 18, '#ff5a6e').setOrigin(1, 0.5).setDepth(41);
     this.texteRound = texte(this, LARGEUR / 2, 20, '', 18, '#ffffff').setDepth(41);

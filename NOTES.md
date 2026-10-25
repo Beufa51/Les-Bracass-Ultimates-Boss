@@ -31,8 +31,11 @@
   - Esquive réussie = fenêtre de CONTRE (dégâts x2). Garde de Greg haute = vise le corps, basse = le visage.
   - 3 coups encaissés d'affilée : Greg se couvre puis riposte.
   - Coups au corps = vident le souffle de Greg ; à bout de souffle, il est grand ouvert.
-  - Jauge d'esprit combatif pleine : DEMPSEY ROLL (alterner Gauche/Droite ;
-    au round 3 Greg peut le contrer : garde pour freiner).
+  - Jauge d'esprit combatif pleine : DEMPSEY ROLL = jeu de rythme. Une boule parcourt un « ∞ » :
+    ◀ quand elle arrive à gauche, ▶ à droite (PARFAIT / BIEN). Chaque coup accélère et frappe plus fort,
+    10 coups = FINISH. Raté = le roll s'arrête. Round 3 : Greg contre (boule rouge) → ▼ pour freiner.
+  - Lancement du Dempsey Roll : joue `assets/sprites/greg/dempsey.gif` s'il existe (voir « clips »
+    dans le manifeste), sinon une animation dessinée par le code.
   - Au tapis : compte de l'arbitre, marteler Espace. 3 tapis = K.O. Greg : 3 tapis = victoire.
   - Le vieux coach donne des conseils avant chaque round. Fin du round 3 sans K.O. = décision aux points.
   - Tout l'équilibrage est dans `src/bosses/greg/reglages.js`.

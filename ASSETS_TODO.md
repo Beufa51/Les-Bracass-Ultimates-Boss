@@ -58,6 +58,8 @@ Ton boxeur : vu de dos, cheveux bruns, short bleu, gants blancs.
 | greg_sol.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, K.O. allongé sur le dos, étoiles au-dessus de la tête, fond transparent |
 | greg_victoire.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, lève le poing droit, fond transparent |
 
+Clip : `dempsey.gif` (dans `assets/sprites/greg/`) : joué au lancement du Dempsey Roll, environ 2,5 s. MP4/WEBM aussi possible.
+
 Sons Greg (provisoires) : greg_coup, greg_coup_fort, greg_bloque, greg_esquive, greg_cloche, greg_compte, greg_alerte.
 
 ## Sons

@@ -87,3 +87,49 @@ export function gouttes(scene, x, y, sens = 1) {
     });
   }
 }
+
+// Animation de lancement du Dempsey Roll (quand il n'y a pas de clip) :
+// ton boxeur balance le buste en "∞" avec des images rémanentes, titre géant, lignes de vitesse.
+export function encartDempsey(scene) {
+  const elements = [];
+  const cx = LARGEUR / 2, cy = HAUTEUR / 2;
+  const fond = scene.add.rectangle(cx, cy, LARGEUR, HAUTEUR, 0x0a1030, 0.94).setDepth(70).setAlpha(0);
+  scene.tweens.add({ targets: fond, alpha: 1, duration: 120 });
+  const lignes = scene.add.graphics().setDepth(71);
+  const boxeur = scene.add.image(cx, HAUTEUR + 40, 'heros_boxe_dempsey_g').setOrigin(0.5, 1).setDepth(73).setScale(1.35);
+  const titre = scene.add.text(cx, 90, 'DEMPSEY ROLL !!', {
+    fontFamily: POLICE, fontStyle: 'bold italic', fontSize: '76px', color: '#ffd84a',
+    stroke: '#000000', strokeThickness: 12,
+  }).setOrigin(0.5).setDepth(74).setScale(3).setAlpha(0);
+  scene.tweens.add({ targets: titre, scale: 1, alpha: 1, delay: 250, duration: 180, ease: 'Back.Out',
+    onComplete: () => scene.cameras.main.shake(200, 0.012) });
+  elements.push(fond, lignes, boxeur, titre);
+
+  let phi = 0;
+  const anim = scene.time.addEvent({
+    delay: 16, loop: true, callback: () => {
+      phi += 0.16;
+      const s = Math.sin(phi), c = Math.cos(phi), k = 1 + s * s;
+      boxeur.setPosition(cx + (c / k) * 190, HAUTEUR + 40 + (s * c / k) * 70);
+      boxeur.setTexture(c < 0 ? 'heros_boxe_dempsey_g' : 'heros_boxe_dempsey_d');
+      // image rémanente
+      if (Math.floor(phi / 0.16) % 3 === 0) {
+        const fantome = scene.add.image(boxeur.x, boxeur.y, boxeur.texture.key).setOrigin(0.5, 1)
+          .setDepth(72).setScale(1.35).setTint(0x5ad1ff).setAlpha(0.45);
+        scene.tweens.add({ targets: fantome, alpha: 0, duration: 260, onComplete: () => fantome.destroy() });
+      }
+      // lignes de vitesse qui partent du centre
+      lignes.clear().lineStyle(3, 0xffffff, 0.5);
+      for (let i = 0; i < 26; i++) {
+        const a = Math.random() * Math.PI * 2, r1 = 120 + Math.random() * 60;
+        lignes.lineBetween(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1, cx + Math.cos(a) * 700, cy + Math.sin(a) * 700);
+      }
+    },
+  });
+  return {
+    fermer() {
+      anim.remove();
+      elements.forEach(e => scene.tweens.add({ targets: e, alpha: 0, duration: 150, onComplete: () => e.destroy() }));
+    },
+  };
+}

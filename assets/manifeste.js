@@ -84,6 +84,12 @@ export const MANIFESTE = {
       provisoire: { forme: 'rect', couleur: '#ff5ab4' } },
   },
 
+  // Clips (GIF, MP4 ou WEBM) joués par-dessus le jeu (durée en secondes).
+  // Si le fichier n'existe pas (ou fichier: null), le jeu joue son animation dessinée par le code.
+  clips: {
+    greg_dempsey: { fichier: 'sprites/greg/dempsey.gif', duree: 2.5 },   // lancement du Dempsey Roll
+  },
+
   // Sons : fichier null => petit "bip" provisoire (fréquence en Hz, durée en secondes)
   sons: {
     ui_valider: { fichier: null, provisoire: { frequence: 660, duree: 0.08 } },

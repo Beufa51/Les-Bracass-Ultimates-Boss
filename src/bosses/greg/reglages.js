@@ -37,14 +37,22 @@ export const REGLAGES = {
 
   // ---------- Esprit combatif (jauge du Dempsey Roll) ----------
   esprit: { coupPorte: 3, esquive: 10, contre: 15, releve: 25 },
+  // Dempsey Roll = jeu de rythme : une boule parcourt un "∞" (le balancement du buste).
+  // Appuie sur ◀ quand elle arrive à gauche, ▶ quand elle arrive à droite.
+  // Chaque coup réussi accélère le rythme et frappe plus fort.
   dempsey: {
-    coupsMax: 8,
-    degats: 3,
-    degatsFinal: 8,
-    delaiMax: 0.6,             // temps max entre deux appuis Gauche/Droite
-    contreAuCoup: 3,           // round 3 : Greg tente de contrer vers ce coup-là
-    reflexe: 0.5,              // temps pour appuyer sur Bas quand Greg contre
-    degatsContre: 30,
+    coupsMax: 10,              // le 10e coup est le coup final
+    periodeDepart: 1.3,        // secondes pour un tour complet du "∞" au début
+    acceleration: 0.92,        // chaque coup réussi : le tour dure 8 % de moins
+    periodeMin: 0.55,
+    parfait: 0.32,             // tolérance (en "angle") pour un PARFAIT
+    bien: 0.75,                // ... et pour un BIEN (au-delà : raté, le roll s'arrête)
+    degatsParfait: 5,
+    degatsBien: 3,
+    bonusCombo: 0.1,           // +10 % de dégâts par coup déjà enchaîné
+    degatsFinal: 14,
+    contreEntre: [3, 6],       // round 3 : Greg tente un contre entre ces coups-là
+    degatsContre: 25,
   },
 
   // ---------- Au tapis ----------
@@ -100,12 +108,12 @@ export const CONSEILS = [
   [
     'Ses coups au visage, tu les ESQUIVES (Gauche / Droite)...',
     '...et tu CONTRES tout de suite derrière : dégâts x2 !',
-    'Ta jauge d\'esprit est pleine ? DEMPSEY ROLL !',
+    'Jauge d\'esprit pleine ? DEMPSEY ROLL : frappe ◀ ▶ au rythme de la boule !',
   ],
   [
     'Attention à son SMASH (le gros "!!" rouge) :',
     'ESQUIVE sur le côté ! La garde ne suffit pas.',
-    'Pendant le Dempsey Roll, s\'il contre : GARDE pour freiner net !',
+    'Dempsey Roll : s\'il contre (boule ROUGE), GARDE (▼) pour freiner net !',
   ],
 ];
 
