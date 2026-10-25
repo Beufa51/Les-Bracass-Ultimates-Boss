@@ -24,6 +24,42 @@ Les boss seront ajoutés au fur et à mesure de leur développement. Le guide de
 | badge_remi.png | 48x48 | 1 | provisoire | Médaille ronde orange "Drunk Master" avec une chope, pixel art |
 | badge_lionel.png | 48x48 | 1 | provisoire | Médaille ronde violette avec un frisbee, pixel art |
 
+## Greg (combat de boxe, vue Punch-Out)
+Style : manga de boxe des années 90 (Hajime no Ippo), traits épais. Greg : cheveux noirs en pics, short rouge à ceinture jaune, gants rouges.
+Ton boxeur : vu de dos, cheveux bruns, short bleu, gants blancs.
+
+| Nom du fichier | Taille d'une case | Images | Statut | Description pour le générateur d'images |
+|---|---|---|---|---|
+| greg_ring.png | 960x540 | 1 | provisoire | Ring de boxe vu depuis un coin (face aux cordes du fond), public dans l'ombre, projecteurs, tapis bleu clair, style manga |
+| greg_coach.png | 160x160 | 1 | provisoire | Portrait d'un vieux coach de boxe chauve à moustache blanche, avec une canne, style manga |
+| heros_boxe_garde.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, en garde, les deux gants levés de chaque côté de la tête, fond transparent |
+| heros_boxe_jab.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, jab : bras gauche tendu vers l'avant et vers le haut, fond transparent |
+| heros_boxe_crochet.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, crochet du droit, buste tourné, fond transparent |
+| heros_boxe_corps.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, coup au corps, légèrement accroupi, bras droit tendu à mi-hauteur, fond transparent |
+| heros_boxe_esquive.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, esquive : accroupi, buste penché (le jeu le fait glisser sur le côté), fond transparent |
+| heros_boxe_bloque.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, garde fermée, les deux gants collés devant le visage, fond transparent |
+| heros_boxe_touche.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, sonné, gants écartés, tête rejetée, fond transparent |
+| heros_boxe_sol.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, allongé au tapis, fond transparent |
+| heros_boxe_victoire.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, les deux bras levés, fond transparent |
+| heros_boxe_dempsey_g.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, Dempsey Roll : buste plongé à gauche, crochet, fond transparent |
+| heros_boxe_dempsey_d.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, Dempsey Roll : buste plongé à droite, crochet, fond transparent |
+| greg_garde.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, garde haute, gants devant le menton, fond transparent |
+| greg_garde_basse.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, garde basse, gants au niveau du ventre, fond transparent |
+| greg_prepare.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, arme un coup au visage : bras droit tiré en arrière en hauteur, fond transparent |
+| greg_prepare_bas.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, arme un coup au corps : bras droit tiré en arrière en bas, fond transparent |
+| greg_prepare_smash.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, arme le SMASH : accroupi, gant droit très bas, fond transparent |
+| greg_jab.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, jab : gant gauche qui fonce vers l'écran (gros, en raccourci), fond transparent |
+| greg_crochet.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, crochet : gant droit qui balaie vers la gauche de l'écran, fond transparent |
+| greg_corps.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, coup au foie : gant droit vers le bas de l'écran, fond transparent |
+| greg_uppercut.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, SMASH : uppercut, gant droit très haut, fond transparent |
+| greg_bloque.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, garde fermée, deux gants devant le visage, fond transparent |
+| greg_touche.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, touché : tête projetée sur le côté, yeux en croix, fond transparent |
+| greg_essouffle.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, à bout de souffle : voûté, gants bas, bouche ouverte, fond transparent |
+| greg_sol.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, K.O. allongé sur le dos, étoiles au-dessus de la tête, fond transparent |
+| greg_victoire.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, lève le poing droit, fond transparent |
+
+Sons Greg (provisoires) : greg_coup, greg_coup_fort, greg_bloque, greg_esquive, greg_cloche, greg_compte, greg_alerte.
+
 ## Sons
 | Nom du fichier | Statut | Description (pour sfxr / jfxr) |
 |---|---|---|

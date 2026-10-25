@@ -28,8 +28,8 @@ export class BossScene extends Phaser.Scene {
       voile(this, 0.85).setDepth(1000),
       texte(this, LARGEUR / 2, 120, titre, 40, '#ffd84a').setDepth(1001),
       texte(this, LARGEUR / 2, 190, 'COMMANDES', 22, '#aaaaaa').setDepth(1001),
-      texte(this, LARGEUR / 2, 290, commandes.join('\n'), 22, '#ffffff', { lineSpacing: 10 }).setDepth(1001),
-      texte(this, LARGEUR / 2, 450, 'Appuie sur ESPACE pour commencer', 22, '#7fff7f').setDepth(1001),
+      texte(this, LARGEUR / 2, 220, commandes.join('\n'), 20, '#ffffff', { lineSpacing: 6 }).setOrigin(0.5, 0).setDepth(1001),
+      texte(this, LARGEUR / 2, 495, 'Appuie sur ESPACE pour commencer', 22, '#7fff7f').setDepth(1001),
     ];
     this.input.keyboard.once('keydown-SPACE', () => {
       elements.forEach(el => el.destroy());

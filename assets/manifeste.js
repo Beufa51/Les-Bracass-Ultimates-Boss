@@ -9,8 +9,12 @@
 //      nombre de cases posées côte à côte, de gauche à droite).
 // Le champ "provisoire" sert seulement tant que fichier vaut null.
 //
-// Formes provisoires possibles : perso, porte, dalle, mur, cercle, badge, rect
+// Formes provisoires possibles : perso, porte, dalle, mur, cercle, badge, rect, boxeurFace, boxeurDos, ring, coach
 // =====================================================================
+
+// Couleurs des boxeurs provisoires
+const HEROS_BOXE = { couleur: '#3fa7ff', gants: '#f4f4f4', gantsOmbre: '#c9c9c9', cheveux: '#3b2416' };
+const GREG = { couleur: '#e6194b', gants: '#b3122f', gantsOmbre: '#7d0c20', cheveux: '#111111', coiffure: 'pics', peau: '#e8b58a', peauOmbre: '#c98f63', ceinture: '#ffd84a' };
 
 export const MANIFESTE = {
   images: {
@@ -44,6 +48,37 @@ export const MANIFESTE = {
     badge_modele: { fichier: null, largeur: 48, hauteur: 48, images: 1, vitesse: 1,
       provisoire: { forme: 'badge', couleur: '#888888', lettre: 'M' } },
 
+    // ---------- GREG (combat de boxe) ----------
+    // Vue "Punch-Out" : ton boxeur vu de DOS (heros_boxe_*), Greg vu de FACE (greg_*).
+    // Une image par pose. Le bas du corps touche le bas de la case.
+    greg_ring:  { fichier: null, largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'ring' } },
+    greg_coach: { fichier: null, largeur: 160, hauteur: 160, images: 1, vitesse: 1, provisoire: { forme: 'coach' } },
+    heros_boxe_garde:         { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'garde', ...HEROS_BOXE } },
+    heros_boxe_jab:           { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'jab', ...HEROS_BOXE } },
+    heros_boxe_crochet:       { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'crochet', ...HEROS_BOXE } },
+    heros_boxe_corps:         { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'corps', ...HEROS_BOXE } },
+    heros_boxe_esquive:       { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'esquive', ...HEROS_BOXE } },
+    heros_boxe_bloque:        { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'bloque', ...HEROS_BOXE } },
+    heros_boxe_touche:        { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'touche', ...HEROS_BOXE } },
+    heros_boxe_sol:           { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'sol', ...HEROS_BOXE } },
+    heros_boxe_victoire:      { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'victoire', ...HEROS_BOXE } },
+    heros_boxe_dempsey_g:     { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'dempsey_g', ...HEROS_BOXE } },
+    heros_boxe_dempsey_d:     { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'dempsey_d', ...HEROS_BOXE } },
+    greg_garde:               { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'garde', ...GREG } },
+    greg_garde_basse:         { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'garde_basse', ...GREG } },
+    greg_prepare:             { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'prepare', ...GREG } },
+    greg_prepare_bas:         { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'prepare_bas', ...GREG } },
+    greg_prepare_smash:       { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'prepare_smash', ...GREG } },
+    greg_jab:                 { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'jab', ...GREG } },
+    greg_crochet:             { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'crochet', ...GREG } },
+    greg_corps:               { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'corps', ...GREG } },
+    greg_uppercut:            { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'uppercut', ...GREG } },
+    greg_bloque:              { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'bloque', ...GREG } },
+    greg_touche:              { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'touche', ...GREG } },
+    greg_essouffle:           { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'essouffle', ...GREG } },
+    greg_sol:                 { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'sol', ...GREG } },
+    greg_victoire:            { fichier: null, largeur: 360, hauteur: 420, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'victoire', ...GREG } },
+
     // ---------- BOSS MODÈLE (test technique, pas un vrai boss) ----------
     modele_cible: { fichier: null, largeur: 64, hauteur: 64, images: 2, vitesse: 4,
       provisoire: { forme: 'rect', couleur: '#ff5ab4' } },
@@ -55,5 +90,13 @@ export const MANIFESTE = {
     ui_badge:   { fichier: null, provisoire: { frequence: 990, duree: 0.25 } },
     ui_defaite: { fichier: null, provisoire: { frequence: 160, duree: 0.35 } },
     hub_porte:  { fichier: null, provisoire: { frequence: 440, duree: 0.12 } },
+    // Greg (boxe)
+    greg_coup:       { fichier: null, provisoire: { frequence: 220, duree: 0.06 } },
+    greg_coup_fort:  { fichier: null, provisoire: { frequence: 110, duree: 0.16 } },
+    greg_bloque:     { fichier: null, provisoire: { frequence: 880, duree: 0.04 } },
+    greg_esquive:    { fichier: null, provisoire: { frequence: 1250, duree: 0.03 } },
+    greg_cloche:     { fichier: null, provisoire: { frequence: 1320, duree: 0.5 } },
+    greg_compte:     { fichier: null, provisoire: { frequence: 520, duree: 0.1 } },
+    greg_alerte:     { fichier: null, provisoire: { frequence: 740, duree: 0.07 } },
   },
 };
