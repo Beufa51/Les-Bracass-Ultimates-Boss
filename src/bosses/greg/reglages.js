@@ -16,6 +16,8 @@ export const REGLAGES = {
   piedsJoueur: 575,            // bas du dessin du joueur (coupé par le bas de l'écran)
   decalageEsquive: 120,        // de combien ton boxeur part sur le côté en esquivant
   tailleGreg: 0.9,             // 1 = taille du dessin
+  // Greg en illustration (assets/sprites/greg/greg_combat.png)
+  illustre: { taille: 0.93, pieds: 475, yAuSol: 395 },
   tailleJoueur: 0.85,
 
   // ---------- Joueur ----------

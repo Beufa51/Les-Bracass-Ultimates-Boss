@@ -32,6 +32,7 @@ Ton boxeur : vu de dos, cheveux bruns en pics, short vert, gants blancs.
 
 | Nom du fichier | Taille d'une case | Images | Statut | Description pour le générateur d'images |
 |---|---|---|---|---|
+| greg_combat.png | 274x470 | 1 | **définitif** | Illustration de Greg détourée (fond transparent), utilisée pour toutes ses actions |
 | greg_ring.png | 960x540 | 1 | provisoire | Ring de boxe vu depuis un coin (face aux cordes du fond), public dans l'ombre, projecteurs, tapis bleu clair, style manga |
 | greg_coach.png | 160x160 | 1 | provisoire | Portrait d'un vieux coach de boxe chauve à moustache blanche, avec une canne, style manga |
 | heros_boxe_garde.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, en garde, les deux gants levés de chaque côté de la tête, fond transparent |
@@ -45,7 +46,7 @@ Ton boxeur : vu de dos, cheveux bruns en pics, short vert, gants blancs.
 | heros_boxe_victoire.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, les deux bras levés, fond transparent |
 | heros_boxe_dempsey_g.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, Dempsey Roll : buste plongé à gauche, crochet, fond transparent |
 | heros_boxe_dempsey_d.png | 280x340 | 1 | provisoire | Boxeur vu de DOS, Dempsey Roll : buste plongé à droite, crochet, fond transparent |
-| greg_garde.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, garde haute, gants devant le menton, fond transparent |
+| greg_garde.png (facultatif, remplacé par greg_combat.png) | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, garde haute, gants devant le menton, fond transparent |
 | greg_garde_basse.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, garde basse, gants au niveau du ventre, fond transparent |
 | greg_prepare.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, arme un coup au visage : bras droit tiré en arrière en hauteur, fond transparent |
 | greg_prepare_bas.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, arme un coup au corps : bras droit tiré en arrière en bas, fond transparent |

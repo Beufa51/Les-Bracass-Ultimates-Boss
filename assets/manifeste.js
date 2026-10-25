@@ -58,6 +58,10 @@ export const MANIFESTE = {
     // Vue "Punch-Out" : ton boxeur vu de DOS (heros_boxe_*), Greg vu de FACE (greg_*).
     // Une image par pose. Le bas du corps touche le bas de la case.
     greg_ring:  { fichier: null, largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'ring' } },
+    // Greg en combat : son illustration détourée (une seule image, le jeu l'anime en la déplaçant)
+    greg_combat:   { fichier: 'sprites/greg/greg_combat.png', largeur: 274, hauteur: 470, images: 1, vitesse: 1 },
+    greg_gant:     { fichier: null, largeur: 220, hauteur: 220, images: 1, vitesse: 1,
+      provisoire: { forme: 'gantSeul', gants: '#f4f4f4', poignets: '#f4f4f4', croix: true } },
     greg_portrait: { fichier: 'sprites/greg/greg_portrait.jpg', largeur: 572, hauteur: 1024, images: 1, vitesse: 1 },
     greg_visage:   { fichier: 'sprites/greg/greg_visage.jpg', largeur: 300, hauteur: 260, images: 1, vitesse: 1 },
     greg_coach: { fichier: null, largeur: 160, hauteur: 160, images: 1, vitesse: 1, provisoire: { forme: 'coach' } },

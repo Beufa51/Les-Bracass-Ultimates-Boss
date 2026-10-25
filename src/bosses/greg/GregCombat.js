@@ -65,7 +65,12 @@ export class GregCombat extends BossScene {
       etat: 'garde', t: 0, attaque: null, coupIndex: 0, garde: 'haute',
       gardeTimer: entre(...R.changementGarde), pause: 1.5, poseForcee: null,
       sprite: this.add.image(R.centreX, R.piedsGreg, 'greg_garde').setOrigin(0.5, 1).setDepth(9),
+      vis: { dx: 0, dy: 0, echelle: 1, angle: 0 },   // mouvements de l'illustration
     };
+    // Si l'illustration détourée de Greg existe, on l'utilise (sinon : les poses dessinées par le code)
+    this.illustre = this.textures.exists('greg_combat');
+    if (this.illustre) this.g.sprite.setTexture('greg_combat');
+    this.zoneGarde = this.add.graphics().setDepth(9.5);
     this.alerte = texte(this, R.centreX + 150, 150, '!', 60, '#ffd84a').setDepth(30).setVisible(false);
     this.aideContre = texte(this, R.centreX, 250, 'CONTRE !', 28, '#ff8a3d').setDepth(30).setVisible(false);
 
@@ -354,6 +359,7 @@ export class GregCombat extends BossScene {
     const g = this.g, j = this.j, at = g.attaque;
     g.coupIndex++;
     g.etat = 'frappe'; g.t = 0;
+    if (this.illustre) this.gantVolant(at, j.esquive && j.esquive.t <= R.esquiveProtege && at.cible !== 'corps' ? j.esquive.cote : 0);
     this.alerte.setVisible(false);
     const xImpact = R.centreX + j.decalage, yImpact = at.cible === 'corps' ? TETE_JOUEUR_Y + 90 : TETE_JOUEUR_Y;
 
@@ -395,6 +401,20 @@ export class GregCombat extends BossScene {
       jouerSon(this, 'greg_coup_fort');
     }
     this.blesserJoueur(degats);
+  }
+
+  // Le gros gant blanc de Greg qui fonce vers l'écran (vue Punch-Out)
+  gantVolant(at, esquive) {
+    const depart = at.cible === 'smash' ? [R.centreX + 30, 330] : (at.cible === 'corps' ? [R.centreX + 70, 290] : [R.centreX + 80, 170]);
+    const arrivee = at.cible === 'corps' ? [R.centreX, 430] : [R.centreX, TETE_JOUEUR_Y - (at.cible === 'smash' ? 40 : 0)];
+    // si tu as esquivé, le gant passe à côté (du côté opposé)
+    if (esquive) arrivee[0] -= esquive * 260;
+    const gt = this.add.image(depart[0], depart[1], 'greg_gant').setDepth(20).setScale(0.35)
+      .setAngle(at.id === 'crochet' ? -35 : (at.cible === 'smash' ? 180 : 0));
+    this.tweens.add({
+      targets: gt, x: arrivee[0], y: arrivee[1], scale: at.cible === 'smash' ? 2.0 : 1.6, duration: 110, ease: 'Quad.In',
+      onComplete: () => this.tweens.add({ targets: gt, alpha: 0, scale: gt.scale * 1.15, duration: 140, onComplete: () => gt.destroy() }),
+    });
   }
 
   blesserJoueur(degats) {
@@ -852,6 +872,8 @@ export class GregCombat extends BossScene {
     j.sprite.setPosition(R.centreX + j.decalage + tremble, R.piedsJoueur + rebond + (pj === 'sol' ? -30 : 0));
 
     // ---- Greg (de face) ----
+    if (this.illustre) { this.afficherGregIllustre(reel); }
+    else {
     let pg = g.garde === 'haute' ? 'garde' : 'garde_basse';
     if (g.etat === 'sol') pg = 'sol';
     else if (g.poseForcee) pg = g.poseForcee.nom;
@@ -870,11 +892,64 @@ export class GregCombat extends BossScene {
     // Greg clignote en rouge pendant la préparation du Smash
     if (g.etat === 'prepare' && g.attaque.cible === 'smash' && Math.floor(this.horloge * 12) % 2) g.sprite.setTint(0xff7070);
     else g.sprite.clearTint();
+    }
 
     const contre = this.horloge < j.contreJusqua && this.etat === 'combat';
     this.aideContre.setVisible(contre).setPosition(R.centreX + j.decalage, 250);
     this.dessinerDempsey();
     this.majHud();
+  }
+
+  // Greg = son illustration, animée en la déplaçant / tournant / teintant selon ce qu'il fait
+  afficherGregIllustre(reel) {
+    const g = this.g, v = g.vis, I = R.illustre, t = this.time.now;
+    let dx = 0, dy = 0, echelle = 1, angle = 0, teinte = null, rapide = false;
+    const pose = g.poseForcee ? g.poseForcee.nom : null;
+    if (g.etat === 'sol') { angle = -90; }
+    else if (pose === 'touche' || g.etat === 'touche') { dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }
+    else if (pose === 'bloque') { echelle = 0.97; teinte = 0xc8d4ff; rapide = true; }
+    else if (pose === 'uppercut') { echelle = 1.12; dy = 20; rapide = true; }
+    else if (g.etat === 'prepare') {
+      const c = g.attaque.cible;
+      if (c === 'tete') { dx = 26; angle = 5; echelle = 0.97; }
+      else if (c === 'corps') { dx = 20; dy = 16; angle = 3; echelle = 0.97; }
+      else { dy = 34; echelle = 0.94; angle = -3; }
+      // flash de la couleur de l'alerte
+      if (Math.floor(this.horloge * 10) % 2) teinte = c === 'smash' ? 0xff7070 : (c === 'corps' ? 0xa8e8ff : 0xfff0a0);
+    }
+    else if (g.etat === 'frappe') {
+      echelle = 1.12; dy = 26; rapide = true;
+      angle = g.attaque.id === 'crochet' ? -7 : 0;
+    }
+    else if (g.etat === 'essouffle' || g.etat === 'recup') { dy = 14 + Math.sin(t / 140) * 4; echelle = 0.98; teinte = 0xd8d0e8; }
+    else if (this.etat === 'fin' && this.j.downs >= R.knockdownsMax) { dy = -10 + Math.sin(t / 160) * 6; echelle = 1.04; }
+    else { dx = Math.sin(t / 400) * 12; dy = Math.sin(t / 300) * 2; }     // en garde : il se balance et respire
+
+    const k = rapide ? 1 : Math.min(1, reel * 12);
+    v.dx += (dx - v.dx) * k; v.dy += (dy - v.dy) * k; v.echelle += (echelle - v.echelle) * k;
+    v.angle += (angle - v.angle) * (g.etat === 'sol' ? Math.min(1, reel * 5) : k);
+    g.secousse = Math.max(0, g.secousse - reel);
+    const secousse = g.secousse > 0 ? Phaser.Math.Between(-8, 8) : 0;
+
+    const sp = g.sprite;
+    if (g.etat === 'sol') {   // il bascule et s'écroule sur le tapis
+      sp.setOrigin(0.5, 0.5).setPosition(R.centreX, I.yAuSol);
+    } else {
+      sp.setOrigin(0.5, 1).setPosition(R.centreX + v.dx + secousse, I.pieds + v.dy);
+    }
+    sp.setScale(I.taille * v.echelle).setAngle(v.angle);
+    if (teinte) sp.setTint(teinte); else sp.clearTint();
+
+    // zone protégée par sa garde (visage ou ventre)
+    const z = this.zoneGarde;
+    z.clear();
+    if (g.etat === 'garde' && this.etat === 'combat' && !this.j.dempsey) {
+      const haut = g.garde === 'haute';
+      const x = R.centreX + v.dx, y = haut ? VISAGE_GREG.y : CORPS_GREG.y + 10, l = haut ? 120 : 150, h = haut ? 100 : 90;
+      const pulse = 0.5 + Math.sin(t / 200) * 0.2;
+      z.fillStyle(0x5ad1ff, 0.16 * pulse + 0.06).fillRoundedRect(x - l / 2, y - h / 2, l, h, 18);
+      z.lineStyle(3, 0x9fe6ff, pulse).strokeRoundedRect(x - l / 2, y - h / 2, l, h, 18);
+    }
   }
 
   creerHud() {

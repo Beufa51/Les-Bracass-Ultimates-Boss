@@ -111,65 +111,77 @@ function cheveuxBoucles(ctx, hx, hy, couleur) {
   }
 }
 
-// Grosse coupe afro : derrière la tête (la frange est dessinée après le visage)
+// Grosse coupe afro, style manga encré : masse noire pleine au bord festonné net,
+// un reflet bleuté en haut à gauche. Dessinée derrière la tête.
 function afroArriere(ctx, hx, hy, couleur) {
-  const cx = hx, cy = hy - 34, R = 68;
+  const cx = hx, cy = hy - 30, rx = 74, ry = 66, n = 24;
+  const pt = (a, k) => [cx + Math.cos(a) * rx * k, cy + Math.sin(a) * ry * k];
   ctx.beginPath();
-  for (let a = 0; a <= Math.PI * 2 + 0.01; a += Math.PI / 14) {
-    const r = R + ((Math.round(a / (Math.PI / 14)) % 2) ? 6 : -2);
-    const x = cx + Math.cos(a) * r * 1.02, y = cy + Math.sin(a) * r * 0.92;
-    a === 0 ? ctx.moveTo(x, y) : ctx.quadraticCurveTo(cx + Math.cos(a - 0.11) * (R + 14), cy + Math.sin(a - 0.11) * (R + 14) * 0.92, x, y);
+  ctx.moveTo(...pt(0, 1));
+  for (let i = 1; i <= n; i++) {
+    const a0 = ((i - 1) / n) * Math.PI * 2, a1 = (i / n) * Math.PI * 2;
+    ctx.quadraticCurveTo(...pt((a0 + a1) / 2, 1.13), ...pt(a1, 1));   // une bosse = une boucle
   }
   ctx.closePath();
-  const g = ctx.createRadialGradient(cx - 20, cy - 30, 5, cx, cy, R + 10);
-  g.addColorStop(0, teinte(couleur, 0.18)); g.addColorStop(1, couleur);
+  const g = ctx.createRadialGradient(cx - 26, cy - 34, 4, cx, cy, rx * 1.1);
+  g.addColorStop(0, teinte(couleur, 0.16)); g.addColorStop(0.55, couleur); g.addColorStop(1, teinte(couleur, -0.3));
   remplir(ctx, g, 3);
-  // texture bouclée
-  ctx.strokeStyle = teinte(couleur, 0.22); ctx.lineWidth = 2;
-  const alea = hasard(21);
-  for (let k = 0; k < 40; k++) {
-    const a = alea() * Math.PI * 2, r = alea() * R * 0.9;
-    const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r * 0.9;
-    ctx.beginPath(); ctx.arc(x, y, 4 + alea() * 3, alea() * 3, alea() * 3 + 3.6); ctx.stroke();
+  // reflet : petites virgules claires en arc, en haut à gauche
+  ctx.strokeStyle = 'rgba(150,160,190,0.55)'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+  for (let k = 0; k < 7; k++) {
+    const a = Math.PI * (1.12 + k * 0.07);
+    const [x, y] = pt(a, 0.74);
+    ctx.beginPath(); ctx.arc(x, y, 6, a + 1.2, a + 2.6); ctx.stroke();
   }
 }
 
+// Ligne des cheveux sur le front + favoris qui descendent rejoindre la barbe (sans contour : même noir que l'afro)
 function afroFrange(ctx, hx, hy, couleur) {
-  // le haut du front est recouvert ; seul le bord bouclé (au-dessus des sourcils) a un contour
-  const bord = [];
-  for (let k = 0; k <= 8; k++) bord.push([hx + 40 - k * 10, hy - 30 - Math.sin((k / 8) * Math.PI) * 6]);
   ctx.beginPath();
-  ctx.moveTo(hx - 48, hy - 2);
-  ctx.quadraticCurveTo(hx - 50, hy - 70, hx, hy - 72);
-  ctx.quadraticCurveTo(hx + 50, hy - 70, hx + 48, hy - 2);
-  ctx.lineTo(...bord[0]);
-  for (let k = 1; k < bord.length; k++) ctx.quadraticCurveTo((bord[k - 1][0] + bord[k][0]) / 2, bord[k][1] + 7, ...bord[k]);
+  ctx.moveTo(hx - 45, hy + 14);
+  ctx.lineTo(hx - 48, hy - 40);
+  ctx.quadraticCurveTo(hx, hy - 80, hx + 48, hy - 40);
+  ctx.lineTo(hx + 45, hy + 14);
+  ctx.lineTo(hx + 37, hy + 14);
+  ctx.lineTo(hx + 36, hy - 18);
+  ctx.quadraticCurveTo(hx + 30, hy - 34, hx + 12, hy - 34);
+  ctx.quadraticCurveTo(hx, hy - 37, hx - 12, hy - 34);
+  ctx.quadraticCurveTo(hx - 30, hy - 34, hx - 36, hy - 18);
+  ctx.lineTo(hx - 37, hy + 14);
   ctx.closePath();
   ctx.fillStyle = couleur; ctx.fill();
-  ctx.beginPath(); ctx.moveTo(...bord[0]);
-  for (let k = 1; k < bord.length; k++) ctx.quadraticCurveTo((bord[k - 1][0] + bord[k][0]) / 2, bord[k][1] + 7, ...bord[k]);
-  ctx.strokeStyle = CONTOUR; ctx.lineWidth = 2.5; ctx.stroke();
 }
 
-// Barbe courte qui couvre la mâchoire, avec moustache
+// Barbe pleine, bord inférieur en petites mèches pointues, avec moustache
 function barbe(ctx, hx, hy, couleur) {
   ctx.beginPath();
-  ctx.moveTo(hx - 42, hy - 6);
-  ctx.quadraticCurveTo(hx - 46, hy + 24, hx - 32, hy + 42);
-  ctx.quadraticCurveTo(hx - 16, hy + 64, hx, hy + 64);
-  ctx.quadraticCurveTo(hx + 16, hy + 64, hx + 32, hy + 42);
-  ctx.quadraticCurveTo(hx + 46, hy + 24, hx + 42, hy - 6);
-  ctx.lineTo(hx + 36, hy - 4);
-  ctx.quadraticCurveTo(hx + 32, hy + 14, hx + 18, hy + 22);
-  ctx.quadraticCurveTo(hx, hy + 16, hx - 18, hy + 22);
-  ctx.quadraticCurveTo(hx - 32, hy + 14, hx - 36, hy - 4);
+  ctx.moveTo(hx - 42, hy + 4);
+  // contour extérieur : joue gauche -> menton -> joue droite, en petites pointes
+  const bord = [];
+  for (let k = 0; k <= 12; k++) {
+    const a = Math.PI - (k / 12) * Math.PI;                 // de la gauche vers la droite par le bas
+    bord.push([hx + Math.cos(a) * 42, hy + 10 + Math.sin(a) * 56]);
+  }
+  for (let k = 1; k < bord.length; k++) {
+    const [x0, y0] = bord[k - 1], [x1, y1] = bord[k];
+    const mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+    const ox = (mx - hx) * 0.12, oy = (my - hy - 10) * 0.12;   // pointe vers l'extérieur
+    ctx.lineTo(mx + ox, my + oy); ctx.lineTo(x1, y1);
+  }
+  // contour intérieur : joue droite -> moustache -> joue gauche
+  ctx.lineTo(hx + 38, hy + 6);
+  ctx.quadraticCurveTo(hx + 30, hy + 20, hx + 16, hy + 20);
+  ctx.quadraticCurveTo(hx + 6, hy + 16, hx, hy + 19);
+  ctx.quadraticCurveTo(hx - 6, hy + 16, hx - 16, hy + 20);
+  ctx.quadraticCurveTo(hx - 30, hy + 20, hx - 38, hy + 6);
   ctx.closePath();
-  remplir(ctx, degrade(ctx, hx, hy, hx, hy + 64, [[0, teinte(couleur, 0.15)], [1, couleur]]), 2.5);
-  ctx.strokeStyle = teinte(couleur, 0.35); ctx.lineWidth = 1.5;
-  const alea = hasard(9);
-  for (let k = 0; k < 14; k++) {
-    const x = hx - 30 + alea() * 60, y = hy + 26 + alea() * 30;
-    ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 1.4); ctx.stroke();
+  const g = ctx.createLinearGradient(hx - 40, hy, hx + 40, hy + 60);
+  g.addColorStop(0, teinte(couleur, 0.12)); g.addColorStop(1, couleur);
+  remplir(ctx, g, 2.5);
+  // quelques reflets nets sur le menton
+  ctx.strokeStyle = 'rgba(150,140,140,0.45)'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+  for (const [x, y] of [[-14, 50], [-6, 54], [8, 52], [16, 46]]) {
+    ctx.beginPath(); ctx.moveTo(hx + x, hy + y - 6); ctx.lineTo(hx + x + 2, hy + y); ctx.stroke();
   }
 }
 
@@ -849,4 +861,9 @@ function rect(ctx, w, h, p, { i, n }) {
   remplir(ctx, degrade(ctx, 0, 6, 0, h - 6, [[0, teinte(p.couleur, 0.3)], [1, teinte(p.couleur, -0.3)]]));
 }
 
-export const FORMES = { rect, cercle, badge, perso, porte, dalle, mur, boxeurFace, boxeurDos, ring, coach };
+// Un gant seul, vu de face (celui que Greg envoie vers l'écran)
+function gantSeul(ctx, w, h, p) {
+  gant(ctx, w / 2, h * 0.44, w * 0.36, p.gants, Math.PI / 2, p.poignets, 1, p.croix);
+}
+
+export const FORMES = { gantSeul, rect, cercle, badge, perso, porte, dalle, mur, boxeurFace, boxeurDos, ring, coach };
