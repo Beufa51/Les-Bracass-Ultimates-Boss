@@ -971,7 +971,10 @@ export class GregCombat extends BossScene {
     const existe = (nom) => this.textures.exists(I.poses[nom].cle);
     const repos = existe('entier') ? 'entier' : 'basse';   // image complète si elle existe
     const haute = existe('gardePied') ? 'gardePied' : 'haute';
-    const garde = g.garde === 'haute' && existe(haute) ? haute : repos;
+    // pour l'instant, la même pose (gants levés) sert pour les deux gardes ;
+    // c'est la zone lumineuse qui montre ce qu'il protège
+    const unePoseDeGarde = existe('gardePied');
+    const garde = (g.garde === 'haute' || unePoseDeGarde) && existe(haute) ? haute : repos;
     const imageCoup = (cible) => (cible === 'corps' ? 'corps' : 'visage');
     let pose = garde, dx = 0, dy = 0, echelle = 1, angle = 0, teinte = null, rapide = false;
     const forcee = g.poseForcee ? g.poseForcee.nom : null;
@@ -1047,12 +1050,17 @@ export class GregCombat extends BossScene {
     // sans l'image "garde haute", une zone bleue montre ce qu'il protège
     const z = this.zoneGarde;
     z.clear();
-    if (!existe('haute') && g.etat === 'garde' && this.etat === 'combat' && !this.j.dempsey) {
+    if ((unePoseDeGarde || !existe('haute')) && g.etat === 'garde' && this.etat === 'combat' && !this.j.dempsey) {
       const haut = g.garde === 'haute';
       const x = R.centreX + v.dx, y = haut ? VISAGE_GREG.y : CORPS_GREG.y + 10, l = haut ? 120 : 150, h = haut ? 100 : 90;
       const pulse = 0.5 + Math.sin(t / 200) * 0.2;
-      z.fillStyle(0x5ad1ff, 0.16 * pulse + 0.06).fillRoundedRect(x - l / 2, y - h / 2, l, h, 18);
-      z.lineStyle(3, 0x9fe6ff, pulse).strokeRoundedRect(x - l / 2, y - h / 2, l, h, 18);
+      z.fillStyle(0x5ad1ff, 0.22 * pulse + 0.12).fillRoundedRect(x - l / 2, y - h / 2, l, h, 18);
+      z.lineStyle(5, 0x9fe6ff, 0.5 + pulse * 0.5).strokeRoundedRect(x - l / 2, y - h / 2, l, h, 18);
+      // petit bouclier sur le côté de la zone protégée
+      const bx = x + l / 2 + 4, by = y - 14;
+      z.fillStyle(0x9fe6ff, 0.95).beginPath();
+      z.moveTo(bx, by); z.lineTo(bx + 22, by); z.lineTo(bx + 22, by + 14); z.lineTo(bx + 11, by + 28); z.lineTo(bx, by + 14);
+      z.closePath(); z.fillPath();
     }
   }
 
