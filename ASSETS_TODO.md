@@ -25,9 +25,9 @@ Les boss seront ajoutés au fur et à mesure de leur développement. Le guide de
 | badge_lionel.png | 48x48 | 1 | provisoire | Médaille ronde violette avec un frisbee, pixel art |
 
 ## Greg (combat de boxe, vue Punch-Out)
-Style : pixel art, comme le sprite de référence `assets_inbox/greg_reference.jpg`.
-Greg en boxeur : peau mate, cheveux noirs bouclés courts, barbe noire courte, manches de tatouages vert-jaune
-sur les deux bras, torse nu musclé, short de boxe bleu à bordures rouges, ceinture rouge « GREG », gants rouges.
+Style : manga de boxe, comme l'illustration `assets_inbox/greg_manga.jpg` (déjà utilisée pour la présentation).
+Greg : peau mate, grosse coupe afro, barbe noire, torse en sueur, tatouages de guerriers de manga sur les bras,
+short bleu marine à bandes rouges, ceinture bleu foncé avec une épée, gants blancs avec une croix.
 Ton boxeur : vu de dos, cheveux bruns en pics, short vert, gants blancs.
 
 | Nom du fichier | Taille d'une case | Images | Statut | Description pour le générateur d'images |
@@ -62,7 +62,8 @@ Ton boxeur : vu de dos, cheveux bruns en pics, short vert, gants blancs.
 
 Clip : `dempsey.gif` (dans `assets/sprites/greg/`) : **intégré**, joué au lancement du Dempsey Roll (2 boucles = 2,46 s).
 
-Sons Greg (provisoires) : greg_coup, greg_coup_fort, greg_bloque, greg_esquive, greg_cloche, greg_compte, greg_alerte.
+Sons Greg : greg_coup, greg_coup_fort, greg_bloque, greg_esquive, greg_cloche, greg_compte, greg_alerte, greg_tapis
+(générés par `outils/generer_sons.py`, remplaçables par de vrais fichiers).
 
 ## Sons
 | Nom du fichier | Statut | Description (pour sfxr / jfxr) |

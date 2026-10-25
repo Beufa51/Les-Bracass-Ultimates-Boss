@@ -22,8 +22,10 @@
   Le menu de test (F1) n'existe que sur ordinateur.
 - Manifeste unique des visuels/sons : `assets/manifeste.js`. Tant qu'un visuel n'a pas de fichier,
   il est dessiné par le code dans `src/core/dessins.js` (style manga : contours, ombres, reflets).
-  Avec `pixel: 3` dans ses réglages, le dessin est fait en petit puis agrandi (style pixel art) :
-  c'est le cas des deux boxeurs. Greg est dessiné d'après `assets_inbox/greg_reference.jpg`.
+  Option `pixel: 3` possible (dessin fait en petit puis agrandi, style pixel art).
+  Greg est dessiné d'après son illustration `assets_inbox/greg_manga.jpg`, aussi affichée telle quelle
+  sur l'écran de présentation (`greg_portrait`) et dans l'annonce du SMASH (`greg_visage`).
+- Bruitages du combat : générés par `outils/generer_sons.py` (Python + numpy) dans `assets/audio/`.
 - Rendu lissé (`pixelArt: false` dans `src/main.js`).
 - **Greg** (`src/bosses/greg/`) : combat de boxe en 3 rounds de 60 s.
   - Commandes : ◀ ▶ esquive, Espace = coup au visage, Z = coup au corps, Bas (maintenu) = garde,
@@ -33,9 +35,10 @@
   - Esquive réussie = fenêtre de CONTRE (dégâts x2). Garde de Greg haute = vise le corps, basse = le visage.
   - 3 coups encaissés d'affilée : Greg se couvre puis riposte.
   - Coups au corps = vident le souffle de Greg ; à bout de souffle, il est grand ouvert.
-  - Jauge d'esprit combatif pleine : DEMPSEY ROLL = jeu de rythme. Une boule parcourt un « ∞ » :
-    ◀ quand elle arrive à gauche, ▶ à droite (PARFAIT / BIEN). Chaque coup accélère et frappe plus fort,
-    10 coups = FINISH. Raté = le roll s'arrête. Round 3 : Greg contre (boule rouge) → ▼ pour freiner.
+  - Jauge d'esprit combatif pleine : DEMPSEY ROLL = jeu de rythme. La boule attend dans le cercle de droite :
+    ▶ lance le roll, puis ◀ quand elle arrive à gauche, ▶ à droite (PARFAIT / BIEN). Chaque coup accélère
+    et frappe plus fort, 10 coups = FINISH. 2 ratés pardonnés, le 3e arrête le roll.
+    Round 3 : Greg contre (boule rouge) → ▼ pour freiner.
   - Lancement du Dempsey Roll : joue `assets/sprites/greg/dempsey.gif` s'il existe (voir « clips »
     dans le manifeste), sinon une animation dessinée par le code.
   - Au tapis : compte de l'arbitre, marteler Espace. 3 tapis = K.O. Greg : 3 tapis = victoire.

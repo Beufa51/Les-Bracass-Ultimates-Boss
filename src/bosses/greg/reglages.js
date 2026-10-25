@@ -42,11 +42,13 @@ export const REGLAGES = {
   // Chaque coup réussi accélère le rythme et frappe plus fort.
   dempsey: {
     coupsMax: 10,              // le 10e coup est le coup final
-    periodeDepart: 1.3,        // secondes pour un tour complet du "∞" au début
-    acceleration: 0.92,        // chaque coup réussi : le tour dure 8 % de moins
-    periodeMin: 0.55,
-    parfait: 0.32,             // tolérance (en "angle") pour un PARFAIT
-    bien: 0.75,                // ... et pour un BIEN (au-delà : raté, le roll s'arrête)
+    periodeDepart: 1.7,        // secondes pour un tour complet du "∞" au début
+    acceleration: 0.95,        // chaque coup réussi : le tour dure 5 % de moins
+    periodeMin: 0.8,
+    parfait: 0.45,             // tolérance (en "angle") pour un PARFAIT
+    bien: 1.15,                // ... et pour un BIEN (au-delà : raté)
+    erreursPermises: 2,        // ratés pardonnés ; le suivant arrête le roll
+    attenteMax: 6,             // secondes pour donner le 1er coup (▶) avant que le roll s'annule
     degatsParfait: 5,
     degatsBien: 3,
     bonusCombo: 0.1,           // +10 % de dégâts par coup déjà enchaîné

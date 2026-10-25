@@ -48,8 +48,33 @@ function bras(ctx, sx, sy, gx, gy, largeurEpaule, largeurPoignet, peau, tatouage
   remplir(ctx, degrade(ctx, mx + nx * b, my + ny * b, mx - nx * b, my - ny * b,
     [[0, teinte(peau, 0.25)], [0.45, peau], [1, teinte(peau, -0.35)]]));
   if (!tatouage) return;
-  // manche de tatouages : taches de couleur à l'intérieur du bras
   ctx.save(); ctx.clip();
+  if (typeof tatouage[0] === 'object') {
+    // tatouages de personnages : un habit coloré + une tête avec des cheveux en pics
+    const ux = dx / L, uy = dy / L, w = largeurEpaule;
+    for (const f of tatouage) {
+      const t0 = f.t, hx0 = sx + dx * t0, hy0 = sy + dy * t0;
+      const bxc = sx + dx * (t0 + 0.22), byc = sy + dy * (t0 + 0.22);
+      ctx.beginPath(); ctx.ellipse(bxc, byc, L * 0.2, w * 0.42, Math.atan2(dy, dx), 0, Math.PI * 2);
+      ctx.fillStyle = f.habit; ctx.globalAlpha = 0.85; ctx.fill(); ctx.globalAlpha = 1;
+      ctx.strokeStyle = 'rgba(20,10,10,0.6)'; ctx.lineWidth = 1.5; ctx.stroke();
+      // cheveux en pics (vers l'épaule)
+      ctx.beginPath();
+      for (let k = -2; k <= 2; k++) {
+        const bx = hx0 + nx * k * w * 0.11, by = hy0 + ny * k * w * 0.11;
+        ctx.moveTo(bx + nx * w * 0.08, by + ny * w * 0.08);
+        ctx.lineTo(bx - ux * w * (0.42 + (k % 2 ? 0 : 0.12)) + nx * k * 3, by - uy * w * (0.42 + (k % 2 ? 0 : 0.12)) + ny * k * 3);
+        ctx.lineTo(bx - nx * w * 0.08, by - ny * w * 0.08);
+      }
+      ctx.fillStyle = f.cheveux; ctx.fill(); ctx.strokeStyle = 'rgba(20,10,10,0.7)'; ctx.lineWidth = 1.2; ctx.stroke();
+      ctx.beginPath(); ctx.arc(hx0, hy0, w * 0.2, 0, Math.PI * 2);
+      ctx.fillStyle = '#e9c39c'; ctx.fill(); ctx.stroke();
+    }
+    ctx.restore();
+    ctx.strokeStyle = CONTOUR; ctx.lineWidth = 3; ctx.stroke();
+    return;
+  }
+  // manche de tatouages : taches de couleur à l'intérieur du bras
   const alea = hasard(Math.round(Math.abs(sx * 7 + sy * 3)) + 11);
   for (let k = 0; k < 46; k++) {
     const t = 0.12 + alea() * 0.86, cote = (alea() - 0.5) * largeurEpaule;
@@ -86,6 +111,46 @@ function cheveuxBoucles(ctx, hx, hy, couleur) {
   }
 }
 
+// Grosse coupe afro : derrière la tête (la frange est dessinée après le visage)
+function afroArriere(ctx, hx, hy, couleur) {
+  const cx = hx, cy = hy - 34, R = 68;
+  ctx.beginPath();
+  for (let a = 0; a <= Math.PI * 2 + 0.01; a += Math.PI / 14) {
+    const r = R + ((Math.round(a / (Math.PI / 14)) % 2) ? 6 : -2);
+    const x = cx + Math.cos(a) * r * 1.02, y = cy + Math.sin(a) * r * 0.92;
+    a === 0 ? ctx.moveTo(x, y) : ctx.quadraticCurveTo(cx + Math.cos(a - 0.11) * (R + 14), cy + Math.sin(a - 0.11) * (R + 14) * 0.92, x, y);
+  }
+  ctx.closePath();
+  const g = ctx.createRadialGradient(cx - 20, cy - 30, 5, cx, cy, R + 10);
+  g.addColorStop(0, teinte(couleur, 0.18)); g.addColorStop(1, couleur);
+  remplir(ctx, g, 3);
+  // texture bouclée
+  ctx.strokeStyle = teinte(couleur, 0.22); ctx.lineWidth = 2;
+  const alea = hasard(21);
+  for (let k = 0; k < 40; k++) {
+    const a = alea() * Math.PI * 2, r = alea() * R * 0.9;
+    const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r * 0.9;
+    ctx.beginPath(); ctx.arc(x, y, 4 + alea() * 3, alea() * 3, alea() * 3 + 3.6); ctx.stroke();
+  }
+}
+
+function afroFrange(ctx, hx, hy, couleur) {
+  // le haut du front est recouvert ; seul le bord bouclé (au-dessus des sourcils) a un contour
+  const bord = [];
+  for (let k = 0; k <= 8; k++) bord.push([hx + 40 - k * 10, hy - 30 - Math.sin((k / 8) * Math.PI) * 6]);
+  ctx.beginPath();
+  ctx.moveTo(hx - 48, hy - 2);
+  ctx.quadraticCurveTo(hx - 50, hy - 70, hx, hy - 72);
+  ctx.quadraticCurveTo(hx + 50, hy - 70, hx + 48, hy - 2);
+  ctx.lineTo(...bord[0]);
+  for (let k = 1; k < bord.length; k++) ctx.quadraticCurveTo((bord[k - 1][0] + bord[k][0]) / 2, bord[k][1] + 7, ...bord[k]);
+  ctx.closePath();
+  ctx.fillStyle = couleur; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(...bord[0]);
+  for (let k = 1; k < bord.length; k++) ctx.quadraticCurveTo((bord[k - 1][0] + bord[k][0]) / 2, bord[k][1] + 7, ...bord[k]);
+  ctx.strokeStyle = CONTOUR; ctx.lineWidth = 2.5; ctx.stroke();
+}
+
 // Barbe courte qui couvre la mâchoire, avec moustache
 function barbe(ctx, hx, hy, couleur) {
   ctx.beginPath();
@@ -109,7 +174,7 @@ function barbe(ctx, hx, hy, couleur) {
 }
 
 // Gant de boxe : (x, y) = centre, r = taille, versBras = angle vers le coude
-function gant(ctx, x, y, r, couleur, versBras, poignet = '#ffffff', pouce = 1) {
+function gant(ctx, x, y, r, couleur, versBras, poignet = '#ffffff', pouce = 1, croix = false) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(versBras - Math.PI / 2);
@@ -119,8 +184,13 @@ function gant(ctx, x, y, r, couleur, versBras, poignet = '#ffffff', pouce = 1) {
   // manchette (vers le bras)
   ctx.beginPath(); ctx.roundRect(-17, 18, 34, 22, 6);
   remplir(ctx, degrade(ctx, -17, 0, 17, 0, [[0, teinte(poignet, -0.3)], [0.4, poignet], [1, teinte(poignet, -0.4)]]), trait);
-  ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 1.5 / k;
-  ctx.beginPath(); ctx.moveTo(-10, 24); ctx.lineTo(10, 34); ctx.moveTo(10, 24); ctx.lineTo(-10, 34); ctx.stroke();
+  if (croix) {   // petite croix noire sur la manchette
+    ctx.strokeStyle = CONTOUR; ctx.lineWidth = 2.5 / k;
+    ctx.beginPath(); ctx.moveTo(0, 21); ctx.lineTo(0, 37); ctx.moveTo(-6, 26); ctx.lineTo(6, 26); ctx.stroke();
+  } else {
+    ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 1.5 / k;
+    ctx.beginPath(); ctx.moveTo(-10, 24); ctx.lineTo(10, 34); ctx.moveTo(10, 24); ctx.lineTo(-10, 34); ctx.stroke();
+  }
   // poing
   ctx.beginPath();
   ctx.moveTo(-27, 2);
@@ -228,8 +298,16 @@ function boxeurFace(ctx, w, h, p) {
   // ceinture
   ctx.beginPath(); ctx.roundRect(ax - 2, ay - 14, bx - ax + 4, 18, 4);
   remplir(ctx, degrade(ctx, 0, ay - 14, 0, ay + 4, [[0, teinte(p.ceinture, 0.4)], [0.5, p.ceinture], [1, teinte(p.ceinture, -0.35)]]));
-  ctx.fillStyle = p.texteCeinture || '#1a1014'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.fillText(p.nom || '', (ax + bx) / 2, ay - 5);
+  if (p.embleme === 'epee') {   // petite épée au milieu de la ceinture
+    const ex = (ax + bx) / 2, ey = ay - 5;
+    ctx.beginPath(); ctx.roundRect(ex - 22, ey - 8, 44, 16, 3); remplir(ctx, teinte(p.ceinture, 0.25), 1.5);
+    ctx.beginPath(); ctx.moveTo(ex - 6, ey - 2); ctx.lineTo(ex + 17, ey); ctx.lineTo(ex - 6, ey + 2); ctx.closePath(); remplir(ctx, '#e8eef4', 1);
+    ctx.fillStyle = '#c9a227'; ctx.fillRect(ex - 8, ey - 5, 3, 10);
+    ctx.fillStyle = '#6b4a2b'; ctx.fillRect(ex - 17, ey - 1.5, 9, 3);
+  } else {
+    ctx.fillStyle = p.texteCeinture || '#1a1014'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(p.nom || '', (ax + bx) / 2, ay - 5);
+  }
 
   // torse
   ctx.beginPath();
@@ -272,6 +350,14 @@ function boxeurFace(ctx, w, h, p) {
   }
   ctx.fillStyle = 'rgba(255,255,255,0.18)';      // reflet sur l'épaule
   ctx.beginPath(); ctx.ellipse(...T(-78, -240), 18, 8, -0.4, 0, Math.PI * 2); ctx.fill();
+  if (p.sueur) {   // gouttes de sueur qui brillent
+    const alea = hasard(33);
+    for (let k = 0; k < 16; k++) {
+      const [x, y] = T(-80 + alea() * 160, -250 + alea() * 130);
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.beginPath(); ctx.moveTo(x, y - 4); ctx.quadraticCurveTo(x + 2.5, y + 1, x, y + 2.5); ctx.quadraticCurveTo(x - 2.5, y + 1, x, y - 4); ctx.fill();
+    }
+  }
 
   // cou
   ctx.beginPath();
@@ -290,8 +376,9 @@ function boxeurFace(ctx, w, h, p) {
   // bras + gants (le plus gros gant, le plus "proche", en dernier)
   const dessinerBras = (epX, [gx, gy, r], cote) => {
     const sx = epX + dx, sy = -240 + dy, x = gx + dx, y = gy + dy;
-    bras(ctx, sx, sy, x, y, 36, 24, peau, p.tatouage);
-    gant(ctx, x, y, r, p.gants, Math.atan2(sy - y, sx - x), p.poignets || '#ffffff', cote);
+    const tatouage = (epX < 0 ? p.tatouageGauche : p.tatouageDroit) || p.tatouage;
+    bras(ctx, sx, sy, x, y, 36, 24, peau, tatouage);
+    gant(ctx, x, y, r, p.gants, Math.atan2(sy - y, sx - x), p.poignets || '#ffffff', cote, p.croix);
   };
   if (P.g[2] >= P.d[2]) { dessinerBras(84, P.d, -1); dessinerBras(-84, P.g, 1); }
   else { dessinerBras(-84, P.g, 1); dessinerBras(84, P.d, -1); }
@@ -299,6 +386,7 @@ function boxeurFace(ctx, w, h, p) {
 }
 
 function visageGreg(ctx, hx, hy, peau, p, expression) {
+  if (p.coiffure === 'afro') afroArriere(ctx, hx, hy, p.cheveux || '#111');
   // oreilles
   for (const s of [-1, 1]) {
     ctx.beginPath(); ctx.ellipse(hx + s * 42, hy + 4, 9, 14, 0, 0, Math.PI * 2); remplir(ctx, teinte(peau, -0.15));
@@ -387,7 +475,8 @@ function visageGreg(ctx, hx, hy, peau, p, expression) {
       ctx.quadraticCurveTo(hx + x - 6, hy + y + 2, hx + x, hy + y - 9); remplir(ctx, '#bfe8ff', 1.5);
     }
   }
-  if (p.coiffure === 'boucles') cheveuxBoucles(ctx, hx, hy, p.cheveux || '#111');
+  if (p.coiffure === 'afro') afroFrange(ctx, hx, hy, p.cheveux || '#111');
+  else if (p.coiffure === 'boucles') cheveuxBoucles(ctx, hx, hy, p.cheveux || '#111');
   else cheveuxPics(ctx, hx, hy - 16, 44, p.cheveux || '#111', 9, true);
 }
 

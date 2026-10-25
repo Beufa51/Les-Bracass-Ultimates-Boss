@@ -30,10 +30,11 @@ export function preparerVisuels(scene) {
 }
 
 // Joue un son du manifeste (ou un bip provisoire)
-export function jouerSon(scene, cle) {
+// options (facultatif) : { rate: vitesse/hauteur, volume }
+export function jouerSon(scene, cle, options) {
   const e = MANIFESTE.sons[cle];
   if (!e) return;
-  if (e.fichier && scene.cache.audio.exists(cle)) { scene.sound.play(cle); return; }
+  if (e.fichier && scene.cache.audio.exists(cle)) { scene.sound.play(cle, options); return; }
   const ctx = scene.sound.context;
   if (!ctx || !e.provisoire) return;
   const osc = ctx.createOscillator();

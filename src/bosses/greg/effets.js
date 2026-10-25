@@ -35,7 +35,8 @@ export function flash(scene, opacite = 0.6, couleur = 0xffffff) {
 
 // Bande "manga" au milieu de l'écran pour annoncer une attaque spéciale.
 // Le combat est figé pendant 'duree' secondes (géré par la scène).
-export function encart(scene, titre, sousTitre, couleur = '#ffd84a', fond = 0x000000) {
+// image (facultatif) : clé d'une image affichée à gauche de la bande (ex. le visage de Greg)
+export function encart(scene, titre, sousTitre, couleur = '#ffd84a', fond = 0x000000, image = null) {
   const elements = [];
   const haut = scene.add.rectangle(LARGEUR / 2, -40, LARGEUR, 80, 0x000000).setDepth(70);
   const bas = scene.add.rectangle(LARGEUR / 2, HAUTEUR + 40, LARGEUR, 80, 0x000000).setDepth(70);
@@ -59,6 +60,11 @@ export function encart(scene, titre, sousTitre, couleur = '#ffd84a', fond = 0x00
     fontFamily: POLICE, fontSize: '22px', color: '#ffffff', stroke: '#000000', strokeThickness: 4,
   }).setOrigin(0.5).setDepth(73);
   elements.push(haut, bas, bande, g, t1, t2);
+  if (image) {
+    const img = scene.add.image(-200, HAUTEUR / 2, image).setDepth(72).setDisplaySize(196, 170);
+    scene.tweens.add({ targets: img, x: 110, duration: 200, ease: 'Cubic.Out' });
+    elements.push(img);
+  }
   return {
     fermer() {
       elements.forEach(e => scene.tweens.add({ targets: e, alpha: 0, duration: 150, onComplete: () => e.destroy() }));
