@@ -107,10 +107,11 @@ export const REGLAGES = {
   aideFleche: [true, true, true],     // flèche "ESQUIVE / GARDE"
   aideCible: [true, true, true],      // cercle qui se resserre là où le coup va frapper
 
-  // ---------- Moment secret : Greg te nargue, garde baissée ----------
-  // Une fois par round, quand il reste 'aSeconde' secondes : frappe-le pendant qu'il nargue !
-  // La 1re fois du combat = COUP SECRET (il tombe direct) ; ensuite = dégâts x3.
-  nargue: { aSeconde: 32, duree: 1.4, multiplicateur: 3 },
+  // ---------- Moment secret : Greg baisse la garde un très court instant ----------
+  // Une fois par round, à un moment au hasard (entre 'entre' secondes restantes). Pour réussir :
+  // un COUP AU CORPS lancé APRÈS qu'il a baissé la garde (marteler avant ne marche pas), en moins de 'duree'.
+  // 1re fois du combat = COUP SECRET (tapis direct) ; ensuite = dégâts x3. Mauvais coup = il esquive.
+  nargue: { entre: [45, 15], duree: 0.6, coup: 'corps', multiplicateur: 3 },
 
   // ---------- Classement de fin (temps de K.O. + coups reçus + tapis) ----------
   rangs: [ // du meilleur au moins bon : il faut un score >= au seuil
@@ -162,22 +163,21 @@ export const ENCHAINEMENTS = [
 // Ce que dit le vieux coach dans le coin, entre les rounds
 export const CONSEILS = [
   [
-    'Regarde ses gants, petit !',
-    'Garde HAUTE : tape au CORPS.',
-    'Garde BASSE : tape au VISAGE.',
-    'Son coup au foie (« ! » violet) : seule la GARDE marche.',
+    'Regarde le cadre blanc : c\'est ce qu\'il protège.',
+    'Il protège le visage ? Tape au CORPS. Le ventre ? Tape au VISAGE.',
+    'Son coup au foie (« ! » violet) : seule la GARDE (▼) marche.',
   ],
   [
-    'Son coup part de GAUCHE ? Esquive à DROITE (et inversement) !',
+    'Coup de GAUCHE ? Esquive à DROITE (et inversement) !',
+    'Et juste après une esquive, CONTRE : dégâts x2,5 !',
+    'Chaque esquive réussie remplit ta jauge. Pleine ? DEMPSEY ROLL !',
     'Il répète toujours les mêmes enchaînements : apprends-les !',
-    'Et s\'il baisse la garde pour te narguer... FRAPPE !',
-    '...et tu CONTRES tout de suite derrière : dégâts x2 !',
-    'Chaque esquive réussie remplit ta jauge d\'esprit. Pleine ? DEMPSEY ROLL !',
+    'Parfois il baisse sa garde une fraction de seconde... vise là où ça fait mal !',
   ],
   [
-    'Attention à son SMASH (le gros "!!" rouge) :',
+    'Quand il tape ses gants, le SMASH arrive :',
     'ESQUIVE sur le côté ! La garde ne suffit pas.',
-    'Dempsey Roll : s\'il contre (boule ROUGE), GARDE (▼) pour freiner net !',
+    'Dempsey Roll : s\'il contre (boule ROUGE), GARDE (▼) pour freiner !',
   ],
 ];
 

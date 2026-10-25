@@ -54,8 +54,10 @@
   - Jauge d'esprit : ne se remplit QU'avec les esquives réussies.
   - Dempsey Roll : boule sur un « ∞ » (◀ à gauche, ▶ à droite, bip au bon moment) ;
     2 ratés pardonnés, timing serré, environ 50 dégâts max.
-  - Moment secret : à 32 s de la fin de chaque round, Greg baisse la garde et nargue (« Allez, frappe ! »).
-    Le frapper à ce moment = COUP SECRET (tapis direct) la 1re fois, puis dégâts x3.
+  - Moment secret : une fois par round, à un moment au hasard, Greg baisse la garde 0,6 s (discret : « hé... »).
+    Il faut un COUP AU CORPS lancé après qu'il a baissé la garde : 1re fois = COUP SECRET (tapis direct),
+    ensuite dégâts x3. Coup au visage ou coup lancé trop tôt = il esquive (« Raté, hé hé ! »).
+  - La cloche de fin de round arrête un Dempsey Roll en cours.
   - Au tapis : alterner ◀ ▶ pour se relever.
   - Fin : classement S/A/B/C (coups reçus, tapis, temps) + record gardé dans le navigateur.
   - Esquive : protège 0,45 s ; « Trop tôt ! » / « Mauvais côté ! » s'affichent ; le coach commente

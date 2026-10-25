@@ -52,6 +52,7 @@ export class GregCombat extends BossScene {
     this.statsRound = this.nouvellesStatsRound();
     this.arret = 0;   // hit-stop : image figée un instant à l'impact
     this.tempsTotal = 0; this.secretFait = false; this.nargueRound = 0;
+    this.momentNargue = entre(...R.nargue.entre);   // moment (secondes restantes) où il nargue, tiré à chaque round
     this.smashAnnonce = false;
     this.roundsJoues = 0;
 
@@ -212,7 +213,7 @@ export class GregCombat extends BossScene {
     j.souffle -= c.souffle; j.reposSouffle = 0.5;
     // pour le visage, on alterne jab et crochet (juste pour l'animation)
     this.alterne = !this.alterne;
-    j.action = { coup, t: 0, fait: false, pose: coup === 'corps' ? 'corps' : (this.alterne ? 'jab' : 'crochet') };
+    j.action = { coup, t: 0, fait: false, debut: this.horloge, pose: coup === 'corps' ? 'corps' : (this.alterne ? 'jab' : 'crochet') };
   }
 
   essouffle() {
@@ -241,7 +242,16 @@ export class GregCombat extends BossScene {
     }
 
     let degats = c.degats;
-    if (g.etat === 'nargue') {
+    // il faut avoir lancé un COUP AU CORPS après qu'il a baissé la garde (pas en martelant avant)
+    const secretValide = g.etat === 'nargue' && j.action && j.action.debut >= g.nargueDebut && coup === R.nargue.coup;
+    if (g.etat === 'nargue' && !secretValide) {
+      // mauvais coup ou coup lancé trop tôt : il esquive en rigolant et reprend sa garde
+      onomatopee(this, R.centreX + 150, 150, 'Raté, hé hé !', 22, '#ffd84a');
+      jouerSon(this, 'greg_esquive');
+      this.retourGardeGreg(0.3);
+      return;
+    }
+    if (secretValide) {
       if (!this.secretFait) {   // COUP SECRET : il tombe direct
         this.secretFait = true;
         flash(this, 0.9, 0xffd84a);
@@ -327,7 +337,7 @@ export class GregCombat extends BossScene {
         g.souffle = Math.min(100, g.souffle + R.souffleGregRecup * dt);
         g.pause -= dt;
         if (g.pause <= 0) {
-          if (this.nargueRound !== this.round && this.tempsRound <= R.nargue.aSeconde && g.finSeq) this.narguer();
+          if (this.nargueRound !== this.round && this.tempsRound <= this.momentNargue && g.finSeq) this.narguer();
           else this.choisirAttaque();
         }
         break;
@@ -402,10 +412,9 @@ export class GregCombat extends BossScene {
   narguer() {
     const g = this.g;
     this.nargueRound = this.round;
-    g.etat = 'nargue'; g.t = 0; g.attaque = null;
+    g.etat = 'nargue'; g.t = 0; g.attaque = null; g.nargueDebut = this.horloge;
     this.alerte.setVisible(false);
-    bulle(this, R.centreX + 210, 120, 'Greg : « Allez, vas-y, frappe ! »', R.nargue.duree * 1000);
-    onomatopee(this, R.centreX - 160, 150, 'Hé hé...', 26, '#ffd84a');
+    onomatopee(this, R.centreX - 150, 150, 'hé...', 18, '#ffd84a');   // discret : il faut le repérer
   }
 
   // De quel côté de l'écran part le coup : 'g' (gauche), 'd' (droite) ; le SMASH part du centre
@@ -911,16 +920,21 @@ export class GregCombat extends BossScene {
     el.push(texte(this, LARGEUR / 2, 60, fin ? `FIN DU ROUND ${this.round - 1}` : 'DANS TON COIN', 36, '#ffd84a').setDepth(101));
     el.push(this.add.image(170, 250, 'greg_coach').setDepth(101).setScale(1.2));
     el.push(texte(this, 170, 360, 'Le vieux coach', 18, '#aaaaaa').setDepth(101));
-    el.push(texte(this, 580, 130, `Conseils pour le ROUND ${this.round} :`, 24, '#ffffff').setDepth(101));
-    el.push(texte(this, 580, 250, CONSEILS[this.round - 1].join('\n\n'), 18, '#ffffff', {
-      wordWrap: { width: 620 }, lineSpacing: 2,
-    }).setDepth(101));
+    el.push(texte(this, 580, 115, `Conseils pour le ROUND ${this.round} :`, 24, '#ffffff').setDepth(101));
+    // les blocs de texte se placent les uns sous les autres (pas de chevauchement)
+    const conseils = texte(this, 580, 145, CONSEILS[this.round - 1].map(l => '- ' + l).join('\n'), 16, '#ffffff', {
+      wordWrap: { width: 600 }, lineSpacing: 8,
+    }).setOrigin(0.5, 0).setDepth(101);
+    el.push(conseils);
+    let y = conseils.y + conseils.height + 18;
     if (fin) {
-      el.push(texte(this, 580, 400,
+      const bilan = texte(this, 580, y,
         `Ta vie remonte (+${R.soinEntreRounds}).   Coups donnés : ${Math.round(this.stats.donnes)}   reçus : ${Math.round(this.stats.recus)}`,
-        16, '#7fff7f').setDepth(101));
+        15, '#7fff7f', { wordWrap: { width: 600 } }).setOrigin(0.5, 0).setDepth(101);
+      y += bilan.height + 12;
       // le coach commente ce que tu as raté pendant le round
-      el.push(texte(this, 580, 435, 'Coach : « ' + this.remarqueCoach() + ' »', 18, '#ffd84a', { wordWrap: { width: 640 } }).setDepth(101));
+      el.push(bilan, texte(this, 580, y, 'Coach : « ' + this.remarqueCoach() + ' »', 16, '#ffd84a', { wordWrap: { width: 600 } })
+        .setOrigin(0.5, 0).setDepth(101));
     }
     this.statsRound = this.nouvellesStatsRound();
     el.push(texte(this, LARGEUR / 2, HAUTEUR - 50, (estTactile() ? 'OK' : 'ESPACE') + ' : on y va !', 22, '#7fff7f').setDepth(101));
@@ -977,6 +991,8 @@ export class GregCombat extends BossScene {
     j.souffle = 100; this.g.souffle = 100;
     j.action = null; j.esquive = null; j.sonne = 0; j.contreJusqua = -1;
     const g = this.g; g.seqIndex = 0; g.seqPas = 0; g.finSeq = true;   // ses enchaînements repartent du début
+    this.momentNargue = entre(...R.nargue.entre);
+    j.dempsey = null;
     this.retourGardeGreg(1.2);
     this.tempsRound = R.dureeRound;
     this.smashAnnonce = false;
@@ -993,6 +1009,10 @@ export class GregCombat extends BossScene {
 
   finDuRound() {
     jouerSon(this, 'greg_cloche');
+    // la cloche arrête tout : un Dempsey Roll en cours ne continue pas au round suivant
+    if (this.j.dempsey) { this.j.dempsey = null; this.dessinerDempsey(); }
+    if (this.texteAideDempsey) this.texteAideDempsey.setVisible(false);
+    this.j.action = null; this.j.esquive = null;
     this.alerte.setVisible(false);
     this.roundsJoues++;
     if (this.round >= R.nbRounds) { this.decision(); return; }
