@@ -17,15 +17,20 @@
 - Modèle de boss commun (`src/core/BossScene.js`) : écran des commandes, victoire (badge), défaite, retour hub.
 - Boss "Modèle" de test (menu F1 uniquement) : Z = gagner, X = perdre.
 - Menu de test caché (F1) : lancer n'importe quel boss / phase, remettre la sauvegarde à zéro.
+- **Smartphone / tablette** : boutons tactiles à l'écran (`src/core/tactile.js`), qui "appuient" sur
+  les touches du clavier. Chaque scène choisit le texte de ses boutons (`etiquettesTactiles`).
+  Le menu de test (F1) n'existe que sur ordinateur.
 - Manifeste unique des visuels/sons : `assets/manifeste.js` (formes provisoires dessinées par le code).
 - **Greg** (`src/bosses/greg/`) : combat de boxe en 3 rounds de 60 s.
-  - Greg prévient avant de frapper : « ! » jaune = visage (esquive Gauche/Droite ou garde X),
-    « ! ▼ » bleu = corps (garde X seulement), « !! » rouge = SMASH (esquive seulement, round 3).
-  - Esquive réussie = fenêtre de CONTRE (dégâts x2). Garde de Greg haute = vise le corps, basse = la tête.
+  - Commandes : ◀ ▶ esquive, Espace = coup au visage, Z = coup au corps, Bas (maintenu) = garde,
+    X = Dempsey Roll (quand la jauge d'esprit est pleine).
+  - Greg prévient avant de frapper : « ! » jaune = visage (esquive ou garde),
+    « ! ▼ » bleu = corps (garde seulement), « !! » rouge = SMASH (esquive seulement, round 3).
+  - Esquive réussie = fenêtre de CONTRE (dégâts x2). Garde de Greg haute = vise le corps, basse = le visage.
   - 3 coups encaissés d'affilée : Greg se couvre puis riposte.
   - Coups au corps = vident le souffle de Greg ; à bout de souffle, il est grand ouvert.
-  - Jauge d'esprit combatif pleine : Haut + Z = DEMPSEY ROLL (alterner Gauche/Droite ;
-    au round 3 Greg peut le contrer : Bas pour freiner).
+  - Jauge d'esprit combatif pleine : DEMPSEY ROLL (alterner Gauche/Droite ;
+    au round 3 Greg peut le contrer : garde pour freiner).
   - Au tapis : compte de l'arbitre, marteler Espace. 3 tapis = K.O. Greg : 3 tapis = victoire.
   - Le vieux coach donne des conseils avant chaque round. Fin du round 3 sans K.O. = décision aux points.
   - Tout l'équilibrage est dans `src/bosses/greg/reglages.js`.

@@ -5,11 +5,13 @@ import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { texte } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { IDENTITE, REGLAGES } from './reglages.js';
+import { etiquettesTactiles } from '../../core/tactile.js';
 
 export class ModeleScene extends BossScene {
   constructor() { super('ModeleScene', IDENTITE); }
 
   create() {
+    etiquettesTactiles({ z: 'Gagner', x: 'Perdre' });
     this.cameras.main.setBackgroundColor('#202830');
     this.enJeu = false;
     this.cible = this.add.sprite(LARGEUR / 2, HAUTEUR / 2, 'modele_cible').play('modele_cible');

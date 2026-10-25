@@ -21,10 +21,9 @@ export const REGLAGES = {
   // ---------- Joueur ----------
   souffleRecup: 22,            // souffle regagné par seconde quand on ne frappe pas
   coups: {
-    //            moment de l'impact, durée totale, dégâts, souffle dépensé, cible
-    jab:     { impact: 0.08, duree: 0.24, degats: 2, souffle: 6,  cible: 'tete' },
-    crochet: { impact: 0.20, duree: 0.45, degats: 4, souffle: 14, cible: 'tete' },
-    corps:   { impact: 0.16, duree: 0.40, degats: 3, souffle: 12, cible: 'corps', souffleGreg: 15 },
+    //          moment de l'impact, durée totale, dégâts, souffle dépensé, cible
+    visage: { impact: 0.10, duree: 0.30, degats: 3, souffle: 8,  cible: 'tete' },
+    corps:  { impact: 0.14, duree: 0.36, degats: 3, souffle: 11, cible: 'corps', souffleGreg: 15 },
   },
   esquiveDuree: 0.38,          // durée de l'esquive (Gauche ou Droite)
   esquiveProtege: 0.32,        // pendant ce temps, les coups au visage passent à côté
@@ -72,8 +71,8 @@ export const REGLAGES = {
 };
 
 // Attaques de Greg.
-//  cible 'tete'  : esquive (Gauche/Droite) ou garde (X)
-//  cible 'corps' : garde (X) seulement
+//  cible 'tete'  : esquive (Gauche/Droite) ou garde (Bas)
+//  cible 'corps' : garde (Bas) seulement
 //  cible 'smash' : esquive (Gauche/Droite) ! La garde ne protège qu'à moitié.
 export const ATTAQUES = {
   jab:     { nom: 'Jab',          cible: 'tete',  prepa: 0.45, degats: 6,  recup: 0.4, souffle: 4 },
@@ -94,19 +93,19 @@ export const ATTAQUES_PAR_ROUND = [
 export const CONSEILS = [
   [
     'Regarde ses gants, petit !',
-    'Garde HAUTE : tape au CORPS (Bas + Espace / Z).',
-    'Garde BASSE : vise la TÊTE.',
-    'Son coup au foie (« ! » bleu) : seule la GARDE (X) marche.',
+    'Garde HAUTE : tape au CORPS.',
+    'Garde BASSE : tape au VISAGE.',
+    'Son coup au foie (« ! » bleu) : seule la GARDE marche.',
   ],
   [
     'Ses coups au visage, tu les ESQUIVES (Gauche / Droite)...',
     '...et tu CONTRES tout de suite derrière : dégâts x2 !',
-    'Ta jauge d\'esprit est pleine ? Haut + Z : DEMPSEY ROLL !',
+    'Ta jauge d\'esprit est pleine ? DEMPSEY ROLL !',
   ],
   [
     'Attention à son SMASH (le gros "!!" rouge) :',
     'ESQUIVE sur le côté ! La garde ne suffit pas.',
-    'Pendant le Dempsey Roll, s\'il contre : BAS pour freiner net !',
+    'Pendant le Dempsey Roll, s\'il contre : GARDE pour freiner net !',
   ],
 ];
 

@@ -5,6 +5,7 @@ import { BientotScene } from './core/BientotScene.js';
 import { MenuTestScene, basculerMenuTest } from './core/MenuTestScene.js';
 import { HubScene } from './hub/HubScene.js';
 import { BOSS, MODELE } from './bosses/liste.js';
+import { installerTactile } from './core/tactile.js';
 
 const scenesDesBoss = [...BOSS, MODELE].flatMap(b => b.scenes);
 
@@ -26,5 +27,8 @@ window.addEventListener('keydown', (e) => {
     if (!e.repeat) basculerMenuTest(jeu);
   }
 });
+
+// Boutons tactiles (seulement sur smartphone / tablette)
+installerTactile();
 
 window.jeu = jeu;

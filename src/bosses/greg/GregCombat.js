@@ -2,12 +2,12 @@
 // BOSS GREG : combat de boxe en 3 rounds.
 // Vue "Punch-Out" (ton boxeur de dos, Greg de face), règles façon Hajime no Ippo :
 //   - Greg prévient avant de frapper ("!" à côté de sa tête) :
-//       jaune = visage (esquive Gauche/Droite ou garde X), bleu = corps (garde X),
+//       jaune = visage (esquive Gauche/Droite ou garde Bas), bleu = corps (garde Bas),
 //       rouge "!!" = SMASH (esquive sur le côté !)
 //   - Esquive réussie => fenêtre de CONTRE (dégâts x2)
 //   - Garde de Greg haute => tape au corps ; basse => tape au visage
-//   - Jauge d'esprit pleine => DEMPSEY ROLL (alterner Gauche / Droite)
-//   - Au tapis : marteler Espace avant 10 !
+//   - Jauge d'esprit pleine => X : DEMPSEY ROLL (alterner Gauche / Droite)
+//   - Au tapis : marteler Espace (bouton Visage sur mobile) avant 10 !
 // Tous les chiffres sont dans reglages.js.
 // =====================================================================
 import { BossScene } from '../../core/BossScene.js';
@@ -17,6 +17,7 @@ import { jouerSon } from '../../core/ressources.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { IDENTITE, REGLAGES as R, ATTAQUES, ATTAQUES_PAR_ROUND, CONSEILS, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
 import { lignesImpact, onomatopee, flash, encart, bulle, gouttes } from './effets.js';
+import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 
 const auHasard = (liste) => liste[Math.floor(Math.random() * liste.length)];
 const entre = (min, max) => min + Math.random() * (max - min);
@@ -28,6 +29,9 @@ const COULEUR_ALERTE = { tete: '#ffd84a', corps: '#5ad1ff', smash: '#ff3b3b' };
 const VISAGE_GREG = { x: R.centreX, y: 140 };
 const CORPS_GREG = { x: R.centreX, y: 270 };
 const TETE_JOUEUR_Y = 330;
+// Boutons tactiles : pendant le combat / sur les écrans à valider
+const ETIQUETTES_COMBAT = { haut: null, bas: '▼\nGarde', espace: 'Visage', z: 'Corps', x: 'Dempsey' };
+const ETIQUETTES_OK = { haut: null, bas: null, gauche: null, droite: null, espace: 'OK', z: null, x: null };
 
 export class GregCombat extends BossScene {
   constructor() { super('GregCombat', IDENTITE); }
@@ -67,13 +71,14 @@ export class GregCombat extends BossScene {
     this.touches = creerTouches(this);
     this.afficher();
 
+    etiquettesTactiles(ETIQUETTES_OK);
+    const tactile = estTactile();
     this.afficherIntro('GREG - Le Boxeur', [
-      'Gauche / Droite : esquive (puis frappe vite = CONTRE !)',
-      'Espace : jab (rapide)      Z : crochet (puissant)',
-      'Bas + Espace ou Z : coup au CORPS',
-      'X (maintenu) : garde',
-      'Jauge d\'esprit pleine : Haut + Z = DEMPSEY ROLL',
-      'Au tapis : martèle Espace !',
+      '◀ / ▶ : esquive (puis frappe vite = CONTRE !)',
+      tactile ? 'Visage : coup au visage      Corps : coup au corps' : 'Espace : coup au VISAGE      Z : coup au CORPS',
+      tactile ? '▼ Garde (maintenu) : garde' : 'Bas (maintenu) : garde',
+      tactile ? 'Jauge d\'esprit pleine : Dempsey = DEMPSEY ROLL' : 'Jauge d\'esprit pleine : X = DEMPSEY ROLL',
+      tactile ? 'Au tapis : tape vite sur Visage !' : 'Au tapis : martèle Espace !',
     ], () => this.ouvrirCoin());
   }
 
@@ -135,7 +140,7 @@ export class GregCombat extends BossScene {
     if (j.sonne > 0) { j.sonne -= dt; j.garde = false; return; }
 
     // Dempsey Roll (prioritaire, même pendant une esquive)
-    if (!j.action && a.z && t.haut.isDown && j.esprit >= 100) {
+    if (!j.action && a.x && j.esprit >= 100) {
       this.lancerDempsey();
       return;
     }
@@ -158,7 +163,7 @@ export class GregCombat extends BossScene {
       return;
     }
 
-    j.garde = t.x.isDown;
+    j.garde = t.bas.isDown;
     if (j.garde) return;
 
     if ((a.gauche || a.droite) && j.esquivePause <= 0) {
@@ -171,15 +176,16 @@ export class GregCombat extends BossScene {
   }
 
   choixCoup(a) {
-    if (this.touches.bas.isDown) return 'corps';
-    return a.z ? 'crochet' : 'jab';
+    return a.z ? 'corps' : 'visage';
   }
 
   frapper(coup) {
     const j = this.j, c = R.coups[coup];
     if (j.souffle < c.souffle) { this.essouffle(); return; }
     j.souffle -= c.souffle; j.reposSouffle = 0.5;
-    j.action = { coup, t: 0, fait: false };
+    // pour le visage, on alterne jab et crochet (juste pour l'animation)
+    this.alterne = !this.alterne;
+    j.action = { coup, t: 0, fait: false, pose: coup === 'corps' ? 'corps' : (this.alterne ? 'jab' : 'crochet') };
   }
 
   essouffle() {
@@ -218,12 +224,11 @@ export class GregCombat extends BossScene {
       onomatopee(this, xImpact, yImpact - 50, 'CONTRE !!', 52, '#ff8a3d');
       this.cameras.main.shake(180, 0.012);
     } else {
-      onomatopee(this, xImpact, yImpact, c.cible === 'corps' ? ONO.corps : (coup === 'jab' ? ONO.leger : ONO.fort),
-        coup === 'jab' ? 32 : 44, c.cible === 'corps' ? '#5ad1ff' : '#ffffff');
-      lignesImpact(this, xImpact, yImpact, 0xffffff, coup === 'jab' ? 10 : 16, coup === 'jab' ? 100 : 160);
-      if (coup !== 'jab') this.cameras.main.shake(90, 0.006);
+      onomatopee(this, xImpact, yImpact, c.cible === 'corps' ? ONO.corps : ONO.fort, 40, c.cible === 'corps' ? '#5ad1ff' : '#ffffff');
+      lignesImpact(this, xImpact, yImpact, 0xffffff, 14, 140);
+      this.cameras.main.shake(70, 0.005);
     }
-    jouerSon(this, coup === 'jab' && !contre ? 'greg_coup' : 'greg_coup_fort');
+    jouerSon(this, contre ? 'greg_coup_fort' : 'greg_coup');
     j.esprit = Math.min(100, j.esprit + R.esprit.coupPorte);
     g.secousse = contre ? 0.3 : 0.15;
     if (c.souffleGreg) g.souffle -= c.souffleGreg * (contre ? 2 : 1);
@@ -242,8 +247,8 @@ export class GregCombat extends BossScene {
       return;
     }
 
-    // Un crochet ou un contre interrompt la préparation de Greg (sauf le Smash)
-    const interrompt = g.etat !== 'prepare' || coup !== 'jab' || contre;
+    // Pendant qu'il prépare son coup, seul un contre l'interrompt (sauf le Smash)
+    const interrompt = g.etat !== 'prepare' || contre;
     const smash = g.attaque && g.attaque.cible === 'smash' && (g.etat === 'prepare' || g.etat === 'frappe');
     if (interrompt && !smash) {
       if (g.etat === 'prepare') onomatopee(this, R.centreX + 170, 60, 'Interrompu !', 22, '#7fff7f');
@@ -403,7 +408,7 @@ export class GregCombat extends BossScene {
     j.esprit = 0; j.esquive = null; j.garde = false;
     j.dempsey = { coups: 0, dernier: null, delai: R.dempsey.delaiMax + 0.8, cote: 'g', contre: null, contreTente: false };
     g.etat = 'touche'; g.t = 0; g.attaque = null; this.alerte.setVisible(false);
-    const e = encart(this, 'DEMPSEY ROLL !!', 'Alterne GAUCHE / DROITE le plus vite possible !', '#ffd84a', 0x101a40);
+    const e = encart(this, 'DEMPSEY ROLL !!', 'Alterne ◀ / ▶ le plus vite possible !', '#ffd84a', 0x101a40);
     this.figer(1.1, () => e.fermer());
   }
 
@@ -414,7 +419,7 @@ export class GregCombat extends BossScene {
     // Greg tente un contre (à partir du round 3)
     if (d.contre !== null) {
       d.contre -= dt;
-      if (a.bas) {
+      if (a.bas) {   // la garde sert de frein
         d.contre = null;
         onomatopee(this, R.centreX, 300, 'FREIN !', 44, '#7fff7f');
         onomatopee(this, R.centreX + 170, 60, 'Dans le vide !', 24, '#ffffff');
@@ -457,7 +462,7 @@ export class GregCombat extends BossScene {
       if (this.round >= 3 && !d.contreTente && d.coups >= D.contreAuCoup && Math.random() < 0.8) {
         d.contreTente = true;
         d.contre = D.reflexe;
-        this.alerte.setText('!!\nBAS !').setColor('#ff3b3b').setVisible(true);
+        this.alerte.setText('!!\nGARDE !').setColor('#ff3b3b').setVisible(true);
         jouerSon(this, 'greg_alerte');
         this.ralentir(0.5, 0.4);
       }
@@ -511,7 +516,7 @@ export class GregCombat extends BossScene {
     this.texteCompte2 = texte(this, LARGEUR / 2, 240, '', 22, '#ffffff').setDepth(45);
     if (qui === 'joueur') {
       this.barreReleve = this.add.graphics().setDepth(45);
-      this.texteCompte2.setText('ESPACE ! ESPACE ! ESPACE !').setColor('#7fff7f');
+      this.texteCompte2.setText(estTactile() ? 'VISAGE ! VISAGE ! VISAGE !' : 'ESPACE ! ESPACE ! ESPACE !').setColor('#7fff7f');
     }
   }
 
@@ -579,6 +584,7 @@ export class GregCombat extends BossScene {
   // =================================================================
   ouvrirCoin() {
     this.etat = 'coin';
+    etiquettesTactiles(ETIQUETTES_OK);
     const fin = this.roundsJoues > 0;
     const el = [];
     el.push(voile(this, 0.85).setDepth(100));
@@ -594,7 +600,7 @@ export class GregCombat extends BossScene {
         `Ta vie remonte (+${R.soinEntreRounds}).   Coups donnés : ${Math.round(this.stats.donnes)}   reçus : ${Math.round(this.stats.recus)}`,
         16, '#7fff7f').setDepth(101));
     }
-    el.push(texte(this, LARGEUR / 2, HAUTEUR - 50, 'ESPACE : on y va !', 22, '#7fff7f').setDepth(101));
+    el.push(texte(this, LARGEUR / 2, HAUTEUR - 50, (estTactile() ? 'OK' : 'ESPACE') + ' : on y va !', 22, '#7fff7f').setDepth(101));
     this.time.delayedCall(400, () => {
       this.input.keyboard.once('keydown-SPACE', () => {
         el.forEach(e => e.destroy());
@@ -605,6 +611,8 @@ export class GregCombat extends BossScene {
   }
 
   debutRound() {
+    etiquettesTactiles({ ...ETIQUETTES_COMBAT, x: null });
+    this.boutonDempsey = false;
     const j = this.j;
     j.souffle = 100; this.g.souffle = 100;
     j.action = null; j.esquive = null; j.sonne = 0; j.contreJusqua = -1;
@@ -661,7 +669,7 @@ export class GregCombat extends BossScene {
     else if (this.etat === 'fin' && g.etat === 'sol') pj = 'victoire';
     else if (j.dempsey) pj = j.dempsey.cote === 'g' ? 'dempsey_g' : 'dempsey_d';
     else if (j.sonne > 0) pj = 'touche';
-    else if (j.action) pj = j.action.coup;
+    else if (j.action) pj = j.action.pose;
     else if (j.esquive) pj = 'esquive';
     else if (j.garde) pj = 'bloque';
     j.sprite.setTexture('heros_boxe_' + pj);
@@ -708,8 +716,8 @@ export class GregCombat extends BossScene {
     this.texteRound = texte(this, LARGEUR / 2, 20, '', 18, '#ffffff').setDepth(41);
     this.texteTemps = texte(this, LARGEUR / 2, 50, '', 30, '#ffd84a').setDepth(41);
     this.texteGarde = texte(this, LARGEUR - 30, 92, '', 14, '#cccccc').setOrigin(1, 0.5).setDepth(41);
-    texte(this, 30, HAUTEUR - 52, 'ESPRIT COMBATIF', 14, '#ffd84a').setOrigin(0, 0.5).setDepth(41);
-    this.texteDempsey = texte(this, 30, HAUTEUR - 78, 'Haut + Z : DEMPSEY ROLL !', 18, '#ffd84a').setOrigin(0, 0.5).setDepth(41).setVisible(false);
+    texte(this, 30, 62, 'ESPRIT', 12, '#ffd84a').setOrigin(0, 0.5).setDepth(41);
+    this.texteDempsey = texte(this, 80, 98, estTactile() ? 'Dempsey : DEMPSEY ROLL !' : 'X : DEMPSEY ROLL !', 18, '#ffd84a').setOrigin(0, 0.5).setDepth(41).setVisible(false);
   }
 
   majHud() {
@@ -727,13 +735,19 @@ export class GregCombat extends BossScene {
     barre(LARGEUR - 380, 14, 300, 18, g.vie / 100, couleurVie(g.vie), true);
     barre(LARGEUR - 380, 38, 300, 7, g.souffle / 100, 0x5ad1ff, true);
     // knockdowns subis (petits ronds rouges)
-    for (let i = 0; i < j.downs; i++) h.fillStyle(0xff3b30, 1).fillCircle(90 + i * 16, 60, 5);
-    for (let i = 0; i < g.downs; i++) h.fillStyle(0xff3b30, 1).fillCircle(LARGEUR - 90 - i * 16, 60, 5);
+    for (let i = 0; i < j.downs; i++) h.fillStyle(0xff3b30, 1).fillCircle(400 + i * 16, 23, 5);
+    for (let i = 0; i < g.downs; i++) h.fillStyle(0xff3b30, 1).fillCircle(LARGEUR - 400 - i * 16, 23, 5);
 
     const plein = j.esprit >= 100;
     const clignote = plein && Math.floor(this.time.now / 150) % 2;
-    barre(30, HAUTEUR - 40, 300, 16, j.esprit / 100, clignote ? 0xffffff : 0xffd84a, false);
-    this.texteDempsey.setVisible(plein && this.etat === 'combat' && !j.dempsey);
+    barre(80, 55, 300, 13, j.esprit / 100, clignote ? 0xffffff : 0xffd84a, false);
+    const dempseyPret = plein && this.etat === 'combat' && !j.dempsey;
+    this.texteDempsey.setVisible(dempseyPret);
+    // sur mobile, le bouton Dempsey n'apparaît que quand la jauge est pleine
+    if (this.etat === 'combat' && dempseyPret !== this.boutonDempsey) {
+      this.boutonDempsey = dempseyPret;
+      etiquettesTactiles({ ...ETIQUETTES_COMBAT, x: dempseyPret ? 'Dempsey' : null });
+    }
 
     this.texteRound.setText(`ROUND ${this.round} / ${R.nbRounds}`);
     this.texteTemps.setText(String(Math.max(0, Math.ceil(this.tempsRound ?? R.dureeRound))));

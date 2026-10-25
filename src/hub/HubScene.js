@@ -9,6 +9,7 @@ import { Sauvegarde } from '../core/sauvegarde.js';
 import { jouerSon } from '../core/ressources.js';
 import { BOSS } from '../bosses/liste.js';
 import { REGLAGES_HUB as R } from './reglages.js';
+import { estTactile, etiquettesTactiles } from '../core/tactile.js';
 
 export class HubScene extends Phaser.Scene {
   constructor() { super('Hub'); }
@@ -17,6 +18,7 @@ export class HubScene extends Phaser.Scene {
 
   create() {
     this.entree = false;
+    etiquettesTactiles({ espace: 'Entrer', z: null, x: null });
     // Sol et mur du fond
     this.add.tileSprite(0, 0, LARGEUR, HAUTEUR, 'hub_sol', 0).setOrigin(0);
     this.add.tileSprite(0, 0, LARGEUR, R.basDuMur, 'hub_mur', 0).setOrigin(0);
@@ -39,7 +41,7 @@ export class HubScene extends Phaser.Scene {
       const cle = Sauvegarde.aLeBadge(boss.id) ? 'badge_' + boss.id : 'badge_vide';
       this.add.image(260 + i * 64, HAUTEUR - R.hauteurBarre / 2, cle);
     });
-    texte(this, 820, HAUTEUR - R.hauteurBarre / 2, 'Flèches : bouger\nEspace : entrer', 14, '#aaaaaa');
+    texte(this, 820, HAUTEUR - R.hauteurBarre / 2, estTactile() ? 'Flèches : bouger\nEntrer : porte' : 'Flèches : bouger\nEspace : entrer', 14, '#aaaaaa');
 
     // Héros : devant la porte du boss d'où l'on revient, sinon en bas au centre
     const retour = this.portes.find(p => p.boss.id === this.depuis);
@@ -74,7 +76,7 @@ export class HubScene extends Phaser.Scene {
     this.portes.forEach(p => p.porte.clearTint());
     if (proche) {
       proche.porte.setTint(0xffffaa);
-      this.aide.setText(`Espace : entrer chez ${proche.boss.nom}`);
+      this.aide.setText(`${estTactile() ? 'Entrer' : 'Espace'} : entrer chez ${proche.boss.nom}`);
       if (vientDAppuyer(t.espace)) this.entrer(proche.boss);
     } else {
       this.aide.setText('');

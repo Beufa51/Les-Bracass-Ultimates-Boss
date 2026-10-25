@@ -9,6 +9,7 @@ import { LARGEUR, HAUTEUR } from './reglages.js';
 import { Sauvegarde } from './sauvegarde.js';
 import { texte, voile } from './ui.js';
 import { jouerSon } from './ressources.js';
+import { estTactile, etiquettesTactiles } from './tactile.js';
 
 export class BossScene extends Phaser.Scene {
   // cle : nom unique de la scène ; identite : { id, nom } du boss
@@ -29,7 +30,7 @@ export class BossScene extends Phaser.Scene {
       texte(this, LARGEUR / 2, 120, titre, 40, '#ffd84a').setDepth(1001),
       texte(this, LARGEUR / 2, 190, 'COMMANDES', 22, '#aaaaaa').setDepth(1001),
       texte(this, LARGEUR / 2, 220, commandes.join('\n'), 20, '#ffffff', { lineSpacing: 6 }).setOrigin(0.5, 0).setDepth(1001),
-      texte(this, LARGEUR / 2, 495, 'Appuie sur ESPACE pour commencer', 22, '#7fff7f').setDepth(1001),
+      texte(this, LARGEUR / 2, 495, `Appuie sur ${estTactile() ? 'OK' : 'ESPACE'} pour commencer`, 22, '#7fff7f').setDepth(1001),
     ];
     this.input.keyboard.once('keydown-SPACE', () => {
       elements.forEach(el => el.destroy());
@@ -54,11 +55,12 @@ export class BossScene extends Phaser.Scene {
   }
 
   ecranFin(titre, message, couleur, gagne) {
+    etiquettesTactiles({ espace: 'OK', z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
     voile(this, 0.8).setDepth(1000);
     texte(this, LARGEUR / 2, 170, titre, 56, couleur).setDepth(1001);
     texte(this, LARGEUR / 2, 270, message, 24, '#ffffff', { wordWrap: { width: 800 } }).setDepth(1001);
     if (gagne) this.add.image(LARGEUR / 2, 360, 'badge_' + this.identite.id).setScale(2).setDepth(1001);
-    texte(this, LARGEUR / 2, HAUTEUR - 60, 'ESPACE : retour au hub', 20, '#aaaaaa').setDepth(1001);
+    texte(this, LARGEUR / 2, HAUTEUR - 60, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, 20, '#aaaaaa').setDepth(1001);
     // petit délai pour ne pas sauter l'écran par accident
     this.time.delayedCall(600, () => {
       this.input.keyboard.once('keydown-SPACE', () => this.retourHub());
