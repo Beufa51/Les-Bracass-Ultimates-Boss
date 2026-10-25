@@ -62,8 +62,8 @@ export const REGLAGES = {
   // ---------- Esprit combatif (jauge du Dempsey Roll) ----------
   // la jauge ne se remplit QU'avec les esquives réussies (environ 8 esquives pour un Dempsey)
   esprit: { coupPorte: 0, esquive: 13, contre: 0, releve: 0 },
-  // Dempsey Roll = jeu de rythme : deux cibles ◀ / ▶ ; un anneau se resserre sur celle à frapper,
-  // frappe quand il la touche (un bip marque le bon moment). Ton boxeur balance en "∞".
+  // Dempsey Roll = jeu de rythme : une boule parcourt un "∞" (le balancement du buste).
+  // Appuie sur ◀ quand elle arrive à gauche, ▶ quand elle arrive à droite (un bip marque le bon moment).
   // Chaque coup réussi accélère le rythme et frappe plus fort.
   dempsey: {
     coupsMax: 10,              // le 10e coup est le coup final
@@ -79,7 +79,7 @@ export const REGLAGES = {
     bonusCombo: 0.05,          // +5 % de dégâts par coup déjà enchaîné
     degatsFinal: 12,
     contreEntre: [3, 6],       // round 3 : Greg tente un contre entre ces coups-là
-    degatsContre: 25,
+    degatsContre: 30,
   },
 
   // ---------- Au tapis ----------
@@ -127,11 +127,11 @@ export const REGLAGES = {
 //  cible 'corps' : garde (Bas) seulement
 //  cible 'smash' : esquive (Gauche/Droite) ! La garde ne protège qu'à moitié.
 export const ATTAQUES = {
-  jab:     { nom: 'Jab',          cible: 'tete',  prepa: 0.8,  degats: 6,  recup: 0.4, souffle: 4 },
-  crochet: { nom: 'Crochet',      cible: 'tete',  prepa: 1.0,  degats: 12, recup: 0.7, souffle: 8 },
-  corps:   { nom: 'Coup au foie', cible: 'corps', prepa: 0.9,  degats: 10, recup: 0.6, souffle: 8, souffleJoueur: 25 },
-  rafale:  { nom: 'Flicker',      cible: 'tete',  prepa: 0.7,  degats: 4,  recup: 0.8, souffle: 12, coups: 3, entre: 0.75 },
-  smash:   { nom: 'SMASH',        cible: 'smash', prepa: 1.1,  degats: 28, recup: 1.2, souffle: 20, gardeCassee: 0.5 },
+  jab:     { nom: 'Jab',          cible: 'tete',  prepa: 0.8,  degats: 8,  recup: 0.4, souffle: 4 },
+  crochet: { nom: 'Crochet',      cible: 'tete',  prepa: 1.0,  degats: 16, recup: 0.7, souffle: 8 },
+  corps:   { nom: 'Coup au foie', cible: 'corps', prepa: 0.9,  degats: 13, recup: 0.6, souffle: 8, souffleJoueur: 25 },
+  rafale:  { nom: 'Flicker',      cible: 'tete',  prepa: 0.7,  degats: 6,  recup: 0.8, souffle: 12, coups: 3, entre: 0.75 },
+  smash:   { nom: 'SMASH',        cible: 'smash', prepa: 1.1,  degats: 34, recup: 1.2, souffle: 20, gardeCassee: 0.5 },
 };
 
 // ENCHAÎNEMENTS de Greg, par round : il les joue dans l'ordre, en boucle (comme dans Punch-Out,
@@ -177,7 +177,7 @@ export const CONSEILS = [
   [
     'Attention à son SMASH (le gros "!!" rouge) :',
     'ESQUIVE sur le côté ! La garde ne suffit pas.',
-    'Dempsey Roll : s\'il contre (cible ROUGE ▼), GARDE (▼) pour freiner net !',
+    'Dempsey Roll : s\'il contre (boule ROUGE), GARDE (▼) pour freiner net !',
   ],
 ];
 

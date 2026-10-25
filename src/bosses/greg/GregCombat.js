@@ -551,7 +551,7 @@ export class GregCombat extends BossScene {
     if (!this.texteAideDempsey) {
       this.texteAideDempsey = texte(this, R.centreX, 375, '', 20, '#ffd84a', { lineSpacing: 4 }).setDepth(46);
     }
-    this.texteAideDempsey.setText('Appuie sur ▶ pour lancer le roll !\nPuis frappe ◀ / ▶ quand l\'anneau blanc touche la cible (au bip)').setVisible(true);
+    this.texteAideDempsey.setText('Appuie sur ▶ pour lancer le roll !\nEnsuite : ◀ quand la boule arrive à GAUCHE, ▶ à DROITE').setVisible(true);
   }
 
   // Le "∞" : x de -1 à 1, droite quand phi = 0, gauche quand phi = PI
@@ -692,7 +692,6 @@ export class GregCombat extends BossScene {
     const gr = this.grDempsey, fond = this.grVitesse, d = this.j.dempsey;
     gr.clear(); fond.clear();
     this.texteCombo.setVisible(false);
-    if (this.texteFlechesDempsey) this.texteFlechesDempsey.forEach(f => f.setVisible(false));
     if (!d || this.etat !== 'combat') return;
     // lignes de vitesse de plus en plus intenses
     const intensite = Math.min(1, 0.25 + d.coups * 0.08);
@@ -701,32 +700,32 @@ export class GregCombat extends BossScene {
       const ang = Math.random() * Math.PI * 2, r1 = 150 + Math.random() * 80, r2 = 600;
       fond.lineBetween(R.centreX + Math.cos(ang) * r1, 240 + Math.sin(ang) * r1, R.centreX + Math.cos(ang) * r2, 240 + Math.sin(ang) * r2);
     }
-    // deux grosses cibles G / D : un anneau se resserre sur la cible à frapper (frappe quand il la touche)
-    const cx = R.centreX, cy = 455, ecartX = 210;
+    // piste en "∞"
+    const cx = R.centreX, cy = 455, ax = 210, ay = 140;
+    gr.fillStyle(0x000000, 0.45).fillRoundedRect(cx - ax - 50, cy - 60, (ax + 50) * 2, 120, 20);
+    gr.lineStyle(6, 0xffffff, 0.35).beginPath();
+    for (let t = 0; t <= Math.PI * 2 + 0.05; t += 0.05) {
+      const p = GregCombat.infini(t);
+      t === 0 ? gr.moveTo(cx + p.x * ax, cy + p.y * ay) : gr.lineTo(cx + p.x * ax, cy + p.y * ay);
+    }
+    gr.strokePath();
+    // zones de frappe (celle à viser brille)
     const coteDemi = d.demi % 2 === 0 ? 'd' : 'g';
     // erreurs restantes (petits coeurs)
     for (let k = 0; k <= R.dempsey.erreursPermises; k++) {
-      gr.fillStyle(k < R.dempsey.erreursPermises + 1 - d.erreurs ? 0xff5a6e : 0x444444, 1).fillCircle(cx - 20 + k * 20, cy - 70, 6);
+      gr.fillStyle(k < R.dempsey.erreursPermises + 1 - d.erreurs ? 0xff5a6e : 0x444444, 1).fillCircle(cx - 20 + k * 20, cy - 46, 6);
     }
     for (const cote of ['g', 'd']) {
-      const x = cx + (cote === 'd' ? ecartX : -ecartX);
+      const x = cx + (cote === 'd' ? ax : -ax) * 0.98;
       const active = cote === coteDemi && (!d.touche || d.attente > 0);
       const couleur = d.contre && active ? 0xff3b3b : 0xffd84a;
-      gr.fillStyle(0x000000, 0.5).fillCircle(x, cy, 46);
-      gr.lineStyle(5, couleur, active ? 1 : 0.3).strokeCircle(x, cy, 40);
-      gr.fillStyle(couleur, active ? 0.35 : 0.08).fillCircle(x, cy, 40);
-      if (active) {
-        const centre = cote === 'd' ? 0 : Math.PI;
-        const avant = Phaser.Math.Angle.Wrap(centre - d.phi);   // > 0 : pas encore arrivé
-        const r = d.attente > 0 ? 40 : 40 + Math.max(0, avant) * 70;
-        gr.lineStyle(6, 0xffffff, 0.95).strokeCircle(x, cy, r);
-        gr.fillStyle(0x1a1014, 1);
-      }
+      gr.lineStyle(4, couleur, active ? 1 : 0.35).strokeCircle(x, cy, 30);
+      gr.fillStyle(couleur, active ? 0.3 : 0.08).fillCircle(x, cy, 30);
     }
-    const fleches = this.texteFlechesDempsey || (this.texteFlechesDempsey = [
-      texte(this, cx - ecartX, cy, '◀', 34, '#ffffff').setDepth(36), texte(this, cx + ecartX, cy, '▶', 34, '#ffffff').setDepth(36)]);
-    fleches.forEach(f => f.setVisible(true));
-    if (d.contre) { fleches[coteDemi === 'g' ? 0 : 1].setText('▼'); } else { fleches[0].setText('◀'); fleches[1].setText('▶'); }
+    // la boule
+    const p = GregCombat.infini(d.phi);
+    gr.fillStyle(d.contre ? 0xff3b3b : 0xffffff, 1).fillCircle(cx + p.x * ax, cy + p.y * ay, 14);
+    gr.lineStyle(3, 0x1a1014, 1).strokeCircle(cx + p.x * ax, cy + p.y * ay, 14);
     // compteur de coups
     this.texteCombo.setVisible(d.coups > 0).setText(`${d.coups} COUP${d.coups > 1 ? 'S' : ''} !`).setScale(1 + d.coups * 0.04);
   }

@@ -52,7 +52,7 @@
     et change de garde à la fin de chacun. Avant le SMASH, il tape ses gants (« TAP ! TAP ! »).
   - Aides : flèche ESQUIVE/GARDE et cible qui se resserre, à tous les rounds (réglables : aideFleche, aideCible).
   - Jauge d'esprit : ne se remplit QU'avec les esquives réussies.
-  - Dempsey Roll : deux cibles ◀ / ▶, un anneau blanc se resserre sur celle à frapper, bip au bon moment ;
+  - Dempsey Roll : boule sur un « ∞ » (◀ à gauche, ▶ à droite, bip au bon moment) ;
     2 ratés pardonnés, timing serré, environ 50 dégâts max.
   - Moment secret : à 32 s de la fin de chaque round, Greg baisse la garde et nargue (« Allez, frappe ! »).
     Le frapper à ce moment = COUP SECRET (tapis direct) la 1re fois, puis dégâts x3.
