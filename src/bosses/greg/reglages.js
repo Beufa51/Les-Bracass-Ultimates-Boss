@@ -39,25 +39,26 @@ export const REGLAGES = {
     debutElanCorps: 0.4,   // pour le coup au corps : il plonge d'abord bas plus longtemps
   },
   tailleJoueur: 0.72,          // petit et transparent, comme dans Super Punch-Out
-  transparenceJoueur: 0.6,
+  transparenceJoueur: 0.75,
 
   // ---------- Joueur ----------
   souffleRecup: 22,            // souffle regagné par seconde quand on ne frappe pas
   coups: {
     //          moment de l'impact, durée totale, dégâts, souffle dépensé, cible
-    visage: { impact: 0.10, duree: 0.30, degats: 4, souffle: 8,  cible: 'tete' },
-    corps:  { impact: 0.14, duree: 0.36, degats: 4, souffle: 11, cible: 'corps', souffleGreg: 15 },
+    visage: { impact: 0.10, duree: 0.30, degats: 3, souffle: 8,  cible: 'tete' },
+    corps:  { impact: 0.14, duree: 0.36, degats: 3, souffle: 11, cible: 'corps', souffleGreg: 15 },
   },
   esquiveDuree: 0.5,           // durée de l'esquive (Gauche ou Droite)
   esquiveProtege: 0.45,        // pendant ce temps, les coups au visage passent à côté
   tropTot: 0.4,                // esquive finie moins de X s avant le coup => message "Trop tôt !"
   esquivePause: 0.2,           // délai avant de pouvoir ré-esquiver
   esquiveSouffle: 8,
-  garde: 0.15,                 // part des dégâts reçus en garde (0.15 = 15 %)
-  gardeSouffle: 10,            // souffle perdu par coup bloqué
+  garde: 0.3,                  // part des dégâts reçus en garde (0.3 = 30 %)
+  gardeSouffle: 22,            // souffle perdu par coup bloqué (et pas de récupération tant qu'on garde)
   toucheDuree: 0.38,           // temps sonné après un coup reçu
   contreFenetre: 0.8,          // après une esquive réussie, temps pour placer un contre
-  contreMultiplicateur: 2.5,   // dégâts du contre : c'est LA stratégie
+  contreMultiplicateur: 3,     // dégâts du contre : c'est LA stratégie
+  memoireAppui: 0.15,          // un appui fait pendant un coup / sonné est gardé en mémoire ce temps
 
   // ---------- Esprit combatif (jauge du Dempsey Roll) ----------
   // la jauge ne se remplit QU'avec les esquives réussies (environ 8 esquives pour un Dempsey)
@@ -87,7 +88,7 @@ export const REGLAGES = {
   appuisPourSeRelever: [10, 14, 20],   // alternances ◀ ▶ à faire : 1er, 2e, 3e passage au tapis
   vieApresRelevee: [55, 40, 30],
   knockdownsMax: 3,            // au 3e tapis... c'est fini (pour toi comme pour Greg)
-  vieGregApresRelevee: [80, 60],
+  vieGregApresRelevee: [100, 100],
   compteGregRelevee: [6, 8],   // Greg se relève à ce chiffre
 
   // ---------- Greg ----------
@@ -111,7 +112,7 @@ export const REGLAGES = {
   // Une fois par round, à un moment au hasard (entre 'entre' secondes restantes). Pour réussir :
   // un COUP AU CORPS lancé APRÈS qu'il a baissé la garde (marteler avant ne marche pas), en moins de 'duree'.
   // 1re fois du combat = COUP SECRET (tapis direct) ; ensuite = dégâts x3. Mauvais coup = il esquive.
-  nargue: { entre: [45, 15], duree: 0.6, coup: 'corps', multiplicateur: 3 },
+  nargue: { entre: [45, 15], duree: 0.7, coup: 'corps', multiplicateur: 3 },
 
   // ---------- Classement de fin (temps de K.O. + coups reçus + tapis) ----------
   rangs: [ // du meilleur au moins bon : il faut un score >= au seuil
@@ -121,6 +122,11 @@ export const REGLAGES = {
   // ---------- Coups / garde : finitions ----------
   arretImpact: { coup: 0.06, contre: 0.12, recu: 0.15 },   // "hit-stop" : l'image se fige un instant
   gardeBriseeSonne: 0.8,       // garde avec souffle à 0 => garde brisée, sonné ce temps
+  smashGardeSonne: 1.0,        // le SMASH bloqué brise toujours la garde
+  // Greg pare même tes coups "libres" (zone ouverte, hors contre / essoufflement) : chance par round
+  blocageLibre: [0.4, 0.5, 0.6],
+  pauseApresTouche: 0.4,       // après avoir encaissé, il ne reste pas bloqué : pause max avant d'attaquer
+  riposte: { prepa: 0.5 },     // après "Il se couvre", il riposte tout de suite par un jab rapide
 };
 
 // Attaques de Greg.
@@ -132,6 +138,8 @@ export const ATTAQUES = {
   crochet: { nom: 'Crochet',      cible: 'tete',  prepa: 1.0,  degats: 16, recup: 0.7, souffle: 8 },
   corps:   { nom: 'Coup au foie', cible: 'corps', prepa: 0.9,  degats: 13, recup: 0.6, souffle: 8, souffleJoueur: 25 },
   rafale:  { nom: 'Flicker',      cible: 'tete',  prepa: 0.7,  degats: 6,  recup: 0.8, souffle: 12, coups: 3, entre: 0.75 },
+  // FEINTE (Greg énervé) : elle ressemble à un coup au visage mais ne frappe pas ; le vrai coup suit !
+  feinte:  { nom: 'Feinte',       cible: 'tete',  prepa: 0.6,  degats: 0,  recup: 0.05, souffle: 2, feinte: true },
   smash:   { nom: 'SMASH',        cible: 'smash', prepa: 1.1,  degats: 34, recup: 1.2, souffle: 20, gardeCassee: 0.5 },
 };
 
@@ -158,6 +166,14 @@ export const ENCHAINEMENTS = [
     ['smash'],                       // avant le SMASH, il tape ses gants (on le voit venir)
     ['corps', 'jab g', 'crochet g'],
   ],
+];
+
+// Greg ÉNERVÉ (après son 2e passage au tapis) : enchaînements avec des feintes
+export const ENCHAINEMENTS_ENERVE = [
+  ['feinte g', 'jab d', 'crochet g'],
+  ['jab g', 'feinte d', 'corps'],
+  ['crochet d', 'feinte g', 'jab g'],
+  ['corps', 'feinte d', 'jab d', 'smash'],
 ];
 
 // Ce que dit le vieux coach dans le coin, entre les rounds

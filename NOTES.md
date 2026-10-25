@@ -46,7 +46,7 @@
     il faut esquiver du côté OPPOSÉ ; une flèche « ESQUIVE » l'indique. Le SMASH part du centre.
   - Greg prévient avant de frapper : « ! » jaune = visage (esquive ou garde),
     « ! ▼ » violet = corps (garde seulement), « !! » rouge = SMASH (esquive seulement, round 3).
-  - Esquive réussie = fenêtre de CONTRE (dégâts x2). Garde de Greg haute = vise le corps, basse = le visage.
+  - Esquive réussie = fenêtre de CONTRE (dégâts x3). Garde de Greg haute = vise le corps, basse = le visage.
   - 3 coups encaissés d'affilée : Greg se couvre puis riposte.
   - Greg joue des ENCHAÎNEMENTS écrits par round (`ENCHAINEMENTS` dans reglages.js), dans l'ordre,
     et change de garde à la fin de chacun. Avant le SMASH, il tape ses gants (« TAP ! TAP ! »).
@@ -55,9 +55,20 @@
   - Dempsey Roll : boule sur un « ∞ » (◀ à gauche, ▶ à droite, bip au bon moment) ;
     2 ratés pardonnés, timing serré, environ 50 dégâts max.
   - Moment secret : une fois par round, à un moment au hasard, Greg baisse la garde 0,6 s (discret : « hé... »).
-    Il faut un COUP AU CORPS lancé après qu'il a baissé la garde : 1re fois = COUP SECRET (tapis direct),
+    Il faut un COUP AU CORPS lancé après qu'il a baissé la garde (fenêtre 0,7 s) : 1re fois = COUP SECRET (tapis direct),
     ensuite dégâts x3. Coup au visage ou coup lancé trop tôt = il esquive (« Raté, hé hé ! »).
   - La cloche de fin de round arrête un Dempsey Roll en cours.
+  - Équilibrage (après audit avec bots) : Greg se relève avec 100 PV à chaque fois (300 PV au total) ;
+    tes coups font 3, le contre x3 ; Greg pare tes coups pendant qu'il arme, et pare 40-60 % des coups
+    « libres » ; après « Il se couvre » il riposte aussitôt ; il n'est plus bloqué en boucle par tes coups.
+    La garde coûte : 30 % des dégâts passent, 22 de souffle par coup bloqué, pas de récupération en garde ;
+    le SMASH bloqué brise toujours la garde.
+  - Greg ÉNERVÉ après son 2e tapis : nouveaux enchaînements avec des FEINTES (`ENCHAINEMENTS_ENERVE`).
+  - Les appuis faits pendant ton coup ou quand tu es sonné sont gardés 0,15 s ; on peut couper la fin
+    de son coup pour esquiver.
+  - Record : seulement pour un combat complet (pas depuis le menu F1 au round 2 / 3).
+  - Résultats des bots : parfait K.O. au round 2 (rang S), moyen K.O. au round 2 (A/B),
+    débutant K.O. au round 2 (C), spam / garde seule / tortue PERDENT.
   - Au tapis : alterner ◀ ▶ pour se relever.
   - Fin : classement S/A/B/C (coups reçus, tapis, temps) + record gardé dans le navigateur.
   - Esquive : protège 0,45 s ; « Trop tôt ! » / « Mauvais côté ! » s'affichent ; le coach commente

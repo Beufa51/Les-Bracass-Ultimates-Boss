@@ -34,7 +34,7 @@ export function installerTactile() {
     .tactile { position: fixed; bottom: 12px; display: grid; gap: 8px; z-index: 10; touch-action: none; user-select: none; -webkit-user-select: none; }
     .tactile.gauche { left: 12px; grid-template-columns: repeat(3, 72px); grid-template-rows: repeat(2, 72px); }
     .tactile.droite { right: 12px; grid-template-columns: repeat(2, 96px); grid-template-rows: repeat(2, 72px); }
-    .tactile button { border: 2px solid rgba(255,255,255,0.55); border-radius: 14px; background: rgba(20,20,30,0.55);
+    .tactile button { border: 2px solid rgba(255,255,255,0.55); border-radius: 14px; background: rgba(20,20,30,0.35);
       color: #fff; font: bold 17px monospace; padding: 0; touch-action: none; -webkit-tap-highlight-color: transparent; }
     .tactile button.appuye { background: rgba(255,216,74,0.65); color: #111; }
     .tactile button.cache { visibility: hidden; }
