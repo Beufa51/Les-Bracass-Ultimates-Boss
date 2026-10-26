@@ -116,9 +116,7 @@ Fusionné dans `main` : en ligne.
   - Ambiance de public en continu (greg_ambiance.wav), plus forte quand Greg est en difficulté.
   - Musique de fond : `assets/audio/greg/greg_musique.mp3` (chargée au début du combat, en boucle, volume dans le manifeste).
   - Menu de test F1 : commencer directement au round 1, 2 ou 3.
-  - Choix de difficulté après la présentation : FACILE / NORMAL / CHAMPION / PERSO (`DIFFICULTES` dans reglages.js), dernier choix retenu, record séparé par difficulté.
-  - PERSO (`src/bosses/lionel/perso.js`) : écran de curseurs (vitesse, réflexes, puissance, agressivité, ta zone d'attrape, aide, surprises),
-    niveau 5 = comme en NORMAL, réglages retenus dans le navigateur (clé `bracass_lionel_perso`).
+  - Choix de difficulté après la présentation : FACILE / NORMAL / CHAMPION (`DIFFICULTES` dans reglages.js), dernier choix retenu, record séparé par difficulté.
   - Héros illustré : garde, coup, uppercut (victoire), touché (tête en arrière), au sol (assis) — `herosIllustre` dans reglages.js.
 
 - **Lionel** (`src/bosses/lionel/`) : match de frisbee en 1 contre 1, façon **Windjammers** (Neo Geo, 1994).
@@ -145,6 +143,8 @@ Fusionné dans `main` : en ligne.
     relance x1,4 (`parfait`).
   - 3 SUPERS DE LIONEL au hasard (`supersLionel`) : LE CHAMBREUR (s'arrête au filet puis repart), LE DÉDOUBLEUR (un vrai
     frisbee + un faux sans ombre qui fait « POF ! » juste avant toi), LE BOOMERANG (part d'un côté, revient en crochet loin de toi).
+  - Difficulté PERSO (4e carte) : (`src/bosses/lionel/perso.js`) : écran de curseurs (vitesse, réflexes, puissance, agressivité, ta zone d'attrape, aide, surprises),
+    niveau 5 = comme en NORMAL, réglages retenus dans le navigateur (clé `bracass_lionel_perso`).
   - SURPRISES (`src/bosses/lionel/surprises.js`, une à la fois, toutes les 16-24 s en FACILE, 12-20 en NORMAL, 10-16 en CHAMPION) :
     mouette qui traverse (« COUAC ! »), château de sable (« PAF ! », il s'écroule), ballon de plage qui roule (« BOING ! »).
     Le frisbee touché est dévié mais garde son sens ; les supers passent à travers ; les lobs volent au-dessus.
