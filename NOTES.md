@@ -130,6 +130,15 @@ Fusionné dans `main` : en ligne.
   - LOB VISÉ : ▲ ▼ = côté, ◀ = court (près du filet), ▶ = profond (près du mur de Lionel) = 3 points au lieu de 2.
     Viseur (cible blanche, dorée si profond) quand tu tiens le frisbee ; gerbe de sable + « BOUM ! » quand il tombe ;
     Lionel lit mal tes lobs (`lentLob` par difficulté) et râle quand il en rate un.
+  - JAUGE DU PUBLIC (sous ton score) : +1 attrape, +2 plongeon ou contre parfait, +1 lancer puissant, +1 point marqué,
+    -3 point encaissé. Pleine = « LE PUBLIC EST EN FEU ! » et SUPER PRÊT sans attraper de lob (`public` dans reglages.js).
+  - CONTRE PARFAIT : Espace appuyé au plus 0,1 s avant d'attraper (pas en plongeon) = ralenti 0,45 s, « CONTRE PARFAIT ! »,
+    relance x1,4 (`parfait`).
+  - 3 SUPERS DE LIONEL au hasard (`supersLionel`) : LE CHAMBREUR (s'arrête au filet puis repart), LE DÉDOUBLEUR (un vrai
+    frisbee + un faux sans ombre qui fait « POF ! » juste avant toi), LE BOOMERANG (part d'un côté, revient en crochet loin de toi).
+  - SURPRISES (`src/bosses/lionel/surprises.js`, une à la fois, toutes les 16-24 s en FACILE, 12-20 en NORMAL, 10-16 en CHAMPION) :
+    mouette qui traverse (« COUAC ! »), château de sable (« PAF ! », il s'écroule), ballon de plage qui roule (« BOING ! »).
+    Le frisbee touché est dévié mais garde son sens ; les supers passent à travers ; les lobs volent au-dessus.
   - SCÈNE DU SUPER (`cinematiqueSuper`, 1,6 s, jeu figé) : fond sombre, lignes de vitesse qui tournent, le lanceur en grand
     (pose « super » de la planche) avec images rémanentes, étincelles, gros titre, zoom, onde de choc ; puis traînée
     lumineuse et étincelles pendant le vol (orange pour toi, vert pour Lionel).

@@ -24,15 +24,16 @@ export const TERRAIN = {
 //  ralenti : le frisbee ralentit (x ce nombre) quand il arrive près de toi (1 = pas de ralenti)
 //  superSurLob : Lionel obtient son super en rattrapant TES lobs
 //  lentLob : il réagit ce nombre de fois plus lentement à tes lobs (ils sont durs à lire)
+//  surprises : une surprise (mouette, château de sable, ballon) toutes les X à Y secondes
 //  biaisApres : ses N premiers lancers de l'échange sont droits (pas de rebond)
 export const DIFFICULTES = {
-  facile:   { nom: 'FACILE',   couleur: '#7fff7f', vitesse: 0.78, reaction: 0.34, erreur: 70, disque: 0.72, superHasard: 0, lentLob: 2.2,
+  facile:   { nom: 'FACILE',   couleur: '#7fff7f', vitesse: 0.78, reaction: 0.34, erreur: 70, disque: 0.72, superHasard: 0, lentLob: 2.2, surprises: [16, 24],
     aides: 'tot', choix: { droit: 64, biais: 24, lob: 12 }, attrape: { x: 62, haut: 90, bas: 40 }, ralenti: 0.7, superSurLob: false, biaisApres: 3,
     texte: 'Lionel court moins vite et rate plus souvent. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 0.96, reaction: 0.23, erreur: 42, disque: 0.86, superHasard: 0.04, lentLob: 1.8,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 0.96, reaction: 0.23, erreur: 42, disque: 0.86, superHasard: 0.04, lentLob: 1.8, surprises: [12, 20],
     aides: 'tot', choix: { droit: 52, biais: 34, lob: 14 }, attrape: { x: 46, haut: 72, bas: 30 }, ralenti: 0.82, superSurLob: false, biaisApres: 1,
     texte: 'Le vrai match.' },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.12, reaction: 0.15, erreur: 24, disque: 1.12, superHasard: 0.08, lentLob: 1.3,
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.12, reaction: 0.15, erreur: 24, disque: 1.12, superHasard: 0.08, lentLob: 1.3, surprises: [10, 16],
     aides: false, choix: { droit: 30, biais: 36, courbe: 22, lob: 12 }, attrape: { x: 38, haut: 55, bas: 26 }, ralenti: 1, superSurLob: true,
     texte: 'Sans aide, lancers rapides et super lancers fréquents. Pour les vrais.' },
 };
@@ -70,6 +71,24 @@ export const REGLAGES = {
   // ---------- Super lancers (quand on rattrape un lob juste en dessous) ----------
   superJoueur: { nom: 'TORNADE DE FEU', vitesse: 1.45, pilotage: 520, reactivite: 7 },   // téléguidé avec ▲ ▼ pendant tout son vol
   superLionel: { nom: 'LE CHAMBREUR', vitesse: 1.15, arret: 0.8 },   // s'arrête au filet (une ligne montre où il va)... puis repart en flèche
+
+  // ---------- Jauge du public (la tienne) : pleine = SUPER PRÊT sans attraper de lob ----------
+  public: { max: 10, attrape: 1, plongeon: 2, parfait: 2, puissant: 1, marque: 1, encaisse: -3 },
+
+  // ---------- Contre parfait : appuyer sur Espace juste avant d'attraper ----------
+  parfait: { fenetre: 0.1, bonus: 1.4, ralenti: 0.35, dureeRalenti: 0.45 },
+
+  // ---------- Les trois supers de Lionel (tirés au hasard) ----------
+  supersLionel: {
+    chambreur:  { nom: 'LE CHAMBREUR' },                           // s'arrête au filet puis repart en flèche (superLionel)
+    dedoubleur: { nom: 'LE DÉDOUBLEUR', vitesse: 1.15, ecart: 0.55 },   // un vrai frisbee et un FAUX qui disparaît au dernier moment
+    boomerang:  { nom: 'LE BOOMERANG', vitesse: 1.2, decalage: 230 },   // part d'un côté et revient en crochet de l'autre
+  },
+
+  // ---------- Surprises sur le terrain ----------
+  mouette: { rayon: 26, hauteur: 50, vitesse: 120 },   // traverse le terrain ; si le frisbee la touche, il est dévié (« COUAC ! »)
+  chateau: { rayon: 24, duree: 11 },                    // château de sable : le frisbee rebondit dessus, il s'écroule
+  ballon:  { rayon: 20, vitesse: 70, duree: 13 },       // ballon de plage qui roule : le frisbee rebondit, le ballon file
 
   // ---------- Lionel (le cerveau) ----------
   ia: {

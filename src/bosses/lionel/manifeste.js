@@ -51,6 +51,10 @@ export const MANIFESTE = {
     heros_frisbee_victoire: { fichier: 'sprites/lionel/heros_frisbee_victoire.png', largeur: 132, hauteur: 330, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'victoire', ...HEROS_FRISBEE } },
     heros_frisbee_touche:   { fichier: 'sprites/lionel/heros_frisbee_touche.png', largeur: 181, hauteur: 256, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'touche', ...HEROS_FRISBEE } },
     heros_frisbee_defaite:  { fichier: 'sprites/lionel/heros_frisbee_defaite.png', largeur: 180, hauteur: 189, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'defaite', ...HEROS_FRISBEE } },
+    // surprises du terrain (dessinées par le code)
+    lionel_mouette:  { fichier: null, largeur: 64, hauteur: 40, images: 2, vitesse: 8, provisoire: { forme: 'mouette' } },
+    lionel_chateau:  { fichier: null, largeur: 70, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'chateau' } },
+    lionel_ballon:   { fichier: null, largeur: 40, hauteur: 40, images: 4, vitesse: 12, provisoire: { forme: 'ballon' } },
     lionel_trophee:  { fichier: null, largeur: 220, hauteur: 260, images: 1, vitesse: 1, provisoire: { forme: 'trophee' } },
   },
 

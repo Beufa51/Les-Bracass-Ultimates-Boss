@@ -390,4 +390,55 @@ function trophee(ctx, w, h) {
   ctx.beginPath(); ctx.ellipse(cx - w * 0.17, h * 0.24, w * 0.04, h * 0.1, -0.2, 0, Math.PI * 2); ctx.fill();
 }
 
-export const FORMES_LIONEL = { joueurFrisbee, frisbee, terrainFrisbee, trophee };
+// =====================================================================
+//  SURPRISES DU TERRAIN : mouette (2 battements d'ailes), château de sable, ballon de plage (qui tourne)
+// =====================================================================
+function mouette(ctx, w, h, p, { i }) {
+  const cx = w / 2, cy = h * 0.55, haut = i % 2 === 0;
+  // ailes (en haut ou en bas selon l'image)
+  for (const s of [-1, 1]) {
+    ctx.beginPath(); ctx.moveTo(cx + s * 6, cy);
+    ctx.quadraticCurveTo(cx + s * w * 0.25, cy + (haut ? -h * 0.55 : h * 0.25), cx + s * w * 0.47, cy + (haut ? -h * 0.2 : h * 0.35));
+    ctx.quadraticCurveTo(cx + s * w * 0.25, cy + (haut ? -h * 0.15 : h * 0.05), cx + s * 6, cy + 5);
+    remplir(ctx, '#f4f6f8', 2);
+    ctx.fillStyle = '#5a6470'; ctx.beginPath(); ctx.arc(cx + s * w * 0.44, cy + (haut ? -h * 0.2 : h * 0.33), 3, 0, Math.PI * 2); ctx.fill();
+  }
+  // corps, tête, bec orange
+  ctx.beginPath(); ctx.ellipse(cx, cy + 2, 11, 7, 0, 0, Math.PI * 2); remplir(ctx, '#ffffff', 2);
+  ctx.beginPath(); ctx.arc(cx + 9, cy - 3, 6, 0, Math.PI * 2); remplir(ctx, '#ffffff', 2);
+  ctx.beginPath(); ctx.moveTo(cx + 14, cy - 4); ctx.lineTo(cx + 22, cy - 2); ctx.lineTo(cx + 14, cy); ctx.closePath(); remplir(ctx, '#ffa22a', 1.5);
+  ctx.fillStyle = CONTOUR; ctx.beginPath(); ctx.arc(cx + 10, cy - 4, 1.4, 0, Math.PI * 2); ctx.fill();
+}
+
+function chateau(ctx, w, h) {
+  const sable = (y0, y1) => degrade(ctx, 0, y0, 0, y1, [[0, '#f3d898'], [1, '#c9a35e']]);
+  // base
+  ctx.beginPath(); ctx.ellipse(w / 2, h - 8, w * 0.46, 8, 0, 0, Math.PI * 2); remplir(ctx, '#d8b878', 2);
+  ctx.beginPath(); ctx.roundRect(w * 0.12, h * 0.45, w * 0.76, h * 0.45, 4); remplir(ctx, sable(h * 0.45, h), 2);
+  // tours avec créneaux
+  for (const [x, l, haut] of [[w * 0.08, w * 0.26, h * 0.18], [w * 0.66, w * 0.26, h * 0.18], [w * 0.36, w * 0.28, h * 0.04]]) {
+    ctx.beginPath(); ctx.rect(x, haut + 8, l, h * 0.86 - haut - 8); remplir(ctx, sable(haut, h), 2);
+    for (let k = 0; k < 3; k++) { ctx.beginPath(); ctx.rect(x + k * l / 3 + 1, haut, l / 3 - 3, 9); remplir(ctx, sable(haut, haut + 9), 1.5); }
+  }
+  // porte et petit drapeau
+  ctx.beginPath(); ctx.arc(w / 2, h * 0.8, w * 0.09, Math.PI, 0); ctx.lineTo(w / 2 + w * 0.09, h * 0.88); ctx.lineTo(w / 2 - w * 0.09, h * 0.88); ctx.closePath(); remplir(ctx, '#7a5a30', 1.5);
+  ctx.strokeStyle = CONTOUR; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(w / 2, h * 0.04); ctx.lineTo(w / 2, -2 + 4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(w / 2, 2); ctx.lineTo(w / 2 + 12, 6); ctx.lineTo(w / 2, 10); ctx.closePath(); remplir(ctx, '#e6303a', 1);
+  // grains
+  const alea = hasard(7);
+  for (let k = 0; k < 60; k++) { ctx.fillStyle = 'rgba(120,80,30,0.25)'; ctx.fillRect(w * 0.1 + alea() * w * 0.8, h * 0.1 + alea() * h * 0.8, 1.5, 1.5); }
+}
+
+function ballon(ctx, w, h, p, { i, n }) {
+  const cx = w / 2, cy = h / 2, r = Math.min(w, h) / 2 - 2, tour = (i / n) * Math.PI * 2 / 3;
+  const couleurs = ['#e6303a', '#ffffff', '#2a6fd0', '#ffffff', '#ffd84a', '#ffffff'];
+  for (let k = 0; k < 6; k++) {
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, tour + k * Math.PI / 3, tour + (k + 1) * Math.PI / 3); ctx.closePath();
+    ctx.fillStyle = couleurs[k]; ctx.fill();
+  }
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.strokeStyle = CONTOUR; ctx.lineWidth = 2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, r * 0.2, 0, Math.PI * 2); remplir(ctx, '#ffffff', 1.5);
+  ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.beginPath(); ctx.ellipse(cx - r * 0.35, cy - r * 0.4, r * 0.25, r * 0.13, -0.6, 0, Math.PI * 2); ctx.fill();
+}
+
+export const FORMES_LIONEL = { joueurFrisbee, frisbee, terrainFrisbee, trophee, mouette, chateau, ballon };
