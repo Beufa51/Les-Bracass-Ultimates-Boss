@@ -6,9 +6,11 @@
 Copie de référence de la version finale : branche `greg-termine` (`version-1-greg` = état un peu plus ancien).
 **Étape 2 terminée : boss Lionel VALIDÉ par le propriétaire** (match de frisbee façon Windjammers, illustrations manga
 mains vides, entraînement, joystick, jauges du public, 3 supers, surprises, difficulté PERSO). En ligne sur `main`.
-**Étape 3 : boss Kédric — À COMMENCER.** On sait seulement : porte « Kédric » dans le hub (`src/bosses/kedric/index.js`, pret: false),
-badge = médaille verte avec un ballon de football américain. Le type de jeu, la personnalité et les images sont à demander au propriétaire.
-Rappel : Kédric a son propre dossier (`src/bosses/kedric/`, partir de `src/bosses/modele/`), ne touche ni Greg ni Lionel.
+**Étape 3 : boss Kédric — PREMIÈRE VERSION JOUABLE** (à faire essayer au propriétaire). Choix du propriétaire : tu portes le ballon
+et tu traverses le terrain en esquivant les défenseurs qui reçoivent les ordres du coach Kédric, VUE DE DOS, esquives ◀ ▶ ▲ ▼,
+plus tu esquives plus tu accélères jusqu'au DEVIL BAT GHOST, référence graphique **Eyeshield 21**, Kédric = **showman frimeur**.
+Pas encore d'images : dessins provisoires du code + prompts Gemini dans ASSETS_TODO.md.
+Rappel : Kédric a son propre dossier (`src/bosses/kedric/`), ne touche ni Greg ni Lionel.
 Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
 ## Décisions
@@ -223,13 +225,42 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
   - Terrain dessiné par le code (secours) dans l'esprit de Windjammers 2 (cage grillagée, rambardes, palmiers, ombres de palmes, public,
     ligne centrale jaune, poteaux jaunes rembourrés) : dessin du code, pas d'image du vrai jeu (droits d'auteur).
   - Ton joueur : nouvelle planche mains vides (le jeu pose le frisbee dans ses mains quand il le tient).
+- **Kédric** (`src/bosses/kedric/`) : course de football américain façon **Eyeshield 21**, vue de DOS (perspective : 3 couloirs).
+  - Tu portes le ballon (n°21, casque rouge) vers l'en-but de Kédric. 3 ACTIONS (90, 100, 110 yards) = 3 touchdowns pour gagner.
+  - Kédric, coach SHOWMAN (banane, lunettes noires, micro-casque, veste verte et or), crie ses COMBINAISONS dans un cadre en haut
+    à gauche (« LE MUR ! », « LA FAUX ! », « BLITZ !! »...) 2,4 s avant qu'elles arrivent ; il surgit en dansant après chaque plaquage.
+  - Défenseurs (maillot vert, casque blanc) : PLAQUEUR debout (◀ ▶ change de couloir), LA FAUX = plongeon aux jambes (▲ saute),
+    LA CORDE À LINGE = bras tendus (▼ baisse-toi en tournant), LE MUR = 2 couloirs bouchés, POT DE COLLE = te suit puis devient
+    ROUGE (verrouillé) 0,5 s avant le contact : esquiver après. Un symbole au-dessus de chaque défenseur dit quoi faire.
+  - Chaque esquive d'affilée : +1 dans la série ; 2 esquives = +1 niveau de VITESSE (5 niveaux ; niveau 5 = « 40 yards en 4"2 », comme
+    le n°21). Plus vite = le symbole apparaît plus tard. Plaqué = vitesse à zéro.
+  - Esquive au dernier moment = PARFAIT (jauge x2). Jauge pleine = DEVIL BAT GHOST (Espace / bouton Ghost) : petite cinématique,
+    puis 3 s d'invincibilité à pleine vitesse avec des images fantômes ; les défenseurs tombent (« Où ?! »).
+  - Tentatives : un nombre de plaquages permis par ACTION (FACILE 6, NORMAL 4, CHAMPION 3) ; plus aucune = BALLE PERDUE (défaite).
+    Après un plaquage on repart du même endroit.
+  - Action 3 « SHOWTIME » : à 30 yards de l'en-but, KÉDRIC ENTRE EN JEU (maillot doré n°1) : il danse puis charge 3 fois (plaqueur,
+    plongeon ou bras tendus, jamais deux fois le même) avec des FEINTES (NORMAL 35 %, CHAMPION 60 %, FACILE aucune) : son symbole
+    change au dernier moment (« FEINTE ! »). Le Devil Bat Ghost le passe d'un coup (« IL N'A RIEN VU ! »).
+  - Aides (FACILE / NORMAL) : « ▲ SAUTE ! » en bas de l'écran ; la première fois qu'un type de plaquage arrive (action 1), RALENTI
+    + explication (une seule fois : `Sauvegarde.fait('kedric_tuto')`). CHAMPION : aucune aide.
+  - Téléphone : croix tactile ▲ ◀ ▼ ▶ + bouton « Ghost » ; on peut aussi GLISSER le doigt sur l'écran (haut / bas / gauche / droite).
+  - Difficulté FACILE / NORMAL / CHAMPION (`src/bosses/kedric/difficulte.js`, copie propre à Kédric), record par difficulté.
+  - Fin : rang S/A/B/C (plaquages subis, esquives parfaites, temps), écran de victoire (ballon en or, Kédric à genoux en larmes, badge vert).
+  - Menu F1 : match depuis l'action 1, ou directement l'action 3 (duel contre Kédric).
+  - Tout l'équilibrage dans `src/bosses/kedric/reglages.js` (difficultés, combinaisons, ordre des combinaisons par action, duel).
+    Dessins provisoires : `src/bosses/kedric/dessins.js` ; bruitages : `outils/kedric/generer_sons.py` ; effets : `effets.js` (copie).
+  - Le stade (tribunes, projecteurs) est dessiné une fois dans une image (des milliers de ronds redessinés à chaque image = jeu lent).
+  - Toute la logique avance dans `pas(dt, touches)` (pas de minuteries Phaser) : les bots de test jouent en accéléré.
+  - Bots (ils lisent les symboles parfaitement, donc plus forts qu'un humain) : NORMAL bon / moyen gagnent, enfant ~1 fois sur 2 ;
+    FACILE enfant gagne ; CHAMPION moyen gagne encore souvent (un humain réagit moins vite au symbole). À ajuster après essai.
+  - Pas de musique pour l'instant (ambiance de stade générée) ; badge provisoire = médaille verte au ballon (`icone: 'football'`).
   - RÈGLE : chaque boss est indépendant ; une modification pour un boss ne doit JAMAIS changer un autre boss (Greg !).
     Le code commun (src/core) ne reçoit que des AJOUTS optionnels, que seul le boss concerné active.
 
 ## Ordre de développement (mis à jour)
 1. ~~Greg (style Hajime no Ippo)~~ fait
 2. ~~Lionel (Windjammers)~~ fait et validé
-3. **Kédric**  ← prochain boss (le propriétaire a choisi de le faire maintenant)
+3. **Kédric**  ← EN COURS : première version jouable, en attente de l'essai du propriétaire et de ses images
    Ancienne fiche Lionel, pour mémoire :
    - Jeu : **exactement comme Windjammers** (Neo Geo, 1994) — lancer de frisbee en 1 contre 1, vue de 3/4 au-dessus du terrain,
      buts à 3 et 5 points, lancers courbes, lob, super lancer quand on rattrape au bon moment, sets.
@@ -273,6 +304,8 @@ Fichiers de chaque boss :
 - **Lionel** : `src/bosses/lionel/` (LionelMatch, reglages, entrainement, manifeste, dessins, effets, difficulte, joystick),
   `assets/sprites/lionel/` (Lionel ET ton joueur au frisbee), `assets/audio/lionel/`,
   `outils/lionel/generer_sons.py`, `outils/lionel/decouper_planches.py`.
+- **Kédric** : `src/bosses/kedric/` (KedricCourse, reglages, manifeste, dessins, effets, difficulte), `assets/audio/kedric/`,
+  `outils/kedric/generer_sons.py` (pas encore d'images : `assets/sprites/kedric/` viendra avec les planches).
 
 ## Ajouter un boss (rappel technique)
 Copier `src/bosses/modele/` (avec son `manifeste.js`), renommer, puis dans `src/bosses/<boss>/index.js` : `pret: true`, `phases`, `scenes`.

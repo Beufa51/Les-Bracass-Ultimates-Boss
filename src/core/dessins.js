@@ -137,6 +137,15 @@ function badge(ctx, w, h, p) {
     ctx.beginPath(); ctx.ellipse(0, 0, r * 0.6, r * 0.3, 0, 0, Math.PI * 2); remplir(ctx, '#ffffff', 1.5);
     ctx.beginPath(); ctx.ellipse(0, 0, r * 0.36, r * 0.17, 0, 0, Math.PI * 2); ctx.strokeStyle = p.couleur; ctx.lineWidth = 2; ctx.stroke();
     ctx.restore();
+  } else if (p.icone === 'football') {
+    // petit ballon de football américain à la place de la lettre
+    ctx.save(); ctx.translate(cx, cy + 1); ctx.rotate(-0.6);
+    ctx.beginPath(); ctx.ellipse(1, 2, r * 0.62, r * 0.38, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, 0, r * 0.62, r * 0.38, 0, 0, Math.PI * 2); remplir(ctx, '#8a4a20', 1.5);
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(-r * 0.25, 0); ctx.lineTo(r * 0.25, 0); ctx.stroke();
+    for (let k = -1; k <= 1; k++) { ctx.beginPath(); ctx.moveTo(k * r * 0.12, -r * 0.08); ctx.lineTo(k * r * 0.12, r * 0.08); ctx.stroke(); }
+    ctx.restore();
   } else {
   ctx.font = `bold ${Math.round(h * 0.42)}px monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillText(p.lettre || '?', cx + 1, cy + 2);

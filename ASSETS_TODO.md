@@ -101,6 +101,41 @@ Surprises du terrain (dessinées par le code en style manga ombré, remplaçable
 Sons Lionel : frisbee_lancer, frisbee_attrape, frisbee_rebond, frisbee_but, frisbee_sifflet, frisbee_super, frisbee_pret, frisbee_plongeon, frisbee_sol
 (générés par `outils/lionel/generer_sons.py`).
 
+## Kédric (course de football américain façon Eyeshield 21, vue de dos)
+Style : manga sportif façon **Eyeshield 21** (traits nets, ombres en aplats, mouvement).
+Kédric : coach showman — banane gominée noire, lunettes noires, micro-casque, veste de sport verte à liseré doré avec un « K »,
+t-shirt noir, chaîne en or, pantalon blanc, baskets dorées. Ses joueurs : maillot vert à numéros dorés, casque blanc à bande verte.
+Ton coureur : vu de DOS, maillot rouge n°21, casque rouge à bande blanche, pantalon blanc, ballon sous le bras droit.
+Planches sur **fond blanc uni**, poses bien espacées (je les découpe avec l'outil de Lionel).
+
+| Nom du fichier | Taille d'une case | Images | Statut | Description pour le générateur d'images |
+|---|---|---|---|---|
+| kedric_portrait.png | 360x400 | 1 | provisoire | Kédric en pied, de face, il te pointe du doigt, micro dans l'autre main, grand sourire |
+| kedric_coach.png | 120x120 | 2 | provisoire | Buste de Kédric : 1) sourire de star 2) il crie dans son micro-casque |
+| kedric_danse.png | 300x300 | 2 | provisoire | Kédric qui danse (pose disco, un bras vers le ciel), 2 images |
+| kedric_defaite.png | 300x300 | 1 | provisoire | Kédric à genoux, lunettes fêlées, une larme |
+| kedric_toi_course.png | 180x220 | 4 | provisoire | Ton coureur vu de DOS qui court (4 images) |
+| kedric_toi_saut / rotation / plaque / victoire | 180x220 | 1 | provisoire | De dos : saut genoux repliés ; baissé en tournant ; plaqué (bras en l'air) ; ballon levé |
+| kedric_def_course.png | 220x200 | 4 | provisoire | Défenseur de face qui fonce vers toi (4 images) |
+| kedric_def_garde / bas / plonge / bras / rate | 220x200 | 1 | provisoire | De face : prêt à plaquer bras ouverts ; accroupi ; plongeon vers toi ; bras tendus en l'air ; assis sonné |
+| kedric_star_* | 220x200 | 1-4 | provisoire | Mêmes poses pour Kédric en joueur (maillot doré n°1, casque vert à étoile, lunettes) |
+| kedric_trophee.png | 220x260 | 1 | provisoire | Ballon de football américain en or sur un socle |
+
+**Prompts pour Gemini** (une planche par prompt) :
+1. *« Planche de personnage style manga Eyeshield 21, fond blanc uni, 6 poses en pied bien séparées, même personnage : un coach
+   de football américain showman, banane gominée noire, lunettes de soleil noires, micro-casque, veste de sport verte à liseré doré
+   avec un K sur la poitrine, t-shirt noir, chaîne en or, pantalon blanc, baskets dorées. Poses : 1) il pointe le spectateur du doigt
+   en tenant un micro 2) il crie dans son micro 3) danse disco bras vers le ciel 4) danse bras sur la hanche 5) bras croisés, sourire
+   arrogant 6) à genoux, lunettes fêlées, il pleure. Contours noirs épais, ombres en aplats. »*
+2. *« Planche style manga Eyeshield 21, fond blanc uni, poses bien séparées : un joueur de football américain vu DE DOS, maillot rouge
+   numéro 21 dans le dos, casque rouge à bande blanche, pantalon blanc, chaussettes rouges, ballon serré sous le bras droit.
+   Poses : 4 images d'une course vers le fond de l'image, 1 saut genoux repliés, 1 accroupi en pleine rotation, 1 plaqué bras en l'air,
+   1 victoire ballon levé. »*
+3. *« Planche style manga Eyeshield 21, fond blanc uni, poses bien séparées : un joueur de défense de football américain vu DE FACE,
+   maillot vert numéro 55 doré, casque blanc à bande verte avec grille, pantalon blanc. Poses : 4 images de course vers le spectateur,
+   prêt à plaquer bras ouverts, accroupi prêt à plonger, plongeon vers le spectateur bras tendus, debout bras tendus en l'air,
+   assis par terre sonné avec des étoiles. »*
+
 ## Sons
 | Nom du fichier | Statut | Description (pour sfxr / jfxr) |
 |---|---|---|
