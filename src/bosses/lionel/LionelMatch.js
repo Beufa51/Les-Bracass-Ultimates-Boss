@@ -145,9 +145,10 @@ export class LionelMatch extends BossScene {
     etiquettesTactiles(ETIQUETTES_OK);
     const tactile = estTactile();
     this.afficherIntro('LIONEL - Le Chambreur', [
-      'Flèches : te déplacer (tu ne bouges plus quand tu tiens le frisbee)',
+      'BUT : vise le mur derrière Lionel (jaune = 3 points, rouge = 5)',
+      'Flèches : cours vers le cercle vert (suis les points blancs !)',
       (tactile ? 'Lancer' : 'ESPACE') + ' : lancer (maintiens ▲ ou ▼ pour lancer en biais)',
-      (tactile ? 'Lob' : 'Z') + ' : lob (2 points s\'il tombe dans le sable)',
+      (tactile ? 'Lob' : 'Z') + ' : lob (2 points s\'il tombe dans le sable : une bonne arme !)',
       'Attrape un lob juste en dessous = SUPER LANCER !',
       (tactile ? 'Lancer' : 'ESPACE') + ' en courant vers le frisbee = plongeon',
     ], () => this.presentation(() => choisirDifficulte(this, 'lionel', DIFFICULTES, (nom, diff) => {
@@ -198,8 +199,8 @@ export class LionelMatch extends BossScene {
 
   majJeu(dt, e) {
     this.tempsTotal += dt;
-    // chrono du set
-    if (!this.pointEnOr) {
+    // chrono du set (arrêté pendant que quelqu'un tient le frisbee : service, Lionel qui nargue...)
+    if (!this.pointEnOr && !this.porteur) {
       this.tempsSet -= dt;
       if (this.tempsSet <= 0) {
         this.tempsSet = 0;
@@ -336,6 +337,17 @@ export class LionelMatch extends BossScene {
     return null;
   }
 
+  // Points du trajet au sol jusqu'à la hauteur du joueur p (pour dessiner l'aide)
+  trajet(d, p) {
+    const c = copieDisque(d), pas = 1 / 60, pts = [];
+    for (let t = 0; t < 3; t += pas) {
+      const ev = avancerDisque(c, pas);
+      if (Math.round(t / pas) % 3 === 0) pts.push({ x: c.x, y: c.y });
+      if ((p.cote === 'j' && c.x <= p.x) || ev === 'butG' || ev === 'butD') break;
+    }
+    return pts;
+  }
+
   lancerLionel() {
     const p = this.l, D = this.diff;
     // côté opposé au tien
@@ -345,6 +357,8 @@ export class LionelMatch extends BossScene {
     let r = Math.random() * total, type = 'droit';
     for (const [k, w] of Object.entries(poids)) { if ((r -= w) < 0) { type = k; break; } }
     if (type === 'droit' && Math.abs(this.j.y - MILIEU_Y) < 50) type = 'biais';
+    // FACILE / NORMAL : ses premiers lancers de l'échange sont droits (le temps de se mettre en route)
+    if (type === 'biais' && this.echange < (D.biaisApres || 0)) type = 'droit';
     this.lancer(p, type, type === 'droit' ? 0 : (Math.random() < 0.75 ? dir : -dir));
   }
 
@@ -370,7 +384,13 @@ export class LionelMatch extends BossScene {
     this.echange++;
     const x0 = p.x + p.sens * 30, y0 = p.y;
     const d = { x: x0, y: y0, z: 0, vx: p.sens * v, vy: 0, ay: 0, t: 0, type, lanceur: p.cote, arret: 0, vitesse: v };
-    if (type === 'biais') {
+    if (type === 'droit' && p === this.l) {
+      // Lionel vise à côté de toi, sans rebond : tu dois bouger, mais le trajet reste simple
+      const ecart = R.ia.ecartVise, j = this.j;
+      const ty = borne(j.y + (j.y < MILIEU_Y ? ecart : -ecart), T.y0 + 25, T.y1 - 25);
+      const a = Math.atan2(ty - y0, Math.abs(MAISON.j - x0));
+      d.vx = p.sens * v * Math.cos(a); d.vy = v * Math.sin(a);
+    } else if (type === 'biais') {
       d.vx = p.sens * v * Math.cos(R.angle); d.vy = dir * v * Math.sin(R.angle);
     } else if (type === 'courbe') {
       // part d'un côté, finit de l'autre : on calcule la courbe pour arriver décalé
@@ -751,6 +771,9 @@ export class LionelMatch extends BossScene {
     if (aide && (d.vx < 0 || (d.arret > 0 && d.lanceur === 'l')) && d.t > 0.05) {
       const pr = this.prevoir(d, this.j);
       if (pr) {
+        // le trajet du frisbee en pointillés, rebonds compris
+        g.fillStyle(0xffffff, 0.9);
+        this.trajet(d, this.j).forEach((q, k) => { if (k % 2 === 0) g.fillCircle(q.x, q.y, 4); });
         const A = this.diff.attrape;
         g.fillStyle(0x7fff7f, 0.18).fillEllipse(pr.x, pr.y, A.x * 2, 28);
         g.lineStyle(4, 0x7fff7f, 0.9).strokeEllipse(pr.x, pr.y, A.x * 2, 28);
@@ -768,7 +791,8 @@ export class LionelMatch extends BossScene {
     this.hudChrono = texte(this, LARGEUR / 2, 38, '45', 30, '#ffd84a', { fontStyle: 'bold' }).setDepth(P + 1);
     this.hudSet = texte(this, LARGEUR / 2, 12, 'SET 1', 13, '#dddddd').setDepth(P + 1);
     this.hudSets = this.add.graphics().setDepth(P + 1);
-    this.hudSuper = texte(this, 140, 140, '', 16, '#7fff7f').setDepth(P + 1);
+    // message au-dessus de ta tête (SUPER PRÊT, lance !)
+    this.hudSuper = texte(this, 0, 0, '', 18, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000cc', padding: { x: 8, y: 4 } }).setDepth(P + 1);
     this.majHud();
   }
 
@@ -791,12 +815,17 @@ export class LionelMatch extends BossScene {
     if (!this.hudChrono) return;
     this.hudChrono.setText(this.pointEnOr ? 'OR' : String(Math.ceil(this.tempsSet)));
     this.hudChrono.setColor(this.tempsSet <= 10 && !this.pointEnOr ? '#ff6b6b' : '#ffd84a');
-    this.hudSuper.setText(this.j.superPret ? 'SUPER PRÊT !\n' + (estTactile() ? 'Lancer' : 'Espace') : '');
+    const j = this.j, bouton = estTactile() ? 'Lancer' : 'ESPACE';
+    let msg = '';
+    if (j.superPret) msg = `SUPER PRÊT !  ${bouton}`;
+    else if (j.tient && j.tenue > 0.8 && this.etat === 'jeu') msg = `${bouton} : lance !`;
+    this.hudSuper.setText(msg).setVisible(!!msg).setColor(j.superPret ? '#7fff7f' : '#ffd84a')
+      .setPosition(borne(j.x, 120, LARGEUR - 120), j.y - 160);
   }
 }
 
 // Bulle de Lionel au-dessus de sa tête (une seule à la fois)
-function bulleLionel(scene, message, duree = 1600) {
+function bulleLionel(scene, message, duree = 1300) {
   const p = scene.l;
   if (p.bulle && p.bulle.active) p.bulle.destroy();
   p.bulle = bulle(scene, borne(p.x, 620, LARGEUR - 130), Math.max(150, p.y - 140), 'Lionel : « ' + message + ' »', duree).setDepth(950);
