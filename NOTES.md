@@ -48,7 +48,8 @@
 - Bruitages du combat : générés par `outils/generer_sons.py` (Python + numpy) dans `assets/audio/`.
 - Rendu lissé (`pixelArt: false` dans `src/main.js`).
 - Combat de Greg inspiré de Super Punch-Out (SNES) : bandeau avec portraits et « VS », public dense,
-  tapis bleu avec logo, ton boxeur de dos façon Little Mac (dos large, touffe, gants verts, contour cyan,
+  tapis bleu avec logo, ton boxeur de dos = illustrations (heros_garde / heros_coup / heros_uppercut,
+  réglages `herosIllustre`), sinon dessin façon Little Mac (dos large, touffe, gants verts, contour cyan,
   transparent ; réglages `tailleJoueur`, `transparenceJoueur`), public façon SNES (visages, flashs, pixel art).
 - **Greg** (`src/bosses/greg/`) : combat de boxe en 3 rounds de 60 s.
   - Commandes : ◀ ▶ esquive, Espace = coup au visage, Z = coup au corps, Bas (maintenu) = garde,

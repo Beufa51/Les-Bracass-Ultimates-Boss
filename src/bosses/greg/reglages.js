@@ -51,6 +51,24 @@ export const REGLAGES = {
     debutElanCorps: 0.4,   // pour le coup au corps : il plonge d'abord bas plus longtemps
   },
   tailleJoueur: 0.92,          // petit et transparent, comme dans Super Punch-Out
+  // Ton boxeur en illustrations (assets/sprites/hub/heros_*.png) : origine = milieu du haut de la ceinture.
+  // Pour chaque pose du jeu : quelle image, retournée (miroir) ou non, décalage, inclinaison.
+  herosIllustre: {
+    ceintureY: 565, taille: 0.66,
+    images: { heros_garde: [0.496, 0.801], heros_coup: [0.617, 0.807], heros_uppercut: [0.517, 0.851] },
+    poses: {
+      garde:     { cle: 'heros_garde' },
+      bloque:    { cle: 'heros_garde', echelle: 0.96, dy: 6 },
+      esquive:   { cle: 'heros_garde', dy: 40, echelle: 0.95 },
+      touche:    { cle: 'heros_garde', angle: -6, dy: -8 },
+      jab:       { cle: 'heros_coup', miroir: true },
+      crochet:   { cle: 'heros_coup' },
+      corps:     { cle: 'heros_coup', dy: 30, angle: 8 },
+      dempsey_g: { cle: 'heros_coup', miroir: true, dy: 30 },
+      dempsey_d: { cle: 'heros_coup', dy: 30 },
+      victoire:  { cle: 'heros_uppercut' },
+    },
+  },
   transparenceJoueur: 0.75,
 
   // ---------- Joueur ----------

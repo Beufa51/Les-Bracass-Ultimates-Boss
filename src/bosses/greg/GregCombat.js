@@ -1189,7 +1189,8 @@ export class GregCombat extends BossScene {
     else if (this.etat === 'fin' && g.etat === 'sol') pj = 'victoire';
     else if (j.dempsey) pj = Math.cos(j.dempsey.phi) < 0 ? 'dempsey_g' : 'dempsey_d';
     else if (j.sonne > 0) pj = 'touche';
-    else if (j.action) pj = j.action.pose;
+    else if (j.action) { pj = j.action.pose; j.dernierePose = pj; j.poseJusqua = this.time.now + 120; }
+    else if (j.poseJusqua > this.time.now && !j.esquive && !j.garde) pj = j.dernierePose;   // le coup reste visible un instant
     else if (j.esquive) pj = 'esquive';
     else if (j.garde) pj = 'bloque';
     j.sprite.setTexture('heros_boxe_' + pj);
@@ -1205,6 +1206,16 @@ export class GregCombat extends BossScene {
     // pendant que Greg est au tapis, ton boxeur s'efface un peu pour qu'on le voie bien
     j.sprite.setAlpha(this.g.etat === 'sol' ? R.transparenceJoueur * 0.5 : R.transparenceJoueur);
     j.sprite.setPosition(R.centreX + j.decalage + tremble, R.piedsJoueur + rebond + (pj === 'sol' ? -30 : 0));
+    // illustrations de ton boxeur (si elles existent) : posées sur la ceinture, à la place du dessin
+    const H = R.herosIllustre, ill = H && H.poses[pj];
+    if (ill && this.textures.exists(ill.cle)) {
+      const P = H.images[ill.cle];
+      j.sprite.setTexture(ill.cle).setFlipX(!!ill.miroir)
+        .setOrigin(ill.miroir ? 1 - P[0] : P[0], P[1]).setScale(H.taille * (ill.echelle || 1)).setAngle(ill.angle || 0)
+        .setPosition(R.centreX + j.decalage + tremble + (ill.dx || 0), H.ceintureY + rebond + (ill.dy || 0));
+    } else {
+      j.sprite.setFlipX(false).setOrigin(0.5, 1).setScale(R.tailleJoueur).setAngle(0);
+    }
 
     // ---- Greg (de face) ----
     if (this.illustre) { this.afficherGregIllustre(reel); }
