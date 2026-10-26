@@ -5,11 +5,13 @@
 // du manifeste), et l'image en cours { i, n } pour les animations.
 // =====================================================================
 
-const CONTOUR = '#1a1014';
+import { FORMES_FRISBEE } from './dessins_frisbee.js';   // terrain, joueurs et frisbee de Lionel
+
+export const CONTOUR = '#1a1014';
 
 // ---------- petits outils ----------
 // Éclaircit (f > 0) ou assombrit (f < 0) une couleur "#rrggbb"
-function teinte(hex, f) {
+export function teinte(hex, f) {
   const n = parseInt(hex.slice(1), 16);
   let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
   const cible = f > 0 ? 255 : 0, k = Math.abs(f);
@@ -18,17 +20,17 @@ function teinte(hex, f) {
 }
 
 // Hasard "fixe" : le même dessin à chaque chargement
-function hasard(graine) {
+export function hasard(graine) {
   let s = graine;
   return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
 }
 
-function remplir(ctx, couleur, epaisseur = 3) {
+export function remplir(ctx, couleur, epaisseur = 3) {
   ctx.fillStyle = couleur; ctx.fill();
   if (epaisseur) { ctx.strokeStyle = CONTOUR; ctx.lineWidth = epaisseur; ctx.lineJoin = 'round'; ctx.stroke(); }
 }
 
-function degrade(ctx, x0, y0, x1, y1, arrets) {
+export function degrade(ctx, x0, y0, x1, y1, arrets) {
   const g = ctx.createLinearGradient(x0, y0, x1, y1);
   arrets.forEach(([pos, c]) => g.addColorStop(pos, c));
   return g;
@@ -927,9 +929,18 @@ function badge(ctx, w, h, p) {
   remplir(ctx, g, 2.5);
   ctx.beginPath(); ctx.arc(cx, cy, r - 6, 0, Math.PI * 2);
   ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2; ctx.stroke();
+  if (p.icone === 'frisbee') {
+    // petit frisbee vu de 3/4 à la place de la lettre
+    ctx.save(); ctx.translate(cx, cy + 1); ctx.rotate(-0.35);
+    ctx.beginPath(); ctx.ellipse(0, 2, r * 0.6, r * 0.3, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, 0, r * 0.6, r * 0.3, 0, 0, Math.PI * 2); remplir(ctx, '#ffffff', 1.5);
+    ctx.beginPath(); ctx.ellipse(0, 0, r * 0.36, r * 0.17, 0, 0, Math.PI * 2); ctx.strokeStyle = p.couleur; ctx.lineWidth = 2; ctx.stroke();
+    ctx.restore();
+  } else {
   ctx.font = `bold ${Math.round(h * 0.42)}px monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillText(p.lettre || '?', cx + 1, cy + 2);
   ctx.fillStyle = '#ffffff'; ctx.fillText(p.lettre || '?', cx, cy + 1);
+  }
   ctx.fillStyle = 'rgba(255,255,255,0.55)';
   ctx.beginPath(); ctx.ellipse(cx - r * 0.4, cy - r * 0.45, r * 0.25, r * 0.12, -0.6, 0, Math.PI * 2); ctx.fill();
 }
@@ -979,4 +990,4 @@ function trophee(ctx, w, h) {
   ctx.beginPath(); ctx.ellipse(cx - w * 0.17, h * 0.24, w * 0.04, h * 0.1, -0.2, 0, Math.PI * 2); ctx.fill();
 }
 
-export const FORMES = { trophee, portraitHeros, gantSeul, rect, cercle, badge, perso, porte, dalle, mur, boxeurFace, boxeurDos, ring, coach };
+export const FORMES = { ...FORMES_FRISBEE, trophee, portraitHeros, gantSeul, rect, cercle, badge, perso, porte, dalle, mur, boxeurFace, boxeurDos, ring, coach };

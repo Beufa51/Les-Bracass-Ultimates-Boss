@@ -1,6 +1,6 @@
-// Effets visuels "manga" pour le combat de Greg :
+// Effets visuels "manga" (combat de Greg, match de Lionel...) :
 // lignes de vitesse, onomatopées géantes, flash d'impact, encarts d'attaque spéciale.
-import { LARGEUR, HAUTEUR, POLICE } from '../../core/reglages.js';
+import { LARGEUR, HAUTEUR, POLICE } from './reglages.js';
 
 function auHasard(liste) { return liste[Math.floor(Math.random() * liste.length)]; }
 

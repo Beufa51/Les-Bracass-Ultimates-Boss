@@ -1,9 +1,14 @@
-// Boss Lionel : fiche d'identité lue par le hub et le menu de test.
-// pret: false => la porte affiche "Bientôt".
+// Boss Lionel : match de frisbee façon Windjammers (2 sets gagnants).
+// Le menu de test (F1) permet aussi de commencer directement au set décisif.
+import { IDENTITE } from './reglages.js';
+import { LionelMatch } from './LionelMatch.js';
+
 export default {
-  id: 'lionel',
-  nom: 'Lionel',
-  pret: false,
-  phases: [],   // ex. [{ id: 'combat', nom: 'Combat', scene: 'GregCombat' }]
-  scenes: [],   // les scènes Phaser de ce boss
+  ...IDENTITE,
+  pret: true,
+  phases: [
+    { id: 'set1', nom: 'Match (depuis le set 1)', scene: 'LionelMatch' },
+    { id: 'decisif', nom: 'Match (set décisif, 1-1)', scene: 'LionelMatch' },
+  ],
+  scenes: [LionelMatch],
 };

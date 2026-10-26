@@ -12,6 +12,8 @@
 // Formes provisoires possibles : perso, porte, dalle, mur, cercle, badge, rect, boxeurFace, boxeurDos, ring, coach
 // =====================================================================
 
+import { TERRAIN as TERRAIN_FRISBEE } from '../src/bosses/lionel/reglages.js';
+
 // Couleurs des boxeurs provisoires
 // Ton boxeur, façon Super Punch-Out : cheveux noirs courts, gants verts, short sombre, en pixel art
 const HEROS_BOXE = { couleur: '#1d2440', gants: '#5cc93a', poignets: '#2d6a1f', cheveux: '#7a4a20', coiffure: 'touffe',
@@ -23,6 +25,13 @@ const GREG = { couleur: '#2a4d8f', bandes: '#b3202c', ceinture: '#1d2f63', emble
   barbe: '#130e0c', yeux: '#1a1010', sueur: true,
   tatouageGauche: [{ t: 0.22, cheveux: '#161010', habit: '#c62828' }],
   tatouageDroit: [{ t: 0.12, cheveux: '#c6dd3c', habit: '#5a7a30' }, { t: 0.55, cheveux: '#a07ad0', habit: '#2c4a8a' }] };
+
+// Lionel d'après ses planches (maillot vert et crème n°93, short vert, baskets vertes, cheveux courts, barbe)
+const LIONEL = { maillot: '#1f9a6a', panneau: '#f2ead2', numero: '93', short: '#1f9a6a', chaussures: '#2fae7a',
+  peau: '#e0a77c', cheveux: '#5a3a22', barbe: '#7a6656', yeux: '#4a7ab0' };
+// Toi au frisbee : maillot bleu, cheveux en pics (comme dans le hub)
+const HEROS_FRISBEE = { maillot: '#2a6fd0', panneau: '#ffffff', numero: '1', short: '#1d2440', chaussures: '#ffd84a',
+  peau: '#f2c9a0', cheveux: '#7a4a20', coiffure: 'pics', yeux: '#2a2a2a' };
 
 export const MANIFESTE = {
   images: {
@@ -52,7 +61,7 @@ export const MANIFESTE = {
     badge_remi:   { fichier: null, largeur: 48, hauteur: 48, images: 1, vitesse: 1,
       provisoire: { forme: 'badge', couleur: '#f58231', lettre: 'R' } },
     badge_lionel: { fichier: null, largeur: 48, hauteur: 48, images: 1, vitesse: 1,
-      provisoire: { forme: 'badge', couleur: '#911eb4', lettre: 'L' } },
+      provisoire: { forme: 'badge', couleur: '#911eb4', lettre: 'L', icone: 'frisbee' } },   // médaille violette au frisbee
     badge_modele: { fichier: null, largeur: 48, hauteur: 48, images: 1, vitesse: 1,
       provisoire: { forme: 'badge', couleur: '#888888', lettre: 'M' } },
 
@@ -123,6 +132,36 @@ export const MANIFESTE = {
     greg_sol:                 { fichier: null, largeur: 360, hauteur: 460, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'sol', ...GREG } },
     greg_victoire:            { fichier: null, largeur: 360, hauteur: 460, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'victoire', ...GREG } },
 
+    // ---------- LIONEL (frisbee façon Windjammers) ----------
+    // Lionel : poses découpées dans ses planches manga (outils/decouper_lionel.py), tournées vers la GAUCHE.
+    // Dessins provisoires (fichier: null) : tournés vers la DROITE (le jeu les retourne au besoin).
+    // Les pieds touchent le bas de la case. "course" dessinée = 4 images côte à côte.
+    // Pas d'attente sans frisbee sur les planches : "garde" utilise la course ; "nargue" utilise la victoire.
+    lionel_terrain:  { fichier: null, largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'terrainFrisbee', terrain: TERRAIN_FRISBEE } },
+    frisbee:         { fichier: null, largeur: 34, hauteur: 34, images: 4, vitesse: 16, provisoire: { forme: 'frisbee' } },
+    lionel_garde:    { fichier: 'sprites/lionel/lionel_course.png', largeur: 181, hauteur: 270, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...LIONEL } },
+    lionel_course:   { fichier: 'sprites/lionel/lionel_course.png', largeur: 181, hauteur: 270, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...LIONEL } },
+    lionel_tient:    { fichier: 'sprites/lionel/lionel_tient.png', largeur: 178, hauteur: 266, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...LIONEL } },
+    lionel_lance:    { fichier: 'sprites/lionel/lionel_lance.png', largeur: 248, hauteur: 269, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'lance', ...LIONEL } },
+    lionel_super:    { fichier: 'sprites/lionel/lionel_super.png', largeur: 225, hauteur: 210, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'super', ...LIONEL } },
+    lionel_rattrape: { fichier: 'sprites/lionel/lionel_rattrape.png', largeur: 158, hauteur: 305, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'rattrape', ...LIONEL } },
+    lionel_plongeon: { fichier: 'sprites/lionel/lionel_plongeon.png', largeur: 328, hauteur: 192, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'plongeon', ...LIONEL } },
+    lionel_nargue:   { fichier: 'sprites/lionel/lionel_victoire.png', largeur: 161, hauteur: 355, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'nargue', ...LIONEL } },
+    lionel_victoire: { fichier: 'sprites/lionel/lionel_victoire.png', largeur: 161, hauteur: 355, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'victoire', ...LIONEL } },
+    lionel_touche:   { fichier: 'sprites/lionel/lionel_touche.png', largeur: 226, hauteur: 238, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'touche', ...LIONEL } },
+    lionel_defaite:  { fichier: 'sprites/lionel/lionel_defaite.png', largeur: 154, hauteur: 168, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'defaite', ...LIONEL } },
+    lionel_portrait: { fichier: 'sprites/lionel/lionel_portrait.png', largeur: 215, hauteur: 650, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'nargue', ...LIONEL } },
+    heros_frisbee_garde:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...HEROS_FRISBEE } },
+    heros_frisbee_course:   { fichier: null, largeur: 110, hauteur: 140, images: 4, vitesse: 10, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...HEROS_FRISBEE } },
+    heros_frisbee_tient:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...HEROS_FRISBEE } },
+    heros_frisbee_lance:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'lance', ...HEROS_FRISBEE } },
+    heros_frisbee_super:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'super', ...HEROS_FRISBEE } },
+    heros_frisbee_rattrape: { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'rattrape', ...HEROS_FRISBEE } },
+    heros_frisbee_plongeon: { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'plongeon', ...HEROS_FRISBEE } },
+    heros_frisbee_victoire: { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'victoire', ...HEROS_FRISBEE } },
+    heros_frisbee_touche:   { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'touche', ...HEROS_FRISBEE } },
+    heros_frisbee_defaite:  { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'defaite', ...HEROS_FRISBEE } },
+
     // ---------- BOSS MODÈLE (test technique, pas un vrai boss) ----------
     modele_cible: { fichier: null, largeur: 64, hauteur: 64, images: 2, vitesse: 4,
       provisoire: { forme: 'rect', couleur: '#ff5ab4' } },
@@ -153,5 +192,14 @@ export const MANIFESTE = {
     greg_foule:      { fichier: 'audio/greg_foule.wav' },
     greg_ambiance:   { fichier: 'audio/greg_ambiance.wav' },   // public en continu (boucle)
     greg_alerte:     { fichier: 'audio/greg_alerte.wav', provisoire: { frequence: 740, duree: 0.07 } },
+    // Lionel (frisbee) : générés par outils/generer_sons_lionel.py
+    frisbee_lancer:  { fichier: 'audio/frisbee_lancer.wav', provisoire: { frequence: 600, duree: 0.06 } },
+    frisbee_attrape: { fichier: 'audio/frisbee_attrape.wav', provisoire: { frequence: 300, duree: 0.05 } },
+    frisbee_rebond:  { fichier: 'audio/frisbee_rebond.wav', provisoire: { frequence: 900, duree: 0.03 } },
+    frisbee_but:     { fichier: 'audio/frisbee_but.wav', provisoire: { frequence: 200, duree: 0.3 } },
+    frisbee_sifflet: { fichier: 'audio/frisbee_sifflet.wav', provisoire: { frequence: 1800, duree: 0.3 } },
+    frisbee_super:   { fichier: 'audio/frisbee_super.wav', provisoire: { frequence: 1100, duree: 0.25 } },
+    frisbee_plongeon: { fichier: 'audio/frisbee_plongeon.wav', provisoire: { frequence: 150, duree: 0.08 } },
+    frisbee_sol:     { fichier: 'audio/frisbee_sol.wav', provisoire: { frequence: 120, duree: 0.12 } },
   },
 };
