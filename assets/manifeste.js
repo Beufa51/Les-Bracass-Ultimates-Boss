@@ -128,6 +128,7 @@ export const MANIFESTE = {
     greg_cloche:     { fichier: 'audio/greg_cloche.wav', provisoire: { frequence: 1320, duree: 0.5 } },
     greg_compte:     { fichier: 'audio/greg_compte.wav', provisoire: { frequence: 520, duree: 0.1 } },
     greg_tapis:      { fichier: 'audio/greg_tapis.wav' },
+    greg_foule:      { fichier: 'audio/greg_foule.wav' },
     greg_alerte:     { fichier: 'audio/greg_alerte.wav', provisoire: { frequence: 740, duree: 0.07 } },
   },
 };

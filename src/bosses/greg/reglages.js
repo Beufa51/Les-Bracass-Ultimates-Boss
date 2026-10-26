@@ -108,6 +108,12 @@ export const REGLAGES = {
   aideFleche: [true, true, true],     // flèche "ESQUIVE / GARDE"
   aideCible: [true, true, true],      // cercle qui se resserre là où le coup va frapper
 
+  // ---------- Étourdissement (comme dans Super Punch-Out) ----------
+  // Chaque coup qui TOUCHE remplit une jauge cachée (qui se vide toute seule). Pleine => Greg titube,
+  // sans défense pendant 'duree' secondes : tous tes coups passent !
+  etourdi: { parCoup: 15, parContre: 35, baisse: 18, duree: 1.8 },
+  annonceur: true,             // voix de synthèse : "Box !", compte, "K.O. !" (si le navigateur en a une)
+
   // ---------- Moment secret : Greg baisse la garde un très court instant ----------
   // Une fois par round, à un moment au hasard (entre 'entre' secondes restantes). Pour réussir :
   // un COUP AU CORPS lancé APRÈS qu'il a baissé la garde (marteler avant ne marche pas), en moins de 'duree'.
@@ -203,6 +209,8 @@ export const REPLIQUES = {
   gregReleve: ['C\'est tout ce que t\'as ?!', 'Ça chatouille...', 'Maintenant, je suis ÉNERVÉ !'],
   joueurSol: ['Mes jambes... ne répondent plus...', 'Je... ne peux pas... perdre ici !', 'Tout le monde compte sur moi !'],
   coach: 'Relève-toi, petit !!',
+  joueurContre: ['Trop facile !', 'Je l\'ai eu !', 'Dans le mille !', 'Et BAM !'],
+  joueurTouche: ['Trop près...', 'Aïe aïe aïe...', 'Ça pique !'],
 };
 
 // Onomatopées affichées à l'impact (comme dans le manga)

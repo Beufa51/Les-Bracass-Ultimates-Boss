@@ -73,3 +73,11 @@ ecrire('greg_compte', balayage(d, 900, 500, 50) * env(d, 0.0005, 0.03) + 0.3 * p
 d = 1.2
 x = 1.3 * balayage(d, 90, 30, 4) * env(d, 0.003, 0.4) + passe_bas(bruit(d), 600) * env(d, 0.001, 0.15)
 ecrire('greg_tapis', reverb(np.tanh(x * 2.5), 0.5, 0.4))
+
+# public qui hurle : bruit filtré qui monte puis redescend, avec des "vagues"
+d = 2.2
+x = t(d)
+n = passe_haut(passe_bas(bruit(d), 2200), 250)
+vagues = 0.75 + 0.25 * np.sin(2 * np.pi * 3.1 * x) * np.sin(2 * np.pi * 0.7 * x)
+forme = np.clip(x / 0.25, 0, 1) * np.exp(-np.clip(x - 0.6, 0, None) / 0.8)
+ecrire('greg_foule', n * vagues * forme, 0.6)

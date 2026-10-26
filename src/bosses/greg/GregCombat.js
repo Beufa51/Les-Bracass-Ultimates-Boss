@@ -15,6 +15,7 @@ import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { texte, voile } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
+import { annoncer, taireAnnonceur } from '../../core/annonceur.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { IDENTITE, REGLAGES as R, ATTAQUES, ENCHAINEMENTS, ENCHAINEMENTS_ENERVE, CONSEILS, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
 import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from './effets.js';
@@ -67,7 +68,7 @@ export class GregCombat extends BossScene {
         .setScale(R.tailleJoueur).setAlpha(R.transparenceJoueur),   // transparent pour bien voir Greg
     };
     this.g = {
-      vie: 100, souffle: 100, downs: 0, fureur: 1, secousse: 0, combo: 0, couvert: 0,
+      vie: 100, souffle: 100, downs: 0, fureur: 1, secousse: 0, combo: 0, couvert: 0, vertige: 0,
       etat: 'garde', t: 0, attaque: null, coupIndex: 0, garde: 'haute',
       seqIndex: 0, seqPas: 0, finSeq: true, pause: 1.5, poseForcee: null,
       sprite: this.add.image(R.centreX, R.piedsGreg, 'greg_garde').setOrigin(0.5, 1).setDepth(9),
@@ -81,7 +82,8 @@ export class GregCombat extends BossScene {
     this.g.jambes = this.illustre && this.textures.exists(J.cle)
       ? this.add.image(R.centreX, 0, J.cle).setDepth(8.9) : null;
     this.zoneGarde = this.add.graphics().setDepth(9.5);
-    this.aura = this.add.graphics().setDepth(8);        // aura bleue derrière Greg (coup au corps)
+    this.aura = this.add.graphics().setDepth(8);
+    this.etoiles = this.add.graphics().setDepth(12);        // aura bleue derrière Greg (coup au corps)
     this.cible = this.add.graphics().setDepth(25);      // cible qui se resserre là où le coup va frapper
     this.alerte = texte(this, R.centreX + 150, 150, '!', 60, '#ffd84a').setDepth(30).setVisible(false);
     // grosse flèche "où esquiver" pendant que Greg prépare son coup
@@ -90,6 +92,7 @@ export class GregCombat extends BossScene {
 
     this.creerHud();
     this.touches = creerTouches(this);
+    this.events.once('shutdown', () => taireAnnonceur());
     // musique de fond (Hajime no Ippo, opening 2) : chargée pendant l'écran des commandes
     jouerMusique(this, 'greg_musique');
     this.afficher();
@@ -157,6 +160,8 @@ export class GregCombat extends BossScene {
     }
   }
 
+
+  parler(texte, options) { if (R.annonceur) annoncer(texte, options); }
 
   figer(secondes, ensuite) { this.gel = secondes; this.apresGel = ensuite || null; }
   // Hit-stop : fige l'image un court instant à l'impact (séparé de figer, qui sert aux encarts)
@@ -256,12 +261,13 @@ export class GregCombat extends BossScene {
     const xImpact = point.x + Phaser.Math.Between(-30, 30), yImpact = point.y;
     const contre = this.horloge < j.contreJusqua;
     const neutre = g.etat === 'garde';
+    const titube = g.etat === 'etourdi';
     const zoneProtegee = (g.garde === 'haute' && c.cible === 'tete') || (g.garde === 'basse' && c.cible === 'corps');
     // pendant qu'il ARME un coup (sauf SMASH), il pare : il faut esquiver puis contrer
     const pareEnArmant = g.etat === 'prepare' && g.attaque && g.attaque.cible !== 'smash';
     // même dans la zone ouverte, il pare parfois (les contres restent la vraie source de dégâts)
     const pareLibre = neutre && !zoneProtegee && Math.random() < R.blocageLibre[this.round - 1];
-    const bloque = !contre && ((neutre && zoneProtegee) || g.couvert > 0 || pareEnArmant || pareLibre);
+    const bloque = !contre && !titube && ((neutre && zoneProtegee) || g.couvert > 0 || pareEnArmant || pareLibre);
 
     if (bloque) {
       jouerSon(this, 'greg_bloque');
@@ -286,6 +292,7 @@ export class GregCombat extends BossScene {
         this.secretFait = true;
         flash(this, 0.9, 0xffd84a);
         this.arreter(0.25);
+        jouerSon(this, 'greg_foule');
         onomatopee(this, R.centreX, 110, 'COUP SECRET !!', 56, '#ffd84a');
         jouerSon(this, 'greg_coup_fort', { rate: 0.7 });
         this.delaiDown = 0.6;   // le "DOWN !!" arrive juste après, pour ne pas se superposer
@@ -319,6 +326,12 @@ export class GregCombat extends BossScene {
     if (c.souffleGreg) g.souffle -= c.souffleGreg * (contre ? 2 : 1);
     this.blesserGreg(degats);
     if (g.etat === 'sol') return;
+    if (contre && Math.random() < 0.35) bulle(this, R.centreX - 220, 330, auHasard(REPLIQUES.joueurContre), 900);
+    if (g.etat === 'etourdi') return;   // il titube : il encaisse tout
+
+    // jauge d'étourdissement (cachée)
+    g.vertige += contre ? R.etourdi.parContre : R.etourdi.parCoup;
+    if (g.vertige >= 100) { this.etourdirGreg(); return; }
 
     // Après plusieurs coups d'affilée, Greg se couvre puis riposte (pas de "coups gratuits" à l'infini)
     g.combo++;
@@ -345,6 +358,16 @@ export class GregCombat extends BossScene {
     }
   }
 
+  // Greg étourdi : il titube, garde baissée, des étoiles autour de la tête
+  etourdirGreg() {
+    const g = this.g;
+    g.vertige = 0; g.etat = 'etourdi'; g.t = 0; g.attaque = null; g.couvert = 0; g.combo = 0;
+    this.alerte.setVisible(false);
+    onomatopee(this, R.centreX, 230, 'ÉTOURDI !!', 54, '#ffd84a');
+    jouerSon(this, 'greg_foule');
+    this.parler('Il est sonné !', { coupe: false });
+  }
+
   blesserGreg(degats) {
     const g = this.g;
     this.stats.donnes += Math.min(degats, g.vie);
@@ -359,6 +382,7 @@ export class GregCombat extends BossScene {
     const g = this.g;
     g.t += dt;
     g.couvert -= dt;
+    g.vertige = Math.max(0, g.vertige - R.etourdi.baisse * dt);
     if (g.poseForcee) { g.poseForcee.t -= dt; if (g.poseForcee.t <= 0) g.poseForcee = null; }
 
     if (g.souffle <= 0 && (g.etat === 'garde' || g.etat === 'touche' || g.etat === 'recup')) {
@@ -402,6 +426,9 @@ export class GregCombat extends BossScene {
           g.etat = 'garde'; g.t = 0; g.attaque = null;
           g.pause = Math.min(g.pauseAvant ?? R.pauseApresTouche, R.pauseApresTouche);
         }
+        break;
+      case 'etourdi':
+        if (g.t >= R.etourdi.duree) { onomatopee(this, R.centreX + 170, 80, 'Il reprend ses esprits...', 20, '#cccccc'); this.retourGardeGreg(0.3); }
         break;
       case 'essouffle':
         if (g.t >= R.dureeEssoufflement) { g.souffle = R.souffleGregApresEssoufflement; this.retourGardeGreg(); }
@@ -559,6 +586,7 @@ export class GregCombat extends BossScene {
       if (enorme) flash(this, 0.8, 0xff3b3b);
       jouerSon(this, 'greg_coup_fort');
       this.arreter(R.arretImpact.recu);
+      if (Math.random() < 0.2) bulle(this, R.centreX - 220, 330, auHasard(REPLIQUES.joueurTouche), 900);
       this.statsRound[at.cible === 'tete' ? 'tete' : at.cible]++;
       if (navigator.vibrate) navigator.vibrate(enorme ? 120 : 40);
     }
@@ -806,6 +834,8 @@ export class GregCombat extends BossScene {
     flash(this, 0.9);
     lignesImpact(this, VISAGE_GREG.x, VISAGE_GREG.y, 0xffd84a, 36, 340);
     const down = () => onomatopee(this, LARGEUR / 2, 200, 'DOWN !!', 76, '#ffd84a');
+    jouerSon(this, 'greg_foule');
+    this.parler('Down !', { coupe: true });
     if (this.delaiDown) { this.time.delayedCall(this.delaiDown * 1000, down); this.delaiDown = 0; } else down();
     jouerSon(this, 'greg_tapis');
     this.cameras.main.shake(350, 0.02);
@@ -867,6 +897,7 @@ export class GregCombat extends BossScene {
     if (c.t >= R.secondeCompte) {
       c.t = 0; c.n++;
       jouerSon(this, 'greg_compte');
+      this.parler(c.n >= 10 ? 'K.O. !' : ['un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'][c.n - 1], { vitesse: 1.2 });
       this.texteCompte.setText(c.n >= 10 ? 'K.O. !!' : String(c.n)).setScale(1.6);
       this.tweens.add({ targets: this.texteCompte, scale: 1, duration: 150 });
       if (c.qui === 'greg') {
@@ -912,6 +943,7 @@ export class GregCombat extends BossScene {
     this.compte = null;
     this.etat = 'combat';
     onomatopee(this, LARGEUR / 2, 200, 'BOX !', 68, '#ffd84a');
+    this.parler('Box !');
     this.figer(0.6);
   }
 
@@ -1015,7 +1047,6 @@ export class GregCombat extends BossScene {
 
   // Classement de fin : rang S / A / B / C + record gardé dans le navigateur
   classement(debut, ko) {
-    const minutes = Math.floor(this.tempsTotal / 60), sec = Math.floor(this.tempsTotal % 60);
     let score = 100;
     score -= Math.min(40, this.stats.recus * 0.4);          // coups reçus
     score -= this.j.downs * 15;                              // passages au tapis
@@ -1034,8 +1065,9 @@ export class GregCombat extends BossScene {
         localStorage.setItem(cle, JSON.stringify(record));
       }
     } catch (e) { /* ignoré */ }
-    const t = (x) => `${Math.floor(x / 60)}'${String(Math.floor(x % 60)).padStart(2, '0')}`;
-    return `${debut}\nRANG ${rang}   -   temps ${minutes}'${String(sec).padStart(2, '0')}` +
+    // chrono au centième, comme Super Punch-Out
+    const t = (x) => `${Math.floor(x / 60)}'${String(Math.floor(x % 60)).padStart(2, '0')}"${String(Math.floor((x % 1) * 100)).padStart(2, '0')}`;
+    return `${debut}\nRANG ${rang}   -   temps ${t(this.tempsTotal)}` +
       (record ? `\nRecord : rang ${record.rang} en ${t(record.temps)}` : '') +
       (this.secretFait ? '\n(Coup secret trouvé !)' : '');
   }
@@ -1066,10 +1098,12 @@ export class GregCombat extends BossScene {
     this.etat = 'combat';
     this.afficher();
     jouerSon(this, 'greg_cloche');
+    this.parler(this.round === R.nbRounds ? 'Dernier round !' : `Round ${this.round}`);
     const e = encart(this, `ROUND ${this.round}`, this.round === R.nbRounds ? 'Dernier round !' : '', '#ffffff', 0x000000);
     this.figer(1.2, () => {
       e.fermer();
       onomatopee(this, LARGEUR / 2, 200, 'BOX !', 68, '#ffd84a');
+      this.parler('Box !');
       if (this.round === 1) bulle(this, R.centreX + 230, 130, 'Greg : « ' + auHasard(REPLIQUES.gregDebut) + ' »', 1800);
     });
   }
@@ -1186,7 +1220,8 @@ export class GregCombat extends BossScene {
       return;
     }
     g.sprite.setVisible(true);
-    if (g.etat === 'nargue') { pose = repos; dy = Math.sin(t / 110) * 5; dx = Math.sin(t / 220) * 8; }
+    if (g.etat === 'etourdi') { pose = repos; dx = Math.sin(t / 160) * 22; angle = Math.sin(t / 160) * 6; dy = 8; teinte = 0xfff3c0; }
+    else if (g.etat === 'nargue') { pose = repos; dy = Math.sin(t / 110) * 5; dx = Math.sin(t / 220) * 8; }
     else if (forcee === 'touche' || g.etat === 'touche') { pose = repos; dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }
     else if (forcee === 'bloque') { pose = existe(haute) ? haute : repos; echelle = 0.97; teinte = 0xc8d4ff; rapide = true; }
     else if (forcee === 'uppercut') { pose = 'visage'; echelle = 1.12; dy = 20; rapide = true; }
@@ -1247,6 +1282,17 @@ export class GregCombat extends BossScene {
     }
 
     this.dessinerCibleEtAura();
+    // étoiles qui tournent autour de la tête quand il est étourdi
+    const et = this.etoiles;
+    et.clear();
+    if (g.etat === 'etourdi') {
+      for (let k = 0; k < 4; k++) {
+        const a = t / 250 + k * Math.PI / 2, x = I.teteX + v.dx + Math.cos(a) * 55, y = I.teteY - 30 + Math.sin(a) * 14;
+        et.fillStyle(0xffd84a, 1).lineStyle(2, 0x1a1014, 1).beginPath();
+        for (let i = 0; i < 10; i++) { const b = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 4 : 10; et.lineTo(x + Math.cos(b) * r, y + Math.sin(b) * r); }
+        et.closePath(); et.fillPath(); et.strokePath();
+      }
+    }
 
     // sans l'image "garde haute", une zone bleue montre ce qu'il protège
     const z = this.zoneGarde;
