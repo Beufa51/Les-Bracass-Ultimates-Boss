@@ -891,7 +891,6 @@ export class LionelMatch extends BossScene {
     el.push(texte(this, 300, 300, [
       'Sport : frisbee de plage',
       'Armes secrètes : 3 super lancers',
-      'Signe distinctif : le maillot n°93',
       'Phrase culte : « Trop facile ! »',
     ].join('\n'), 20, '#dddddd', { lineSpacing: 10 }).setDepth(102));
     el.push(texte(this, 300, 460, (estTactile() ? 'OK' : 'ESPACE') + ' : sur le terrain !', 22, '#7fff7f').setDepth(102));
