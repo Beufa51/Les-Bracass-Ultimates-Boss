@@ -79,10 +79,29 @@ export function installerTactile() {
 
 // Chaque scène choisit le texte de ses boutons ; null = bouton caché.
 // Ex. : etiquettesTactiles({ espace: 'Entrer', z: null, x: null })
+let dernieresEtiquettes = {};
 export function etiquettesTactiles(etiquettes = {}) {
+  dernieresEtiquettes = etiquettes;
   for (const [nom, b] of Object.entries(boutons)) {
     const e = nom in etiquettes ? etiquettes[nom] : TOUCHES[nom].texte;
     b.classList.toggle('cache', e === null);
     if (e !== null) b.textContent = e;
   }
+}
+
+// Étiquettes actuelles (pour les remettre après la pause)
+export function etiquettesActuelles() { return { ...dernieresEtiquettes }; }
+
+// Bouton pause (en haut au milieu de l'écran) : appelle 'action' quand on le touche
+export function installerBoutonPause(action) {
+  if (!estTactile()) return;
+  const b = document.createElement('button');
+  b.textContent = 'II';
+  Object.assign(b.style, {
+    position: 'fixed', top: '6px', left: '50%', transform: 'translateX(-50%)', width: '46px', height: '34px',
+    zIndex: 11, border: '2px solid rgba(255,255,255,0.55)', borderRadius: '10px', background: 'rgba(20,20,30,0.45)',
+    color: '#fff', font: 'bold 16px monospace', touchAction: 'none',
+  });
+  b.addEventListener('pointerdown', (e) => { e.preventDefault(); action(); });
+  document.body.appendChild(b);
 }

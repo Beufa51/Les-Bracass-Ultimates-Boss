@@ -4,6 +4,7 @@
 //  - les navigateurs bloquent la musique tant qu'on n'a pas touché l'écran ou le clavier :
 //    on la (re)lance donc au premier appui si elle a été bloquée.
 import { MANIFESTE } from '../../assets/manifeste.js';
+import { Sauvegarde } from './sauvegarde.js';
 
 const pistes = {};
 
@@ -14,8 +15,8 @@ function piste(cle) {
     const a = new Audio('assets/' + e.fichier);
     a.loop = true;
     a.preload = 'none';
-    a.volume = e.volume ?? 0.5;
-    pistes[cle] = { audio: a, voulue: false };
+    pistes[cle] = { audio: a, voulue: false, base: e.volume ?? 0.5 };
+    a.volume = pistes[cle].base * Sauvegarde.volume('musique');
   }
   return pistes[cle];
 }
@@ -46,4 +47,13 @@ export function jouerMusique(scene, cle) {
   p.audio.currentTime = 0;
   p.audio.play().catch(() => { /* bloquée : relancée au prochain appui */ });
   scene.events.once('shutdown', () => { p.voulue = false; p.audio.pause(); });
+  // jeu en pause => musique en pause
+  const pause = () => p.audio.pause(), reprise = () => { if (p.voulue) p.audio.play().catch(() => {}); };
+  scene.events.on('pause', pause); scene.events.on('resume', reprise);
+  scene.events.once('shutdown', () => { scene.events.off('pause', pause); scene.events.off('resume', reprise); });
+}
+
+// À appeler quand on change le volume de la musique dans les réglages
+export function majVolumeMusique() {
+  for (const p of Object.values(pistes)) p.audio.volume = p.base * Sauvegarde.volume('musique');
 }

@@ -2,6 +2,7 @@
 // Si un élément n'a pas encore de fichier, on dessine une forme provisoire.
 import { MANIFESTE } from '../../assets/manifeste.js';
 import { FORMES } from './dessins.js';
+import { Sauvegarde } from './sauvegarde.js';
 
 // À appeler dans preload() : charge les vrais fichiers PNG / sons
 export function chargerFichiers(scene) {
@@ -34,14 +35,16 @@ export function preparerVisuels(scene) {
 export function jouerSon(scene, cle, options) {
   const e = MANIFESTE.sons[cle];
   if (!e) return;
-  if (e.fichier && scene.cache.audio.exists(cle)) { scene.sound.play(cle, options); return; }
+  const volSons = Sauvegarde.volume('sons');
+  if (volSons <= 0) return;
+  if (e.fichier && scene.cache.audio.exists(cle)) { scene.sound.play(cle, { ...options, volume: (options && options.volume || 1) * volSons }); return; }
   const ctx = scene.sound.context;
   if (!ctx || !e.provisoire) return;
   const osc = ctx.createOscillator();
   const vol = ctx.createGain();
   osc.type = 'square';
   osc.frequency.value = e.provisoire.frequence;
-  vol.gain.setValueAtTime(0.08, ctx.currentTime);
+  vol.gain.setValueAtTime(0.08 * Sauvegarde.volume('sons'), ctx.currentTime);
   vol.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + e.provisoire.duree);
   osc.connect(vol).connect(ctx.destination);
   osc.start();

@@ -20,6 +20,11 @@
 - **Smartphone / tablette** : boutons tactiles à l'écran (`src/core/tactile.js`), qui "appuient" sur
   les touches du clavier. Chaque scène choisit le texte de ses boutons (`etiquettesTactiles`).
   Le menu de test (F1) n'existe que sur ordinateur.
+- PAUSE (Échap / P, bouton II sur mobile) : reprendre, volumes musique / bruitages / voix (enregistrés),
+  abandonner. `src/core/PauseScene.js`. Volumes et records dans `src/core/sauvegarde.js`.
+- Le hub affiche le record (rang + temps) sous la porte de chaque boss gagné.
+- Téléphone tenu en vertical : message « Tourne ton téléphone » (index.html).
+- Allègement : musique de Greg en 64 kbit/s (2,5 Mo), clip du Dempsey en MP4 (190 Ko au lieu du GIF de 1 Mo).
 - Manifeste unique des visuels/sons : `assets/manifeste.js`. Tant qu'un visuel n'a pas de fichier,
   il est dessiné par le code dans `src/core/dessins.js` (style manga : contours, ombres, reflets).
   Option `pixel: 3` possible (dessin fait en petit puis agrandi, style pixel art).
@@ -96,6 +101,7 @@
   - Au tapis : compte de l'arbitre, alterner ◀ ▶. 3 tapis = K.O. Greg : 3 tapis = victoire.
   - Le coach (portraits de Kamogawa, expression selon tes erreurs) donne des conseils avant chaque round. Fin du round 3 sans K.O. = décision aux points.
   - Tout l'équilibrage est dans `src/bosses/greg/reglages.js`.
+  - Ambiance de public en continu (greg_ambiance.wav), plus forte quand Greg est en difficulté.
   - Musique de fond : `assets/audio/greg_musique.mp3` (chargée au début du combat, en boucle, volume dans le manifeste).
   - Menu de test F1 : commencer directement au round 1, 2 ou 3.
 

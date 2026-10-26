@@ -27,8 +27,9 @@ export function jouerClip(scene, cle) {
     objectFit: 'contain', background: 'rgba(0,0,0,0.85)', zIndex: 5, pointerEvents: 'none',
   });
   if (video) {
-    el.playsInline = true;
-    el.play().catch(() => { el.muted = true; el.play(); });   // certains navigateurs refusent le son
+    el.playsInline = true; el.muted = true; el.loop = true;   // vidéo muette en boucle (comme un GIF)
+    el.setAttribute('playsinline', ''); el.setAttribute('muted', '');
+    el.play().catch(() => {});
   }
   document.body.appendChild(el);
   return { duree: e.duree || 2, fermer: () => el.remove() };

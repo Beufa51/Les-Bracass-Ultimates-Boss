@@ -7,10 +7,15 @@
   <style>
     html, body { margin: 0; height: 100%; background: #111; overflow: hidden; touch-action: none; overscroll-behavior: none; }
     #jeu { width: 100%; height: 100%; }
+    /* téléphone tenu en vertical : on demande de le tourner */
+    #tourner { display: none; position: fixed; inset: 0; z-index: 50; background: #111; color: #ffd84a;
+      font: bold 22px monospace; text-align: center; align-items: center; justify-content: center; padding: 20px; }
+    @media (orientation: portrait) and (pointer: coarse) { #tourner { display: flex; } }
   </style>
 </head>
 <body>
   <div id="jeu"></div>
+  <div id="tourner">⟳<br><br>Tourne ton téléphone<br>à l'horizontale<br>pour jouer !</div>
   <!-- Moteur Phaser 3 (gratuit, licence MIT), copié dans lib/ pour marcher sans Internet -->
   <script src="lib/phaser.min.js"></script>
   <script type="module" src="src/main.js"></script>

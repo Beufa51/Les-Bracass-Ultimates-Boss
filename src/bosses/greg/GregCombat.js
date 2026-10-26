@@ -21,6 +21,7 @@ import { IDENTITE, REGLAGES as R, ATTAQUES, ENCHAINEMENTS, ENCHAINEMENTS_ENERVE,
 import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from './effets.js';
 import { jouerClip } from '../../core/clips.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
+import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
 
 // compte en japonais : [kana, lecture en lettres si le navigateur n'a pas de voix japonaise]
 const JAPONAIS = [['いち', 'itchi'], ['に', 'ni'], ['さん', 'sann'], ['し', 'chi'], ['ご', 'go'],
@@ -98,6 +99,16 @@ export class GregCombat extends BossScene {
     this.creerHud();
     this.touches = creerTouches(this);
     this.events.once('shutdown', () => taireAnnonceur());
+    // ambiance du public en continu : plus Greg est en difficulté, plus le public hurle
+    if (this.cache.audio.exists('greg_ambiance')) {
+      this.ambiance = this.sound.add('greg_ambiance', { loop: true, volume: 0 });
+      this.ambiance.play();
+      this.events.on('pause', () => this.ambiance.pause());
+      this.events.on('resume', () => this.ambiance.resume());
+      this.events.once('shutdown', () => { this.ambiance.stop(); this.ambiance.destroy(); });
+    }
+    // au retour de pause, on "oublie" la touche qui a servi à reprendre
+    this.events.on('resume', () => { this.lireTouches(); this.memoire = {}; });
     // musique de fond (Hajime no Ippo, opening 2) : chargée pendant l'écran des commandes
     jouerMusique(this, 'greg_musique');
     this.afficher();
@@ -1078,20 +1089,10 @@ export class GregCombat extends BossScene {
     score -= Math.max(0, this.tempsTotal - 60) * 0.15;       // lenteur (après 1 minute)
     if (!ko) score -= 20;
     const rang = R.rangs.find(r => score >= r.seuil).rang;
-    const ordre = R.rangs.map(r => r.rang);
-    let record = null;
-    try {
-      const cle = 'bracass_greg_record';
-      record = JSON.parse(localStorage.getItem(cle) || 'null');
-      if ((this.donnees.phase || 'round1') !== 'round1') throw new Error('pas de record hors combat complet');
-      if (!record || ordre.indexOf(rang) < ordre.indexOf(record.rang) ||
-          (rang === record.rang && this.tempsTotal < record.temps)) {
-        record = { rang, temps: this.tempsTotal };
-        localStorage.setItem(cle, JSON.stringify(record));
-      }
-    } catch (e) { /* ignoré */ }
-    // chrono au centième, comme Super Punch-Out
-    const t = (x) => `${Math.floor(x / 60)}'${String(Math.floor(x % 60)).padStart(2, '0')}"${String(Math.floor((x % 1) * 100)).padStart(2, '0')}`;
+    // record seulement pour un combat complet (pas depuis le menu de test au round 2 / 3)
+    const complet = (this.donnees.phase || 'round1') === 'round1';
+    const record = complet ? Sauvegarde.proposerRecord('greg', rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record('greg');
+    const t = formatTemps;   // chrono au centième, comme Super Punch-Out
     return `${debut}\nRANG ${rang}   -   temps ${t(this.tempsTotal)}` +
       (record ? `\nRecord : rang ${record.rang} en ${t(record.temps)}` : '') +
       (this.secretFait ? '\n(Coup secret trouvé !)' : '');
@@ -1234,6 +1235,13 @@ export class GregCombat extends BossScene {
     this.aideContre.setVisible(contre).setPosition(R.centreX + j.decalage, 250);
     this.dessinerDempsey();
     this.majHud();
+    if (this.ambiance) {
+      const g = this.g;
+      let cible = this.etat === 'combat' || this.etat === 'compte' ? 0.1 + 0.25 * (1 - g.vie / 100) : 0.05;
+      if (g.etat === 'etourdi' || g.etat === 'sol' || this.j.dempsey) cible += 0.25;
+      cible *= Sauvegarde.volume('sons');
+      this.ambiance.setVolume(this.ambiance.volume + (cible - this.ambiance.volume) * Math.min(1, reel * 3));
+    }
   }
 
   // Greg en illustrations : on choisit l'image selon ce qu'il fait, puis on la bouge / grossit / teinte

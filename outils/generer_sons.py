@@ -81,3 +81,16 @@ n = passe_haut(passe_bas(bruit(d), 2200), 250)
 vagues = 0.75 + 0.25 * np.sin(2 * np.pi * 3.1 * x) * np.sin(2 * np.pi * 0.7 * x)
 forme = np.clip(x / 0.25, 0, 1) * np.exp(-np.clip(x - 0.6, 0, None) / 0.8)
 ecrire('greg_foule', n * vagues * forme, 0.6)
+
+# ambiance de public en continu (boucle de 6 s sans coupure audible)
+d = 6.0
+x = t(d)
+n = passe_haut(passe_bas(bruit(d), 1600), 200)
+houle = 0.7 + 0.3 * np.sin(2 * np.pi * x / d) * np.sin(2 * np.pi * 3 * x / d)
+amb = n * houle
+f = int(SR * 0.5)   # fondu enchaîné fin -> début pour boucler proprement
+amb[:f] = amb[:f] * np.linspace(0, 1, f) + amb[-f:] * np.linspace(1, 0, f)
+amb = amb[:-f]
+wave_x = amb / (np.max(np.abs(amb)) + 1e-9) * 0.5
+with wave.open(f'{out}/greg_ambiance.wav', 'wb') as w:
+    w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((wave_x * 32767).astype(np.int16).tobytes())

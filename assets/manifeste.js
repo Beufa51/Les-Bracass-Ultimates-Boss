@@ -124,7 +124,7 @@ export const MANIFESTE = {
   // Clips (GIF, MP4 ou WEBM) joués par-dessus le jeu (durée en secondes).
   // Si le fichier n'existe pas (ou fichier: null), le jeu joue son animation dessinée par le code.
   clips: {
-    greg_dempsey: { fichier: 'sprites/greg/dempsey.gif', duree: 2.46 },   // lancement du Dempsey Roll (2 boucles du GIF)
+    greg_dempsey: { fichier: 'sprites/greg/dempsey.mp4', duree: 2.46 },   // lancement du Dempsey Roll (2 boucles du GIF)
   },
 
   // Sons : fichier null => petit "bip" provisoire (fréquence en Hz, durée en secondes)
@@ -144,6 +144,7 @@ export const MANIFESTE = {
     greg_compte:     { fichier: 'audio/greg_compte.wav', provisoire: { frequence: 520, duree: 0.1 } },
     greg_tapis:      { fichier: 'audio/greg_tapis.wav' },
     greg_foule:      { fichier: 'audio/greg_foule.wav' },
+    greg_ambiance:   { fichier: 'audio/greg_ambiance.wav' },   // public en continu (boucle)
     greg_alerte:     { fichier: 'audio/greg_alerte.wav', provisoire: { frequence: 740, duree: 0.07 } },
   },
 };

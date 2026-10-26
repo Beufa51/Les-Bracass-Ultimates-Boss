@@ -5,7 +5,7 @@
 import { LARGEUR, HAUTEUR } from '../core/reglages.js';
 import { texte } from '../core/ui.js';
 import { creerTouches, vientDAppuyer } from '../core/clavier.js';
-import { Sauvegarde } from '../core/sauvegarde.js';
+import { Sauvegarde, formatTemps } from '../core/sauvegarde.js';
 import { jouerSon } from '../core/ressources.js';
 import { BOSS } from '../bosses/liste.js';
 import { REGLAGES_HUB as R } from './reglages.js';
@@ -30,6 +30,8 @@ export class HubScene extends Phaser.Scene {
       texte(this, x, 30, boss.nom, 20, '#ffd84a');
       if (!boss.pret) texte(this, x, R.basDuMur + 18, 'Bientôt', 16, '#ffb347');
       else if (Sauvegarde.aLeBadge(boss.id)) texte(this, x, R.basDuMur + 18, 'Gagné !', 16, '#7fff7f');
+      const rec = boss.pret && Sauvegarde.record(boss.id);
+      if (rec) texte(this, x, R.basDuMur + 38, `Record ${rec.rang} ${formatTemps(rec.temps)}`, 12, '#ffd84a');
       return { boss, x, porte };
     });
 
