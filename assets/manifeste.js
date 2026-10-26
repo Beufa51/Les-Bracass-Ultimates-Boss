@@ -14,8 +14,8 @@
 
 // Couleurs des boxeurs provisoires
 // Ton boxeur, façon Super Punch-Out : cheveux noirs courts, gants verts, short sombre, en pixel art
-const HEROS_BOXE = { couleur: '#26263c', gants: '#6ab04c', poignets: '#2d6a1f', cheveux: '#151515', coiffure: 'court',
-  peau: '#e8b48a', pixel: 3 };
+const HEROS_BOXE = { couleur: '#1d2440', gants: '#5cc93a', poignets: '#2d6a1f', cheveux: '#7a4a20', coiffure: 'touffe',
+  peau: '#e8b48a', carrure: 1.3, pixel: 3 };
 // Greg d'après son illustration (assets_inbox/greg_manga.jpg) : afro, barbe, torse en sueur,
 // tatouages de personnages sur les bras, short bleu marine à bandes rouges, ceinture à l'épée, gants blancs à croix.
 const GREG = { couleur: '#2a4d8f', bandes: '#b3202c', ceinture: '#1d2f63', embleme: 'epee',
@@ -59,7 +59,7 @@ export const MANIFESTE = {
     // ---------- GREG (combat de boxe) ----------
     // Vue "Punch-Out" : ton boxeur vu de DOS (heros_boxe_*), Greg vu de FACE (greg_*).
     // Une image par pose. Le bas du corps touche le bas de la case.
-    greg_ring:  { fichier: null, largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'ring' } },
+    greg_ring:  { fichier: null, largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'ring', pixel: 2 } },
     // Greg en combat : ses illustrations détourées (garde basse, garde haute, coup au corps, coup au visage, K.O.)
     greg_combat:   { fichier: 'sprites/greg/greg_combat.png', largeur: 274, hauteur: 470, images: 1, vitesse: 1 },
     greg_garde_haute: { fichier: 'sprites/greg/greg_garde_haute.png', largeur: 343, hauteur: 517, images: 1, vitesse: 1 },

@@ -529,7 +529,7 @@ function faceAuSol(ctx, p, peau) {
 //  TON BOXEUR, VU DE DOS
 // =====================================================================
 const POSES_DOS = {
-  garde:     { g: [-32, -242, 31], d: [32, -240, 31] },     // gants devant la tête (façon Super Punch-Out)
+  garde:     { g: [-50, -236, 32], d: [50, -234, 32] },     // gants de chaque côté de la tête (façon Super Punch-Out)
   jab:       { g: [-22, -298, 21], d: [58, -226, 27], dx: -6 },
   crochet:   { g: [-60, -226, 27], d: [14, -286, 23], dx: 10 },
   corps:     { g: [-60, -220, 27], d: [10, -232, 23], dx: 8, dy: 14 },
@@ -549,7 +549,8 @@ function boxeurDos(ctx, w, h, p) {
   if (p.pose === 'sol') { dosAuSol(ctx, p, peau); ctx.restore(); return; }
   const P = POSES_DOS[p.pose] || POSES_DOS.garde;
   const dx = P.dx || 0, dy = P.dy || 0;
-  const T = (x, y) => [x + dx, y + dy];
+  const k = p.carrure || 1;   // > 1 : dos plus large (en V)
+  const T = (x, y) => [x * (y < -150 ? k : 1 + (k - 1) * 0.5) + dx, y + dy];
 
   // cuisses
   for (const s of [-1, 1]) {
@@ -591,6 +592,15 @@ function boxeurDos(ctx, w, h, p) {
   ctx.stroke();
   ctx.fillStyle = 'rgba(255,255,255,0.2)';
   ctx.beginPath(); ctx.ellipse(...T(-64, -192), 16, 7, -0.3, 0, Math.PI * 2); ctx.fill();
+  if (k > 1) {   // gros dos : creux des muscles + reflets
+    ctx.fillStyle = 'rgba(90,40,15,0.22)';
+    for (const sgn of [-1, 1]) {
+      ctx.beginPath(); ctx.ellipse(...T(sgn * 34, -178), 20, 12, sgn * 0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(...T(sgn * 50, -140), 14, 22, sgn * -0.3, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.fillStyle = 'rgba(255,240,215,0.25)';
+    for (const sgn of [-1, 1]) { ctx.beginPath(); ctx.ellipse(...T(sgn * 66, -200), 14, 8, sgn * 0.4, 0, Math.PI * 2); ctx.fill(); }
+  }
 
   // nuque + oreilles + arrière de la tête
   const hx = dx + (P.tete || 0), hy = -250 + dy;
@@ -601,7 +611,16 @@ function boxeurDos(ctx, w, h, p) {
   }
   ctx.beginPath(); ctx.ellipse(hx, hy, 30, 33, 0, 0, Math.PI * 2);
   remplir(ctx, degrade(ctx, hx - 30, hy - 30, hx + 30, hy + 30, [[0, teinte(p.cheveux, 0.3)], [0.6, p.cheveux], [1, teinte(p.cheveux, -0.4)]]));
-  if (p.coiffure === 'court') {
+  if (p.coiffure === 'touffe') {
+    // cheveux bruns courts sur la nuque, grosse touffe en pointe sur le dessus (façon Little Mac)
+    ctx.strokeStyle = teinte(p.cheveux, 0.35); ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(hx - 4, hy - 4, 20, Math.PI * 1.1, Math.PI * 1.7); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(hx - 16, hy - 26); ctx.lineTo(hx - 10, hy - 52); ctx.lineTo(hx - 2, hy - 36);
+    ctx.lineTo(hx + 6, hy - 60); ctx.lineTo(hx + 10, hy - 36); ctx.lineTo(hx + 20, hy - 48); ctx.lineTo(hx + 16, hy - 24);
+    ctx.closePath();
+    remplir(ctx, degrade(ctx, hx, hy - 60, hx, hy - 24, [[0, teinte(p.cheveux, 0.35)], [1, p.cheveux]]), 2.5);
+  } else if (p.coiffure === 'court') {
     // cheveux courts : juste un reflet et une nuque bien dégagée
     ctx.strokeStyle = teinte(p.cheveux, 0.35); ctx.lineWidth = 3;
     ctx.beginPath(); ctx.arc(hx - 6, hy - 6, 18, Math.PI * 1.1, Math.PI * 1.6); ctx.stroke();
@@ -615,8 +634,8 @@ function boxeurDos(ctx, w, h, p) {
 
   // bras + gants (vus de dos : on voit le dessus des gants)
   const dessinerBras = (epX, [gx, gy, r], cote) => {
-    const sx = epX + dx, sy = -196 + dy, x = gx + dx, y = gy + dy;
-    bras(ctx, sx, sy, x, y, 30, 20, teinte(peau, -0.08));
+    const sx = epX * k + dx, sy = -196 + dy, x = gx + dx, y = gy + dy;
+    bras(ctx, sx, sy, x, y, 30 * k, 20 * k, teinte(peau, -0.08));
     gant(ctx, x, y, r, p.gants, Math.atan2(sy - y, sx - x), p.poignets || '#3fa7ff', cote);
   };
   dessinerBras(-70, P.g, -1); dessinerBras(70, P.d, 1);
@@ -649,35 +668,56 @@ function ring(ctx, w, h) {
     halo.addColorStop(0, 'rgba(255,250,225,0.95)'); halo.addColorStop(0.25, 'rgba(255,240,190,0.3)'); halo.addColorStop(1, 'rgba(255,240,190,0)');
     ctx.fillStyle = halo; ctx.fillRect(x - 70, 0, 140, 100);
   }
-  // public : rangées de petits spectateurs colorés (plus clairs et plus gros vers l'avant)
-  const peaux = ['#f2c9a0', '#d9a77c', '#a8714f', '#7a4e33', '#ffdcb8'];
-  const cheveux = ['#1a1410', '#4a2c18', '#7a5a30', '#d8c070', '#2a2a2a', '#a03020', '#dddddd'];
-  const habits = ['#c0392b', '#2980b9', '#27ae60', '#f39c12', '#8e44ad', '#ecf0f1', '#34495e', '#e67e22', '#16a085', '#d35400'];
-  for (let rang = 0; rang < 15; rang++) {
-    const y = 96 + rang * 16, r = 5 + rang * 0.35, lum = 0.35 + rang * 0.045;
-    for (let x = -10 + (rang % 2) * 9; x < w + 12; x += r * 2.3) {
-      const xx = x + (alea() - 0.5) * 3, yy = y + (alea() - 0.5) * 3;
-      ctx.globalAlpha = Math.min(1, lum);
-      ctx.fillStyle = habits[Math.floor(alea() * habits.length)];
-      ctx.beginPath(); ctx.ellipse(xx, yy + r * 1.7, r * 1.25, r * 1.1, 0, Math.PI, 0); ctx.fill();
-      ctx.fillRect(xx - r * 1.25, yy + r * 1.7, r * 2.5, r);
-      ctx.fillStyle = peaux[Math.floor(alea() * peaux.length)];
-      ctx.beginPath(); ctx.arc(xx, yy, r, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = cheveux[Math.floor(alea() * cheveux.length)];
-      ctx.beginPath(); ctx.arc(xx, yy - r * 0.3, r, Math.PI, 0); ctx.fill();
-      if (alea() < 0.12) {   // bras levés
-        ctx.fillStyle = peaux[Math.floor(alea() * peaux.length)];
-        ctx.fillRect(xx - r * 1.6, yy - r * 2.2, r * 0.6, r * 2); ctx.fillRect(xx + r, yy - r * 2.2, r * 0.6, r * 2);
+  // public façon Super Punch-Out : spectateurs en rangées, visages détaillés, tons chauds,
+  // bras levés, appareils photo qui flashent (les rangs du fond sont plus sombres)
+  const peaux = ['#f0c8a0', '#d8a074', '#b07850', '#8a5636', '#ffd8b0', '#c48a5c'];
+  const cheveux = ['#1a1410', '#3a2414', '#6a4422', '#a87838', '#d8c070', '#2a2a2a', '#8a2a1a', '#cccccc'];
+  const habits = ['#5a2a1e', '#8a3a24', '#2a3450', '#3a3a3a', '#6a5a3a', '#7a2030', '#2a4a3a', '#9a6a3a', '#e0d0b0', '#4a2a50'];
+  const rangs = [
+    { y: 112, r: 8.5, lum: 0.45 }, { y: 146, r: 9.5, lum: 0.55 }, { y: 184, r: 10.5, lum: 0.66 },
+    { y: 226, r: 11.5, lum: 0.78 }, { y: 270, r: 12.5, lum: 0.9 }, { y: 316, r: 13.5, lum: 1 },
+  ];
+  const flashs = [];
+  rangs.forEach((rg, n) => {
+    const { r } = rg, ombre = (c) => teinte(c, -(1 - rg.lum) * 0.75);
+    for (let x = -12 + (n % 2) * r * 1.3; x < w + 20; x += r * 2.6) {
+      const xx = x + (alea() - 0.5) * r * 0.5, yy = rg.y + (alea() - 0.5) * 4;
+      const habit = habits[Math.floor(alea() * habits.length)], peau = peaux[Math.floor(alea() * peaux.length)];
+      // buste (costume ou t-shirt)
+      ctx.fillStyle = ombre(habit);
+      ctx.beginPath(); ctx.ellipse(xx, yy + r * 2.1, r * 1.45, r * 1.25, 0, Math.PI, 0); ctx.fill();
+      ctx.fillRect(xx - r * 1.45, yy + r * 2.1, r * 2.9, r * 1.6);
+      if (alea() < 0.35) {   // chemise blanche + cravate
+        ctx.fillStyle = ombre('#e8e0d0'); ctx.beginPath(); ctx.moveTo(xx - r * 0.35, yy + r * 1.05); ctx.lineTo(xx + r * 0.35, yy + r * 1.05); ctx.lineTo(xx, yy + r * 2.2); ctx.fill();
+        ctx.fillStyle = ombre('#a02020'); ctx.fillRect(xx - r * 0.1, yy + r * 1.15, r * 0.2, r * 0.9);
+      }
+      // bras levés ou appareil photo
+      const geste = alea();
+      if (geste < 0.18) {
+        ctx.fillStyle = ombre(peau);
+        for (const sg of [-1, 1]) { ctx.save(); ctx.translate(xx + sg * r * 1.1, yy + r * 1.3); ctx.rotate(sg * 0.35); ctx.fillRect(-r * 0.25, -r * 2.2, r * 0.5, r * 2.2); ctx.beginPath(); ctx.arc(0, -r * 2.25, r * 0.4, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
+      }
+      // tête + visage
+      ctx.fillStyle = ombre(peau);
+      ctx.beginPath(); ctx.ellipse(xx, yy, r * 0.9, r, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = ombre(cheveux[Math.floor(alea() * cheveux.length)]);
+      ctx.beginPath(); ctx.ellipse(xx, yy - r * 0.45, r * 0.95, r * 0.6, 0, Math.PI, 0); ctx.fill();
+      ctx.fillStyle = ombre('#1a1010');
+      ctx.fillRect(xx - r * 0.42, yy - r * 0.05, r * 0.22, r * 0.22); ctx.fillRect(xx + r * 0.2, yy - r * 0.05, r * 0.22, r * 0.22);
+      if (alea() < 0.5) { ctx.fillStyle = ombre('#5a1414'); ctx.beginPath(); ctx.ellipse(xx, yy + r * 0.5, r * 0.25, r * 0.22, 0, 0, Math.PI * 2); ctx.fill(); }   // il crie
+      else ctx.fillRect(xx - r * 0.25, yy + r * 0.48, r * 0.5, r * 0.1);
+      if (alea() < 0.12) { ctx.fillStyle = ombre('#101010'); ctx.fillRect(xx - r * 0.55, yy - r * 0.18, r * 1.1, r * 0.32); }   // lunettes de soleil
+      if (geste > 0.92) {   // appareil photo devant le visage
+        ctx.fillStyle = '#1a1a1a'; ctx.fillRect(xx - r * 0.8, yy - r * 0.35, r * 1.6, r * 0.95);
+        ctx.fillStyle = '#9ab0c0'; ctx.beginPath(); ctx.arc(xx, yy + r * 0.12, r * 0.32, 0, Math.PI * 2); ctx.fill();
+        if (alea() < 0.5) flashs.push([xx + r * 0.5, yy - r * 0.2, r]);
       }
     }
-  }
-  ctx.globalAlpha = 1;
-  // flashs d'appareils photo
-  for (let i = 0; i < 7; i++) {
-    const x = alea() * w, y = 110 + alea() * 170;
-    const f = ctx.createRadialGradient(x, y, 0, x, y, 12);
-    f.addColorStop(0, 'rgba(255,255,255,0.95)'); f.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = f; ctx.fillRect(x - 12, y - 12, 24, 24);
+  });
+  for (const [x, y, r] of flashs) {
+    const f = ctx.createRadialGradient(x, y, 0, x, y, r * 2.5);
+    f.addColorStop(0, 'rgba(255,255,255,1)'); f.addColorStop(0.3, 'rgba(255,255,230,0.7)'); f.addColorStop(1, 'rgba(255,255,230,0)');
+    ctx.fillStyle = f; ctx.fillRect(x - r * 2.5, y - r * 2.5, r * 5, r * 5);
   }
   // tapis bleu vu d'en haut (en perspective)
   ctx.beginPath(); ctx.moveTo(80, 330); ctx.lineTo(w - 80, 330); ctx.lineTo(w + 120, h); ctx.lineTo(-120, h); ctx.closePath();
@@ -743,7 +783,7 @@ function portraitHeros(ctx, w, h) {
   ctx.beginPath(); ctx.ellipse(cx, cy, w * 0.3, h * 0.34, 0, 0, Math.PI * 2);
   const g = ctx.createRadialGradient(cx - 6, cy - 8, 2, cx, cy, w * 0.4);
   g.addColorStop(0, '#ffe3c6'); g.addColorStop(1, '#d9a77c'); remplir(ctx, g, 2.5);
-  cheveuxPics(ctx, cx, cy - h * 0.12, w * 0.31, '#151515', 8, true);
+  cheveuxPics(ctx, cx, cy - h * 0.12, w * 0.31, '#7a4a20', 8, true);
   ctx.fillStyle = CONTOUR;
   for (const s of [-1, 1]) {
     ctx.fillRect(cx + s * w * 0.12 - 3, cy - 2, 6, 7);

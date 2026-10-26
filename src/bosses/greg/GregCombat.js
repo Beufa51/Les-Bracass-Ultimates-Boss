@@ -70,6 +70,8 @@ export class GregCombat extends BossScene {
       sprite: this.add.image(R.centreX, R.piedsJoueur, 'heros_boxe_garde').setOrigin(0.5, 1).setDepth(10)
         .setScale(R.tailleJoueur).setAlpha(R.transparenceJoueur),   // transparent pour bien voir Greg
     };
+    // contour lumineux cyan autour de ton boxeur (comme Little Mac), si la carte graphique le permet
+    try { if (this.j.sprite.preFX) this.j.sprite.preFX.addGlow(0x7fe8ff, 3, 0, false, 0.1, 12); } catch (e) { /* ignoré */ }
     this.g = {
       vie: 100, souffle: 100, downs: 0, fureur: 1, secousse: 0, combo: 0, couvert: 0, vertige: 0,
       etat: 'garde', t: 0, attaque: null, coupIndex: 0, garde: 'haute',
