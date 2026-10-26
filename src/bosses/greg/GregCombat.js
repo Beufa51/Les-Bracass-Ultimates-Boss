@@ -829,6 +829,7 @@ export class GregCombat extends BossScene {
   gregAuTapis() {
     const g = this.g;
     g.downs++; g.etat = 'sol'; g.attaque = null; g.poseForcee = null;
+    g.chuteDebut = this.time.now; g.sensChute = Math.random() < 0.5 ? -1 : 1; g.boumChute = false;
     this.j.action = null; this.j.dempsey = null; this.j.esquive = null;
     this.alerte.setVisible(false);
     flash(this, 0.9);
@@ -869,10 +870,9 @@ export class GregCombat extends BossScene {
     if (qui === 'greg' && this.illustre && this.textures.exists('greg_ko')) {
       // le compte se met à gauche, la case de manga du K.O. à droite
       this.texteCompte.setPosition(250, 220); this.texteCompte2.setPosition(250, 310);
-      if (this.secretFait && this.g.downs === 1 && !this.caseKOFaite) {   // après "COUP SECRET !!", la case attend un peu
-        this.caseKOFaite = true;
-        this.time.delayedCall(700, () => { if (this.compte && this.compte.qui === 'greg') this.caseKO = this.ouvrirCaseKO(); });
-      } else this.caseKO = this.ouvrirCaseKO();
+      // la case manga arrive après la chute de Greg sur le ring
+      const delai = R.illustre.dureeChute * 1000 + 150;
+      this.time.delayedCall(delai, () => { if (this.compte && this.compte.qui === 'greg') this.caseKO = this.ouvrirCaseKO(); });
     }
     if (qui === 'joueur') {
       this.barreReleve = this.add.graphics().setDepth(45);
@@ -1222,11 +1222,31 @@ export class GregCombat extends BossScene {
 
     // au tapis, Greg est montré dans une case de manga (voir ouvrirCaseKO) : on le cache sur le ring
     if (g.etat === 'sol') {
-      g.sprite.setVisible(false); if (g.jambes) g.jambes.setVisible(false);
+      // d'abord la chute (pose "K.O. debout" qui bascule en arrière et s'écrase), puis il disparaît
+      const e = (t - (g.chuteDebut || 0)) / 1000;
+      if (existe('koDebout') && e < I.dureeChute) {
+        const P = I.poses.koDebout, p = Phaser.Math.Clamp((e - 0.15) / (I.dureeChute - 0.15), 0, 1);
+        const chute = p * p;   // accélère, comme un vrai corps qui tombe
+        g.sprite.setVisible(true).setTexture(P.cle).setFlipX(false).clearTint().setOrigin(P.origine[0], P.origine[1])
+          .setPosition(I.teteX + (g.sensChute || 1) * 30 * chute, I.solY + 30 * chute)
+          .setScale(P.taille, P.taille * (1 - 0.4 * chute)).setAngle((g.sensChute || 1) * 12 * chute)
+          .setAlpha(p < 0.75 ? 1 : 1 - (p - 0.75) / 0.25);   // il s'efface en touchant le tapis
+        if (g.jambes) g.jambes.setVisible(false);
+        this.zoneGarde.clear(); this.dessinerCibleEtAura(); this.etoiles.clear();
+        if (p >= 0.8 && !g.boumChute) {   // impact sur le tapis : secousse + nuage de poussière
+          g.boumChute = true; this.cameras.main.shake(250, 0.02); jouerSon(this, 'greg_tapis');
+          for (let k = 0; k < 14; k++) {
+            const c = this.add.circle(I.teteX + Phaser.Math.Between(-90, 90), I.solY - Phaser.Math.Between(0, 30), Phaser.Math.Between(10, 24), 0xe8e2d4, 0.8).setDepth(11);
+            this.tweens.add({ targets: c, y: c.y - Phaser.Math.Between(20, 60), x: c.x + Phaser.Math.Between(-60, 60), scale: 1.8, alpha: 0, duration: 600, onComplete: () => c.destroy() });
+          }
+        }
+        return;
+      }
+      g.sprite.setVisible(false).setAlpha(1); if (g.jambes) g.jambes.setVisible(false);
       this.zoneGarde.clear(); this.dessinerCibleEtAura();
       return;
     }
-    g.sprite.setVisible(true);
+    g.sprite.setVisible(true).setAlpha(1);
     if (g.etat === 'etourdi') { pose = ou('etourdi', repos); dx = Math.sin(t / 160) * 22; angle = Math.sin(t / 160) * 6; dy = 8; teinte = 0xfff3c0; }
     else if (g.etat === 'nargue') { pose = repos; dy = Math.sin(t / 110) * 5; dx = Math.sin(t / 220) * 8; }
     else if (forcee === 'touche' || g.etat === 'touche') { pose = ou('touche', repos); dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }

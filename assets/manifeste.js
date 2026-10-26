@@ -74,6 +74,7 @@ export const MANIFESTE = {
     greg_touche_pied:       { fichier: 'sprites/greg/greg_touche_pied.png', largeur: 332, hauteur: 538, images: 1, vitesse: 1 },
     greg_etourdi:           { fichier: 'sprites/greg/greg_etourdi.png', largeur: 243, hauteur: 534, images: 1, vitesse: 1 },
     greg_pied_victoire:        { fichier: 'sprites/greg/greg_pied_victoire.png', largeur: 253, hauteur: 550, images: 1, vitesse: 1 },
+    greg_ko_debout:          { fichier: 'sprites/greg/greg_ko_debout.png', largeur: 318, hauteur: 540, images: 1, vitesse: 1 },
     greg_garde_pied:  { fichier: 'sprites/greg/greg_garde_pied.png', largeur: 486, hauteur: 743, images: 1, vitesse: 1 },
     greg_entier:      { fichier: 'sprites/greg/greg_entier.png', largeur: 327, hauteur: 670, images: 1, vitesse: 1 },
     greg_jambes:      { fichier: 'sprites/greg/greg_jambes.png', largeur: 327, hauteur: 410, images: 1, vitesse: 1 },

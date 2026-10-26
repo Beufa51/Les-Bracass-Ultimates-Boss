@@ -39,12 +39,14 @@ export const REGLAGES = {
       smash:      { cle: 'greg_smash',            origine: [0.331, 1], taille: 0.815, pied: true },
       touche:     { cle: 'greg_touche_pied',      origine: [0.666, 1], taille: 0.815, pied: true },
       etourdi:    { cle: 'greg_etourdi',          origine: [0.23, 1], taille: 0.815, pied: true },
+      koDebout:   { cle: 'greg_ko_debout',        origine: [0.494, 1], taille: 0.815, pied: true },   // il s'effondre
       victoire:   { cle: 'greg_pied_victoire',         origine: [0.506, 1], taille: 0.815, pied: true },
       basse:  { cle: 'greg_combat',      origine: [0.467, 0.134], taille: 0.382 },
       haute:  { cle: 'greg_garde_haute', origine: [0.584, 0.18],  taille: 0.368, ceinture: [205, 414, 192] },
       corps:  { cle: 'greg_coup_corps',  origine: [0.3, 0.154],   taille: 0.355, ceinture: [190, 392, 215], cote: 'd' },
       visage: { cle: 'greg_coup_visage', origine: [0.633, 0.19],  taille: 0.40,  ceinture: [225, 474, 240], cote: 'g' },
     },
+    dureeChute: 0.9,   // K.O. : durée de la chute sur le ring avant la case manga
     debutElan: 0.2,    // à partir de ce moment de la préparation, on voit le coup partir
     debutElanCorps: 0.4,   // pour le coup au corps : il plonge d'abord bas plus longtemps
   },

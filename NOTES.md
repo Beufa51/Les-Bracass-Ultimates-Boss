@@ -37,7 +37,8 @@
   pour la garde haute et les coups, le haut du corps est coupé à la ceinture (gants gardés) et
   posé sur les jambes `greg_jambes.png` (réglages `ceinture` dans `src/bosses/greg/reglages.js`).
   Quand il prépare un coup, on voit l'image du coup grossir vers toi avant l'impact.
-  Au tapis : Greg disparaît du ring et une case de manga (greg_ko) s'affiche pendant le compte.
+  Au tapis : Greg s'effondre sur le ring (greg_ko_debout.png, 0,9 s, poussière), puis une case de manga
+  (greg_ko) s'affiche pendant le compte.
   L'illustration complète sert aussi pour la présentation (`greg_portrait`) et l'annonce du SMASH (`greg_visage`).
 - Bruitages du combat : générés par `outils/generer_sons.py` (Python + numpy) dans `assets/audio/`.
 - Rendu lissé (`pixelArt: false` dans `src/main.js`).
