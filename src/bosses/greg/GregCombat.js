@@ -18,10 +18,11 @@ import { jouerMusique } from '../../core/musique.js';
 import { annoncer, taireAnnonceur } from '../../core/annonceur.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { IDENTITE, DIFFICULTES, REGLAGES as R, ATTAQUES, ENCHAINEMENTS, ENCHAINEMENTS_ENERVE, CONSEILS, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
-import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from './effets.js';
+import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from '../../core/effets.js';
 import { jouerClip } from '../../core/clips.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
+import { choisirDifficulte, cleRecord } from '../../core/difficulte.js';
 
 // compte en japonais : [kana, lecture en lettres si le navigateur n'a pas de voix japonaise]
 const JAPONAIS = [['いち', 'itchi'], ['に', 'ni'], ['さん', 'sann'], ['し', 'chi'], ['ご', 'go'],
@@ -1007,45 +1008,11 @@ export class GregCombat extends BossScene {
   //  ROUNDS ET COIN DU RING
   // =================================================================
   // record séparé pour chaque difficulté (le hub affiche celui du mode normal)
-  cleRecord() { return this.nomDiff === 'normal' ? 'greg' : 'greg_' + this.nomDiff; }
+  cleRecord() { return cleRecord('greg', this.nomDiff); }
 
   // Choix de la difficulté (◀ ▶ puis Espace), le dernier choix est retenu
   choisirDifficulte(ensuite) {
-    const noms = Object.keys(DIFFICULTES);
-    let i = Math.max(0, noms.indexOf(Sauvegarde.difficulte ? Sauvegarde.difficulte('greg') : 'normal'));
-    etiquettesTactiles({ haut: null, bas: null, z: null, x: null, espace: 'OK' });
-    const el = [];
-    el.push(this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0b0b14, 0.95).setDepth(100));
-    el.push(texte(this, LARGEUR / 2, 70, 'DIFFICULTÉ', 44, '#ffd84a').setDepth(101));
-    const cartes = noms.map((n, k) => {
-      const D = DIFFICULTES[n], x = LARGEUR / 2 + (k - 1) * 290;
-      const fond = this.add.rectangle(x, 260, 260, 220, 0x1d1d30).setDepth(101).setStrokeStyle(4, 0x555566);
-      const titre = texte(this, x, 190, D.nom, 30, D.couleur).setDepth(102);
-      const desc = texte(this, x, 275, D.texte, 15, '#dddddd', { wordWrap: { width: 230 } }).setDepth(102);
-      const rec = Sauvegarde.record(n === 'normal' ? 'greg' : 'greg_' + n);
-      const r = texte(this, x, 350, rec ? `Record : ${rec.rang} ${formatTemps(rec.temps)}` : 'Pas encore de record', 13, '#aaaaaa').setDepth(102);
-      el.push(fond, titre, desc, r);
-      return fond;
-    });
-    el.push(texte(this, LARGEUR / 2, HAUTEUR - 60, `◀ ▶ : choisir     ${estTactile() ? 'OK' : 'ESPACE'} : valider`, 20, '#7fff7f').setDepth(101));
-    const maj = () => cartes.forEach((c, k) => {
-      c.setStrokeStyle(k === i ? 6 : 3, k === i ? 0xffd84a : 0x555566).setScale(k === i ? 1.06 : 0.95);
-    });
-    maj();
-    const kb = this.input.keyboard;
-    const gauche = () => { i = (i + noms.length - 1) % noms.length; maj(); jouerSon(this, 'greg_bloque'); };
-    const droite = () => { i = (i + 1) % noms.length; maj(); jouerSon(this, 'greg_bloque'); };
-    kb.on('keydown-LEFT', gauche); kb.on('keydown-RIGHT', droite);
-    // sur téléphone : toucher une carte la choisit
-    cartes.forEach((c, k) => c.setInteractive().on('pointerdown', () => { i = k; maj(); }));
-    this.time.delayedCall(300, () => kb.once('keydown-SPACE', () => {
-      kb.off('keydown-LEFT', gauche); kb.off('keydown-RIGHT', droite);
-      this.nomDiff = noms[i]; this.diff = DIFFICULTES[noms[i]];
-      if (Sauvegarde.reglerDifficulte) Sauvegarde.reglerDifficulte('greg', noms[i]);
-      el.forEach(e => e.destroy());
-      jouerSon(this, 'ui_valider');
-      ensuite();
-    }));
+    choisirDifficulte(this, 'greg', DIFFICULTES, (nom, diff) => { this.nomDiff = nom; this.diff = diff; ensuite(); }, 'greg_bloque');
   }
 
   // Écran de présentation de Greg (son illustration), avant le premier round

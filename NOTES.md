@@ -4,6 +4,8 @@
 **Étape 0 terminée : squelette jouable.**
 **Étape 1 terminée : boss Greg TERMINÉ** (illustrations, sons, équilibrage testé par bots, écran de victoire avec trophée).
 Copie de référence de la version finale : branche `greg-termine` (`version-1-greg` = état un peu plus ancien).
+**Étape 2 en cours : boss Lionel JOUABLE** (match de frisbee façon Windjammers, visuels provisoires dessinés par le code).
+Prochaine étape : découper/détourer les planches manga de Lionel (à déposer dans `assets_inbox/`).
 
 ## Décisions
 - Moteur : **Phaser 3.90** (gratuit, licence MIT), copié dans `lib/`. Aucune installation pour jouer.
@@ -111,9 +113,33 @@ Copie de référence de la version finale : branche `greg-termine` (`version-1-g
   - Choix de difficulté après la présentation : FACILE / NORMAL / CHAMPION (`DIFFICULTES` dans reglages.js), dernier choix retenu, record séparé par difficulté.
   - Héros illustré : garde, coup, uppercut (victoire), touché (tête en arrière), au sol (assis) — `herosIllustre` dans reglages.js.
 
+- **Lionel** (`src/bosses/lionel/`) : match de frisbee en 1 contre 1, façon **Windjammers** (Neo Geo, 1994).
+  Règles vérifiées sur le remake https://github.com/Historn/Project-1 (sets de 30 s, 3/5/2 points, plongeon = lancer + direction).
+  - Vue de 3/4 au-dessus d'un terrain de plage : TOI à gauche (maillot bleu), Lionel à droite (maillot vert/crème n°93).
+  - Commandes : flèches = courir (immobile quand on tient le frisbee) ; Espace = lancer droit (▲/▼ maintenu = en biais,
+    il rebondit sur les murs) ; Z = lob ; X = lancer courbe ; en courant, Espace = plongeon.
+  - Points : frisbee derrière l'adversaire = 3 points (côtés, jaune) ou 5 points (milieu, rouge) ; lob qui touche le sable = 2 points.
+  - Set : 12 points ou 30 s (égalité = POINT EN OR) ; 2 sets gagnants. Celui qui encaisse sert.
+  - Relancer tout de suite après avoir attrapé = lancer PUISSANT (+22 %). Le frisbee accélère à chaque lancer de l'échange.
+  - Rattraper un lob juste en dessous (cercle au sol) = SUPER LANCER : le tien = « ÉCLAIR VERT » (zigzag rapide).
+  - Super de Lionel « LE CHAMBREUR » : s'arrête au filet (une ligne violette montre où il va), puis repart en flèche.
+    Il l'obtient en rattrapant tes lobs, et parfois au hasard à partir du set 2 (NORMAL / CHAMPION).
+  - Lionel chambreur : bulles de moquerie quand il marque / encaisse, il garde parfois le frisbee pour te narguer.
+  - IA de Lionel : il devine où arrive le frisbee (simulation du vol) avec un temps de réaction et une erreur selon la difficulté,
+    plonge s'il est trop loin, se replace en suivant ta position.
+  - Aides (FACILE / NORMAL) : cercle vert au sol là où le frisbee va arriver. Le point de chute des lobs est toujours montré.
+  - Difficulté FACILE / NORMAL / CHAMPION (écran commun `src/core/difficulte.js`, aussi utilisé par Greg), record par difficulté.
+  - Fin : rang S/A/B/C (points encaissés, sets perdus, temps), écran de victoire (trophée, Lionel à genoux, badge violet au frisbee).
+  - Menu F1 : match depuis le set 1, ou directement au set décisif (1-1).
+  - Tout l'équilibrage dans `src/bosses/lionel/reglages.js` ; dessins provisoires dans `src/core/dessins_frisbee.js` ;
+    bruitages générés par `outils/generer_sons_lionel.py`. Effets manga partagés : `src/core/effets.js`.
+  - Toute la logique avance dans update() (pas de minuteries Phaser) : les bots de test peuvent jouer en accéléré.
+  - Planches manga de Lionel reçues dans la discussion (4 poses + 5 poses + portrait) mais PAS encore dans le dépôt :
+    les déposer dans `assets_inbox/` pour les découper (liste des poses dans ASSETS_TODO.md).
+
 ## Ordre de développement (mis à jour)
 1. ~~Greg (style Hajime no Ippo)~~ fait
-2. **Lionel**  ← prochaine étape (choisi avant Beufa)
+2. **Lionel**  ← en cours : jouable, reste les illustrations (choisi avant Beufa)
    - Jeu : **exactement comme Windjammers** (Neo Geo, 1994) — lancer de frisbee en 1 contre 1, vue de 3/4 au-dessus du terrain,
      buts à 3 et 5 points, lancers courbes, lob, super lancer quand on rattrape au bon moment, sets.
    - Badge : médaille violette avec un frisbee.

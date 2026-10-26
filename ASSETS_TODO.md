@@ -70,6 +70,28 @@ Clip : `dempsey.gif` (dans `assets/sprites/greg/`) : **intégré**, joué au lan
 Sons Greg : greg_coup, greg_coup_fort, greg_bloque, greg_esquive, greg_cloche, greg_compte, greg_alerte, greg_tapis
 (générés par `outils/generer_sons.py`, remplaçables par de vrais fichiers).
 
+## Lionel (frisbee façon Windjammers, vue de 3/4)
+Planches manga reçues (maillot vert/crème n°93) : **à déposer dans `assets_inbox/`** pour être découpées et détourées.
+Chaque pose remplace le dessin provisoire du même nom (`assets/sprites/lionel/`, fond transparent, pieds en bas de l'image).
+
+| Nom du fichier | Statut | Pose (planche d'origine) |
+|---|---|---|
+| lionel_tient.png | provisoire | Garde, frisbee tenu à deux mains (planche 1, image 1) |
+| lionel_course.png | provisoire | Course (planche 1, image 2) |
+| lionel_lance.png | provisoire | Lancer, bras tendu (planche 1, image 3) |
+| lionel_rattrape.png | provisoire | Rattrape au-dessus de la tête (planche 1, image 4) |
+| lionel_plongeon.png | provisoire | Plongeon (planche 2, image 1) |
+| lionel_super.png | provisoire | Super lancer, tourbillon vert (planche 2, image 2) |
+| lionel_touche.png | provisoire | Touché par le frisbee (planche 2, image 3) |
+| lionel_defaite.png | provisoire | À genoux, mains sur le visage (planche 2, image 4) |
+| lionel_victoire.png / lionel_nargue.png | provisoire | Frisbee levé, main sur la hanche (planche 2, image 5) |
+| lionel_portrait.png | provisoire | En pied, frisbee à la main (image seule) : écran de présentation |
+| lionel_garde.png | provisoire | Attente sans frisbee (à tirer de la course ou de l'image seule) |
+
+Toi au frisbee : `heros_frisbee_*` (mêmes poses), dessinés par le code pour l'instant.
+Sons Lionel : frisbee_lancer, frisbee_attrape, frisbee_rebond, frisbee_but, frisbee_sifflet, frisbee_super, frisbee_plongeon, frisbee_sol
+(générés par `outils/generer_sons_lionel.py`).
+
 ## Sons
 | Nom du fichier | Statut | Description (pour sfxr / jfxr) |
 |---|---|---|
