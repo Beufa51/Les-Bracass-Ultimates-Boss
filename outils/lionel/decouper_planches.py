@@ -1,7 +1,7 @@
 # Découpe les planches manga du match de frisbee en une image par pose, fond blanc rendu transparent :
 #  - Lionel (assets_inbox/lionel_*.jpg) : poses tournées vers la GAUCHE (il joue à droite du terrain) ;
 #  - ton joueur (assets_inbox/heros_frisbee_planche.jpg) : poses tournées vers la DROITE.
-# Utilisation : python3 outils/decouper_frisbee.py
+# Utilisation : python3 outils/lionel/decouper_planches.py
 import numpy as np
 from PIL import Image, ImageFilter
 from scipy import ndimage as nd
@@ -86,8 +86,8 @@ for nom, (fichier, (cx, cy), versDroite) in POSES.items():
     if versDroite != heros: rgba = rgba.transpose(Image.FLIP_LEFT_RIGHT)
     k = 0.55 if nom == 'lionel_portrait' else 0.72 if heros else REDUCTION   # même taille à l'écran que Lionel
     rgba = rgba.resize((round(rgba.width * k), round(rgba.height * k)), Image.LANCZOS)
-    sortie = 'assets/sprites/' + ('hub/' if heros else 'lionel/') + nom + '.png'
+    sortie = 'assets/sprites/lionel/' + nom + '.png'
     rgba.save(sortie, optimize=True)
     print(f"{nom}: {rgba.width}x{rgba.height}")
 for nom, source in COPIES.items():
-    Image.open('assets/sprites/hub/' + source + '.png').save('assets/sprites/hub/' + nom + '.png', optimize=True)
+    Image.open('assets/sprites/lionel/' + source + '.png').save('assets/sprites/lionel/' + nom + '.png', optimize=True)

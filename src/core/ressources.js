@@ -1,6 +1,6 @@
 // Chargement des visuels et sons à partir du manifeste.
 // Si un élément n'a pas encore de fichier, on dessine une forme provisoire.
-import { MANIFESTE } from '../../assets/manifeste.js';
+import { MANIFESTE } from './manifestes.js';
 import { FORMES } from './dessins.js';
 import { Sauvegarde } from './sauvegarde.js';
 
@@ -51,17 +51,18 @@ export function jouerSon(scene, cle, options) {
   osc.stop(ctx.currentTime + e.provisoire.duree);
 }
 
-// ---------- Formes provisoires (dessinées dans dessins.js) ----------
+// ---------- Formes provisoires (dessins du moteur ou du boss, rattachés par manifestes.js) ----------
+const FORME_DEFAUT = FORMES.rect;
 function dessinerProvisoire(scene, cle, e) {
   const { largeur: w, hauteur: h, images: n } = e;
   const tex = scene.textures.createCanvas(cle, w * n, h);
   const ctx = tex.getContext();
-  const p = e.provisoire || { forme: 'rect', couleur: '#ff00ff' };
+  const p = e.provisoire || { dessin: FORME_DEFAUT, couleur: '#ff00ff' };
   for (let i = 0; i < n; i++) {
     ctx.save();
     ctx.translate(i * w, 0);
     if (p.pixel) dessinerEnPixels(ctx, w, h, p, { i, n });
-    else (FORMES[p.forme] || FORMES.rect)(ctx, w, h, p, { i, n });
+    else p.dessin(ctx, w, h, p, { i, n });
     ctx.restore();
     tex.add(i, 0, i * w, 0, w, h);
   }
@@ -76,7 +77,7 @@ function dessinerEnPixels(ctx, w, h, p, image) {
   petit.width = pw; petit.height = ph;
   const c = petit.getContext('2d');
   c.scale(1 / k, 1 / k);
-  (FORMES[p.forme] || FORMES.rect)(c, w, h, p, image);
+  p.dessin(c, w, h, p, image);
   const img = c.getImageData(0, 0, pw, ph), d = img.data;
   for (let o = 0; o < d.length; o += 4) {
     d[o + 3] = d[o + 3] > 110 ? 255 : 0;

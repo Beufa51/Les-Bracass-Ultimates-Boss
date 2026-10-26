@@ -1,5 +1,5 @@
 # Génère les bruitages du combat de Greg (WAV 16 bits mono).
-# Utilisation : python3 outils/generer_sons.py assets/audio
+# Utilisation : python3 outils/greg/generer_sons.py assets/audio/greg
 import numpy as np, wave, sys
 SR = 44100
 rng = np.random.default_rng(7)

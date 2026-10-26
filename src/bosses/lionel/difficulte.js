@@ -1,10 +1,10 @@
-// Écran de choix de la difficulté (FACILE / NORMAL / CHAMPION), commun à tous les boss.
+// Écran de choix de la difficulté (FACILE / NORMAL / CHAMPION) de Lionel (copie propre à ce boss).
 // Le dernier choix est retenu, et chaque difficulté a son propre record.
-import { LARGEUR, HAUTEUR } from './reglages.js';
-import { texte } from './ui.js';
-import { jouerSon } from './ressources.js';
-import { estTactile, etiquettesTactiles } from './tactile.js';
-import { Sauvegarde, formatTemps } from './sauvegarde.js';
+import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
+import { texte } from '../../core/ui.js';
+import { jouerSon } from '../../core/ressources.js';
+import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
+import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
 
 // Clé du record : 'greg' en NORMAL, 'greg_facile', 'greg_champion' sinon
 export function cleRecord(idBoss, nomDiff) { return nomDiff === 'normal' ? idBoss : idBoss + '_' + nomDiff; }

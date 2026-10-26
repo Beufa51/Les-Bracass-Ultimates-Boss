@@ -1,9 +1,9 @@
 // =====================================================================
-// DESSINS PROVISOIRES du match de frisbee (Lionel, façon Windjammers) :
+// DESSINS PROVISOIRES DE LIONEL (match de frisbee façon Windjammers) :
 // le terrain de plage, les joueurs vus de 3/4 (tournés vers la DROITE,
-// le jeu les retourne pour Lionel) et le frisbee qui tourne.
+// le jeu les retourne pour Lionel), le frisbee qui tourne et le trophée.
 // =====================================================================
-import { CONTOUR, teinte, hasard, remplir, degrade } from './dessins.js';
+import { CONTOUR, teinte, hasard, remplir, degrade } from '../../core/dessins.js';
 
 // ---------- petits outils ----------
 function trait(ctx, pts, largeur, couleur) {
@@ -356,4 +356,38 @@ function terrainFrisbee(ctx, w, h, p) {
   palmier(ctx, w - 16, 150, 90, -0.1, alea);
 }
 
-export const FORMES_FRISBEE = { joueurFrisbee, frisbee, terrainFrisbee };
+// Trophée doré (coupe à deux anses sur un socle)
+function trophee(ctx, w, h) {
+  const cx = w / 2;
+  const or = (y0, y1) => degrade(ctx, cx - w * 0.3, y0, cx + w * 0.3, y1, [[0, '#fff3a8'], [0.35, '#ffd84a'], [0.7, '#c8961e'], [1, '#8a5a10']]);
+  // anses
+  ctx.lineWidth = w * 0.06; ctx.strokeStyle = '#1a1014';
+  for (const s of [-1, 1]) {
+    ctx.beginPath(); ctx.ellipse(cx + s * w * 0.3, h * 0.27, w * 0.14, h * 0.11, 0, s < 0 ? Math.PI * 0.5 : -Math.PI * 0.5, s < 0 ? Math.PI * 1.5 : Math.PI * 0.5); ctx.stroke();
+  }
+  ctx.lineWidth = w * 0.035; ctx.strokeStyle = '#e8b830';
+  for (const s of [-1, 1]) {
+    ctx.beginPath(); ctx.ellipse(cx + s * w * 0.3, h * 0.27, w * 0.14, h * 0.11, 0, s < 0 ? Math.PI * 0.5 : -Math.PI * 0.5, s < 0 ? Math.PI * 1.5 : Math.PI * 0.5); ctx.stroke();
+  }
+  // coupe
+  ctx.beginPath();
+  ctx.moveTo(cx - w * 0.3, h * 0.1); ctx.lineTo(cx + w * 0.3, h * 0.1);
+  ctx.quadraticCurveTo(cx + w * 0.3, h * 0.5, cx + w * 0.06, h * 0.56);
+  ctx.lineTo(cx + w * 0.06, h * 0.7); ctx.lineTo(cx - w * 0.06, h * 0.7); ctx.lineTo(cx - w * 0.06, h * 0.56);
+  ctx.quadraticCurveTo(cx - w * 0.3, h * 0.5, cx - w * 0.3, h * 0.1); ctx.closePath();
+  remplir(ctx, or(0, h * 0.6), 3);
+  ctx.beginPath(); ctx.ellipse(cx, h * 0.1, w * 0.3, h * 0.035, 0, 0, Math.PI * 2); remplir(ctx, '#8a5a10', 2);
+  // étoile
+  ctx.fillStyle = '#fffbe0'; ctx.beginPath();
+  for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? w * 0.04 : w * 0.1; ctx.lineTo(cx + Math.cos(a) * r, h * 0.3 + Math.sin(a) * r); }
+  ctx.closePath(); ctx.fill();
+  // socle
+  ctx.beginPath(); ctx.roundRect(cx - w * 0.2, h * 0.7, w * 0.4, h * 0.08, 4); remplir(ctx, or(h * 0.7, h * 0.78), 2.5);
+  ctx.beginPath(); ctx.roundRect(cx - w * 0.28, h * 0.78, w * 0.56, h * 0.18, 6); remplir(ctx, degrade(ctx, 0, h * 0.78, 0, h * 0.96, [[0, '#5a2a1e'], [1, '#2a120c']]), 3);
+  ctx.beginPath(); ctx.roundRect(cx - w * 0.18, h * 0.82, w * 0.36, h * 0.09, 3); remplir(ctx, or(h * 0.82, h * 0.91), 1.5);
+  // reflet
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.beginPath(); ctx.ellipse(cx - w * 0.17, h * 0.24, w * 0.04, h * 0.1, -0.2, 0, Math.PI * 2); ctx.fill();
+}
+
+export const FORMES_LIONEL = { joueurFrisbee, frisbee, terrainFrisbee, trophee };

@@ -68,11 +68,11 @@ Ton boxeur : vu de dos, cheveux bruns en pics, short vert, gants blancs.
 Clip : `dempsey.gif` (dans `assets/sprites/greg/`) : **intégré**, joué au lancement du Dempsey Roll (2 boucles = 2,46 s).
 
 Sons Greg : greg_coup, greg_coup_fort, greg_bloque, greg_esquive, greg_cloche, greg_compte, greg_alerte, greg_tapis
-(générés par `outils/generer_sons.py`, remplaçables par de vrais fichiers).
+(générés par `outils/greg/generer_sons.py`, remplaçables par de vrais fichiers).
 
 ## Lionel (frisbee façon Windjammers, vue de 3/4)
 Planches manga (maillot vert/crème n°93) : **intégrées**. Originaux dans `assets_inbox/lionel_planche_1.jpg`, `_2.jpg`, `lionel_entier.jpg`,
-découpés par `outils/decouper_frisbee.py` dans `assets/sprites/lionel/` (fond transparent, tournés vers la gauche).
+découpés par `outils/lionel/decouper_planches.py` dans `assets/sprites/lionel/` (fond transparent, tournés vers la gauche).
 
 | Nom du fichier | Statut | Pose (planche d'origine) |
 |---|---|---|
@@ -91,7 +91,7 @@ découpés par `outils/decouper_frisbee.py` dans `assets/sprites/lionel/` (fond 
 Toi au frisbee : `heros_frisbee_*` : **intégrés** depuis `assets_inbox/heros_frisbee_planche.jpg` (blond, maillot rouge).
 À refaire si possible : une course SANS frisbee, et la défaite avec les cheveux blonds.
 Sons Lionel : frisbee_lancer, frisbee_attrape, frisbee_rebond, frisbee_but, frisbee_sifflet, frisbee_super, frisbee_plongeon, frisbee_sol
-(générés par `outils/generer_sons_lionel.py`).
+(générés par `outils/lionel/generer_sons.py`).
 
 ## Sons
 | Nom du fichier | Statut | Description (pour sfxr / jfxr) |

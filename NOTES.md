@@ -48,7 +48,7 @@ Fusionné dans `main` : en ligne.
   Au tapis : Greg s'effondre sur le ring (greg_ko_debout.png, 0,9 s, poussière), puis une case de manga
   (greg_ko) s'affiche pendant le compte.
   L'illustration complète sert aussi pour la présentation (`greg_portrait`) et l'annonce du SMASH (`greg_visage`).
-- Bruitages du combat : générés par `outils/generer_sons.py` (Python + numpy) dans `assets/audio/`.
+- Bruitages du combat : générés par `outils/greg/generer_sons.py` (Python + numpy) dans `assets/audio/greg/`.
 - Rendu lissé (`pixelArt: false` dans `src/main.js`).
 - Combat de Greg inspiré de Super Punch-Out (SNES) : bandeau avec portraits et « VS », public dense,
   tapis bleu avec logo, ton boxeur de dos = illustrations (heros_garde / heros_coup / heros_uppercut,
@@ -108,7 +108,7 @@ Fusionné dans `main` : en ligne.
   - Le coach (portraits de Kamogawa, expression selon tes erreurs) donne des conseils avant chaque round. Fin du round 3 sans K.O. = décision aux points.
   - Tout l'équilibrage est dans `src/bosses/greg/reglages.js`.
   - Ambiance de public en continu (greg_ambiance.wav), plus forte quand Greg est en difficulté.
-  - Musique de fond : `assets/audio/greg_musique.mp3` (chargée au début du combat, en boucle, volume dans le manifeste).
+  - Musique de fond : `assets/audio/greg/greg_musique.mp3` (chargée au début du combat, en boucle, volume dans le manifeste).
   - Menu de test F1 : commencer directement au round 1, 2 ou 3.
   - Choix de difficulté après la présentation : FACILE / NORMAL / CHAMPION (`DIFFICULTES` dans reglages.js), dernier choix retenu, record séparé par difficulté.
   - Héros illustré : garde, coup, uppercut (victoire), touché (tête en arrière), au sol (assis) — `herosIllustre` dans reglages.js.
@@ -131,18 +131,18 @@ Fusionné dans `main` : en ligne.
     plonge s'il est trop loin, se replace en suivant ta position.
   - Aides : cercle vert au sol là où le frisbee va arriver (FACILE et NORMAL : dès le lancer ;
     CHAMPION : aucune). Le point de chute des lobs est toujours montré.
-  - Difficulté FACILE / NORMAL / CHAMPION (écran commun `src/core/difficulte.js`, aussi utilisé par Greg), record par difficulté.
+  - Difficulté FACILE / NORMAL / CHAMPION (`src/bosses/lionel/difficulte.js`, copie propre à Lionel), record par difficulté.
   - Fin : rang S/A/B/C (points encaissés, sets perdus, temps), écran de victoire (trophée, Lionel à genoux, badge violet au frisbee).
   - Menu F1 : match depuis le set 1, ou directement au set décisif (1-1).
-  - Tout l'équilibrage dans `src/bosses/lionel/reglages.js` ; dessins provisoires dans `src/core/dessins_frisbee.js` ;
-    bruitages générés par `outils/generer_sons_lionel.py`. Effets manga partagés : `src/core/effets.js`.
+  - Tout l'équilibrage dans `src/bosses/lionel/reglages.js` ; dessins provisoires dans `src/bosses/lionel/dessins.js` ;
+    bruitages générés par `outils/lionel/generer_sons.py`. Effets manga : `src/bosses/lionel/effets.js` (copie propre à Lionel).
   - Toute la logique avance dans update() (pas de minuteries Phaser) : les bots de test peuvent jouer en accéléré.
   - Lionel en illustrations : planches `assets_inbox/lionel_planche_1.jpg` (4 poses), `_2.jpg` (5 poses), `lionel_entier.jpg`,
-    découpées par `outils/decouper_frisbee.py` (fond blanc retiré, poses tournées vers la GAUCHE, réduites de moitié)
+    découpées par `outils/lionel/decouper_planches.py` (fond blanc retiré, poses tournées vers la GAUCHE, réduites de moitié)
     dans `assets/sprites/lionel/`. Taille à l'écran : `echelleIllustre` dans reglages.js.
     Pas de pose d'attente sans frisbee : « garde » = la course (avec de petits bonds) ; « nargue » = la victoire.
     Ton joueur (blond, maillot rouge) : planche `assets_inbox/heros_frisbee_planche.jpg` (9 poses légendées en anglais),
-    découpée par le même outil (`outils/decouper_frisbee.py`) dans `assets/sprites/hub/heros_frisbee_*.png`, tournée vers la DROITE.
+    découpée par le même outil (`outils/lionel/decouper_planches.py`) dans `assets/sprites/lionel/heros_frisbee_*.png`, tournée vers la DROITE.
     Sa course tient un frisbee : on affiche l'attente mains vides avec de petits bonds. (Sur la planche, la pose « défaite » a les cheveux bruns.)
   - Équilibrage (bots « humains » qui voient le frisbee avec du retard, et lisent l'aide quand elle est affichée) :
     FACILE = un enfant gagne ; NORMAL = bon joueur gagne, moyen ~1 fois sur 3, enfant perd ; CHAMPION = très dur.
@@ -158,7 +158,7 @@ Fusionné dans `main` : en ligne.
     (attraper, lancer, biais, lob, super), automatique la première fois après la difficulté, F1 « Entraînement puis match »,
     X (ou « Passer » sur téléphone) pour le sauter. Pas de points ni de chrono pendant l'entraînement.
   - TÉLÉPHONE : JOYSTICK VIRTUEL qui suit le pouce (moitié gauche de l'écran), SEULEMENT pendant le match de Lionel
-    (`modeJoystick(true)` dans src/core/tactile.js) ; pause rangée en haut à droite pendant ce match.
+    (`src/bosses/lionel/joystick.js`) ; pause rangée en haut à droite pendant ce match.
     Le hub, Greg et les menus gardent la croix et la pause au milieu.
   - Terrain redessiné dans l'esprit de Windjammers 2 (cage grillagée, rambardes, palmiers, ombres de palmes, public,
     ligne centrale jaune, poteaux jaunes rembourrés) : dessin du code, pas d'image du vrai jeu (droits d'auteur).
@@ -185,19 +185,35 @@ Fusionné dans `main` : en ligne.
 9. Finitions
 
 ## Plan des dossiers
+**Règle : chaque boss est INDÉPENDANT.** Tout ce qui sert à un boss est dans SON dossier ; modifier un boss
+ne peut pas changer un autre boss. Le seul lien entre les boss : le hub, les badges et le moteur commun
+(sauvegarde, sons, clavier / boutons tactiles, pause, menu F1), qu'on ne modifie pas pour un boss.
+
 | Dossier | Contenu |
 |---|---|
 | `index.html` | page du jeu |
 | `lib/` | moteur Phaser (ne pas toucher) |
-| `src/main.js` | démarrage du jeu |
-| `src/core/` | code partagé : sauvegarde, clavier, badges, modèle de boss, menu de test |
+| `src/main.js` | démarrage du jeu (enregistre les visuels du moteur puis ceux de chaque boss) |
+| `src/core/` | MOTEUR COMMUN : hub/boss de base (BossScene : intro, victoire, badge), sauvegarde, sons, musique, annonceur, clavier, boutons tactiles, pause, menu F1, chargement, dessins du hub et des badges |
 | `src/hub/` | le hub (+ `reglages.js`) |
-| `src/bosses/<boss>/` | un dossier par boss : `index.js` (fiche), `reglages.js` (équilibrage), scènes |
+| `src/bosses/<boss>/` | TOUT le boss : `index.js` (fiche), `reglages.js` (équilibrage), scènes, `manifeste.js` (ses visuels et sons), `dessins.js` (ses dessins provisoires), `effets.js`, `difficulte.js`… |
 | `src/bosses/liste.js` | ordre des portes |
+| `assets/manifeste.js` | visuels et sons du MOTEUR COMMUN (hub, badges, interface) |
+| `assets/sprites/<boss>/`, `assets/audio/<boss>/` | fichiers de chaque boss |
+| `assets/sprites/hub/`, `assets/ui/` | fichiers du hub et de l'interface |
+| `outils/<boss>/` | outils d'un boss (génération des sons, découpe des planches) |
 | `data/` | données (questions du quiz, plus tard) |
-| `assets/manifeste.js` | LA liste de tous les visuels et sons |
-| `assets/sprites/<boss>/`, `assets/ui/`, `assets/audio/` | fichiers définitifs |
 | `assets_inbox/` | où tu déposes tes fichiers bruts |
 
+Fichiers de chaque boss :
+- **Greg** : `src/bosses/greg/` (GregCombat, reglages, manifeste, dessins, effets, difficulte), `assets/sprites/greg/`,
+  `assets/audio/greg/`, `outils/greg/generer_sons.py`.
+- **Lionel** : `src/bosses/lionel/` (LionelMatch, reglages, entrainement, manifeste, dessins, effets, difficulte, joystick),
+  `assets/sprites/lionel/` (Lionel ET ton joueur au frisbee), `assets/audio/lionel/`,
+  `outils/lionel/generer_sons.py`, `outils/lionel/decouper_planches.py`.
+
 ## Ajouter un boss (rappel technique)
-Copier `src/bosses/modele/`, renommer, puis dans `src/bosses/<boss>/index.js` : `pret: true`, `phases`, `scenes`.
+Copier `src/bosses/modele/` (avec son `manifeste.js`), renommer, puis dans `src/bosses/<boss>/index.js` : `pret: true`, `phases`, `scenes`.
+Ses visuels et sons vont dans SON `manifeste.js` (noms commençant par le nom du boss), ses fichiers dans
+`assets/sprites/<boss>/` et `assets/audio/<boss>/`. Si on a besoin d'un effet ou d'un écran d'un autre boss,
+on le COPIE dans le dossier du nouveau boss (pas de partage entre boss).

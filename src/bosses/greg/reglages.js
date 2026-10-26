@@ -63,7 +63,7 @@ export const REGLAGES = {
     debutElanCorps: 0.4,   // pour le coup au corps : il plonge d'abord bas plus longtemps
   },
   tailleJoueur: 0.92,          // petit et transparent, comme dans Super Punch-Out
-  // Ton boxeur en illustrations (assets/sprites/hub/heros_*.png) : origine = milieu du haut de la ceinture.
+  // Ton boxeur en illustrations (assets/sprites/greg/heros_*.png) : origine = milieu du haut de la ceinture.
   // Pour chaque pose du jeu : quelle image, retournée (miroir) ou non, décalage, inclinaison.
   herosIllustre: {
     ceintureY: 565, taille: 0.66,

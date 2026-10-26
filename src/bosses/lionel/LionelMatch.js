@@ -16,10 +16,11 @@ import { texte, voile } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { annoncer, taireAnnonceur } from '../../core/annonceur.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
-import { onomatopee, flash, encart, bulle, lignesImpact } from '../../core/effets.js';
-import { estTactile, etiquettesTactiles, modeJoystick, placerBoutonPause } from '../../core/tactile.js';
+import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
+import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
+import { installerJoystick } from './joystick.js';
 import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
-import { choisirDifficulte, cleRecord } from '../../core/difficulte.js';
+import { choisirDifficulte, cleRecord } from './difficulte.js';
 import { IDENTITE, TERRAIN as T, DIFFICULTES, REGLAGES as R, REPLIQUES } from './reglages.js';
 import { ETAPES, VITESSE_ENTRAINEMENT } from './entrainement.js';
 
@@ -132,11 +133,10 @@ export class LionelMatch extends BossScene {
     this.events.once('shutdown', () => taireAnnonceur());
     // sur téléphone : joystick qui suit le pouce et pause en haut à droite, SEULEMENT pendant ce match
     // (le hub, Greg et les autres boss gardent la croix et la pause au milieu)
-    modeJoystick(true); placerBoutonPause('droite');
-    this.events.once('shutdown', () => { modeJoystick(false); placerBoutonPause('centre'); });
+    this.joystick = installerJoystick(this);
     // ambiance du public de la plage
-    if (this.cache.audio.exists('greg_ambiance')) {
-      this.ambiance = this.sound.add('greg_ambiance', { loop: true, volume: 0.18 });
+    if (this.cache.audio.exists('lionel_ambiance')) {
+      this.ambiance = this.sound.add('lionel_ambiance', { loop: true, volume: 0.18 });
       this.ambiance.play();
       this.events.on('pause', () => this.ambiance.pause());
       this.events.on('resume', () => this.ambiance.resume());
@@ -147,7 +147,7 @@ export class LionelMatch extends BossScene {
     this.placerPourService('j');
     this.afficher();
 
-    etiquettesTactiles(ETIQUETTES_OK);
+    this.etiquettes(ETIQUETTES_OK);
     const tactile = estTactile();
     this.afficherIntro('LIONEL - Le Chambreur', [
       'BUT : vise le mur derrière Lionel (jaune = 3 points, rouge = 5)',
@@ -156,9 +156,21 @@ export class LionelMatch extends BossScene {
       (tactile ? 'Lob' : 'Z') + ' : lob (2 points s\'il tombe dans le sable : une bonne arme !)',
       'Attrape un lob juste en dessous = SUPER LANCER !',
       (tactile ? 'Lancer' : 'ESPACE') + ' en courant vers le frisbee = plongeon',
-    ], () => this.presentation(() => choisirDifficulte(this, 'lionel', DIFFICULTES, (nom, diff) => {
+    ], () => this.presentation(() => this.choixDifficulte()));
+  }
+
+  choixDifficulte() {
+    // ◀ ▶ du joystick pour choisir (mêmes boutons que l'écran de difficulté)
+    this.etiquettes({ haut: null, bas: null, z: null, x: null, espace: 'OK' });
+    choisirDifficulte(this, 'lionel', DIFFICULTES, (nom, diff) => {
       this.nomDiff = nom; this.diff = diff; this.demarrerMatch();
-    }, 'frisbee_rebond')));
+    }, 'frisbee_rebond');
+  }
+
+  // Boutons tactiles de la scène + directions du joystick (sur téléphone)
+  etiquettes(e) {
+    etiquettesTactiles(e);
+    if (this.joystick) this.joystick.directions(e);
   }
 
   // Lancement du match (aussi appelé directement par les tests)
@@ -184,7 +196,7 @@ export class LionelMatch extends BossScene {
       passer: texte(this, LARGEUR - 12, HAUTEUR - 14, tactile ? '' : 'X : passer l\'entraînement', 14, '#aaaaaa')
         .setOrigin(1, 1).setDepth(92),
     };
-    etiquettesTactiles({ ...ETIQUETTES_JEU, x: 'Passer' });
+    this.etiquettes({ ...ETIQUETTES_JEU, x: 'Passer' });
     this.placerPourService('l');
     this.etat = 'pret';
     encartRapide(this, 'ENTRAÎNEMENT', 'Lionel va te montrer les bases', '#7fd0ff', 1.3);
@@ -652,7 +664,7 @@ export class LionelMatch extends BossScene {
     this.j.poseTemps = 0; this.l.poseTemps = 0;
     this.placerPourService(serveur);
     this.majHud();
-    etiquettesTactiles(ETIQUETTES_JEU);
+    this.etiquettes(ETIQUETTES_JEU);
     this.etat = 'pret';
     encartRapide(this, this.numSet === 3 ? 'SET DÉCISIF !' : `SET ${this.numSet}`, 'Prêt ?... Lancez !', '#ffd84a', 1.3);
     annoncer('Prêt ? Lancez !');
@@ -702,7 +714,7 @@ export class LionelMatch extends BossScene {
   //  ÉCRANS
   // =================================================================
   presentation(ensuite) {
-    etiquettesTactiles(ETIQUETTES_OK);
+    this.etiquettes(ETIQUETTES_OK);
     const el = [];
     el.push(this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0b0b14, 0.96).setDepth(100));
     const portrait = this.add.image(LARGEUR + 200, HAUTEUR / 2 + 10, 'lionel_portrait').setDepth(101);
@@ -749,7 +761,7 @@ export class LionelMatch extends BossScene {
   ecranVictoire(message) {
     const P = 1000, cx = LARGEUR / 2;
     taireAnnonceur();
-    jouerSon(this, 'greg_foule'); jouerSon(this, 'frisbee_sifflet');
+    jouerSon(this, 'lionel_foule'); jouerSon(this, 'frisbee_sifflet');
     this.add.rectangle(cx, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0a0614, 0.97).setDepth(P);
     const rayons = this.add.graphics().setDepth(P + 1).setPosition(300, 300);
     for (let k = 0; k < 18; k++) {
@@ -762,7 +774,7 @@ export class LionelMatch extends BossScene {
     const lionel = this.add.image(LARGEUR + 200, HAUTEUR - 30, 'lionel_defaite').setOrigin(0.5, 1).setDepth(P + 2);
     lionel.setScale(330 / lionel.height).setFlipX(!this.estIllustre('lionel_defaite'));
     this.tweens.add({ targets: lionel, x: 760, duration: 500, ease: 'Cubic.Out' });
-    const trophee = this.add.image(300, 300, 'trophee').setDepth(P + 3).setScale(0).setAngle(-30);
+    const trophee = this.add.image(300, 300, 'lionel_trophee').setDepth(P + 3).setScale(0).setAngle(-30);
     this.tweens.add({ targets: trophee, scale: 1.15, angle: 0, delay: 350, duration: 600, ease: 'Back.Out' });
     this.tweens.add({ targets: trophee, y: 290, delay: 1000, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
     this.time.addEvent({ delay: 180, repeat: -1, callback: () => {

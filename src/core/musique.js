@@ -3,7 +3,7 @@
 //  - sur iPhone, elles s'entendent même en mode silencieux ;
 //  - les navigateurs bloquent la musique tant qu'on n'a pas touché l'écran ou le clavier :
 //    on la (re)lance donc au premier appui si elle a été bloquée.
-import { MANIFESTE } from '../../assets/manifeste.js';
+import { MANIFESTE } from './manifestes.js';
 import { Sauvegarde } from './sauvegarde.js';
 
 const pistes = {};

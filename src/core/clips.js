@@ -1,7 +1,7 @@
 // Clips (GIF ou vidéo) affichés par-dessus le jeu, par exemple pour une attaque spéciale.
-// Ils sont listés dans assets/manifeste.js (rubrique "clips"). Si le fichier n'existe pas,
+// Ils sont listés dans le manifeste de chaque boss (rubrique "clips"). Si le fichier n'existe pas,
 // rien ne s'affiche et le jeu utilise son animation dessinée par le code.
-import { MANIFESTE } from '../../assets/manifeste.js';
+import { MANIFESTE } from './manifestes.js';
 
 // Au démarrage : vérifie quels clips existent vraiment (un fichier absent = on l'ignore)
 export function verifierClips() {
