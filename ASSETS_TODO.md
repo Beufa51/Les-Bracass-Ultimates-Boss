@@ -72,7 +72,7 @@ Sons Greg : greg_coup, greg_coup_fort, greg_bloque, greg_esquive, greg_cloche, g
 
 ## Lionel (frisbee façon Windjammers, vue de 3/4)
 Planches manga (maillot vert/crème n°93) : **intégrées**. Originaux dans `assets_inbox/lionel_planche_1.jpg`, `_2.jpg`, `lionel_entier.jpg`,
-découpés par `outils/decouper_lionel.py` dans `assets/sprites/lionel/` (fond transparent, tournés vers la gauche).
+découpés par `outils/decouper_frisbee.py` dans `assets/sprites/lionel/` (fond transparent, tournés vers la gauche).
 
 | Nom du fichier | Statut | Pose (planche d'origine) |
 |---|---|---|

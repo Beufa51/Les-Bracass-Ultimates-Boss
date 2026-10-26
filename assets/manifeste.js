@@ -133,7 +133,7 @@ export const MANIFESTE = {
     greg_victoire:            { fichier: null, largeur: 360, hauteur: 460, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'victoire', ...GREG } },
 
     // ---------- LIONEL (frisbee façon Windjammers) ----------
-    // Lionel : poses découpées dans ses planches manga (outils/decouper_lionel.py), tournées vers la GAUCHE.
+    // Lionel : poses découpées dans ses planches manga (outils/decouper_frisbee.py), tournées vers la GAUCHE.
     // Dessins provisoires (fichier: null) : tournés vers la DROITE (le jeu les retourne au besoin).
     // Les pieds touchent le bas de la case. "course" dessinée = 4 images côte à côte.
     // Pas d'attente sans frisbee sur les planches : "garde" utilise la course ; "nargue" utilise la victoire.

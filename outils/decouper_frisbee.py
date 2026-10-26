@@ -1,7 +1,7 @@
 # Découpe les planches manga du match de frisbee en une image par pose, fond blanc rendu transparent :
 #  - Lionel (assets_inbox/lionel_*.jpg) : poses tournées vers la GAUCHE (il joue à droite du terrain) ;
 #  - ton joueur (assets_inbox/heros_frisbee_planche.jpg) : poses tournées vers la DROITE.
-# Utilisation : python3 outils/decouper_lionel.py
+# Utilisation : python3 outils/decouper_frisbee.py
 import numpy as np
 from PIL import Image, ImageFilter
 from scipy import ndimage as nd
