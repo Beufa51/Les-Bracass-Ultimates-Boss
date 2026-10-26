@@ -27,5 +27,13 @@
   <!-- Moteur Phaser 3 (gratuit, licence MIT), copié dans lib/ pour marcher sans Internet -->
   <script src="lib/phaser.min.js"></script>
   <script type="module" src="src/main.js"></script>
+  <script>
+    // toujours la dernière version (voir sw.js) ; la toute première fois, on recharge une fois pour en profiter
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      const avait = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+      navigator.serviceWorker.addEventListener('controllerchange', () => { if (!avait && !sessionStorage.getItem('swRecharge')) { sessionStorage.setItem('swRecharge', '1'); location.reload(); } });
+    }
+  </script>
 </body>
 </html>
