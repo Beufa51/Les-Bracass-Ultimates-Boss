@@ -14,6 +14,7 @@ import { BossScene } from '../../core/BossScene.js';
 import { creerTouches } from '../../core/clavier.js';
 import { texte, voile } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
+import { jouerMusique } from '../../core/musique.js';
 import { annoncer, taireAnnonceur } from '../../core/annonceur.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
@@ -139,6 +140,8 @@ export class LionelMatch extends BossScene {
     // sur téléphone : joystick qui suit le pouce et pause en haut à droite, SEULEMENT pendant ce match
     // (le hub, Greg et les autres boss gardent la croix et la pause au milieu)
     this.joystick = installerJoystick(this);
+    // musique de fond (Windjammers, « Lawn Court ») : démarre pendant l'écran des commandes, en boucle
+    jouerMusique(this, 'lionel_musique');
     // ambiance du public de la plage
     if (this.cache.audio.exists('lionel_ambiance')) {
       this.ambiance = this.sound.add('lionel_ambiance', { loop: true, volume: 0.18 });

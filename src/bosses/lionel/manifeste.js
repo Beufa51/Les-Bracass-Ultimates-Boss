@@ -55,6 +55,8 @@ export const MANIFESTE = {
   },
 
   sons: {
+    // musique de fond (jouée par src/core/musique.js, en boucle) : Windjammers, « Lawn Court » ; volume de 0 à 1
+    lionel_musique:   { fichier: 'audio/lionel/lionel_musique.mp3', musique: true, volume: 0.4 },
     // Lionel (frisbee) : générés par outils/lionel/generer_sons.py
     frisbee_lancer:  { fichier: 'audio/lionel/frisbee_lancer.wav', provisoire: { frequence: 600, duree: 0.06 } },
     frisbee_attrape: { fichier: 'audio/lionel/frisbee_attrape.wav', provisoire: { frequence: 300, duree: 0.05 } },
