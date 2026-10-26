@@ -4,8 +4,8 @@
 **Étape 0 terminée : squelette jouable.**
 **Étape 1 terminée : boss Greg TERMINÉ** (illustrations, sons, équilibrage testé par bots, écran de victoire avec trophée).
 Copie de référence de la version finale : branche `greg-termine` (`version-1-greg` = état un peu plus ancien).
-**Étape 2 en cours : boss Lionel JOUABLE** (match de frisbee façon Windjammers, visuels provisoires dessinés par le code).
-Prochaine étape : découper/détourer les planches manga de Lionel (à déposer dans `assets_inbox/`).
+**Étape 2 en cours : boss Lionel JOUABLE** (match de frisbee façon Windjammers), Lionel en illustrations manga.
+Travail sur la branche `lionel` (pas encore fusionnée dans `main`, donc pas encore en ligne).
 
 ## Décisions
 - Moteur : **Phaser 3.90** (gratuit, licence MIT), copié dans `lib/`. Aucune installation pour jouer.
@@ -127,19 +127,26 @@ Prochaine étape : découper/détourer les planches manga de Lionel (à déposer
   - Lionel chambreur : bulles de moquerie quand il marque / encaisse, il garde parfois le frisbee pour te narguer.
   - IA de Lionel : il devine où arrive le frisbee (simulation du vol) avec un temps de réaction et une erreur selon la difficulté,
     plonge s'il est trop loin, se replace en suivant ta position.
-  - Aides (FACILE / NORMAL) : cercle vert au sol là où le frisbee va arriver. Le point de chute des lobs est toujours montré.
+  - Aides : cercle vert au sol là où le frisbee va arriver (FACILE : dès le lancer ; NORMAL : une fois le filet passé ;
+    CHAMPION : aucune). Le point de chute des lobs est toujours montré.
   - Difficulté FACILE / NORMAL / CHAMPION (écran commun `src/core/difficulte.js`, aussi utilisé par Greg), record par difficulté.
   - Fin : rang S/A/B/C (points encaissés, sets perdus, temps), écran de victoire (trophée, Lionel à genoux, badge violet au frisbee).
   - Menu F1 : match depuis le set 1, ou directement au set décisif (1-1).
   - Tout l'équilibrage dans `src/bosses/lionel/reglages.js` ; dessins provisoires dans `src/core/dessins_frisbee.js` ;
     bruitages générés par `outils/generer_sons_lionel.py`. Effets manga partagés : `src/core/effets.js`.
   - Toute la logique avance dans update() (pas de minuteries Phaser) : les bots de test peuvent jouer en accéléré.
-  - Planches manga de Lionel reçues dans la discussion (4 poses + 5 poses + portrait) mais PAS encore dans le dépôt :
-    les déposer dans `assets_inbox/` pour les découper (liste des poses dans ASSETS_TODO.md).
+  - Lionel en illustrations : planches `assets_inbox/lionel_planche_1.jpg` (4 poses), `_2.jpg` (5 poses), `lionel_entier.jpg`,
+    découpées par `outils/decouper_lionel.py` (fond blanc retiré, poses tournées vers la GAUCHE, réduites de moitié)
+    dans `assets/sprites/lionel/`. Taille à l'écran : `echelleIllustre` dans reglages.js.
+    Pas de pose d'attente sans frisbee : « garde » = la course (avec de petits bonds) ; « nargue » = la victoire.
+    Ton joueur (maillot bleu) reste dessiné par le code (`heros_frisbee_*`).
+  - Équilibrage (bots « humains » qui voient le frisbee avec du retard, et lisent l'aide quand elle est affichée) :
+    FACILE = un enfant gagne ; NORMAL = bon joueur gagne, moyen ~1 fois sur 3, enfant perd ; CHAMPION = très dur.
+    Lionel se trompe davantage quand le frisbee va vite ; ses courbes sont son arme principale.
 
 ## Ordre de développement (mis à jour)
 1. ~~Greg (style Hajime no Ippo)~~ fait
-2. **Lionel**  ← en cours : jouable, reste les illustrations (choisi avant Beufa)
+2. **Lionel**  ← en cours : jouable avec ses illustrations, à essayer puis fusionner dans `main` (choisi avant Beufa)
    - Jeu : **exactement comme Windjammers** (Neo Geo, 1994) — lancer de frisbee en 1 contre 1, vue de 3/4 au-dessus du terrain,
      buts à 3 et 5 points, lancers courbes, lob, super lancer quand on rattrape au bon moment, sets.
    - Badge : médaille violette avec un frisbee.

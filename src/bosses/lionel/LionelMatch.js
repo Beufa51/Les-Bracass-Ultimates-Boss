@@ -282,13 +282,17 @@ export class LionelMatch extends BossScene {
     const d = this.d;
     const versLui = d && (d.type === 'lob' ? d.lob.x1 > T.filet : (d.vx > 0 || (d.arret > 0 && d.lanceur === 'j')));
     if (versLui) {
-      if (!p.plan) { p.plan = { reaction: D.reaction * entre(0.8, 1.2), erreur: entre(-1, 1) * D.erreur }; }
+      if (!p.plan) {
+        // plus le frisbee va vite, plus il se trompe
+        const vite = d.type === 'lob' ? 1 : Math.max(1, Math.hypot(d.vx, d.vy) / R.vitesseDisque);
+        p.plan = { reaction: D.reaction * entre(0.8, 1.2), erreur: entre(-1, 1) * D.erreur * vite * vite };
+      }
       if (p.plan.reaction > 0) { p.plan.reaction -= dt; }
       else {
         const pr = this.prevoir(d, p);
         if (pr) {
           // plus le frisbee approche, plus il corrige son erreur
-          const corr = pr.temps < 0.35 ? 0.35 : 1;
+          const corr = pr.temps < 0.3 ? 0.55 : 1;
           p.cible = { x: pr.x, y: borne(pr.y + p.plan.erreur * corr, LIMITES.y0, LIMITES.y1) };
           // trop loin pour y arriver en courant : il plonge
           const dist = Math.hypot(p.cible.x - p.x, p.cible.y - p.y);
@@ -590,8 +594,12 @@ export class LionelMatch extends BossScene {
 
   // vrai si l'image vient d'un fichier (illustration) et pas d'un dessin du code
   estIllustre(cle) {
-    const src = this.textures.exists(cle) && this.textures.get(cle).getSourceImage();
-    return !!src && !(src instanceof HTMLCanvasElement);
+    this.illustrees = this.illustrees || {};
+    if (!(cle in this.illustrees)) {
+      const src = this.textures.exists(cle) && this.textures.get(cle).getSourceImage();
+      this.illustrees[cle] = !!src && !(src instanceof HTMLCanvasElement);
+    }
+    return this.illustrees[cle];
   }
 
   // Écran de victoire : rayons, trophée, Lionel à genoux, badge, rang
@@ -659,11 +667,17 @@ export class LionelMatch extends BossScene {
       if (anim) { if (p.sprite.anims.currentAnim?.key !== cle || !p.sprite.anims.isPlaying) p.sprite.play(cle); }
       else if (p.sprite.texture.key !== cle || p.sprite.anims.isPlaying) { p.sprite.stop(); p.sprite.setTexture(cle); }
       // en courant, il regarde dans le sens de sa course
-      let flip = p === this.l;
-      if (pose === 'course' && Math.abs(p.vx) > 40) flip = p.vx < 0;
-      if (pose === 'plongeon' && Math.abs(p.glisseX) > 0.3) flip = p.glisseX < 0;
-      p.sprite.setFlipX(flip);
-      p.sprite.setPosition(p.x, p.y + 6).setDepth(profondeur(p.y));
+      let versGauche = p === this.l;
+      if (pose === 'course' && Math.abs(p.vx) > 40) versGauche = p.vx < 0;
+      if (pose === 'plongeon' && Math.abs(p.glisseX) > 0.3) versGauche = p.glisseX < 0;
+      // les illustrations de Lionel regardent vers la gauche, les dessins du code vers la droite
+      const illustre = this.estIllustre(cle);
+      p.sprite.setFlipX(versGauche !== illustre);
+      p.sprite.setScale(illustre ? R.echelleIllustre : 1);
+      // une illustration de course n'a qu'une image : petits bonds pour l'animer
+      const bond = illustre && pose === 'course' ? -Math.abs(Math.sin(this.horloge * 14)) * 5 : 0;
+      p.sprite.setAngle(illustre && pose === 'course' ? Math.sin(this.horloge * 14) * 3 : 0);
+      p.sprite.setPosition(p.x, p.y + 6 + bond).setDepth(profondeur(p.y));
       p.ombre.setPosition(p.x, p.y + 2).setDepth(4);
     }
     // frisbee
@@ -685,9 +699,9 @@ export class LionelMatch extends BossScene {
       this.ombreDisque.setVisible(false);
       // pendant qu'il nargue, Lionel fait tourner le frisbee au bout du doigt
       if (p === this.l && p.nargue && this.choisirPose(p) === 'nargue') this.disque.setPosition(p.x - 6, p.y - 132);
-      // les poses dessinées par le code ont déjà le frisbee en main
+      // ces poses ont déjà le frisbee en main (dessins et illustrations ; le plongeon illustré aussi)
       const pose = this.choisirPose(p);
-      if (POSES_AVEC_DISQUE.includes(pose) && !this.estIllustre(p.prefixe + '_' + pose)) this.disque.setVisible(false);
+      if (POSES_AVEC_DISQUE.includes(pose) || (pose === 'plongeon' && this.estIllustre(p.prefixe + '_plongeon'))) this.disque.setVisible(false);
     } else { this.disque.setVisible(false); this.ombreDisque.setVisible(false); }
     this.dessinerReperes();
     this.majChrono();

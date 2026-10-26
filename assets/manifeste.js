@@ -133,22 +133,24 @@ export const MANIFESTE = {
     greg_victoire:            { fichier: null, largeur: 360, hauteur: 460, images: 1, vitesse: 1, provisoire: { forme: 'boxeurFace', pose: 'victoire', ...GREG } },
 
     // ---------- LIONEL (frisbee façon Windjammers) ----------
-    // Joueurs vus de 3/4, dessinés tournés vers la DROITE (le jeu retourne Lionel, qui joue à droite).
-    // Les pieds touchent le bas de la case. "course" = 4 images côte à côte.
+    // Lionel : poses découpées dans ses planches manga (outils/decouper_lionel.py), tournées vers la GAUCHE.
+    // Dessins provisoires (fichier: null) : tournés vers la DROITE (le jeu les retourne au besoin).
+    // Les pieds touchent le bas de la case. "course" dessinée = 4 images côte à côte.
+    // Pas d'attente sans frisbee sur les planches : "garde" utilise la course ; "nargue" utilise la victoire.
     lionel_terrain:  { fichier: null, largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'terrainFrisbee', terrain: TERRAIN_FRISBEE } },
     frisbee:         { fichier: null, largeur: 34, hauteur: 34, images: 4, vitesse: 16, provisoire: { forme: 'frisbee' } },
-    lionel_garde:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...LIONEL } },
-    lionel_course:   { fichier: null, largeur: 110, hauteur: 140, images: 4, vitesse: 10, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...LIONEL } },
-    lionel_tient:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...LIONEL } },
-    lionel_lance:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'lance', ...LIONEL } },
-    lionel_super:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'super', ...LIONEL } },
-    lionel_rattrape: { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'rattrape', ...LIONEL } },
-    lionel_plongeon: { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'plongeon', ...LIONEL } },
-    lionel_nargue:   { fichier: null, largeur: 110, hauteur: 140, images: 4, vitesse: 12, provisoire: { forme: 'joueurFrisbee', pose: 'nargue', ...LIONEL } },
-    lionel_victoire: { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'victoire', ...LIONEL } },
-    lionel_touche:   { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'touche', ...LIONEL } },
-    lionel_defaite:  { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'defaite', ...LIONEL } },
-    lionel_portrait: { fichier: null, largeur: 300, hauteur: 380, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'nargue', ...LIONEL } },
+    lionel_garde:    { fichier: 'sprites/lionel/lionel_course.png', largeur: 181, hauteur: 270, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...LIONEL } },
+    lionel_course:   { fichier: 'sprites/lionel/lionel_course.png', largeur: 181, hauteur: 270, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...LIONEL } },
+    lionel_tient:    { fichier: 'sprites/lionel/lionel_tient.png', largeur: 178, hauteur: 266, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...LIONEL } },
+    lionel_lance:    { fichier: 'sprites/lionel/lionel_lance.png', largeur: 248, hauteur: 269, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'lance', ...LIONEL } },
+    lionel_super:    { fichier: 'sprites/lionel/lionel_super.png', largeur: 225, hauteur: 210, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'super', ...LIONEL } },
+    lionel_rattrape: { fichier: 'sprites/lionel/lionel_rattrape.png', largeur: 158, hauteur: 305, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'rattrape', ...LIONEL } },
+    lionel_plongeon: { fichier: 'sprites/lionel/lionel_plongeon.png', largeur: 328, hauteur: 192, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'plongeon', ...LIONEL } },
+    lionel_nargue:   { fichier: 'sprites/lionel/lionel_victoire.png', largeur: 161, hauteur: 355, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'nargue', ...LIONEL } },
+    lionel_victoire: { fichier: 'sprites/lionel/lionel_victoire.png', largeur: 161, hauteur: 355, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'victoire', ...LIONEL } },
+    lionel_touche:   { fichier: 'sprites/lionel/lionel_touche.png', largeur: 226, hauteur: 238, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'touche', ...LIONEL } },
+    lionel_defaite:  { fichier: 'sprites/lionel/lionel_defaite.png', largeur: 154, hauteur: 168, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'defaite', ...LIONEL } },
+    lionel_portrait: { fichier: 'sprites/lionel/lionel_portrait.png', largeur: 215, hauteur: 650, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'nargue', ...LIONEL } },
     heros_frisbee_garde:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...HEROS_FRISBEE } },
     heros_frisbee_course:   { fichier: null, largeur: 110, hauteur: 140, images: 4, vitesse: 10, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...HEROS_FRISBEE } },
     heros_frisbee_tient:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...HEROS_FRISBEE } },
