@@ -4,8 +4,12 @@
 **Étape 0 terminée : squelette jouable.**
 **Étape 1 terminée : boss Greg TERMINÉ** (illustrations, sons, équilibrage testé par bots, écran de victoire avec trophée).
 Copie de référence de la version finale : branche `greg-termine` (`version-1-greg` = état un peu plus ancien).
-**Étape 2 en cours : boss Lionel JOUABLE** (match de frisbee façon Windjammers), Lionel en illustrations manga.
-Fusionné dans `main` : en ligne.
+**Étape 2 terminée : boss Lionel VALIDÉ par le propriétaire** (match de frisbee façon Windjammers, illustrations manga
+mains vides, entraînement, joystick, jauges du public, 3 supers, surprises, difficulté PERSO). En ligne sur `main`.
+**Étape 3 : boss Kédric — À COMMENCER.** On sait seulement : porte « Kédric » dans le hub (`src/bosses/kedric/index.js`, pret: false),
+badge = médaille verte avec un ballon de football américain. Le type de jeu, la personnalité et les images sont à demander au propriétaire.
+Rappel : Kédric a son propre dossier (`src/bosses/kedric/`, partir de `src/bosses/modele/`), ne touche ni Greg ni Lionel.
+Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
 ## Décisions
 - Moteur : **Phaser 3.90** (gratuit, licence MIT), copié dans `lib/`. Aucune installation pour jouer.
@@ -224,7 +228,9 @@ Fusionné dans `main` : en ligne.
 
 ## Ordre de développement (mis à jour)
 1. ~~Greg (style Hajime no Ippo)~~ fait
-2. **Lionel**  ← jouable en ligne avec ses illustrations, à essayer et ajuster (choisi avant Beufa)
+2. ~~Lionel (Windjammers)~~ fait et validé
+3. **Kédric**  ← prochain boss (le propriétaire a choisi de le faire maintenant)
+   Ancienne fiche Lionel, pour mémoire :
    - Jeu : **exactement comme Windjammers** (Neo Geo, 1994) — lancer de frisbee en 1 contre 1, vue de 3/4 au-dessus du terrain,
      buts à 3 et 5 points, lancers courbes, lob, super lancer quand on rattrape au bon moment, sets.
    - Badge : médaille violette avec un frisbee.
