@@ -901,9 +901,8 @@ export class GregCombat extends BossScene {
     if (c.t >= R.secondeCompte) {
       c.t = 0; c.n++;
       jouerSon(this, 'greg_compte');
-      // compte de l'arbitre en japonais, comme dans Hajime no Ippo
-      if (c.n >= 10) this.parler('K.O. !');
-      else this.parler(JAPONAIS[c.n - 1], { japonais: true, vitesse: 1.1, hauteur: 0.9 });
+      // compte vocal désactivé (voix de synthèse pas assez naturelle) : le compte reste à l'écran
+      if (R.compteVocal) this.parler(JAPONAIS[Math.min(c.n, 9) - 1], { japonais: true, vitesse: 1.1, hauteur: 0.9 });
       this.texteCompte.setText(c.n >= 10 ? 'K.O. !!' : String(c.n)).setScale(1.6);
       this.tweens.add({ targets: this.texteCompte, scale: 1, duration: 150 });
       if (c.qui === 'greg') {

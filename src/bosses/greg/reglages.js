@@ -124,6 +124,7 @@ export const REGLAGES = {
   // Chaque coup qui TOUCHE remplit une jauge cachée (qui se vide toute seule). Pleine => Greg titube,
   // sans défense pendant 'duree' secondes : tous tes coups passent !
   etourdi: { parCoup: 15, parContre: 35, baisse: 18, duree: 1.8 },
+  compteVocal: false,          // compte de l'arbitre à voix haute (japonais) ; false = seulement à l'écran
   annonceur: true,             // voix de synthèse : "Box !", compte, "K.O. !" (si le navigateur en a une)
 
   // ---------- Moment secret : Greg baisse la garde un très court instant ----------
