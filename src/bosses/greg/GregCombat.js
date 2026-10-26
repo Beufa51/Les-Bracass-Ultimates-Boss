@@ -1101,6 +1101,55 @@ export class GregCombat extends BossScene {
       (this.secretFait ? '\n(Coup secret trouvé !)' : '');
   }
 
+  // Écran de victoire : rayons dorés, Greg amoché qui te remet le trophée, ton rang et ton temps
+  ecranVictoire(message) {
+    const P = 1000, cx = LARGEUR / 2, el = [];
+    taireAnnonceur();
+    jouerSon(this, 'greg_foule'); jouerSon(this, 'greg_cloche');
+    el.push(this.add.rectangle(cx, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0a0614, 0.97).setDepth(P));
+    // rayons qui tournent
+    const rayons = this.add.graphics().setDepth(P + 1).setPosition(300, 300);
+    for (let k = 0; k < 18; k++) {
+      const a = (k / 18) * Math.PI * 2;
+      rayons.fillStyle(k % 2 ? 0xffd84a : 0xff8a3d, 0.16).beginPath();
+      rayons.moveTo(0, 0); rayons.lineTo(Math.cos(a) * 700, Math.sin(a) * 700); rayons.lineTo(Math.cos(a + 0.17) * 700, Math.sin(a + 0.17) * 700);
+      rayons.closePath(); rayons.fillPath();
+    }
+    this.tweens.add({ targets: rayons, angle: 360, duration: 20000, repeat: -1 });
+    el.push(rayons);
+    // Greg, le visage marqué, qui tend le trophée
+    const cleGreg = this.textures.exists('greg_touche_pied') ? 'greg_touche_pied' : 'greg_garde';
+    const greg = this.add.image(LARGEUR + 200, HAUTEUR + 10, cleGreg).setOrigin(0.5, 1).setDepth(P + 2).setFlipX(true);
+    greg.setScale(500 / greg.height);
+    this.tweens.add({ targets: greg, x: 760, duration: 500, ease: 'Cubic.Out' });
+    // le trophée apparaît en tournoyant
+    const trophee = this.add.image(300, 300, 'trophee').setDepth(P + 3).setScale(0).setAngle(-30);
+    this.tweens.add({ targets: trophee, scale: 1.15, angle: 0, delay: 350, duration: 600, ease: 'Back.Out' });
+    this.tweens.add({ targets: trophee, y: 290, delay: 1000, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
+    // étincelles
+    this.time.addEvent({ delay: 180, repeat: -1, callback: () => {
+      const e = this.add.star(300 + Phaser.Math.Between(-130, 130), 300 + Phaser.Math.Between(-150, 120), 4, 3, 9, 0xfff3a8).setDepth(P + 4);
+      this.tweens.add({ targets: e, scale: 0, angle: 180, duration: 700, onComplete: () => e.destroy() });
+    } });
+    // textes
+    const titre = texte(this, 300, 70, 'VICTOIRE !!', 64, '#ffd84a', { fontStyle: 'bold italic', stroke: '#b3202c', strokeThickness: 12 }).setDepth(P + 5).setScale(3).setAlpha(0);
+    this.tweens.add({ targets: titre, scale: 1, alpha: 1, duration: 300, ease: 'Back.Out', onComplete: () => this.cameras.main.shake(200, 0.01) });
+    const lignes = message.split('\n');
+    const rang = (lignes[1] || '').match(/RANG (\w)/);
+    if (rang) {
+      const r = texte(this, 140, 440, rang[1], 96, '#ffffff', { fontStyle: 'bold', stroke: '#b3202c', strokeThickness: 12 }).setDepth(P + 5).setScale(0);
+      this.tweens.add({ targets: r, scale: 1, delay: 900, duration: 300, ease: 'Back.Out' });
+      texte(this, 140, 375, 'RANG', 22, '#ffd84a').setDepth(P + 5);
+    }
+    texte(this, 300, 135, lignes[0], 22, '#ffffff').setDepth(P + 5);
+    texte(this, 380, 440, lignes.slice(1).join('\n').replace(/RANG \w\s+-\s+/, ''), 18, '#ffffff', { align: 'left', lineSpacing: 6 }).setOrigin(0, 0.5).setDepth(P + 5);
+    bulle(this, 760, 120, 'Greg : « Ok... t\'as gagné. Prends-le, ce trophée. »', 99999).setDepth(P + 5);
+    const badge = this.add.image(140, 210, 'badge_' + this.identite.id).setDepth(P + 5).setScale(0);
+    this.tweens.add({ targets: badge, scale: 2, delay: 1200, duration: 300, ease: 'Back.Out' });
+    texte(this, 140, 260, 'Badge Greg !', 18, '#ffd84a').setDepth(P + 5);
+    texte(this, LARGEUR / 2, HAUTEUR - 22, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, 18, '#aaaaaa').setDepth(P + 5);
+  }
+
   // Quel portrait du coach afficher dans le coin
   portraitCoach(fin) {
     const ok = (k) => this.textures.exists(k);

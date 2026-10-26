@@ -2,7 +2,8 @@
 
 ## Où on en est
 **Étape 0 terminée : squelette jouable.**
-**Étape 1 terminée : boss Greg jouable** (formes provisoires dessinées par le code).
+**Étape 1 terminée : boss Greg TERMINÉ** (illustrations, sons, équilibrage testé par bots, écran de victoire avec trophée).
+Copie de référence de la version finale : branche `greg-termine` (`version-1-greg` = état un peu plus ancien).
 
 ## Décisions
 - Moteur : **Phaser 3.90** (gratuit, licence MIT), copié dans `lib/`. Aucune installation pour jouer.
@@ -88,6 +89,8 @@
   - Résultats des bots : parfait K.O. au round 2 (rang S), moyen K.O. au round 2 (A/B),
     débutant K.O. au round 2 (C), spam / garde seule / tortue PERDENT.
   - Au tapis : alterner ◀ ▶ pour se relever.
+  - Écran de victoire : rayons, trophée, Greg amoché, badge, rang, temps, record (`ecranVictoire`,
+    BossScene permet à chaque boss d'avoir le sien).
   - Fin : classement S/A/B/C (coups reçus, tapis, temps) + record gardé dans le navigateur.
   - Esquive : protège 0,45 s ; « Trop tôt ! » / « Mauvais côté ! » s'affichent ; le coach commente
     tes erreurs entre les rounds. Garde avec souffle à 0 = garde brisée.
@@ -108,7 +111,8 @@
 
 ## Ordre de développement (mis à jour)
 1. ~~Greg (style Hajime no Ippo)~~ fait
-2. **Beufa, phase quiz**  ← prochaine étape
+2. **Lionel**  ← prochaine étape (choisi avant Beufa)
+3. Beufa, phase quiz (plus tard)
 3. Julien
 4. Kédric
 5. Rémi

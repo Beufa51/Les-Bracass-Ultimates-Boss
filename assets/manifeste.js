@@ -93,6 +93,7 @@ export const MANIFESTE = {
     coach_malin:  { fichier: 'sprites/greg/coach_malin.jpg', largeur: 220, hauteur: 206, images: 1, vitesse: 1 },
     coach_severe: { fichier: 'sprites/greg/coach_severe.jpg', largeur: 220, hauteur: 189, images: 1, vitesse: 1 },
     coach_kbg:    { fichier: 'sprites/greg/coach_kbg.jpg', largeur: 220, hauteur: 190, images: 1, vitesse: 1 },
+    trophee: { fichier: null, largeur: 220, hauteur: 260, images: 1, vitesse: 1, provisoire: { forme: 'trophee' } },
     greg_coach: { fichier: null, largeur: 160, hauteur: 160, images: 1, vitesse: 1, provisoire: { forme: 'coach' } },
     heros_boxe_garde:         { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'garde', ...HEROS_BOXE } },
     heros_boxe_jab:           { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'jab', ...HEROS_BOXE } },
