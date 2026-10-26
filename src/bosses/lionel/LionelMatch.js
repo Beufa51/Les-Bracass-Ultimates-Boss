@@ -17,7 +17,7 @@ import { jouerSon } from '../../core/ressources.js';
 import { annoncer, taireAnnonceur } from '../../core/annonceur.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { onomatopee, flash, encart, bulle, lignesImpact } from '../../core/effets.js';
-import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
+import { estTactile, etiquettesTactiles, modeJoystick, placerBoutonPause } from '../../core/tactile.js';
 import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
 import { choisirDifficulte, cleRecord } from '../../core/difficulte.js';
 import { IDENTITE, TERRAIN as T, DIFFICULTES, REGLAGES as R, REPLIQUES } from './reglages.js';
@@ -130,6 +130,10 @@ export class LionelMatch extends BossScene {
     this.creerHud();
     this.touches = creerTouches(this);
     this.events.once('shutdown', () => taireAnnonceur());
+    // sur téléphone : joystick qui suit le pouce et pause en haut à droite, SEULEMENT pendant ce match
+    // (le hub, Greg et les autres boss gardent la croix et la pause au milieu)
+    modeJoystick(true); placerBoutonPause('droite');
+    this.events.once('shutdown', () => { modeJoystick(false); placerBoutonPause('centre'); });
     // ambiance du public de la plage
     if (this.cache.audio.exists('greg_ambiance')) {
       this.ambiance = this.sound.add('greg_ambiance', { loop: true, volume: 0.18 });
@@ -176,7 +180,8 @@ export class LionelMatch extends BossScene {
     this.tuto = {
       etape: 0, enAttente: false,
       banniere: texte(this, LARGEUR / 2, 150, '', 20, '#ffffff', { backgroundColor: '#000000cc', padding: { x: 12, y: 6 } }).setDepth(92),
-      passer: texte(this, LARGEUR - 12, HAUTEUR - 14, tactile ? 'Passer : passer l\'entraînement' : 'X : passer l\'entraînement', 14, '#aaaaaa')
+      // sur téléphone, le bouton « Passer » suffit
+      passer: texte(this, LARGEUR - 12, HAUTEUR - 14, tactile ? '' : 'X : passer l\'entraînement', 14, '#aaaaaa')
         .setOrigin(1, 1).setDepth(92),
     };
     etiquettesTactiles({ ...ETIQUETTES_JEU, x: 'Passer' });
