@@ -23,7 +23,7 @@ export const DIFFICULTES = {
     aides: 'tot', choix: { droit: 40, biais: 34, courbe: 14, lob: 12 }, texte: 'Lionel court moins vite et rate plus souvent. Idéal pour apprendre.' },
   normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 1,    reaction: 0.22, erreur: 40, disque: 1,    superHasard: 0.08,
     aides: 'filet', choix: { droit: 34, biais: 34, courbe: 20, lob: 12 }, texte: 'Le vrai match.' },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.12, reaction: 0.15, erreur: 24, disque: 1.12, superHasard: 0.12,
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.12, reaction: 0.15, erreur: 24, disque: 1.12, superHasard: 0.08,
     aides: false, choix: { droit: 30, biais: 36, courbe: 22, lob: 12 }, texte: 'Sans aide, lancers rapides et super lancers fréquents. Pour les vrais.' },
 };
 
