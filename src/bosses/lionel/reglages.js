@@ -16,11 +16,13 @@ export const TERRAIN = {
 //  vitesse : x vitesse de course de Lionel ; reaction : temps avant qu'il réagisse au lancer ;
 //  erreur : de combien il se trompe (pixels) sur l'endroit où arrive le frisbee ;
 //  disque : x vitesse de ses lancers ; superHasard : chance d'un super lancer "gratuit" (set 2 et plus)
+//  aides : 'tot' = cercle vert dès le lancer, 'filet' = seulement quand le frisbee a passé le filet, false = aucune
+//  choix : ses lancers préférés (remplace REGLAGES.ia.choix)
 export const DIFFICULTES = {
-  facile:   { nom: 'FACILE',   couleur: '#7fff7f', vitesse: 0.78, reaction: 0.34, erreur: 70, disque: 0.85, superHasard: 0,
-    aides: true, texte: 'Lionel court moins vite et rate plus souvent. Idéal pour apprendre.' },
+  facile:   { nom: 'FACILE',   couleur: '#7fff7f', vitesse: 0.78, reaction: 0.34, erreur: 70, disque: 0.82, superHasard: 0,
+    aides: 'tot', choix: { droit: 40, biais: 34, courbe: 14, lob: 12 }, texte: 'Lionel court moins vite et rate plus souvent. Idéal pour apprendre.' },
   normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 1,    reaction: 0.22, erreur: 40, disque: 1,    superHasard: 0.08,
-    aides: true, texte: 'Le vrai match.' },
+    aides: 'filet', texte: 'Le vrai match.' },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.15, reaction: 0.14, erreur: 18, disque: 1.15, superHasard: 0.16,
     aides: false, texte: 'Sans aide, lancers rapides et super lancers fréquents. Pour les vrais.' },
 };
@@ -47,7 +49,7 @@ export const REGLAGES = {
   vitesseMax: 1150,
   rayonDisque: 11,
   angle: 0.62,            // lancer en biais (Haut / Bas maintenu) : angle en radians
-  courbe: { decalage: 150, depart: 0.38 },   // lancer courbe : arrive décalé de 150 px, part de l'autre côté
+  courbe: { decalage: 120, depart: 0.32 },   // lancer courbe : arrive décalé de 120 px, part de l'autre côté
   lob: { duree: 1.25, hauteur: 170, attrape: 42 },   // lob : temps de vol, hauteur max, distance pour l'attraper
   rapide: { fenetre: 0.2, bonus: 1.22 },     // relancer très vite après avoir attrapé = lancer PUISSANT
   hauteurMain: 34,        // hauteur du frisbee en vol (au niveau de la main)

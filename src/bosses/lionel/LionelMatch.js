@@ -330,7 +330,7 @@ export class LionelMatch extends BossScene {
     // côté opposé au tien
     const dir = this.j.y < MILIEU_Y ? 1 : -1;
     if (p.superPret || (this.numSet >= 2 && Math.random() < D.superHasard)) return this.lancer(p, 'super', dir);
-    const poids = R.ia.choix, total = Object.values(poids).reduce((a, b) => a + b, 0);
+    const poids = this.diff.choix || R.ia.choix, total = Object.values(poids).reduce((a, b) => a + b, 0);
     let r = Math.random() * total, type = 'droit';
     for (const [k, w] of Object.entries(poids)) { if ((r -= w) < 0) { type = k; break; } }
     if (type === 'droit' && Math.abs(this.j.y - MILIEU_Y) < 50) type = 'biais';
@@ -709,7 +709,8 @@ export class LionelMatch extends BossScene {
       g.lineStyle(4, 0xc77dff, 0.35 + 0.4 * Math.abs(Math.sin(this.horloge * 20)));
       g.lineBetween(d.x, d.y, d.x + d.apres.vx * k, d.y + d.apres.vy * k);
     }
-    if (this.diff.aides && (d.vx < 0 || (d.arret > 0 && d.lanceur === 'l')) && d.t > 0.05) {
+    const aide = this.diff.aides === 'tot' || (this.diff.aides === 'filet' && d.x < T.filet);
+    if (aide && (d.vx < 0 || (d.arret > 0 && d.lanceur === 'l')) && d.t > 0.05) {
       const pr = this.prevoir(d, this.j);
       if (pr) g.lineStyle(2, 0x7fff7f, 0.55).strokeEllipse(pr.x, pr.y, 44, 16);
     }
