@@ -1,5 +1,5 @@
 # Découpe les planches manga du match de frisbee en une image par pose, fond blanc rendu transparent :
-#  - Lionel (assets_inbox/lionel_*.jpg) : poses tournées vers la GAUCHE (il joue à droite du terrain) ;
+#  - Lionel (assets_inbox/lionel_mains_vides_*.jpg, et lionel_entier.jpg pour le portrait) : poses tournées vers la GAUCHE (il joue à droite du terrain) ;
 #  - ton joueur (assets_inbox/heros_frisbee_planche.jpg) : poses tournées vers la DROITE.
 # Utilisation : python3 outils/lionel/decouper_planches.py
 import numpy as np
@@ -11,15 +11,16 @@ REDUCTION = 0.5   # les poses sont affichées petites sur le terrain
 
 # pose : (planche, centre approximatif (x, y) de la pose, regarde vers la droite sur la planche ?)
 POSES = {
-    'lionel_tient':    ('lionel_planche_1.jpg', (220, 340), False),
-    'lionel_course':   ('lionel_planche_1.jpg', (620, 330), True),
-    'lionel_lance':    ('lionel_planche_1.jpg', (280, 930), True),
-    'lionel_rattrape': ('lionel_planche_1.jpg', (650, 940), False),
-    'lionel_plongeon': ('lionel_planche_2.jpg', (350, 200), True),
-    'lionel_super':    ('lionel_planche_2.jpg', (600, 370), True),
-    'lionel_touche':   ('lionel_planche_2.jpg', (280, 630), False),
-    'lionel_victoire': ('lionel_planche_2.jpg', (660, 890), False),
-    'lionel_defaite':  ('lionel_planche_2.jpg', (270, 1070), False),
+    # planches « mains vides » : le jeu met son propre frisbee dans les mains de Lionel
+    'lionel_tient':    ('lionel_mains_vides_2.jpg', (230, 340), False),
+    'lionel_course':   ('lionel_mains_vides_2.jpg', (625, 330), True),
+    'lionel_lance':    ('lionel_mains_vides_2.jpg', (265, 920), True),
+    'lionel_rattrape': ('lionel_mains_vides_2.jpg', (650, 930), False),
+    'lionel_plongeon': ('lionel_mains_vides_1.jpg', (330, 180), True),
+    'lionel_super':    ('lionel_mains_vides_1.jpg', (600, 370), True),
+    'lionel_touche':   ('lionel_mains_vides_1.jpg', (280, 620), False),
+    'lionel_victoire': ('lionel_mains_vides_1.jpg', (660, 870), False),
+    'lionel_defaite':  ('lionel_mains_vides_1.jpg', (270, 1050), False),
     'lionel_portrait': ('lionel_entier.jpg',    (420, 660), False),
     # ton joueur (planche avec légendes en anglais sous chaque pose)
     'heros_frisbee_garde':    ('heros_frisbee_planche.jpg', (180, 220), True),

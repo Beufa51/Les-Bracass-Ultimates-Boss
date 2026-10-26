@@ -46,6 +46,8 @@ const MAISON = { j: T.x0 + 110, l: T.x1 - 110 };
 const DUREE_CINEMATIQUE = 1.6;
 
 const POSES_AVEC_DISQUE = ['tient', 'nargue', 'rattrape'];
+// les illustrations de Lionel ont les mains vides : où poser le frisbee du jeu (x vers l'avant, y depuis ses pieds)
+const MAINS_LIONEL = { tient: [27, -71], rattrape: [-25, -134], plongeon: [67, -61], nargue: [-28, -172] };
 
 // 2 boutons seulement : Lancer (Espace) et Lob (Z)
 const ETIQUETTES_JEU = { espace: 'Lancer', z: 'Lob', x: null };
@@ -1055,8 +1057,12 @@ export class LionelMatch extends BossScene {
         if (pose === 'plongeon') this.disque.setPosition(p.x + sens * 70, p.y - 40);
         else if (pose === 'tient' || pose === 'rattrape') this.disque.setPosition(p.x + sens * 39, p.y - 82);   // poing avant
         else this.disque.setPosition(p.x + 3, p.y - 72);
-      } else if (POSES_AVEC_DISQUE.includes(pose) || (pose === 'plongeon' && illustre)) {
-        // ces poses ont déjà le frisbee en main (dessins du code, illustrations de Lionel)
+      } else if (p === this.l && illustre) {
+        const avant = p.sprite.flipX ? 1 : -1;   // ses illustrations regardent vers la gauche
+        const [mx, my] = MAINS_LIONEL[pose] || MAINS_LIONEL.tient;
+        this.disque.setPosition(p.x + avant * mx, p.y + my);
+      } else if (POSES_AVEC_DISQUE.includes(pose)) {
+        // ces poses ont déjà le frisbee en main (dessins du code)
         this.disque.setVisible(false);
       }
     } else { this.disque.setVisible(false); this.ombreDisque.setVisible(false); }
