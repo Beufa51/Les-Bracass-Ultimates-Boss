@@ -42,8 +42,10 @@ export const MANIFESTE = {
     lionel_portrait: { fichier: 'sprites/lionel/lionel_portrait.png', largeur: 215, hauteur: 650, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'nargue', ...LIONEL } },
     // au repos : la 1re image du pas chassé (en garde, de côté)
     heros_frisbee_garde: { fichier: 'sprites/lionel/heros_frisbee_attente.png', largeur: 175, hauteur: 259, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...HEROS_FRISBEE } },
-    // pas chassé en 6 images (assets_inbox/heros_frisbee_chasse_1.jpg, outils/lionel/decouper_animation.py) : il reste face à Lionel
-    heros_frisbee_course: { fichier: 'sprites/lionel/heros_frisbee_chasse.png', largeur: 175, hauteur: 259, images: 6, vitesse: 11, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...HEROS_FRISBEE } },
+    // course en 6 images (assets_inbox/heros_frisbee_course_6.jpg, outils/lionel/decouper_animation.py)
+    heros_frisbee_course: { fichier: 'sprites/lionel/heros_frisbee_course6.png', largeur: 165, hauteur: 267, images: 6, vitesse: 12, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...HEROS_FRISBEE } },
+    // en reculant : pas chassé en 6 images (4 poses en aller-retour, assets_inbox/heros_frisbee_chasse_1.jpg), face à Lionel
+    heros_frisbee_recul: { fichier: 'sprites/lionel/heros_frisbee_chasse.png', largeur: 175, hauteur: 259, images: 6, vitesse: 11, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...HEROS_FRISBEE } },
     heros_frisbee_tient: { fichier: 'sprites/lionel/heros_frisbee_course.png', largeur: 187, hauteur: 256, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...HEROS_FRISBEE } },
     heros_frisbee_lance: { fichier: 'sprites/lionel/heros_frisbee_lance.png', largeur: 188, hauteur: 253, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'lance', ...HEROS_FRISBEE } },
     heros_frisbee_super: { fichier: 'sprites/lionel/heros_frisbee_super.png', largeur: 197, hauteur: 284, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'super', ...HEROS_FRISBEE } },

@@ -203,9 +203,11 @@ Fusionné dans `main` : en ligne.
     (TERRAIN dans reglages.js) est calé sur ses bords de sable et sa ligne jaune ; bandes 3/5/3 ajoutées sur les murs de but.
     Sans ce fichier, le terrain dessiné par le code revient tout seul.
   - Ton joueur au repos : vu de côté (pose de course) au lieu de face.
-  - Déplacement de TON joueur : PAS CHASSÉ animé (4 poses de assets_inbox/heros_frisbee_chasse_1.jpg, jouées 1-2-3-4-3-2,
-    bande `assets/sprites/lionel/heros_frisbee_chasse.png` faite par `outils/lionel/decouper_animation.py`) ; il reste
-    face à Lionel ; la pose 1 sert d'attente. (heros_frisbee_chasse_2.jpg : 2e série, pas utilisée.)
+  - Déplacement de TON joueur : COURSE en 6 images (assets_inbox/heros_frisbee_course_6.jpg → heros_frisbee_course6.png)
+    quand il avance ou monte/descend ; PAS CHASSÉ face à Lionel quand il RECULE (4 poses de heros_frisbee_chasse_1.jpg
+    jouées 1-2-3-4-3-2 → heros_frisbee_chasse.png, clé `heros_frisbee_recul`) ; la pose 1 du pas chassé sert d'attente.
+    Bandes faites par `outils/lionel/decouper_animation.py` (planche → bande d'images alignées sur les pieds).
+    (heros_frisbee_chasse_2.jpg : 2e série, pas utilisée.)
   - Lionel : une seule image de course => animée par le code (penché, écrasé/étiré à chaque foulée, nuage de sable).
     À FAIRE : sa planche « pas chassé » (4 images, même texte Gemini que pour ton joueur).
   - Terrain dessiné par le code (secours) dans l'esprit de Windjammers 2 (cage grillagée, rambardes, palmiers, ombres de palmes, public,

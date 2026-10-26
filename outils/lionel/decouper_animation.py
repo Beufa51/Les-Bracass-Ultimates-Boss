@@ -26,7 +26,16 @@ aires = nd.sum(fg, lab, range(1, n + 1))
 objs = nd.find_objects(lab)
 grandes = [i for i, s in enumerate(aires) if s > 20000]
 # ordre de lecture : ligne par ligne (par le haut), puis de gauche à droite
-grandes.sort(key=lambda i: (round(objs[i][0].start / 300), objs[i][1].start))
+# (deux poses sont sur la même ligne si leurs milieux sont à moins d'une demi-hauteur l'un de l'autre)
+centre = lambda i: (objs[i][0].start + objs[i][0].stop) / 2
+haut_pose = np.median([objs[i][0].stop - objs[i][0].start for i in grandes])
+grandes.sort(key=centre)
+lignes, ligne = [], []
+for i in grandes:
+    if ligne and centre(i) - centre(ligne[0]) > haut_pose / 2: lignes.append(ligne); ligne = []
+    ligne.append(i)
+lignes.append(ligne)
+grandes = [i for l in lignes for i in sorted(l, key=lambda i: objs[i][1].start)]
 poses = []
 for i in grandes:
     m = lab == i + 1

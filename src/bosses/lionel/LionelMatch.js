@@ -974,15 +974,17 @@ export class LionelMatch extends BossScene {
     for (const p of [this.j, this.l]) {
       let pose = this.choisirPose(p);
       let cle = p.prefixe + '_' + pose;
+      // en reculant (vers son propre mur), pas chassé face à l'adversaire s'il existe
+      const recul = pose === 'course' && p.vx * p.sens < -40 && this.textures.exists(p.prefixe + '_recul');
+      if (recul) cle = p.prefixe + '_recul';
       if (!this.textures.exists(cle)) cle = p.prefixe + '_garde';
       const anim = this.anims.exists(cle) && this.textures.get(cle).frameTotal > 2;
       if (anim) { if (p.sprite.anims.currentAnim?.key !== cle || !p.sprite.anims.isPlaying) p.sprite.play(cle); }
       else if (p.sprite.texture.key !== cle || p.sprite.anims.isPlaying) { p.sprite.stop(); p.sprite.setTexture(cle); }
       // en courant, il regarde dans le sens de sa course
       let versGauche = p === this.l;
-      // (une course en une seule image se tourne dans le sens de la course ; un pas chassé reste face à l'adversaire)
-      const pasChasse = pose === 'course' && this.textures.get(cle).frameTotal > 2;
-      if (pose === 'course' && Math.abs(p.vx) > 40 && !pasChasse) versGauche = p.vx < 0;
+      // (en courant, on se tourne dans le sens de la course ; en pas chassé, on reste face à l'adversaire)
+      if (pose === 'course' && Math.abs(p.vx) > 40 && !recul) versGauche = p.vx < 0;
       if (pose === 'plongeon' && Math.abs(p.glisseX) > 0.3) versGauche = p.glisseX < 0;
       // les illustrations de Lionel regardent vers la gauche ; les tiennes et les dessins du code vers la droite
       const illustre = this.estIllustre(cle), imageVersDroite = !illustre || p === this.j;
