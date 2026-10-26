@@ -29,7 +29,8 @@ export const MANIFESTE = {
     lionel_terrain:  { fichier: 'sprites/lionel/lionel_terrain.jpg', largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'terrainFrisbee', terrain: TERRAIN_FRISBEE } },
     frisbee:         { fichier: null, largeur: 34, hauteur: 34, images: 4, vitesse: 16, provisoire: { forme: 'frisbee' } },
     lionel_garde: { fichier: 'sprites/lionel/lionel_course.png', largeur: 181, hauteur: 270, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...LIONEL } },
-    lionel_course: { fichier: 'sprites/lionel/lionel_course.png', largeur: 181, hauteur: 270, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...LIONEL } },
+    // course en 6 images (assets_inbox/lionel_course_6.jpg, découpée par outils/lionel/decouper_animation.py --par-ligne 3, cases retournées)
+    lionel_course: { fichier: 'sprites/lionel/lionel_course6.png', largeur: 172, hauteur: 296, images: 6, vitesse: 12, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...LIONEL } },
     lionel_tient: { fichier: 'sprites/lionel/lionel_tient.png', largeur: 178, hauteur: 266, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...LIONEL } },
     lionel_lance: { fichier: 'sprites/lionel/lionel_lance.png', largeur: 248, hauteur: 269, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'lance', ...LIONEL } },
     lionel_super: { fichier: 'sprites/lionel/lionel_super.png', largeur: 225, hauteur: 210, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'super', ...LIONEL } },

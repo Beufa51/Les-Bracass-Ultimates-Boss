@@ -208,8 +208,10 @@ Fusionné dans `main` : en ligne.
     jouées 1-2-3-4-3-2 → heros_frisbee_chasse.png, clé `heros_frisbee_recul`) ; la pose 1 du pas chassé sert d'attente.
     Bandes faites par `outils/lionel/decouper_animation.py` (planche → bande d'images alignées sur les pieds).
     (heros_frisbee_chasse_2.jpg : 2e série, pas utilisée.)
-  - Lionel : une seule image de course => animée par le code (penché, écrasé/étiré à chaque foulée, nuage de sable).
-    À FAIRE : sa planche « pas chassé » (4 images, même texte Gemini que pour ton joueur).
+  - Lionel : COURSE en 6 images (assets_inbox/lionel_course_6.jpg → lionel_course6.png, cases retournées pour regarder
+    vers la gauche). Sur la planche, des poses se touchaient : `decouper_animation.py --par-ligne 3` les sépare (petits
+    défauts sur 4 images : bout de pied en trop / jambe coupée) et efface la ligne de sol. Une planche aux poses bien
+    espacées les supprimerait. Pas encore de pas chassé pour Lionel (il se retourne quand il recule).
   - Terrain dessiné par le code (secours) dans l'esprit de Windjammers 2 (cage grillagée, rambardes, palmiers, ombres de palmes, public,
     ligne centrale jaune, poteaux jaunes rembourrés) : dessin du code, pas d'image du vrai jeu (droits d'auteur).
   - Ton joueur : nouvelle planche mains vides (le jeu pose le frisbee dans ses mains quand il le tient).
