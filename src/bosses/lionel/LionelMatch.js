@@ -985,11 +985,30 @@ export class LionelMatch extends BossScene {
       // les illustrations de Lionel regardent vers la gauche ; les tiennes et les dessins du code vers la droite
       const illustre = this.estIllustre(cle), imageVersDroite = !illustre || p === this.j;
       p.sprite.setFlipX(versGauche === imageVersDroite);
-      p.sprite.setScale(illustre ? R.echelleIllustre : 1);
-      // une illustration de course n'a qu'une image : petits bonds pour l'animer
-      const bond = illustre && pose === 'course' ? -Math.abs(Math.sin(this.horloge * 14)) * 5 : 0;
-      p.sprite.setAngle(illustre && pose === 'course' ? Math.sin(this.horloge * 14) * 3 : 0);
-      p.sprite.setPosition(p.x, p.y + 6 + bond).setDepth(profondeur(p.y));
+      // une illustration de course n'a qu'une image : on l'anime (foulées, penché en avant, poussière)
+      // (avec une vraie planche de course en plusieurs images, l'animation dessinée prend le relais)
+      const courseUneImage = illustre && pose === 'course' && this.textures.get(cle).frameTotal <= 2;
+      const echelle = illustre ? R.echelleIllustre : 1;
+      if (courseUneImage) {
+        p.foulee = (p.foulee || 0) + Math.hypot(p.vx, p.vy) / 330 * 0.25;   // avance avec la vitesse
+        const f = Math.sin(p.foulee * Math.PI * 2);
+        // écrasé au moment où le pied touche le sol, étiré en l'air
+        p.sprite.setScale(echelle * (1 + Math.abs(f) * 0.04), echelle * (1 - Math.abs(f) * 0.05 + 0.03));
+        // penché dans le sens de la course + petit balancement
+        const sens = Math.abs(p.vx) > 40 ? Math.sign(p.vx) : (p === this.l ? -1 : 1);
+        p.sprite.setAngle(sens * 6 + f * 2);
+        p.sprite.setPosition(p.x, p.y + 6 - Math.abs(f) * 6).setDepth(profondeur(p.y));
+        // un petit nuage de sable à chaque pas
+        const pas = Math.floor(p.foulee * 2);
+        if (pas !== p.dernierPas) {
+          p.dernierPas = pas;
+          const nuage = this.add.ellipse(p.x - sens * 14, p.y + 4, 16, 7, 0xf3dca0, 0.8).setDepth(profondeur(p.y) - 0.1);
+          this.tweens.add({ targets: nuage, scaleX: 2.2, scaleY: 1.6, x: nuage.x - sens * 16, alpha: 0, duration: 380, onComplete: () => nuage.destroy() });
+        }
+      } else {
+        p.sprite.setScale(echelle).setAngle(0);
+        p.sprite.setPosition(p.x, p.y + 6).setDepth(profondeur(p.y));
+      }
       p.ombre.setPosition(p.x, p.y + 2).setDepth(4);
     }
     // frisbee
