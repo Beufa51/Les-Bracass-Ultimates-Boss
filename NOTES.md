@@ -211,7 +211,9 @@ Fusionné dans `main` : en ligne.
   - Lionel : COURSE en 6 images (assets_inbox/lionel_course_6.jpg → lionel_course6.png, cases retournées pour regarder
     vers la gauche). Sur la planche, des poses se touchaient : `decouper_animation.py --par-ligne 3` les sépare (petits
     défauts sur 4 images : bout de pied en trop / jambe coupée) et efface la ligne de sol. Une planche aux poses bien
-    espacées les supprimerait. Pas encore de pas chassé pour Lionel (il se retourne quand il recule).
+    espacées les supprimerait.
+  - Lionel : PAS CHASSÉ face à toi quand il recule (5 poses de assets_inbox/lionel_chasse.jpg jouées 1-2-3-4-5-4-3-2,
+    cases retournées → lionel_chasse.png, clé `lionel_recul`) ; sa 1re pose (bras ouverts) sert d'attente (lionel_attente.png).
   - Terrain dessiné par le code (secours) dans l'esprit de Windjammers 2 (cage grillagée, rambardes, palmiers, ombres de palmes, public,
     ligne centrale jaune, poteaux jaunes rembourrés) : dessin du code, pas d'image du vrai jeu (droits d'auteur).
   - Ton joueur : nouvelle planche mains vides (le jeu pose le frisbee dans ses mains quand il le tient).

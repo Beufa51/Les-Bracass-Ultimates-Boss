@@ -21,14 +21,17 @@ export const MANIFESTE = {
     // Lionel : poses découpées dans ses planches manga (outils/lionel/decouper_planches.py), tournées vers la GAUCHE.
     // Dessins provisoires (fichier: null) : tournés vers la DROITE (le jeu les retourne au besoin).
     // Les pieds touchent le bas de la case. "course" dessinée = 4 images côte à côte.
-    // Pas d'attente sans frisbee sur les planches : "garde" utilise la course ; "nargue" utilise la victoire.
+    // "nargue" utilise la victoire.
     // Ton joueur (blond, maillot rouge) : planche assets_inbox/heros_frisbee_planche.jpg, poses tournées vers la DROITE.
     // Ses poses ont les mains vides : le jeu dessine le frisbee devant lui quand il le tient.
     // Tenir / rattraper : pose de côté (course), le frisbee dans le poing avant (la pose de face ne plaisait pas).
     // décor perso (assets_inbox/lionel_decor.jpg recadré) ; sans fichier : terrain dessiné par le code
     lionel_terrain:  { fichier: 'sprites/lionel/lionel_terrain.jpg', largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'terrainFrisbee', terrain: TERRAIN_FRISBEE } },
     frisbee:         { fichier: null, largeur: 34, hauteur: 34, images: 4, vitesse: 16, provisoire: { forme: 'frisbee' } },
-    lionel_garde: { fichier: 'sprites/lionel/lionel_course.png', largeur: 181, hauteur: 270, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...LIONEL } },
+    // attente : 1re pose du pas chassé (bras ouverts, prêt à attraper)
+    lionel_garde: { fichier: 'sprites/lionel/lionel_attente.png', largeur: 222, hauteur: 275, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...LIONEL } },
+    // en reculant : pas chassé face à toi (5 poses en aller-retour, assets_inbox/lionel_chasse.jpg, cases retournées)
+    lionel_recul: { fichier: 'sprites/lionel/lionel_chasse.png', largeur: 222, hauteur: 275, images: 8, vitesse: 12, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...LIONEL } },
     // course en 6 images (assets_inbox/lionel_course_6.jpg, découpée par outils/lionel/decouper_animation.py --par-ligne 3, cases retournées)
     lionel_course: { fichier: 'sprites/lionel/lionel_course6.png', largeur: 172, hauteur: 296, images: 6, vitesse: 12, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...LIONEL } },
     lionel_tient: { fichier: 'sprites/lionel/lionel_tient.png', largeur: 178, hauteur: 266, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...LIONEL } },
