@@ -22,6 +22,9 @@ import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes 
 import { jouerClip } from '../../core/clips.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 
+// compte en japonais : [kana, lecture en lettres si le navigateur n'a pas de voix japonaise]
+const JAPONAIS = [['いち', 'itchi'], ['に', 'ni'], ['さん', 'sann'], ['し', 'chi'], ['ご', 'go'],
+  ['ろく', 'roku'], ['しち', 'chitchi'], ['はち', 'hatchi'], ['きゅう', 'kyou']];
 const auHasard = (liste) => liste[Math.floor(Math.random() * liste.length)];
 const entre = (min, max) => min + Math.random() * (max - min);
 // Pose de Greg au moment où il frappe
@@ -353,6 +356,7 @@ export class GregCombat extends BossScene {
       if (g.etat === 'prepare') onomatopee(this, R.centreX + 170, 60, 'Interrompu !', 22, '#7fff7f');
       // il garde le temps qui lui restait avant d'attaquer (pas de blocage en boucle)
       g.pauseAvant = g.etat === 'garde' ? g.pause : R.pauseApresTouche;
+      g.toucheDepuis = this.time.now;
       g.etat = 'touche'; g.t = 0; g.attaque = null;
       this.alerte.setVisible(false);
     }
@@ -897,7 +901,9 @@ export class GregCombat extends BossScene {
     if (c.t >= R.secondeCompte) {
       c.t = 0; c.n++;
       jouerSon(this, 'greg_compte');
-      this.parler(c.n >= 10 ? 'K.O. !' : ['un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'][c.n - 1], { vitesse: 1.2 });
+      // compte de l'arbitre en japonais, comme dans Hajime no Ippo
+      if (c.n >= 10) this.parler('K.O. !');
+      else this.parler(JAPONAIS[c.n - 1], { japonais: true, vitesse: 1.1, hauteur: 0.9 });
       this.texteCompte.setText(c.n >= 10 ? 'K.O. !!' : String(c.n)).setScale(1.6);
       this.tweens.add({ targets: this.texteCompte, scale: 1, duration: 150 });
       if (c.qui === 'greg') {
@@ -1249,7 +1255,13 @@ export class GregCombat extends BossScene {
     g.sprite.setVisible(true).setAlpha(1);
     if (g.etat === 'etourdi') { pose = ou('etourdi', repos); dx = Math.sin(t / 160) * 22; angle = Math.sin(t / 160) * 6; dy = 8; teinte = 0xfff3c0; }
     else if (g.etat === 'nargue') { pose = repos; dy = Math.sin(t / 110) * 5; dx = Math.sin(t / 220) * 8; }
-    else if (forcee === 'touche' || g.etat === 'touche') { pose = ou('touche', repos); dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }
+    else if (forcee === 'touche' || g.etat === 'touche' || (g.etat === 'garde' && t - (g.toucheDepuis || -9999) < 550)) {
+      // il prend un coup : la tête part en arrière, puis il a l'air sonné une demi-seconde
+      const e = t - (g.toucheDepuis || t);
+      pose = e < 140 ? ou('touche', repos) : ou('etourdi', 'touche', repos);
+      dx = e < 140 ? -18 : Math.sin(t / 120) * 6; angle = g.secousse > 0 ? 7 : 3; rapide = e < 140;
+      if (e < 90) teinte = 0xffc0c0;
+    }
     else if (forcee === 'bloque') { pose = existe(haute) ? haute : repos; echelle = 0.97; teinte = 0xc8d4ff; rapide = true; }
     else if (forcee === 'uppercut') { pose = ou('smash', 'visage'); echelle = 1.12; dy = 20; rapide = true; }
     else if (g.etat === 'prepare') {
@@ -1275,7 +1287,8 @@ export class GregCombat extends BossScene {
       pose = imageCoup(g.attaque.cible); echelle = 1.1; dy = g.attaque.cible === 'smash' ? -15 : (g.attaque.cible === 'corps' ? 30 : 14); rapide = true;
       angle = g.attaque.id === 'crochet' ? -6 : 0;
     }
-    else if (g.etat === 'essouffle' || g.etat === 'recup') { pose = ou('etourdi', haute, repos); dy = 14 + Math.sin(t / 140) * 4; echelle = 0.98; teinte = 0xd8d0e8; }
+    else if (g.etat === 'recup') { pose = garde; dy = 6; }   // après son coup, il reprend sa garde
+    else if (g.etat === 'essouffle') { pose = ou('etourdi', haute, repos); dy = 14 + Math.sin(t / 140) * 4; echelle = 0.98; teinte = 0xd8d0e8; }
     else if (this.etat === 'fin' && this.j.downs >= R.knockdownsMax) { pose = ou('victoire', haute, repos); dy = -10 + Math.sin(t / 160) * 6; echelle = 1.04; }
     else { dx = Math.sin(t / 400) * 12; dy = Math.sin(t / 300) * 2; }     // en garde : il se balance et respire
     if (!existe(pose)) pose = repos;

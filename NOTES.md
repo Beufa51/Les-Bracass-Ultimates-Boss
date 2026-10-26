@@ -71,7 +71,8 @@
   - Inspiré de Super Punch-Out (structure du jeu original, sans rien copier) :
     ÉTOURDISSEMENT (jauge cachée remplie par les coups qui touchent ; pleine = Greg titube 1,8 s,
     étoiles, tous les coups passent), annonceur vocal (voix de synthèse du navigateur : « Box ! »,
-    compte, « K.O. ! », `src/core/annonceur.js`, désactivable avec `annonceur: false`),
+    compte en japonais « ichi, ni, san… » (voix japonaise du navigateur si elle existe), « K.O. ! »,
+    `src/core/annonceur.js`, désactivable avec `annonceur: false`),
     clameur du public, répliques de ton boxeur, chrono au centième dans le classement.
   - Greg ÉNERVÉ après son 2e tapis : nouveaux enchaînements avec des FEINTES (`ENCHAINEMENTS_ENERVE`).
   - Les appuis faits pendant ton coup ou quand tu es sonné sont gardés 0,15 s ; on peut couper la fin
