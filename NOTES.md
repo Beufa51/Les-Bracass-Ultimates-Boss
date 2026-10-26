@@ -118,7 +118,8 @@ Copie de référence de la version finale : branche `greg-termine` (`version-1-g
      buts à 3 et 5 points, lancers courbes, lob, super lancer quand on rattrape au bon moment, sets.
    - Badge : médaille violette avec un frisbee.
    - Images : le propriétaire a un pixel art de Lionel et demande à Gemini une version manga (planches de poses, fond blanc).
-   - Encore à demander : personnalité / répliques de Lionel.
+   - Personnalité : **un peu chambreur** (il se moque gentiment du joueur, nargue après ses points, fait le malin).
+   - Prompt Gemini (planche manga 9 poses, fond blanc, tourné vers la gauche) déjà donné au propriétaire.
 3. Beufa, phase quiz (plus tard)
 3. Julien
 4. Kédric
