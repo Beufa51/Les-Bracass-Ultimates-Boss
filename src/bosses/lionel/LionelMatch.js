@@ -21,6 +21,7 @@ import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
 import { choisirDifficulte, cleRecord } from '../../core/difficulte.js';
 import { IDENTITE, TERRAIN as T, DIFFICULTES, REGLAGES as R, REPLIQUES } from './reglages.js';
+import { ETAPES, VITESSE_ENTRAINEMENT } from './entrainement.js';
 
 // ordre d'affichage : plus on est bas sur le terrain, plus on est devant (entre 10 et 60)
 const profondeur = (y) => 10 + y / 10;
@@ -158,7 +159,86 @@ export class LionelMatch extends BossScene {
 
   // Lancement du match (aussi appelé directement par les tests)
   demarrerMatch() {
+    // la première fois (ou depuis le menu F1) : petit entraînement avant le match
+    if (this.phase === 'entrainement' || (this.phase === 'set1' && !Sauvegarde.fait('lionel_entrainement') && !this.sansEntrainement)) {
+      return this.debutEntrainement();
+    }
     if (this.phase === 'decisif') { this.sets = { j: 1, l: 1 }; this.numSet = 3; }
+    this.debutSet();
+  }
+
+  // =================================================================
+  //  ENTRAÎNEMENT (mini-tutoriel, voir entrainement.js)
+  // =================================================================
+  debutEntrainement() {
+    const tactile = estTactile();
+    this.boutons = { lancer: tactile ? 'Lancer' : 'ESPACE', lob: tactile ? 'Lob' : 'Z' };
+    this.tuto = {
+      etape: 0, enAttente: false,
+      banniere: texte(this, LARGEUR / 2, 150, '', 20, '#ffffff', { backgroundColor: '#000000cc', padding: { x: 12, y: 6 } }).setDepth(92),
+      passer: texte(this, LARGEUR - 12, HAUTEUR - 14, tactile ? 'Passer : passer l\'entraînement' : 'X : passer l\'entraînement', 14, '#aaaaaa')
+        .setOrigin(1, 1).setDepth(92),
+    };
+    etiquettesTactiles({ ...ETIQUETTES_JEU, x: 'Passer' });
+    this.placerPourService('l');
+    this.etat = 'pret';
+    encartRapide(this, 'ENTRAÎNEMENT', 'Lionel va te montrer les bases', '#7fd0ff', 1.3);
+    this.attendre(1.4, () => this.etapeTuto(0));
+  }
+
+  etapeTuto(i) {
+    if (i >= ETAPES.length) return this.finEntrainement();
+    const E = ETAPES[i], tu = this.tuto;
+    tu.etape = i; tu.enAttente = false;
+    tu.banniere.setText(E.texte(this.boutons)).setColor('#ffffff');
+    if (E.depart === 'l' || !this.j.tient) this.placerPourService(E.depart);
+    if (E.depart === 'l') this.l.tenueVoulue = 1.2;
+    if (E.superPret) this.j.superPret = true;
+    this.etat = 'jeu';
+  }
+
+  // étape réussie : petit bravo, puis la suivante
+  reussiTuto(delai) {
+    const tu = this.tuto;
+    if (!tu || tu.enAttente) return;
+    tu.enAttente = true;
+    tu.banniere.setText(auHasard(['Bravo !', 'Parfait !', 'Super !', 'Bien joué !'])).setColor('#7fff7f');
+    jouerSon(this, 'ui_valider');
+    this.attendre(delai, () => this.etapeTuto(tu.etape + 1));
+  }
+
+  rateTuto(message) {
+    const tu = this.tuto;
+    if (!tu || tu.enAttente) return;
+    tu.enAttente = true;
+    tu.banniere.setText(message).setColor('#ffb347');
+    this.etat = 'pret'; this.d = null;
+    this.attendre(1.3, () => { this.placerPourService(ETAPES[tu.etape].depart); this.etapeTuto(tu.etape); });
+  }
+
+  // vérifie ce que tu viens de faire pendant l'entraînement
+  actionTuto(action, type) {
+    const tu = this.tuto;
+    if (!tu || tu.enAttente) return;
+    const but = ETAPES[tu.etape].but;
+    if (action === 'attrape') {
+      if (but === 'attrape' || (but === 'attrapeLob' && type)) { this.etat = 'pret'; this.reussiTuto(0.7); }
+      return;
+    }
+    // un lancer
+    const ok = (but === 'lance' && (type === 'droit' || type === 'biais')) || but === type;
+    if (ok) this.reussiTuto(0.9);
+    else if (['lance', 'biais', 'super', 'lob'].includes(but)) this.rateTuto('Presque ! Regarde bien la consigne et réessaie.');
+  }
+
+  finEntrainement() {
+    Sauvegarde.marquerFait('lionel_entrainement');
+    const tu = this.tuto;
+    if (!tu) return;
+    tu.banniere.destroy(); tu.passer.destroy();
+    this.tuto = null;
+    this.d = null; this.echange = 0;
+    this.j.superPret = false; this.l.superPret = false;
     this.debutSet();
   }
 
@@ -171,6 +251,7 @@ export class LionelMatch extends BossScene {
     this.horloge += dt;
     const e = this.lireTouches();
     for (const k of ['espace', 'z']) if (e[k]) this.memoire[k] = this.horloge;
+    if (e.x && this.tuto) { this.attente = 0; this.apresAttente = null; this.finEntrainement(); }
 
     if (this.attente > 0) {
       this.attente -= dt;
@@ -187,7 +268,7 @@ export class LionelMatch extends BossScene {
     const t = this.touches, jd = Phaser.Input.Keyboard.JustDown;
     return {
       haut: t.haut.isDown, bas: t.bas.isDown, gauche: t.gauche.isDown, droite: t.droite.isDown,
-      espace: jd(t.espace), z: jd(t.z),
+      espace: jd(t.espace), z: jd(t.z), x: jd(t.x),
     };
   }
 
@@ -200,7 +281,7 @@ export class LionelMatch extends BossScene {
   majJeu(dt, e) {
     this.tempsTotal += dt;
     // chrono du set (arrêté pendant que quelqu'un tient le frisbee : service, Lionel qui nargue...)
-    if (!this.pointEnOr && !this.porteur) {
+    if (!this.pointEnOr && !this.porteur && !this.tuto) {
       this.tempsSet -= dt;
       if (this.tempsSet <= 0) {
         this.tempsSet = 0;
@@ -260,7 +341,7 @@ export class LionelMatch extends BossScene {
       }
       if (this.aAppuye('espace')) return this.lancer(p, p.superPret ? 'super' : (dirY ? 'biais' : 'droit'), dirY);
       if (this.aAppuye('z')) return this.lancer(p, 'lob', dirY);
-      if (p.tenue >= R.tenueMax) return this.lancer(p, 'droit', 0);
+      if (p.tenue >= R.tenueMax && !this.tuto) return this.lancer(p, 'droit', 0);
       return;
     }
     if (!this.peutBouger(p)) return;
@@ -352,6 +433,11 @@ export class LionelMatch extends BossScene {
     const p = this.l, D = this.diff;
     // côté opposé au tien
     const dir = this.j.y < MILIEU_Y ? 1 : -1;
+    if (this.tuto) {
+      const E = ETAPES[this.tuto.etape];
+      // pendant l'entraînement, il ne relance pas tes lancers : il attend l'étape suivante
+      return E.lionel && !this.tuto.enAttente ? this.lancer(p, E.lionel, dir) : null;
+    }
     if (p.superPret || (this.numSet >= 2 && Math.random() < D.superHasard)) return this.lancer(p, 'super', dir);
     const poids = this.diff.choix || R.ia.choix, total = Object.values(poids).reduce((a, b) => a + b, 0);
     let r = Math.random() * total, type = 'droit';
@@ -372,7 +458,7 @@ export class LionelMatch extends BossScene {
   lancer(p, type, dir) {
     const autre = p === this.j ? this.l : this.j;
     let v = this.vitesseDeBase();
-    if (p === this.l) v *= this.diff.disque;
+    if (p === this.l) v *= this.diff.disque * (this.tuto ? VITESSE_ENTRAINEMENT : 1);
     // lancer PUISSANT : relancé tout de suite après avoir attrapé
     const puissant = p.rapideDispo && p.tenue <= R.rapide.fenetre && type !== 'lob' && type !== 'super';
     if (puissant) {
@@ -432,6 +518,7 @@ export class LionelMatch extends BossScene {
     this.d = d; this.porteur = null;
     this.trainee = [];
     this.poser(p, type === 'super' ? 'super' : 'lance', 0.28);
+    if (p === this.j) this.actionTuto('lance', type);
   }
 
   majDisque(dt) {
@@ -488,12 +575,13 @@ export class LionelMatch extends BossScene {
     if (p === this.l) {
       p.plan = null;
       const [a, b] = R.ia.tenue;
-      p.nargue = !sousLeLob && Math.random() < R.ia.nargue;
+      p.nargue = !sousLeLob && !this.tuto && Math.random() < R.ia.nargue;
       p.tenueVoulue = p.nargue ? R.ia.tenueNargue : entre(a, b) + (plongeon ? 0.2 : 0);
       if (p.nargue) bulleLionel(this, auHasard(REPLIQUES.nargue));
     } else {
       // appui fait juste avant d'attraper : on le garde pour relancer aussitôt (PUISSANT)
       p.lancerMemorise = this.aAppuye('z') ? 'z' : this.aAppuye('espace') ? 'espace' : null;
+      this.actionTuto('attrape', sousLeLob);
     }
   }
 
@@ -501,6 +589,12 @@ export class LionelMatch extends BossScene {
   //  POINTS, SETS, MATCH
   // =================================================================
   marquer(qui, points, raison) {
+    // entraînement : pas de points ; si Lionel « marque », on recommence l'étape
+    if (this.tuto) {
+      this.d = null;
+      if (qui === 'l') this.rateTuto(raison === 'lob' ? 'Raté ! Va dans le cercle, on recommence.' : 'Raté ! Suis le cercle vert, on recommence.');
+      return;
+    }
     const perdant = qui === 'j' ? this.l : this.j;
     this.score[qui] += points;
     if (qui === 'j') this.stats.marques += points; else this.stats.concedes += points;
