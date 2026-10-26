@@ -71,13 +71,13 @@ function avancerDisque(d, dt) {
   }
   let ev = null;
   if (d.type === 'superJ') {
-    // zigzag : monte et descend en dents de scie
-    d.vy = d.zig.amplitude * (Math.floor(d.t / d.zig.periode) % 2 ? 1 : -1);
+    // ta tornade est téléguidée : ▲ ▼ (d.pilote) la font monter ou descendre
+    d.vy += (d.pilote * d.guide.vitesse - d.vy) * Math.min(1, dt * d.guide.reactivite);
   } else d.vy += d.ay * dt;
   d.x += d.vx * dt; d.y += d.vy * dt;
   const r = R.rayonDisque;
-  if (d.y < T.y0 + r) { d.y = 2 * (T.y0 + r) - d.y; d.vy = -d.vy; d.ay = -d.ay; if (d.zig) d.zig.amplitude *= -1; ev = 'rebond'; }
-  if (d.y > T.y1 - r) { d.y = 2 * (T.y1 - r) - d.y; d.vy = -d.vy; d.ay = -d.ay; if (d.zig) d.zig.amplitude *= -1; ev = 'rebond'; }
+  if (d.y < T.y0 + r) { d.y = 2 * (T.y0 + r) - d.y; d.vy = -d.vy; d.ay = -d.ay; ev = 'rebond'; }
+  if (d.y > T.y1 - r) { d.y = 2 * (T.y1 - r) - d.y; d.vy = -d.vy; d.ay = -d.ay; ev = 'rebond'; }
   // super de Lionel : s'arrête juste avant le filet (de son côté), puis repart en flèche
   if (d.type === 'superL' && !d.arrete && d.x <= T.filet + 34) { d.arrete = true; d.arret = d.arretDuree; d.vx = 0; d.vy = 0; }
   if (d.x <= T.x0 + r) return 'butG';
@@ -86,7 +86,7 @@ function avancerDisque(d, dt) {
 }
 
 function copieDisque(d) {
-  return { ...d, lob: d.lob && { ...d.lob }, zig: d.zig && { ...d.zig }, apres: d.apres && { ...d.apres } };
+  return { ...d, lob: d.lob && { ...d.lob }, guide: d.guide && { ...d.guide }, apres: d.apres && { ...d.apres } };
 }
 
 export class LionelMatch extends BossScene {
@@ -159,8 +159,8 @@ export class LionelMatch extends BossScene {
       'BUT : vise le mur derrière Lionel (jaune = 3 points, rouge = 5)',
       'Flèches : cours vers le cercle vert (suis les points blancs !)',
       (tactile ? 'Lancer' : 'ESPACE') + ' : lancer (maintiens ▲ ou ▼ pour lancer en biais)',
-      (tactile ? 'Lob' : 'Z') + ' : lob (2 points s\'il tombe dans le sable : une bonne arme !)',
-      'Attrape un lob juste en dessous = SUPER LANCER !',
+      (tactile ? 'Lob' : 'Z') + ' : lob, visé avec les flèches (▶ = profond : 3 points !)',
+      'Attrape un lob juste en dessous = SUPER LANCER, guidé avec ▲ ▼ !',
       (tactile ? 'Lancer' : 'ESPACE') + ' en courant vers le frisbee = plongeon',
     ], () => this.presentation(() => this.choixDifficulte()));
   }
@@ -354,6 +354,9 @@ export class LionelMatch extends BossScene {
   majJoueur(dt, e) {
     const p = this.j;
     const dirY = (e.haut ? -1 : 0) + (e.bas ? 1 : 0), dirX = (e.gauche ? -1 : 0) + (e.droite ? 1 : 0);
+    this.dirJoueur = { x: dirX, y: dirY };   // pour le viseur de lob
+    // ta tornade de feu se guide avec ▲ ▼ pendant tout son vol
+    if (this.d && this.d.type === 'superJ') this.d.pilote = dirY;
     if (p.tient) {
       if (p.tenue < R.ralentiTenue) return;
       // appui fait juste AVANT d'attraper : relancé tout droit (les flèches tenues en courant ne comptent pas)
@@ -362,7 +365,7 @@ export class LionelMatch extends BossScene {
         return this.lancer(p, k === 'z' ? 'lob' : (p.superPret ? 'super' : 'droit'), 0);
       }
       if (this.aAppuye('espace')) return this.lancer(p, p.superPret ? 'super' : (dirY ? 'biais' : 'droit'), dirY);
-      if (this.aAppuye('z')) return this.lancer(p, 'lob', dirY);
+      if (this.aAppuye('z')) return this.lancer(p, 'lob', dirY, dirX);
       if (p.tenue >= R.tenueMax && !this.tuto) return this.lancer(p, 'droit', 0);
       return;
     }
@@ -396,7 +399,7 @@ export class LionelMatch extends BossScene {
       if (!p.plan) {
         // plus le frisbee va vite, plus il se trompe
         const vite = d.type === 'lob' ? 1 : Math.max(1, Math.hypot(d.vx, d.vy) / R.vitesseDisque);
-        p.plan = { reaction: D.reaction * entre(0.8, 1.2), erreur: entre(-1, 1) * D.erreur * vite * vite };
+        p.plan = { reaction: D.reaction * entre(0.8, 1.2) * (d.type === 'lob' ? D.lentLob || 1 : 1), erreur: entre(-1, 1) * D.erreur * vite * vite };
       }
       if (p.plan.reaction > 0) { p.plan.reaction -= dt; }
       else {
@@ -440,6 +443,28 @@ export class LionelMatch extends BossScene {
     return null;
   }
 
+  // Où tombe ton lob selon les flèches (▲ ▼ = côté, ◀ = court, ▶ = profond à 3 points)
+  cibleLob(dirY, dirX) {
+    const L = R.lobVise, ciblesY = { '-1': T.y0 + 55, 0: MILIEU_Y, 1: T.y1 - 55 };
+    const x1 = dirX > 0 ? T.x1 - L.profondX : dirX < 0 ? T.filet + L.courtX : (T.filet + T.x1) / 2;
+    return { x1, y1: ciblesY[dirY], duree: dirX > 0 ? L.dureeProfond : dirX < 0 ? L.dureeCourt : R.lob.duree,
+      hauteur: R.lob.hauteur, points: dirX > 0 ? L.pointsProfond : R.pointsLob };
+  }
+
+  // Lob qui tombe dans le sable : gerbe de sable, « BOUM ! », secousse
+  explosionSable(x, y, points) {
+    this.cameras.main.shake(260, 0.014);
+    onomatopee(this, x, y - 70, points >= 3 ? 'LOB PROFOND !' : 'BOUM !', points >= 3 ? 34 : 40, '#ffd84a');
+    const onde = this.add.ellipse(x, y, 40, 16).setStrokeStyle(5, 0xfff0c0, 1).setDepth(6);
+    this.tweens.add({ targets: onde, scaleX: 5, scaleY: 5, alpha: 0, duration: 450, onComplete: () => onde.destroy() });
+    for (let k = 0; k < 22; k++) {
+      const grain = this.add.circle(x, y, 3 + Math.random() * 4, Math.random() < 0.5 ? 0xe9cf92 : 0xc9a65e).setDepth(profondeur(y) + 1);
+      const a = -Math.PI * Math.random(), v = 60 + Math.random() * 120;
+      this.tweens.add({ targets: grain, x: x + Math.cos(a) * v, y: y + Math.sin(a) * v * 0.9, alpha: 0, duration: 500 + Math.random() * 300,
+        ease: 'Cubic.Out', onComplete: () => grain.destroy() });
+    }
+  }
+
   // Points du trajet au sol jusqu'à la hauteur du joueur p (pour dessiner l'aide)
   trajet(d, p) {
     const c = copieDisque(d), pas = 1 / 60, pts = [];
@@ -477,7 +502,7 @@ export class LionelMatch extends BossScene {
     return Math.min(R.vitesseMax, R.vitesseDisque * (1 + R.accelEchange * this.echange));
   }
 
-  lancer(p, type, dir) {
+  lancer(p, type, dir, dirX = 0) {
     const autre = p === this.j ? this.l : this.j;
     let v = this.vitesseDeBase();
     if (p === this.l) v *= this.diff.disque * (this.tuto ? VITESSE_ENTRAINEMENT : 1);
@@ -511,13 +536,14 @@ export class LionelMatch extends BossScene {
       const ciblesY = { '-1': T.y0 + 55, 0: MILIEU_Y, 1: T.y1 - 55 };
       const xMoitie = p === this.j ? (T.filet + T.x1) / 2 : (T.x0 + T.filet) / 2;
       const ty = p === this.j ? ciblesY[dir] : borne(autre.y < MILIEU_Y ? T.y1 - 60 : T.y0 + 60, T.y0 + 40, T.y1 - 40);
-      d.lob = { x0, y0, x1: xMoitie + entre(-50, 50), y1: ty + entre(-15, 15), duree: R.lob.duree, hauteur: R.lob.hauteur };
+      d.lob = { x0, y0, x1: xMoitie + entre(-50, 50), y1: ty + entre(-15, 15), duree: R.lob.duree, hauteur: R.lob.hauteur, points: R.pointsLob };
+      if (p === this.j) Object.assign(d.lob, this.cibleLob(dir, dirX), { x0, y0 });
       if (p === this.l) bulleLionel(this, auHasard(REPLIQUES.lob));
     } else if (type === 'super') {
       if (p === this.j) {
         const S = R.superJoueur;
         d.type = 'superJ'; d.vx = p.sens * v * S.vitesse;
-        d.zig = { periode: S.zigzag, amplitude: S.amplitude * (dir || 1) };
+        d.guide = { vitesse: S.pilotage, reactivite: S.reactivite }; d.pilote = dir; d.vy = dir * S.pilotage * 0.5;
         this.cinematiqueSuper(p, S.nom, 'Ton super lancer !', 0xff9a3c, '#ffd84a');
         this.stats.supers++;
       } else {
@@ -572,7 +598,7 @@ export class LionelMatch extends BossScene {
     }
     if (ev === 'butG') return this.marquer('l', this.zonePoints(d.y), 'but');
     if (ev === 'butD') return this.marquer('j', this.zonePoints(d.y), 'but');
-    if (ev === 'sol') return this.marquer(d.lanceur, R.pointsLob, 'lob');
+    if (ev === 'sol') return this.marquer(d.lanceur, d.lob.points || R.pointsLob, 'lob');
   }
 
   zonePoints(y) { return y >= ZONE5[0] && y <= ZONE5[1] ? 5 : 3; }
@@ -621,13 +647,14 @@ export class LionelMatch extends BossScene {
     const x = raison === 'lob' ? d.x : (qui === 'j' ? T.x1 - 40 : T.x0 + 40);
     const y = d.y;
     jouerSon(this, raison === 'lob' ? 'frisbee_sol' : 'frisbee_but');
+    if (raison === 'lob') this.explosionSable(x, y, points);
     if (raison === 'but') { flash(this, 0.35, points === 5 ? 0xff3b3b : 0xffd84a); this.cameras.main.shake(220, 0.012); lignesImpact(this, x, y, 0xffffff, 20, 150); }
     const t = texte(this, x + (qui === 'j' ? -60 : 60), y - 40, `+${points}`, 48, points === 5 ? '#ff5a5a' : '#ffd84a', { fontStyle: 'bold' }).setDepth(900).setScale(0.3);
     this.tweens.add({ targets: t, scale: 1, duration: 150, ease: 'Back.Out' });
     this.tweens.add({ targets: t, alpha: 0, y: y - 90, delay: 900, duration: 400, onComplete: () => t.destroy() });
     this.poser(perdant, 'touche', 0.9);
     this.poser(qui === 'j' ? this.j : this.l, 'victoire', 0.9);
-    bulleLionel(this, auHasard(qui === 'l' ? REPLIQUES.marque : REPLIQUES.encaisse));
+    bulleLionel(this, auHasard(qui === 'l' ? REPLIQUES.marque : raison === 'lob' ? REPLIQUES.lobRate : REPLIQUES.encaisse));
     this.majHud();
     this.attendre(R.pauseApresPoint, () => {
       if (this.score[qui] >= R.pointsSet || this.pointEnOr) return this.finSet(qui);
@@ -882,6 +909,15 @@ export class LionelMatch extends BossScene {
   // Repères au sol : où tombe le lob (toujours), où arrive le frisbee (aide, sauf en CHAMPION)
   dessinerReperes() {
     const g = this.reperes.clear(), d = this.d;
+    // viseur de lob : quand tu tiens le frisbee, où tomberait ton lob (Z) selon les flèches
+    if (!d && this.porteur === this.j && this.etat === 'jeu' && !this.j.superPret) {
+      const v = this.dirJoueur || { x: 0, y: 0 }, c = this.cibleLob(v.y, v.x);
+      const profond = c.points > R.pointsLob, couleur = profond ? 0xffd84a : 0xffffff;
+      const pulse = 1 + 0.12 * Math.sin(this.horloge * 8);
+      g.fillStyle(couleur, 0.18).fillEllipse(c.x1, c.y1, 50 * pulse, 20 * pulse);
+      g.lineStyle(3, couleur, 0.9).strokeEllipse(c.x1, c.y1, 50 * pulse, 20 * pulse);
+      g.lineBetween(c.x1 - 14, c.y1, c.x1 + 14, c.y1).lineBetween(c.x1, c.y1 - 7, c.x1, c.y1 + 7);
+    }
     if (!d || this.etat !== 'jeu') return;
     if (d.type === 'lob') {
       const k = Math.min(1, d.t / d.lob.duree), r = 34 - 18 * k;

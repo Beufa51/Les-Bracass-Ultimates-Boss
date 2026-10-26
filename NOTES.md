@@ -125,7 +125,11 @@ Fusionné dans `main` : en ligne.
   - Points : frisbee derrière l'adversaire = 3 points (côtés, jaune) ou 5 points (milieu, rouge) ; lob qui touche le sable = 2 points.
   - Set : 12 points ou 30 s (égalité = POINT EN OR) ; 2 sets gagnants. Celui qui encaisse sert.
   - Relancer tout de suite après avoir attrapé = lancer PUISSANT (+22 %). Le frisbee accélère à chaque lancer de l'échange.
-  - Rattraper un lob juste en dessous (cercle au sol) = SUPER LANCER (Espace) : le tien = « TORNADE DE FEU » (zigzag rapide).
+  - Rattraper un lob juste en dessous (cercle au sol) = SUPER LANCER (Espace) : le tien = « TORNADE DE FEU »,
+    TÉLÉGUIDÉE avec ▲ ▼ pendant tout son vol (`pilotage`, `reactivite` dans reglages.js).
+  - LOB VISÉ : ▲ ▼ = côté, ◀ = court (près du filet), ▶ = profond (près du mur de Lionel) = 3 points au lieu de 2.
+    Viseur (cible blanche, dorée si profond) quand tu tiens le frisbee ; gerbe de sable + « BOUM ! » quand il tombe ;
+    Lionel lit mal tes lobs (`lentLob` par difficulté) et râle quand il en rate un.
   - SCÈNE DU SUPER (`cinematiqueSuper`, 1,6 s, jeu figé) : fond sombre, lignes de vitesse qui tournent, le lanceur en grand
     (pose « super » de la planche) avec images rémanentes, étincelles, gros titre, zoom, onde de choc ; puis traînée
     lumineuse et étincelles pendant le vol (orange pour toi, vert pour Lionel).

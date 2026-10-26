@@ -23,15 +23,16 @@ export const TERRAIN = {
 //  attrape : ta zone d'attrape autour de tes pieds { x : de chaque côté, haut : vers le fond, bas : vers l'écran }
 //  ralenti : le frisbee ralentit (x ce nombre) quand il arrive près de toi (1 = pas de ralenti)
 //  superSurLob : Lionel obtient son super en rattrapant TES lobs
+//  lentLob : il réagit ce nombre de fois plus lentement à tes lobs (ils sont durs à lire)
 //  biaisApres : ses N premiers lancers de l'échange sont droits (pas de rebond)
 export const DIFFICULTES = {
-  facile:   { nom: 'FACILE',   couleur: '#7fff7f', vitesse: 0.78, reaction: 0.34, erreur: 70, disque: 0.72, superHasard: 0,
+  facile:   { nom: 'FACILE',   couleur: '#7fff7f', vitesse: 0.78, reaction: 0.34, erreur: 70, disque: 0.72, superHasard: 0, lentLob: 2.2,
     aides: 'tot', choix: { droit: 64, biais: 24, lob: 12 }, attrape: { x: 62, haut: 90, bas: 40 }, ralenti: 0.7, superSurLob: false, biaisApres: 3,
     texte: 'Lionel court moins vite et rate plus souvent. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 0.96, reaction: 0.23, erreur: 42, disque: 0.86, superHasard: 0.04,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 0.96, reaction: 0.23, erreur: 42, disque: 0.86, superHasard: 0.04, lentLob: 1.8,
     aides: 'tot', choix: { droit: 52, biais: 34, lob: 14 }, attrape: { x: 46, haut: 72, bas: 30 }, ralenti: 0.82, superSurLob: false, biaisApres: 1,
     texte: 'Le vrai match.' },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.12, reaction: 0.15, erreur: 24, disque: 1.12, superHasard: 0.08,
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.12, reaction: 0.15, erreur: 24, disque: 1.12, superHasard: 0.08, lentLob: 1.3,
     aides: false, choix: { droit: 30, biais: 36, courbe: 22, lob: 12 }, attrape: { x: 38, haut: 55, bas: 26 }, ralenti: 1, superSurLob: true,
     texte: 'Sans aide, lancers rapides et super lancers fréquents. Pour les vrais.' },
 };
@@ -60,12 +61,14 @@ export const REGLAGES = {
   angle: 0.52,            // lancer en biais (Haut / Bas maintenu) : angle en radians
   courbe: { decalage: 120, depart: 0.32 },   // lancer courbe : arrive décalé de 120 px, part de l'autre côté
   lob: { duree: 1.25, hauteur: 170, attrape: 42, attrapeLionel: 36 },   // lob : temps de vol, hauteur max, distance pour l'attraper (toi / Lionel)
+  // tes lobs se visent : ▲ ▼ = côté, ◀ = COURT (près du filet), ▶ = PROFOND (près du mur de Lionel, 3 points)
+  lobVise: { courtX: 95, profondX: 70, dureeCourt: 1.0, dureeProfond: 1.1, pointsProfond: 3 },
   rapide: { fenetre: 0.3, bonus: 1.22 },     // relancer très vite après avoir attrapé = lancer PUISSANT
   echelleIllustre: 0.5,   // taille à l'écran des illustrations de Lionel (découpées à moitié de la planche)
   hauteurMain: 34,        // hauteur du frisbee en vol (au niveau de la main)
 
   // ---------- Super lancers (quand on rattrape un lob juste en dessous) ----------
-  superJoueur: { nom: 'TORNADE DE FEU', vitesse: 1.45, zigzag: 0.16, amplitude: 520 },
+  superJoueur: { nom: 'TORNADE DE FEU', vitesse: 1.45, pilotage: 520, reactivite: 7 },   // téléguidé avec ▲ ▼ pendant tout son vol
   superLionel: { nom: 'LE CHAMBREUR', vitesse: 1.15, arret: 0.8 },   // s'arrête au filet (une ligne montre où il va)... puis repart en flèche
 
   // ---------- Lionel (le cerveau) ----------
@@ -96,6 +99,7 @@ export const REPLIQUES = {
   nargue: ['Tu la veux ? Viens la chercher !', 'Attention... attention...', 'Regarde bien... non, en fait !', 'Tic... tac...'],
   super: ['Celle-là, tu la sens pas venir !', 'Regarde bien... trop tard !', 'Tu peux toujours courir !', 'Attention les yeux !'],
   lob: ['Oups, il tombe !', 'Cours, cours !'],
+  lobRate: ['Aïe ! Sur la tête !', 'Hé ! Il était où, celui-là ?', 'Bon... joli lob.', 'Je regardais les mouettes !'],
   setGagne: ['Un set à zéro, tranquille.', 'On continue, ou t\'abandonnes ?'],
   setPerdu: ['Bon... on arrête de rigoler.', 'Ok. Là, je me fâche.'],
   defaite: 'Reviens quand tu sauras attraper un frisbee !',

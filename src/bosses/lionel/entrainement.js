@@ -16,9 +16,9 @@ export const ETAPES = [
   { depart: 'l', lionel: 'lob', but: 'attrapeLob',
     texte: (b) => 'Un LOB ! Va dans le cercle où il va tomber.' },
   { depart: 'j', but: 'super', superPret: true,
-    texte: (b) => `SUPER PRÊT ! ${b.lancer} pour ton super lancer !` },
+    texte: (b) => `SUPER PRÊT ! ${b.lancer}, puis guide-le avec ▲ ▼ !` },
   { depart: 'j', but: 'lob',
-    texte: (b) => `${b.lob} : à toi de faire un lob !` },
+    texte: (b) => `Maintiens ▶ et ${b.lob} : lob profond (3 points) !` },
 ];
 
 export const VITESSE_ENTRAINEMENT = 0.75;   // les lancers de Lionel sont plus lents pendant l'entraînement
