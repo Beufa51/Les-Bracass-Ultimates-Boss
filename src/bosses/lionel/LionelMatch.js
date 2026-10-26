@@ -176,7 +176,7 @@ export class LionelMatch extends BossScene {
       'Attrape un lob juste en dessous = SUPER LANCER, guidé avec ▲ ▼ !',
       (tactile ? 'Lancer' : 'ESPACE') + ' en courant vers le frisbee = plongeon',
       (tactile ? 'Lancer' : 'ESPACE') + ' juste avant d\'attraper = CONTRE PARFAIT !',
-      'Jauge PUBLIC : plongeons, contres parfaits, longs échanges la remplissent. Pleine = SUPER !',
+      'Jauge PUBLIC pleine (plongeons, contres parfaits) = SUPER !',
     ], () => this.presentation(() => this.choixDifficulte()));
   }
 
@@ -877,8 +877,9 @@ export class LionelMatch extends BossScene {
     this.etiquettes(ETIQUETTES_OK);
     const el = [];
     el.push(this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0b0b14, 0.96).setDepth(100));
-    const portrait = this.add.image(LARGEUR + 200, HAUTEUR / 2 + 10, 'lionel_portrait').setDepth(101);
-    portrait.setScale(Math.min(500 / portrait.height, 340 / portrait.width));
+    // un peu plus bas et plus petit : sa bulle tient au-dessus de sa tête
+    const portrait = this.add.image(LARGEUR + 200, HAUTEUR / 2 + 50, 'lionel_portrait').setDepth(101);
+    portrait.setScale(Math.min(430 / portrait.height, 340 / portrait.width));
     portrait.setFlipX(!this.estIllustre('lionel_portrait'));   // le dessin provisoire regarde vers la droite
     this.tweens.add({ targets: portrait, x: LARGEUR - 190, duration: 350, ease: 'Cubic.Out' });
     el.push(portrait);
@@ -894,7 +895,7 @@ export class LionelMatch extends BossScene {
       'Phrase culte : « Trop facile ! »',
     ].join('\n'), 20, '#dddddd', { lineSpacing: 10 }).setDepth(102));
     el.push(texte(this, 300, 460, (estTactile() ? 'OK' : 'ESPACE') + ' : sur le terrain !', 22, '#7fff7f').setDepth(102));
-    const b = bulle(this, LARGEUR - 190, 70, 'Toi ? Contre moi ? Hé hé...', 99999).setDepth(103);
+    const b = bulle(this, LARGEUR - 190, 66, 'Toi ? Contre moi ? Hé hé...', 99999).setDepth(103);
     el.push(b);
     jouerSon(this, 'frisbee_lancer');
     this.time.delayedCall(500, () => {
