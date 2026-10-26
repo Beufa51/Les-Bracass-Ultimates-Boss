@@ -30,12 +30,12 @@ export const DIFFICULTES = {
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', vitesse: 0.78, reaction: 0.34, erreur: 70, disque: 0.72, superHasard: 0.03, lentLob: 2.2, surprises: [16, 24], fenetreParfait: 0.2,
     aides: 'tot', choix: { droit: 64, biais: 24, lob: 12 }, attrape: { x: 62, haut: 90, bas: 40 }, ralenti: 0.7, superSurLob: false, biaisApres: 3,
     texte: 'Lionel court moins vite et rate plus souvent. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 0.96, reaction: 0.23, erreur: 42, disque: 0.86, superHasard: 0.06, lentLob: 1.8, surprises: [12, 20], fenetreParfait: 0.15,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 0.96, reaction: 0.23, erreur: 50, disque: 0.86, superHasard: 0.06, lentLob: 2.3, surprises: [12, 20], fenetreParfait: 0.15,
     aides: 'tot', choix: { droit: 52, biais: 34, lob: 14 }, attrape: { x: 46, haut: 72, bas: 30 }, ralenti: 0.82, superSurLob: false, biaisApres: 1,
     texte: 'Le vrai match.' },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.12, reaction: 0.15, erreur: 24, disque: 1.12, superHasard: 0.08, lentLob: 1.3, surprises: [10, 16], fenetreParfait: 0.1,
-    aides: false, choix: { droit: 30, biais: 36, courbe: 22, lob: 12 }, attrape: { x: 38, haut: 55, bas: 26 }, ralenti: 1, superSurLob: true,
-    texte: 'Sans aide, lancers rapides et super lancers fréquents. Pour les vrais.' },
+    aides: 'filet', choix: { droit: 30, biais: 36, courbe: 22, lob: 12 }, attrape: { x: 38, haut: 55, bas: 26 }, ralenti: 1, superSurLob: true,
+    texte: 'Aide seulement après le filet, lancers rapides, supers fréquents. Pour les vrais.' },
 };
 
 export const REGLAGES = {
@@ -56,7 +56,7 @@ export const REGLAGES = {
 
   // ---------- Frisbee ----------
   vitesseDisque: 560,     // premier lancer de l'échange
-  accelEchange: 0.03,     // +3 % à chaque lancer de l'échange
+  accelEchange: 0.04,     // +4 % à chaque lancer de l'échange (les longs échanges finissent par passer)
   vitesseMax: 900,
   rayonDisque: 11,
   angle: 0.52,            // lancer en biais (Haut / Bas maintenu) : angle en radians
@@ -73,7 +73,7 @@ export const REGLAGES = {
   superLionel: { nom: 'LE CHAMBREUR', vitesse: 1.35, arret: 0.5 },   // s'arrête au filet (une ligne montre où il va)... puis repart en flèche
 
   // ---------- Jauge du public (la tienne) : pleine = SUPER PRÊT sans attraper de lob ----------
-  public: { max: 15, attrape: 1, plongeon: 2, parfait: 3, puissant: 1, marque: 1, encaisse: -2 },
+  public: { max: 15, attrape: 1, plongeon: 2, parfait: 3, puissant: 1, marque: 1, encaisse: 0 },   // (encaisser ne vide plus la jauge : pas de double peine)
 
   // ---------- Contre parfait : appuyer sur Espace juste avant d'attraper (fenetreParfait selon la difficulté) ----------
   parfait: { fenetre: 0.1, bonus: 1.4, ralenti: 0.35, dureeRalenti: 0.45 },
@@ -86,7 +86,8 @@ export const REGLAGES = {
   },
 
   // ---------- Surprises sur le terrain ----------
-  mouette: { rayon: 26, hauteur: 50, vitesse: 120 },   // traverse le terrain ; si le frisbee la touche, il est dévié (« COUAC ! »)
+  surprisePresDeToi: 200,   // un tir de Lionel n'est pas dévié à moins de 200 px de toi
+  mouette: { rayon: 34, hauteur: 60, vitesse: 120 },   // traverse le terrain ; si le frisbee la touche, il est dévié (« COUAC ! »)
   chateau: { rayon: 24, duree: 11 },                    // château de sable : le frisbee rebondit dessus, il s'écroule
   ballon:  { rayon: 20, vitesse: 70, duree: 13 },       // ballon de plage qui roule : le frisbee rebondit, le ballon file
 

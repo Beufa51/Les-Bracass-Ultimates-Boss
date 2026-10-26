@@ -38,6 +38,8 @@ export class Surprises {
       if (!o.vivant || o.touche) continue;
       const dx = d.x - o.x, dy = d.y - o.y, n = Math.hypot(dx, dy);
       if (n > o.rayon + R.rayonDisque) continue;
+      // pas de déviation d'un tir de Lionel tout près de toi (ce serait injuste) : il passe à travers
+      if (d.vx < 0 && Math.hypot(d.x - this.s.j.x, d.y - this.s.j.y) < R.surprisePresDeToi) continue;
       o.touche = true;
       if (d.type.startsWith('super')) { o.casser(); return false; }   // le super passe à travers
       // déviation : on garde le sens (vers le même camp), on change l'angle
@@ -62,7 +64,7 @@ class Mouette {
     this.x0 = entre(T.x0 + 140, T.x1 - 140); this.x = this.x0;
     this.y = this.sens > 0 ? T.y0 - 70 : T.y1 + 70; this.t = 0; this.vitesse = R.mouette.vitesse;
     this.ombre = s.add.ellipse(this.x, this.y, 34, 10, 0x000000, 0.22).setDepth(4.6);
-    this.sprite = s.add.sprite(this.x, this.y - R.mouette.hauteur, 'lionel_mouette').play('lionel_mouette').setDepth(70);
+    this.sprite = s.add.sprite(this.x, this.y - R.mouette.hauteur, 'lionel_mouette').play('lionel_mouette').setDepth(70).setScale(1.6);
   }
   maj(dt) {
     this.t += dt;

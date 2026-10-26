@@ -144,6 +144,12 @@ Fusionné dans `main` : en ligne.
     (15, attrape comptée à partir du 3e lancer), contre parfait plus large en FACILE (0,2 s) / NORMAL (0,15 s) et visable
     avec ▲ ▼, flèches ignorées après une attrape tant qu'on ne les a pas lâchées (plus de biais involontaires), aide sans
     points pendant les supers de Lionel, Chambreur plus rapide, textes du HUD redessinés seulement s'ils changent.
+  - AUDIT 2 (joueur) : entraînement en 9 étapes (~30 s) avec CONTRE PARFAIT, PLONGEON et super à GUIDER ; le cercle vert
+    devient BLEU au moment d'appuyer pour un contre parfait ; tornade en vol avec de vraies flammes + « ▲ ▼ : guide ta
+    tornade ! » ; tir de Lionel jamais dévié à moins de 200 px de toi ; mouette plus grosse ; jauge PUBLIC plus grosse,
+    qui clignote presque pleine, et encaisser ne la vide plus ; Dédoubleur : 2e cercle pour le faux frisbee jusqu'au
+    « POF » ; joueur en haut du terrain : HUD transparent et message sous lui ; NORMAL : Lionel se trompe plus et lit
+    moins bien les lobs, frisbee +4 % par lancer (les échanges finissent par passer) ; CHAMPION : aide après le filet.
   - SCÈNE DU SUPER (`cinematiqueSuper`, 1,6 s, jeu figé) : fond sombre, lignes de vitesse qui tournent, le lanceur en grand
     (pose « super » de la planche) avec images rémanentes, étincelles, gros titre, zoom, onde de choc ; puis traînée
     lumineuse et étincelles pendant le vol (orange pour toi, vert pour Lionel).

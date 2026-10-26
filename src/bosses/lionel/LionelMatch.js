@@ -228,6 +228,7 @@ export class LionelMatch extends BossScene {
     tu.banniere.setText(E.texte(this.boutons)).setColor('#ffffff');
     if (E.depart === 'l' || !this.j.tient) this.placerPourService(E.depart);
     if (E.depart === 'l') this.l.tenueVoulue = 1.2;
+    if (E.joueurLoin) this.j.y = T.y0 + 30;
     if (E.superPret) this.j.superPret = true;
     this.etat = 'jeu';
   }
@@ -252,14 +253,17 @@ export class LionelMatch extends BossScene {
   }
 
   // vérifie ce que tu viens de faire pendant l'entraînement
-  actionTuto(action, type) {
+  actionTuto(action, type, parfait) {
     const tu = this.tuto;
     if (!tu || tu.enAttente) return;
     const but = ETAPES[tu.etape].but;
     if (action === 'attrape') {
-      if (but === 'attrape' || (but === 'attrapeLob' && type)) { this.etat = 'pret'; this.reussiTuto(0.7); }
+      if (but === 'attrape' || (but === 'attrapeLob' && type) || (but === 'parfait' && parfait)) { this.etat = 'pret'; this.reussiTuto(0.9); }
+      else if (but === 'parfait') this.rateTuto('Pas tout à fait ! Appuie au moment où le cercle devient BLEU.');
       return;
     }
+    if (action === 'guide') { if (but === 'superGuide') this.reussiTuto(1.0); return; }
+    if (but === 'superGuide') return;   // le lancer du super seul ne suffit pas : il faut le guider
     // un lancer
     const ok = (but === 'lance' && (type === 'droit' || type === 'biais')) || but === type
       || (but === 'lobProfond' && type === 'lob' && this.d && this.d.lob.points > R.pointsLob);
@@ -381,7 +385,10 @@ export class LionelMatch extends BossScene {
     }
     this.dirJoueur = { x: dirX, y: dirY };   // pour le viseur de lob
     // ta tornade de feu se guide avec ▲ ▼ pendant tout son vol
-    if (this.d && this.d.type === 'superJ') this.d.pilote = dirY;
+    if (this.d && this.d.type === 'superJ') {
+      this.d.pilote = dirY;
+      if (dirY && this.d.t > 0.15) this.actionTuto('guide');
+    }
     if (p.tient) {
       if (p.tenue < R.ralentiTenue) return;
       // appui fait juste AVANT d'attraper : relancé tout droit (les flèches tenues en courant ne comptent pas)
@@ -701,7 +708,8 @@ export class LionelMatch extends BossScene {
     } else {
       // CONTRE PARFAIT : Espace appuyé juste avant d'attraper (pas en plongeon) => ralenti + lancer très rapide
       const delai = this.memoire.espace !== undefined ? this.horloge - this.memoire.espace : 99;
-      p.parfait = !plongeon && !sousLeLob && delai <= (this.diff.fenetreParfait || R.parfait.fenetre) && !this.tuto;
+      const etapeParfait = this.tuto && ETAPES[this.tuto.etape].but === 'parfait';
+      p.parfait = !plongeon && !sousLeLob && delai <= (this.diff.fenetreParfait || R.parfait.fenetre) && (!this.tuto || etapeParfait);
       p.flechesBloquees = true;
       if (p.parfait) {
         this.ralentiReste = R.parfait.dureeRalenti;
@@ -713,7 +721,7 @@ export class LionelMatch extends BossScene {
       this.ajouterPublic(plongeon ? R.public.plongeon : p.parfait ? R.public.parfait : this.echange >= 3 ? R.public.attrape : 0);
       // appui fait juste avant d'attraper : on le garde pour relancer aussitôt (PUISSANT)
       p.lancerMemorise = this.aAppuye('z') ? 'z' : this.aAppuye('espace', Math.max(0.15, this.diff.fenetreParfait || 0)) ? 'espace' : null;
-      this.actionTuto('attrape', sousLeLob);
+      this.actionTuto('attrape', sousLeLob, p.parfait);
     }
   }
 
@@ -971,6 +979,8 @@ export class LionelMatch extends BossScene {
           const f = (k + 1) / this.trainee.length;
           // super lancer : un halo large et lumineux autour de la traînée
           if (superLancer) this.graphTrainee.fillStyle(c, f * 0.25).fillCircle(q.x, q.y, 10 + k * 0.8);
+          // ta tornade : de vraies flammes (rouge au centre, jaune autour)
+          if (d.type === 'superJ') this.graphTrainee.fillStyle(k % 2 ? 0xff3a1a : 0xffd84a, f * 0.5).fillCircle(q.x + (Math.random() - 0.5) * 8, q.y + (Math.random() - 0.5) * 8, 6 + k * 0.9);
           this.graphTrainee.fillStyle(superLancer ? 0xffffff : c, f * (superLancer ? 0.7 : 0.45)).fillCircle(q.x, q.y, (superLancer ? 3 : 4) + k * (superLancer ? 0.4 : 0.9));
         });
         // étincelles qui s'échappent du super lancer
@@ -1049,8 +1059,22 @@ export class LionelMatch extends BossScene {
           (this.cacheAide.trajet || []).forEach((q, k) => { if (k % 2 === 0) g.fillCircle(q.x, q.y, 4); });
         }
         const A = this.diff.attrape;
-        g.fillStyle(0x7fff7f, 0.18).fillEllipse(pr.x, pr.y, A.x * 2, 28);
-        g.lineStyle(4, 0x7fff7f, 0.9).strokeEllipse(pr.x, pr.y, A.x * 2, 28);
+        // le cercle devient BLEU au moment où il faut appuyer pour un CONTRE PARFAIT
+        // (le frisbee est attrapé dès qu'il entre dans ta zone : à A.x pixels devant toi ; ralenti compris)
+        const ralenti = this.diff.ralenti < 1 ? this.diff.ralenti : 1;
+        const tArrivee = d.vx < 0 ? (d.x - this.j.x - A.x) / (-d.vx * ralenti) : 9;
+        const bleu = tArrivee <= (this.diff.fenetreParfait || R.parfait.fenetre) + 0.04 && Math.hypot(pr.x - this.j.x, pr.y - this.j.y) < 70;
+        const c = bleu ? 0x5ad1ff : 0x7fff7f;
+        g.fillStyle(c, bleu ? 0.4 : 0.18).fillEllipse(pr.x, pr.y, A.x * 2, 28);
+        g.lineStyle(bleu ? 6 : 4, c, 0.95).strokeEllipse(pr.x, pr.y, A.x * 2, 28);
+        // Dédoubleur : un 2e cercle (pointillé) pour le faux frisbee, jusqu'au « POF »
+        if (d.fantome) {
+          const f = d.fantome, t = (f.x - this.j.x) / -f.vx;
+          let y = f.y + f.vy * Math.max(0, t);
+          const h = T.y1 - T.y0 - 2 * R.rayonDisque, u = (((y - T.y0 - R.rayonDisque) % (2 * h)) + 2 * h) % (2 * h);
+          y = T.y0 + R.rayonDisque + (u > h ? 2 * h - u : u);
+          g.lineStyle(3, 0x7fff7f, 0.6).strokeEllipse(this.j.x, y, A.x * 2, 28);
+        }
       }
     }
   }
@@ -1137,16 +1161,15 @@ export class LionelMatch extends BossScene {
 
   creerHud() {
     const P = 90;   // sous les écrans d'intro (100) mais au-dessus du jeu
-    this.add.rectangle(LARGEUR / 2, 30, 560, 54, 0x000000, 0.55).setDepth(P).setStrokeStyle(2, 0xffffff, 0.3);
-    texte(this, 260, 18, 'TOI', 16, '#7fd0ff').setDepth(P + 1);
-    texte(this, 700, 18, 'LIONEL', 16, '#7fff9a').setDepth(P + 1);
+    this.hudFond = this.add.rectangle(LARGEUR / 2, 30, 560, 54, 0x000000, 0.55).setDepth(P).setStrokeStyle(2, 0xffffff, 0.3);
+    this.hudEtiquettes = [texte(this, 260, 18, 'TOI', 16, '#7fd0ff').setDepth(P + 1), texte(this, 700, 18, 'LIONEL', 16, '#7fff9a').setDepth(P + 1)];
     this.hudScoreJ = texte(this, 260, 42, '0', 28, '#ffffff', { fontStyle: 'bold' }).setDepth(P + 1);
     this.hudScoreL = texte(this, 700, 42, '0', 28, '#ffffff', { fontStyle: 'bold' }).setDepth(P + 1);
     this.hudChrono = texte(this, LARGEUR / 2, 38, '45', 30, '#ffd84a', { fontStyle: 'bold' }).setDepth(P + 1);
     this.hudSet = texte(this, LARGEUR / 2, 12, 'SET 1', 13, '#dddddd').setDepth(P + 1);
     this.hudSets = this.add.graphics().setDepth(P + 1);
     // jauge du public (sous ton score)
-    this.hudPublicTexte = texte(this, 222, 70, 'PUBLIC', 11, '#ffb070').setDepth(P + 1);
+    this.hudPublicTexte = texte(this, 226, 72, 'PUBLIC', 14, '#ffb070', { fontStyle: 'bold' }).setDepth(P + 1);
     this.hudPublic = this.add.graphics().setDepth(P + 1);
     // message au-dessus de ta tête (SUPER PRÊT, lance !)
     this.hudSuper = texte(this, 0, 0, '', 18, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000cc', padding: { x: 8, y: 4 } }).setDepth(P + 1);
@@ -1171,23 +1194,32 @@ export class LionelMatch extends BossScene {
 
   majJauge() {
     if (!this.hudPublic) return;
-    const g = this.hudPublic.clear(), x = 252, y = 64, l = 190, k = this.public / R.public.max;
-    g.fillStyle(0x000000, 0.6).fillRoundedRect(x - 2, y - 2, l + 4, 16, 6);
-    if (k > 0) g.fillStyle(k > 0.75 ? 0xff5a2a : 0xff9a3c, 1).fillRoundedRect(x, y, Math.max(8, l * k), 12, 5);
-    g.lineStyle(2, 0xffffff, 0.6).strokeRoundedRect(x - 2, y - 2, l + 4, 16, 6);
+    const g = this.hudPublic.clear(), x = 262, y = 64, l = 230, k = this.public / R.public.max;
+    const presque = k >= 0.75 && Math.sin(this.horloge * 12) > 0;   // presque pleine : elle clignote
+    g.fillStyle(0x000000, 0.6).fillRoundedRect(x - 3, y - 3, l + 6, 22, 8);
+    if (k > 0) g.fillStyle(presque ? 0xffe14a : k > 0.75 ? 0xff5a2a : 0xff9a3c, 1).fillRoundedRect(x, y, Math.max(10, l * k), 16, 6);
+    g.lineStyle(2, presque ? 0xffe14a : 0xffffff, 0.8).strokeRoundedRect(x - 3, y - 3, l + 6, 22, 8);
   }
 
   majChrono() {
     if (!this.hudChrono) return;
+    if (this.public / R.public.max >= 0.75) this.majJauge();
     // (on ne redessine un texte que s'il change : sinon, sur téléphone, ça coûte à chaque image)
     const chrono = this.pointEnOr ? 'OR' : String(Math.ceil(this.tempsSet));
     if (this.hudChrono.text !== chrono) this.hudChrono.setText(chrono).setColor(this.tempsSet <= 10 && !this.pointEnOr ? '#ff6b6b' : '#ffd84a');
     const j = this.j, bouton = estTactile() ? 'Lancer' : 'ESPACE';
     let msg = '';
-    if (j.superPret) msg = `SUPER PRÊT !  ${bouton}`;
+    if (this.d && this.d.type === 'superJ' && this.etat === 'jeu' && this.gel <= 0) msg = '▲ ▼ : guide ta tornade !';
+    else if (j.superPret) msg = `SUPER PRÊT !  ${bouton}`;
     else if (j.tient && j.tenue > 0.8 && this.etat === 'jeu') msg = `${bouton} : lance !`;
     if (this.hudSuper.text !== msg) this.hudSuper.setText(msg).setColor(j.superPret ? '#7fff7f' : '#ffd84a');
-    this.hudSuper.setVisible(!!msg).setPosition(borne(j.x, 120, LARGEUR - 120), Math.max(80, j.y - 160));
+    const enHaut = j.y - 160 < 90;   // joueur en haut du terrain : message sous lui, HUD transparent
+    this.hudSuper.setVisible(!!msg).setPosition(borne(j.x, 120, LARGEUR - 120), enHaut ? j.y + 30 : j.y - 160);
+    const alpha = j.y < T.y0 + 70 ? 0.4 : 1;
+    if (this.hudFond && this.hudFond.alpha !== alpha) {
+      for (const o of [this.hudFond, this.hudScoreJ, this.hudScoreL, this.hudChrono, this.hudSet, this.hudSets, this.hudPublic, this.hudPublicTexte, ...(this.hudEtiquettes || [])]) o.setAlpha(alpha);
+      if (this.tuto) this.tuto.banniere.setAlpha(alpha);
+    }
   }
 }
 
