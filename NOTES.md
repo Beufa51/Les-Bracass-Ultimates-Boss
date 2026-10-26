@@ -5,7 +5,7 @@
 **Étape 1 terminée : boss Greg TERMINÉ** (illustrations, sons, équilibrage testé par bots, écran de victoire avec trophée).
 Copie de référence de la version finale : branche `greg-termine` (`version-1-greg` = état un peu plus ancien).
 **Étape 2 en cours : boss Lionel JOUABLE** (match de frisbee façon Windjammers), Lionel en illustrations manga.
-Travail sur la branche `lionel` (pas encore fusionnée dans `main`, donc pas encore en ligne).
+Fusionné dans `main` : en ligne.
 
 ## Décisions
 - Moteur : **Phaser 3.90** (gratuit, licence MIT), copié dans `lib/`. Aucune installation pour jouer.
@@ -146,7 +146,7 @@ Travail sur la branche `lionel` (pas encore fusionnée dans `main`, donc pas enc
 
 ## Ordre de développement (mis à jour)
 1. ~~Greg (style Hajime no Ippo)~~ fait
-2. **Lionel**  ← en cours : jouable avec ses illustrations, à essayer puis fusionner dans `main` (choisi avant Beufa)
+2. **Lionel**  ← jouable en ligne avec ses illustrations, à essayer et ajuster (choisi avant Beufa)
    - Jeu : **exactement comme Windjammers** (Neo Geo, 1994) — lancer de frisbee en 1 contre 1, vue de 3/4 au-dessus du terrain,
      buts à 3 et 5 points, lancers courbes, lob, super lancer quand on rattrape au bon moment, sets.
    - Badge : médaille violette avec un frisbee.
