@@ -22,14 +22,15 @@ POSES = {
     'lionel_defaite':  ('lionel_planche_2.jpg', (270, 1070), False),
     'lionel_portrait': ('lionel_entier.jpg',    (420, 660), False),
     # ton joueur (planche avec légendes en anglais sous chaque pose)
-    'heros_frisbee_garde':    ('heros_frisbee_planche.jpg', (150, 245), False),
-    'heros_frisbee_lance':    ('heros_frisbee_planche.jpg', (670, 245), True),
-    'heros_frisbee_tient':    ('heros_frisbee_planche.jpg', (150, 660), True),
-    'heros_frisbee_plongeon': ('heros_frisbee_planche.jpg', (480, 570), True),
-    'heros_frisbee_super':    ('heros_frisbee_planche.jpg', (690, 715), True),
-    'heros_frisbee_touche':   ('heros_frisbee_planche.jpg', (170, 1055), False),
-    'heros_frisbee_victoire': ('heros_frisbee_planche.jpg', (430, 970), True),
-    'heros_frisbee_defaite':  ('heros_frisbee_planche.jpg', (690, 1100), False),
+    'heros_frisbee_garde':    ('heros_frisbee_planche.jpg', (180, 220), True),
+    'heros_frisbee_course':   ('heros_frisbee_planche.jpg', (427, 215), True),
+    'heros_frisbee_lance':    ('heros_frisbee_planche.jpg', (696, 217), True),
+    'heros_frisbee_tient':    ('heros_frisbee_planche.jpg', (172, 630), True),
+    'heros_frisbee_plongeon': ('heros_frisbee_planche.jpg', (465, 547), True),
+    'heros_frisbee_super':    ('heros_frisbee_planche.jpg', (696, 677), True),
+    'heros_frisbee_touche':   ('heros_frisbee_planche.jpg', (176, 1041), False),
+    'heros_frisbee_victoire': ('heros_frisbee_planche.jpg', (437, 991), True),
+    'heros_frisbee_defaite':  ('heros_frisbee_planche.jpg', (672, 1073), False),
 }
 # légende collée à la pose : on efface tout sous cette ligne (y sur la planche)
 COUPE_BAS = {'heros_frisbee_defaite': 1228}
@@ -72,6 +73,7 @@ for nom, (fichier, (cx, cy), versDroite) in POSES.items():
         s = objs[i]
         if s[0].stop < 140 and s[1].stop < 200: continue   # logo « PIXEL ATHLETE 93 » en haut à gauche
         if a < 1500 and s[0].stop - s[0].start <= 32: continue   # mots des légendes (petits et plats)
+        if s[0].stop - s[0].start <= 32 and (s[0].start + s[0].stop) / 2 > y1 - 40: continue   # ligne de légende sous les pieds
         if s[0].start >= y0 - 30 and s[0].stop <= y1 + 45 and s[1].start >= x0 - 30 and s[1].stop <= x1 + 30:
             garder |= lab == i + 1
     if nom in COUPE_BAS: garder = garder.copy(); garder[COUPE_BAS[nom]:] = False

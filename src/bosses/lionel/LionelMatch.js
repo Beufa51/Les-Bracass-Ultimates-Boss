@@ -743,9 +743,15 @@ export class LionelMatch extends BossScene {
       this.ombreDisque.setVisible(false);
       // pendant qu'il nargue, Lionel fait tourner le frisbee au bout du doigt
       if (p === this.l && p.nargue && this.choisirPose(p) === 'nargue') this.disque.setPosition(p.x - 6, p.y - 132);
-      // ces poses ont déjà le frisbee en main (dessins et illustrations ; le plongeon illustré aussi)
-      const pose = this.choisirPose(p);
-      if (POSES_AVEC_DISQUE.includes(pose) || (pose === 'plongeon' && this.estIllustre(p.prefixe + '_plongeon'))) this.disque.setVisible(false);
+      const pose = this.choisirPose(p), illustre = this.estIllustre(p.prefixe + '_' + pose);
+      if (p === this.j && illustre) {
+        // tes illustrations ont les mains vides : le frisbee est posé dans tes mains
+        if (pose === 'plongeon') this.disque.setPosition(p.x + (p.sprite.flipX ? -1 : 1) * 70, p.y - 40);
+        else this.disque.setPosition(p.x + 3, p.y - 72);
+      } else if (POSES_AVEC_DISQUE.includes(pose) || (pose === 'plongeon' && illustre)) {
+        // ces poses ont déjà le frisbee en main (dessins du code, illustrations de Lionel)
+        this.disque.setVisible(false);
+      }
     } else { this.disque.setVisible(false); this.ombreDisque.setVisible(false); }
     this.dessinerReperes();
     this.majChrono();
