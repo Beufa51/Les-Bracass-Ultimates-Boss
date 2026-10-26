@@ -24,12 +24,22 @@ export const REGLAGES = {
     //  - en garde / touché / essoufflé : l'image complète greg_entier ;
     //  - garde haute et coups : le haut du corps (coupé à la ceinture) + les jambes greg_jambes,
     //    posées sous la ceinture. ceinture = [x du milieu, y du haut, largeur] dans l'image du haut.
+    solY: 505,                // hauteur des pieds sur le tapis (poses "pied")
     teteX: 480, teteY: 118,   // au K.O. : case de manga avec l'image greg_ko
     jambes: { cle: 'greg_jambes', ceintureX: 163.5, largeur: 132.6 },
     poses: {
       entier: { cle: 'greg_entier',      origine: [0.461, 0.082], taille: 0.64 },
       // garde (en pied, gants levés) ; decalY = descendre l'image pour que les pieds touchent le tapis
       gardePied: { cle: 'greg_garde_pied', origine: [0.423, 0.085], taille: 0.6, decalY: -21 },
+      // planche de poses EN PIED : posées sur leurs pieds (solY), toutes à la même taille
+      gardeBasse: { cle: 'greg_garde_basse_pied', origine: [0.415, 1], taille: 0.815, pied: true },
+      jab:        { cle: 'greg_pied_jab',              origine: [0.592, 1], taille: 0.815, pied: true, cote: 'g' },
+      crochet:    { cle: 'greg_pied_crochet',          origine: [0.245, 1], taille: 0.815, pied: true, cote: 'd' },
+      corpsPied:  { cle: 'greg_corps_pied',       origine: [0.432, 1], taille: 0.815, pied: true, cote: 'g' },
+      smash:      { cle: 'greg_smash',            origine: [0.331, 1], taille: 0.815, pied: true },
+      touche:     { cle: 'greg_touche_pied',      origine: [0.666, 1], taille: 0.815, pied: true },
+      etourdi:    { cle: 'greg_etourdi',          origine: [0.23, 1], taille: 0.815, pied: true },
+      victoire:   { cle: 'greg_pied_victoire',         origine: [0.506, 1], taille: 0.815, pied: true },
       basse:  { cle: 'greg_combat',      origine: [0.467, 0.134], taille: 0.382 },
       haute:  { cle: 'greg_garde_haute', origine: [0.584, 0.18],  taille: 0.368, ceinture: [205, 414, 192] },
       corps:  { cle: 'greg_coup_corps',  origine: [0.3, 0.154],   taille: 0.355, ceinture: [190, 392, 215], cote: 'd' },

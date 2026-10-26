@@ -27,6 +27,10 @@
   garde basse `greg_combat.png`, garde haute `greg_garde_haute.png`, coup au corps `greg_coup_corps.png`,
   coup au visage `greg_coup_visage.png`, K.O. `greg_ko.png` (originaux dans `assets_inbox/`).
   Chaque image est calée sur la tête (réglages `illustre` dans `src/bosses/greg/reglages.js`).
+  Planche de poses EN PIED (assets_inbox/greg_planche_1.jpg et _2.jpg, détourées par remplissage du fond
+  blanc) : garde basse, jab, crochet, coup au corps, SMASH, touché, étourdi (aussi essoufflé), victoire.
+  Elles sont posées sur leurs pieds (`solY`), toutes à la même taille ; les images de coup sont
+  retournées selon le côté du coup. Garde haute = greg_garde_pied.png.
   Greg est vu en entier : garde (haute ET basse) = `greg_garde_pied.png` (en pied, gants levés),
   un cadre blanc + bouclier montre la zone protégée (visage ou ventre) ;
   garde basse / touché / essoufflé = image complète `greg_entier.png` ;

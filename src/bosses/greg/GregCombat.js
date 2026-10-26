@@ -1202,14 +1202,21 @@ export class GregCombat extends BossScene {
   // Greg en illustrations : on choisit l'image selon ce qu'il fait, puis on la bouge / grossit / teinte
   afficherGregIllustre(reel) {
     const g = this.g, v = g.vis, I = R.illustre, t = this.time.now;
-    const existe = (nom) => this.textures.exists(I.poses[nom].cle);
+    const existe = (nom) => !!I.poses[nom] && this.textures.exists(I.poses[nom].cle);
+    const ou = (...noms) => noms.find(existe) || 'basse';   // première pose disponible
     const repos = existe('entier') ? 'entier' : 'basse';   // image complète si elle existe
     const haute = existe('gardePied') ? 'gardePied' : 'haute';
     // pour l'instant, la même pose (gants levés) sert pour les deux gardes ;
     // c'est la zone lumineuse qui montre ce qu'il protège
-    const unePoseDeGarde = existe('gardePied');
-    const garde = (g.garde === 'haute' || unePoseDeGarde) && existe(haute) ? haute : repos;
-    const imageCoup = (cible) => (cible === 'corps' ? 'corps' : 'visage');
+    const unePoseDeGarde = existe('gardePied') && !existe('gardeBasse');
+    const garde = g.garde === 'haute' ? ou('gardePied', 'haute', repos) : (unePoseDeGarde ? haute : ou('gardeBasse', repos));
+    // une image par coup (jab, crochet, corps, smash) si elle existe
+    const imageCoup = (cible) => {
+      const id = g.attaque && g.attaque.id;
+      if (cible === 'smash') return ou('smash', 'visage');
+      if (cible === 'corps') return ou('corpsPied', 'corps');
+      return id === 'crochet' ? ou('crochet', 'visage') : ou('jab', 'visage');
+    };
     let pose = garde, dx = 0, dy = 0, echelle = 1, angle = 0, teinte = null, rapide = false;
     const forcee = g.poseForcee ? g.poseForcee.nom : null;
 
@@ -1220,11 +1227,11 @@ export class GregCombat extends BossScene {
       return;
     }
     g.sprite.setVisible(true);
-    if (g.etat === 'etourdi') { pose = repos; dx = Math.sin(t / 160) * 22; angle = Math.sin(t / 160) * 6; dy = 8; teinte = 0xfff3c0; }
+    if (g.etat === 'etourdi') { pose = ou('etourdi', repos); dx = Math.sin(t / 160) * 22; angle = Math.sin(t / 160) * 6; dy = 8; teinte = 0xfff3c0; }
     else if (g.etat === 'nargue') { pose = repos; dy = Math.sin(t / 110) * 5; dx = Math.sin(t / 220) * 8; }
-    else if (forcee === 'touche' || g.etat === 'touche') { pose = repos; dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }
+    else if (forcee === 'touche' || g.etat === 'touche') { pose = ou('touche', repos); dx = -18; angle = g.secousse > 0 ? 9 : 5; teinte = 0xff9a9a; rapide = true; }
     else if (forcee === 'bloque') { pose = existe(haute) ? haute : repos; echelle = 0.97; teinte = 0xc8d4ff; rapide = true; }
-    else if (forcee === 'uppercut') { pose = 'visage'; echelle = 1.12; dy = 20; rapide = true; }
+    else if (forcee === 'uppercut') { pose = ou('smash', 'visage'); echelle = 1.12; dy = 20; rapide = true; }
     else if (g.etat === 'prepare') {
       const c = g.attaque.cible, avance = g.t / g.prepa, sens = g.attaque.cote === 'g' ? -1 : (g.attaque.cote === 'd' ? 1 : 0);
       const debut = c === 'corps' ? I.debutElanCorps : I.debutElan;
@@ -1248,8 +1255,8 @@ export class GregCombat extends BossScene {
       pose = imageCoup(g.attaque.cible); echelle = 1.1; dy = g.attaque.cible === 'smash' ? -15 : (g.attaque.cible === 'corps' ? 30 : 14); rapide = true;
       angle = g.attaque.id === 'crochet' ? -6 : 0;
     }
-    else if (g.etat === 'essouffle' || g.etat === 'recup') { pose = existe(haute) ? haute : repos; dy = 14 + Math.sin(t / 140) * 4; echelle = 0.98; teinte = 0xd8d0e8; }
-    else if (this.etat === 'fin' && this.j.downs >= R.knockdownsMax) { pose = existe(haute) ? haute : repos; dy = -10 + Math.sin(t / 160) * 6; echelle = 1.04; }
+    else if (g.etat === 'essouffle' || g.etat === 'recup') { pose = ou('etourdi', haute, repos); dy = 14 + Math.sin(t / 140) * 4; echelle = 0.98; teinte = 0xd8d0e8; }
+    else if (this.etat === 'fin' && this.j.downs >= R.knockdownsMax) { pose = ou('victoire', haute, repos); dy = -10 + Math.sin(t / 160) * 6; echelle = 1.04; }
     else { dx = Math.sin(t / 400) * 12; dy = Math.sin(t / 300) * 2; }     // en garde : il se balance et respire
     if (!existe(pose)) pose = repos;
 
@@ -1263,7 +1270,8 @@ export class GregCombat extends BossScene {
     const coteCoup = g.attaque && g.attaque.cote;
     const retourne = !!(P.cote && coteCoup && coteCoup !== 'centre' && coteCoup !== P.cote);
     sp.setTexture(P.cle).setFlipX(retourne).setOrigin(retourne ? 1 - P.origine[0] : P.origine[0], P.origine[1]);
-    sp.setPosition(I.teteX + v.dx + secousse, I.teteY + v.dy + (P.decalY || 0)).setScale(P.taille * v.echelle).setAngle(v.angle);
+    const y = P.pied ? I.solY + v.dy : I.teteY + v.dy + (P.decalY || 0);   // pose "pied" : posée sur ses pieds
+    sp.setPosition(I.teteX + v.dx + secousse, y).setScale(P.taille * v.echelle).setAngle(v.angle);
     if (teinte) sp.setTint(teinte); else sp.clearTint();
     // jambes : posées juste sous la ceinture de l'image du haut (seulement pour les poses coupées)
     if (g.jambes) {
