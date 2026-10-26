@@ -17,6 +17,8 @@ Fusionné dans `main` : en ligne.
 - Hub vue du dessus : héros mobile, 6 portes (Beufa, Kédric, Julien, Greg, Rémi, Lionel), noms, "Bientôt".
 - Barre de 6 badges, sauvegarde dans le navigateur.
 - Retour au hub devant la porte du boss après chaque combat.
+- Démarrage rapide : au lancement, seuls le hub et les badges sont chargés ; chaque boss charge SES fichiers
+  en entrant chez lui (barre « Chez Greg... »), une seule fois (`BossScene.preload`).
 - Modèle de boss commun (`src/core/BossScene.js`) : écran des commandes, victoire (badge), défaite, retour hub.
 - Boss "Modèle" de test (menu F1 uniquement) : Z = gagner, X = perdre.
 - Menu de test caché (F1) : lancer n'importe quel boss / phase, remettre la sauvegarde à zéro.
@@ -160,7 +162,11 @@ Fusionné dans `main` : en ligne.
   - TÉLÉPHONE : JOYSTICK VIRTUEL qui suit le pouce (moitié gauche de l'écran), SEULEMENT pendant le match de Lionel
     (`src/bosses/lionel/joystick.js`) ; pause rangée en haut à droite pendant ce match.
     Le hub, Greg et les menus gardent la croix et la pause au milieu.
-  - Terrain redessiné dans l'esprit de Windjammers 2 (cage grillagée, rambardes, palmiers, ombres de palmes, public,
+  - DÉCOR PERSO (assets_inbox/lionel_decor.jpg, recadré dans assets/sprites/lionel/lionel_terrain.jpg) : le terrain
+    (TERRAIN dans reglages.js) est calé sur ses bords de sable et sa ligne jaune ; bandes 3/5/3 ajoutées sur les murs de but.
+    Sans ce fichier, le terrain dessiné par le code revient tout seul.
+  - Ton joueur au repos : vu de côté (pose de course) au lieu de face.
+  - Terrain dessiné par le code (secours) dans l'esprit de Windjammers 2 (cage grillagée, rambardes, palmiers, ombres de palmes, public,
     ligne centrale jaune, poteaux jaunes rembourrés) : dessin du code, pas d'image du vrai jeu (droits d'auteur).
   - Ton joueur : nouvelle planche mains vides (le jeu pose le frisbee dans ses mains quand il le tient).
   - RÈGLE : chaque boss est indépendant ; une modification pour un boss ne doit JAMAIS changer un autre boss (Greg !).
