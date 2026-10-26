@@ -25,7 +25,7 @@ Fusionné dans `main` : en ligne.
 - **Smartphone / tablette** : boutons tactiles à l'écran (`src/core/tactile.js`), qui "appuient" sur
   les touches du clavier. Chaque scène choisit le texte de ses boutons (`etiquettesTactiles`).
   Le menu de test (F1) n'existe que sur ordinateur.
-- PAUSE (Échap / P, bouton II sur mobile) : reprendre, volumes musique / bruitages / voix (enregistrés),
+- PAUSE (Échap / P, bouton II sur mobile ; pendant Greg et Lionel, le bouton II est rangé en haut à droite) : reprendre, volumes musique / bruitages / voix (enregistrés),
   abandonner. `src/core/PauseScene.js`. Volumes et records dans `src/core/sauvegarde.js`.
 - Le hub affiche le record (rang + temps) sous la porte de chaque boss gagné.
 - Téléphone tenu en vertical : message « Tourne ton téléphone » (index.html).

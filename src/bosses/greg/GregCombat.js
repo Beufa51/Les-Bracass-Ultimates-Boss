@@ -23,6 +23,7 @@ import { jouerClip } from '../../core/clips.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
 import { choisirDifficulte, cleRecord } from './difficulte.js';
+import { rangerBoutonPause } from './boutonPause.js';
 
 // compte en japonais : [kana, lecture en lettres si le navigateur n'a pas de voix japonaise]
 const JAPONAIS = [['いち', 'itchi'], ['に', 'ni'], ['さん', 'sann'], ['し', 'chi'], ['ご', 'go'],
@@ -104,6 +105,7 @@ export class GregCombat extends BossScene {
     this.creerHud();
     this.touches = creerTouches(this);
     this.events.once('shutdown', () => taireAnnonceur());
+    rangerBoutonPause(this);   // sur téléphone : pause en haut à droite (comme chez Lionel)
     // ambiance du public en continu : plus Greg est en difficulté, plus le public hurle
     if (this.cache.audio.exists('greg_ambiance')) {
       this.ambiance = this.sound.add('greg_ambiance', { loop: true, volume: 0 });
