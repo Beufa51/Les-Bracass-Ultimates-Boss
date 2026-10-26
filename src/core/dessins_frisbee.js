@@ -205,76 +205,155 @@ function frisbee(ctx, w, h, p, { i, n }) {
 }
 
 // =====================================================================
-//  TERRAIN DE PLAGE (vue de 3/4 au-dessus, comme Windjammers)
+//  TERRAIN DE PLAGE (vue de 3/4 au-dessus, dans l'esprit de Windjammers 2) :
+//  cage grillagée, palmiers, public coloré, ligne centrale jaune, poteaux rembourrés.
 //  p.terrain = { x0, x1, y0, y1, filet, zone5 } (mêmes valeurs que le jeu)
 // =====================================================================
+
+// Palmier : tronc courbé + palmes (vu un peu d'en haut)
+function palmier(ctx, x, y, taille, penche, alea) {
+  ctx.save(); ctx.translate(x, y);
+  // tronc en anneaux
+  const n = 9, hx = penche * taille, hy = -taille;
+  for (let k = 0; k < n; k++) {
+    const t = k / n, t2 = (k + 1) / n;
+    const ax = hx * t * t, ay = hy * t, bx = hx * t2 * t2, by = hy * t2;
+    ctx.beginPath(); ctx.moveTo(ax - 9 + t * 3, ay); ctx.lineTo(bx - 8 + t2 * 3, by); ctx.lineTo(bx + 8 - t2 * 3, by); ctx.lineTo(ax + 9 - t * 3, ay); ctx.closePath();
+    remplir(ctx, k % 2 ? '#9a6a3a' : '#7d5230', 2);
+  }
+  // palmes
+  ctx.translate(hx, hy);
+  for (let k = 0; k < 8; k++) {
+    const a = (k / 8) * Math.PI * 2 + alea() * 0.4, L = taille * (0.55 + alea() * 0.25);
+    ctx.save(); ctx.rotate(a);
+    ctx.beginPath(); ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(L * 0.5, -L * 0.22, L, L * 0.12);
+    ctx.quadraticCurveTo(L * 0.5, L * 0.12, 0, 0);
+    remplir(ctx, degrade(ctx, 0, 0, L, 0, [[0, '#2f9a3a'], [1, '#1d6b2a']]), 2);
+    ctx.strokeStyle = 'rgba(200,255,150,0.5)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(4, 0); ctx.quadraticCurveTo(L * 0.5, -L * 0.06, L * 0.95, L * 0.1); ctx.stroke();
+    ctx.restore();
+  }
+  ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI * 2); remplir(ctx, '#6a4a2a', 2);   // noix de coco
+  ctx.restore();
+}
+
+// Ombre de palme posée sur le sable
+function ombrePalme(ctx, x, y, r, alea) {
+  ctx.save(); ctx.translate(x, y); ctx.fillStyle = 'rgba(70,45,10,0.16)';
+  for (let k = 0; k < 7; k++) {
+    const a = (k / 7) * Math.PI * 2 + alea() * 0.5, L = r * (0.7 + alea() * 0.3);
+    ctx.save(); ctx.rotate(a); ctx.scale(1, 0.55);
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(L * 0.5, -L * 0.2, L, 0); ctx.quadraticCurveTo(L * 0.5, L * 0.2, 0, 0); ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+// Grillage en losanges dans un rectangle
+function grillage(ctx, x, y, w, h, pas = 9, couleur = 'rgba(220,230,240,0.55)') {
+  ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+  ctx.strokeStyle = couleur; ctx.lineWidth = 1;
+  for (let k = -h; k < w + h; k += pas) {
+    ctx.beginPath(); ctx.moveTo(x + k, y); ctx.lineTo(x + k + h, y + h); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + k, y + h); ctx.lineTo(x + k + h, y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// Tube métallique (rambarde)
+function tube(ctx, x0, y0, x1, y1, ep = 6) {
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = CONTOUR; ctx.lineWidth = ep + 3; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+  ctx.strokeStyle = '#b9c3cc'; ctx.lineWidth = ep; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x0, y0 - ep * 0.2); ctx.lineTo(x1, y1 - ep * 0.2); ctx.stroke();
+}
+
+// Poteau rembourré jaune (comme sur les murs de Windjammers 2)
+function poteauJaune(ctx, x, y, h) {
+  ctx.beginPath(); ctx.roundRect(x - 7, y, 14, h, 7);
+  remplir(ctx, degrade(ctx, x - 7, 0, x + 7, 0, [[0, '#c89a10'], [0.4, '#ffe14a'], [1, '#b08008']]), 2);
+}
+
 function terrainFrisbee(ctx, w, h, p) {
   const T = p.terrain, alea = hasard(93);
   const hT = T.y1 - T.y0, z5a = T.y0 + hT * T.zone5[0], z5b = T.y0 + hT * T.zone5[1];
-  // ciel + mer au fond
-  ctx.fillStyle = degrade(ctx, 0, 0, 0, 70, [[0, '#4fb4ff'], [1, '#bde6ff']]); ctx.fillRect(0, 0, w, 70);
-  ctx.fillStyle = degrade(ctx, 0, 60, 0, 112, [[0, '#1d7ccc'], [1, '#3fb6d8']]); ctx.fillRect(0, 58, w, 54);
-  ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 2;
-  for (let k = 0; k < 40; k++) { const x = alea() * w, y = 64 + alea() * 44; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 10 + alea() * 18, y); ctx.stroke(); }
-  // soleil
-  ctx.fillStyle = 'rgba(255,250,200,0.9)'; ctx.beginPath(); ctx.arc(820, 30, 18, 0, Math.PI * 2); ctx.fill();
-  // gradins + public
-  ctx.fillStyle = degrade(ctx, 0, 100, 0, T.y0 - 34, [[0, '#7a5a3a'], [1, '#5a3e26']]); ctx.fillRect(0, 100, w, T.y0 - 134);
-  const peaux = ['#f0c8a0', '#d8a074', '#b07850', '#8a5636', '#ffd8b0'];
-  const habits = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#ffffff'];
-  for (const [y, r] of [[106, 6], [118, 6.5]]) {
-    for (let x = 4 + (r % 2) * 5; x < w; x += r * 2.4) {
-      const xx = x + (alea() - 0.5) * 4;
-      ctx.fillStyle = habits[Math.floor(alea() * habits.length)]; ctx.beginPath(); ctx.ellipse(xx, y + r * 1.4, r, r * 0.8, 0, Math.PI, 0); ctx.fill();
-      ctx.fillStyle = peaux[Math.floor(alea() * peaux.length)]; ctx.beginPath(); ctx.arc(xx, y, r * 0.6, 0, Math.PI * 2); ctx.fill();
+  // ---------- fond : plage autour de la cage ----------
+  ctx.fillStyle = degrade(ctx, 0, 0, 0, h, [[0, '#f0d79a'], [1, '#e2c07a']]); ctx.fillRect(0, 0, w, h);
+  // public coloré en haut (gradins sur le sable, serviettes, parasols)
+  const peaux = ['#f0c8a0', '#d8a074', '#b07850', '#8a5636', '#ffd8b0', '#c48a5c'];
+  const habits = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#ffffff', '#ff6f91'];
+  const cheveux = ['#1a1410', '#6a4422', '#d8b040', '#a83020', '#2a2a2a', '#f0e0a0'];
+  for (const [y, r] of [[58, 9], [82, 10.5], [108, 12]]) {
+    for (let x = 8 + (r % 2) * 7; x < w; x += r * 2.5) {
+      const xx = x + (alea() - 0.5) * 6, yy = y + (alea() - 0.5) * 4;
+      if (alea() < 0.12) continue;
+      ctx.fillStyle = habits[Math.floor(alea() * habits.length)];
+      ctx.beginPath(); ctx.ellipse(xx, yy + r * 1.5, r * 1.15, r * 0.95, 0, Math.PI, 0); ctx.fill(); ctx.fillRect(xx - r * 1.15, yy + r * 1.5, r * 2.3, r);
+      if (alea() < 0.2) {   // bras levés
+        ctx.strokeStyle = peaux[Math.floor(alea() * peaux.length)]; ctx.lineWidth = r * 0.45; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(xx - r * 0.9, yy + r); ctx.lineTo(xx - r * 1.4, yy - r * 1.2); ctx.moveTo(xx + r * 0.9, yy + r); ctx.lineTo(xx + r * 1.4, yy - r * 1.2); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(xx, yy, r * 0.72, 0, Math.PI * 2); ctx.fillStyle = peaux[Math.floor(alea() * peaux.length)]; ctx.fill();
+      ctx.strokeStyle = CONTOUR; ctx.lineWidth = 1.2; ctx.stroke();
+      ctx.beginPath(); ctx.arc(xx, yy - r * 0.15, r * 0.74, Math.PI * 1.05, Math.PI * 1.95); ctx.fillStyle = cheveux[Math.floor(alea() * cheveux.length)]; ctx.fill();
+      if (alea() < 0.15) { ctx.fillStyle = '#111'; ctx.fillRect(xx - r * 0.55, yy - r * 0.15, r * 1.1, r * 0.28); }   // lunettes de soleil
     }
   }
-  // mur du fond (on voit sa face) avec des panneaux
-  ctx.fillStyle = degrade(ctx, 0, T.y0 - 34, 0, T.y0, [[0, '#f0f0f0'], [1, '#b8c0c8']]); ctx.fillRect(0, T.y0 - 34, w, 34);
-  const pubs = [['#911eb4', 'BRACASS\''], ['#1f9a6a', 'NEO-SPORTS'], ['#e6194b', 'FRISBEE'], ['#4363d8', 'JAM !']];
-  for (let k = 0; k < 6; k++) {
-    const x = 70 + k * 140, [c, t] = pubs[k % pubs.length];
-    ctx.fillStyle = c; ctx.fillRect(x, T.y0 - 30, 120, 24);
-    ctx.fillStyle = '#ffffff'; ctx.font = 'bold 14px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t, x + 60, T.y0 - 18);
+  // ---------- mur du fond : rambarde + grillage ----------
+  const haut = T.y0 - 38;
+  ctx.fillStyle = 'rgba(30,40,55,0.35)'; ctx.fillRect(T.x0 - 30, haut, T.x1 - T.x0 + 60, 38);
+  grillage(ctx, T.x0 - 30, haut, T.x1 - T.x0 + 60, 38);
+  tube(ctx, T.x0 - 30, haut, T.x1 + 30, haut, 7);
+  tube(ctx, T.x0 - 30, T.y0 - 2, T.x1 + 30, T.y0 - 2, 5);
+  for (let x = T.x0 - 30; x <= T.x1 + 30; x += (T.x1 - T.x0 + 60) / 8) tube(ctx, x, haut, x, T.y0 - 2, 6);
+  // ---------- sol de sable ----------
+  ctx.fillStyle = degrade(ctx, 0, T.y0, 0, T.y1, [[0, '#f2d58e'], [1, '#e5bf72']]); ctx.fillRect(T.x0, T.y0, T.x1 - T.x0, hT);
+  for (let k = 0; k < 1400; k++) {
+    ctx.fillStyle = alea() < 0.5 ? 'rgba(160,120,60,0.16)' : 'rgba(255,248,220,0.3)';
+    ctx.fillRect(T.x0 + alea() * (T.x1 - T.x0), T.y0 + alea() * hT, 2, 2);
   }
-  // sable
-  ctx.fillStyle = degrade(ctx, 0, T.y0, 0, h, [[0, '#e9cf92'], [1, '#d9b56e']]); ctx.fillRect(0, T.y0, w, h - T.y0);
-  for (let k = 0; k < 900; k++) {
-    ctx.fillStyle = alea() < 0.5 ? 'rgba(160,120,60,0.18)' : 'rgba(255,245,210,0.25)';
-    ctx.fillRect(alea() * w, T.y0 + alea() * (h - T.y0), 2, 2);
-  }
-  // buts : bandes sur les murs des deux bouts (3 points jaune, 5 points rouge au milieu)
+  // ombres des palmiers sur le sable
+  for (const [x, y, r] of [[T.x0 + 260, T.y0 + 90, 70], [T.x1 - 230, T.y1 - 110, 85], [T.x0 + 120, T.y1 - 40, 55], [T.x1 - 90, T.y0 + 40, 60]]) ombrePalme(ctx, x, y, r, alea);
+  // ombre portée du mur du fond
+  ctx.fillStyle = 'rgba(80,50,10,0.15)'; ctx.fillRect(T.x0, T.y0, T.x1 - T.x0, 14);
+  // ---------- lignes ----------
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)'; ctx.lineWidth = 3; ctx.strokeRect(T.x0 + 2, T.y0 + 2, T.x1 - T.x0 - 4, hT - 4);
+  ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 2;
+  for (const x of [T.x0 + (T.filet - T.x0) * 0.33, T.x1 - (T.x1 - T.filet) * 0.33]) { ctx.beginPath(); ctx.moveTo(x, T.y0); ctx.lineTo(x, T.y1); ctx.stroke(); }
+  ctx.beginPath(); ctx.moveTo(T.x0, (T.y0 + T.y1) / 2); ctx.lineTo(T.x1, (T.y0 + T.y1) / 2); ctx.stroke();
+  // ligne centrale jaune (le « filet »)
+  ctx.strokeStyle = 'rgba(0,0,0,0.2)'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(T.filet + 3, T.y0); ctx.lineTo(T.filet + 3, T.y1); ctx.stroke();
+  ctx.strokeStyle = '#ffd23a'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(T.filet, T.y0); ctx.lineTo(T.filet, T.y1); ctx.stroke();
+  // ---------- buts : murs des deux bouts (3 points jaune, 5 points rouge au milieu) ----------
   for (const [x, sens] of [[T.x0, -1], [T.x1, 1]]) {
-    const bx = sens < 0 ? x - 26 : x;
+    const bx = sens < 0 ? x - 28 : x;
     for (const [ya, yb, c, pts] of [[T.y0, z5a, '#ffd84a', 3], [z5a, z5b, '#e6303a', 5], [z5b, T.y1, '#ffd84a', 3]]) {
-      ctx.fillStyle = c; ctx.fillRect(bx, ya, 26, yb - ya);
-      ctx.strokeStyle = CONTOUR; ctx.lineWidth = 2; ctx.strokeRect(bx, ya, 26, yb - ya);
-      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 20px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.strokeStyle = CONTOUR; ctx.lineWidth = 4; ctx.strokeText(String(pts), bx + 13, (ya + yb) / 2); ctx.fillText(String(pts), bx + 13, (ya + yb) / 2);
+      ctx.fillStyle = degrade(ctx, bx, 0, bx + 28, 0, [[0, teinte(c, sens < 0 ? -0.25 : 0.1)], [1, teinte(c, sens < 0 ? 0.1 : -0.25)]]);
+      ctx.fillRect(bx, ya, 28, yb - ya);
+      grillage(ctx, bx, ya, 28, yb - ya, 8, 'rgba(255,255,255,0.35)');
+      ctx.strokeStyle = CONTOUR; ctx.lineWidth = 2; ctx.strokeRect(bx, ya, 28, yb - ya);
+      ctx.font = 'bold 20px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.strokeStyle = CONTOUR; ctx.lineWidth = 4; ctx.strokeText(String(pts), bx + 14, (ya + yb) / 2);
+      ctx.fillStyle = '#ffffff'; ctx.fillText(String(pts), bx + 14, (ya + yb) / 2);
     }
-    // filet de but (quadrillage)
-    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 1;
-    for (let y = T.y0; y < T.y1; y += 10) { ctx.beginPath(); ctx.moveTo(bx, y); ctx.lineTo(bx + 26, y); ctx.stroke(); }
+    // poteaux jaunes rembourrés aux limites des zones
+    for (const y of [T.y0 - 6, z5a - 14, z5b - 14, T.y1 - 20]) poteauJaune(ctx, bx + 14, y, 28);
   }
-  // lignes du terrain
-  ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 4;
-  ctx.strokeRect(T.x0, T.y0, T.x1 - T.x0, hT);
-  ctx.lineWidth = 2; ctx.setLineDash([10, 8]);
-  for (const x of [T.x0 + (T.filet - T.x0) * 0.5, T.filet + (T.x1 - T.filet) * 0.5]) { ctx.beginPath(); ctx.moveTo(x, T.y0); ctx.lineTo(x, T.y1); ctx.stroke(); }
-  ctx.setLineDash([]);
-  // mur de devant (bas de l'écran)
-  ctx.fillStyle = degrade(ctx, 0, T.y1 + 6, 0, h, [[0, '#c8d0d8'], [1, '#8a949e']]); ctx.fillRect(0, T.y1 + 6, w, h - T.y1 - 6);
-  ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(0, T.y1 + 6, w, 4);
-  // filet au milieu : poteaux + mailles
-  const fx = T.filet;
-  ctx.fillStyle = 'rgba(0,0,0,0.18)'; ctx.fillRect(fx + 4, T.y0, 10, hT);    // ombre
-  ctx.save(); ctx.strokeStyle = 'rgba(30,30,30,0.55)'; ctx.lineWidth = 1;
-  for (let y = T.y0 - 26; y < T.y1; y += 7) { ctx.beginPath(); ctx.moveTo(fx - 5, y); ctx.lineTo(fx + 5, y + 7); ctx.moveTo(fx + 5, y); ctx.lineTo(fx - 5, y + 7); ctx.stroke(); }
-  ctx.restore();
-  ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(fx, T.y0 - 30); ctx.lineTo(fx, T.y1 - 26); ctx.stroke();
-  for (const [y0, y1] of [[T.y0 - 34, T.y0 + 4], [T.y1 - 30, T.y1 + 8]]) {
-    ctx.beginPath(); ctx.roundRect(fx - 4, y0, 8, y1 - y0, 3); remplir(ctx, '#d0d4da', 2);
-  }
+  // ---------- mur de devant : rambarde basse + grillage ----------
+  ctx.fillStyle = 'rgba(30,40,55,0.35)'; ctx.fillRect(T.x0 - 30, T.y1 + 4, T.x1 - T.x0 + 60, 24);
+  grillage(ctx, T.x0 - 30, T.y1 + 4, T.x1 - T.x0 + 60, 24);
+  tube(ctx, T.x0 - 30, T.y1 + 4, T.x1 + 30, T.y1 + 4, 5);
+  tube(ctx, T.x0 - 30, T.y1 + 28, T.x1 + 30, T.y1 + 28, 7);
+  for (let x = T.x0 - 30; x <= T.x1 + 30; x += (T.x1 - T.x0 + 60) / 8) tube(ctx, x, T.y1 + 4, x, T.y1 + 28, 6);
+  // poteaux du centre (petits piquets jaunes aux bouts de la ligne)
+  poteauJaune(ctx, T.filet, T.y0 - 40, 40); poteauJaune(ctx, T.filet, T.y1 - 6, 36);
+  // ---------- palmiers dans les coins (hors du terrain) ----------
+  // (ceux du bas restent dans les coins pour ne pas cacher les buts)
+  palmier(ctx, 12, h + 95, 80, 0.2, alea);
+  palmier(ctx, w - 12, h + 95, 80, -0.2, alea);
+  palmier(ctx, 18, 150, 90, 0.1, alea);
+  palmier(ctx, w - 16, 150, 90, -0.1, alea);
 }
 
 export const FORMES_FRISBEE = { joueurFrisbee, frisbee, terrainFrisbee };
