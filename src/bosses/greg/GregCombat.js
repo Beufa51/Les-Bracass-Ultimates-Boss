@@ -895,7 +895,15 @@ export class GregCombat extends BossScene {
       this.barreReleve.fillStyle(0x000000, 0.7).fillRect(LARGEUR / 2 - 160, 265, 320, 22);
       this.barreReleve.fillStyle(0x7fff7f, 1).fillRect(LARGEUR / 2 - 157, 268, 314 * Math.min(1, c.appuis / besoin), 16);
       if (!c.monologue && c.n >= 2) { c.monologue = true; bulle(this, R.centreX, 360, auHasard(REPLIQUES.joueurSol), 2200); }
-      if (!c.coach && c.n >= 5) { c.coach = true; bulle(this, 150, 440, 'Coach : « ' + REPLIQUES.coach + ' »', 1800); }
+      if (!c.coach && c.n >= 5) {
+        c.coach = true;
+        bulle(this, 230, 440, 'Coach : « ' + REPLIQUES.coach + ' »', 1800);
+        if (this.textures.exists('coach_severe')) {
+          const img = this.add.image(-120, 400, 'coach_severe').setDepth(66).setDisplaySize(150, 129);
+          this.tweens.add({ targets: img, x: 85, duration: 180, ease: 'Back.Out' });
+          this.tweens.add({ targets: img, alpha: 0, delay: 1800, duration: 300, onComplete: () => img.destroy() });
+        }
+      }
       if (c.appuis >= besoin) { this.releveJoueur(); return; }
     }
     if (c.t >= R.secondeCompte) {
@@ -1021,8 +1029,18 @@ export class GregCombat extends BossScene {
     const el = [];
     el.push(voile(this, 0.85).setDepth(100));
     el.push(texte(this, LARGEUR / 2, 60, fin ? `FIN DU ROUND ${this.round - 1}` : 'DANS TON COIN', 36, '#ffd84a').setDepth(101));
-    el.push(this.add.image(170, 250, 'greg_coach').setDepth(101).setScale(1.2));
-    el.push(texte(this, 170, 360, 'Le vieux coach', 18, '#aaaaaa').setDepth(101));
+    // portrait du coach : déterminé avant le combat, sévère si tu as fait des erreurs, malin si tu t'en sors bien
+    const portrait = this.portraitCoach(fin);
+    const pc = this.add.image(170, 245, portrait).setDepth(101);
+    if (portrait !== 'greg_coach') { pc.setDisplaySize(220, 220 * pc.height / pc.width); }
+    else pc.setScale(1.2);
+    el.push(pc);
+    if (portrait !== 'greg_coach') {
+      const cadre = this.add.graphics().setDepth(102);
+      cadre.lineStyle(4, 0xffd84a, 1).strokeRect(170 - 110, 245 - pc.displayHeight / 2, 220, pc.displayHeight);
+      el.push(cadre);
+    }
+    el.push(texte(this, 170, 360, 'Coach Kamogawa', 18, '#dddddd').setDepth(101));
     el.push(texte(this, 580, 115, `Conseils pour le ROUND ${this.round} :`, 24, '#ffffff').setDepth(101));
     // les blocs de texte se placent les uns sous les autres (pas de chevauchement)
     const conseils = texte(this, 580, 145, CONSEILS[this.round - 1].map(l => '- ' + l).join('\n'), 16, '#ffffff', {
@@ -1075,6 +1093,18 @@ export class GregCombat extends BossScene {
     return `${debut}\nRANG ${rang}   -   temps ${t(this.tempsTotal)}` +
       (record ? `\nRecord : rang ${record.rang} en ${t(record.temps)}` : '') +
       (this.secretFait ? '\n(Coup secret trouvé !)' : '');
+  }
+
+  // Quel portrait du coach afficher dans le coin
+  portraitCoach(fin) {
+    const ok = (k) => this.textures.exists(k);
+    if (!ok('coach_regard')) return 'greg_coach';
+    if (!fin) return ok('coach_kbg') ? 'coach_kbg' : 'coach_regard';
+    const s = this.statsRound;
+    const erreurs = s.tropTot + s.mauvaisCote + s.corps + s.smash * 2 + s.tete;
+    if (erreurs >= 4) return ok('coach_severe') ? 'coach_severe' : 'coach_regard';
+    if (erreurs <= 1) return ok('coach_malin') ? 'coach_malin' : 'coach_regard';
+    return 'coach_regard';
   }
 
   // Remarque du coach selon les erreurs du round

@@ -93,7 +93,7 @@
   - Lancement du Dempsey Roll : joue `assets/sprites/greg/dempsey.gif` s'il existe (voir « clips »
     dans le manifeste), sinon une animation dessinée par le code.
   - Au tapis : compte de l'arbitre, alterner ◀ ▶. 3 tapis = K.O. Greg : 3 tapis = victoire.
-  - Le vieux coach donne des conseils avant chaque round. Fin du round 3 sans K.O. = décision aux points.
+  - Le coach (portraits de Kamogawa, expression selon tes erreurs) donne des conseils avant chaque round. Fin du round 3 sans K.O. = décision aux points.
   - Tout l'équilibrage est dans `src/bosses/greg/reglages.js`.
   - Musique de fond : `assets/audio/greg_musique.mp3` (chargée au début du combat, en boucle, volume dans le manifeste).
   - Menu de test F1 : commencer directement au round 1, 2 ou 3.

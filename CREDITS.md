@@ -8,3 +8,4 @@
 | Clip du Dempsey Roll (`assets/sprites/greg/dempsey.gif`) | extrait de l'animé Hajime no Ippo | © ayants droit, ajouté par le propriétaire du projet |
 | Illustration de Greg (`assets/sprites/greg/greg_portrait.jpg`, `greg_visage.jpg`) | fournie par le propriétaire du projet | — |
 | Bruitages du combat (`assets/audio/greg_*.wav`) | générés par `outils/generer_sons.py` | — |
+| Portraits du coach (`assets/sprites/greg/coach_*.jpg`) | Coach Kamogawa, animé Hajime no Ippo | © ayants droit, ajoutés par le propriétaire du projet |

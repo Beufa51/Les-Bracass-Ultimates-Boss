@@ -204,7 +204,7 @@ export const CONSEILS = [
   ],
   [
     'Coup de GAUCHE ? Esquive à DROITE (et inversement) !',
-    'Et juste après une esquive, CONTRE : dégâts x2,5 !',
+    'Et juste après une esquive, CONTRE : dégâts x3 !',
     'Chaque esquive réussie remplit ta jauge. Pleine ? DEMPSEY ROLL !',
     'Il répète toujours les mêmes enchaînements : apprends-les !',
     'Parfois il baisse sa garde une fraction de seconde... vise là où ça fait mal !',

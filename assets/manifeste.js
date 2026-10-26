@@ -84,6 +84,11 @@ export const MANIFESTE = {
     greg_portrait: { fichier: 'sprites/greg/greg_portrait.jpg', largeur: 572, hauteur: 1024, images: 1, vitesse: 1 },
     greg_visage:   { fichier: 'sprites/greg/greg_visage.jpg', largeur: 300, hauteur: 260, images: 1, vitesse: 1 },
     heros_portrait: { fichier: null, largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'portraitHeros' } },
+    // Le coach (portraits tirés de assets_inbox/coach_planche.jpg) : l'expression change selon ton round
+    coach_regard: { fichier: 'sprites/greg/coach_regard.jpg', largeur: 220, hauteur: 206, images: 1, vitesse: 1 },
+    coach_malin:  { fichier: 'sprites/greg/coach_malin.jpg', largeur: 220, hauteur: 206, images: 1, vitesse: 1 },
+    coach_severe: { fichier: 'sprites/greg/coach_severe.jpg', largeur: 220, hauteur: 189, images: 1, vitesse: 1 },
+    coach_kbg:    { fichier: 'sprites/greg/coach_kbg.jpg', largeur: 220, hauteur: 190, images: 1, vitesse: 1 },
     greg_coach: { fichier: null, largeur: 160, hauteur: 160, images: 1, vitesse: 1, provisoire: { forme: 'coach' } },
     heros_boxe_garde:         { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'garde', ...HEROS_BOXE } },
     heros_boxe_jab:           { fichier: null, largeur: 280, hauteur: 340, images: 1, vitesse: 1, provisoire: { forme: 'boxeurDos', pose: 'jab', ...HEROS_BOXE } },
