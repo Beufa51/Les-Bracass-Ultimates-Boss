@@ -116,12 +116,14 @@ Fusionné dans `main` : en ligne.
 - **Lionel** (`src/bosses/lionel/`) : match de frisbee en 1 contre 1, façon **Windjammers** (Neo Geo, 1994).
   Règles vérifiées sur le remake https://github.com/Historn/Project-1 (sets de 30 s, 3/5/2 points, plongeon = lancer + direction).
   - Vue de 3/4 au-dessus d'un terrain de plage : TOI à gauche (maillot bleu), Lionel à droite (maillot vert/crème n°93).
-  - Commandes : flèches = courir (immobile quand on tient le frisbee) ; Espace = lancer droit (▲/▼ maintenu = en biais,
-    il rebondit sur les murs) ; Z = lob ; X = lancer courbe ; en courant, Espace = plongeon.
+  - Commandes (simplifiées à 2 boutons après essai : « trop dur avec Z, X et Espace ») : flèches = courir
+    (immobile quand on tient le frisbee) ; Espace = lancer (▲/▼ maintenu = en biais, il rebondit sur les murs ;
+    déclenche le super quand il est prêt) ; Z = lob ; Espace en courant vers le frisbee qui arrive = plongeon.
+    Le lancer courbe n'est plus que pour Lionel.
   - Points : frisbee derrière l'adversaire = 3 points (côtés, jaune) ou 5 points (milieu, rouge) ; lob qui touche le sable = 2 points.
   - Set : 12 points ou 30 s (égalité = POINT EN OR) ; 2 sets gagnants. Celui qui encaisse sert.
   - Relancer tout de suite après avoir attrapé = lancer PUISSANT (+22 %). Le frisbee accélère à chaque lancer de l'échange.
-  - Rattraper un lob juste en dessous (cercle au sol) = SUPER LANCER : le tien = « ÉCLAIR VERT » (zigzag rapide).
+  - Rattraper un lob juste en dessous (cercle au sol) = SUPER LANCER (Espace) : le tien = « ÉCLAIR VERT » (zigzag rapide).
   - Super de Lionel « LE CHAMBREUR » : s'arrête au filet (une ligne violette montre où il va), puis repart en flèche.
     Il l'obtient en rattrapant tes lobs, et parfois au hasard à partir du set 2 (NORMAL / CHAMPION).
   - Lionel chambreur : bulles de moquerie quand il marque / encaisse, il garde parfois le frisbee pour te narguer.

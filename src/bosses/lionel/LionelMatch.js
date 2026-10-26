@@ -41,7 +41,8 @@ const MAISON = { j: T.x0 + 110, l: T.x1 - 110 };
 // poses dessinées où le joueur a déjà le frisbee dans la main
 const POSES_AVEC_DISQUE = ['tient', 'nargue', 'rattrape'];
 
-const ETIQUETTES_JEU = { espace: 'Lancer', z: 'Lob', x: 'Courbe' };
+// 2 boutons seulement : Lancer (Espace) et Lob (Z)
+const ETIQUETTES_JEU = { espace: 'Lancer', z: 'Lob', x: null };
 const ETIQUETTES_OK = { haut: null, bas: null, gauche: null, droite: null, espace: 'OK', z: null, x: null };
 
 // ---------------------------------------------------------------------
@@ -145,12 +146,10 @@ export class LionelMatch extends BossScene {
     const tactile = estTactile();
     this.afficherIntro('LIONEL - Le Chambreur', [
       'Flèches : te déplacer (tu ne bouges plus quand tu tiens le frisbee)',
-      tactile ? 'Lancer : lancer droit (▲ ou ▼ maintenu = en biais, ça rebondit !)' : 'Espace : lancer droit (▲ ou ▼ maintenu = en biais, ça rebondit !)',
-      tactile ? 'Lob : lob (il retombe : 2 points s\'il touche le sable)' : 'Z : lob (il retombe : 2 points s\'il touche le sable)',
-      tactile ? 'Courbe : lancer courbe (vers ▲ ou ▼)' : 'X : lancer courbe (vers ▲ ou ▼)',
-      'Relance tout de suite après avoir attrapé = lancer PUISSANT',
+      (tactile ? 'Lancer' : 'ESPACE') + ' : lancer (maintiens ▲ ou ▼ pour lancer en biais)',
+      (tactile ? 'Lob' : 'Z') + ' : lob (2 points s\'il tombe dans le sable)',
       'Attrape un lob juste en dessous = SUPER LANCER !',
-      tactile ? 'En courant, Lancer = plongeon' : 'En courant, Espace = plongeon',
+      (tactile ? 'Lancer' : 'ESPACE') + ' en courant vers le frisbee = plongeon',
     ], () => this.presentation(() => choisirDifficulte(this, 'lionel', DIFFICULTES, (nom, diff) => {
       this.nomDiff = nom; this.diff = diff; this.demarrerMatch();
     }, 'frisbee_rebond')));
@@ -254,7 +253,6 @@ export class LionelMatch extends BossScene {
     if (p.tient) {
       if (p.tenue < R.ralentiTenue) return;
       if (this.aAppuye('espace')) return this.lancer(p, p.superPret ? 'super' : (dirY ? 'biais' : 'droit'), dirY);
-      if (this.aAppuye('x')) return this.lancer(p, p.superPret ? 'super' : 'courbe', dirY || (this.l.y < MILIEU_Y ? 1 : -1));
       if (this.aAppuye('z')) return this.lancer(p, 'lob', dirY);
       if (p.tenue >= R.tenueMax) return this.lancer(p, 'droit', 0);
       return;
@@ -264,8 +262,10 @@ export class LionelMatch extends BossScene {
     p.vx = dirX / n * R.vitesseJoueur; p.vy = dirY / n * R.vitesseJoueur;
     // plongeon : Espace en courant, si le frisbee n'est pas déjà à portée
     if ((dirX || dirY) && p.recharge <= 0 && this.memoire.espace !== undefined && this.horloge - this.memoire.espace <= 0.05) {
-      const pres = this.d && Math.hypot(this.d.x - p.x, this.d.y - p.y) < 80;
-      if (!pres) { delete this.memoire.espace; this.plonger(p, dirX, dirY); }
+      // seulement si le frisbee arrive vers toi et n'est pas déjà à portée (évite les plongeons par erreur)
+      const d = this.d, vient = d && (d.type === 'lob' ? d.lob.x1 < T.filet : d.vx < 0);
+      const pres = d && Math.hypot(d.x - p.x, d.y - p.y) < 80;
+      if (vient && !pres) { delete this.memoire.espace; this.plonger(p, dirX, dirY); }
     }
   }
 
@@ -450,7 +450,7 @@ export class LionelMatch extends BossScene {
       p.nargue = !sousLeLob && Math.random() < R.ia.nargue;
       p.tenueVoulue = p.nargue ? R.ia.tenueNargue : entre(a, b) + (plongeon ? 0.2 : 0);
       if (p.nargue) bulleLionel(this, auHasard(REPLIQUES.nargue));
-    } else if (this.aAppuye('espace') || this.aAppuye('x') || this.aAppuye('z')) {
+    } else if (this.aAppuye('espace') || this.aAppuye('z')) {
       // appui fait juste avant d'attraper : on le garde pour relancer aussitôt (PUISSANT)
       this.memoire.espace = this.horloge;
     }
@@ -763,7 +763,7 @@ export class LionelMatch extends BossScene {
     if (!this.hudChrono) return;
     this.hudChrono.setText(this.pointEnOr ? 'OR' : String(Math.ceil(this.tempsSet)));
     this.hudChrono.setColor(this.tempsSet <= 10 && !this.pointEnOr ? '#ff6b6b' : '#ffd84a');
-    this.hudSuper.setText(this.j.superPret ? 'SUPER PRÊT !\nEspace / X' : '');
+    this.hudSuper.setText(this.j.superPret ? 'SUPER PRÊT !\n' + (estTactile() ? 'Lancer' : 'Espace') : '');
   }
 }
 
