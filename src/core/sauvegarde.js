@@ -36,6 +36,10 @@ export const Sauvegarde = {
   volume(type) { return donnees.volumes[type] ?? 1; },
   reglerVolume(type, v) { donnees.volumes[type] = Math.round(Math.max(0, Math.min(1, v)) * 10) / 10; ecrire(donnees); },
 
+  // dernière difficulté choisie pour un boss
+  difficulte(id) { return (donnees.difficultes || {})[id] || 'normal'; },
+  reglerDifficulte(id, nom) { donnees.difficultes = { ...(donnees.difficultes || {}), [id]: nom }; ecrire(donnees); },
+
   // record d'un boss : { rang, temps } ; ordreRangs = ['S', 'A', 'B', 'C'] (du meilleur au moins bon)
   record(id) { return donnees.records[id] || null; },
   proposerRecord(id, rang, temps, ordreRangs) {

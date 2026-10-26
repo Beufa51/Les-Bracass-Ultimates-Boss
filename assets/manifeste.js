@@ -87,6 +87,8 @@ export const MANIFESTE = {
     heros_garde:    { fichier: 'sprites/hub/heros_garde.png', largeur: 499, hauteur: 538, images: 1, vitesse: 1 },
     heros_coup:     { fichier: 'sprites/hub/heros_coup.png', largeur: 396, hauteur: 649, images: 1, vitesse: 1 },
     heros_uppercut: { fichier: 'sprites/hub/heros_uppercut.png', largeur: 522, hauteur: 789, images: 1, vitesse: 1 },
+    heros_touche:   { fichier: 'sprites/hub/heros_touche.png', largeur: 985, hauteur: 591, images: 1, vitesse: 1 },
+    heros_sol:      { fichier: 'sprites/hub/heros_sol.png', largeur: 634, hauteur: 534, images: 1, vitesse: 1 },
     heros_portrait: { fichier: null, largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'portraitHeros' } },
     // Le coach (portraits tirés de assets_inbox/coach_planche.jpg) : l'expression change selon ton round
     coach_regard: { fichier: 'sprites/greg/coach_regard.jpg', largeur: 220, hauteur: 206, images: 1, vitesse: 1 },

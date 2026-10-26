@@ -17,7 +17,7 @@ import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { annoncer, taireAnnonceur } from '../../core/annonceur.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
-import { IDENTITE, REGLAGES as R, ATTAQUES, ENCHAINEMENTS, ENCHAINEMENTS_ENERVE, CONSEILS, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
+import { IDENTITE, DIFFICULTES, REGLAGES as R, ATTAQUES, ENCHAINEMENTS, ENCHAINEMENTS_ENERVE, CONSEILS, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
 import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from './effets.js';
 import { jouerClip } from '../../core/clips.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
@@ -60,6 +60,7 @@ export class GregCombat extends BossScene {
     this.momentNargue = entre(...R.nargue.entre);   // moment (secondes restantes) où il nargue, tiré à chaque round
     this.smashAnnonce = false;
     this.roundsJoues = 0;
+    this.nomDiff = 'normal'; this.diff = DIFFICULTES.normal;
 
     this.add.image(0, 0, 'greg_ring').setOrigin(0);
     this.add.ellipse(R.centreX, R.piedsGreg - 4, 260, 34, 0x000000, 0.25);
@@ -124,7 +125,7 @@ export class GregCombat extends BossScene {
       tactile ? '▼ Garde (maintenu) : garde' : 'Bas (maintenu) : garde',
       tactile ? 'Esquives réussies => jauge d\'esprit => bouton Dempsey' : 'Esquives réussies => jauge d\'esprit => X = DEMPSEY ROLL',
       'Au tapis : alterne ◀ ▶ très vite pour te relever !',
-    ], () => this.presentation(() => this.ouvrirCoin()));
+    ], () => this.presentation(() => this.choisirDifficulte(() => this.ouvrirCoin())));
   }
 
   // =================================================================
@@ -431,7 +432,7 @@ export class GregCombat extends BossScene {
         if (g.t >= 0.14) {
           const at = g.attaque;
           if (at.coups && g.coupIndex < at.coups) {
-            g.etat = 'prepare'; g.t = 0; g.prepa = at.entre * g.fureur * R.vitesseRound[this.round - 1];
+            g.etat = 'prepare'; g.t = 0; g.prepa = at.entre * g.fureur * R.vitesseRound[this.round - 1] * this.diff.vitesse;
             at.cote = this.coteAuHasard(at);
             this.montrerAlerte();
           }
@@ -472,7 +473,7 @@ export class GregCombat extends BossScene {
     const at = ATTAQUES.jab;
     g.attaque = { id: 'jab', ...at, cote: this.coteAuHasard(at) };
     g.coupIndex = 0; g.combo = 0;
-    g.etat = 'prepare'; g.t = 0; g.prepa = R.riposte.prepa;
+    g.etat = 'prepare'; g.t = 0; g.prepa = R.riposte.prepa * this.diff.vitesse;
     this.montrerAlerte();
     onomatopee(this, R.centreX + 170, 80, 'Riposte !', 22, '#ff8a3d');
   }
@@ -489,7 +490,7 @@ export class GregCombat extends BossScene {
     const at = ATTAQUES[nom];
     g.attaque = { id: nom, ...at, cote: at.cible === 'smash' ? 'centre' : (cote || this.coteAuHasard(at)) };
     g.coupIndex = 0; g.combo = 0;
-    g.etat = 'prepare'; g.t = 0; g.prepa = at.prepa * g.fureur * R.vitesseRound[this.round - 1];
+    g.etat = 'prepare'; g.t = 0; g.prepa = at.prepa * g.fureur * R.vitesseRound[this.round - 1] * this.diff.vitesse;
     g.souffle -= at.souffle;
     this.montrerAlerte();
     if (at.cible === 'smash') {
@@ -542,7 +543,7 @@ export class GregCombat extends BossScene {
     g.coupIndex++;
     g.etat = 'frappe'; g.t = 0;
     // gant blanc qui fonce vers l'écran (seulement s'il n'y a pas d'image de coup)
-    if (this.illustre && !this.textures.exists('greg_coup_visage')) this.gantVolant(at, j.esquive && j.esquive.t <= R.esquiveProtege && at.cible !== 'corps' ? j.esquive.cote : 0);
+    if (this.illustre && !this.textures.exists('greg_coup_visage')) this.gantVolant(at, j.esquive && j.esquive.t <= this.diff.esquive && at.cible !== 'corps' ? j.esquive.cote : 0);
     this.alerte.setVisible(false);
     const xImpact = R.centreX + j.decalage, yImpact = at.cible === 'corps' ? TETE_JOUEUR_Y + VENTRE_JOUEUR : TETE_JOUEUR_Y;
     if (at.feinte) {   // feinte : rien ne part... et le vrai coup arrive juste après
@@ -552,7 +553,7 @@ export class GregCombat extends BossScene {
 
     // esquive réussie = partir du côté OPPOSÉ au coup (coup venant de gauche => esquive à droite)
     const bonCote = at.cote === 'centre' || !at.cote || (j.esquive && j.esquive.cote === (at.cote === 'g' ? 1 : -1));
-    const esquive = j.esquive && j.esquive.t <= R.esquiveProtege && bonCote;
+    const esquive = j.esquive && j.esquive.t <= this.diff.esquive && bonCote;
     if (j.esquive && !bonCote && at.cible !== 'corps') {
       onomatopee(this, R.centreX, TETE_JOUEUR_Y - 70, 'Mauvais côté !', 26, '#ff6b6b');
       this.statsRound.mauvaisCote++;
@@ -572,7 +573,7 @@ export class GregCombat extends BossScene {
       return;
     }
 
-    let degats = at.degats;
+    let degats = at.degats * this.diff.degatsGreg;
     if (j.garde && at.cible !== 'smash') {
       degats *= R.garde;
       j.souffle = Math.max(0, j.souffle - R.gardeSouffle);
@@ -1005,6 +1006,48 @@ export class GregCombat extends BossScene {
   // =================================================================
   //  ROUNDS ET COIN DU RING
   // =================================================================
+  // record séparé pour chaque difficulté (le hub affiche celui du mode normal)
+  cleRecord() { return this.nomDiff === 'normal' ? 'greg' : 'greg_' + this.nomDiff; }
+
+  // Choix de la difficulté (◀ ▶ puis Espace), le dernier choix est retenu
+  choisirDifficulte(ensuite) {
+    const noms = Object.keys(DIFFICULTES);
+    let i = Math.max(0, noms.indexOf(Sauvegarde.difficulte ? Sauvegarde.difficulte('greg') : 'normal'));
+    etiquettesTactiles({ haut: null, bas: null, z: null, x: null, espace: 'OK' });
+    const el = [];
+    el.push(this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0b0b14, 0.95).setDepth(100));
+    el.push(texte(this, LARGEUR / 2, 70, 'DIFFICULTÉ', 44, '#ffd84a').setDepth(101));
+    const cartes = noms.map((n, k) => {
+      const D = DIFFICULTES[n], x = LARGEUR / 2 + (k - 1) * 290;
+      const fond = this.add.rectangle(x, 260, 260, 220, 0x1d1d30).setDepth(101).setStrokeStyle(4, 0x555566);
+      const titre = texte(this, x, 190, D.nom, 30, D.couleur).setDepth(102);
+      const desc = texte(this, x, 275, D.texte, 15, '#dddddd', { wordWrap: { width: 230 } }).setDepth(102);
+      const rec = Sauvegarde.record(n === 'normal' ? 'greg' : 'greg_' + n);
+      const r = texte(this, x, 350, rec ? `Record : ${rec.rang} ${formatTemps(rec.temps)}` : 'Pas encore de record', 13, '#aaaaaa').setDepth(102);
+      el.push(fond, titre, desc, r);
+      return fond;
+    });
+    el.push(texte(this, LARGEUR / 2, HAUTEUR - 60, `◀ ▶ : choisir     ${estTactile() ? 'OK' : 'ESPACE'} : valider`, 20, '#7fff7f').setDepth(101));
+    const maj = () => cartes.forEach((c, k) => {
+      c.setStrokeStyle(k === i ? 6 : 3, k === i ? 0xffd84a : 0x555566).setScale(k === i ? 1.06 : 0.95);
+    });
+    maj();
+    const kb = this.input.keyboard;
+    const gauche = () => { i = (i + noms.length - 1) % noms.length; maj(); jouerSon(this, 'greg_bloque'); };
+    const droite = () => { i = (i + 1) % noms.length; maj(); jouerSon(this, 'greg_bloque'); };
+    kb.on('keydown-LEFT', gauche); kb.on('keydown-RIGHT', droite);
+    // sur téléphone : toucher une carte la choisit
+    cartes.forEach((c, k) => c.setInteractive().on('pointerdown', () => { i = k; maj(); }));
+    this.time.delayedCall(300, () => kb.once('keydown-SPACE', () => {
+      kb.off('keydown-LEFT', gauche); kb.off('keydown-RIGHT', droite);
+      this.nomDiff = noms[i]; this.diff = DIFFICULTES[noms[i]];
+      if (Sauvegarde.reglerDifficulte) Sauvegarde.reglerDifficulte('greg', noms[i]);
+      el.forEach(e => e.destroy());
+      jouerSon(this, 'ui_valider');
+      ensuite();
+    }));
+  }
+
   // Écran de présentation de Greg (son illustration), avant le premier round
   presentation(ensuite) {
     this.etat = 'coin';
@@ -1094,11 +1137,12 @@ export class GregCombat extends BossScene {
     const rang = R.rangs.find(r => score >= r.seuil).rang;
     // record seulement pour un combat complet (pas depuis le menu de test au round 2 / 3)
     const complet = (this.donnees.phase || 'round1') === 'round1';
-    const record = complet ? Sauvegarde.proposerRecord('greg', rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record('greg');
+    const record = complet ? Sauvegarde.proposerRecord(this.cleRecord(), rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record(this.cleRecord());
     const t = formatTemps;   // chrono au centième, comme Super Punch-Out
     return `${debut}\nRANG ${rang}   -   temps ${t(this.tempsTotal)}` +
       (record ? `\nRecord : rang ${record.rang} en ${t(record.temps)}` : '') +
-      (this.secretFait ? '\n(Coup secret trouvé !)' : '');
+      (this.secretFait ? '\n(Coup secret trouvé !)' : '') +
+      (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '');
   }
 
   // Écran de victoire : rayons dorés, Greg amoché qui te remet le trophée, ton rang et ton temps
@@ -1143,7 +1187,7 @@ export class GregCombat extends BossScene {
     }
     texte(this, 300, 135, lignes[0], 22, '#ffffff').setDepth(P + 5);
     texte(this, 380, 440, lignes.slice(1).join('\n').replace(/RANG \w\s+-\s+/, ''), 18, '#ffffff', { align: 'left', lineSpacing: 6 }).setOrigin(0, 0.5).setDepth(P + 5);
-    bulle(this, 760, 120, 'Greg : « Ok... t\'as gagné. Prends-le, ce trophée. »', 99999).setDepth(P + 5);
+    bulle(this, 770, 512, 'Greg : « Ok... t\'as gagné. Prends-le, ce trophée. »', 99999).setDepth(P + 5);   // sous Greg
     const badge = this.add.image(140, 210, 'badge_' + this.identite.id).setDepth(P + 5).setScale(0);
     this.tweens.add({ targets: badge, scale: 2, delay: 1200, duration: 300, ease: 'Back.Out' });
     texte(this, 140, 260, 'Badge Greg !', 18, '#ffd84a').setDepth(P + 5);
@@ -1292,7 +1336,7 @@ export class GregCombat extends BossScene {
     else g.sprite.clearTint();
     }
 
-    this.flecheEsquive.setVisible(this.etat === 'combat' && g.etat === 'prepare' && !j.dempsey && R.aideFleche[this.round - 1]
+    this.flecheEsquive.setVisible(this.etat === 'combat' && g.etat === 'prepare' && !j.dempsey && R.aideFleche[this.round - 1] && this.diff.aides
       && Math.floor(this.time.now / 140) % 4 !== 0);   // clignote
     const contre = this.horloge < j.contreJusqua && this.etat === 'combat';
     this.aideContre.setVisible(contre).setPosition(R.centreX + j.decalage, 250);
@@ -1463,7 +1507,7 @@ export class GregCombat extends BossScene {
     const couleur = at.cible === 'corps' ? 0xc77dff : (at.cible === 'smash' ? 0xff3b3b : 0xffd84a);
     const x = R.centreX, y = at.cible === 'corps' ? TETE_JOUEUR_Y + VENTRE_JOUEUR : TETE_JOUEUR_Y - 10;
     const r = 24 + 80 * (1 - avance);
-    if (R.aideCible[this.round - 1]) {
+    if (R.aideCible[this.round - 1] && this.diff.aides) {
     c.lineStyle(5, couleur, 0.9).strokeCircle(x, y, r);
     c.lineStyle(2, couleur, 0.9).strokeCircle(x, y, 20);
     c.lineBetween(x - r - 10, y, x - r + 14, y).lineBetween(x + r - 14, y, x + r + 10, y)

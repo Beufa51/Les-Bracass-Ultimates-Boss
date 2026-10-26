@@ -3,6 +3,18 @@
 // Les temps sont en secondes, les dégâts en points de vie (sur 100).
 export const IDENTITE = { id: 'greg', nom: 'Greg' };
 
+// Niveaux de difficulté (choisis avant le combat)
+//  degatsGreg : x dégâts des coups de Greg ; vitesse : x durée de préparation de ses coups (plus petit = plus rapide)
+//  esquive : durée pendant laquelle ton esquive protège ; aides : flèche + cible d'aide
+export const DIFFICULTES = {
+  facile:   { nom: 'FACILE',   couleur: '#7fff7f', degatsGreg: 0.65, vitesse: 1.25, esquive: 0.55, aides: true,
+    texte: 'Greg frappe moins fort et plus lentement. Idéal pour apprendre.' },
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 1,    vitesse: 1,    esquive: 0.45, aides: true,
+    texte: 'Le vrai combat.' },
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', degatsGreg: 1.25, vitesse: 0.85, esquive: 0.38, aides: false,
+    texte: 'Sans flèche ni cible, coups rapides et puissants. Pour les vrais.' },
+};
+
 export const REGLAGES = {
   // ---------- Match ----------
   nbRounds: 3,
@@ -55,12 +67,14 @@ export const REGLAGES = {
   // Pour chaque pose du jeu : quelle image, retournée (miroir) ou non, décalage, inclinaison.
   herosIllustre: {
     ceintureY: 565, taille: 0.66,
-    images: { heros_garde: [0.496, 0.801], heros_coup: [0.617, 0.807], heros_uppercut: [0.517, 0.851] },
+    images: { heros_garde: [0.496, 0.801], heros_coup: [0.617, 0.807], heros_uppercut: [0.517, 0.851],
+      heros_touche: [0.499, 0.709], heros_sol: [0.485, 0.75] },
     poses: {
       garde:     { cle: 'heros_garde' },
       bloque:    { cle: 'heros_garde', echelle: 0.96, dy: 6 },
       esquive:   { cle: 'heros_garde', dy: 40, echelle: 0.95 },
-      touche:    { cle: 'heros_garde', angle: -6, dy: -8 },
+      touche:    { cle: 'heros_touche' },
+      sol:       { cle: 'heros_sol', dy: -10 },
       jab:       { cle: 'heros_coup', miroir: true },
       crochet:   { cle: 'heros_coup' },
       corps:     { cle: 'heros_coup', dy: 30, angle: 8 },
