@@ -980,7 +980,9 @@ export class LionelMatch extends BossScene {
       else if (p.sprite.texture.key !== cle || p.sprite.anims.isPlaying) { p.sprite.stop(); p.sprite.setTexture(cle); }
       // en courant, il regarde dans le sens de sa course
       let versGauche = p === this.l;
-      if (pose === 'course' && Math.abs(p.vx) > 40) versGauche = p.vx < 0;
+      // (une course en une seule image se tourne dans le sens de la course ; un pas chassé reste face à l'adversaire)
+      const pasChasse = pose === 'course' && this.textures.get(cle).frameTotal > 2;
+      if (pose === 'course' && Math.abs(p.vx) > 40 && !pasChasse) versGauche = p.vx < 0;
       if (pose === 'plongeon' && Math.abs(p.glisseX) > 0.3) versGauche = p.glisseX < 0;
       // les illustrations de Lionel regardent vers la gauche ; les tiennes et les dessins du code vers la droite
       const illustre = this.estIllustre(cle), imageVersDroite = !illustre || p === this.j;

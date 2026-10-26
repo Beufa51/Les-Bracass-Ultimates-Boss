@@ -203,9 +203,11 @@ Fusionné dans `main` : en ligne.
     (TERRAIN dans reglages.js) est calé sur ses bords de sable et sa ligne jaune ; bandes 3/5/3 ajoutées sur les murs de but.
     Sans ce fichier, le terrain dessiné par le code revient tout seul.
   - Ton joueur au repos : vu de côté (pose de course) au lieu de face.
-  - Course : une seule image par personnage pour l'instant => animée par le code (penché en avant, écrasé/étiré à
-    chaque foulée, nuage de sable à chaque pas). À FAIRE : planches « cycle de course en 6 images » (Lionel et ton
-    joueur, vus de côté, fond blanc) ; découpées en bande, elles remplacent automatiquement cette animation.
+  - Déplacement de TON joueur : PAS CHASSÉ animé (4 poses de assets_inbox/heros_frisbee_chasse_1.jpg, jouées 1-2-3-4-3-2,
+    bande `assets/sprites/lionel/heros_frisbee_chasse.png` faite par `outils/lionel/decouper_animation.py`) ; il reste
+    face à Lionel ; la pose 1 sert d'attente. (heros_frisbee_chasse_2.jpg : 2e série, pas utilisée.)
+  - Lionel : une seule image de course => animée par le code (penché, écrasé/étiré à chaque foulée, nuage de sable).
+    À FAIRE : sa planche « pas chassé » (4 images, même texte Gemini que pour ton joueur).
   - Terrain dessiné par le code (secours) dans l'esprit de Windjammers 2 (cage grillagée, rambardes, palmiers, ombres de palmes, public,
     ligne centrale jaune, poteaux jaunes rembourrés) : dessin du code, pas d'image du vrai jeu (droits d'auteur).
   - Ton joueur : nouvelle planche mains vides (le jeu pose le frisbee dans ses mains quand il le tient).

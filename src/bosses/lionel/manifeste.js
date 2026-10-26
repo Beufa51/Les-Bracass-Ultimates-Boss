@@ -40,9 +40,10 @@ export const MANIFESTE = {
     lionel_touche: { fichier: 'sprites/lionel/lionel_touche.png', largeur: 226, hauteur: 236, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'touche', ...LIONEL } },
     lionel_defaite: { fichier: 'sprites/lionel/lionel_defaite.png', largeur: 154, hauteur: 168, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'defaite', ...LIONEL } },
     lionel_portrait: { fichier: 'sprites/lionel/lionel_portrait.png', largeur: 215, hauteur: 650, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'nargue', ...LIONEL } },
-    // au repos : vu de côté (pose de course, avec de petits bonds dans le jeu) plutôt que de face
-    heros_frisbee_garde: { fichier: 'sprites/lionel/heros_frisbee_course.png', largeur: 187, hauteur: 256, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...HEROS_FRISBEE } },
-    heros_frisbee_course: { fichier: 'sprites/lionel/heros_frisbee_course.png', largeur: 187, hauteur: 256, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...HEROS_FRISBEE } },
+    // au repos : la 1re image du pas chassé (en garde, de côté)
+    heros_frisbee_garde: { fichier: 'sprites/lionel/heros_frisbee_attente.png', largeur: 175, hauteur: 259, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...HEROS_FRISBEE } },
+    // pas chassé en 6 images (assets_inbox/heros_frisbee_chasse_1.jpg, outils/lionel/decouper_animation.py) : il reste face à Lionel
+    heros_frisbee_course: { fichier: 'sprites/lionel/heros_frisbee_chasse.png', largeur: 175, hauteur: 259, images: 6, vitesse: 11, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...HEROS_FRISBEE } },
     heros_frisbee_tient: { fichier: 'sprites/lionel/heros_frisbee_course.png', largeur: 187, hauteur: 256, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...HEROS_FRISBEE } },
     heros_frisbee_lance: { fichier: 'sprites/lionel/heros_frisbee_lance.png', largeur: 188, hauteur: 253, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'lance', ...HEROS_FRISBEE } },
     heros_frisbee_super: { fichier: 'sprites/lionel/heros_frisbee_super.png', largeur: 197, hauteur: 284, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'super', ...HEROS_FRISBEE } },
