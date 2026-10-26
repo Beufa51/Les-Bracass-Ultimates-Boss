@@ -1,23 +1,26 @@
 // Chargement des visuels et sons à partir du manifeste.
 // Si un élément n'a pas encore de fichier, on dessine une forme provisoire.
-import { MANIFESTE } from './manifestes.js';
+import { MANIFESTE, manifesteDe } from './manifestes.js';
 import { FORMES } from './dessins.js';
 import { Sauvegarde } from './sauvegarde.js';
 
-// À appeler dans preload() : charge les vrais fichiers PNG / sons
-export function chargerFichiers(scene) {
-  for (const [cle, e] of Object.entries(MANIFESTE.images)) {
-    if (e.fichier) scene.load.spritesheet(cle, 'assets/' + e.fichier, { frameWidth: e.largeur, frameHeight: e.hauteur });
+// À appeler dans preload() : charge les vrais fichiers PNG / sons d'un groupe
+// ('commun' = hub et badges, au démarrage ; sinon l'id d'un boss, en entrant chez lui).
+// Ce qui est déjà chargé n'est pas rechargé.
+export function chargerFichiers(scene, groupe = 'commun') {
+  const m = manifesteDe(groupe);
+  for (const [cle, e] of Object.entries(m.images)) {
+    if (e.fichier && !scene.textures.exists(cle)) scene.load.spritesheet(cle, 'assets/' + e.fichier, { frameWidth: e.largeur, frameHeight: e.hauteur });
   }
-  for (const [cle, e] of Object.entries(MANIFESTE.sons)) {
+  for (const [cle, e] of Object.entries(m.sons)) {
     // les musiques sont jouées à part (voir musique.js)
-    if (e.fichier && !e.musique) scene.load.audio(cle, 'assets/' + e.fichier);
+    if (e.fichier && !e.musique && !scene.cache.audio.exists(cle)) scene.load.audio(cle, 'assets/' + e.fichier);
   }
 }
 
-// À appeler dans create() : crée les visuels provisoires et les animations
-export function preparerVisuels(scene) {
-  for (const [cle, e] of Object.entries(MANIFESTE.images)) {
+// À appeler une fois les fichiers chargés : crée les visuels provisoires et les animations d'un groupe
+export function preparerVisuels(scene, groupe = 'commun') {
+  for (const [cle, e] of Object.entries(manifesteDe(groupe).images)) {
     if (!scene.textures.exists(cle)) dessinerProvisoire(scene, cle, e);
     if (!scene.anims.exists(cle)) {
       scene.anims.create({

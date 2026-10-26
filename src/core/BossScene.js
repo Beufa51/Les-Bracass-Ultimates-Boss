@@ -8,7 +8,7 @@
 import { LARGEUR, HAUTEUR } from './reglages.js';
 import { Sauvegarde } from './sauvegarde.js';
 import { texte, voile } from './ui.js';
-import { jouerSon } from './ressources.js';
+import { jouerSon, chargerFichiers, preparerVisuels } from './ressources.js';
 import { estTactile, etiquettesTactiles } from './tactile.js';
 
 export class BossScene extends Phaser.Scene {
@@ -21,6 +21,23 @@ export class BossScene extends Phaser.Scene {
   init(donnees) {
     this.donnees = donnees || {};
     this.termine = false;
+  }
+
+  // Les visuels et sons de CE boss sont chargés en entrant chez lui (le démarrage du jeu ne charge que le hub).
+  // Une deuxième visite ne recharge rien.
+  preload() {
+    const id = this.identite.id;
+    chargerFichiers(this, id);
+    if (this.load.list.size === 0) { preparerVisuels(this, id); return; }
+    const titre = texte(this, LARGEUR / 2, HAUTEUR / 2 - 30, `Chez ${this.identite.nom}...`, 28, '#ffd84a');
+    const fond = this.add.rectangle(LARGEUR / 2, HAUTEUR / 2 + 20, 404, 24, 0x000000).setStrokeStyle(2, 0xffffff, 0.6);
+    const barre = this.add.rectangle(LARGEUR / 2 - 200, HAUTEUR / 2 + 20, 0, 18, 0xffd84a).setOrigin(0, 0.5);
+    this.load.on('progress', (v) => { barre.width = 400 * v; });
+    this.load.once('complete', () => {
+      this.load.off('progress');
+      titre.destroy(); fond.destroy(); barre.destroy();
+      preparerVisuels(this, id);
+    });
   }
 
   // Affiche le titre et la liste des commandes, puis attend Espace

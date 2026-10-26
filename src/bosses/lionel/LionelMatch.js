@@ -104,6 +104,8 @@ export class LionelMatch extends BossScene {
     this.trainee = [];
 
     this.add.image(0, 0, 'lionel_terrain').setOrigin(0);
+    // le décor illustré n'a pas de zones de but dessinées : bandes 3 / 5 / 3 le long des deux murs de but
+    if (this.estIllustre('lionel_terrain')) this.dessinerButs();
 
     // ---------- les deux joueurs ----------
     const joueur = (cote, prefixe) => ({
@@ -191,7 +193,7 @@ export class LionelMatch extends BossScene {
     this.boutons = { lancer: tactile ? 'Lancer' : 'ESPACE', lob: tactile ? 'Lob' : 'Z' };
     this.tuto = {
       etape: 0, enAttente: false,
-      banniere: texte(this, LARGEUR / 2, 150, '', 20, '#ffffff', { backgroundColor: '#000000cc', padding: { x: 12, y: 6 } }).setDepth(92),
+      banniere: texte(this, LARGEUR / 2, 82, '', 20, '#ffffff', { backgroundColor: '#000000cc', padding: { x: 12, y: 6 } }).setDepth(92),
       // sur téléphone, le bouton « Passer » suffit
       passer: texte(this, LARGEUR - 12, HAUTEUR - 14, tactile ? '' : 'X : passer l\'entraînement', 14, '#aaaaaa')
         .setOrigin(1, 1).setDepth(92),
@@ -898,6 +900,18 @@ export class LionelMatch extends BossScene {
     }
   }
 
+  // Bandes de but le long des murs (jaune = 3 points, rouge = 5 points au milieu)
+  dessinerButs() {
+    const g = this.add.graphics().setDepth(5);
+    for (const x of [T.x0, T.x1]) {
+      const sens = x === T.x0 ? 1 : -1;
+      for (const [ya, yb, c, pts] of [[T.y0, ZONE5[0], 0xffd84a, 3], [ZONE5[0], ZONE5[1], 0xe6303a, 5], [ZONE5[1], T.y1, 0xffd84a, 3]]) {
+        g.fillStyle(c, 0.55).fillRect(sens > 0 ? x : x - 10, ya + 2, 10, yb - ya - 4);
+        texte(this, x + sens * 22, (ya + yb) / 2, String(pts), 20, pts === 5 ? '#ff5a5a' : '#ffd84a', { fontStyle: 'bold' }).setDepth(5).setAlpha(0.85);
+      }
+    }
+  }
+
   creerHud() {
     const P = 90;   // sous les écrans d'intro (100) mais au-dessus du jeu
     this.add.rectangle(LARGEUR / 2, 30, 560, 54, 0x000000, 0.55).setDepth(P).setStrokeStyle(2, 0xffffff, 0.3);
@@ -937,7 +951,7 @@ export class LionelMatch extends BossScene {
     if (j.superPret) msg = `SUPER PRÊT !  ${bouton}`;
     else if (j.tient && j.tenue > 0.8 && this.etat === 'jeu') msg = `${bouton} : lance !`;
     this.hudSuper.setText(msg).setVisible(!!msg).setColor(j.superPret ? '#7fff7f' : '#ffd84a')
-      .setPosition(borne(j.x, 120, LARGEUR - 120), j.y - 160);
+      .setPosition(borne(j.x, 120, LARGEUR - 120), Math.max(80, j.y - 160));
   }
 }
 

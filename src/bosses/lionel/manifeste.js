@@ -24,7 +24,8 @@ export const MANIFESTE = {
     // Pas d'attente sans frisbee sur les planches : "garde" utilise la course ; "nargue" utilise la victoire.
     // Ton joueur (blond, maillot rouge) : planche assets_inbox/heros_frisbee_planche.jpg, poses tournées vers la DROITE.
     // Ses poses ont les mains vides : le jeu dessine le frisbee devant lui quand il le tient.
-    lionel_terrain:  { fichier: null, largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'terrainFrisbee', terrain: TERRAIN_FRISBEE } },
+    // décor perso (assets_inbox/lionel_decor.jpg recadré) ; sans fichier : terrain dessiné par le code
+    lionel_terrain:  { fichier: 'sprites/lionel/lionel_terrain.jpg', largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'terrainFrisbee', terrain: TERRAIN_FRISBEE } },
     frisbee:         { fichier: null, largeur: 34, hauteur: 34, images: 4, vitesse: 16, provisoire: { forme: 'frisbee' } },
     lionel_garde:    { fichier: 'sprites/lionel/lionel_course.png', largeur: 181, hauteur: 270, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...LIONEL } },
     lionel_course:   { fichier: 'sprites/lionel/lionel_course.png', largeur: 181, hauteur: 270, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...LIONEL } },
@@ -38,7 +39,8 @@ export const MANIFESTE = {
     lionel_touche:   { fichier: 'sprites/lionel/lionel_touche.png', largeur: 226, hauteur: 238, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'touche', ...LIONEL } },
     lionel_defaite:  { fichier: 'sprites/lionel/lionel_defaite.png', largeur: 154, hauteur: 168, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'defaite', ...LIONEL } },
     lionel_portrait: { fichier: 'sprites/lionel/lionel_portrait.png', largeur: 215, hauteur: 650, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'nargue', ...LIONEL } },
-    heros_frisbee_garde:    { fichier: 'sprites/lionel/heros_frisbee_garde.png', largeur: 210, hauteur: 247, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...HEROS_FRISBEE } },
+    // au repos : vu de côté (pose de course, avec de petits bonds dans le jeu) plutôt que de face
+    heros_frisbee_garde:    { fichier: 'sprites/lionel/heros_frisbee_course.png', largeur: 187, hauteur: 256, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...HEROS_FRISBEE } },
     heros_frisbee_course:   { fichier: 'sprites/lionel/heros_frisbee_course.png', largeur: 187, hauteur: 256, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...HEROS_FRISBEE } },
     heros_frisbee_tient:    { fichier: 'sprites/lionel/heros_frisbee_tient.png', largeur: 201, hauteur: 256, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...HEROS_FRISBEE } },
     heros_frisbee_lance:    { fichier: 'sprites/lionel/heros_frisbee_lance.png', largeur: 188, hauteur: 253, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'lance', ...HEROS_FRISBEE } },

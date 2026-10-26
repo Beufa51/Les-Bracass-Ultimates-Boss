@@ -5,10 +5,12 @@ export const IDENTITE = { id: 'lionel', nom: 'Lionel' };
 
 // Le terrain (vu de 3/4 au-dessus) : TOI à gauche, Lionel à droite, le filet au milieu.
 // Les buts sont les murs des deux bouts : zone du milieu = 5 points, côtés = 3 points.
+// Calé sur le décor assets/sprites/lionel/lionel_terrain.jpg (assets_inbox/lionel_decor.jpg recadré :
+// x de 120 à 1246 et y de 100 à 733, puis réduit à 960 x 540) : bords du sable et ligne jaune du milieu.
 export const TERRAIN = {
-  x0: 70, x1: 890,       // murs de but (gauche = le tien, droite = celui de Lionel)
-  y0: 168, y1: 500,      // murs du haut et du bas (le frisbee rebondit dessus)
-  filet: 480,            // personne ne passe le filet
+  x0: 90, x1: 872,       // murs de but (gauche = le tien, droite = celui de Lionel)
+  y0: 104, y1: 468,      // murs du haut et du bas (le frisbee rebondit dessus)
+  filet: 481,            // personne ne passe le filet
   zone5: [0.36, 0.64],   // zone à 5 points (en fraction de la hauteur du terrain)
 };
 
@@ -26,8 +28,8 @@ export const DIFFICULTES = {
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', vitesse: 0.78, reaction: 0.34, erreur: 70, disque: 0.72, superHasard: 0,
     aides: 'tot', choix: { droit: 64, biais: 24, lob: 12 }, attrape: { x: 62, haut: 90, bas: 40 }, ralenti: 0.7, superSurLob: false, biaisApres: 3,
     texte: 'Lionel court moins vite et rate plus souvent. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 0.92, reaction: 0.26, erreur: 52, disque: 0.8,  superHasard: 0,
-    aides: 'tot', choix: { droit: 60, biais: 28, lob: 12 }, attrape: { x: 50, haut: 75, bas: 32 }, ralenti: 0.75, superSurLob: false, biaisApres: 2,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 0.96, reaction: 0.23, erreur: 42, disque: 0.86, superHasard: 0.04,
+    aides: 'tot', choix: { droit: 52, biais: 34, lob: 14 }, attrape: { x: 46, haut: 72, bas: 30 }, ralenti: 0.82, superSurLob: false, biaisApres: 1,
     texte: 'Le vrai match.' },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.12, reaction: 0.15, erreur: 24, disque: 1.12, superHasard: 0.08,
     aides: false, choix: { droit: 30, biais: 36, courbe: 22, lob: 12 }, attrape: { x: 38, haut: 55, bas: 26 }, ralenti: 1, superSurLob: true,

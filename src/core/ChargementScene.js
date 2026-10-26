@@ -1,4 +1,5 @@
-// Première scène : charge tout le manifeste puis ouvre le hub.
+// Première scène : charge le hub et les badges (vite), puis ouvre le hub.
+// Les fichiers de chaque boss sont chargés seulement en entrant chez lui (BossScene).
 import { chargerFichiers, preparerVisuels } from './ressources.js';
 import { texte } from './ui.js';
 import { LARGEUR, HAUTEUR } from './reglages.js';

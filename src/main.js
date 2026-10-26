@@ -14,7 +14,7 @@ import { MANIFESTE as MANIFESTE_COMMUN } from '../assets/manifeste.js';
 
 // Visuels et sons : ceux du moteur commun (hub, badges) + ceux de chaque boss (chacun dans son dossier)
 enregistrer(MANIFESTE_COMMUN);
-for (const b of [...BOSS, MODELE]) if (b.manifeste) enregistrer(b.manifeste);
+for (const b of [...BOSS, MODELE]) if (b.manifeste) enregistrer(b.manifeste, b.id);
 
 const scenesDesBoss = [...BOSS, MODELE].flatMap(b => b.scenes);
 
