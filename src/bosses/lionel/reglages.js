@@ -37,6 +37,10 @@ export const DIFFICULTES = {
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.14, reaction: 0.15, erreur: 22, disque: 1.14, superHasard: 0.08, lentLob: 1.3, surprises: [10, 16], fenetreParfait: 0.1, publicLionel: 1,
     aides: 'filet', choix: { droit: 30, biais: 36, courbe: 22, lob: 12 }, attrape: { x: 38, haut: 55, bas: 26 }, ralenti: 1, superSurLob: true,
     texte: 'Aide seulement après le filet, lancers rapides, supers fréquents. Pour les vrais.' },
+  // PERSO : tu règles tout toi-même (écran de curseurs, voir perso.js) ; ces chiffres sont ceux de départ
+  perso:    { nom: 'PERSO',    couleur: '#c77dff', perso: true, vitesse: 1.0, reaction: 0.21, erreur: 44, disque: 0.89, superHasard: 0.07, lentLob: 2.2, surprises: [12, 20], fenetreParfait: 0.15, publicLionel: 0.85,
+    aides: 'tot', choix: { droit: 50, biais: 36, lob: 14 }, attrape: { x: 44, haut: 70, bas: 30 }, ralenti: 0.85, superSurLob: false, biaisApres: 1,
+    texte: 'Règle Lionel toi-même : vitesse, réflexes, agressivité, aides...' },
 };
 
 export const REGLAGES = {

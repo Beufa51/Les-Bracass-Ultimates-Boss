@@ -1,10 +1,11 @@
-// Écran de choix de la difficulté (FACILE / NORMAL / CHAMPION) de Lionel (copie propre à ce boss).
+// Écran de choix de la difficulté (FACILE / NORMAL / CHAMPION / PERSO) de Lionel (copie propre à ce boss).
 // Le dernier choix est retenu, et chaque difficulté a son propre record.
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { texte } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
+import { reglerPerso } from './perso.js';
 
 // Clé du record : 'greg' en NORMAL, 'greg_facile', 'greg_champion' sinon
 export function cleRecord(idBoss, nomDiff) { return nomDiff === 'normal' ? idBoss : idBoss + '_' + nomDiff; }
@@ -18,10 +19,10 @@ export function choisirDifficulte(scene, idBoss, difficultes, ensuite, son = 'ui
   el.push(scene.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0b0b14, 0.95).setDepth(100));
   el.push(texte(scene, LARGEUR / 2, 70, 'DIFFICULTÉ', 44, '#ffd84a').setDepth(101));
   const cartes = noms.map((n, k) => {
-    const D = difficultes[n], x = LARGEUR / 2 + (k - 1) * 290;
-    const fond = scene.add.rectangle(x, 260, 260, 220, 0x1d1d30).setDepth(101).setStrokeStyle(4, 0x555566);
-    const titre = texte(scene, x, 190, D.nom, 30, D.couleur).setDepth(102);
-    const desc = texte(scene, x, 275, D.texte, 15, '#dddddd', { wordWrap: { width: 230 } }).setDepth(102);
+    const D = difficultes[n], x = LARGEUR / 2 + (k - (noms.length - 1) / 2) * 228;
+    const fond = scene.add.rectangle(x, 260, 212, 220, 0x1d1d30).setDepth(101).setStrokeStyle(4, 0x555566);
+    const titre = texte(scene, x, 190, D.nom, 28, D.couleur).setDepth(102);
+    const desc = texte(scene, x, 275, D.texte, 15, '#dddddd', { wordWrap: { width: 190 } }).setDepth(102);
     const rec = Sauvegarde.record(cleRecord(idBoss, n));
     const r = texte(scene, x, 350, rec ? `Record : ${rec.rang} ${formatTemps(rec.temps)}` : 'Pas encore de record', 13, '#aaaaaa').setDepth(102);
     el.push(fond, titre, desc, r);
@@ -43,6 +44,8 @@ export function choisirDifficulte(scene, idBoss, difficultes, ensuite, son = 'ui
     Sauvegarde.reglerDifficulte(idBoss, noms[i]);
     el.forEach(e => e.destroy());
     jouerSon(scene, 'ui_valider');
-    ensuite(noms[i], difficultes[noms[i]]);
+    // PERSO : on passe d'abord par l'écran des curseurs
+    if (difficultes[noms[i]].perso) reglerPerso(scene, difficultes[noms[i]], (D) => ensuite(noms[i], D));
+    else ensuite(noms[i], difficultes[noms[i]]);
   }));
 }

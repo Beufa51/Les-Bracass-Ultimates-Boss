@@ -116,7 +116,9 @@ Fusionné dans `main` : en ligne.
   - Ambiance de public en continu (greg_ambiance.wav), plus forte quand Greg est en difficulté.
   - Musique de fond : `assets/audio/greg/greg_musique.mp3` (chargée au début du combat, en boucle, volume dans le manifeste).
   - Menu de test F1 : commencer directement au round 1, 2 ou 3.
-  - Choix de difficulté après la présentation : FACILE / NORMAL / CHAMPION (`DIFFICULTES` dans reglages.js), dernier choix retenu, record séparé par difficulté.
+  - Choix de difficulté après la présentation : FACILE / NORMAL / CHAMPION / PERSO (`DIFFICULTES` dans reglages.js), dernier choix retenu, record séparé par difficulté.
+  - PERSO (`src/bosses/lionel/perso.js`) : écran de curseurs (vitesse, réflexes, puissance, agressivité, ta zone d'attrape, aide, surprises),
+    niveau 5 = comme en NORMAL, réglages retenus dans le navigateur (clé `bracass_lionel_perso`).
   - Héros illustré : garde, coup, uppercut (victoire), touché (tête en arrière), au sol (assis) — `herosIllustre` dans reglages.js.
 
 - **Lionel** (`src/bosses/lionel/`) : match de frisbee en 1 contre 1, façon **Windjammers** (Neo Geo, 1994).
