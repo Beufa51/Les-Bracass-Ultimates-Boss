@@ -18,11 +18,11 @@ import { jouerMusique } from '../../core/musique.js';
 import { annoncer, taireAnnonceur } from '../../core/annonceur.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { IDENTITE, DIFFICULTES, REGLAGES as R, ATTAQUES, ENCHAINEMENTS, ENCHAINEMENTS_ENERVE, CONSEILS, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
-import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from '../../core/effets.js';
+import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from './effets.js';
 import { jouerClip } from '../../core/clips.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
-import { choisirDifficulte, cleRecord } from '../../core/difficulte.js';
+import { choisirDifficulte, cleRecord } from './difficulte.js';
 
 // compte en japonais : [kana, lecture en lettres si le navigateur n'a pas de voix japonaise]
 const JAPONAIS = [['いち', 'itchi'], ['に', 'ni'], ['さん', 'sann'], ['し', 'chi'], ['ご', 'go'],
@@ -1134,7 +1134,7 @@ export class GregCombat extends BossScene {
     greg.setScale(500 / greg.height);
     this.tweens.add({ targets: greg, x: 760, duration: 500, ease: 'Cubic.Out' });
     // le trophée apparaît en tournoyant
-    const trophee = this.add.image(300, 300, 'trophee').setDepth(P + 3).setScale(0).setAngle(-30);
+    const trophee = this.add.image(300, 300, 'greg_trophee').setDepth(P + 3).setScale(0).setAngle(-30);
     this.tweens.add({ targets: trophee, scale: 1.15, angle: 0, delay: 350, duration: 600, ease: 'Back.Out' });
     this.tweens.add({ targets: trophee, y: 290, delay: 1000, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
     // étincelles

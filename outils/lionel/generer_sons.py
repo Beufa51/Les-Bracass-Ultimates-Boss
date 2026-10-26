@@ -1,5 +1,5 @@
 # Génère les bruitages du match de frisbee de Lionel (WAV 16 bits mono).
-# Utilisation : python3 outils/generer_sons_lionel.py assets/audio
+# Utilisation : python3 outils/lionel/generer_sons.py assets/audio/lionel
 import numpy as np, wave, sys
 SR = 44100
 rng = np.random.default_rng(93)
