@@ -714,9 +714,9 @@ export class LionelMatch extends BossScene {
       let versGauche = p === this.l;
       if (pose === 'course' && Math.abs(p.vx) > 40) versGauche = p.vx < 0;
       if (pose === 'plongeon' && Math.abs(p.glisseX) > 0.3) versGauche = p.glisseX < 0;
-      // les illustrations de Lionel regardent vers la gauche, les dessins du code vers la droite
-      const illustre = this.estIllustre(cle);
-      p.sprite.setFlipX(versGauche !== illustre);
+      // les illustrations de Lionel regardent vers la gauche ; les tiennes et les dessins du code vers la droite
+      const illustre = this.estIllustre(cle), imageVersDroite = !illustre || p === this.j;
+      p.sprite.setFlipX(versGauche === imageVersDroite);
       p.sprite.setScale(illustre ? R.echelleIllustre : 1);
       // une illustration de course n'a qu'une image : petits bonds pour l'animer
       const bond = illustre && pose === 'course' ? -Math.abs(Math.sin(this.horloge * 14)) * 5 : 0;

@@ -29,9 +29,9 @@ const GREG = { couleur: '#2a4d8f', bandes: '#b3202c', ceinture: '#1d2f63', emble
 // Lionel d'après ses planches (maillot vert et crème n°93, short vert, baskets vertes, cheveux courts, barbe)
 const LIONEL = { maillot: '#1f9a6a', panneau: '#f2ead2', numero: '93', short: '#1f9a6a', chaussures: '#2fae7a',
   peau: '#e0a77c', cheveux: '#5a3a22', barbe: '#7a6656', yeux: '#4a7ab0' };
-// Toi au frisbee : maillot bleu, cheveux en pics (comme dans le hub)
-const HEROS_FRISBEE = { maillot: '#2a6fd0', panneau: '#ffffff', numero: '1', short: '#1d2440', chaussures: '#ffd84a',
-  peau: '#f2c9a0', cheveux: '#7a4a20', coiffure: 'pics', yeux: '#2a2a2a' };
+// Toi au frisbee (dessin de secours) : blond, maillot et short rouges, comme sur ta planche
+const HEROS_FRISBEE = { maillot: '#c8202c', panneau: '#d8343c', numero: '1', short: '#c8202c', chaussures: '#d02a2a',
+  peau: '#e8b48a', cheveux: '#e8c050', coiffure: 'pics', yeux: '#4a7ab0' };
 
 export const MANIFESTE = {
   images: {
@@ -137,6 +137,8 @@ export const MANIFESTE = {
     // Dessins provisoires (fichier: null) : tournés vers la DROITE (le jeu les retourne au besoin).
     // Les pieds touchent le bas de la case. "course" dessinée = 4 images côte à côte.
     // Pas d'attente sans frisbee sur les planches : "garde" utilise la course ; "nargue" utilise la victoire.
+    // Ton joueur (blond, maillot rouge) : planche assets_inbox/heros_frisbee_planche.jpg, poses tournées vers la DROITE.
+    // Sa course tient un frisbee : on utilise l'attente (mains vides) avec de petits bonds.
     lionel_terrain:  { fichier: null, largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'terrainFrisbee', terrain: TERRAIN_FRISBEE } },
     frisbee:         { fichier: null, largeur: 34, hauteur: 34, images: 4, vitesse: 16, provisoire: { forme: 'frisbee' } },
     lionel_garde:    { fichier: 'sprites/lionel/lionel_course.png', largeur: 181, hauteur: 270, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...LIONEL } },
@@ -151,16 +153,16 @@ export const MANIFESTE = {
     lionel_touche:   { fichier: 'sprites/lionel/lionel_touche.png', largeur: 226, hauteur: 238, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'touche', ...LIONEL } },
     lionel_defaite:  { fichier: 'sprites/lionel/lionel_defaite.png', largeur: 154, hauteur: 168, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'defaite', ...LIONEL } },
     lionel_portrait: { fichier: 'sprites/lionel/lionel_portrait.png', largeur: 215, hauteur: 650, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'nargue', ...LIONEL } },
-    heros_frisbee_garde:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...HEROS_FRISBEE } },
-    heros_frisbee_course:   { fichier: null, largeur: 110, hauteur: 140, images: 4, vitesse: 10, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...HEROS_FRISBEE } },
-    heros_frisbee_tient:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...HEROS_FRISBEE } },
-    heros_frisbee_lance:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'lance', ...HEROS_FRISBEE } },
-    heros_frisbee_super:    { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'super', ...HEROS_FRISBEE } },
-    heros_frisbee_rattrape: { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'rattrape', ...HEROS_FRISBEE } },
-    heros_frisbee_plongeon: { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'plongeon', ...HEROS_FRISBEE } },
-    heros_frisbee_victoire: { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'victoire', ...HEROS_FRISBEE } },
-    heros_frisbee_touche:   { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'touche', ...HEROS_FRISBEE } },
-    heros_frisbee_defaite:  { fichier: null, largeur: 110, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'defaite', ...HEROS_FRISBEE } },
+    heros_frisbee_garde:    { fichier: 'sprites/hub/heros_frisbee_garde.png', largeur: 142, hauteur: 266, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'garde', ...HEROS_FRISBEE } },
+    heros_frisbee_course:   { fichier: 'sprites/hub/heros_frisbee_garde.png', largeur: 142, hauteur: 266, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...HEROS_FRISBEE } },
+    heros_frisbee_tient:    { fichier: 'sprites/hub/heros_frisbee_tient.png', largeur: 161, hauteur: 271, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...HEROS_FRISBEE } },
+    heros_frisbee_lance:    { fichier: 'sprites/hub/heros_frisbee_lance.png', largeur: 212, hauteur: 261, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'lance', ...HEROS_FRISBEE } },
+    heros_frisbee_super:    { fichier: 'sprites/hub/heros_frisbee_super.png', largeur: 184, hauteur: 287, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'super', ...HEROS_FRISBEE } },
+    heros_frisbee_rattrape: { fichier: 'sprites/hub/heros_frisbee_rattrape.png', largeur: 161, hauteur: 271, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'rattrape', ...HEROS_FRISBEE } },
+    heros_frisbee_plongeon: { fichier: 'sprites/hub/heros_frisbee_plongeon.png', largeur: 344, hauteur: 157, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'plongeon', ...HEROS_FRISBEE } },
+    heros_frisbee_victoire: { fichier: 'sprites/hub/heros_frisbee_victoire.png', largeur: 158, hauteur: 369, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'victoire', ...HEROS_FRISBEE } },
+    heros_frisbee_touche:   { fichier: 'sprites/hub/heros_frisbee_touche.png', largeur: 169, hauteur: 238, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'touche', ...HEROS_FRISBEE } },
+    heros_frisbee_defaite:  { fichier: 'sprites/hub/heros_frisbee_defaite.png', largeur: 176, hauteur: 193, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'defaite', ...HEROS_FRISBEE } },
 
     // ---------- BOSS MODÈLE (test technique, pas un vrai boss) ----------
     modele_cible: { fichier: null, largeur: 64, hauteur: 64, images: 2, vitesse: 4,

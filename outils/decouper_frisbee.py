@@ -1,11 +1,12 @@
-# Découpe les planches manga de Lionel (assets_inbox/lionel_*.jpg) en une image par pose,
-# fond blanc rendu transparent, toutes tournées vers la GAUCHE (Lionel joue à droite du terrain).
+# Découpe les planches manga du match de frisbee en une image par pose, fond blanc rendu transparent :
+#  - Lionel (assets_inbox/lionel_*.jpg) : poses tournées vers la GAUCHE (il joue à droite du terrain) ;
+#  - ton joueur (assets_inbox/heros_frisbee_planche.jpg) : poses tournées vers la DROITE.
 # Utilisation : python3 outils/decouper_lionel.py
 import numpy as np
 from PIL import Image, ImageFilter
 from scipy import ndimage as nd
 
-ENTREE, SORTIE = 'assets_inbox/', 'assets/sprites/lionel/'
+ENTREE = 'assets_inbox/'
 REDUCTION = 0.5   # les poses sont affichées petites sur le terrain
 
 # pose : (planche, centre approximatif (x, y) de la pose, regarde vers la droite sur la planche ?)
@@ -20,7 +21,20 @@ POSES = {
     'lionel_victoire': ('lionel_planche_2.jpg', (660, 890), False),
     'lionel_defaite':  ('lionel_planche_2.jpg', (270, 1070), False),
     'lionel_portrait': ('lionel_entier.jpg',    (420, 660), False),
+    # ton joueur (planche avec légendes en anglais sous chaque pose)
+    'heros_frisbee_garde':    ('heros_frisbee_planche.jpg', (150, 245), False),
+    'heros_frisbee_lance':    ('heros_frisbee_planche.jpg', (670, 245), True),
+    'heros_frisbee_tient':    ('heros_frisbee_planche.jpg', (150, 660), True),
+    'heros_frisbee_plongeon': ('heros_frisbee_planche.jpg', (480, 570), True),
+    'heros_frisbee_super':    ('heros_frisbee_planche.jpg', (690, 715), True),
+    'heros_frisbee_touche':   ('heros_frisbee_planche.jpg', (170, 1055), False),
+    'heros_frisbee_victoire': ('heros_frisbee_planche.jpg', (430, 970), True),
+    'heros_frisbee_defaite':  ('heros_frisbee_planche.jpg', (690, 1100), False),
 }
+# légende collée à la pose : on efface tout sous cette ligne (y sur la planche)
+COUPE_BAS = {'heros_frisbee_defaite': 1228}
+# même image pour deux poses
+COPIES = {'heros_frisbee_rattrape': 'heros_frisbee_tient'}
 
 def masque(im):
     blanc = (im.min(axis=2) > 225) & (im.max(axis=2) - im.min(axis=2) < 30)
@@ -57,15 +71,21 @@ for nom, (fichier, (cx, cy), versDroite) in POSES.items():
         if i == princ or a > 20000 or a < 30: continue
         s = objs[i]
         if s[0].stop < 140 and s[1].stop < 200: continue   # logo « PIXEL ATHLETE 93 » en haut à gauche
+        if a < 1500 and s[0].stop - s[0].start <= 32: continue   # mots des légendes (petits et plats)
         if s[0].start >= y0 - 30 and s[0].stop <= y1 + 45 and s[1].start >= x0 - 30 and s[1].stop <= x1 + 30:
             garder |= lab == i + 1
+    if nom in COUPE_BAS: garder = garder.copy(); garder[COUPE_BAS[nom]:] = False
     ys, xs = np.nonzero(garder)
     y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
     alpha = Image.fromarray((garder[y0:y1, x0:x1] * 255).astype(np.uint8))
     alpha = alpha.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.8))
     rgba = Image.fromarray(im[y0:y1, x0:x1]).convert('RGBA'); rgba.putalpha(alpha)
-    if versDroite: rgba = rgba.transpose(Image.FLIP_LEFT_RIGHT)
-    k = 0.55 if nom == 'lionel_portrait' else REDUCTION
+    heros = nom.startswith('heros')
+    if versDroite != heros: rgba = rgba.transpose(Image.FLIP_LEFT_RIGHT)
+    k = 0.55 if nom == 'lionel_portrait' else 0.72 if heros else REDUCTION   # même taille à l'écran que Lionel
     rgba = rgba.resize((round(rgba.width * k), round(rgba.height * k)), Image.LANCZOS)
-    rgba.save(SORTIE + nom + '.png', optimize=True)
+    sortie = 'assets/sprites/' + ('hub/' if heros else 'lionel/') + nom + '.png'
+    rgba.save(sortie, optimize=True)
     print(f"{nom}: {rgba.width}x{rgba.height}")
+for nom, source in COPIES.items():
+    Image.open('assets/sprites/hub/' + source + '.png').save('assets/sprites/hub/' + nom + '.png', optimize=True)

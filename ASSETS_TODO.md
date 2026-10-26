@@ -88,7 +88,8 @@ découpés par `outils/decouper_lionel.py` dans `assets/sprites/lionel/` (fond t
 | lionel_portrait.png | intégré | En pied, frisbee à la main : écran de présentation |
 | lionel_garde.png | manquant (facultatif) | Attente SANS frisbee, prêt à courir (même style, fond blanc) |
 
-Toi au frisbee : `heros_frisbee_*` (mêmes poses), dessinés par le code pour l'instant.
+Toi au frisbee : `heros_frisbee_*` : **intégrés** depuis `assets_inbox/heros_frisbee_planche.jpg` (blond, maillot rouge).
+À refaire si possible : une course SANS frisbee, et la défaite avec les cheveux blonds.
 Sons Lionel : frisbee_lancer, frisbee_attrape, frisbee_rebond, frisbee_but, frisbee_sifflet, frisbee_super, frisbee_plongeon, frisbee_sol
 (générés par `outils/generer_sons_lionel.py`).
 
