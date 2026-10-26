@@ -31,10 +31,10 @@ export const DIFFICULTES = {
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', vitesse: 0.78, reaction: 0.34, erreur: 70, disque: 0.72, superHasard: 0.03, lentLob: 2.2, surprises: [16, 24], fenetreParfait: 0.2, publicLionel: 0.5,
     aides: 'tot', choix: { droit: 64, biais: 24, lob: 12 }, attrape: { x: 62, haut: 90, bas: 40 }, ralenti: 0.7, superSurLob: false, biaisApres: 3,
     texte: 'Lionel court moins vite et rate plus souvent. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 0.96, reaction: 0.23, erreur: 50, disque: 0.86, superHasard: 0.06, lentLob: 2.3, surprises: [12, 20], fenetreParfait: 0.15, publicLionel: 0.8,
-    aides: 'tot', choix: { droit: 52, biais: 34, lob: 14 }, attrape: { x: 46, haut: 72, bas: 30 }, ralenti: 0.82, superSurLob: false, biaisApres: 1,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 1.0, reaction: 0.21, erreur: 44, disque: 0.89, superHasard: 0.07, lentLob: 2.2, surprises: [12, 20], fenetreParfait: 0.15, publicLionel: 0.85,
+    aides: 'tot', choix: { droit: 50, biais: 36, lob: 14 }, attrape: { x: 44, haut: 70, bas: 30 }, ralenti: 0.85, superSurLob: false, biaisApres: 1,
     texte: 'Le vrai match.' },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.12, reaction: 0.15, erreur: 24, disque: 1.12, superHasard: 0.08, lentLob: 1.3, surprises: [10, 16], fenetreParfait: 0.1, publicLionel: 1,
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.14, reaction: 0.15, erreur: 22, disque: 1.14, superHasard: 0.08, lentLob: 1.3, surprises: [10, 16], fenetreParfait: 0.1, publicLionel: 1,
     aides: 'filet', choix: { droit: 30, biais: 36, courbe: 22, lob: 12 }, attrape: { x: 38, haut: 55, bas: 26 }, ralenti: 1, superSurLob: true,
     texte: 'Aide seulement après le filet, lancers rapides, supers fréquents. Pour les vrais.' },
 };

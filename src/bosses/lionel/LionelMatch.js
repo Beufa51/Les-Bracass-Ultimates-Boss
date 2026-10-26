@@ -638,7 +638,7 @@ export class LionelMatch extends BossScene {
     const ev = avancerDisque(d, dt);
     if (ev === 'rebond') jouerSon(this, 'frisbee_rebond', { volume: 0.7 });
     if (this.surprises) this.surprises.toucher(d);
-    if (ev === 'relance') { jouerSon(this, 'frisbee_super'); lignesImpact(this, d.x, d.y - R.hauteurMain, 0x3fd07a, 14, 120); }
+    if (ev === 'relance') { jouerSon(this, 'frisbee_super', { volume: 0.6 }); lignesImpact(this, d.x, d.y - R.hauteurMain, 0x3fd07a, 14, 120); }
 
     // qui peut l'attraper ? (même en train de plonger ou de se relever)
     const defenseur = d.type === 'lob' ? (d.lob.x1 < T.filet ? this.j : this.l) : (d.vx < 0 ? this.j : d.vx > 0 ? this.l : null);
@@ -703,7 +703,7 @@ export class LionelMatch extends BossScene {
         this.cameras.main.flash(250, 120, 255, 160);
         bulleLionel(this, 'Merci, merci ! Et maintenant... le super !');
       }
-      jouerSon(this, 'lionel_foule'); jouerSon(this, 'frisbee_super', { volume: 0.6 });
+      jouerSon(this, 'lionel_foule'); jouerSon(this, 'frisbee_pret');
     }
     this.majJauge();
   }
@@ -721,7 +721,7 @@ export class LionelMatch extends BossScene {
     if (sousLeLob && (p === this.j || this.diff.superSurLob)) {
       p.superPret = true;
       onomatopee(this, p.x, p.y - 130, 'SUPER PRÊT !', 26, p === this.j ? '#7fff7f' : '#c77dff');
-      jouerSon(this, 'frisbee_super', { volume: 0.5 });
+      jouerSon(this, 'frisbee_pret');
     }
     if (p === this.l) {
       p.plan = null;

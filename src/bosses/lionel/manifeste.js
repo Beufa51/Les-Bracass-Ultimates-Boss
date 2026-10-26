@@ -59,9 +59,9 @@ export const MANIFESTE = {
     heros_frisbee_touche: { fichier: 'sprites/lionel/heros_frisbee_touche.png', largeur: 181, hauteur: 256, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'touche', ...HEROS_FRISBEE } },
     heros_frisbee_defaite: { fichier: 'sprites/lionel/heros_frisbee_defaite.png', largeur: 180, hauteur: 189, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'defaite', ...HEROS_FRISBEE } },
     // surprises du terrain (dessinées par le code)
-    lionel_mouette:  { fichier: null, largeur: 64, hauteur: 40, images: 2, vitesse: 8, provisoire: { forme: 'mouette' } },
-    lionel_chateau:  { fichier: null, largeur: 70, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'chateau' } },
-    lionel_ballon:   { fichier: null, largeur: 40, hauteur: 40, images: 4, vitesse: 12, provisoire: { forme: 'ballon' } },
+    lionel_mouette:  { fichier: null, largeur: 128, hauteur: 96, images: 4, vitesse: 10, provisoire: { forme: 'mouette' } },
+    lionel_chateau:  { fichier: null, largeur: 140, hauteur: 128, images: 1, vitesse: 1, provisoire: { forme: 'chateau' } },
+    lionel_ballon:   { fichier: null, largeur: 80, hauteur: 80, images: 12, vitesse: 16, provisoire: { forme: 'ballon' } },
     lionel_trophee:  { fichier: null, largeur: 220, hauteur: 260, images: 1, vitesse: 1, provisoire: { forme: 'trophee' } },
   },
 
@@ -75,6 +75,7 @@ export const MANIFESTE = {
     frisbee_but:     { fichier: 'audio/lionel/frisbee_but.wav', provisoire: { frequence: 200, duree: 0.3 } },
     frisbee_sifflet: { fichier: 'audio/lionel/frisbee_sifflet.wav', provisoire: { frequence: 1800, duree: 0.3 } },
     frisbee_super:   { fichier: 'audio/lionel/frisbee_super.wav', provisoire: { frequence: 1100, duree: 0.25 } },
+    frisbee_pret:    { fichier: 'audio/lionel/frisbee_pret.wav', provisoire: { frequence: 880, duree: 0.2 } },
     frisbee_plongeon: { fichier: 'audio/lionel/frisbee_plongeon.wav', provisoire: { frequence: 150, duree: 0.08 } },
     frisbee_sol:     { fichier: 'audio/lionel/frisbee_sol.wav', provisoire: { frequence: 120, duree: 0.12 } },
     lionel_foule:     { fichier: 'audio/lionel/lionel_foule.wav' },

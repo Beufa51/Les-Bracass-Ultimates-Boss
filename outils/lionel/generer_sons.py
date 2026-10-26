@@ -51,11 +51,20 @@ def sif(d):
 s = np.zeros(int(SR * 0.75)); a = sif(0.18); s[:len(a)] += a; b = sif(0.4); k = int(SR * 0.28); s[k:k + len(b)] += b
 ecrire('frisbee_sifflet', s + 0.08 * passe_haut(bruit(len(s) / SR), 4000) * (np.abs(s) > 0.01), 0.55)
 
-# super lancer : montée électrique + souffle
-d = 0.8
+# super lancer : grand souffle grave + accord doux et lumineux (pas de sirène, pas de saturation)
+bruit(0.8)   # (même tirage que l'ancien super : les sons suivants restent identiques)
+d = 1.1
 x = t(d)
-monte = balayage(d, 200, 2400, -3) * np.clip(x / 0.6, 0, 1)
-ecrire('frisbee_super', np.tanh((0.5 * monte + 0.6 * passe_haut(bruit(d), 1500) * np.sin(np.pi * x / d)) * 2) * np.sin(np.pi * x / d) ** 0.5, 0.7)
+souffle = passe_bas(np.random.default_rng(7).uniform(-1, 1, len(x)), 900)   # son propre hasard : ne change pas les autres sons * np.sin(np.pi * np.clip(x / 0.7, 0, 1)) ** 2
+coup = balayage(d, 140, 45, 7) * env(d, 0.004, 0.18)
+accord = sum(np.sin(2 * np.pi * f * x) for f in (523.25, 659.25, 783.99)) / 3 * np.clip((x - 0.12) / 0.08, 0, 1) * np.exp(-np.clip(x - 0.12, 0, None) / 0.35)
+ecrire('frisbee_super', 0.9 * souffle + 0.8 * coup + 0.35 * accord, 0.6)
+
+# super prêt / jauge pleine : petit « ding-ding » joyeux
+d = 0.55
+x = t(d)
+note = lambda f, debut: np.sin(2 * np.pi * f * x) * (x >= debut) * np.exp(-np.clip(x - debut, 0, None) / 0.12)
+ecrire('frisbee_pret', note(659.25, 0) + note(880, 0.12) + 0.3 * note(1318.5, 0.12), 0.5)
 
 # plongeon dans le sable : "pffshh"
 d = 0.4

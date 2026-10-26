@@ -90,7 +90,15 @@ découpés par `outils/lionel/decouper_planches.py` dans `assets/sprites/lionel/
 
 Toi au frisbee : `heros_frisbee_*` : **intégrés** depuis `assets_inbox/heros_frisbee_planche.jpg` (blond, maillot rouge).
 À refaire si possible : une course SANS frisbee, et la défaite avec les cheveux blonds.
-Sons Lionel : frisbee_lancer, frisbee_attrape, frisbee_rebond, frisbee_but, frisbee_sifflet, frisbee_super, frisbee_plongeon, frisbee_sol
+Surprises du terrain (dessinées par le code en style manga ombré, remplaçables par une planche Gemini) :
+
+| Nom du fichier | Taille d'une case | Images | Statut | Description |
+|---|---|---|---|---|
+| lionel_mouette.png | 128x96 | 4 | provisoire | Mouette vue de profil tournée vers la droite, 4 positions d'ailes (haut, milieu, bas, remonte) |
+| lionel_chateau.png | 140x128 | 1 | provisoire | Château de sable vu de 3/4, trois tours, coquillages, petit drapeau violet |
+| lionel_ballon.png | 80x80 | 12 | provisoire | Ballon de plage rouge/blanc/bleu/jaune qui roule (un tour complet), lumière fixe en haut à gauche |
+
+Sons Lionel : frisbee_lancer, frisbee_attrape, frisbee_rebond, frisbee_but, frisbee_sifflet, frisbee_super, frisbee_pret, frisbee_plongeon, frisbee_sol
 (générés par `outils/lionel/generer_sons.py`).
 
 ## Sons

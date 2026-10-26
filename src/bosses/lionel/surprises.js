@@ -8,6 +8,7 @@ import { jouerSon } from '../../core/ressources.js';
 
 const entre = (min, max) => min + Math.random() * (max - min);
 const profondeur = (y) => 10 + y / 10;   // même ordre d'affichage que les joueurs
+const ECHELLE = { mouette: 0.8, chateau: 0.5, ballon: 0.5 };   // les dessins sont en double taille
 
 export class Surprises {
   constructor(scene) {
@@ -64,14 +65,17 @@ class Mouette {
     this.x0 = entre(T.x0 + 140, T.x1 - 140); this.x = this.x0;
     this.y = this.sens > 0 ? T.y0 - 70 : T.y1 + 70; this.t = 0; this.vitesse = R.mouette.vitesse;
     this.ombre = s.add.ellipse(this.x, this.y, 34, 10, 0x000000, 0.22).setDepth(4.6);
-    this.sprite = s.add.sprite(this.x, this.y - R.mouette.hauteur, 'lionel_mouette').play('lionel_mouette').setDepth(70).setScale(1.6);
+    this.sprite = s.add.sprite(this.x, this.y - R.mouette.hauteur, 'lionel_mouette').play('lionel_mouette').setDepth(70).setScale(ECHELLE.mouette);
+    this.versDroite = Math.random() < 0.5;   // vue de profil : elle regarde à droite ou à gauche
+    this.sprite.setFlipX(!this.versDroite);
   }
   maj(dt) {
     this.t += dt;
     this.y += this.sens * this.vitesse * dt;
     this.x = this.x0 + Math.sin(this.t * 2.2) * 40;
-    // le dessin regarde vers la droite : on le tourne dans le sens du vol (vers le bas ou vers le haut)
-    this.sprite.setPosition(this.x, this.y - R.mouette.hauteur).setAngle(this.sens * 90 + Math.cos(this.t * 2.2) * 20);
+    // vue de profil, le bec penche un peu vers où elle va (vers le bas ou vers le haut de l'écran)
+    const penche = this.sens * 22 * (this.versDroite ? 1 : -1);
+    this.sprite.setPosition(this.x, this.y - R.mouette.hauteur).setAngle(penche + Math.cos(this.t * 2.2) * 8);
     this.ombre.setPosition(this.x, this.y);
     if (this.y < T.y0 - 90 || this.y > T.y1 + 90) this.disparaitre();
   }
@@ -103,7 +107,7 @@ class Chateau {
       if (loinDe(this.x, this.y)) break;
     }
     this.sprite = s.add.image(this.x, this.y + 8, 'lionel_chateau').setOrigin(0.5, 1).setDepth(profondeur(this.y)).setScale(0);
-    s.tweens.add({ targets: this.sprite, scale: 1, duration: 350, ease: 'Back.Out' });
+    s.tweens.add({ targets: this.sprite, scale: ECHELLE.chateau, duration: 350, ease: 'Back.Out' });
     onomatopee(s, this.x, this.y - 70, 'POP !', 24, '#ffd84a');
   }
   maj(dt) { this.reste -= dt; if (this.reste <= 0) this.casser(); }
@@ -132,7 +136,7 @@ class Ballon {
     this.vx = R.ballon.vitesse * Math.cos(a) * (Math.random() < 0.5 ? 1 : -1); this.vy = R.ballon.vitesse * Math.sin(a);
     this.ombre = s.add.ellipse(this.x, this.y + 2, 32, 10, 0x000000, 0.22).setDepth(4.6);
     this.sprite = s.add.sprite(this.x, this.y - 18, 'lionel_ballon').play('lionel_ballon').setDepth(profondeur(this.y)).setScale(0);
-    s.tweens.add({ targets: this.sprite, scale: 1, duration: 300, ease: 'Back.Out' });
+    s.tweens.add({ targets: this.sprite, scale: ECHELLE.ballon, duration: 300, ease: 'Back.Out' });
   }
   maj(dt) {
     this.reste -= dt;
@@ -143,7 +147,9 @@ class Ballon {
     // il ralentit doucement après un coup
     const v = Math.hypot(this.vx, this.vy);
     if (v > R.ballon.vitesse) { const k = Math.max(R.ballon.vitesse, v - 160 * dt) / v; this.vx *= k; this.vy *= k; }
-    this.sprite.setPosition(this.x, this.y - 18).setDepth(profondeur(this.y)).setAngle(this.sprite.angle + this.vx * dt * 3);
+    // il roule : ses quartiers tournent (plus ou moins vite), la lumière reste en haut à gauche
+    this.sprite.setPosition(this.x, this.y - 18).setDepth(profondeur(this.y)).setFlipX(this.vx < 0);
+    this.sprite.anims.timeScale = Math.max(0.2, Math.hypot(this.vx, this.vy) / R.ballon.vitesse);
     this.ombre.setPosition(this.x, this.y + 2);
     if (this.reste <= 0) {
       this.vivant = false;

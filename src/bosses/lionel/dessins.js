@@ -391,54 +391,147 @@ function trophee(ctx, w, h) {
 }
 
 // =====================================================================
-//  SURPRISES DU TERRAIN : mouette (2 battements d'ailes), château de sable, ballon de plage (qui tourne)
+//  SURPRISES DU TERRAIN : mouette (4 battements d'ailes), château de sable, ballon de plage (qui roule)
+//  Dessinées en DOUBLE taille (le jeu les affiche à moitié) avec des ombres en aplats et des reflets,
+//  pour aller avec les illustrations manga des joueurs.
 // =====================================================================
+// remplit un chemin, ajoute une ombre en aplat (le chemin "ombre" est découpé dedans), puis l'encre
+function encrer(ctx, chemin, couleur, ombre, dessinOmbre, epaisseur = 4) {
+  ctx.save();
+  chemin(); ctx.fillStyle = couleur; ctx.fill();
+  if (dessinOmbre) { chemin(); ctx.clip(); dessinOmbre(); ctx.fillStyle = ombre; ctx.fill(); }
+  ctx.restore();
+  chemin(); ctx.strokeStyle = CONTOUR; ctx.lineWidth = epaisseur; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.stroke();
+}
+
+// Mouette vue de profil, tournée vers la droite (128 x 96) : 4 positions d'ailes
 function mouette(ctx, w, h, p, { i }) {
-  const cx = w / 2, cy = h * 0.55, haut = i % 2 === 0;
-  // ailes (en haut ou en bas selon l'image)
-  for (const s of [-1, 1]) {
-    ctx.beginPath(); ctx.moveTo(cx + s * 6, cy);
-    ctx.quadraticCurveTo(cx + s * w * 0.25, cy + (haut ? -h * 0.55 : h * 0.25), cx + s * w * 0.47, cy + (haut ? -h * 0.2 : h * 0.35));
-    ctx.quadraticCurveTo(cx + s * w * 0.25, cy + (haut ? -h * 0.15 : h * 0.05), cx + s * 6, cy + 5);
-    remplir(ctx, '#f4f6f8', 2);
-    ctx.fillStyle = '#5a6470'; ctx.beginPath(); ctx.arc(cx + s * w * 0.44, cy + (haut ? -h * 0.2 : h * 0.33), 3, 0, Math.PI * 2); ctx.fill();
-  }
-  // corps, tête, bec orange
-  ctx.beginPath(); ctx.ellipse(cx, cy + 2, 11, 7, 0, 0, Math.PI * 2); remplir(ctx, '#ffffff', 2);
-  ctx.beginPath(); ctx.arc(cx + 9, cy - 3, 6, 0, Math.PI * 2); remplir(ctx, '#ffffff', 2);
-  ctx.beginPath(); ctx.moveTo(cx + 14, cy - 4); ctx.lineTo(cx + 22, cy - 2); ctx.lineTo(cx + 14, cy); ctx.closePath(); remplir(ctx, '#ffa22a', 1.5);
-  ctx.fillStyle = CONTOUR; ctx.beginPath(); ctx.arc(cx + 10, cy - 4, 1.4, 0, Math.PI * 2); ctx.fill();
+  const cx = w * 0.46, cy = h * 0.56;
+  const ailes = [-0.95, -0.35, 0.35, -0.2][i % 4];   // haut, milieu, bas, remonte
+  // une aile : attachée au dos, la pointe monte ou descend
+  const aile = (dx, fonce) => {
+    const px = cx - 6 + dx, bout = [cx - 38 + dx, cy + ailes * 46];
+    const chemin = () => { ctx.beginPath(); ctx.moveTo(px + 16, cy - 4);
+      ctx.quadraticCurveTo(px - 4, cy + ailes * 30 - 10, bout[0], bout[1]);
+      ctx.quadraticCurveTo(px + 2, cy + ailes * 14 + 6, px + 22, cy + 4); ctx.closePath(); };
+    encrer(ctx, chemin, fonce ? '#c9d2dc' : '#f6f8fb', '#aeb9c6',
+      () => { ctx.beginPath(); ctx.ellipse(px + 6, cy + (ailes > 0 ? -6 : 8), 34, 10, ailes * 0.6, 0, Math.PI * 2); }, 3.5);
+    // bout des ailes noir
+    ctx.save(); chemin(); ctx.clip();
+    ctx.beginPath(); ctx.arc(bout[0], bout[1], 14, 0, Math.PI * 2); ctx.fillStyle = '#2b2f36'; ctx.fill(); ctx.restore();
+    chemin(); ctx.strokeStyle = CONTOUR; ctx.lineWidth = 3.5; ctx.stroke();
+  };
+  aile(10, true);   // aile du fond (plus sombre)
+  // queue
+  encrer(ctx, () => { ctx.beginPath(); ctx.moveTo(cx - 20, cy - 4); ctx.lineTo(cx - 44, cy - 10); ctx.lineTo(cx - 40, cy + 2); ctx.lineTo(cx - 44, cy + 10); ctx.lineTo(cx - 18, cy + 8); ctx.closePath(); },
+    '#eef1f5', '#b8c2cd', () => { ctx.beginPath(); ctx.rect(cx - 50, cy + 2, 40, 12); });
+  // corps : ventre blanc, dos gris
+  encrer(ctx, () => { ctx.beginPath(); ctx.ellipse(cx, cy + 2, 26, 13, -0.08, 0, Math.PI * 2); },
+    '#ffffff', '#c3ccd6', () => { ctx.beginPath(); ctx.ellipse(cx - 2, cy + 14, 30, 8, 0, 0, Math.PI * 2); });
+  ctx.save(); ctx.beginPath(); ctx.ellipse(cx, cy + 2, 26, 13, -0.08, 0, Math.PI * 2); ctx.clip();
+  ctx.beginPath(); ctx.ellipse(cx - 4, cy - 10, 26, 8, -0.08, 0, Math.PI * 2); ctx.fillStyle = '#b7c3cf'; ctx.fill(); ctx.restore();
+  ctx.beginPath(); ctx.ellipse(cx, cy + 2, 26, 13, -0.08, 0, Math.PI * 2); ctx.strokeStyle = CONTOUR; ctx.lineWidth = 4; ctx.stroke();
+  // tête
+  const tx = cx + 26, ty = cy - 10;
+  encrer(ctx, () => { ctx.beginPath(); ctx.arc(tx, ty, 12, 0, Math.PI * 2); }, '#ffffff', '#c9d2dc',
+    () => { ctx.beginPath(); ctx.arc(tx - 4, ty + 7, 11, 0, Math.PI * 2); });
+  // bec jaune avec la tache rouge
+  encrer(ctx, () => { ctx.beginPath(); ctx.moveTo(tx + 9, ty - 3); ctx.lineTo(tx + 30, ty + 1); ctx.quadraticCurveTo(tx + 31, ty + 5, tx + 26, ty + 5); ctx.lineTo(tx + 9, ty + 5); ctx.closePath(); },
+    '#ffc93a', '#e08a1a', () => { ctx.beginPath(); ctx.rect(tx, ty + 2, 40, 6); }, 3);
+  ctx.fillStyle = '#e6303a'; ctx.beginPath(); ctx.arc(tx + 24, ty + 4, 2.2, 0, Math.PI * 2); ctx.fill();
+  // œil vif et sourcil (elle a l'air fière d'elle)
+  ctx.fillStyle = CONTOUR; ctx.beginPath(); ctx.arc(tx + 3, ty - 3, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(tx + 4, ty - 4, 1.1, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = CONTOUR; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(tx - 3, ty - 9); ctx.lineTo(tx + 8, ty - 7); ctx.stroke();
+  // pattes repliées
+  ctx.strokeStyle = '#e08a1a'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(cx - 6, cy + 14); ctx.lineTo(cx - 16, cy + 20); ctx.stroke();
+  aile(0, false);   // aile de devant
 }
 
+// Château de sable vu de 3/4 (140 x 128) : base arrondie, trois tours, coquillages, drapeau
 function chateau(ctx, w, h) {
-  const sable = (y0, y1) => degrade(ctx, 0, y0, 0, y1, [[0, '#f3d898'], [1, '#c9a35e']]);
-  // base
-  ctx.beginPath(); ctx.ellipse(w / 2, h - 8, w * 0.46, 8, 0, 0, Math.PI * 2); remplir(ctx, '#d8b878', 2);
-  ctx.beginPath(); ctx.roundRect(w * 0.12, h * 0.45, w * 0.76, h * 0.45, 4); remplir(ctx, sable(h * 0.45, h), 2);
-  // tours avec créneaux
-  for (const [x, l, haut] of [[w * 0.08, w * 0.26, h * 0.18], [w * 0.66, w * 0.26, h * 0.18], [w * 0.36, w * 0.28, h * 0.04]]) {
-    ctx.beginPath(); ctx.rect(x, haut + 8, l, h * 0.86 - haut - 8); remplir(ctx, sable(haut, h), 2);
-    for (let k = 0; k < 3; k++) { ctx.beginPath(); ctx.rect(x + k * l / 3 + 1, haut, l / 3 - 3, 9); remplir(ctx, sable(haut, haut + 9), 1.5); }
+  const SABLE = '#efcf8a', OMBRE = '#c79a55', CLAIR = '#fbe6b4';
+  const alea = hasard(11);
+  // une tour cylindrique vue de 3/4 : face éclairée à gauche, ombre à droite, créneaux en haut
+  const tour = (x, haut, l, bas) => {
+    const ry = l * 0.22;
+    encrer(ctx, () => { ctx.beginPath(); ctx.moveTo(x - l / 2, haut); ctx.lineTo(x - l / 2, bas); ctx.ellipse(x, bas, l / 2, ry, 0, Math.PI, 0, true); ctx.lineTo(x + l / 2, haut); ctx.closePath(); },
+      SABLE, OMBRE, () => { ctx.beginPath(); ctx.rect(x + l * 0.12, haut - 10, l, bas - haut + 30); });
+    // créneaux
+    for (let k = 0; k < 4; k++) {
+      const cxk = x - l / 2 + l * (k + 0.5) / 4;
+      encrer(ctx, () => { ctx.beginPath(); ctx.roundRect(cxk - l * 0.09, haut - 11, l * 0.18, 13, 2); }, k >= 2 ? OMBRE : SABLE, null, null, 3);
+    }
+    // dessus de la tour
+    encrer(ctx, () => { ctx.beginPath(); ctx.ellipse(x, haut, l / 2, ry, 0, 0, Math.PI * 2); }, CLAIR, null, null, 3);
+    // traces de seau (les anneaux du moule)
+    ctx.strokeStyle = 'rgba(120,80,30,0.45)'; ctx.lineWidth = 2;
+    for (const f of [0.35, 0.7]) { ctx.beginPath(); ctx.ellipse(x, haut + (bas - haut) * f, l / 2 - 1, ry, 0, 0.15, Math.PI - 0.15); ctx.stroke(); }
+  };
+  // tas de sable à la base
+  encrer(ctx, () => { ctx.beginPath(); ctx.ellipse(w / 2, h - 16, w * 0.47, 14, 0, 0, Math.PI * 2); }, '#e3bf78', '#c09050',
+    () => { ctx.beginPath(); ctx.ellipse(w / 2 + 10, h - 6, w * 0.5, 10, 0, 0, Math.PI * 2); });
+  // rempart
+  encrer(ctx, () => { ctx.beginPath(); ctx.moveTo(18, 62); ctx.lineTo(18, h - 22); ctx.quadraticCurveTo(w / 2, h - 6, w - 18, h - 22); ctx.lineTo(w - 18, 62); ctx.quadraticCurveTo(w / 2, 74, 18, 62); ctx.closePath(); },
+    SABLE, OMBRE, () => { ctx.beginPath(); ctx.rect(w * 0.62, 50, w, h); });
+  tour(30, 48, 30, h - 24);
+  tour(w - 30, 48, 30, h - 24);
+  tour(w / 2, 22, 38, h - 34);
+  // porte en arche
+  encrer(ctx, () => { ctx.beginPath(); ctx.moveTo(w / 2 - 11, h - 22); ctx.lineTo(w / 2 - 11, h - 42); ctx.arc(w / 2, h - 42, 11, Math.PI, 0); ctx.lineTo(w / 2 + 11, h - 22); ctx.closePath(); }, '#6b4520', null, null, 3);
+  // coquillages (un rose, un blanc) et une étoile de mer
+  const coquille = (x, y, c) => {
+    encrer(ctx, () => { ctx.beginPath(); ctx.moveTo(x, y + 6); ctx.arc(x, y, 8, Math.PI * 0.85, Math.PI * 0.15, false); ctx.closePath(); }, c, null, null, 2.5);
+    ctx.strokeStyle = CONTOUR; ctx.lineWidth = 1.5;
+    for (const a of [-0.9, -0.3, 0.3, 0.9]) { ctx.beginPath(); ctx.moveTo(x, y + 6); ctx.lineTo(x + Math.sin(a) * 7, y - 6 + Math.abs(a) * 3); ctx.stroke(); }
+  };
+  coquille(w * 0.3, h - 52, '#ffb3c1');
+  coquille(w * 0.72, h - 46, '#fff6e6');
+  ctx.save(); ctx.translate(w * 0.86, h - 16); ctx.beginPath();
+  for (let k = 0; k < 10; k++) { const r = k % 2 ? 4 : 10, a = -Math.PI / 2 + k * Math.PI / 5; ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r * 0.6); }
+  ctx.closePath(); remplir(ctx, '#ff7a3a', 2.5); ctx.restore();
+  // drapeau violet de Lionel au sommet (bâton de glace en guise de mât)
+  ctx.strokeStyle = CONTOUR; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(w / 2, 14); ctx.lineTo(w / 2, -2 + 4); ctx.stroke();
+  ctx.strokeStyle = '#e8d2a0'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(w / 2, 14); ctx.lineTo(w / 2, 3); ctx.stroke();
+  encrer(ctx, () => { ctx.beginPath(); ctx.moveTo(w / 2 + 1, 2); ctx.quadraticCurveTo(w / 2 + 14, 0, w / 2 + 24, 7); ctx.quadraticCurveTo(w / 2 + 12, 9, w / 2 + 1, 12); ctx.closePath(); },
+    '#9b4dff', '#6a2bc0', () => { ctx.beginPath(); ctx.rect(w / 2, 8, 30, 10); }, 2.5);
+  // reflets de lumière (côté soleil) et grains de sable
+  ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  for (const [x, y0, y1] of [[w / 2 - 14, 30, 60], [21, 54, 74], [w - 39, 54, 74]]) { ctx.beginPath(); ctx.moveTo(x, y0); ctx.lineTo(x, y1); ctx.stroke(); }
+  for (let k = 0; k < 140; k++) {
+    ctx.fillStyle = alea() < 0.5 ? 'rgba(120,80,30,0.35)' : 'rgba(255,255,255,0.45)';
+    ctx.fillRect(12 + alea() * (w - 24), 16 + alea() * (h - 30), 2, 2);
   }
-  // porte et petit drapeau
-  ctx.beginPath(); ctx.arc(w / 2, h * 0.8, w * 0.09, Math.PI, 0); ctx.lineTo(w / 2 + w * 0.09, h * 0.88); ctx.lineTo(w / 2 - w * 0.09, h * 0.88); ctx.closePath(); remplir(ctx, '#7a5a30', 1.5);
-  ctx.strokeStyle = CONTOUR; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(w / 2, h * 0.04); ctx.lineTo(w / 2, -2 + 4); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(w / 2, 2); ctx.lineTo(w / 2 + 12, 6); ctx.lineTo(w / 2, 10); ctx.closePath(); remplir(ctx, '#e6303a', 1);
-  // grains
-  const alea = hasard(7);
-  for (let k = 0; k < 60; k++) { ctx.fillStyle = 'rgba(120,80,30,0.25)'; ctx.fillRect(w * 0.1 + alea() * w * 0.8, h * 0.1 + alea() * h * 0.8, 1.5, 1.5); }
 }
 
+// Ballon de plage (80 x 80) : 6 quartiers qui tournent, l'ombre et le reflet restent fixes (la lumière ne bouge pas)
 function ballon(ctx, w, h, p, { i, n }) {
-  const cx = w / 2, cy = h / 2, r = Math.min(w, h) / 2 - 2, tour = (i / n) * Math.PI * 2 / 3;
+  const cx = w / 2, cy = h / 2, r = Math.min(w, h) / 2 - 4, tour = (i / n) * Math.PI * 2;   // n images = un tour complet
   const couleurs = ['#e6303a', '#ffffff', '#2a6fd0', '#ffffff', '#ffd84a', '#ffffff'];
+  ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
+  // chaque quartier est compris entre deux méridiens ; un méridien de longitude a se voit
+  // comme une demi-ellipse de largeur sin(a) ; seule la moitié tournée vers nous (-90° à 90°) est visible
+  const meridien = (a, sens) => { for (let k = 0; k <= 16; k++) { const t = -Math.PI / 2 + Math.PI * (sens > 0 ? k : 16 - k) / 16;
+    ctx.lineTo(cx + Math.sin(a) * Math.cos(t) * r, cy + Math.sin(t) * r); } };
   for (let k = 0; k < 6; k++) {
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, tour + k * Math.PI / 3, tour + (k + 1) * Math.PI / 3); ctx.closePath();
+    let milieu = tour + (k + 0.5) * Math.PI / 3;
+    milieu = Math.atan2(Math.sin(milieu), Math.cos(milieu));   // ramené entre -180° et 180°
+    const a0 = Math.max(-Math.PI / 2, milieu - Math.PI / 6), a1 = Math.min(Math.PI / 2, milieu + Math.PI / 6);
+    if (a0 >= a1) continue;   // quartier caché derrière
+    ctx.beginPath(); meridien(a0, 1); meridien(a1, -1); ctx.closePath();
     ctx.fillStyle = couleurs[k]; ctx.fill();
+    ctx.strokeStyle = 'rgba(26,16,20,0.55)'; ctx.lineWidth = 2; ctx.stroke();
   }
-  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.strokeStyle = CONTOUR; ctx.lineWidth = 2; ctx.stroke();
-  ctx.beginPath(); ctx.arc(cx, cy, r * 0.2, 0, Math.PI * 2); remplir(ctx, '#ffffff', 1.5);
-  ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.beginPath(); ctx.ellipse(cx - r * 0.35, cy - r * 0.4, r * 0.25, r * 0.13, -0.6, 0, Math.PI * 2); ctx.fill();
+  // ombre en aplat (bas-droite) et reflet (haut-gauche)
+  ctx.beginPath(); ctx.arc(cx + r * 0.45, cy + r * 0.5, r * 1.05, 0, Math.PI * 2); ctx.arc(cx - r * 0.1, cy - r * 0.05, r * 0.98, 0, Math.PI * 2, true);
+  ctx.fillStyle = 'rgba(40,20,60,0.32)'; ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.beginPath(); ctx.ellipse(cx - r * 0.38, cy - r * 0.45, r * 0.24, r * 0.12, -0.7, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(cx - r * 0.12, cy - r * 0.66, r * 0.06, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+  // pastille du haut et encre
+  ctx.beginPath(); ctx.ellipse(cx, cy - r + 3, r * 0.18, r * 0.08, 0, 0, Math.PI * 2); remplir(ctx, '#ffffff', 2);
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.strokeStyle = CONTOUR; ctx.lineWidth = 4; ctx.stroke();
 }
 
 export const FORMES_LIONEL = { joueurFrisbee, frisbee, terrainFrisbee, trophee, mouette, chateau, ballon };
