@@ -154,7 +154,17 @@ Fusionné dans `main` : en ligne.
     plongeon dirigé vers le frisbee, trajet en pointillés (rebonds compris) + cercle vert, premiers lancers de Lionel sans
     rebond et visant à côté de toi, chrono arrêté quand on tient le frisbee, « Prêt ? » avant chaque service,
     « ESPACE : lance ! » / SUPER PRÊT au-dessus du joueur, plus de lancer courbe en FACILE/NORMAL.
-    Idées non faites : mini-tutoriel de 20 s ; croix tactile qui suit le pouce (concerne aussi Greg).
+  - ENTRAÎNEMENT (src/bosses/lionel/entrainement.js) : 7 étapes (~20 s) avec Lionel qui lance lentement
+    (attraper, lancer, biais, lob, super), automatique la première fois après la difficulté, F1 « Entraînement puis match »,
+    X (ou « Passer » sur téléphone) pour le sauter. Pas de points ni de chrono pendant l'entraînement.
+  - TÉLÉPHONE : JOYSTICK VIRTUEL qui suit le pouce (moitié gauche de l'écran), SEULEMENT pendant le match de Lionel
+    (`modeJoystick(true)` dans src/core/tactile.js) ; pause rangée en haut à droite pendant ce match.
+    Le hub, Greg et les menus gardent la croix et la pause au milieu.
+  - Terrain redessiné dans l'esprit de Windjammers 2 (cage grillagée, rambardes, palmiers, ombres de palmes, public,
+    ligne centrale jaune, poteaux jaunes rembourrés) : dessin du code, pas d'image du vrai jeu (droits d'auteur).
+  - Ton joueur : nouvelle planche mains vides (le jeu pose le frisbee dans ses mains quand il le tient).
+  - RÈGLE : chaque boss est indépendant ; une modification pour un boss ne doit JAMAIS changer un autre boss (Greg !).
+    Le code commun (src/core) ne reçoit que des AJOUTS optionnels, que seul le boss concerné active.
 
 ## Ordre de développement (mis à jour)
 1. ~~Greg (style Hajime no Ippo)~~ fait

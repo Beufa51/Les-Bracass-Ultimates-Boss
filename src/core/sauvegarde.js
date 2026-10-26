@@ -36,6 +36,10 @@ export const Sauvegarde = {
   volume(type) { return donnees.volumes[type] ?? 1; },
   reglerVolume(type, v) { donnees.volumes[type] = Math.round(Math.max(0, Math.min(1, v)) * 10) / 10; ecrire(donnees); },
 
+  // choses déjà faites une fois (ex. 'lionel_entrainement')
+  fait(cle) { return !!(donnees.faits || {})[cle]; },
+  marquerFait(cle) { donnees.faits = { ...(donnees.faits || {}), [cle]: true }; ecrire(donnees); },
+
   // dernière difficulté choisie pour un boss
   difficulte(id) { return (donnees.difficultes || {})[id] || 'normal'; },
   reglerDifficulte(id, nom) { donnees.difficultes = { ...(donnees.difficultes || {}), [id]: nom }; ecrire(donnees); },

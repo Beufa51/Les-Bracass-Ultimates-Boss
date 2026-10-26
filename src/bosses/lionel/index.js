@@ -9,6 +9,7 @@ export default {
   phases: [
     { id: 'set1', nom: 'Match (depuis le set 1)', scene: 'LionelMatch' },
     { id: 'decisif', nom: 'Match (set décisif, 1-1)', scene: 'LionelMatch' },
+    { id: 'entrainement', nom: 'Entraînement puis match', scene: 'LionelMatch' },
   ],
   scenes: [LionelMatch],
 };
