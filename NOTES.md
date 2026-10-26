@@ -139,6 +139,11 @@ Fusionné dans `main` : en ligne.
   - SURPRISES (`src/bosses/lionel/surprises.js`, une à la fois, toutes les 16-24 s en FACILE, 12-20 en NORMAL, 10-16 en CHAMPION) :
     mouette qui traverse (« COUAC ! »), château de sable (« PAF ! », il s'écroule), ballon de plage qui roule (« BOING ! »).
     Le frisbee touché est dévié mais garde son sens ; les supers passent à travers ; les lobs volent au-dessus.
+  - AUDIT 2 (développeur + joueur) : super prêt gardé après un point, entraînement / ralenti / gel remis à zéro à chaque
+    visite, écouteurs de pause retirés, fin de la scène du super calée sur le jeu (téléphones lents), jauge plus lente
+    (15, attrape comptée à partir du 3e lancer), contre parfait plus large en FACILE (0,2 s) / NORMAL (0,15 s) et visable
+    avec ▲ ▼, flèches ignorées après une attrape tant qu'on ne les a pas lâchées (plus de biais involontaires), aide sans
+    points pendant les supers de Lionel, Chambreur plus rapide, textes du HUD redessinés seulement s'ils changent.
   - SCÈNE DU SUPER (`cinematiqueSuper`, 1,6 s, jeu figé) : fond sombre, lignes de vitesse qui tournent, le lanceur en grand
     (pose « super » de la planche) avec images rémanentes, étincelles, gros titre, zoom, onde de choc ; puis traînée
     lumineuse et étincelles pendant le vol (orange pour toi, vert pour Lionel).
@@ -146,8 +151,7 @@ Fusionné dans `main` : en ligne.
   - Musique de fond : `assets/audio/lionel/lionel_musique.mp3` (Windjammers, « Lawn Court », 64 kbit/s, 2,3 Mo, en boucle,
     volume 0,4 dans le manifeste de Lionel).
   - Pas de voix (annonceur) dans le match de Lionel, à la demande du propriétaire (Greg garde les siennes).
-  - Super de Lionel « LE CHAMBREUR » : s'arrête au filet (une ligne violette montre où il va), puis repart en flèche.
-    Il l'obtient en rattrapant tes lobs, et parfois au hasard à partir du set 2 (NORMAL / CHAMPION).
+  - Supers de Lionel : il les obtient au hasard (`superHasard`, dès le set 1), et en CHAMPION aussi en rattrapant tes lobs.
   - Lionel chambreur : bulles de moquerie quand il marque / encaisse, il garde parfois le frisbee pour te narguer.
   - IA de Lionel : il devine où arrive le frisbee (simulation du vol) avec un temps de réaction et une erreur selon la difficulté,
     plonge s'il est trop loin, se replace en suivant ta position.

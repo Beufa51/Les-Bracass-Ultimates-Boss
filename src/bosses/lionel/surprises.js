@@ -92,9 +92,14 @@ class Mouette {
 class Chateau {
   constructor(s) {
     this.s = s; this.vivant = true; this.rayon = R.chateau.rayon; this.reste = R.chateau.duree;
-    const cote = Math.random() < 0.5;   // dans ton camp ou dans celui de Lionel
-    this.x = cote ? entre(T.x0 + 190, T.filet - 90) : entre(T.filet + 90, T.x1 - 190);
-    this.y = entre(T.y0 + 60, T.y1 - 40);
+    // dans ton camp ou dans celui de Lionel, jamais sur un joueur ni sur le frisbee
+    const loinDe = (x, y) => [s.j, s.l, s.d].every(o => !o || Math.hypot(o.x - x, o.y - y) > 90);
+    for (let essai = 0; essai < 12; essai++) {
+      const cote = Math.random() < 0.5;
+      this.x = cote ? entre(T.x0 + 190, T.filet - 90) : entre(T.filet + 90, T.x1 - 190);
+      this.y = entre(T.y0 + 60, T.y1 - 40);
+      if (loinDe(this.x, this.y)) break;
+    }
     this.sprite = s.add.image(this.x, this.y + 8, 'lionel_chateau').setOrigin(0.5, 1).setDepth(profondeur(this.y)).setScale(0);
     s.tweens.add({ targets: this.sprite, scale: 1, duration: 350, ease: 'Back.Out' });
     onomatopee(s, this.x, this.y - 70, 'POP !', 24, '#ffd84a');
@@ -129,6 +134,7 @@ class Ballon {
   }
   maj(dt) {
     this.reste -= dt;
+    if (this.attenteRetouche > 0 && (this.attenteRetouche -= dt) <= 0) this.touche = false;   // il peut être retouché
     this.x += this.vx * dt; this.y += this.vy * dt;
     if (this.y < T.y0 + 20 || this.y > T.y1 - 10) this.vy = -this.vy;
     if (this.x < T.x0 + 40 || this.x > T.x1 - 40) this.vx = -this.vx;
@@ -148,8 +154,7 @@ class Ballon {
     // le ballon file dans le sens du frisbee
     const v = Math.hypot(d.vx, d.vy) || 1;
     this.vx = d.vx / v * 380; this.vy = -d.vy / v * 380;
-    // il pourra être retouché un peu plus tard
-    this.s.time.delayedCall(400, () => { this.touche = false; });
+    this.attenteRetouche = 0.4;   // il pourra être retouché un peu plus tard
   }
   casser() { this.choc(this.s.d || { vx: 1, vy: 0 }); }
   disparaitre() { if (this.vivant) { this.vivant = false; this.sprite.destroy(); this.ombre.destroy(); } }

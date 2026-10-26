@@ -12,7 +12,7 @@
 // =====================================================================
 import { BossScene } from '../../core/BossScene.js';
 import { creerTouches } from '../../core/clavier.js';
-import { texte, voile } from '../../core/ui.js';
+import { texte } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
@@ -106,6 +106,8 @@ export class LionelMatch extends BossScene {
     this.memoire = {};            // appuis gardés un instant (relancer pile en attrapant)
     this.horloge = 0;
     this.trainee = [];
+    // (la scène est réutilisée d'une visite à l'autre : tout remettre à zéro)
+    this.tuto = null; this.ralentiReste = 0; this.dirJoueur = { x: 0, y: 0 }; this.finCinematique = null;
 
     this.add.image(0, 0, 'lionel_terrain').setOrigin(0);
     // le décor illustré n'a pas de zones de but dessinées : bandes 3 / 5 / 3 le long des deux murs de but
@@ -149,11 +151,14 @@ export class LionelMatch extends BossScene {
     if (this.cache.audio.exists('lionel_ambiance')) {
       this.ambiance = this.sound.add('lionel_ambiance', { loop: true, volume: 0.18 });
       this.ambiance.play();
-      this.events.on('pause', () => this.ambiance.pause());
-      this.events.on('resume', () => this.ambiance.resume());
-      this.events.once('shutdown', () => { this.ambiance.stop(); this.ambiance.destroy(); });
+      const pause = () => this.ambiance.pause(), reprise = () => this.ambiance.resume();
+      this.events.on('pause', pause); this.events.on('resume', reprise);
+      this.events.once('shutdown', () => { this.events.off('pause', pause); this.events.off('resume', reprise); this.ambiance.stop(); this.ambiance.destroy(); });
     }
-    this.events.on('resume', () => { this.lireTouches(); this.memoire = {}; });
+    // au retour de pause, on « oublie » la touche qui a servi à reprendre
+    const oublier = () => { this.lireTouches(); this.memoire = {}; };
+    this.events.on('resume', oublier);
+    this.events.once('shutdown', () => this.events.off('resume', oublier));
 
     this.placerPourService('j');
     this.afficher();
@@ -167,7 +172,8 @@ export class LionelMatch extends BossScene {
       (tactile ? 'Lob' : 'Z') + ' : lob, visé avec les flèches (▶ = profond : 3 points !)',
       'Attrape un lob juste en dessous = SUPER LANCER, guidé avec ▲ ▼ !',
       (tactile ? 'Lancer' : 'ESPACE') + ' en courant vers le frisbee = plongeon',
-      (tactile ? 'Lancer' : 'ESPACE') + ' juste avant d\'attraper = CONTRE PARFAIT ; jauge PUBLIC pleine = SUPER !',
+      (tactile ? 'Lancer' : 'ESPACE') + ' juste avant d\'attraper = CONTRE PARFAIT !',
+      'Jauge PUBLIC pleine = SUPER LANCER !',
     ], () => this.presentation(() => this.choixDifficulte()));
   }
 
@@ -203,7 +209,7 @@ export class LionelMatch extends BossScene {
     this.boutons = { lancer: tactile ? 'Lancer' : 'ESPACE', lob: tactile ? 'Lob' : 'Z' };
     this.tuto = {
       etape: 0, enAttente: false,
-      banniere: texte(this, LARGEUR / 2, 82, '', 20, '#ffffff', { backgroundColor: '#000000cc', padding: { x: 12, y: 6 } }).setDepth(92),
+      banniere: texte(this, LARGEUR / 2, 120, '', 20, '#ffffff', { backgroundColor: '#000000cc', padding: { x: 12, y: 6 } }).setDepth(92),
       // sur téléphone, le bouton « Passer » suffit
       passer: texte(this, LARGEUR - 12, HAUTEUR - 14, tactile ? '' : 'X : passer l\'entraînement', 14, '#aaaaaa')
         .setOrigin(1, 1).setDepth(92),
@@ -255,9 +261,10 @@ export class LionelMatch extends BossScene {
       return;
     }
     // un lancer
-    const ok = (but === 'lance' && (type === 'droit' || type === 'biais')) || but === type;
+    const ok = (but === 'lance' && (type === 'droit' || type === 'biais')) || but === type
+      || (but === 'lobProfond' && type === 'lob' && this.d && this.d.lob.points > R.pointsLob);
     if (ok) this.reussiTuto(0.9);
-    else if (['lance', 'biais', 'super', 'lob'].includes(but)) this.rateTuto('Presque ! Regarde bien la consigne et réessaie.');
+    else if (['lance', 'biais', 'super', 'lob', 'lobProfond'].includes(but)) this.rateTuto('Presque ! Regarde bien la consigne et réessaie.');
   }
 
   finEntrainement() {
@@ -287,7 +294,11 @@ export class LionelMatch extends BossScene {
       if (this.attente <= 0 && this.apresAttente) { const f = this.apresAttente; this.apresAttente = null; f(); }
     }
     if (this.etat === 'jeu') {
-      if (this.gel > 0) this.gel -= dt;
+      if (this.gel > 0) {
+        this.gel -= dt;
+        // la scène du super se termine en même temps que le jeu reprend (même sur un téléphone lent)
+        if (this.finCinematique && this.gel <= 0.3) { const f = this.finCinematique; this.finCinematique = null; f(); }
+      }
       else if (this.ralentiReste > 0) { this.ralentiReste -= dt; this.majJeu(dt * R.parfait.ralenti, e); }   // contre parfait
       else this.majJeu(dt, e);
     }
@@ -302,9 +313,9 @@ export class LionelMatch extends BossScene {
     };
   }
 
-  // appui fait il y a moins de 0,15 s (on le "consomme")
-  aAppuye(k) {
-    if (this.memoire[k] !== undefined && this.horloge - this.memoire[k] <= 0.15) { delete this.memoire[k]; return true; }
+  // appui fait il y a moins de 0,15 s (ou 'fenetre' s) : on le "consomme"
+  aAppuye(k, fenetre = 0.15) {
+    if (this.memoire[k] !== undefined && this.horloge - this.memoire[k] <= fenetre) { delete this.memoire[k]; return true; }
     return false;
   }
 
@@ -361,7 +372,13 @@ export class LionelMatch extends BossScene {
   // =================================================================
   majJoueur(dt, e) {
     const p = this.j;
-    const dirY = (e.haut ? -1 : 0) + (e.bas ? 1 : 0), dirX = (e.gauche ? -1 : 0) + (e.droite ? 1 : 0);
+    let dirY = (e.haut ? -1 : 0) + (e.bas ? 1 : 0), dirX = (e.gauche ? -1 : 0) + (e.droite ? 1 : 0);
+    // après avoir attrapé en courant, les flèches encore tenues ne comptent pas tant qu'on ne les a pas lâchées
+    // (sinon, surtout avec le pouce sur téléphone, tous les lancers partiraient en biais sans le vouloir)
+    if (p.flechesBloquees) {
+      if (!dirX && !dirY) p.flechesBloquees = false;
+      else if (p.tient) { dirX = 0; dirY = 0; }
+    }
     this.dirJoueur = { x: dirX, y: dirY };   // pour le viseur de lob
     // ta tornade de feu se guide avec ▲ ▼ pendant tout son vol
     if (this.d && this.d.type === 'superJ') this.d.pilote = dirY;
@@ -370,7 +387,9 @@ export class LionelMatch extends BossScene {
       // appui fait juste AVANT d'attraper : relancé tout droit (les flèches tenues en courant ne comptent pas)
       if (p.lancerMemorise) {
         const k = p.lancerMemorise; p.lancerMemorise = null;
-        return this.lancer(p, k === 'z' ? 'lob' : (p.superPret ? 'super' : 'droit'), 0);
+        // contre parfait : la direction ▲ ▼ est lue à la fin du ralenti (on peut donc le viser)
+        const dir = p.parfait ? dirY : 0;
+        return this.lancer(p, k === 'z' ? 'lob' : (p.superPret ? 'super' : (dir ? 'biais' : 'droit')), dir);
       }
       if (this.aAppuye('espace')) return this.lancer(p, p.superPret ? 'super' : (dirY ? 'biais' : 'droit'), dirY);
       if (this.aAppuye('z')) return this.lancer(p, 'lob', dirY, dirX);
@@ -493,7 +512,7 @@ export class LionelMatch extends BossScene {
       // pendant l'entraînement, il ne relance pas tes lancers : il attend l'étape suivante
       return E.lionel && !this.tuto.enAttente ? this.lancer(p, E.lionel, dir) : null;
     }
-    if (p.superPret || (this.numSet >= 2 && Math.random() < D.superHasard)) return this.lancer(p, 'super', dir);
+    if (p.superPret || Math.random() < D.superHasard) return this.lancer(p, 'super', dir);
     const poids = this.diff.choix || R.ia.choix, total = Object.values(poids).reduce((a, b) => a + b, 0);
     let r = Math.random() * total, type = 'droit';
     for (const [k, w] of Object.entries(poids)) { if ((r -= w) < 0) { type = k; break; } }
@@ -682,16 +701,18 @@ export class LionelMatch extends BossScene {
     } else {
       // CONTRE PARFAIT : Espace appuyé juste avant d'attraper (pas en plongeon) => ralenti + lancer très rapide
       const delai = this.memoire.espace !== undefined ? this.horloge - this.memoire.espace : 99;
-      p.parfait = !plongeon && !sousLeLob && delai <= R.parfait.fenetre && !this.tuto;
+      p.parfait = !plongeon && !sousLeLob && delai <= (this.diff.fenetreParfait || R.parfait.fenetre) && !this.tuto;
+      p.flechesBloquees = true;
       if (p.parfait) {
         this.ralentiReste = R.parfait.dureeRalenti;
         onomatopee(this, p.x + 30, p.y - 120, 'CONTRE PARFAIT !', 34, '#7fd0ff');
         this.cameras.main.flash(120, 255, 255, 255);
         lignesImpact(this, p.x + 20, p.y - 60, 0x7fd0ff, 16, 110);
       }
-      this.ajouterPublic(plongeon ? R.public.plongeon : p.parfait ? R.public.parfait : R.public.attrape);
+      // (une simple attrape ne compte qu'à partir du 3e lancer de l'échange)
+      this.ajouterPublic(plongeon ? R.public.plongeon : p.parfait ? R.public.parfait : this.echange >= 3 ? R.public.attrape : 0);
       // appui fait juste avant d'attraper : on le garde pour relancer aussitôt (PUISSANT)
-      p.lancerMemorise = this.aAppuye('z') ? 'z' : this.aAppuye('espace') ? 'espace' : null;
+      p.lancerMemorise = this.aAppuye('z') ? 'z' : this.aAppuye('espace', Math.max(0.15, this.diff.fenetreParfait || 0)) ? 'espace' : null;
       this.actionTuto('attrape', sousLeLob);
     }
   }
@@ -770,8 +791,11 @@ export class LionelMatch extends BossScene {
 
   placerPourService(serveur) {
     for (const p of [this.j, this.l]) {
-      Object.assign(p, { x: MAISON[p.cote], y: MILIEU_Y, vx: 0, vy: 0, glisse: 0, relever: 0, tient: false, tenue: 0, superPret: false, rapideDispo: false, lancerMemorise: null });
+      // (le super prêt est GARDÉ : il sert au prochain lancer, même après un point)
+      Object.assign(p, { x: MAISON[p.cote], y: MILIEU_Y, vx: 0, vy: 0, glisse: 0, relever: 0, tient: false, tenue: 0, rapideDispo: false, lancerMemorise: null, parfait: false });
     }
+    this.ralentiReste = 0; this.gel = 0;
+    if (this.finCinematique) { const f = this.finCinematique; this.finCinematique = null; f(); }
     const s = serveur === 'j' ? this.j : this.l;
     s.tient = true; s.tenue = 0;
     this.d = null; this.porteur = s; this.echange = 0; this.trainee = [];
@@ -780,6 +804,7 @@ export class LionelMatch extends BossScene {
   }
 
   finMatch(gagnant) {
+    this.etiquettes(ETIQUETTES_OK);   // (cache aussi le joystick)
     this.etat = 'fin';
     if (gagnant === 'j') this.victoire(this.classement());
     else this.defaite(`Lionel : « ${REPLIQUES.defaite} »\nSets ${this.sets.j} - ${this.sets.l}`);
@@ -826,7 +851,7 @@ export class LionelMatch extends BossScene {
     el.push(texte(this, 300, 175, '« LE CHAMBREUR »', 34, '#c77dff').setDepth(102));
     el.push(texte(this, 300, 300, [
       'Sport : frisbee de plage',
-      'Arme secrète : LE CHAMBREUR (super lancer)',
+      'Armes secrètes : 3 super lancers',
       'Signe distinctif : le maillot n°93',
       'Phrase culte : « Trop facile ! »',
     ].join('\n'), 20, '#dddddd', { lineSpacing: 10 }).setDepth(102));
@@ -949,7 +974,7 @@ export class LionelMatch extends BossScene {
           this.graphTrainee.fillStyle(superLancer ? 0xffffff : c, f * (superLancer ? 0.7 : 0.45)).fillCircle(q.x, q.y, (superLancer ? 3 : 4) + k * (superLancer ? 0.4 : 0.9));
         });
         // étincelles qui s'échappent du super lancer
-        if (superLancer && Math.random() < 0.6) {
+        if (superLancer && this.gel <= 0 && (this.imageEtoile = (this.imageEtoile || 0) + 1) % 3 === 0) {
           const e = this.add.star(d.x, yAff, 4, 2, 6, Math.random() < 0.5 ? c : 0xffffff).setDepth(profondeur(d.y) + 0.6);
           this.tweens.add({ targets: e, x: e.x + (Math.random() - 0.5) * 60, y: e.y + (Math.random() - 0.5) * 60, alpha: 0, scale: 0.2, angle: 180,
             duration: 400, onComplete: () => e.destroy() });
@@ -1010,11 +1035,19 @@ export class LionelMatch extends BossScene {
     }
     const aide = this.diff.aides === 'tot' || (this.diff.aides === 'filet' && d.x < T.filet);
     if (aide && (d.vx < 0 || (d.arret > 0 && d.lanceur === 'l')) && d.t > 0.05) {
-      const pr = this.prevoir(d, this.j);
+      // (calcul du trajet refait toutes les 4 images seulement : moins de travail sur téléphone)
+      const c = this.cacheAide = this.cacheAide || {};
+      if (c.d !== d || c.vx !== Math.sign(d.vx) || ++c.images >= 4) {
+        Object.assign(c, { d, vx: Math.sign(d.vx), images: 0, pr: this.prevoir(d, this.j), trajet: this.trajet(d, this.j) });
+      }
+      const pr = c.pr;
       if (pr) {
         // le trajet du frisbee en pointillés, rebonds compris
-        g.fillStyle(0xffffff, 0.9);
-        this.trajet(d, this.j).forEach((q, k) => { if (k % 2 === 0) g.fillCircle(q.x, q.y, 4); });
+        // (pas pendant un super de Lionel : seulement le point d'arrivée, sinon le Dédoubleur ne trompe personne)
+        if (!(d.lanceur === 'l' && d.type.startsWith('super'))) {
+          g.fillStyle(0xffffff, 0.9);
+          (this.cacheAide.trajet || []).forEach((q, k) => { if (k % 2 === 0) g.fillCircle(q.x, q.y, 4); });
+        }
         const A = this.diff.attrape;
         g.fillStyle(0x7fff7f, 0.18).fillEllipse(pr.x, pr.y, A.x * 2, 28);
         g.lineStyle(4, 0x7fff7f, 0.9).strokeEllipse(pr.x, pr.y, A.x * 2, 28);
@@ -1080,14 +1113,14 @@ export class LionelMatch extends BossScene {
     // petit zoom de caméra
     cam.zoomTo(1.08, 300, 'Sine.easeOut');
     // fin : onde de choc depuis le lanceur, puis tout disparaît et le frisbee part
-    this.time.delayedCall((DUREE_CINEMATIQUE - 0.3) * 1000, () => {
+    this.finCinematique = () => {
       cam.zoomTo(1, 200, 'Sine.easeIn');
       el.forEach(o => this.tweens.add({ targets: o, alpha: 0, duration: 200, onComplete: () => o.destroy() }));
       const onde = this.add.circle(p.x, p.y - 40, 30).setStrokeStyle(8, couleur, 1).setDepth(P - 1);
       this.tweens.add({ targets: onde, scale: 7, alpha: 0, duration: 450, ease: 'Cubic.Out', onComplete: () => onde.destroy() });
       flash(this, 0.5, couleur);
       cam.shake(250, 0.012);
-    });
+    };
   }
 
   // Bandes de but le long des murs (jaune = 3 points, rouge = 5 points au milieu)
@@ -1146,14 +1179,15 @@ export class LionelMatch extends BossScene {
 
   majChrono() {
     if (!this.hudChrono) return;
-    this.hudChrono.setText(this.pointEnOr ? 'OR' : String(Math.ceil(this.tempsSet)));
-    this.hudChrono.setColor(this.tempsSet <= 10 && !this.pointEnOr ? '#ff6b6b' : '#ffd84a');
+    // (on ne redessine un texte que s'il change : sinon, sur téléphone, ça coûte à chaque image)
+    const chrono = this.pointEnOr ? 'OR' : String(Math.ceil(this.tempsSet));
+    if (this.hudChrono.text !== chrono) this.hudChrono.setText(chrono).setColor(this.tempsSet <= 10 && !this.pointEnOr ? '#ff6b6b' : '#ffd84a');
     const j = this.j, bouton = estTactile() ? 'Lancer' : 'ESPACE';
     let msg = '';
     if (j.superPret) msg = `SUPER PRÊT !  ${bouton}`;
     else if (j.tient && j.tenue > 0.8 && this.etat === 'jeu') msg = `${bouton} : lance !`;
-    this.hudSuper.setText(msg).setVisible(!!msg).setColor(j.superPret ? '#7fff7f' : '#ffd84a')
-      .setPosition(borne(j.x, 120, LARGEUR - 120), Math.max(80, j.y - 160));
+    if (this.hudSuper.text !== msg) this.hudSuper.setText(msg).setColor(j.superPret ? '#7fff7f' : '#ffd84a');
+    this.hudSuper.setVisible(!!msg).setPosition(borne(j.x, 120, LARGEUR - 120), Math.max(80, j.y - 160));
   }
 }
 
@@ -1161,7 +1195,7 @@ export class LionelMatch extends BossScene {
 function bulleLionel(scene, message, duree = 1300) {
   const p = scene.l;
   if (p.bulle && p.bulle.active) p.bulle.destroy();
-  p.bulle = bulle(scene, borne(p.x, 620, LARGEUR - 130), Math.max(150, p.y - 140), 'Lionel : « ' + message + ' »', duree).setDepth(950);
+  p.bulle = bulle(scene, borne(p.x, 620, LARGEUR - 175), Math.max(150, p.y - 140), 'Lionel : « ' + message + ' »', duree).setDepth(950);
 }
 
 // Bandeau rapide au milieu de l'écran (se ferme tout seul)

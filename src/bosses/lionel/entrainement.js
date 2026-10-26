@@ -3,7 +3,7 @@
 // Joué automatiquement la première fois (après le choix de la difficulté), ou depuis le menu F1.
 //  depart : qui a le frisbee au début de l'étape ('l' = Lionel lance, 'j' = c'est toi)
 //  lionel : le lancer que fait Lionel ; but : ce qu'il faut réussir
-//   'attrape' | 'attrapeLob' | 'lance' (droit ou biais) | 'biais' | 'super' | 'lob'
+//   'attrape' | 'attrapeLob' | 'lance' (droit ou biais) | 'biais' | 'super' | 'lob' | 'lobProfond'
 export const ETAPES = [
   { depart: 'l', lionel: 'droit', but: 'attrape',
     texte: (b) => 'Lionel lance. Cours sur le CERCLE VERT pour attraper !' },
@@ -17,7 +17,7 @@ export const ETAPES = [
     texte: (b) => 'Un LOB ! Va dans le cercle où il va tomber.' },
   { depart: 'j', but: 'super', superPret: true,
     texte: (b) => `SUPER PRÊT ! ${b.lancer}, puis guide-le avec ▲ ▼ !` },
-  { depart: 'j', but: 'lob',
+  { depart: 'j', but: 'lobProfond',
     texte: (b) => `Maintiens ▶ et ${b.lob} : lob profond (3 points) !` },
 ];
 
