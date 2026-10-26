@@ -15,7 +15,6 @@ import { creerTouches } from '../../core/clavier.js';
 import { texte, voile } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
-import { annoncer, taireAnnonceur } from '../../core/annonceur.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
@@ -136,7 +135,6 @@ export class LionelMatch extends BossScene {
 
     this.creerHud();
     this.touches = creerTouches(this);
-    this.events.once('shutdown', () => taireAnnonceur());
     // sur téléphone : joystick qui suit le pouce et pause en haut à droite, SEULEMENT pendant ce match
     // (le hub, Greg et les autres boss gardent la croix et la pause au milieu)
     this.joystick = installerJoystick(this);
@@ -313,7 +311,6 @@ export class LionelMatch extends BossScene {
         if (this.score.j !== this.score.l) { this.finSet(this.score.j > this.score.l ? 'j' : 'l'); return; }
         this.pointEnOr = true;
         encartRapide(this, 'POINT EN OR !', 'Le prochain point gagne le set', '#ffd84a');
-        annoncer('Point en or !');
         this.gel = 1.2;
         return;
       }
@@ -531,7 +528,6 @@ export class LionelMatch extends BossScene {
         const dx = tx - (T.filet + 34), dy = ty - y0, n = Math.hypot(dx, dy);
         d.apres = { vx: dx / n * v * S.vitesse, vy: dy / n * v * S.vitesse };
         this.cinematiqueSuper(p, S.nom, 'Lionel : « ' + auHasard(REPLIQUES.super) + ' »', 0x3fd07a, '#a8ffc0');
-        annoncer('Le chambreur !');
       }
       p.superPret = false;
       this.gel = DUREE_CINEMATIQUE;   // le jeu reste figé pendant la scène du super
@@ -629,7 +625,6 @@ export class LionelMatch extends BossScene {
     const t = texte(this, x + (qui === 'j' ? -60 : 60), y - 40, `+${points}`, 48, points === 5 ? '#ff5a5a' : '#ffd84a', { fontStyle: 'bold' }).setDepth(900).setScale(0.3);
     this.tweens.add({ targets: t, scale: 1, duration: 150, ease: 'Back.Out' });
     this.tweens.add({ targets: t, alpha: 0, y: y - 90, delay: 900, duration: 400, onComplete: () => t.destroy() });
-    annoncer(points === 5 ? 'Cinq points !' : points === 3 ? 'Trois points !' : 'Deux points !');
     this.poser(perdant, 'touche', 0.9);
     this.poser(qui === 'j' ? this.j : this.l, 'victoire', 0.9);
     bulleLionel(this, auHasard(qui === 'l' ? REPLIQUES.marque : REPLIQUES.encaisse));
@@ -651,7 +646,6 @@ export class LionelMatch extends BossScene {
     this.majHud();
     jouerSon(this, 'frisbee_sifflet');
     const fini = this.sets[gagnant] >= R.setsGagnants;
-    annoncer(fini ? 'Match !' : 'Set !');
     this.poser(gagnant === 'j' ? this.j : this.l, 'victoire', 99);
     this.poser(gagnant === 'j' ? this.l : this.j, 'defaite', 99);
     const titre = fini ? (gagnant === 'j' ? 'MATCH GAGNÉ !' : 'MATCH PERDU...') : `SET ${this.numSet} : ${gagnant === 'j' ? 'POUR TOI !' : 'POUR LIONEL'}`;
@@ -672,7 +666,6 @@ export class LionelMatch extends BossScene {
     this.etiquettes(ETIQUETTES_JEU);
     this.etat = 'pret';
     encartRapide(this, this.numSet === 3 ? 'SET DÉCISIF !' : `SET ${this.numSet}`, 'Prêt ?... Lancez !', '#ffd84a', 1.3);
-    annoncer('Prêt ? Lancez !');
     jouerSon(this, 'frisbee_sifflet');
     this.attendre(1.4, () => { this.etat = 'jeu'; });
   }
@@ -765,7 +758,6 @@ export class LionelMatch extends BossScene {
   // Écran de victoire : rayons, trophée, Lionel à genoux, badge, rang
   ecranVictoire(message) {
     const P = 1000, cx = LARGEUR / 2;
-    taireAnnonceur();
     jouerSon(this, 'lionel_foule'); jouerSon(this, 'frisbee_sifflet');
     this.add.rectangle(cx, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0a0614, 0.97).setDepth(P);
     const rayons = this.add.graphics().setDepth(P + 1).setPosition(300, 300);

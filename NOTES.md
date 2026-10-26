@@ -132,6 +132,7 @@ Fusionné dans `main` : en ligne.
   - Ton joueur qui tient / rattrape le frisbee : pose de côté (course), frisbee dans le poing avant.
   - Musique de fond : `assets/audio/lionel/lionel_musique.mp3` (Windjammers, « Lawn Court », 64 kbit/s, 2,3 Mo, en boucle,
     volume 0,4 dans le manifeste de Lionel).
+  - Pas de voix (annonceur) dans le match de Lionel, à la demande du propriétaire (Greg garde les siennes).
   - Super de Lionel « LE CHAMBREUR » : s'arrête au filet (une ligne violette montre où il va), puis repart en flèche.
     Il l'obtient en rattrapant tes lobs, et parfois au hasard à partir du set 2 (NORMAL / CHAMPION).
   - Lionel chambreur : bulles de moquerie quand il marque / encaisse, il garde parfois le frisbee pour te narguer.
