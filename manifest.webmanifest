@@ -1,0 +1,13 @@
+{
+  "name": "Les Bracass'",
+  "short_name": "Bracass'",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "icons": [
+    { "src": "assets/ui/icone_192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/ui/icone_512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

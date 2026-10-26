@@ -4,8 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>Les Bracass'</title>
+  <!-- ajouté à l'écran d'accueil (iPhone, Android) : le jeu s'ouvre en plein écran, comme une appli -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bracass'">
+  <meta name="theme-color" content="#111111">
+  <link rel="apple-touch-icon" href="assets/ui/icone_192.png">
   <style>
-    html, body { margin: 0; height: 100%; background: #111; overflow: hidden; touch-action: none; overscroll-behavior: none; }
+    html, body { margin: 0; height: 100%; height: 100dvh; background: #111; overflow: hidden; touch-action: none; overscroll-behavior: none; }
     #jeu { width: 100%; height: 100%; }
     /* téléphone tenu en vertical : on demande de le tourner */
     #tourner { display: none; position: fixed; inset: 0; z-index: 50; background: #111; color: #ffd84a;

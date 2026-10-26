@@ -10,6 +10,7 @@ import { PauseScene, basculerPause } from './core/PauseScene.js';
 import { verifierClips } from './core/clips.js';
 import { installerMusiques } from './core/musique.js';
 import { enregistrer } from './core/manifestes.js';
+import { installerPleinEcran } from './core/pleinEcran.js';
 import { MANIFESTE as MANIFESTE_COMMUN } from '../assets/manifeste.js';
 
 // Visuels et sons : ceux du moteur commun (hub, badges) + ceux de chaque boss (chacun dans son dossier)
@@ -44,6 +45,7 @@ window.addEventListener('keydown', (e) => {
 // Boutons tactiles (seulement sur smartphone / tablette)
 installerTactile();
 installerBoutonPause(() => basculerPause(jeu));
+installerPleinEcran(jeu);   // plein écran sur téléphone (bouton ⛶, astuce iPhone)
 verifierClips();
 installerMusiques();
 

@@ -133,7 +133,8 @@ export class LionelMatch extends BossScene {
     this.porteur = null;
     this.disque = this.add.sprite(0, 0, 'frisbee').play('frisbee');
     this.disqueFantome = this.add.sprite(0, 0, 'frisbee').play('frisbee').setVisible(false);   // le faux frisbee du Dédoubleur
-    this.public = 0;          // jauge du public (la tienne)
+    this.public = { j: 0, l: 0 };   // jauges du public (la tienne, celle de Lionel)
+    this.astucePublic = false;      // l'explication de la jauge s'affiche une fois par visite
     this.ralentiReste = 0;    // ralenti du contre parfait
     this.surprises = null;
     this.ombreDisque = this.add.ellipse(0, 0, 26, 9, 0x000000, 0.3);
@@ -173,7 +174,7 @@ export class LionelMatch extends BossScene {
       'Attrape un lob juste en dessous = SUPER LANCER, guidé avec ▲ ▼ !',
       (tactile ? 'Lancer' : 'ESPACE') + ' en courant vers le frisbee = plongeon',
       (tactile ? 'Lancer' : 'ESPACE') + ' juste avant d\'attraper = CONTRE PARFAIT !',
-      'Jauge PUBLIC pleine = SUPER LANCER !',
+      'Jauge PUBLIC : plongeons, contres parfaits, longs échanges la remplissent. Pleine = SUPER !',
     ], () => this.presentation(() => this.choixDifficulte()));
   }
 
@@ -547,7 +548,8 @@ export class LionelMatch extends BossScene {
     } else if (puissant) {
       v *= R.rapide.bonus;
       onomatopee(this, p.x + p.sens * 40, p.y - 120, 'PUISSANT !', 26, '#ff8a3d');
-      if (p === this.j) { this.stats.puissants++; this.ajouterPublic(R.public.puissant); }
+      if (p === this.j) this.stats.puissants++;
+      this.ajouterPublic(p.cote, R.public.puissant, 'lancer puissant');
     }
     p.parfait = false;
     p.tient = false; p.rapideDispo = false;
@@ -670,16 +672,38 @@ export class LionelMatch extends BossScene {
     }
   }
 
-  // Jauge du public : pleine = SUPER PRÊT (sans avoir à attraper un lob)
-  ajouterPublic(n) {
-    if (this.tuto) return;
-    this.public = borne(this.public + n, 0, R.public.max);
-    if (this.public >= R.public.max && !this.j.superPret) {
-      this.public = 0;
-      this.j.superPret = true;
-      encartRapide(this, 'LE PUBLIC EST EN FEU !', 'SUPER PRÊT : ' + (estTactile() ? 'Lancer' : 'ESPACE') + ' !', '#ff9a3c', 1.0);
+  // Jauges du public (la tienne et celle de Lionel) : les beaux gestes la remplissent ;
+  // pleine = SUPER PRÊT (sans avoir à attraper de lob). raison = ce qui l'a fait monter (affiché).
+  ajouterPublic(cote, n, raison) {
+    if (this.tuto || !n) return;
+    const p = cote === 'j' ? this.j : this.l;
+    n *= cote === 'l' ? (this.diff.publicLionel ?? 1) : 1;
+    this.public[cote] = borne(this.public[cote] + n, 0, R.public.max);
+    // petit « +2 PUBLIC : plongeon » qui monte au-dessus du joueur : on comprend comment la remplir
+    if (raison) {
+      const t = texte(this, borne(p.x, 110, LARGEUR - 110), Math.max(110, p.y - 150), `+${Math.round(n)} PUBLIC : ${raison}`, 15,
+        cote === 'j' ? '#ffb070' : '#a8ffc0', { fontStyle: 'bold' }).setDepth(94);
+      this.tweens.add({ targets: t, y: t.y - 30, alpha: 0, delay: 500, duration: 600, onComplete: () => t.destroy() });
+    }
+    // la première fois : explication sous ta jauge
+    if (cote === 'j' && !this.astucePublic) {
+      this.astucePublic = true;
+      const a = texte(this, 352, 104, 'Ta jauge PUBLIC monte quand tu plonges, réussis un contre parfait,\nfais un long échange ou marques. Pleine = SUPER LANCER !', 13, '#ffe0b0',
+        { backgroundColor: '#000000cc', padding: { x: 8, y: 4 } }).setDepth(94).setOrigin(0.2, 0);
+      this.tweens.add({ targets: a, alpha: 0, delay: 4500, duration: 500, onComplete: () => a.destroy() });
+    }
+    if (this.public[cote] >= R.public.max && !p.superPret) {
+      this.public[cote] = 0;
+      p.superPret = true;
+      if (cote === 'j') {
+        encartRapide(this, 'LE PUBLIC EST EN FEU !', 'SUPER PRÊT : ' + (estTactile() ? 'Lancer' : 'ESPACE') + ' !', '#ff9a3c', 1.0);
+        this.cameras.main.flash(250, 255, 160, 60);
+      } else {
+        encartRapide(this, 'LE PUBLIC ACCLAME LIONEL !', 'Attention : son super lancer arrive !', '#7fff9a', 1.0);
+        this.cameras.main.flash(250, 120, 255, 160);
+        bulleLionel(this, 'Merci, merci ! Et maintenant... le super !');
+      }
       jouerSon(this, 'lionel_foule'); jouerSon(this, 'frisbee_super', { volume: 0.6 });
-      this.cameras.main.flash(250, 255, 160, 60);
     }
     this.majJauge();
   }
@@ -705,6 +729,9 @@ export class LionelMatch extends BossScene {
       p.nargue = !sousLeLob && !this.tuto && Math.random() < R.ia.nargue;
       p.tenueVoulue = p.nargue ? R.ia.tenueNargue : entre(a, b) + (plongeon ? 0.2 : 0);
       if (p.nargue) bulleLionel(this, auHasard(REPLIQUES.nargue));
+      // le public aime aussi les beaux gestes de Lionel
+      if (plongeon) this.ajouterPublic('l', R.public.plongeon, 'plongeon');
+      else if (this.echange >= 3) this.ajouterPublic('l', R.public.attrape, 'bel échange');
     } else {
       // CONTRE PARFAIT : Espace appuyé juste avant d'attraper (pas en plongeon) => ralenti + lancer très rapide
       const delai = this.memoire.espace !== undefined ? this.horloge - this.memoire.espace : 99;
@@ -718,7 +745,9 @@ export class LionelMatch extends BossScene {
         lignesImpact(this, p.x + 20, p.y - 60, 0x7fd0ff, 16, 110);
       }
       // (une simple attrape ne compte qu'à partir du 3e lancer de l'échange)
-      this.ajouterPublic(plongeon ? R.public.plongeon : p.parfait ? R.public.parfait : this.echange >= 3 ? R.public.attrape : 0);
+      if (plongeon) this.ajouterPublic('j', R.public.plongeon, 'plongeon');
+      else if (p.parfait) this.ajouterPublic('j', R.public.parfait, 'contre parfait');
+      else if (this.echange >= 3) this.ajouterPublic('j', R.public.attrape, 'bel échange');
       // appui fait juste avant d'attraper : on le garde pour relancer aussitôt (PUISSANT)
       p.lancerMemorise = this.aAppuye('z') ? 'z' : this.aAppuye('espace', Math.max(0.15, this.diff.fenetreParfait || 0)) ? 'espace' : null;
       this.actionTuto('attrape', sousLeLob, p.parfait);
@@ -738,7 +767,7 @@ export class LionelMatch extends BossScene {
     const perdant = qui === 'j' ? this.l : this.j;
     this.score[qui] += points;
     if (qui === 'j') this.stats.marques += points; else this.stats.concedes += points;
-    this.ajouterPublic(qui === 'j' ? R.public.marque : R.public.encaisse);
+    this.ajouterPublic(qui, R.public.marque, 'point marqué');
     const d = this.d;
     this.d = null; this.etat = 'point'; this.echange = 0;
     const x = raison === 'lob' ? d.x : (qui === 'j' ? T.x1 - 40 : T.x0 + 40);
@@ -1170,6 +1199,7 @@ export class LionelMatch extends BossScene {
     this.hudSets = this.add.graphics().setDepth(P + 1);
     // jauge du public (sous ton score)
     this.hudPublicTexte = texte(this, 226, 72, 'PUBLIC', 14, '#ffb070', { fontStyle: 'bold' }).setDepth(P + 1);
+    this.hudPublicTexteL = texte(this, 734, 72, 'PUBLIC', 14, '#a8ffc0', { fontStyle: 'bold' }).setDepth(P + 1);
     this.hudPublic = this.add.graphics().setDepth(P + 1);
     // message au-dessus de ta tête (SUPER PRÊT, lance !)
     this.hudSuper = texte(this, 0, 0, '', 18, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000cc', padding: { x: 8, y: 4 } }).setDepth(P + 1);
@@ -1194,16 +1224,23 @@ export class LionelMatch extends BossScene {
 
   majJauge() {
     if (!this.hudPublic) return;
-    const g = this.hudPublic.clear(), x = 262, y = 64, l = 230, k = this.public / R.public.max;
-    const presque = k >= 0.75 && Math.sin(this.horloge * 12) > 0;   // presque pleine : elle clignote
-    g.fillStyle(0x000000, 0.6).fillRoundedRect(x - 3, y - 3, l + 6, 22, 8);
-    if (k > 0) g.fillStyle(presque ? 0xffe14a : k > 0.75 ? 0xff5a2a : 0xff9a3c, 1).fillRoundedRect(x, y, Math.max(10, l * k), 16, 6);
-    g.lineStyle(2, presque ? 0xffe14a : 0xffffff, 0.8).strokeRoundedRect(x - 3, y - 3, l + 6, 22, 8);
+    const g = this.hudPublic.clear(), l = 180, y = 64;
+    // ta jauge à gauche (orange), celle de Lionel à droite (verte, qui se remplit vers la gauche)
+    for (const [cote, x, couleurs] of [['j', 262, [0xff9a3c, 0xff5a2a]], ['l', LARGEUR - 262 - l, [0x3fd07a, 0x1fae5a]]]) {
+      const k = this.public[cote] / R.public.max;
+      const presque = k >= 0.75 && Math.sin(this.horloge * 12) > 0;   // presque pleine : elle clignote
+      g.fillStyle(0x000000, 0.6).fillRoundedRect(x - 3, y - 3, l + 6, 22, 8);
+      if (k > 0) {
+        const largeur = Math.max(10, l * k);
+        g.fillStyle(presque ? 0xffe14a : k > 0.75 ? couleurs[1] : couleurs[0], 1).fillRoundedRect(cote === 'j' ? x : x + l - largeur, y, largeur, 16, 6);
+      }
+      g.lineStyle(2, presque ? 0xffe14a : 0xffffff, 0.8).strokeRoundedRect(x - 3, y - 3, l + 6, 22, 8);
+    }
   }
 
   majChrono() {
     if (!this.hudChrono) return;
-    if (this.public / R.public.max >= 0.75) this.majJauge();
+    if (Math.max(this.public.j, this.public.l) / R.public.max >= 0.75) this.majJauge();
     // (on ne redessine un texte que s'il change : sinon, sur téléphone, ça coûte à chaque image)
     const chrono = this.pointEnOr ? 'OR' : String(Math.ceil(this.tempsSet));
     if (this.hudChrono.text !== chrono) this.hudChrono.setText(chrono).setColor(this.tempsSet <= 10 && !this.pointEnOr ? '#ff6b6b' : '#ffd84a');
@@ -1217,7 +1254,7 @@ export class LionelMatch extends BossScene {
     this.hudSuper.setVisible(!!msg).setPosition(borne(j.x, 120, LARGEUR - 120), enHaut ? j.y + 30 : j.y - 160);
     const alpha = j.y < T.y0 + 70 ? 0.4 : 1;
     if (this.hudFond && this.hudFond.alpha !== alpha) {
-      for (const o of [this.hudFond, this.hudScoreJ, this.hudScoreL, this.hudChrono, this.hudSet, this.hudSets, this.hudPublic, this.hudPublicTexte, ...(this.hudEtiquettes || [])]) o.setAlpha(alpha);
+      for (const o of [this.hudFond, this.hudScoreJ, this.hudScoreL, this.hudChrono, this.hudSet, this.hudSets, this.hudPublic, this.hudPublicTexte, this.hudPublicTexteL, ...(this.hudEtiquettes || [])]) o.setAlpha(alpha);
       if (this.tuto) this.tuto.banniere.setAlpha(alpha);
     }
   }

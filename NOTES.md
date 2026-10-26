@@ -29,6 +29,10 @@ Fusionné dans `main` : en ligne.
   abandonner. `src/core/PauseScene.js`. Volumes et records dans `src/core/sauvegarde.js`.
 - Le hub affiche le record (rang + temps) sous la porte de chaque boss gagné.
 - Téléphone tenu en vertical : message « Tourne ton téléphone » (index.html).
+- PLEIN ÉCRAN sur téléphone (`src/core/pleinEcran.js`, tout le jeu) : automatique au premier toucher (Android/tablettes,
+  bloqué à l'horizontale), bouton ⛶ en haut à gauche pour y revenir ; sur iPhone (pas de plein écran dans Safari),
+  astuce une fois : « Partager → Sur l'écran d'accueil » ; `manifest.webmanifest` + icônes `assets/ui/icone_*.png`
+  => depuis l'écran d'accueil, le jeu s'ouvre en plein écran comme une appli.
 - Allègement : musique de Greg en 64 kbit/s (2,5 Mo), clip du Dempsey en MP4 (190 Ko au lieu du GIF de 1 Mo).
 - Manifeste unique des visuels/sons : `assets/manifeste.js`. Tant qu'un visuel n'a pas de fichier,
   il est dessiné par le code dans `src/core/dessins.js` (style manga : contours, ombres, reflets).
@@ -130,8 +134,11 @@ Fusionné dans `main` : en ligne.
   - LOB VISÉ : ▲ ▼ = côté, ◀ = court (près du filet), ▶ = profond (près du mur de Lionel) = 3 points au lieu de 2.
     Viseur (cible blanche, dorée si profond) quand tu tiens le frisbee ; gerbe de sable + « BOUM ! » quand il tombe ;
     Lionel lit mal tes lobs (`lentLob` par difficulté) et râle quand il en rate un.
-  - JAUGE DU PUBLIC (sous ton score) : +1 attrape, +2 plongeon ou contre parfait, +1 lancer puissant, +1 point marqué,
-    -3 point encaissé. Pleine = « LE PUBLIC EST EN FEU ! » et SUPER PRÊT sans attraper de lob (`public` dans reglages.js).
+  - JAUGES DU PUBLIC : une pour toi (orange, à gauche) et une pour LIONEL (verte, à droite). Elles montent avec les
+    beaux gestes : plongeon +2, contre parfait +3, attrape à partir du 3e lancer d'un échange +1, lancer puissant +1,
+    point marqué +1 (un « +2 PUBLIC : plongeon » s'affiche au-dessus du joueur ; explication la première fois).
+    Pleine = SUPER PRÊT (« LE PUBLIC EST EN FEU ! » / « LE PUBLIC ACCLAME LIONEL ! »). Encaisser ne la vide pas.
+    La jauge de Lionel monte moins vite en FACILE (x0,5) et NORMAL (x0,8) : `publicLionel`.
   - CONTRE PARFAIT : Espace appuyé au plus 0,1 s avant d'attraper (pas en plongeon) = ralenti 0,45 s, « CONTRE PARFAIT ! »,
     relance x1,4 (`parfait`).
   - 3 SUPERS DE LIONEL au hasard (`supersLionel`) : LE CHAMBREUR (s'arrête au filet puis repart), LE DÉDOUBLEUR (un vrai
