@@ -20,9 +20,9 @@ export const TERRAIN = {
 //  choix : ses lancers préférés (remplace REGLAGES.ia.choix)
 export const DIFFICULTES = {
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', vitesse: 0.78, reaction: 0.34, erreur: 70, disque: 0.82, superHasard: 0,
-    aides: 'tot', choix: { droit: 40, biais: 34, courbe: 14, lob: 12 }, texte: 'Lionel court moins vite et rate plus souvent. Idéal pour apprendre.' },
+    aides: 'tot', choix: { droit: 50, biais: 38, courbe: 0, lob: 12 }, texte: 'Lionel court moins vite et rate plus souvent. Idéal pour apprendre.' },
   normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 0.95, reaction: 0.26, erreur: 52, disque: 0.92, superHasard: 0.04,
-    aides: 'tot', choix: { droit: 36, biais: 34, courbe: 16, lob: 14 }, texte: 'Le vrai match.' },
+    aides: 'tot', choix: { droit: 46, biais: 40, courbe: 0, lob: 14 }, texte: 'Le vrai match.' },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.12, reaction: 0.15, erreur: 24, disque: 1.12, superHasard: 0.08,
     aides: false, choix: { droit: 30, biais: 36, courbe: 22, lob: 12 }, texte: 'Sans aide, lancers rapides et super lancers fréquents. Pour les vrais.' },
 };
