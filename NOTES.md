@@ -114,6 +114,11 @@ Copie de référence de la version finale : branche `greg-termine` (`version-1-g
 ## Ordre de développement (mis à jour)
 1. ~~Greg (style Hajime no Ippo)~~ fait
 2. **Lionel**  ← prochaine étape (choisi avant Beufa)
+   - Jeu : **exactement comme Windjammers** (Neo Geo, 1994) — lancer de frisbee en 1 contre 1, vue de 3/4 au-dessus du terrain,
+     buts à 3 et 5 points, lancers courbes, lob, super lancer quand on rattrape au bon moment, sets.
+   - Badge : médaille violette avec un frisbee.
+   - Images : le propriétaire a un pixel art de Lionel et demande à Gemini une version manga (planches de poses, fond blanc).
+   - Encore à demander : personnalité / répliques de Lionel.
 3. Beufa, phase quiz (plus tard)
 3. Julien
 4. Kédric
