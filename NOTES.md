@@ -125,7 +125,11 @@ Fusionné dans `main` : en ligne.
   - Points : frisbee derrière l'adversaire = 3 points (côtés, jaune) ou 5 points (milieu, rouge) ; lob qui touche le sable = 2 points.
   - Set : 12 points ou 30 s (égalité = POINT EN OR) ; 2 sets gagnants. Celui qui encaisse sert.
   - Relancer tout de suite après avoir attrapé = lancer PUISSANT (+22 %). Le frisbee accélère à chaque lancer de l'échange.
-  - Rattraper un lob juste en dessous (cercle au sol) = SUPER LANCER (Espace) : le tien = « ÉCLAIR VERT » (zigzag rapide).
+  - Rattraper un lob juste en dessous (cercle au sol) = SUPER LANCER (Espace) : le tien = « TORNADE DE FEU » (zigzag rapide).
+  - SCÈNE DU SUPER (`cinematiqueSuper`, 1,6 s, jeu figé) : fond sombre, lignes de vitesse qui tournent, le lanceur en grand
+    (pose « super » de la planche) avec images rémanentes, étincelles, gros titre, zoom, onde de choc ; puis traînée
+    lumineuse et étincelles pendant le vol (orange pour toi, vert pour Lionel).
+  - Ton joueur qui tient / rattrape le frisbee : pose de côté (course), frisbee dans le poing avant.
   - Super de Lionel « LE CHAMBREUR » : s'arrête au filet (une ligne violette montre où il va), puis repart en flèche.
     Il l'obtient en rattrapant tes lobs, et parfois au hasard à partir du set 2 (NORMAL / CHAMPION).
   - Lionel chambreur : bulles de moquerie quand il marque / encaisse, il garde parfois le frisbee pour te narguer.

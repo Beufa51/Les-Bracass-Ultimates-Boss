@@ -41,6 +41,9 @@ const LIMITES = {
 const MAISON = { j: T.x0 + 110, l: T.x1 - 110 };
 
 // poses dessinées où le joueur a déjà le frisbee dans la main
+// durée de la scène du super lancer (secondes)
+const DUREE_CINEMATIQUE = 1.6;
+
 const POSES_AVEC_DISQUE = ['tient', 'nargue', 'rattrape'];
 
 // 2 boutons seulement : Lancer (Espace) et Lob (Z)
@@ -511,14 +514,11 @@ export class LionelMatch extends BossScene {
       d.lob = { x0, y0, x1: xMoitie + entre(-50, 50), y1: ty + entre(-15, 15), duree: R.lob.duree, hauteur: R.lob.hauteur };
       if (p === this.l) bulleLionel(this, auHasard(REPLIQUES.lob));
     } else if (type === 'super') {
-      jouerSon(this, 'frisbee_super');
-      flash(this, 0.5, p === this.j ? 0x7fff9a : 0xc77dff);
-      this.cameras.main.shake(250, 0.01);
       if (p === this.j) {
         const S = R.superJoueur;
         d.type = 'superJ'; d.vx = p.sens * v * S.vitesse;
         d.zig = { periode: S.zigzag, amplitude: S.amplitude * (dir || 1) };
-        encartRapide(this, S.nom + ' !!', 'Ton super lancer !', '#7fff7f');
+        this.cinematiqueSuper(p, S.nom, 'Ton super lancer !', 0xff9a3c, '#ffd84a');
         this.stats.supers++;
       } else {
         const S = R.superLionel;
@@ -527,11 +527,11 @@ export class LionelMatch extends BossScene {
         const ty = this.j.y < MILIEU_Y ? T.y1 - 30 : T.y0 + 30, tx = T.x0;
         const dx = tx - (T.filet + 34), dy = ty - y0, n = Math.hypot(dx, dy);
         d.apres = { vx: dx / n * v * S.vitesse, vy: dy / n * v * S.vitesse };
-        encartRapide(this, S.nom + ' !!', auHasard(REPLIQUES.super), '#c77dff');
+        this.cinematiqueSuper(p, S.nom, 'Lionel : « ' + auHasard(REPLIQUES.super) + ' »', 0x3fd07a, '#a8ffc0');
         annoncer('Le chambreur !');
       }
       p.superPret = false;
-      this.gel = 0.7;
+      this.gel = DUREE_CINEMATIQUE;   // le jeu reste figé pendant la scène du super
     }
     if (type !== 'super') jouerSon(this, 'frisbee_lancer');
     this.d = d; this.porteur = null;
@@ -549,14 +549,14 @@ export class LionelMatch extends BossScene {
     for (let k = 0; k < pas && this.d === d; k++) this.pasDisque(d, dt / pas);
     if (this.d) {
       this.trainee.push({ x: d.x, y: d.y - d.z - R.hauteurMain });
-      if (this.trainee.length > 10) this.trainee.shift();
+      if (this.trainee.length > (d.type.startsWith('super') ? 22 : 10)) this.trainee.shift();
     }
   }
 
   pasDisque(d, dt) {
     const ev = avancerDisque(d, dt);
     if (ev === 'rebond') jouerSon(this, 'frisbee_rebond', { volume: 0.7 });
-    if (ev === 'relance') { jouerSon(this, 'frisbee_super'); lignesImpact(this, d.x, d.y - R.hauteurMain, 0xc77dff, 14, 120); }
+    if (ev === 'relance') { jouerSon(this, 'frisbee_super'); lignesImpact(this, d.x, d.y - R.hauteurMain, 0x3fd07a, 14, 120); }
 
     // qui peut l'attraper ? (même en train de plonger ou de se relever)
     const defenseur = d.type === 'lob' ? (d.lob.x1 < T.filet ? this.j : this.l) : (d.vx < 0 ? this.j : d.vx > 0 ? this.l : null);
@@ -846,9 +846,21 @@ export class LionelMatch extends BossScene {
       this.ombreDisque.setVisible(true).setPosition(d.x, d.y + 2).setDepth(4.5).setScale(1 - d.z / 400);
       const rapide = Math.hypot(d.vx, d.vy) > 760 || d.type.startsWith('super');
       if (rapide && this.trainee.length > 1) {
-        const c = d.type === 'superJ' ? 0x7fff9a : d.type === 'superL' ? 0xc77dff : 0xffffff;
+        const superLancer = d.type.startsWith('super');
+        const c = d.type === 'superJ' ? 0xff9a3c : d.type === 'superL' ? 0x3fd07a : 0xffffff;
         this.graphTrainee.setDepth(profondeur(d.y) + 0.4);
-        this.trainee.forEach((q, k) => this.graphTrainee.fillStyle(c, (k + 1) / this.trainee.length * 0.45).fillCircle(q.x, q.y, 4 + k * 0.9));
+        this.trainee.forEach((q, k) => {
+          const f = (k + 1) / this.trainee.length;
+          // super lancer : un halo large et lumineux autour de la traînée
+          if (superLancer) this.graphTrainee.fillStyle(c, f * 0.25).fillCircle(q.x, q.y, 10 + k * 0.8);
+          this.graphTrainee.fillStyle(superLancer ? 0xffffff : c, f * (superLancer ? 0.7 : 0.45)).fillCircle(q.x, q.y, (superLancer ? 3 : 4) + k * (superLancer ? 0.4 : 0.9));
+        });
+        // étincelles qui s'échappent du super lancer
+        if (superLancer && Math.random() < 0.6) {
+          const e = this.add.star(d.x, yAff, 4, 2, 6, Math.random() < 0.5 ? c : 0xffffff).setDepth(profondeur(d.y) + 0.6);
+          this.tweens.add({ targets: e, x: e.x + (Math.random() - 0.5) * 60, y: e.y + (Math.random() - 0.5) * 60, alpha: 0, scale: 0.2, angle: 180,
+            duration: 400, onComplete: () => e.destroy() });
+        }
       }
     } else if (this.porteur) {
       const p = this.porteur;
@@ -859,7 +871,9 @@ export class LionelMatch extends BossScene {
       const pose = this.choisirPose(p), illustre = this.estIllustre(p.prefixe + '_' + pose);
       if (p === this.j && illustre) {
         // tes illustrations ont les mains vides : le frisbee est posé dans tes mains
-        if (pose === 'plongeon') this.disque.setPosition(p.x + (p.sprite.flipX ? -1 : 1) * 70, p.y - 40);
+        const sens = p.sprite.flipX ? -1 : 1;
+        if (pose === 'plongeon') this.disque.setPosition(p.x + sens * 70, p.y - 40);
+        else if (pose === 'tient' || pose === 'rattrape') this.disque.setPosition(p.x + sens * 39, p.y - 82);   // poing avant
         else this.disque.setPosition(p.x + 3, p.y - 72);
       } else if (POSES_AVEC_DISQUE.includes(pose) || (pose === 'plongeon' && illustre)) {
         // ces poses ont déjà le frisbee en main (dessins du code, illustrations de Lionel)
@@ -883,7 +897,7 @@ export class LionelMatch extends BossScene {
     // super de Lionel arrêté au filet : une ligne montre où il va repartir (dans toutes les difficultés)
     if (d.arret > 0 && d.apres) {
       const n = Math.hypot(d.apres.vx, d.apres.vy), k = 260 / n;
-      g.lineStyle(4, 0xc77dff, 0.35 + 0.4 * Math.abs(Math.sin(this.horloge * 20)));
+      g.lineStyle(4, 0x3fd07a, 0.35 + 0.4 * Math.abs(Math.sin(this.horloge * 20)));
       g.lineBetween(d.x, d.y, d.x + d.apres.vx * k, d.y + d.apres.vy * k);
     }
     const aide = this.diff.aides === 'tot' || (this.diff.aides === 'filet' && d.x < T.filet);
@@ -898,6 +912,74 @@ export class LionelMatch extends BossScene {
         g.lineStyle(4, 0x7fff7f, 0.9).strokeEllipse(pr.x, pr.y, A.x * 2, 28);
       }
     }
+  }
+
+  // =================================================================
+  //  SCÈNE DU SUPER LANCER : le jeu se fige, fond sombre, lignes de vitesse qui tournent,
+  //  le lanceur en grand avec ses images rémanentes, gros titre, zoom, puis onde de choc.
+  // =================================================================
+  cinematiqueSuper(p, nom, sousTitre, couleur, couleurTexte) {
+    const P = 95, cx = LARGEUR / 2, cy = HAUTEUR / 2, el = [], gauche = p === this.j;
+    const cam = this.cameras.main;
+    jouerSon(this, 'frisbee_super');
+    flash(this, 0.7, 0xffffff);
+    // fond sombre + lignes de vitesse qui tournent autour du centre
+    const fond = this.add.rectangle(cx, cy, LARGEUR, HAUTEUR, 0x05030c, 0).setDepth(P);
+    this.tweens.add({ targets: fond, fillAlpha: 0.82, duration: 120 });
+    const lignes = this.add.graphics().setDepth(P + 1).setPosition(gauche ? 300 : 660, cy);
+    for (let k = 0; k < 44; k++) {
+      const a = (k / 44) * Math.PI * 2 + Math.random() * 0.1, r1 = 90 + Math.random() * 80;
+      lignes.lineStyle(2 + Math.random() * 4, k % 3 ? couleur : 0xffffff, 0.35 + Math.random() * 0.4);
+      lignes.lineBetween(Math.cos(a) * r1, Math.sin(a) * r1, Math.cos(a) * 900, Math.sin(a) * 900);
+    }
+    this.tweens.add({ targets: lignes, angle: gauche ? 40 : -40, duration: DUREE_CINEMATIQUE * 1000 });
+    // halo coloré derrière le personnage
+    const halo = this.add.circle(gauche ? 300 : 660, cy + 20, 150, couleur, 0.35).setDepth(P + 2).setScale(0.2);
+    this.tweens.add({ targets: halo, scale: 1.3, alpha: 0.15, duration: 500, ease: 'Cubic.Out' });
+    el.push(fond, lignes, halo);
+    // le lanceur en grand (pose de super), qui arrive de son côté avec des images rémanentes
+    const cle = this.textures.exists(p.prefixe + '_super') ? p.prefixe + '_super' : p.prefixe + '_lance';
+    const illustre = this.estIllustre(cle), imageVersDroite = !illustre || p === this.j;
+    const xFin = gauche ? 300 : 660, xDebut = gauche ? -250 : LARGEUR + 250;
+    const perso = this.add.image(xDebut, HAUTEUR + 10, cle).setOrigin(0.5, 1).setDepth(P + 4);
+    perso.setScale(430 / perso.height).setFlipX(gauche ? !imageVersDroite : imageVersDroite);
+    this.tweens.add({ targets: perso, x: xFin, duration: 260, ease: 'Cubic.Out' });
+    for (let k = 1; k <= 3; k++) {
+      const fantome = this.add.image(xDebut, HAUTEUR + 10, cle).setOrigin(0.5, 1).setDepth(P + 3)
+        .setScale(perso.scale).setFlipX(perso.flipX).setTint(couleur).setAlpha(0.5 - k * 0.12);
+      this.tweens.add({ targets: fantome, x: xFin - (gauche ? 1 : -1) * k * 45, duration: 260 + k * 60, ease: 'Cubic.Out' });
+      el.push(fantome);
+    }
+    el.push(perso);
+    // étincelles qui jaillissent
+    for (let k = 0; k < 26; k++) {
+      const e = this.add.star(xFin, cy, 4, 3, 9, k % 2 ? couleur : 0xffffff).setDepth(P + 5).setScale(0.4 + Math.random());
+      const a = Math.random() * Math.PI * 2, d = 120 + Math.random() * 260;
+      this.tweens.add({ targets: e, x: xFin + Math.cos(a) * d, y: cy + Math.sin(a) * d, angle: 360, alpha: 0,
+        delay: 150 + Math.random() * 300, duration: 700 + Math.random() * 400, onComplete: () => e.destroy() });
+    }
+    // gros titre qui claque, puis le sous-titre
+    const xt = gauche ? 640 : 320;
+    const titre = this.add.text(xt, cy - 40, nom + ' !!', {
+      fontFamily: 'monospace', fontStyle: 'bold italic', fontSize: '50px', color: couleurTexte, align: 'center',
+      stroke: '#000000', strokeThickness: 11, wordWrap: { width: 540 },
+    }).setOrigin(0.5).setDepth(P + 6).setScale(3).setAlpha(0).setAngle(-6);
+    this.tweens.add({ targets: titre, scale: 1, alpha: 1, delay: 220, duration: 200, ease: 'Back.Out',
+      onComplete: () => cam.shake(220, 0.014) });
+    const sous = texte(this, xt, cy + 45, sousTitre, 22, '#ffffff').setDepth(P + 6).setAlpha(0);
+    this.tweens.add({ targets: sous, alpha: 1, delay: 450, duration: 200 });
+    el.push(titre, sous);
+    // petit zoom de caméra
+    cam.zoomTo(1.08, 300, 'Sine.easeOut');
+    // fin : onde de choc depuis le lanceur, puis tout disparaît et le frisbee part
+    this.time.delayedCall((DUREE_CINEMATIQUE - 0.3) * 1000, () => {
+      cam.zoomTo(1, 200, 'Sine.easeIn');
+      el.forEach(o => this.tweens.add({ targets: o, alpha: 0, duration: 200, onComplete: () => o.destroy() }));
+      const onde = this.add.circle(p.x, p.y - 40, 30).setStrokeStyle(8, couleur, 1).setDepth(P - 1);
+      this.tweens.add({ targets: onde, scale: 7, alpha: 0, duration: 450, ease: 'Cubic.Out', onComplete: () => onde.destroy() });
+      flash(this, 0.5, couleur);
+      cam.shake(250, 0.012);
+    });
   }
 
   // Bandes de but le long des murs (jaune = 3 points, rouge = 5 points au milieu)

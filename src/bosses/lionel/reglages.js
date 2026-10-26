@@ -65,7 +65,7 @@ export const REGLAGES = {
   hauteurMain: 34,        // hauteur du frisbee en vol (au niveau de la main)
 
   // ---------- Super lancers (quand on rattrape un lob juste en dessous) ----------
-  superJoueur: { nom: 'ÉCLAIR VERT', vitesse: 1.45, zigzag: 0.16, amplitude: 520 },
+  superJoueur: { nom: 'TORNADE DE FEU', vitesse: 1.45, zigzag: 0.16, amplitude: 520 },
   superLionel: { nom: 'LE CHAMBREUR', vitesse: 1.15, arret: 0.8 },   // s'arrête au filet (une ligne montre où il va)... puis repart en flèche
 
   // ---------- Lionel (le cerveau) ----------
@@ -94,7 +94,7 @@ export const REPLIQUES = {
   encaisse: ['Coup de chance...', 'Ok, pas mal... pour un débutant.', 'Je te laisse gagner, c\'est tout.',
     'Pfff, j\'étais pas prêt !', 'Hé ! C\'était pas du jeu !', 'Le soleil m\'a ébloui.'],
   nargue: ['Tu la veux ? Viens la chercher !', 'Attention... attention...', 'Regarde bien... non, en fait !', 'Tic... tac...'],
-  super: ['LE CHAMBREUR !', 'Celle-là, tu la sens pas venir !'],
+  super: ['Celle-là, tu la sens pas venir !', 'Regarde bien... trop tard !', 'Tu peux toujours courir !', 'Attention les yeux !'],
   lob: ['Oups, il tombe !', 'Cours, cours !'],
   setGagne: ['Un set à zéro, tranquille.', 'On continue, ou t\'abandonnes ?'],
   setPerdu: ['Bon... on arrête de rigoler.', 'Ok. Là, je me fâche.'],
