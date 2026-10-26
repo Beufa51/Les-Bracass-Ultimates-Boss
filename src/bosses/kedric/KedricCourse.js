@@ -48,6 +48,9 @@ const TUTO = {
   suiveur: 'Le POT DE COLLE te suit : attends qu\'il devienne ROUGE, puis ◀ ▶ !',
 };
 
+// les illustrations sont enregistrées 1,5 fois plus grandes que leur taille à l'écran (plus nettes)
+const ZOOM_ILLUSTRE = 1 / 1.5;
+
 const ETIQUETTES_JEU = { haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'Ghost', z: null, x: null };
 const ETIQUETTES_OK = { haut: null, bas: null, gauche: null, droite: null, espace: 'OK', z: null, x: null };
 
@@ -665,6 +668,9 @@ export class KedricCourse extends BossScene {
     });
   }
 
+  // réduction à appliquer à une image (les illustrations sont enregistrées en plus grand)
+  zoom(cle) { return this.estIllustre(cle) ? ZOOM_ILLUSTRE : 1; }
+
   // vrai si l'image vient d'un fichier (illustration) et pas d'un dessin du code
   estIllustre(cle) {
     this.illustrees = this.illustrees || {};
@@ -843,14 +849,17 @@ export class KedricCourse extends BossScene {
       if (this.sprJ.texture.key !== cle || !this.sprJ.anims.isPlaying) this.sprJ.play(cle);
       this.sprJ.anims.timeScale = this.etat === 'jeu' && this.gel <= 0 ? 0.7 + this.niveau * 0.15 + (this.ghost > 0 ? 0.6 : 0) : 0;
     } else if (this.sprJ.texture.key !== cle) { this.sprJ.stop(); this.sprJ.setTexture(cle); }
-    this.sprJ.setPosition(xJ, VUE.pieds + 8 - hauteur).setScale(1.0);
-    this.sprJ.setAngle(j.rotation > 0 ? Math.sin(this.horloge * 30) * 6 : 0);
+    // une illustration de course = une seule image : on la fait rebondir à chaque foulée
+    const foulee = pose === 'course' && this.estIllustre(cle) && this.etat === 'jeu' && this.gel <= 0;
+    const pas = foulee ? Math.sin(this.horloge * (11 + this.niveau * 1.6 + (this.ghost > 0 ? 6 : 0))) : 0;
+    this.sprJ.setPosition(xJ, VUE.pieds + 8 - hauteur - Math.abs(pas) * 9).setScale(this.zoom(cle) * (1 + Math.abs(pas) * 0.02), this.zoom(cle) * (1 - Math.abs(pas) * 0.02));
+    this.sprJ.setAngle(j.rotation > 0 ? Math.sin(this.horloge * 30) * 6 : pas * 3);
     this.ombreJ.setPosition(xJ, VUE.pieds + 4).setScale(1 - hauteur / 200);
     // Devil Bat Ghost : images fantômes de chaque côté
     this.fantomes.forEach((f, k) => {
       if (this.ghost > 0 && this.etat === 'jeu') {
         const dec = Math.sin(this.horloge * 22 + k * 2.1) * (70 + k * 25);
-        f.setTexture(this.sprJ.texture.key, this.sprJ.frame.name).setPosition(xJ + dec, this.sprJ.y).setAlpha(0.35 - k * 0.08);
+        f.setTexture(this.sprJ.texture.key, this.sprJ.frame.name).setPosition(xJ + dec, this.sprJ.y).setScale(this.sprJ.scaleX, this.sprJ.scaleY).setAlpha(0.35 - k * 0.08);
       } else f.setAlpha(0);
     });
     // ---------- les défenseurs ----------
@@ -877,7 +886,22 @@ export class KedricCourse extends BossScene {
     }
     const x = ecranX(d.x, dist), y = ecranY(dist);
     const montee = pose === 'bras' && d.etat === 'approche' ? 20 * k : 0;
-    d.sprite.setPosition(x, y + 6 * k - montee).setScale(k * (d.star ? 1.12 : 1.04)).setAngle(d.etat === 'rate' ? d.angle * 0.25 : 0);
+    const illustre = this.estIllustre(cle);
+    // course illustrée (une seule image) : petits rebonds ; Kédric en joueur n'a qu'une image : on la penche selon la pose
+    const pas = illustre && (pose === 'course' || (d.star && pose === 'garde')) && d.etat !== 'plaqueur' ? Math.sin(this.horloge * 12 + d.groupe) : 0;
+    let angle = d.etat === 'rate' ? d.angle * 0.25 : pas * 3, ecrase = 1;
+    if (d.star && illustre) {
+      if (pose === 'plonge') angle = (d.x >= this.j.x ? -1 : 1) * 60;
+      else if (pose === 'bas') ecrase = 0.78;
+      else if (pose === 'bras') angle = Math.sin(this.horloge * 20) * 8;
+      else if (pose === 'rate') angle = d.sensChute * 80;
+    }
+    const z = k * this.zoom(cle) * (d.star ? 1.08 : 1.04);
+    d.sprite.setPosition(x, y + 6 * k - montee - Math.abs(pas) * 8 * k).setScale(z, z * ecrase).setAngle(angle);
+    // le plongeon illustré part vers la gauche : retourné s'il vient de ta gauche
+    d.sprite.setFlipX(illustre && pose === 'plonge' && !d.star && d.x < this.j.x - 0.1);
+    // ton illustration « plaqué » montre déjà le plaqueur
+    d.sprite.setVisible(!(d.etat === 'plaqueur' && this.estIllustre('kedric_toi_plaque')));
     d.sprite.setDepth(500 - dist * 8 + (d.etat === 'plaqueur' ? 20 : 0));
     d.sprite.setAlpha(d.etat === 'rate' ? Math.max(0, 1 - d.chute * 0.9) : 1);
     if (this.ghost > 0 && d.etat === 'approche') d.sprite.setTint(0xbbbbcc); else d.sprite.clearTint();

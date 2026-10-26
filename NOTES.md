@@ -9,7 +9,8 @@ mains vides, entraînement, joystick, jauges du public, 3 supers, surprises, dif
 **Étape 3 : boss Kédric — PREMIÈRE VERSION JOUABLE** (à faire essayer au propriétaire). Choix du propriétaire : tu portes le ballon
 et tu traverses le terrain en esquivant les défenseurs qui reçoivent les ordres du coach Kédric, VUE DE DOS, esquives ◀ ▶ ▲ ▼,
 plus tu esquives plus tu accélères jusqu'au DEVIL BAT GHOST, référence graphique **Eyeshield 21**, Kédric = **showman frimeur**.
-Pas encore d'images : dessins provisoires du code + prompts Gemini dans ASSETS_TODO.md.
+ILLUSTRATIONS INTÉGRÉES (personnages) : 24 images Gemini du propriétaire, renommées `assets_inbox/kedric_*.jpg`, détourées par
+`outils/kedric/preparer_images.py` dans `assets/sprites/kedric/`. Manquent encore : le décor (stade + pelouse illustrés), le trophée.
 Rappel : Kédric a son propre dossier (`src/bosses/kedric/`), ne touche ni Greg ni Lionel.
 Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
@@ -254,6 +255,15 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
   - Bots (ils lisent les symboles parfaitement, donc plus forts qu'un humain) : NORMAL bon / moyen gagnent, enfant ~1 fois sur 2 ;
     FACILE enfant gagne ; CHAMPION moyen gagne encore souvent (un humain réagit moins vite au symbole). À ajuster après essai.
   - Pas de musique pour l'instant (ambiance de stade générée) ; badge provisoire = médaille verte au ballon (`icone: 'football'`).
+  - ILLUSTRATIONS (assets_inbox/kedric_*.jpg → `outils/kedric/preparer_images.py` : fond retiré avec rembg isnet-anime, bords
+    nettoyés, recadrées, enregistrées 1,5 fois plus grandes que l'écran, le jeu les réduit avec ZOOM_ILLUSTRE) :
+    toi de dos (course, saut, rotation, plaqué avec le plaqueur déjà dessus, victoire), défenseurs de face (course, garde, accroupi,
+    plongeon, bras tendus, sonné), Kédric en joueur (une seule image `kedric_star` : le jeu la penche / la couche selon l'attaque),
+    Kédric coach (portrait qui te pointe, buste bras croisés / au micro, danse 2 images, défaite à genoux en larmes).
+    Une seule image par pose : le jeu fait rebondir la course à chaque foulée. Le plongeon illustré est retourné s'il vient de ta gauche.
+    Images non utilisées : course de loin (kedric_toi_course_loin / _tres_loin / _2), autres courses du défenseur (_2 à _5 ;
+    _4 porte des logos « Deimon / Devil Bats » d'Eyeshield 21, à éviter). Sur la danse « main sur la hanche », il reste un petit
+    trait gris du décor près des jambes.
   - RÈGLE : chaque boss est indépendant ; une modification pour un boss ne doit JAMAIS changer un autre boss (Greg !).
     Le code commun (src/core) ne reçoit que des AJOUTS optionnels, que seul le boss concerné active.
 

@@ -106,19 +106,20 @@ Style : manga sportif façon **Eyeshield 21** (traits nets, ombres en aplats, mo
 Kédric : coach showman — banane gominée noire, lunettes noires, micro-casque, veste de sport verte à liseré doré avec un « K »,
 t-shirt noir, chaîne en or, pantalon blanc, baskets dorées. Ses joueurs : maillot vert à numéros dorés, casque blanc à bande verte.
 Ton coureur : vu de DOS, maillot rouge n°21, casque rouge à bande blanche, pantalon blanc, ballon sous le bras droit.
-Planches sur **fond blanc uni**, poses bien espacées (je les découpe avec l'outil de Lionel).
+Planches sur **fond blanc uni**, poses bien espacées.
+**Personnages : définitifs** (images du propriétaire, détourées par `outils/kedric/preparer_images.py`). Reste : trophée, stade, pelouse illustrée.
 
 | Nom du fichier | Taille d'une case | Images | Statut | Description pour le générateur d'images |
 |---|---|---|---|---|
-| kedric_portrait.png | 360x400 | 1 | provisoire | Kédric en pied, de face, il te pointe du doigt, micro dans l'autre main, grand sourire |
-| kedric_coach.png | 120x120 | 2 | provisoire | Buste de Kédric : 1) sourire de star 2) il crie dans son micro-casque |
-| kedric_danse.png | 300x300 | 2 | provisoire | Kédric qui danse (pose disco, un bras vers le ciel), 2 images |
-| kedric_defaite.png | 300x300 | 1 | provisoire | Kédric à genoux, lunettes fêlées, une larme |
-| kedric_toi_course.png | 180x220 | 4 | provisoire | Ton coureur vu de DOS qui court (4 images) |
-| kedric_toi_saut / rotation / plaque / victoire | 180x220 | 1 | provisoire | De dos : saut genoux repliés ; baissé en tournant ; plaqué (bras en l'air) ; ballon levé |
-| kedric_def_course.png | 220x200 | 4 | provisoire | Défenseur de face qui fonce vers toi (4 images) |
-| kedric_def_garde / bas / plonge / bras / rate | 220x200 | 1 | provisoire | De face : prêt à plaquer bras ouverts ; accroupi ; plongeon vers toi ; bras tendus en l'air ; assis sonné |
-| kedric_star_* | 220x200 | 1-4 | provisoire | Mêmes poses pour Kédric en joueur (maillot doré n°1, casque vert à étoile, lunettes) |
+| kedric_portrait.png | 360x400 | 1 | **définitif** | Kédric en pied, de face, il te pointe du doigt, micro dans l'autre main, grand sourire |
+| kedric_coach.png | 120x120 | 2 | **définitif** | Buste de Kédric : 1) sourire de star 2) il crie dans son micro-casque |
+| kedric_danse.png | 300x300 | 2 | **définitif** | Kédric qui danse (pose disco, un bras vers le ciel), 2 images |
+| kedric_defaite.png | 300x300 | 1 | **définitif** | Kédric à genoux, lunettes fêlées, une larme |
+| kedric_toi_course.png | 180x220 | 4 | **définitif** | Ton coureur vu de DOS qui court (4 images) |
+| kedric_toi_saut / rotation / plaque / victoire | 180x220 | 1 | **définitif** | De dos : saut genoux repliés ; baissé en tournant ; plaqué (bras en l'air) ; ballon levé |
+| kedric_def_course.png | 220x200 | 4 | **définitif** | Défenseur de face qui fonce vers toi (4 images) |
+| kedric_def_garde / bas / plonge / bras / rate | 220x200 | 1 | **définitif** | De face : prêt à plaquer bras ouverts ; accroupi ; plongeon vers toi ; bras tendus en l'air ; assis sonné |
+| kedric_star_* | 220x200 | 1-4 | **définitif** | Mêmes poses pour Kédric en joueur (maillot doré n°1, casque vert à étoile, lunettes) |
 | kedric_trophee.png | 220x260 | 1 | provisoire | Ballon de football américain en or sur un socle |
 
 **Prompts pour Gemini** (une planche par prompt) :
