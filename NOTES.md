@@ -138,14 +138,23 @@ Fusionné dans `main` : en ligne.
     bruitages générés par `outils/generer_sons_lionel.py`. Effets manga partagés : `src/core/effets.js`.
   - Toute la logique avance dans update() (pas de minuteries Phaser) : les bots de test peuvent jouer en accéléré.
   - Lionel en illustrations : planches `assets_inbox/lionel_planche_1.jpg` (4 poses), `_2.jpg` (5 poses), `lionel_entier.jpg`,
-    découpées par `outils/decouper_lionel.py` (fond blanc retiré, poses tournées vers la GAUCHE, réduites de moitié)
+    découpées par `outils/decouper_frisbee.py` (fond blanc retiré, poses tournées vers la GAUCHE, réduites de moitié)
     dans `assets/sprites/lionel/`. Taille à l'écran : `echelleIllustre` dans reglages.js.
     Pas de pose d'attente sans frisbee : « garde » = la course (avec de petits bonds) ; « nargue » = la victoire.
-    Ton joueur (maillot bleu) reste dessiné par le code (`heros_frisbee_*`).
+    Ton joueur (blond, maillot rouge) : planche `assets_inbox/heros_frisbee_planche.jpg` (9 poses légendées en anglais),
+    découpée par le même outil (`outils/decouper_frisbee.py`) dans `assets/sprites/hub/heros_frisbee_*.png`, tournée vers la DROITE.
+    Sa course tient un frisbee : on affiche l'attente mains vides avec de petits bonds. (Sur la planche, la pose « défaite » a les cheveux bruns.)
   - Équilibrage (bots « humains » qui voient le frisbee avec du retard, et lisent l'aide quand elle est affichée) :
     FACILE = un enfant gagne ; NORMAL = bon joueur gagne, moyen ~1 fois sur 3, enfant perd ; CHAMPION = très dur.
     Après essai du propriétaire (« trop dur en normal ») : NORMAL adouci (aide dès le lancer, Lionel plus lent, moins de courbes).
     Lionel se trompe davantage quand le frisbee va vite ; ses courbes sont son arme principale.
+
+  - AUDIT (développeur + joueur testeur, agents) après « trop dur en NORMAL » : frisbee plus lent (+3 %/échange, max 900),
+    zone d'attrape plus grande à la forme du corps, ralenti à l'approche (FACILE/NORMAL), plus de traversée (sous-pas),
+    plongeon dirigé vers le frisbee, trajet en pointillés (rebonds compris) + cercle vert, premiers lancers de Lionel sans
+    rebond et visant à côté de toi, chrono arrêté quand on tient le frisbee, « Prêt ? » avant chaque service,
+    « ESPACE : lance ! » / SUPER PRÊT au-dessus du joueur, plus de lancer courbe en FACILE/NORMAL.
+    Idées non faites : mini-tutoriel de 20 s ; croix tactile qui suit le pouce (concerne aussi Greg).
 
 ## Ordre de développement (mis à jour)
 1. ~~Greg (style Hajime no Ippo)~~ fait
