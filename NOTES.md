@@ -127,7 +127,7 @@ Fusionné dans `main` : en ligne.
   - Lionel chambreur : bulles de moquerie quand il marque / encaisse, il garde parfois le frisbee pour te narguer.
   - IA de Lionel : il devine où arrive le frisbee (simulation du vol) avec un temps de réaction et une erreur selon la difficulté,
     plonge s'il est trop loin, se replace en suivant ta position.
-  - Aides : cercle vert au sol là où le frisbee va arriver (FACILE : dès le lancer ; NORMAL : une fois le filet passé ;
+  - Aides : cercle vert au sol là où le frisbee va arriver (FACILE et NORMAL : dès le lancer ;
     CHAMPION : aucune). Le point de chute des lobs est toujours montré.
   - Difficulté FACILE / NORMAL / CHAMPION (écran commun `src/core/difficulte.js`, aussi utilisé par Greg), record par difficulté.
   - Fin : rang S/A/B/C (points encaissés, sets perdus, temps), écran de victoire (trophée, Lionel à genoux, badge violet au frisbee).
@@ -142,6 +142,7 @@ Fusionné dans `main` : en ligne.
     Ton joueur (maillot bleu) reste dessiné par le code (`heros_frisbee_*`).
   - Équilibrage (bots « humains » qui voient le frisbee avec du retard, et lisent l'aide quand elle est affichée) :
     FACILE = un enfant gagne ; NORMAL = bon joueur gagne, moyen ~1 fois sur 3, enfant perd ; CHAMPION = très dur.
+    Après essai du propriétaire (« trop dur en normal ») : NORMAL adouci (aide dès le lancer, Lionel plus lent, moins de courbes).
     Lionel se trompe davantage quand le frisbee va vite ; ses courbes sont son arme principale.
 
 ## Ordre de développement (mis à jour)
