@@ -10,7 +10,7 @@ mains vides, entraînement, joystick, jauges du public, 3 supers, surprises, dif
 et tu traverses le terrain en esquivant les défenseurs qui reçoivent les ordres du coach Kédric, VUE DE DOS, esquives ◀ ▶ ▲ ▼,
 plus tu esquives plus tu accélères jusqu'au DEVIL BAT GHOST, référence graphique **Eyeshield 21**, Kédric = **showman frimeur**.
 ILLUSTRATIONS INTÉGRÉES (personnages) : 24 images Gemini du propriétaire, renommées `assets_inbox/kedric_*.jpg`, détourées par
-`outils/kedric/preparer_images.py` dans `assets/sprites/kedric/`. Manquent encore : le décor (stade + pelouse illustrés), le trophée.
+`outils/kedric/preparer_images.py` dans `assets/sprites/kedric/`. Musique intégrée. Manquent encore : le décor (stade + pelouse illustrés), le trophée.
 Rappel : Kédric a son propre dossier (`src/bosses/kedric/`), ne touche ni Greg ni Lionel.
 Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
@@ -254,7 +254,8 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
   - Toute la logique avance dans `pas(dt, touches)` (pas de minuteries Phaser) : les bots de test jouent en accéléré.
   - Bots (ils lisent les symboles parfaitement, donc plus forts qu'un humain) : NORMAL bon / moyen gagnent, enfant ~1 fois sur 2 ;
     FACILE enfant gagne ; CHAMPION moyen gagne encore souvent (un humain réagit moins vite au symbole). À ajuster après essai.
-  - Pas de musique pour l'instant (ambiance de stade générée) ; badge provisoire = médaille verte au ballon (`icone: 'football'`).
+  - Musique de fond : `assets/audio/kedric/kedric_musique.mp3` (Eyeshield 21, « Code Name Eyeshield 21 », donnée par le propriétaire,
+    réduite en 64 kbit/s : 1,3 Mo, en boucle, volume 0,4 dans le manifeste de Kédric) + ambiance de stade générée, plus discrète ; badge provisoire = médaille verte au ballon (`icone: 'football'`).
   - ILLUSTRATIONS (assets_inbox/kedric_*.jpg → `outils/kedric/preparer_images.py` : fond retiré avec rembg isnet-anime, bords
     nettoyés, recadrées, enregistrées 1,5 fois plus grandes que l'écran, le jeu les réduit avec ZOOM_ILLUSTRE) :
     toi de dos (course, saut, rotation, plaqué avec le plaqueur déjà dessus, victoire), défenseurs de face (course, garde, accroupi,

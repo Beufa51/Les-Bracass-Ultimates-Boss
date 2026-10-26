@@ -16,6 +16,7 @@ import { BossScene } from '../../core/BossScene.js';
 import { creerTouches } from '../../core/clavier.js';
 import { texte } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
+import { jouerMusique } from '../../core/musique.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
@@ -96,8 +97,10 @@ export class KedricCourse extends BossScene {
     this.creerHud();
     this.touches = creerTouches(this);
     this.installerBalayage();
+    // musique de fond (Eyeshield 21) : démarre pendant l'écran des commandes, en boucle
+    jouerMusique(this, 'kedric_musique');
     if (this.cache.audio.exists('kedric_ambiance')) {
-      this.ambiance = this.sound.add('kedric_ambiance', { loop: true, volume: 0.2 });
+      this.ambiance = this.sound.add('kedric_ambiance', { loop: true, volume: 0.12 });
       this.ambiance.play();
       const pause = () => this.ambiance.pause(), reprise = () => this.ambiance.resume();
       this.events.on('pause', pause); this.events.on('resume', reprise);

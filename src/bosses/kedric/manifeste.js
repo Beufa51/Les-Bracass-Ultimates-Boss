@@ -56,6 +56,8 @@ export const MANIFESTE = {
   },
 
   sons: {
+    // musique de fond (jouée par src/core/musique.js, en boucle) : Eyeshield 21, « Code Name Eyeshield 21 », 64 kbit/s ; volume de 0 à 1
+    kedric_musique:   { fichier: 'audio/kedric/kedric_musique.mp3', musique: true, volume: 0.4 },
     // générés par outils/kedric/generer_sons.py
     kedric_esquive:   { fichier: 'audio/kedric/kedric_esquive.wav', provisoire: { frequence: 700, duree: 0.06 } },
     kedric_saut:      { fichier: 'audio/kedric/kedric_saut.wav', provisoire: { frequence: 500, duree: 0.08 } },
