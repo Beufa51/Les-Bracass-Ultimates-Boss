@@ -239,6 +239,11 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     et ligne qui ne se décale plus (sauf CHAMPION : `murTardif`, `decalage`), pot de colle figé 0,75 s avant, rangs derrière le
     prochain défenseur ESTOMPÉS, symbole placé à la hauteur de la pose (plus bas quand il plonge). Duel : tu restes face à Kédric
     (le terrain ne défile plus pendant le duel), sa charge dure toujours ≈ 1,2 s (avant, le bout du terrain la ralentissait).
+  - v4.2 : BUG corrigé : le trou de la ligne (et des murs) était tiré au hasard POUR CHAQUE COULOIR → parfois 3 défenseurs
+    = ligne complète impassable avec le symbole ◀ ▶ (détecté par un bot qui cherche les rangs qui bouchent les 3 couloirs).
+    Terrain du KÉDRIC SHOW rallongé à 140 yards (réglage `terrain`, le milieu est le 70) ; finale à 40 yards de son en-but.
+    En attente de la décision du propriétaire : remplacer le duel d'esquive contre Kédric (une seule illustration penchée,
+    pas lisible) par un DUEL DE FRIME EN RYTHME (proposition du joueur testeur, voir conversation).
   - v4 : 3 ATTAQUES puis la FINALE. Chaque attaque : COUP D'ENVOI (le ballon arrive du fond, le VENT peut le faire changer de couloir
     à 60 % du vol ; cercle de timing qui se resserre, BLEU = appuie, BLANC = pile ; ▲ à ±0,12 s = RÉCEPTION PARFAITE vitesse 3 + Ghost,
     ±0,3 s = BIEN vitesse 2, sinon attrapé vitesse 0 ; hors du couloir = BOING, tu ramasses) puis RETOUR, limité à 40 yards

@@ -40,6 +40,7 @@ export const VUE = {
 
 export const REGLAGES = {
   // ---------- Le match ----------
+  terrain: 140,          // le terrain du KÉDRIC SHOW fait 140 yards (un vrai terrain : 100) : plus d'actions avant l'en-but
   // 3 ATTAQUES (chacune commence par un COUP D'ENVOI à réceptionner), puis la FINALE en 1 contre 1 contre Kédric.
   attaques: 3,
   // coup d'envoi : Kédric botte, le ballon arrive du fond du terrain ; tu le réceptionnes sur tes 5 yards.
@@ -87,9 +88,10 @@ export const REGLAGES = {
   //  vies : dans les duels de zone rouge (2e et 3e attaques)
   duel: { vies: 2, distance: 7, charge: 6, danse: 1.0, pose: 0.7, feinteAvant: 0.6 },
   // ---------- La FINALE : 1 contre 1 contre Kédric, depuis ses 40 yards, en 3 ACTES ----------
+  //  depart : la finale commence à 40 yards de son en-but
   //  vies : esquives qu'il faut pour le passer (+1 par touchdown de retard au score) ; ton avance te donne 1 vie (2 au plus)
   //  acte 1 (vies 6-5) : attaques simples ; acte 2 (4-3) : COMBOS de 2 attaques annoncés ; acte 3 (2-1) : feintes
-  finale: { depart: 60, vies: 6, viesMax: 8, bonusMax: 2, acte2: 4, acte3: 2, distanceCombo: 6.5 },
+  finale: { depart: 40, vies: 6, viesMax: 8, bonusMax: 2, acte2: 4, acte3: 2, distanceCombo: 6.5 },
   // ---------- Classement ----------
   tempsReference: 300,   // au-delà de ce temps de jeu, le rang baisse
   rangs: [

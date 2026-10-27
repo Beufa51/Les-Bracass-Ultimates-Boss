@@ -35,8 +35,9 @@ const echelle = (d) => VUE.recul / Math.max(0.05, d + VUE.recul);
 const ecranY = (d) => VUE.horizon + (VUE.pieds - VUE.horizon) * echelle(d);
 const ecranX = (x, d) => LARGEUR / 2 + x * VUE.largeurCouloir * echelle(d);
 
-// l'en-but de Kédric commence à 100 (le terrain va de 0, ton en-but, à 100)
-const EN_BUT = 100;
+// le terrain du KÉDRIC SHOW va de 0 (ton en-but) à EN_BUT (celui de Kédric) : plus long qu'un vrai terrain (réglage `terrain`)
+const EN_BUT = R.terrain;
+const MILIEU = EN_BUT / 2;
 
 // ce qu'il faut faire contre chaque type de défenseur
 const SYMBOLES = {
@@ -66,7 +67,7 @@ const ETIQUETTES_OK = { haut: null, bas: null, gauche: null, droite: null, espac
 // « 1er ESSAI & 10 », « 3e ESSAI & BUT »
 const nomEssai = (n) => (n === 1 ? '1er' : n + 'e') + ' ESSAI';
 // position sur le terrain comme à la télé : « tes 35 », « le 50 », « ses 20 »
-const surLes = (L) => { const n = Math.round(L); return n < 50 ? `tes ${n}` : n === 50 ? 'le 50' : `ses ${EN_BUT - n}`; };
+const surLes = (L) => { const n = Math.round(L); return n < MILIEU ? `tes ${n}` : n === MILIEU ? `le ${MILIEU}` : `ses ${EN_BUT - n}`; };
 
 export class KedricCourse extends BossScene {
   constructor() { super('KedricCourse', IDENTITE); }
@@ -347,7 +348,11 @@ export class KedricCourse extends BossScene {
     const g = ++this.groupe;
     let voies;
     if (couloir === 'tous') voies = [-1, 0, 1];
-    else if (couloir === 'mur') voies = ligneDef || !this.diff.murTardif ? [-1, 0, 1].filter(v => v !== this.trouLigne()) : ['mur', 'mur'];
+    else if (couloir === 'mur') {
+      // le trou est tiré UNE fois (avant, il était retiré pour chaque couloir : parfois 3 couloirs bouchés, une ligne impassable)
+      const trou = this.trouLigne();
+      voies = ligneDef || !this.diff.murTardif ? [-1, 0, 1].filter(v => v !== trou) : ['mur', 'mur'];
+    }
     else voies = [null];   // 'toi' : il vise ton couloir jusqu'au dernier moment
     voies.forEach((vo, i) => {
       const d = this.ajouterDefenseur({ pos, type, voie: vo === 'mur' ? (i ? 1 : -1) : vo, groupe: g });
@@ -966,7 +971,7 @@ export class KedricCourse extends BossScene {
     this.attaque = { nom: 'FINALE', titre: 'SHOWTIME', kedric: true, formations: [] };
     this.numAttaque = R.attaques;
     this.kedricVu = true; this.niveau = 0;
-    this.pos = this.ligne = R.finale.depart; this.premier = EN_BUT; this.essai = 1;
+    this.pos = this.ligne = EN_BUT - R.finale.depart; this.premier = EN_BUT; this.essai = 1;
     this.etat = 'pause';
     jouerSon(this, 'kedric_touchdown', { volume: 0.7 });
     const bonus = this.finale.viesToi - this.diff.viesFinale;
@@ -1208,7 +1213,7 @@ export class KedricCourse extends BossScene {
       g.lineStyle(Math.max(1, 4 * echelle(d)), 0xffffff, L === EN_BUT ? 1 : 0.8);
       g.lineBetween(ecranX(-B, d), y, ecranX(B, d), y);
       // numéros des yards (comme sur un vrai terrain : 10, 20... 50... 20, 10)
-      const n = L <= 50 ? L : EN_BUT - L;
+      const n = L <= MILIEU ? L : EN_BUT - L;
       if (L % 10 === 0 && n > 0 && L < EN_BUT && iN < this.nombres.length - 1 && d > 0.5) {
         for (const s of [-1, 1]) {
           const t = this.nombres[iN++]; if (!t) break;
