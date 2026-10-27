@@ -14,17 +14,17 @@ export const IDENTITE = { id: 'kedric', nom: 'Kédric' };
 //  charge : vitesse des défenseurs qui foncent sur toi (en plus de ta course)
 //  poursuite : chance qu'un défenseur esquivé de côté se relève et te poursuive ;
 //  poursuiteEcart : il court ce nombre de yards / s plus vite que toi au moment où il part (le sprint le sème)
-//  viesFinale : nombre de plaquages que tu peux encaisser dans la FINALE contre Kédric
+//  fenetreShow : largeur des fenêtres de timing du SHOWTIME (x)
 export const DIFFICULTES = {
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', alerte: 1.8, parfait: 0.22, aide: true, feintes: 0, ghost: 3, vitesse: 0.9, decalage: 0, murTardif: false,
-    charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, viesFinale: 4,
-    texte: 'Les défenseurs préviennent tôt, Kédric ne feinte pas. Idéal pour apprendre.' },
+    charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, fenetreShow: 1.35,
+    texte: 'Les défenseurs préviennent tôt, Kédric danse lentement. Idéal pour apprendre.' },
   normal:   { nom: 'NORMAL',   couleur: '#ffd84a', alerte: 1.45, parfait: 0.17, aide: true, feintes: 0.3, ghost: 5, vitesse: 1, decalage: 0, murTardif: false,
-    charge: 1.5, poursuite: 0.12, poursuiteEcart: 1.2, viesFinale: 3,
-    texte: 'Le vrai match. Kédric feinte dans le dernier acte de la finale.' },
+    charge: 1.5, poursuite: 0.12, poursuiteEcart: 1.2, fenetreShow: 1,
+    texte: 'Le vrai match, et un vrai duel de frime contre Kédric.' },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', alerte: 0.95, parfait: 0.12, aide: false, feintes: 0.45, ghost: 6, vitesse: 1.06, decalage: 0.5, murTardif: true,
-    charge: 3.0, poursuite: 0.2, poursuiteEcart: 1.5, viesFinale: 2,
-    texte: 'Pas d\'aide, défense rapide, Kédric feinte plus souvent. Pour les vrais.' },
+    charge: 3.0, poursuite: 0.2, poursuiteEcart: 1.5, fenetreShow: 0.8,
+    texte: 'Pas d\'aide, défense rapide, timing serré au SHOWTIME. Pour les vrais.' },
 };
 
 // Le terrain vu de dos (perspective) : la ligne d'horizon, la taille d'un couloir sous tes pieds.
@@ -81,17 +81,19 @@ export const REGLAGES = {
   // Espace quand la jauge est pleine : vitesse maximale, le PROCHAIN défenseur (dans les 1,6 s) est passé à coup sûr,
   // et le dernier rideau ne t'arrête pas : c'est la grande percée.
   ghost: { fenetre: 1.6, gel: 0.45 },
-  // ---------- Kédric en personne : il prévient TOUJOURS de la même façon ----------
-  //  danse (il se dandine) → POSE immobile (son attaque s'affiche, avec sa couleur) → CHARGE (≈ 1,2 s, toujours pareille :
-  //  pendant le duel tu restes face à lui, le terrain ne défile pas)
-  //  feinteAvant : une feinte change son attaque ce nombre de secondes avant le contact (annoncée par « FEINTE ! »)
-  //  vies : dans les duels de zone rouge (2e et 3e attaques)
+  // ---------- SHOWTIME : le DUEL DE FRIME contre Kédric (showtime.js) ----------
+  //  Kédric montre ses pas en rythme, puis « À TOI ! » : tu les refais sur les mêmes temps. FLÈCHE ROUGE = l'inverse.
+  //  manches : nombre de pas de chaque manche de la finale ; rouges : flèches rouges par manche ; bpm : tempo par manche
+  //  parfait / bien : fenêtres de timing (s, x fenetreShow de la difficulté) ; gain : points de PUBLIC (la jauge va de -100 à +100)
+  //  kedricParPas : le public qu'il te prend à chaque pas qu'il montre ; tu gagnes la finale si la jauge finit au-dessus de 0
+  //  (-100 = perdu tout de suite). Chaque touchdown d'avance au score : +15 au départ (30 au plus).
+  //  revanche : après chacun de tes touchdowns, Kédric veut sa revanche sur 4 pas (sans risque, réussie = +1 Ghost)
+  showtime: { manches: [4, 6, 8], rouges: [0, 1, 2], bpm: [88, 96, 104], annonce: 1.6, pause: 1.2,
+    parfait: 0.1, bien: 0.22, gain: { parfait: 11, bien: 7, rate: 12 }, kedricParPas: 2,
+    parTouchdown: 15, avanceMax: 30, revanche: 4 },
+  // ---------- Kédric en personne sur le terrain (option : attaque avec kedric: true) ----------
+  //  il garde l'en-but en zone rouge et prévient toujours pareil : danse → POSE (son attaque s'affiche) → CHARGE
   duel: { vies: 2, distance: 7, charge: 6, danse: 1.0, pose: 0.7, feinteAvant: 0.6 },
-  // ---------- La FINALE : 1 contre 1 contre Kédric, depuis ses 40 yards, en 3 ACTES ----------
-  //  depart : la finale commence à 40 yards de son en-but
-  //  vies : esquives qu'il faut pour le passer (+1 par touchdown de retard au score) ; ton avance te donne 1 vie (2 au plus)
-  //  acte 1 (vies 6-5) : attaques simples ; acte 2 (4-3) : COMBOS de 2 attaques annoncés ; acte 3 (2-1) : feintes
-  finale: { depart: 40, vies: 6, viesMax: 8, bonusMax: 2, acte2: 4, acte3: 2, distanceCombo: 6.5 },
   // ---------- Classement ----------
   tempsReference: 300,   // au-delà de ce temps de jeu, le rang baisse
   rangs: [
@@ -103,11 +105,12 @@ export const REGLAGES = {
 };
 
 // Les 3 ATTAQUES : à chaque action, Kédric choisit une FORMATION dans la liste (dans l'ordre, puis il recommence).
-// En zone rouge, il prend ZONE_ROUGE ; en 2e et 3e attaques, il garde lui-même l'en-but (duel).
+// En zone rouge, il prend ZONE_ROUGE. Kédric ne plaque jamais lui-même (une star ne se salit pas les mains) :
+// on l'affronte au SHOWTIME. (kedric: true sur une attaque = il garde l'en-but en zone rouge, en duel d'esquive.)
 export const ATTAQUES = [
   { nom: '1re ATTAQUE', titre: 'L\'échauffement', formations: ['base', 'faux', 'corde', 'base', 'blitz', 'zone'] },
-  { nom: '2e ATTAQUE', titre: 'Kédric garde l\'en-but', kedric: true, formations: ['blitz', 'zone', 'corde', 'piege', 'faux', 'blitz'] },
-  { nom: '3e ATTAQUE', titre: 'Le grand show', kedric: true, formations: ['piege', 'blitz', 'zone', 'faux', 'piege', 'corde'] },
+  { nom: '2e ATTAQUE', titre: 'Le grand show', formations: ['blitz', 'zone', 'corde', 'piege', 'faux', 'blitz'] },
+  { nom: '3e ATTAQUE', titre: 'La défense de fer', formations: ['piege', 'blitz', 'zone', 'faux', 'piege', 'corde'] },
 ];
 
 // L'équipe du coup d'envoi qui descend sur toi (elle court déjà quand tu réceptionnes)
@@ -155,10 +158,8 @@ export const REPLIQUES = {
   passe: 'Une passe ?! Marquez-le !',
   incomplete: 'Incomplète ! Rends-moi ce ballon !',
   zoneRouge: 'Zone rouge ! Ici, c\'est MON territoire !',
-  finale: 'Toi et moi. Sous les projecteurs. C\'est MON SHOWTIME !',
-  finalePlaque: ['Et la foule est en DÉLIRE !', 'Rejoue, rejoue ! J\'adore ce passage !', 'Encore raté, la star c\'est MOI !'],
-  acte2: 'ACTE 2 : mes COMBOS !',
-  acte3: 'ACTE 3 : mes FEINTES de star !',
+  finale: 'Une star ne plaque pas. On règle ça au SHOWTIME ! Suis mes pas... si tu peux !',
+  revanche: 'Tu crois savoir faire le show ? Montre-moi !',
   touchdown: ['Ok ok... c\'était l\'échauffement.', 'Tu me voles la vedette, là !', 'Le public est pour MOI, hein !'],
   balle: 'Ballon pour MOI ! Regardez bien... TOUCHDOWN KÉDRIC !',
   premierEssai: ['Pfff... 10 yards, la belle affaire.', 'Les gars, réveillez-vous !'],

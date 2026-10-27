@@ -239,6 +239,19 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     et ligne qui ne se décale plus (sauf CHAMPION : `murTardif`, `decalage`), pot de colle figé 0,75 s avant, rangs derrière le
     prochain défenseur ESTOMPÉS, symbole placé à la hauteur de la pose (plus bas quand il plonge). Duel : tu restes face à Kédric
     (le terrain ne défile plus pendant le duel), sa charge dure toujours ≈ 1,2 s (avant, le bout du terrain la ralentissait).
+  - v5 : KÉDRIC NE PLAQUE PLUS (« une star ne se salit pas les mains ») : on l'affronte au SHOWTIME, un DUEL DE FRIME EN
+    RYTHME façon PaRappa / Simon (`showtime.js`, idée du joueur testeur validée par le propriétaire). Kédric montre ses pas
+    (une pose, une grosse flèche de couleur ◀ bleu ▶ orange ▲ jaune ▼ violet, une note par direction), il tend le micro
+    « À TOI ! », tu refais les pas sur les mêmes temps : un cercle se resserre sur la flèche à jouer (BLEU = appuie,
+    BLANC = pile). FLÈCHE ROUGE = fais l'INVERSE. Jauge PUBLIC en tir à la corde (-100 Kédric / +100 toi) : parfait +11,
+    bien +7, raté -12, chaque pas qu'il montre -2. FINALE = 3 manches (4, 6, 8 pas ; 0, 1, 2 flèches rouges ; 88, 96,
+    104 bpm) ; gagnée si la jauge finit au-dessus de 0 (-100 = perdu tout de suite) ; chaque touchdown d'avance = +15 au
+    départ (30 au plus). Après chacun de tes touchdowns : REVANCHE de 4 pas sans risque (réussie = +1 Ghost) pour apprendre.
+    Fenêtres de timing x1,35 FACILE / x0,8 CHAMPION (`fenetreShow`). Plus de duel d'esquive (le code reste, option
+    `kedric: true` sur une attaque). Images provisoires : ses 2 poses de danse (retournée pour ▶, écrasée pour ▼) et ton
+    saut / ta rotation / ta victoire penchée ; nouvelles images attendues (prompts Gemini donnés) : `kedric_frime_gauche /
+    droite / haut / bas / micro / triche` et `kedric_toi_frime_gauche / droite / haut / bas` (le jeu les prend dès qu'elles
+    sont dans le manifeste). Bots : finale NORMAL moyen gagne nettement, enfant 2 fois sur 3, CHAMPION enfant perd.
   - v4.2 : BUG corrigé : le trou de la ligne (et des murs) était tiré au hasard POUR CHAQUE COULOIR → parfois 3 défenseurs
     = ligne complète impassable avec le symbole ◀ ▶ (détecté par un bot qui cherche les rangs qui bouchent les 3 couloirs).
     Terrain du KÉDRIC SHOW rallongé à 140 yards (réglage `terrain`, le milieu est le 70) ; finale à 40 yards de son en-but.
