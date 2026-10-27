@@ -10,19 +10,20 @@ export const IDENTITE = { id: 'kedric', nom: 'Kédric' };
 //  feintes : chance que Kédric FEINTE (en finale, acte 3 seulement ; dans les duels de zone rouge, en CHAMPION)
 //  ghost : esquives PARFAITES (ou réceptions parfaites) pour remplir la jauge du DEVIL BAT GHOST
 //  decalage : chance que la ligne se décale au « HUT ! » (le trou change de couloir)
+//  murTardif : le trou des murs de 2 défenseurs n'est choisi qu'au dernier moment (sinon on le voit dès le placement)
 //  charge : vitesse des défenseurs qui foncent sur toi (en plus de ta course)
 //  poursuite : chance qu'un défenseur esquivé de côté se relève et te poursuive ;
 //  poursuiteEcart : il court ce nombre de yards / s plus vite que toi au moment où il part (le sprint le sème)
 //  viesFinale : nombre de plaquages que tu peux encaisser dans la FINALE contre Kédric
 export const DIFFICULTES = {
-  facile:   { nom: 'FACILE',   couleur: '#7fff7f', alerte: 1.2, parfait: 0.22, aide: true, feintes: 0, ghost: 3, vitesse: 0.95, decalage: 0,
-    charge: 2.0, poursuite: 0.06, poursuiteEcart: 0.9, viesFinale: 4,
+  facile:   { nom: 'FACILE',   couleur: '#7fff7f', alerte: 1.8, parfait: 0.22, aide: true, feintes: 0, ghost: 3, vitesse: 0.9, decalage: 0, murTardif: false,
+    charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, viesFinale: 4,
     texte: 'Les défenseurs préviennent tôt, Kédric ne feinte pas. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', alerte: 0.95, parfait: 0.17, aide: true, feintes: 0.3, ghost: 5, vitesse: 1, decalage: 0.3,
-    charge: 3.0, poursuite: 0.12, poursuiteEcart: 1.2, viesFinale: 3,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', alerte: 1.45, parfait: 0.17, aide: true, feintes: 0.3, ghost: 5, vitesse: 1, decalage: 0, murTardif: false,
+    charge: 1.5, poursuite: 0.12, poursuiteEcart: 1.2, viesFinale: 3,
     texte: 'Le vrai match. Kédric feinte dans le dernier acte de la finale.' },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', alerte: 0.72, parfait: 0.12, aide: false, feintes: 0.45, ghost: 6, vitesse: 1.06, decalage: 0.55,
-    charge: 4.0, poursuite: 0.2, poursuiteEcart: 1.5, viesFinale: 2,
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', alerte: 0.95, parfait: 0.12, aide: false, feintes: 0.45, ghost: 6, vitesse: 1.06, decalage: 0.5, murTardif: true,
+    charge: 3.0, poursuite: 0.2, poursuiteEcart: 1.5, viesFinale: 2,
     texte: 'Pas d\'aide, défense rapide, Kédric feinte plus souvent. Pour les vrais.' },
 };
 
@@ -65,7 +66,7 @@ export const REGLAGES = {
   niveauMax: 5,          // niveau 5 = 9,5 yards / s = 40 yards en 4,2 s, comme le n°21 !
   esquivesParNiveau: 2,  // esquives d'affilée pour gagner un niveau de vitesse
   elan: 2,               // à chaque nouvelle action, tu gardes ta vitesse moins 2 niveaux
-  alerteParNiveau: 0.05, // le symbole apparaît 5 % plus tard par niveau de vitesse (plus vite = plus dur)
+  alerteParNiveau: 0.03, // le symbole apparaît 3 % plus tard par niveau de vitesse (plus vite = un peu plus dur)
   changementCouloir: 0.13,
   saut: { duree: 0.5, recharge: 0.12 },        // ▲ : saute par-dessus un plaquage aux jambes
   rotation: { duree: 0.45, recharge: 0.12 },   // ▼ : se baisse en tournant sous les bras tendus
@@ -80,10 +81,11 @@ export const REGLAGES = {
   // et le dernier rideau ne t'arrête pas : c'est la grande percée.
   ghost: { fenetre: 1.6, gel: 0.45 },
   // ---------- Kédric en personne : il prévient TOUJOURS de la même façon ----------
-  //  danse (il se dandine) → POSE immobile (son attaque s'affiche, avec sa couleur) → CHARGE
+  //  danse (il se dandine) → POSE immobile (son attaque s'affiche, avec sa couleur) → CHARGE (≈ 1,2 s, toujours pareille :
+  //  pendant le duel tu restes face à lui, le terrain ne défile pas)
   //  feinteAvant : une feinte change son attaque ce nombre de secondes avant le contact (annoncée par « FEINTE ! »)
   //  vies : dans les duels de zone rouge (2e et 3e attaques)
-  duel: { vies: 2, distance: 7, charge: 5, danse: 1.0, pose: 0.7, tonAllure: 0.55, feinteAvant: 0.6 },
+  duel: { vies: 2, distance: 7, charge: 6, danse: 1.0, pose: 0.7, feinteAvant: 0.6 },
   // ---------- La FINALE : 1 contre 1 contre Kédric, depuis ses 40 yards, en 3 ACTES ----------
   //  vies : esquives qu'il faut pour le passer (+1 par touchdown de retard au score) ; ton avance te donne 1 vie (2 au plus)
   //  acte 1 (vies 6-5) : attaques simples ; acte 2 (4-3) : COMBOS de 2 attaques annoncés ; acte 3 (2-1) : feintes
@@ -107,31 +109,34 @@ export const ATTAQUES = [
 ];
 
 // L'équipe du coup d'envoi qui descend sur toi (elle court déjà quand tu réceptionnes)
-export const COUVERTURE = { nom: 'COUP D\'ENVOI !', liste: [[16, 'bloc', 'toi'], [22, 'bas', 'tous'], [28, 'bloc', 'mur'], [34, 'haut', 'toi'], [40, 'suiveur', 'toi']] };
+export const COUVERTURE = { nom: 'COUP D\'ENVOI !', liste: [[14, 'bloc', 'toi'], [23, 'bas', 'tous'], [32, 'bloc', 'mur'], [41, 'haut', 'toi']] };
 
 // Les formations : 11 défenseurs au plus, comme un vrai match. [profondeur (yards devant la ligne d'engagement), type, couloir]
 //  types : 'bloc' = plaqueur debout (change de couloir ◀ ▶), 'bas' = plonge aux jambes (▲ saute, il te suit : pas de ◀ ▶ possible),
 //          'haut' = bras tendus (▼ baisse-toi, il te suit aussi), 'suiveur' = te suit puis se fige au dernier moment (◀ ▶ après)
 //  couloir : 'toi' = le tien, 'tous' = un défenseur dans chaque couloir, 'mur' = 2 couloirs bouchés (le libre n'est pas le tien)
-//  La LIGNE (profondeur 4) bloque 2 couloirs dès le départ : place-toi face au trou avant le « HUT ! »
+//  La LIGNE (profondeur 6) bloque 2 couloirs dès le départ : place-toi face au trou avant le « HUT ! »
 //  (attention, elle peut se DÉCALER au dernier moment). Plaqué par la ligne = pas de gain (tu es arrêté sur la ligne).
+// Les rangs sont espacés d'au moins 8 yards (plus d'une seconde entre deux défenseurs) : on a le temps de lire.
 export const FORMATIONS = {
-  base:  { nom: 'DÉFENSE DE BASE !', liste: [[4, 'bloc', 'mur'], [9, 'bloc', 'toi'], [14, 'bas', 'toi'], [20, 'suiveur', 'toi']] },
-  faux:  { nom: 'LA FAUX !', liste: [[4, 'bloc', 'mur'], [9, 'bas', 'tous'], [15, 'bloc', 'toi'], [21, 'haut', 'toi']] },
-  corde: { nom: 'LA CORDE À LINGE !', liste: [[4, 'bloc', 'mur'], [10, 'haut', 'tous'], [15, 'suiveur', 'toi'], [21, 'bas', 'toi']] },
-  blitz: { nom: 'BLITZ !!', liste: [[4, 'bloc', 'mur'], [7, 'bloc', 'toi'], [11, 'bas', 'toi'], [16, 'haut', 'tous'], [22, 'bloc', 'toi']] },
-  zone:  { nom: 'DÉFENSE DE ZONE !', liste: [[4, 'bloc', 'mur'], [10, 'suiveur', 'toi'], [15, 'bloc', 'mur'], [21, 'haut', 'toi']] },
-  piege: { nom: 'LE PIÈGE !', liste: [[4, 'bloc', 'mur'], [8, 'bas', 'tous'], [13, 'haut', 'tous'], [19, 'suiveur', 'toi']] },
+  base:  { nom: 'DÉFENSE DE BASE !', liste: [[6, 'bloc', 'mur'], [14, 'bloc', 'toi'], [22, 'bas', 'toi'], [30, 'suiveur', 'toi']] },
+  faux:  { nom: 'LA FAUX !', liste: [[6, 'bloc', 'mur'], [14, 'bas', 'tous'], [22, 'bloc', 'toi'], [30, 'haut', 'toi']] },
+  corde: { nom: 'LA CORDE À LINGE !', liste: [[6, 'bloc', 'mur'], [14, 'haut', 'tous'], [22, 'suiveur', 'toi'], [30, 'bas', 'toi']] },
+  blitz: { nom: 'BLITZ !!', liste: [[6, 'bloc', 'mur'], [14, 'bloc', 'toi'], [22, 'bas', 'toi'], [30, 'haut', 'tous'], [38, 'bloc', 'toi']] },
+  zone:  { nom: 'DÉFENSE DE ZONE !', liste: [[6, 'bloc', 'mur'], [14, 'suiveur', 'toi'], [22, 'bloc', 'mur'], [30, 'haut', 'toi']] },
+  piege: { nom: 'LE PIÈGE !', liste: [[6, 'bloc', 'mur'], [14, 'bas', 'tous'], [22, 'haut', 'tous'], [30, 'suiveur', 'toi']] },
 };
 
-// ZONE ROUGE (près de l'en-but) : défense serrée, des rangs réguliers jusqu'à la ligne d'en-but (placés par le jeu)
+// ZONE ROUGE (près de l'en-but) : des rangs réguliers jusqu'à la ligne d'en-but, espacés d'au moins 6 yards (placés par le jeu ;
+// ceux qui n'ont pas la place ne jouent pas)
 export const ZONE_ROUGE = [
-  { nom: 'ZONE ROUGE : LE MUR VERT !', liste: [[0, 'bloc', 'mur'], [0, 'bas', 'tous'], [0, 'bloc', 'toi'], [0, 'haut', 'tous'], [0, 'suiveur', 'toi']] },
-  { nom: 'ZONE ROUGE : PERSONNE NE PASSE !', liste: [[0, 'bloc', 'mur'], [0, 'haut', 'tous'], [0, 'bas', 'toi'], [0, 'bloc', 'mur'], [0, 'bas', 'tous']] },
+  { nom: 'ZONE ROUGE : LE MUR VERT !', liste: [[0, 'bloc', 'mur'], [0, 'bas', 'tous'], [0, 'bloc', 'toi'], [0, 'haut', 'tous']] },
+  { nom: 'ZONE ROUGE : PERSONNE NE PASSE !', liste: [[0, 'bloc', 'mur'], [0, 'haut', 'tous'], [0, 'bas', 'toi'], [0, 'bloc', 'mur']] },
 ];
+export const ESPACE_ZONE_ROUGE = 6;
 
 // Le suiveur se fige ce nombre de secondes avant le contact (il devient rouge) : esquive APRÈS
-export const VERROU_SUIVEUR = 0.5;
+export const VERROU_SUIVEUR = 0.75;
 
 // Ce que fait Kédric (le coach showman)
 export const REPLIQUES = {

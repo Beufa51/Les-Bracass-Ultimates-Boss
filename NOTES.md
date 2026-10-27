@@ -233,6 +233,12 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     trop court, plus de défenseurs vers l'en-but, Kédric seul quand il arrive, patterns de Kédric durs à lire, réception mal exploitée ».
     → AUDIT par 2 agents (joueur testeur + développeur, ~40 matchs simulés) puis v4 (actuelle). Bug trouvé : ◀ ▶ esquivait TOUT,
     y compris les plongeons, les bras tendus et Kédric (les feintes ne servaient à rien) ; des poursuivants restaient pendant le duel.
+  - v4.1, après « trop dur en NORMAL : pas le temps d'anticiper, défenseurs trop près, ils changent au dernier moment, on ne
+    voit rien avec plusieurs lignes » : symbole 1,45 s avant le contact en NORMAL (1,8 FACILE, 0,95 CHAMPION), rangs espacés d'au
+    moins 8 yards (6 en zone rouge), défenseurs qui foncent moins vite (`charge` 1,5), trou des murs visible dès le placement
+    et ligne qui ne se décale plus (sauf CHAMPION : `murTardif`, `decalage`), pot de colle figé 0,75 s avant, rangs derrière le
+    prochain défenseur ESTOMPÉS, symbole placé à la hauteur de la pose (plus bas quand il plonge). Duel : tu restes face à Kédric
+    (le terrain ne défile plus pendant le duel), sa charge dure toujours ≈ 1,2 s (avant, le bout du terrain la ralentissait).
   - v4 : 3 ATTAQUES puis la FINALE. Chaque attaque : COUP D'ENVOI (le ballon arrive du fond, le VENT peut le faire changer de couloir
     à 60 % du vol ; cercle de timing qui se resserre, BLEU = appuie, BLANC = pile ; ▲ à ±0,12 s = RÉCEPTION PARFAITE vitesse 3 + Ghost,
     ±0,3 s = BIEN vitesse 2, sinon attrapé vitesse 0 ; hors du couloir = BOING, tu ramasses) puis RETOUR, limité à 40 yards

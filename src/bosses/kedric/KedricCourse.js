@@ -24,7 +24,7 @@ import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
 import { choisirDifficulte, cleRecord } from './difficulte.js';
-import { IDENTITE, DIFFICULTES, VUE, REGLAGES as R, ATTAQUES, COUVERTURE, FORMATIONS, ZONE_ROUGE, VERROU_SUIVEUR, REPLIQUES } from './reglages.js';
+import { IDENTITE, DIFFICULTES, VUE, REGLAGES as R, ATTAQUES, COUVERTURE, FORMATIONS, ZONE_ROUGE, ESPACE_ZONE_ROUGE, VERROU_SUIVEUR, REPLIQUES } from './reglages.js';
 
 const auHasard = (liste) => liste[Math.floor(Math.random() * liste.length)];
 const entre = (min, max) => min + Math.random() * (max - min);
@@ -53,6 +53,9 @@ const TUTO = {
   haut: 'BRAS TENDUS : ▼ pour passer dessous en tournant !',
   suiveur: 'Le POT DE COLLE te suit : attends qu\'il devienne ROUGE, puis ◀ ▶ !',
 };
+
+// hauteur du symbole au-dessus des pieds selon la pose (plus bas quand il plonge, sinon on ne sait plus à qui il est)
+const HAUTEUR_POSE = { course: 215, garde: 200, bas: 165, plonge: 120, bras: 240, rate: 150 };
 
 // les illustrations sont enregistrées 1,5 fois plus grandes que leur taille à l'écran (plus nettes)
 const ZOOM_ILLUSTRE = 1 / 1.5;
@@ -329,9 +332,9 @@ export class KedricCourse extends BossScene {
   placerZoneRouge(F) {
     // avec Kédric, ses gars s'arrêtent à 13 yards de l'en-but : la fin est un duel, seul contre lui
     const fin = this.attaque.kedric ? EN_BUT - 13 : EN_BUT - 0.5;
-    const n = F.liste.length, pas = Math.max(2.6, (fin - this.ligne - 4) / n);
+    const n = F.liste.length, pas = Math.max(ESPACE_ZONE_ROUGE, (fin - this.ligne - 6) / n);
     F.liste.forEach(([, type, couloir], i) => {
-      const pos = this.ligne + 4 + i * pas;
+      const pos = this.ligne + 6 + i * pas;
       if (pos <= fin) this.placerRang(pos, type, couloir, i === 0);
     });
     if (this.attaque.kedric) {
@@ -344,7 +347,7 @@ export class KedricCourse extends BossScene {
     const g = ++this.groupe;
     let voies;
     if (couloir === 'tous') voies = [-1, 0, 1];
-    else if (couloir === 'mur') voies = ligneDef ? [-1, 0, 1].filter(v => v !== this.trouLigne()) : ['mur', 'mur'];
+    else if (couloir === 'mur') voies = ligneDef || !this.diff.murTardif ? [-1, 0, 1].filter(v => v !== this.trouLigne()) : ['mur', 'mur'];
     else voies = [null];   // 'toi' : il vise ton couloir jusqu'au dernier moment
     voies.forEach((vo, i) => {
       const d = this.ajouterDefenseur({ pos, type, voie: vo === 'mur' ? (i ? 1 : -1) : vo, groupe: g });
@@ -462,9 +465,7 @@ export class KedricCourse extends BossScene {
   }
 
   vitesse() {
-    let v = (R.vitesseBase + this.niveau * R.pasVitesse) * this.diff.vitesse + this.boost;
-    if (this.duel && this.duel.vies > 0 && this.ghostArme <= 0) v *= R.duel.tonAllure;
-    return v;
+    return (R.vitesseBase + this.niveau * R.pasVitesse) * this.diff.vitesse + this.boost;
   }
   alerte() { return this.diff.alerte * (1 - R.alerteParNiveau * this.niveau); }
 
@@ -496,9 +497,10 @@ export class KedricCourse extends BossScene {
     }
 
     // ---------- on avance ----------
-    const v = this.vitesse();
+    // pendant le duel, tu restes face à Kédric (le terrain ne défile pas) : son rythme est toujours le même
+    const enDuel = this.duel && this.duel.vies > 0;
+    const v = enDuel ? 0 : this.vitesse();
     this.pos += v * dt;
-    if (this.duel && this.duel.vies > 0) this.pos = Math.min(this.pos, EN_BUT - 3, this.duel.limite);
     if (this.pos >= EN_BUT) { this.pos = EN_BUT; this.touchdown(); return; }
     // le dernier rideau : poussé en touche (sauf grande percée du Devil Bat Ghost)
     if (this.pos >= this.rideau && !this.ghostAction) { this.pousseEnTouche(); return; }
@@ -559,7 +561,7 @@ export class KedricCourse extends BossScene {
 
   // vitesse à laquelle le défenseur se rapproche de toi
   vitesseRelative(d, v) {
-    if (d.star) return v + (this.duel && this.duel.phase === 'charge' ? R.duel.charge : 0);
+    if (d.star) return (this.duel && this.duel.vies > 0 ? 0 : v) + (this.duel && this.duel.phase === 'charge' ? R.duel.charge : 0);
     return v + (d.charge ? this.diff.charge : 0);
   }
 
@@ -822,7 +824,7 @@ export class KedricCourse extends BossScene {
     this.viderPoursuivants();
     for (const d of this.defs) if (!d.star && d.etat === 'approche') d.etat = 'passe';
     this.duel = { vies: this.finale ? this.finale.viesK : R.duel.vies, phase: 'danse', attente: R.duel.danse, kedric: k, montre: 'bloc', vrai: 'bloc',
-      precedent: null, depuisFeinte: 3, limite: this.finale ? EN_BUT - 3 : EN_BUT - 3 };
+      precedent: null, depuisFeinte: 3 };
     k.etat = 'approche'; k.pos = this.pos + R.duel.distance;
     if (!this.kedricVu) {
       this.kedricVu = true;
@@ -889,9 +891,8 @@ export class KedricCourse extends BossScene {
       return;
     }
     if (D.phase === 'charge' && k.etat === 'approche') {
-      const v = this.vitesse() + R.duel.charge;
       k.pos -= R.duel.charge * dt;
-      const ttc = (k.pos - this.pos) / v;
+      const ttc = (k.pos - this.pos) / R.duel.charge;
       // l'épaule : il vise ton couloir jusqu'à 0,4 s du contact ; plongeon et corde : il te suit jusqu'au bout
       if (k.type === 'bloc' && ttc > 0.4) k.voie = this.j.voie;
       if (k.type !== 'bloc') k.voie = this.j.voie;
@@ -1386,14 +1387,16 @@ export class KedricCourse extends BossScene {
     // ton illustration « plaqué » montre déjà le plaqueur
     d.sprite.setVisible(!(d.etat === 'plaqueur' && this.estIllustre('kedric_toi_plaque')));
     d.sprite.setDepth(500 - dist * 8 + (d.etat === 'plaqueur' ? 20 : 0));
-    d.sprite.setAlpha(d.etat === 'rate' ? Math.max(0, 1 - d.chute * 0.9) : 1);
+    // les rangs derrière le prochain défenseur sont estompés : on lit d'abord celui qui arrive
+    const derriere = this.prochain && d.etat === 'approche' && !d.star && d.groupe !== this.prochain.groupe && d.pos > this.prochain.pos + 1;
+    d.sprite.setAlpha(d.etat === 'rate' ? Math.max(0, 1 - d.chute * 0.9) : derriere ? 0.45 : 1);
     if (this.ghostArme > 0 && d.etat === 'approche') d.sprite.setTint(0xbbbbcc); else d.sprite.clearTint();
     d.ombre.setPosition(x, y + 2).setScale(k).setVisible(d.etat !== 'rate');
     // le symbole : ce qu'il faut faire
     const S = d === this.prochain && d.etat === 'approche' && d.alerte && this.ghostArme <= 0 ? SYMBOLES[d.type === 'suiveur' ? (d.verrou ? 'verrou' : 'suiveur') : d.type] : null;
     if (S) {
       // Kédric : symbole plus gros (c'est LUI qu'il faut lire)
-      d.symbole.setVisible(true).setText(S.texte).setColor(S.couleur).setPosition(x, y - 215 * k - 18).setScale(Math.max(d.star ? 1.1 : 0.6, k * (d.star ? 1.8 : 1.3))).setDepth(890);
+      d.symbole.setVisible(true).setText(S.texte).setColor(S.couleur).setPosition(x, y - (HAUTEUR_POSE[pose] || 215) * k - 18).setScale(Math.max(d.star ? 1.1 : 0.6, k * (d.star ? 1.8 : 1.3))).setDepth(890);
     } else d.symbole.setVisible(false);
   }
 
