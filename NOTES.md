@@ -261,9 +261,10 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     toi de dos (course, saut, rotation, plaqué avec le plaqueur déjà dessus, victoire), défenseurs de face (course, garde, accroupi,
     plongeon, bras tendus, sonné), Kédric en joueur (une seule image `kedric_star` : le jeu la penche / la couche selon l'attaque),
     Kédric coach (portrait qui te pointe, buste bras croisés / au micro, danse 2 images, défaite à genoux en larmes).
-    TA COURSE = 16 images (planche du propriétaire `assets_inbox/kedric_toi_course_planche.jpg`, 2 lignes de 8 cases encadrées,
-    découpée par `outils/kedric/decouper_course.py` : pieds sur le bas, casque au milieu → `kedric_toi_course16.png`), jouées dans
-    l'ordre de lecture de la planche, plus vite quand tu accélères. Les autres poses = une seule image (la course d'un défenseur rebondit à chaque foulée). Le plongeon illustré est retourné s'il vient de ta gauche.
+    TA COURSE = 4 images choisies dans la planche du propriétaire (`assets_inbox/kedric_toi_course_planche.jpg`, 16 cases) par
+    `outils/kedric/decouper_course.py` → `kedric_toi_course4.png` : talon gauche levé, 2 pieds au sol, talon droit levé, 2 pieds au sol.
+    Les 16 poses jouées à la suite faisaient « se replier la jambe » à chaque pas (trop de poses jambe gauche levée) : refusé
+    par le propriétaire. Plus vite quand tu accélères. Les autres poses = une seule image (la course d'un défenseur rebondit à chaque foulée). Le plongeon illustré est retourné s'il vient de ta gauche.
     Images non utilisées : course de loin (kedric_toi_course_loin / _tres_loin / _2), autres courses du défenseur (_2 à _5 ;
     _4 porte des logos « Deimon / Devil Bats » d'Eyeshield 21, à éviter). Sur la danse « main sur la hanche », il reste un petit
     trait gris du décor près des jambes.

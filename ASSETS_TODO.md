@@ -115,7 +115,7 @@ Planches sur **fond blanc uni**, poses bien espacées.
 | kedric_coach.png | 120x120 | 2 | **définitif** | Buste de Kédric : 1) sourire de star 2) il crie dans son micro-casque |
 | kedric_danse.png | 300x300 | 2 | **définitif** | Kédric qui danse (pose disco, un bras vers le ciel), 2 images |
 | kedric_defaite.png | 300x300 | 1 | **définitif** | Kédric à genoux, lunettes fêlées, une larme |
-| kedric_toi_course16.png | 203x326 | 16 | **définitif** | Ton coureur vu de DOS qui court (16 images, planche du propriétaire) |
+| kedric_toi_course4.png | 197x326 | 4 | **définitif** | Ton coureur vu de DOS qui court (4 images choisies dans la planche du propriétaire) |
 | kedric_toi_saut / rotation / plaque / victoire | 180x220 | 1 | **définitif** | De dos : saut genoux repliés ; baissé en tournant ; plaqué (bras en l'air) ; ballon levé |
 | kedric_def_course.png | 220x200 | 4 | **définitif** | Défenseur de face qui fonce vers toi (4 images) |
 | kedric_def_garde / bas / plonge / bras / rate | 220x200 | 1 | **définitif** | De face : prêt à plaquer bras ouverts ; accroupi ; plongeon vers toi ; bras tendus en l'air ; assis sonné |

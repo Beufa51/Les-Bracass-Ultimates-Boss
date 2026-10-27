@@ -1,11 +1,15 @@
 # Découpe la planche de course de ton coureur vu de dos (assets_inbox/kedric_toi_course_planche.jpg :
-# 2 lignes de 8 cases encadrées de noir) en une bande de 16 images alignées : pieds sur le bas, casque au milieu.
+# 2 lignes de 8 cases encadrées de noir) en une bande d'images alignées : pieds sur le bas, casque au milieu.
+# Toutes les 16 poses donnaient une jambe qui « se replie » à chaque pas (la planche lève presque toujours la jambe gauche) :
+# on n'en garde que 4 qui font un vrai cycle (CHOIX, numéros des cases dans l'ordre de lecture, à partir de 0).
 # Utilisation : python3 outils/kedric/decouper_course.py   (depuis la racine du projet)
 import numpy as np, cv2
 from PIL import Image
 from rembg import remove, new_session
 
-SOURCE, SORTIE = 'assets_inbox/kedric_toi_course_planche.jpg', 'assets/sprites/kedric/kedric_toi_course16.png'
+SOURCE, SORTIE = 'assets_inbox/kedric_toi_course_planche.jpg', 'assets/sprites/kedric/kedric_toi_course4.png'
+# talon gauche qui remonte, deux pieds au sol, talon droit qui remonte, deux pieds au sol
+CHOIX = [0, 1, 5, 9]
 HAUTEUR = round(215 * 1.5)   # hauteur du personnage dans la bande (1,5 fois l'écran, comme les autres illustrations)
 session = new_session('isnet-anime')
 
@@ -23,7 +27,7 @@ cases.sort(key=lambda r: (r[1] // 100, r[0]))
 assert len(cases) == 16, len(cases)
 
 poses = []
-for x, y, w, h in cases:
+for x, y, w, h in [cases[i] for i in CHOIX]:
     m = 5   # on retire le cadre noir
     case = Image.fromarray(cv2.cvtColor(im[y + m:y + h - m, x + m:x + w - m], cv2.COLOR_BGR2RGB))
     rgba = np.array(remove(case, session=session))
@@ -44,10 +48,10 @@ k = HAUTEUR / grand
 gauche = max(c for _, _, _, c in poses) * k
 droite = max(img.width - c for img, _, _, c in poses) * k
 W, H = int(gauche + droite) + 4, HAUTEUR + 4
-bande = Image.new('RGBA', (W * 16, H))
+bande = Image.new('RGBA', (W * len(poses), H))
 for i, (img, a, b, c) in enumerate(poses):
     img = img.resize((round(img.width * k), round(img.height * k)), Image.LANCZOS)
     # pieds sur le bas de la case, casque au milieu
     bande.paste(img, (i * W + round(gauche - c * k) + 2, H - 2 - round(b * k)), img)
 bande.save(SORTIE, optimize=True)
-print('bande', W, H, '16 images')
+print('bande', W, H, len(poses), 'images')
