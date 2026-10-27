@@ -6,7 +6,7 @@
 Copie de référence de la version finale : branche `greg-termine` (`version-1-greg` = état un peu plus ancien).
 **Étape 2 terminée : boss Lionel VALIDÉ par le propriétaire** (match de frisbee façon Windjammers, illustrations manga
 mains vides, entraînement, joystick, jauges du public, 3 supers, surprises, difficulté PERSO). En ligne sur `main`.
-**Étape 3 : boss Kédric — v4 après 3 essais du propriétaire + audit joueur/développeur** (à réessayer). Choix du propriétaire : tu portes le ballon
+**Étape 3 : boss Kédric — v6 : 3 courses d'une traite puis le battle de danse sur scène** (à réessayer). Choix du propriétaire : tu portes le ballon
 et tu traverses le terrain en esquivant les défenseurs qui reçoivent les ordres du coach Kédric, VUE DE DOS, esquives ◀ ▶ ▲ ▼,
 plus tu esquives plus tu accélères jusqu'au DEVIL BAT GHOST, référence graphique **Eyeshield 21**, Kédric = **showman frimeur**.
 ILLUSTRATIONS INTÉGRÉES (personnages) : 24 images Gemini du propriétaire, renommées `assets_inbox/kedric_*.jpg`, détourées par
@@ -239,6 +239,14 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     et ligne qui ne se décale plus (sauf CHAMPION : `murTardif`, `decalage`), pot de colle figé 0,75 s avant, rangs derrière le
     prochain défenseur ESTOMPÉS, symbole placé à la hauteur de la pose (plus bas quand il plonge). Duel : tu restes face à Kédric
     (le terrain ne défile plus pendant le duel), sa charge dure toujours ≈ 1,2 s (avant, le bout du terrain la ralentissait).
+  - v6 (demande du propriétaire : « trop de phases de football, on comprend rien ») : plus d'essais, de passes, de zone
+    rouge, de « HUT ! » ni de dernier rideau. 3 COURSES (`REGLAGES.courses`, liste `COURSES`) : coup d'envoi, puis tout le
+    terrain (160 yards) d'une traite ; la défense enchaîne les formations de la course, un rang tous les 10 yards
+    (`REGLAGES.defense`), qui entrent en jeu au fur et à mesure (`preparerFile` / `appelerRangs`). Un plaquage = la course
+    s'arrête (pas de points) ; personne ne t'arrête = TOUCHDOWN. La jauge du Devil Bat Ghost se garde d'une course à l'autre.
+    Ensuite, TOUJOURS le battle de danse : public de départ = (touchdowns - 1) x 15 (aucun touchdown : -15, avec la réplique
+    `finaleZero`). Kédric ne marque plus jamais ; le HUD affiche les touchdowns et « COURSE n/3 ». Menu F1 : « Battle de danse
+    direct (2 touchdowns) ». Le duel contre Kédric reste en option (`kedric: true` sur une course : il garde l'en-but).
   - v5.2 (demande du propriétaire : « ça doit faire affrontement de boss ») : le battle se joue SUR SCÈNE (décor
     `kedric_scene.jpg`, la scène de concert Devil Bats du propriétaire), Kédric en GRAND sur l'estrade (335 px), toi de dos au
     premier plan, plus d'interface de match (seulement la jauge du PUBLIC, en haut). Musique du battle : Naruto, opening 2
