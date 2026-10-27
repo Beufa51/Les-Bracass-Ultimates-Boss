@@ -25,7 +25,8 @@ export const MANIFESTE = {
     // d'affichage, le jeu les réduit). Une seule image par pose : le jeu les fait bouger (foulées, rebonds).
     // Sans fichier (fichier: null), c'est le dessin provisoire du code qui revient.
     // ---------- TOI (vu de dos, n°21, casque rouge) ----------
-    kedric_toi_course:   ill('toi_course', 245, 322, toi('course', 4, 12)),
+    // course en 16 images (assets_inbox/kedric_toi_course_planche.jpg, découpée par outils/kedric/decouper_course.py)
+    kedric_toi_course:   { ...toi('course', 4, 12), fichier: 'sprites/kedric/kedric_toi_course16.png', largeur: 203, hauteur: 326, images: 16, vitesse: 22 },
     kedric_toi_saut:     ill('toi_saut', 277, 300, toi('saut')),
     kedric_toi_rotation: ill('toi_rotation', 282, 240, toi('rotation')),
     kedric_toi_plaque:   ill('toi_plaque', 265, 368, toi('plaque')),       // le plaqueur est déjà sur l'image

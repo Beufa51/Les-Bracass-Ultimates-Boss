@@ -14,7 +14,6 @@ session = new_session('isnet-anime')
 # SEUL : images où des traits du décor restent collés : on ne garde que le personnage (la plus grosse tache)
 SEUL = {'kedric_danse_hanche'}
 IMAGES = [
-    ('kedric_toi_course', 'kedric_toi_course', 215),
     ('kedric_toi_saut', 'kedric_toi_saut', 200),
     ('kedric_toi_rotation', 'kedric_toi_rotation', 160),
     ('kedric_toi_plaque', 'kedric_toi_plaque', 245),

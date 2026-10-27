@@ -852,8 +852,8 @@ export class KedricCourse extends BossScene {
       if (this.sprJ.texture.key !== cle || !this.sprJ.anims.isPlaying) this.sprJ.play(cle);
       this.sprJ.anims.timeScale = this.etat === 'jeu' && this.gel <= 0 ? 0.7 + this.niveau * 0.15 + (this.ghost > 0 ? 0.6 : 0) : 0;
     } else if (this.sprJ.texture.key !== cle) { this.sprJ.stop(); this.sprJ.setTexture(cle); }
-    // une illustration de course = une seule image : on la fait rebondir à chaque foulée
-    const foulee = pose === 'course' && this.estIllustre(cle) && this.etat === 'jeu' && this.gel <= 0;
+    // une illustration de course en une seule image : on la fait rebondir à chaque foulée (la planche de 16 images s'anime seule)
+    const foulee = pose === 'course' && this.estIllustre(cle) && this.textures.get(cle).frameTotal <= 2 && this.etat === 'jeu' && this.gel <= 0;
     const pas = foulee ? Math.sin(this.horloge * (11 + this.niveau * 1.6 + (this.ghost > 0 ? 6 : 0))) : 0;
     this.sprJ.setPosition(xJ, VUE.pieds + 8 - hauteur - Math.abs(pas) * 9).setScale(this.zoom(cle) * (1 + Math.abs(pas) * 0.02), this.zoom(cle) * (1 - Math.abs(pas) * 0.02));
     this.sprJ.setAngle(j.rotation > 0 ? Math.sin(this.horloge * 30) * 6 : pas * 3);
