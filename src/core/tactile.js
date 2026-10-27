@@ -43,6 +43,10 @@ export function installerTactile() {
     .tactile.droite.danse { grid-template-columns: 124px; grid-template-rows: repeat(2, 104px); }
     .tactile.danse button { font-size: 46px; }
     .tactile.danse button.cache { display: none; }
+    .tactile.gauche.separee { grid-template-columns: repeat(2, 96px); grid-template-rows: 96px; }
+    .tactile.droite.separee { grid-template-columns: repeat(2, 84px); grid-template-rows: repeat(2, 76px); }
+    .tactile.separee button.cache { display: none; }
+    .tactile.gauche.separee button { font-size: 36px; }
   `;
   document.head.appendChild(style);
 
@@ -111,15 +115,26 @@ export function installerBoutonPause(action) {
   document.body.appendChild(b);
 }
 
-// Disposition « danse » (optionnelle) : 4 très gros boutons, ◀ ▶ sous le pouce gauche, ▲ ▼ sous le pouce droit,
-// les autres boutons retirés. dispositionDanse(false) remet la disposition habituelle.
-export function dispositionDanse(actif) {
+// Dispositions (optionnelles) des boutons, au choix d'un boss :
+//  'normale' : la croix à gauche, les actions à droite (par défaut)
+//  'separee' : ◀ ▶ sous le pouce gauche ; ▲ ▼ et les actions (Espace, Z) sous le pouce droit
+//  'danse'   : 4 TRÈS gros boutons, ◀ ▶ à gauche, ▲ ▼ à droite, le reste retiré
+// Un boss qui change de disposition remet 'normale' en partant.
+const DISPOSITIONS = {
+  separee: { gauche: ['croix', '1', '1'], droite: ['croix', '2', '1'], haut: ['actions', '1', '1'], bas: ['actions', '1', '2'],
+    espace: ['actions', '2', '1'], z: ['actions', '2', '2'], x: ['actions', '3', '1'] },
+  danse: { gauche: ['croix', '1', '1'], droite: ['croix', '2', '1'], haut: ['actions', '1', '1'], bas: ['actions', '1', '2'] },
+};
+export function disposition(nom = 'normale') {
   if (!croix) return;
-  croix.classList.toggle('danse', actif); actions.classList.toggle('danse', actif);
-  const danse = { gauche: [croix, '1', '1'], droite: [croix, '2', '1'], haut: [actions, '1', '1'], bas: [actions, '1', '2'] };
-  for (const [nom, [parent, col, ligne]] of Object.entries(actif ? danse : placement)) {
-    const b = boutons[nom];
+  for (const n of ['danse', 'separee']) { croix.classList.toggle(n, n === nom); actions.classList.toggle(n, n === nom); }
+  const parents = { croix, actions };
+  const place = DISPOSITIONS[nom] ? Object.fromEntries(Object.entries(DISPOSITIONS[nom]).map(([k, [p, c, l]]) => [k, [parents[p], c, l]])) : placement;
+  for (const [nom2, [parent, col, ligne]] of Object.entries({ ...placement, ...place })) {
+    const b = boutons[nom2];
     b.style.gridColumn = col; b.style.gridRow = ligne;
     if (b.parentNode !== parent) parent.appendChild(b);
   }
 }
+// (ancienne forme, gardée) : dispositionDanse(true) = disposition('danse'), dispositionDanse(false) = 'normale'
+export function dispositionDanse(actif) { disposition(actif ? 'danse' : 'normale'); }

@@ -10,6 +10,7 @@ import { jouerSon } from '../core/ressources.js';
 import { BOSS } from '../bosses/liste.js';
 import { REGLAGES_HUB as R } from './reglages.js';
 import { estTactile, etiquettesTactiles } from '../core/tactile.js';
+import { ouvrirReglagesDev } from '../core/ReglagesDevScene.js';
 
 export class HubScene extends Phaser.Scene {
   constructor() { super('Hub'); }
@@ -39,6 +40,7 @@ export class HubScene extends Phaser.Scene {
     this.add.rectangle(LARGEUR / 2, HAUTEUR - R.hauteurBarre / 2, LARGEUR, R.hauteurBarre, 0x000000, 0.75);
     const nb = BOSS.filter(b => Sauvegarde.aLeBadge(b.id)).length;
     texte(this, 90, HAUTEUR - R.hauteurBarre / 2, `Badges\n${nb} / ${BOSS.length}`, 16, '#ffffff');
+    this.accesCacheReglages();
     BOSS.forEach((boss, i) => {
       const cle = Sauvegarde.aLeBadge(boss.id) ? 'badge_' + boss.id : 'badge_vide';
       this.add.image(260 + i * 64, HAUTEUR - R.hauteurBarre / 2, cle);
@@ -54,6 +56,18 @@ export class HubScene extends Phaser.Scene {
     this.aide = texte(this, LARGEUR / 2, R.limiteBas + 20, '', 18, '#ffffff');
     this.touches = creerTouches(this);
     this.cameras.main.fadeIn(250);
+  }
+
+  // Accès caché aux RÉGLAGES DÉVELOPPEUR : 5 appuis rapides sur « Badges » (en bas à gauche), ou la touche D
+  accesCacheReglages() {
+    let appuis = [];
+    const zone = this.add.zone(90, HAUTEUR - R.hauteurBarre / 2, 170, R.hauteurBarre).setInteractive();
+    zone.on('pointerdown', () => {
+      const t = this.time.now;
+      appuis = [...appuis.filter(a => t - a < 2500), t];
+      if (appuis.length >= 5) { appuis = []; ouvrirReglagesDev(this.game); }
+    });
+    this.input.keyboard.on('keydown-D', () => ouvrirReglagesDev(this.game));
   }
 
   update(temps, delta) {

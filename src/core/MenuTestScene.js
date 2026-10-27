@@ -26,6 +26,7 @@ export class MenuTestScene extends Phaser.Scene {
       }
     }
     this.choix.push({ libelle: 'Retour au hub', action: () => this.lancer('Hub', {}) });
+    this.choix.push({ libelle: 'Réglages développeur (vitesses, jauges...)', action: () => this.scene.start('ReglagesDev', { enPause: this.enPause }) });
     this.choix.push({ libelle: 'Remettre la sauvegarde à zéro', action: () => this.reset() });
     this.choix.push({ libelle: 'Fermer le menu (F1)', action: () => this.fermer() });
 

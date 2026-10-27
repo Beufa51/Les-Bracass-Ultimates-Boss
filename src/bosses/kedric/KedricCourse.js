@@ -18,7 +18,7 @@ import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
-import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
+import { estTactile, etiquettesTactiles, disposition } from '../../core/tactile.js';
 import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
 import { choisirDifficulte, cleRecord } from './difficulte.js';
 import { Showtime } from './showtime.js';
@@ -109,6 +109,9 @@ export class KedricCourse extends BossScene {
     this.alertePoursuite = texte(this, LARGEUR / 2, 470, '', 24, '#ff5a5a', { fontStyle: 'bold' }).setDepth(905).setVisible(false);
 
     this.creerHud();
+    // téléphone : ◀ ▶ sous le pouce gauche, ▲ ▼ (et Ghost, Sprint) sous le pouce droit, comme au battle de danse
+    disposition('separee');
+    this.events.once('shutdown', () => disposition('normale'));
     this.touches = creerTouches(this);
     this.installerBalayage();
     // musique de fond (Eyeshield 21) : démarre pendant l'écran des commandes, en boucle
@@ -419,7 +422,7 @@ export class KedricCourse extends BossScene {
     if (this.aAppuye('espace', 0.05) && this.jauge >= this.diff.ghost && this.ghostArme <= 0) this.armerGhost();
     if (this.ghostArme > 0) {
       this.ghostArme -= dt;
-      if (this.ghostArme <= 0) this.messageCentre('Ghost dans le vide...', '#9fe0ff', 22, 0.7);
+      if (this.ghostArme <= 0) this.messageCentre(this.ghostPasses ? `GHOST : ${this.ghostPasses} défenseur(s) passé(s) !` : 'Ghost dans le vide...', '#9fe0ff', 24, 0.9);
     }
 
     // ---------- on avance ----------
@@ -678,12 +681,13 @@ export class KedricCourse extends BossScene {
   }
 
   // =================================================================
-  //  DEVIL BAT GHOST : le prochain défenseur est passé à coup sûr
+  //  DEVIL BAT GHOST : pendant quelques secondes (R.ghost.duree), vitesse maximale et TOUS les défenseurs sont passés
   // =================================================================
   armerGhost() {
     this.jauge = 0; this.ghostAnnonce = false;
     this.stats.ghosts++;
-    this.ghostArme = R.ghost.fenetre; this.ghostAction = true;
+    this.ghostArme = R.ghost.duree; this.ghostAction = true; this.ghostPasses = 0;
+    this.viderPoursuivants();   // il sème aussi celui qui te court après
     this.serie = Math.max(this.serie, R.niveauMax * R.esquivesParNiveau);
     this.niveau = R.niveauMax;
     jouerSon(this, 'kedric_ghost');
@@ -692,13 +696,13 @@ export class KedricCourse extends BossScene {
   }
 
   passeGhost(d) {
-    this.ghostArme = 0;
+    this.ghostPasses++;
     this.esquive(d, 'ghost');
     jouerSon(this, 'kedric_parfait', { rate: 0.8 });
     lignesImpact(this, ecranX(this.j.x, 0), VUE.pieds - 200, 0x9fe0ff, 24, 260);
     onomatopee(this, ecranX(d.x, 0.5), VUE.pieds - 230, ['?!', 'Hein ?!', 'Où ?!'], 40, '#9fe0ff');
-    this.gel = R.ghost.gel;
-    this.direCoach(REPLIQUES.ghost, 1500, true);
+    // le premier défenseur passé : petit arrêt sur image (les suivants : on file)
+    if (this.ghostPasses === 1) { this.gel = R.ghost.gel; this.direCoach(REPLIQUES.ghost, 1500, true); }
   }
 
   // =================================================================
@@ -1366,7 +1370,7 @@ export class KedricCourse extends BossScene {
     if (this.hudVitesseTexte.text !== t4) this.hudVitesseTexte.setText(t4);
     // jauge du Devil Bat Ghost
     const g = this.hudGhost; g.clear();
-    const plein = this.jauge >= this.diff.ghost, fj = this.ghostArme > 0 ? this.ghostArme / R.ghost.fenetre : this.jauge / this.diff.ghost;
+    const plein = this.jauge >= this.diff.ghost, fj = this.ghostArme > 0 ? this.ghostArme / R.ghost.duree : this.jauge / this.diff.ghost;
     g.fillStyle(0x000000, 0.5); g.fillRect(LARGEUR - 48, 194, 28, 220);
     g.fillStyle(plein && Math.floor(this.horloge * 6) % 2 ? 0xffffff : 0x9fe0ff, 1); g.fillRect(LARGEUR - 48, 194 + 220 * (1 - fj), 28, 220 * fj);
     g.lineStyle(2, 0xffffff, 0.8); g.strokeRect(LARGEUR - 48, 194, 28, 220);

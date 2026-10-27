@@ -3,6 +3,8 @@ import { LARGEUR, HAUTEUR } from './core/reglages.js';
 import { ChargementScene } from './core/ChargementScene.js';
 import { BientotScene } from './core/BientotScene.js';
 import { MenuTestScene, basculerMenuTest } from './core/MenuTestScene.js';
+import { ReglagesDevScene } from './core/ReglagesDevScene.js';
+import { appliquerReglagesDev } from './core/reglagesDev.js';
 import { HubScene } from './hub/HubScene.js';
 import { BOSS, MODELE } from './bosses/liste.js';
 import { installerTactile, installerBoutonPause } from './core/tactile.js';
@@ -16,6 +18,8 @@ import { MANIFESTE as MANIFESTE_COMMUN } from '../assets/manifeste.js';
 // Visuels et sons : ceux du moteur commun (hub, badges) + ceux de chaque boss (chacun dans son dossier)
 enregistrer(MANIFESTE_COMMUN);
 for (const b of [...BOSS, MODELE]) if (b.manifeste) enregistrer(b.manifeste, b.id);
+// réglages développeur changés dans le navigateur (écran caché ReglagesDevScene)
+appliquerReglagesDev([...BOSS, MODELE]);
 
 const scenesDesBoss = [...BOSS, MODELE].flatMap(b => b.scenes);
 
@@ -29,7 +33,7 @@ const jeu = new Phaser.Game({
   pixelArt: false,
   antialias: true,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-  scene: [ChargementScene, HubScene, BientotScene, MenuTestScene, PauseScene, ...scenesDesBoss],
+  scene: [ChargementScene, HubScene, BientotScene, MenuTestScene, PauseScene, ReglagesDevScene, ...scenesDesBoss],
 });
 
 // Touche F1 : menu de test caché

@@ -19,6 +19,12 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
 - Jeu en ligne : GitHub Pages (lien dans README.md).
 - Greg : **vue Punch-Out** (ton boxeur de dos, Greg de face) + **règles façon Hajime no Ippo**.
   C'est le **premier boss développé**.
+- **RÉGLAGES DÉVELOPPEUR** (demande du propriétaire) : écran caché pour régler les chiffres de chaque boss sans ouvrir
+  les fichiers. Accès : **5 appuis rapides sur « Badges »** (en bas à gauche du hub), touche **D** dans le hub, ou le menu F1.
+  Chaque boss liste ses réglages dans SON `index.js` (`reglagesDev`) ; moteur : `src/core/reglagesDev.js` +
+  `src/core/ReglagesDevScene.js`. Les valeurs changées sont gardées dans le navigateur (localStorage, clé
+  `bracass_reglages_dev_v1`) et appliquées au démarrage ; « par défaut » = la valeur des fichiers. Greg et Lionel : seule
+  la liste `reglagesDev` a été ajoutée à leur `index.js` (aucun changement de leur jeu).
 
 ## Ce qui est fini
 - Hub vue du dessus : héros mobile, 6 portes (Beufa, Kédric, Julien, Greg, Rémi, Lionel), noms, "Bientôt".
@@ -239,6 +245,12 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     et ligne qui ne se décale plus (sauf CHAMPION : `murTardif`, `decalage`), pot de colle figé 0,75 s avant, rangs derrière le
     prochain défenseur ESTOMPÉS, symbole placé à la hauteur de la pose (plus bas quand il plonge). Duel : tu restes face à Kédric
     (le terrain ne défile plus pendant le duel), sa charge dure toujours ≈ 1,2 s (avant, le bout du terrain la ralentissait).
+  - v6.2 : boutons tactiles ◀ ▶ à gauche, ▲ ▼ + Ghost + Sprint à droite pendant tout le match (`disposition('separee')`,
+    ajout optionnel de `src/core/tactile.js`, remis à 'normale' en quittant Kédric), comme au battle. DEVIL BAT GHOST : dure
+    4 s (`REGLAGES.ghost.duree`) et passe TOUS les défenseurs pendant ce temps (sème aussi le poursuivant). Battle : plus de
+    flèches rouges en FACILE et NORMAL (`flechesRouges`, seulement CHAMPION ; l'aide « flèche déjà retournée » est retirée).
+    Réglages développeur de Kédric : courses, écart des rangs, vitesse, Ghost (durée, points), vitesse des flèches, et par
+    difficulté : taille de la jauge Ghost, vitesse, symbole avant contact, vitesse des défenseurs, timing, flèches rouges.
   - v6.1 (retours du propriétaire : Ghost jamais utilisé, battle mal annoncé, flèches dures à lire en rythme) :
     GHOST : chaque esquive (et une bonne réception) remplit la jauge de 1, une PARFAITE de 2 (`REGLAGES.ghost.parEsquive /
     parParfait`) ; jauge de 5 / 6 / 9 (FACILE / NORMAL / CHAMPION) : 2 à 3 Ghosts par match. BATTLE : transition (fondu au
