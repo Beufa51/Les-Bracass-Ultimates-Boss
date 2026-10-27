@@ -671,6 +671,15 @@ export class KedricCourse extends BossScene {
     });
   }
 
+  // un pied touche la pelouse : bruit de crampons + touffe d'herbe qui part vers l'arrière (vers toi)
+  appui(x) {
+    jouerSon(this, 'kedric_pas', { volume: 0.35, rate: 0.9 + Math.random() * 0.2 });
+    for (let k = 0; k < 4; k++) {
+      const t = this.add.ellipse(x + Phaser.Math.Between(-10, 10), VUE.pieds + 2, 9, 5, k % 2 ? 0x2f7a32 : 0x8a6a40, 0.85).setDepth(501);
+      this.tweens.add({ targets: t, x: t.x + Phaser.Math.Between(-30, 30), y: t.y + Phaser.Math.Between(10, 30), scale: 1.8, alpha: 0, duration: 260, onComplete: () => t.destroy() });
+    }
+  }
+
   // réduction à appliquer à une image (les illustrations sont enregistrées en plus grand)
   zoom(cle) { return this.estIllustre(cle) ? ZOOM_ILLUSTRE : 1; }
 
@@ -850,14 +859,28 @@ export class KedricCourse extends BossScene {
     const cle = 'kedric_toi_' + pose;
     if (pose === 'course') {
       if (this.sprJ.texture.key !== cle || !this.sprJ.anims.isPlaying) this.sprJ.play(cle);
-      this.sprJ.anims.timeScale = this.etat === 'jeu' && this.gel <= 0 ? 0.7 + this.niveau * 0.15 + (this.ghost > 0 ? 0.6 : 0) : 0;
+      this.sprJ.anims.timeScale = this.etat === 'jeu' && this.gel <= 0 ? 1 + this.niveau * 0.16 + (this.ghost > 0 ? 0.6 : 0) : 0;
     } else if (this.sprJ.texture.key !== cle) { this.sprJ.stop(); this.sprJ.setTexture(cle); }
     // une illustration de course en une seule image : on la fait rebondir à chaque foulée (la planche de 16 images s'anime seule)
     const foulee = pose === 'course' && this.estIllustre(cle) && this.textures.get(cle).frameTotal <= 2 && this.etat === 'jeu' && this.gel <= 0;
     const pas = foulee ? Math.sin(this.horloge * (11 + this.niveau * 1.6 + (this.ghost > 0 ? 6 : 0))) : 0;
-    this.sprJ.setPosition(xJ, VUE.pieds + 8 - hauteur - Math.abs(pas) * 9).setScale(this.zoom(cle) * (1 + Math.abs(pas) * 0.02), this.zoom(cle) * (1 - Math.abs(pas) * 0.02));
-    this.sprJ.setAngle(j.rotation > 0 ? Math.sin(this.horloge * 30) * 6 : pas * 3);
-    this.ombreJ.setPosition(xJ, VUE.pieds + 4).setScale(1 - hauteur / 200);
+    // course en plusieurs images : le corps monte quand un talon remonte et retombe quand le pied touche le sol
+    // (images paires = talon levé, impaires = pied au sol), avec un bruit de crampons et une touffe d'herbe à chaque appui
+    let saute = 0, tasse = 0, penche = 0;
+    if (pose === 'course' && !foulee && this.estIllustre(cle) && this.etat === 'jeu') {
+      const n = this.sprJ.anims.currentFrame ? this.sprJ.anims.currentFrame.index - 1 : 0;
+      const dt = Math.min(0.05, Math.max(0, this.horloge - (this.horlogeAffiche || this.horloge)));
+      const cible = n % 2 === 0 ? 1 : 0;
+      this.rebondJ = (this.rebondJ || 0) + (cible - (this.rebondJ || 0)) * Math.min(1, dt * 22);
+      saute = this.rebondJ * 12; tasse = (1 - this.rebondJ) * 0.03;
+      penche = n === 0 ? -2 : n === 2 ? 2 : 0;
+      if (n % 2 === 1 && this.imageJ !== n && this.gel <= 0) this.appui(xJ + (n === 1 ? 26 : -26));
+      this.imageJ = n;
+    }
+    this.horlogeAffiche = this.horloge;
+    this.sprJ.setPosition(xJ, VUE.pieds + 8 - hauteur - Math.abs(pas) * 9 - saute).setScale(this.zoom(cle) * (1 + Math.abs(pas) * 0.02 + tasse), this.zoom(cle) * (1 - Math.abs(pas) * 0.02 - tasse));
+    this.sprJ.setAngle(j.rotation > 0 ? Math.sin(this.horloge * 30) * 6 : pas * 3 + penche);
+    this.ombreJ.setPosition(xJ, VUE.pieds + 4).setScale(1 - (hauteur + saute) / 200);
     // Devil Bat Ghost : images fantômes de chaque côté
     this.fantomes.forEach((f, k) => {
       if (this.ghost > 0 && this.etat === 'jeu') {

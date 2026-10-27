@@ -61,6 +61,7 @@ export const MANIFESTE = {
     kedric_musique:   { fichier: 'audio/kedric/kedric_musique.mp3', musique: true, volume: 0.4 },
     // générés par outils/kedric/generer_sons.py
     kedric_esquive:   { fichier: 'audio/kedric/kedric_esquive.wav', provisoire: { frequence: 700, duree: 0.06 } },
+    kedric_pas:       { fichier: 'audio/kedric/kedric_pas.wav', provisoire: { frequence: 140, duree: 0.03 } },   // foulée
     kedric_saut:      { fichier: 'audio/kedric/kedric_saut.wav', provisoire: { frequence: 500, duree: 0.08 } },
     kedric_parfait:   { fichier: 'audio/kedric/kedric_parfait.wav', provisoire: { frequence: 1400, duree: 0.12 } },
     kedric_plaque:    { fichier: 'audio/kedric/kedric_plaque.wav', provisoire: { frequence: 110, duree: 0.25 } },

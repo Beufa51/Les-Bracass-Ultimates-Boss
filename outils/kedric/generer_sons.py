@@ -85,3 +85,7 @@ amb = n * (0.7 + 0.3 * np.sin(2 * np.pi * x / d) * np.sin(2 * np.pi * 3 * x / d)
 f = int(SR * 0.5)
 amb[:f] = amb[:f] * np.linspace(0, 1, f) + amb[-f:] * np.linspace(1, 0, f)
 ecrire('kedric_ambiance', amb[:-f], 0.5, fondu_fin=False)
+
+# foulée : crampons qui mordent la pelouse (petit "tchk" sourd, très court)
+d = 0.12
+ecrire('kedric_pas', 0.8 * balayage(d, 160, 70, 25) * env(d, 0.001, 0.03) + passe_haut(passe_bas(bruit(d), 4000), 900) * env(d, 0.0005, 0.012), 0.5)
