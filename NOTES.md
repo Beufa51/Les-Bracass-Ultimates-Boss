@@ -288,7 +288,7 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
 ## Ordre de développement (mis à jour)
 1. ~~Greg (style Hajime no Ippo)~~ fait
 2. ~~Lionel (Windjammers)~~ fait et validé
-3. **Kédric**  ← EN COURS : première version jouable, en attente de l'essai du propriétaire et de ses images
+3. **Kédric**  ← EN COURS : refait en vrai match après le 1er essai ; manquent le décor (stade, pelouse) et le trophée
    Ancienne fiche Lionel, pour mémoire :
    - Jeu : **exactement comme Windjammers** (Neo Geo, 1994) — lancer de frisbee en 1 contre 1, vue de 3/4 au-dessus du terrain,
      buts à 3 et 5 points, lancers courbes, lob, super lancer quand on rattrape au bon moment, sets.
