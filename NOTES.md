@@ -6,7 +6,7 @@
 Copie de référence de la version finale : branche `greg-termine` (`version-1-greg` = état un peu plus ancien).
 **Étape 2 terminée : boss Lionel VALIDÉ par le propriétaire** (match de frisbee façon Windjammers, illustrations manga
 mains vides, entraînement, joystick, jauges du public, 3 supers, surprises, difficulté PERSO). En ligne sur `main`.
-**Étape 3 : boss Kédric — v3 après 2 essais du propriétaire** (coup d'envoi, sprint, finale contre Kédric ; à réessayer). Choix du propriétaire : tu portes le ballon
+**Étape 3 : boss Kédric — v4 après 3 essais du propriétaire + audit joueur/développeur** (à réessayer). Choix du propriétaire : tu portes le ballon
 et tu traverses le terrain en esquivant les défenseurs qui reçoivent les ordres du coach Kédric, VUE DE DOS, esquives ◀ ▶ ▲ ▼,
 plus tu esquives plus tu accélères jusqu'au DEVIL BAT GHOST, référence graphique **Eyeshield 21**, Kédric = **showman frimeur**.
 ILLUSTRATIONS INTÉGRÉES (personnages) : 24 images Gemini du propriétaire, renommées `assets_inbox/kedric_*.jpg`, détourées par
@@ -228,33 +228,37 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
   - Ton joueur : nouvelle planche mains vides (le jeu pose le frisbee dans ses mains quand il le tient).
 - **Kédric** (`src/bosses/kedric/`) : MATCH de football américain façon **Eyeshield 21**, vu de DOS (perspective : 3 couloirs).
   - Historique des essais du propriétaire : v1 (course en 3 actions) « trop de défenseurs, trop court, Ghost trop facile, pas fun » ;
-    v2 (vrai match à essais) « pas lisible, fouillis, on ne peut pas accélérer quand les défenseurs sont derrière, encore trop court,
-    ajouter une réception, Kédric trop peu présent (passé en 2 fois) ». Version actuelle = v3 :
-  - 3 ATTAQUES puis la FINALE. Chaque attaque commence par un COUP D'ENVOI : le ballon arrive du fond du terrain (cible au sol jaune,
-    BLEUE dans les 0,3 dernières secondes) ; être dans son couloir = RÉCEPTION (vitesse 1), ▲ quand la cible est bleue = SUPER
-    RÉCEPTION (vitesse 2 + 1 dans la jauge Ghost), raté = « BOING ! » le temps de ramasser. Puis RETOUR face à l'équipe du coup
-    d'envoi (`COUVERTURE`, 9 joueurs qui descendent) ; plaqué = 1er essai à cet endroit (« RETOUR DE 27 YARDS »).
-  - Ensuite 4 ESSAIS pour avancer de 10 yards (ligne jaune), sinon BALLON PERDU : Kédric marque 7 (il danse). Touchdown = 7.
-  - Chaque ACTION : Kédric place sa défense (FORMATIONS) et crie son nom ; bandeau « 2e ESSAI & 6 - sur tes 34 » ; 1,7 s pour se
-    placer (◀ ▶) puis « HUT ! HUT ! ». Lignes télé : engagement (bleue), premier essai (jaune) ; cachées pendant retour et finale.
-  - La LIGNE de défense (4 yards) bouche 2 couloirs, peut SE DÉCALER au « HUT ! » (NORMAL 30 %, CHAMPION 55 %) ; plaqué par la ligne =
-    pas de gain. Les autres attendent puis FONCENT sur toi à 1,5 s. Près de l'en-but, la défense se resserre.
-  - LISIBILITÉ : seul le PROCHAIN défenseur qui te menace a son symbole (◀ ▶ / ▲ / ▼ / ◎) et un ANNEAU de couleur à ses pieds ;
-    plus de textes « ZIP / HOP / VITESSE +1 » (la barre de vitesse clignote), moins de bulles de Kédric.
-  - VITESSE : 2 esquives d'affilée = +1 niveau (5). SPRINT : Z (bouton « Sprint » sur téléphone) tapé vite = jusqu'à +2,5 yards / s
-    (petite barre orange à côté de la vitesse), qui retombe tout seul : c'est LA façon d'accélérer quand on te poursuit.
-  - POURSUIVANTS : un défenseur esquivé de côté peut te courir après ; quand toute la défense est passée, 2 ARRIÈRES (3 sur un coup
-    d'envoi) reviennent en diagonale, très vite (`angle`) : seuls vitesse max + sprint les sèment. Leur casque surgit en bas ;
-    « ⚠ IL TE RATTRAPE ! Z Z Z ! ».
-  - DEVIL BAT GHOST : jauge remplie par les esquives PARFAITES (et les super réceptions) : FACILE 3, NORMAL 4, CHAMPION 5. Espace :
-    vitesse max, le PROCHAIN défenseur dans les 1,6 s est passé à coup sûr ; contre Kédric = une seule esquive.
-  - KÉDRIC PLUS PRÉSENT : coach au micro (cadre en haut à gauche), joue en dernier défenseur dans les 2e et 3e attaques (duel, 2
-    charges), puis la FINALE « SHOWTIME » : 1 contre 1 depuis ses 40 yards. Il faut le passer 5 fois (+1 par touchdown de retard au
-    score) ; toi : FACILE 4 / NORMAL 3 / CHAMPION 2 vies (+1 par touchdown d'avance, 2 au plus). Feintes +15 % en finale ;
-    CHORÉGRAPHIE : il se relève aussitôt et enchaîne (de plus en plus souvent quand il faiblit). HUD « KÉDRIC ★★★ TOI ♥♥ ».
-    Gagner la finale = victoire (badge) ; la perdre = défaite, quel que soit le score.
-  - Durée mesurée avec les bots (temps réel, pauses comprises) : NORMAL bon ≈ 1 min 30, moyen ≈ 2 min 20, enfant ≈ 3 min.
-    Les bots lisent les symboles parfaitement : un humain mettra plus longtemps.
+    v2 (vrai match à essais) « pas lisible, fouillis, pas moyen d'accélérer, trop court, ajouter une réception, Kédric trop peu présent » ;
+    v3 (coup d'envoi, sprint, finale) « les arrières qui reviennent par derrière sont insupportables, le sprint ne sert à rien, terrain
+    trop court, plus de défenseurs vers l'en-but, Kédric seul quand il arrive, patterns de Kédric durs à lire, réception mal exploitée ».
+    → AUDIT par 2 agents (joueur testeur + développeur, ~40 matchs simulés) puis v4 (actuelle). Bug trouvé : ◀ ▶ esquivait TOUT,
+    y compris les plongeons, les bras tendus et Kédric (les feintes ne servaient à rien) ; des poursuivants restaient pendant le duel.
+  - v4 : 3 ATTAQUES puis la FINALE. Chaque attaque : COUP D'ENVOI (le ballon arrive du fond, le VENT peut le faire changer de couloir
+    à 60 % du vol ; cercle de timing qui se resserre, BLEU = appuie, BLANC = pile ; ▲ à ±0,12 s = RÉCEPTION PARFAITE vitesse 3 + Ghost,
+    ±0,3 s = BIEN vitesse 2, sinon attrapé vitesse 0 ; hors du couloir = BOING, tu ramasses) puis RETOUR, limité à 40 yards
+    (« POUSSÉ EN TOUCHE »). Ensuite 4 ESSAIS pour 10 yards ; ballon perdu = Kédric marque 7.
+  - PASSES : ▲ pendant le placement (avant le « HUT ! ») = jeu de passe (2 par attaque) : tu pars 8 yards plus loin, la ligne est
+    derrière toi, le ballon arrive (même réception à 3 niveaux) ; ratée = PASSE INCOMPLÈTE (essai perdu, aucun gain).
+  - DERNIER RIDEAU : passé le dernier défenseur d'une formation, ses arrières te POUSSENT EN TOUCHE 6 yards plus loin (pas un
+    plaquage). Seul le DEVIL BAT GHOST perce le rideau (grande percée). Formations moins profondes (≤ 22 yards) : 6 à 9 actions par attaque.
+  - ZONE ROUGE (en-but à 22 yards ou moins) : `ZONE_ROUGE`, rangs serrés et réguliers jusqu'à la ligne d'en-but ; en 2e et 3e
+    attaques, ses gars s'arrêtent à 13 yards de l'en-but et KÉDRIC GARDE L'EN-BUT, SEUL (duel, 2 vies).
+  - Plus d'arrières qui reviennent en diagonale. UN SEUL poursuivant possible (rare : NORMAL 12 %), qui part 6 yards derrière toi
+    à ta vitesse + 1,2 ; toujours visible (son casque remonte du bas de l'écran) ; jauge « POURSUIVANT ▮▮▮▯ Z Z Z ! » ; SPRINT
+    (Z tapé vite, jusqu'à +3,5) = SEMÉ à 11 yards. Jamais de poursuivant quand Kédric est là.
+  - ▲ / ▼ OBLIGATOIRES : un plongeon ou des bras tendus seuls dans ton couloir te suivent (◀ ▶ ne suffit pas) ; idem Kédric.
+  - LISIBILITÉ : seul le PROCHAIN défenseur a son symbole + anneau de couleur ; UN SEUL message au centre à la fois (`messageCentre`) ;
+    Kédric danse à côté de la jauge de vitesse (plus dessus).
+  - KÉDRIC télégraphié, toujours pareil : il DANSE 1 s → POSE 0,7 s immobile à 7 yards (gros symbole de couleur, anneau, son nom
+    d'attaque dans sa bulle : « LE PLONGEON DORÉ ! ») → CHARGE (≈ 0,85 s). Feinte ANNONCÉE (flash rouge + « FEINTE ! ») à 0,6 s
+    du contact, au plus 1 charge sur 3, seulement en acte 3 de la finale (et dans les duels en CHAMPION).
+  - FINALE « SHOWTIME » (1 contre 1, depuis ses 40) en 3 ACTES : il a 6 vies (+1 par touchdown de retard) ; toi 3 en NORMAL
+    (+1 par touchdown d'avance, 2 au plus). Acte 1 (6-5) attaques simples ; acte 2 (4-3) COMBOS de 2 attaques annoncés dans sa
+    bulle (« ▲ puis ▼ ! ») ; acte 3 (2-1) feintes. Encart à chaque nouvel acte. Gagner la finale = badge.
+  - VITESSE : 2 esquives d'affilée = +1 niveau (5) ; à chaque nouvelle action tu gardes ton élan moins 2 niveaux (`elan`).
+  - DEVIL BAT GHOST : jauge = esquives / réceptions PARFAITES (FACILE 3, NORMAL 5, CHAMPION 6) ; Espace : vitesse max, le prochain
+    défenseur est passé, et le rideau ne t'arrête pas ; contre Kédric = une seule esquive.
+  - Durée mesurée (bots, temps réel) : NORMAL moyen ≈ 3 à 4 min (15 à 30 actions), finale seule ≈ 40 s pour un bon joueur.
   - Aides (FACILE / NORMAL) : « ▲ SAUTE ! » en bas de l'écran ; la première fois qu'un type de plaquage arrive (1re attaque), RALENTI
     + explication (une seule fois : `Sauvegarde.fait('kedric_tuto')`). CHAMPION : aucune aide.
   - HUD : score « TOI 7 - 0 KÉDRIC », essai et distance, attaque et en-but, barre avec la ligne du premier essai ; vitesse à gauche,
