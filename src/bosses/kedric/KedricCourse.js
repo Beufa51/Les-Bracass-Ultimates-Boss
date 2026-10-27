@@ -1,14 +1,14 @@
 // =====================================================================
-// KÉDRIC : course de football américain façon Eyeshield 21.
-// Vue de DOS : tu portes le ballon et tu cours vers l'en-but de Kédric.
-// Kédric, le coach showman, crie ses COMBINAISONS depuis le bord du terrain :
-// ses défenseurs foncent sur toi.
-//  - ◀ ▶ : changer de couloir (plaqueur debout)
-//  - ▲ : sauter (plaquage aux jambes)
-//  - ▼ : se baisser en tournant (bras tendus)
-//  - chaque esquive d'affilée te fait accélérer ; la jauge pleine = DEVIL BAT GHOST (Espace).
-// 3 ACTIONS à marquer (touchdown) ; un nombre limité de plaquages par action.
-// Dernière action : Kédric entre lui-même sur le terrain (duel avec feintes).
+// KÉDRIC : match de football américain façon Eyeshield 21, vu de DOS.
+// Tu portes le ballon. Chaque ATTAQUE part de tes 20 yards ; à chaque ACTION, Kédric (le coach
+// showman) place sa défense (11 joueurs au plus) et crie sa formation, puis « HUT ! » : tu cours.
+//  - ◀ ▶ : changer de couloir (plaqueur debout, la ligne de défense)
+//  - ▲ : sauter (plaquage aux jambes)      ▼ : se baisser en tournant (bras tendus)
+//  - chaque esquive d'affilée te fait accélérer ; les défenseurs esquivés de côté peuvent te POURSUIVRE ;
+//  - esquives PARFAITES = jauge du DEVIL BAT GHOST (Espace : le prochain défenseur est passé à coup sûr).
+// Un plaquage arrête l'action : 4 essais pour avancer de 10 yards, sinon Kédric récupère le ballon et marque.
+// 3 attaques : il faut finir avec plus de points que Kédric (égalité = prolongation).
+// En 3e attaque, Kédric joue lui-même en dernier défenseur (duel avec feintes).
 // Toute la logique avance dans pas() (pas de minuteries Phaser) : les bots de test
 // peuvent jouer en accéléré.
 // =====================================================================
@@ -22,7 +22,7 @@ import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
 import { choisirDifficulte, cleRecord } from './difficulte.js';
-import { IDENTITE, DIFFICULTES, VUE, REGLAGES as R, ACTIONS, COMBINAISONS, VERROU_SUIVEUR, REPLIQUES } from './reglages.js';
+import { IDENTITE, DIFFICULTES, VUE, REGLAGES as R, ATTAQUES, PROLONGATION, FORMATIONS, VERROU_SUIVEUR, REPLIQUES } from './reglages.js';
 
 const auHasard = (liste) => liste[Math.floor(Math.random() * liste.length)];
 const entre = (min, max) => min + Math.random() * (max - min);
@@ -32,6 +32,9 @@ const borne = Phaser.Math.Clamp;
 const echelle = (d) => VUE.recul / Math.max(0.05, d + VUE.recul);
 const ecranY = (d) => VUE.horizon + (VUE.pieds - VUE.horizon) * echelle(d);
 const ecranX = (x, d) => LARGEUR / 2 + x * VUE.largeurCouloir * echelle(d);
+
+// l'en-but de Kédric commence à 100 (le terrain va de 0, ton en-but, à 100)
+const EN_BUT = 100;
 
 // ce qu'il faut faire contre chaque type de défenseur
 const SYMBOLES = {
@@ -55,28 +58,34 @@ const ZOOM_ILLUSTRE = 1 / 1.5;
 const ETIQUETTES_JEU = { haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'Ghost', z: null, x: null };
 const ETIQUETTES_OK = { haut: null, bas: null, gauche: null, droite: null, espace: 'OK', z: null, x: null };
 
+// « 1er ESSAI & 10 », « 3e ESSAI & BUT »
+const nomEssai = (n) => (n === 1 ? '1er' : n + 'e') + ' ESSAI';
+// position sur le terrain comme à la télé : « tes 35 », « le 50 », « ses 20 »
+const surLes = (L) => { const n = Math.round(L); return n < 50 ? `tes ${n}` : n === 50 ? 'le 50' : `ses ${EN_BUT - n}`; };
+
 export class KedricCourse extends BossScene {
   constructor() { super('KedricCourse', IDENTITE); }
 
   create() {
     this.phase = this.donnees.phase || 'action1';
-    this.etat = 'intro';          // intro | jeu | pause | fin
+    this.etat = 'intro';          // intro | presnap | jeu | pause | fin
     this.attente = 0; this.apresAttente = null;
     this.gel = 0;                 // jeu figé un instant (impact, cinématique)
     this.ralenti = 1;             // < 1 pendant l'explication d'un nouveau plaquage
     this.horloge = 0; this.memoire = {};
     this.nomDiff = 'normal'; this.diff = DIFFICULTES.normal;
-    this.numAction = this.phase === 'action3' ? 2 : 0;
-    this.pos = 0; this.objectif = ACTIONS[this.numAction].yards;
-    this.tentatives = this.diff.tentatives;
-    this.niveau = 0; this.serie = 0; this.jauge = 0; this.ghost = 0;
+    this.numAttaque = 0; this.attaque = ATTAQUES[0];
+    this.score = { toi: 0, ked: 0 };
+    this.ligne = R.depart; this.premier = R.depart + R.premierEssai; this.essai = 1;
+    this.pos = R.depart;
+    this.niveau = 0; this.serie = 0; this.jauge = 0; this.ghostArme = 0;
     this.tempsTotal = 0;
-    this.stats = { plaquages: 0, esquives: 0, parfaits: 0, ghosts: 0, touchdowns: 0 };
-    this.defs = []; this.groupe = 0;
-    this.iComb = 0; this.prochaine = 1.2;
-    this.duel = null;             // Kédric en personne (dernière action)
+    this.stats = { plaquages: 0, esquives: 0, parfaits: 0, ghosts: 0, touchdowns: 0, actions: 0 };
+    this.defs = []; this.groupe = 0; this.poursuivants = [];
+    this.iFormation = 0;
+    this.duel = null; this.kedricVu = false;
     this.tutoVus = {}; this.tuto = null;
-    this.j = { voie: 0, x: 0, saut: 0, sautDebut: -9, rotation: 0, rotationDebut: -9, recharge: 0, changeT: -9, ancienneVoie: 0, pose: null, poseTemps: 0, sautHauteur: 0 };
+    this.j = { voie: 0, x: 0, saut: 0, sautDebut: -9, rotation: 0, rotationDebut: -9, recharge: 0, changeT: -9, ancienneVoie: 0, pose: null, poseTemps: 0 };
 
     // ---------- le décor ----------
     this.dessinerStade();
@@ -93,6 +102,9 @@ export class KedricCourse extends BossScene {
     this.sprJ = this.add.sprite(0, 0, 'kedric_toi_course').setOrigin(0.5, 1).setDepth(500);
     this.sprJ.play('kedric_toi_course');
     this.aide = texte(this, LARGEUR / 2, 512, '', 26, '#ffffff', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 4 } }).setDepth(900).setVisible(false);
+    // bandeau de l'action (avant le « HUT ! ») et alerte de poursuite
+    this.bandeau = texte(this, LARGEUR / 2, 214, '', 28, '#ffffff', { fontStyle: 'bold', backgroundColor: '#0b2a16dd', padding: { x: 16, y: 8 } }).setDepth(905).setVisible(false);
+    this.alertePoursuite = texte(this, LARGEUR / 2, 470, '', 24, '#ff5a5a', { fontStyle: 'bold' }).setDepth(905).setVisible(false);
 
     this.creerHud();
     this.touches = creerTouches(this);
@@ -115,13 +127,13 @@ export class KedricCourse extends BossScene {
     etiquettesTactiles(ETIQUETTES_OK);
     const tactile = estTactile();
     this.afficherIntro('KÉDRIC - Le Showman', [
-      'BUT : porte le ballon jusqu\'à l\'en-but de Kédric (3 actions)',
-      '◀ ▶ : change de couloir (plaqueur debout)',
-      '▲ : saute (plaquage aux jambes)      ▼ : baisse-toi (bras tendus)',
+      'BUT : marquer plus de touchdowns que Kédric en 3 attaques',
+      '4 ESSAIS pour avancer de 10 yards, sinon Kédric prend le ballon... et marque',
+      '◀ ▶ : change de couloir      ▲ : saute      ▼ : baisse-toi en tournant',
       'Le symbole au-dessus du défenseur te dit quoi faire.',
-      'Chaque esquive d\'affilée te fait ACCÉLÉRER.',
-      'Esquive au DERNIER moment = PARFAIT (jauge x2)',
-      'Jauge pleine : ' + (tactile ? 'Ghost' : 'ESPACE') + ' = DEVIL BAT GHOST !',
+      'Esquive d\'affilée = tu ACCÉLÈRES (sinon on te rattrape par derrière !)',
+      'Esquive au DERNIER moment = PARFAIT : remplit la jauge GHOST',
+      'Jauge pleine : ' + (tactile ? 'Ghost' : 'ESPACE') + ' = DEVIL BAT GHOST (passe le défenseur suivant)',
       tactile ? '(Tu peux aussi glisser le doigt sur l\'écran.)' : '',
     ].filter(Boolean), () => this.presentation(() => this.choixDifficulte()));
   }
@@ -135,32 +147,83 @@ export class KedricCourse extends BossScene {
   // Lancement du match (aussi appelé directement par les tests)
   demarrerMatch() {
     this.tempsTotal = 0;
-    this.stats = { plaquages: 0, esquives: 0, parfaits: 0, ghosts: 0, touchdowns: 0 };
+    this.stats = { plaquages: 0, esquives: 0, parfaits: 0, ghosts: 0, touchdowns: 0, actions: 0 };
     this.jauge = 0;
-    this.debutAction(this.numAction);
+    // menu F1 : directement la 3e attaque, à 7 partout
+    if (this.phase === 'action3') { this.score = { toi: 7, ked: 7 }; this.debutAttaque(2); }
+    else { this.score = { toi: 0, ked: 0 }; this.debutAttaque(0); }
   }
 
-  debutAction(n) {
-    this.numAction = n;
-    const A = ACTIONS[n];
-    this.pos = 0; this.objectif = A.yards;
-    this.tentatives = this.diff.tentatives;
-    this.niveau = 0; this.serie = 0; this.ghost = 0;
-    this.iComb = 0; this.prochaine = 1.3;
-    this.duel = null;
+  debutAttaque(n) {
+    this.numAttaque = n;
+    this.attaque = n < R.attaques ? ATTAQUES[n] : PROLONGATION;
+    this.ligne = R.depart; this.premier = R.depart + R.premierEssai; this.essai = 1;
+    this.iFormation = 0;
     this.viderDefenseurs();
-    Object.assign(this.j, { voie: 0, x: 0, saut: 0, rotation: 0, recharge: 0, pose: null, poseTemps: 0 });
+    this.pos = this.ligne;
     this.etat = 'pause';
     etiquettesTactiles(ETIQUETTES_JEU);
-    const e = encart(this, A.nom, `« ${A.titre} » - ${A.yards} yards jusqu'à l'en-but`, '#ffd84a', 0x0b2a16);
+    const A = this.attaque;
+    const e = encart(this, A.nom, `« ${A.titre} »  -  TOI ${this.score.toi} - ${this.score.ked} KÉDRIC`, '#ffd84a', 0x0b2a16);
     jouerSon(this, 'kedric_sifflet');
-    this.majHud();
-    this.attendre(1.6, () => {
+    this.attendre(1.8, () => {
       e.fermer();
-      this.etat = 'jeu';
-      if (n === 0) this.direCoach('Les gars ! On lui montre le SHOW !');
+      if (n === 0) this.direCoach('Les gars ! On lui montre le SHOW !', 1400, true);
+      this.nouvelleAction();
     });
   }
+
+  // Une action : la défense se met en place, puis « HUT ! »
+  nouvelleAction() {
+    this.viderDefenseurs();
+    this.pos = this.ligne;
+    this.niveau = 0; this.serie = 0; this.ghostArme = 0; this.duel = null; this.angleFait = false;
+    Object.assign(this.j, { voie: 0, x: 0, saut: 0, rotation: 0, recharge: 0, pose: null, poseTemps: 0 });
+    const A = this.attaque;
+    const F = FORMATIONS[A.formations[this.iFormation++ % A.formations.length]];
+    this.placerDefense(F);
+    this.stats.actions++;
+    this.etat = 'presnap';
+    this.presnap = R.avantSnap;
+    const reste = this.premier >= EN_BUT ? 'BUT' : Math.round(this.premier - this.ligne);
+    this.bandeau.setText(`${nomEssai(this.essai)} & ${reste}   -   sur ${surLes(this.ligne)}`).setColor(this.essai === 4 ? '#ff6b6b' : '#ffffff').setVisible(true);
+    this.direCoach(F.nom, 1500, true);
+  }
+
+  // Les défenseurs à leur place. Près de l'en-but, la défense se resserre (mais garde des rangs espacés)
+  // et ceux qui n'ont plus la place restent dans l'en-but ou sortent du jeu.
+  placerDefense(F) {
+    const reste = EN_BUT - this.ligne;
+    const k = Math.min(1, (reste + 4) / 40);
+    const liste = F.liste.map(e => [...e]);
+    // 3e attaque : Kédric en personne remplace le défenseur le plus profond
+    if (this.attaque.kedric) liste[liste.length - 1] = [liste[liste.length - 1][0], 'kedric', 'toi'];
+    for (let i = 0; i < liste.length; i++) {
+      const [prof0, type, couloir] = liste[i];
+      const prof = Math.max(prof0 * k, 4 + 3 * i);
+      if (prof > reste + 6 && type !== 'kedric') continue;
+      const pos = this.ligne + Math.min(prof, reste + 6);
+      const ligneDef = i === 0;
+      const g = ++this.groupe;
+      if (type === 'kedric') {
+        const d = this.ajouterDefenseur({ pos, type: 'bloc', voie: 0, groupe: g, star: true });
+        d.etat = 'attend';   // il attend son heure (le duel commence quand tu arrives près de lui)
+        continue;
+      }
+      let voies;
+      if (couloir === 'tous') voies = [-1, 0, 1];
+      else if (couloir === 'mur') voies = ligneDef ? [-1, 0, 1].filter(v => v !== this.trouLigne()) : ['mur', 'mur'];
+      else voies = [null];   // 'toi' : il vise ton couloir jusqu'au dernier moment
+      voies.forEach((vo, i) => {
+        const d = this.ajouterDefenseur({ pos, type, voie: vo === 'mur' ? (i ? 1 : -1) : vo, groupe: g });
+        if (vo === 'mur') d.mur = true;   // le trou du mur est choisi au dernier moment (jamais dans ton couloir)
+        d.ligne = ligneDef;
+        d.x += (Math.random() - 0.5) * 0.1;
+      });
+    }
+  }
+  // le trou dans la ligne : à gauche ou à droite (tu pars du milieu)
+  trouLigne() { return auHasard([-1, 1]); }
 
   attendre(duree, ensuite) { this.attente = duree; this.apresAttente = ensuite; }
 
@@ -182,9 +245,38 @@ export class KedricCourse extends BossScene {
       this.attente -= dt;
       if (this.attente <= 0 && this.apresAttente) { const f = this.apresAttente; this.apresAttente = null; f(); }
     }
+    if (this.etat === 'presnap') { this.majPresnap(dt); return; }
     if (this.etat !== 'jeu') return;
     if (this.gel > 0) { this.gel -= dt; if (this.gel <= 0 && this.apresGel) { const f = this.apresGel; this.apresGel = null; f(); } return; }
     this.majJeu(dt * this.ralenti);
+  }
+
+  // Avant le « HUT ! » : tu peux déjà te placer dans un couloir (face au trou de la ligne)
+  majPresnap(dt) {
+    const j = this.j;
+    if (this.aAppuye('gauche') && j.voie > -1) this.changerCouloir(-1);
+    if (this.aAppuye('droite') && j.voie < 1) this.changerCouloir(1);
+    j.x += borne(j.voie - j.x, -dt / R.changementCouloir, dt / R.changementCouloir);
+    this.presnap -= dt;
+    if (this.presnap <= 0) {
+      this.etat = 'jeu';
+      this.bandeau.setVisible(false);
+      this.memoire = {};
+      jouerSon(this, 'kedric_sifflet', { volume: 0.6 });
+      onomatopee(this, LARGEUR / 2, 300, 'HUT ! HUT !', 48, '#ffffff');
+      // la ligne se décale au dernier moment : le trou change de couloir
+      if (Math.random() < this.diff.decalage) {
+        const ligne = this.defs.filter(d => d.ligne && d.etat === 'approche');
+        if (ligne.length === 2) {
+          const trou = [-1, 0, 1].find(k => !ligne.some(d => d.voie === k));
+          const nouveau = auHasard([-1, 0, 1].filter(k => k !== trou));
+          const voies = [-1, 0, 1].filter(k => k !== nouveau);
+          ligne.forEach((d, i) => { d.voie = voies[i]; });
+          const t = texte(this, LARGEUR / 2, 250, 'LA LIGNE SE DÉCALE !', 30, '#ff9a3c', { fontStyle: 'bold' }).setDepth(905);
+          this.tweens.add({ targets: t, alpha: 0, delay: 700, duration: 300, onComplete: () => t.destroy() });
+        }
+      }
+    }
   }
 
   lireTouches() {
@@ -206,7 +298,7 @@ export class KedricCourse extends BossScene {
     let debut = null;
     this.input.on('pointerdown', (p) => { debut = { x: p.x, y: p.y }; });
     this.input.on('pointerup', (p) => {
-      if (!debut || this.etat !== 'jeu') { debut = null; return; }
+      if (!debut || (this.etat !== 'jeu' && this.etat !== 'presnap')) { debut = null; return; }
       const dx = p.x - debut.x, dy = p.y - debut.y; debut = null;
       if (Math.max(Math.abs(dx), Math.abs(dy)) < 40) return;
       this.balaye = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'gauche' : 'droite') : (dy < 0 ? 'haut' : 'bas');
@@ -214,9 +306,8 @@ export class KedricCourse extends BossScene {
   }
 
   vitesse() {
-    if (this.ghost > 0) return R.ghost.vitesse;
     let v = (R.vitesseBase + this.niveau * R.pasVitesse) * this.diff.vitesse;
-    if (this.duel && this.duel.vies > 0) v *= R.duel.tonAllure;
+    if (this.duel && this.duel.vies > 0 && this.ghostArme <= 0) v *= R.duel.tonAllure;
     return v;
   }
   alerte() { return this.diff.alerte * (1 - R.alerteParNiveau * this.niveau); }
@@ -234,32 +325,22 @@ export class KedricCourse extends BossScene {
     if (this.aAppuye('droite') && j.voie < 1) this.changerCouloir(1);
     if (libre && this.aAppuye('haut')) { j.saut = R.saut.duree; j.sautDebut = this.horloge; jouerSon(this, 'kedric_saut'); }
     else if (libre && this.aAppuye('bas')) { j.rotation = R.rotation.duree; j.rotationDebut = this.horloge; jouerSon(this, 'kedric_esquive', { rate: 0.8 }); }
-    if (this.aAppuye('espace', 0.05) && this.jauge >= this.diff.ghost && this.ghost <= 0) this.lancerGhost();
+    if (this.aAppuye('espace', 0.05) && this.jauge >= this.diff.ghost && this.ghostArme <= 0) this.armerGhost();
     j.x += borne(j.voie - j.x, -dt / R.changementCouloir, dt / R.changementCouloir);
-    if (this.ghost > 0) this.ghost -= dt;
+    if (this.ghostArme > 0) {
+      this.ghostArme -= dt;
+      if (this.ghostArme <= 0) { const t = texte(this, LARGEUR / 2, 250, 'Ghost dans le vide...', 22, '#9fe0ff').setDepth(905); this.tweens.add({ targets: t, alpha: 0, delay: 700, duration: 300, onComplete: () => t.destroy() }); }
+    }
 
     // ---------- on avance ----------
     const v = this.vitesse();
     this.pos += v * dt;
-    if (this.duel && this.duel.vies > 0) this.pos = Math.min(this.pos, this.objectif - 3);
-    if (this.pos >= this.objectif) { this.pos = this.objectif; this.touchdown(); return; }
+    if (this.duel && this.duel.vies > 0) this.pos = Math.min(this.pos, EN_BUT - 3, this.duel.limite);
+    if (this.pos >= EN_BUT) { this.pos = EN_BUT; this.touchdown(); return; }
 
-    // ---------- Kédric appelle ses combinaisons ----------
-    const A = ACTIONS[this.numAction];
-    const debutDuel = A.duel ? this.objectif - R.duel.avant : Infinity;
-    this.prochaine -= dt;
-    if (this.prochaine <= 0 && !this.duel) {
-      const nom = A.combinaisons[this.iComb % A.combinaisons.length];
-      const C = COMBINAISONS[nom];
-      const fin = C.liste[C.liste.length - 1][0];
-      // pas de nouvelle combinaison qui arriverait dans l'en-but (ou dans la zone du duel)
-      if (this.pos + v * (VUE.apparition + fin) < Math.min(this.objectif - 4, debutDuel - 2)) {
-        this.appelerCombinaison(nom, v);
-        this.iComb++;
-        this.prochaine = fin + this.diff.ecart + 0.25;
-      } else this.prochaine = 0.3;
-    }
-    if (A.duel && !this.duel && this.pos >= debutDuel && this.defs.every(d => d.etat !== 'approche')) this.entreeKedric();
+    // ---------- Kédric en personne : le duel commence quand tu arrives près de lui ----------
+    const star = this.defs.find(d => d.star && d.etat === 'attend');
+    if (star && star.pos - this.pos <= R.duel.distance && this.defs.every(d => d.star || d.etat !== 'approche')) this.entreeKedric(star);
     if (this.duel) this.majDuel(dt);
 
     // ---------- les défenseurs ----------
@@ -271,6 +352,14 @@ export class KedricCourse extends BossScene {
       if (d.pos - this.pos < -1.6 && !d.star) { d.sprite.destroy(); d.ombre.destroy(); d.symbole.destroy(); return false; }
       return true;
     });
+    // toute la défense est passée (sans Kédric) : ses arrières reviennent en diagonale
+    if (!this.angleFait && this.etat === 'jeu' && !this.defs.some(d => d.star || d.etat === 'approche')) {
+      this.angleFait = true;
+      for (let k = 0; k < R.angle.nombre; k++) this.ajouterPoursuivant(entre(...R.angle.depart), this.diff.angle);
+      const t = texte(this, LARGEUR / 2, 250, 'LES ARRIÈRES REVIENNENT !', 28, '#ff9a3c', { fontStyle: 'bold' }).setDepth(905);
+      this.tweens.add({ targets: t, alpha: 0, delay: 900, duration: 300, onComplete: () => t.destroy() });
+    }
+    if (this.etat === 'jeu') this.majPoursuivants(dt, v);
     this.majAide();
   }
 
@@ -283,31 +372,14 @@ export class KedricCourse extends BossScene {
   // =================================================================
   //  LES DÉFENSEURS
   // =================================================================
-  appelerCombinaison(nom, v) {
-    const C = COMBINAISONS[nom];
-    this.direCoach(C.nom, 1400, true);
-    for (const [delai, type, couloir] of C.liste) {
-      const pos = this.pos + v * (VUE.apparition + delai);
-      const g = ++this.groupe;
-      let voies;
-      if (couloir === 'tous') voies = [-1, 0, 1];
-      else if (couloir === 'mur') {
-        const libre = auHasard([-1, 0, 1].filter(k => k !== this.j.voie));
-        voies = [-1, 0, 1].filter(k => k !== libre);
-      } else if (couloir === 'autre') voies = [this.j.voie === 0 ? auHasard([-1, 1]) : 0];
-      else voies = [null];   // 'toi' : décidé au dernier moment
-      for (const vo of voies) this.ajouterDefenseur({ pos, type, voie: vo, groupe: g });
-    }
-  }
-
   ajouterDefenseur({ pos, type, voie, groupe, star = false }) {
     const prefixe = star ? 'kedric_star_' : 'kedric_def_';
     const d = {
       pos, type, groupe, star, prefixe,
       voie: voie === null ? this.j.voie : voie, x: voie === null ? this.j.voie : voie,
       suit: voie === null,           // 'toi' : il vise ton couloir jusqu'au dernier moment
-      etat: 'approche', alerte: false, verrou: false, menace: false, chute: 0, angle: 0, poseActuelle: null,
-      sprite: this.add.sprite(0, 0, prefixe + 'course').setOrigin(0.5, 1),
+      etat: 'approche', alerte: false, verrou: false, menace: false, charge: false, chute: 0, angle: 0, poseActuelle: null,
+      sprite: this.add.sprite(0, 0, prefixe + 'garde').setOrigin(0.5, 1),
       ombre: this.add.ellipse(0, 0, 120, 24, 0x000000, 0.3).setDepth(5),
       symbole: texte(this, 0, 0, '', 40, '#ffffff', { fontStyle: 'bold' }).setVisible(false),
     };
@@ -318,10 +390,16 @@ export class KedricCourse extends BossScene {
   viderDefenseurs() {
     for (const d of this.defs) { d.sprite.destroy(); d.ombre.destroy(); d.symbole.destroy(); }
     this.defs = [];
+    for (const p of this.poursuivants) p.sprite.destroy();
+    this.poursuivants = [];
+    if (this.alertePoursuite) this.alertePoursuite.setVisible(false);
   }
 
   // vitesse à laquelle le défenseur se rapproche de toi
-  vitesseRelative(d, v) { return v + (d.star && this.duel && this.duel.phase === 'charge' ? R.duel.charge : 0); }
+  vitesseRelative(d, v) {
+    if (d.star) return v + (this.duel && this.duel.phase === 'charge' ? R.duel.charge : 0);
+    return v + (d.charge ? this.diff.charge : 0);
+  }
 
   majDefenseur(d, dt, v) {
     if (d.etat === 'rate') {
@@ -329,16 +407,25 @@ export class KedricCourse extends BossScene {
       d.chute += dt; d.x += d.sensChute * dt * 1.6; d.angle += d.sensChute * dt * 260;
       return;
     }
-    if (d.etat !== 'approche') return;
-    if (d.star) return;   // Kédric : géré par majDuel
-    const ttc = (d.pos - this.pos) / v;
+    if (d.etat !== 'approche' || d.star) return;   // Kédric : géré par majDuel
+    // en place, puis il fonce sur toi (sauf la ligne, occupée avec tes bloqueurs)
+    if (!d.charge && !d.ligne && (d.pos - this.pos) / v < R.chargeAvant) d.charge = true;
+    if (d.charge) d.pos -= this.diff.charge * dt;
+    const ttc = (d.pos - this.pos) / this.vitesseRelative(d, v);
+    // un mur de 2 défenseurs choisit son trou au dernier moment : jamais dans ton couloir
+    if (d.mur && ttc < this.alerte() + 0.5) {
+      const libre = auHasard([-1, 0, 1].filter(k => k !== this.j.voie));
+      const voies = [-1, 0, 1].filter(k => k !== libre);
+      this.defs.filter(o => o.groupe === d.groupe).forEach((o, i) => { o.mur = false; o.voie = voies[i]; });
+    }
     // il vise ton couloir, puis se décide (le suiveur : jusqu'au verrou)
     if (d.suit) {
       const limite = d.type === 'suiveur' ? VERROU_SUIVEUR : this.alerte() + 0.35;
       if (ttc > limite) d.voie = this.j.voie;
       else { d.suit = false; if (d.type === 'suiveur') { d.verrou = true; jouerSon(this, 'kedric_alerte', { rate: 1.5 }); } }
     }
-    d.x += borne(d.voie - d.x, -dt * (d.type === 'suiveur' ? 7 : 5), dt * (d.type === 'suiveur' ? 7 : 5));
+    const vx = d.type === 'suiveur' ? 7 : d.charge || d.ligne ? 5 : 2;
+    d.x += borne(d.voie - d.x, -dt * vx, dt * vx);
     this.alerterSiBesoin(d, ttc);
   }
 
@@ -349,7 +436,7 @@ export class KedricCourse extends BossScene {
         d.alerte = true;
         if (this.groupeSonne !== d.groupe) { this.groupeSonne = d.groupe; jouerSon(this, 'kedric_alerte'); }
         // explication avec ralenti, la première fois (FACILE / NORMAL)
-        if (this.diff.aide && !Sauvegarde.fait('kedric_tuto') && this.numAction === 0 && enFace && !this.tutoVus[d.type] && TUTO[d.type]) this.debutTuto(d);
+        if (this.diff.aide && !Sauvegarde.fait('kedric_tuto') && this.numAttaque === 0 && enFace && !this.tutoVus[d.type] && TUTO[d.type]) this.debutTuto(d);
       }
       if (enFace) d.menace = true;
     }
@@ -372,12 +459,12 @@ export class KedricCourse extends BossScene {
     const enFace = Math.abs(d.x - j.x) < 0.5;
     const type = d.star ? this.duel.vrai : d.type;
     if (this.tuto && this.tuto.d === d) this.finTuto();
-    if (this.ghost > 0) { this.esquive(d, 'ghost'); return; }
     if (!enFace) {
       if (d.menace || d.star) this.esquive(d, this.horloge - j.changeT <= this.diff.parfait ? 'parfait' : 'cote');
       else { d.etat = 'passe'; }
       return;
     }
+    if (this.ghostArme > 0) { this.passeGhost(d); return; }
     const fen = this.diff.parfait + 0.06;
     if (type === 'bas' && j.saut > 0) { this.esquive(d, this.horloge - j.sautDebut <= fen ? 'parfait' : 'saut'); return; }
     if (type === 'haut' && j.rotation > 0) { this.esquive(d, this.horloge - j.rotationDebut <= fen ? 'parfait' : 'rotation'); return; }
@@ -395,14 +482,12 @@ export class KedricCourse extends BossScene {
     d.etat = 'rate'; d.chute = 0; d.sensChute = d.x >= this.j.x ? 1 : -1; if (Math.abs(d.x - this.j.x) < 0.3) d.sensChute = auHasard([-1, 1]);
     const parfait = comment === 'parfait';
     const x = ecranX(this.j.x, 0), y = VUE.pieds - 250;
-    if (comment === 'ghost') {
-      onomatopee(this, ecranX(d.x, 0.5), y + 40, ['?!', 'Hein ?!', 'Où ?!'], 34, '#9fe0ff');
-    } else {
+    if (comment !== 'ghost') {
       this.stats.esquives++;
       this.serie++;
-      this.jauge = Math.min(this.diff.ghost, this.jauge + (parfait ? 2 : 1));
       if (parfait) {
         this.stats.parfaits++;
+        this.jauge = Math.min(this.diff.ghost, this.jauge + 1);
         jouerSon(this, 'kedric_parfait');
         onomatopee(this, x, y, 'PARFAIT !', 40, '#7fe8ff');
         lignesImpact(this, x, y + 60, 0x9fe0ff, 16, 150);
@@ -412,29 +497,36 @@ export class KedricCourse extends BossScene {
         onomatopee(this, x, y, comment === 'saut' ? 'HOP !' : comment === 'rotation' ? 'SPIN !' : 'ZIP !', 32, '#ffffff');
         if (Math.random() < 0.15 && !d.star) this.direCoach(auHasard(REPLIQUES.esquive));
       }
-      const niveau = Math.min(R.niveauMax, Math.floor(this.serie / R.esquivesParNiveau));
-      if (niveau > this.niveau) {
-        this.niveau = niveau;
-        jouerSon(this, 'kedric_niveau');
-        const t = texte(this, x, y - 50, niveau === R.niveauMax ? 'VITESSE MAX : 4"2 !' : 'VITESSE +1', 24, '#7fff7f').setDepth(905);
-        this.tweens.add({ targets: t, y: y - 90, alpha: 0, duration: 900, onComplete: () => t.destroy() });
-      }
+      this.monterVitesse(x, y);
       if (this.jauge >= this.diff.ghost && !this.ghostAnnonce) {
         this.ghostAnnonce = true;
         jouerSon(this, 'kedric_niveau', { rate: 1.3 });
         const t = texte(this, LARGEUR / 2, 220, `DEVIL BAT GHOST PRÊT : ${estTactile() ? 'Ghost' : 'ESPACE'} !`, 28, '#9fe0ff', { fontStyle: 'bold' }).setDepth(905);
         this.tweens.add({ targets: t, alpha: 0, delay: 1300, duration: 400, onComplete: () => t.destroy() });
       }
+      // esquivé de côté, il se relève et te court après
+      if ((comment === 'cote' || parfait) && !d.star && (d.type === 'bloc' || d.type === 'suiveur') && Math.random() < this.diff.poursuite) this.ajouterPoursuivant();
     }
-    if (d.star) this.kedricEsquive(comment === 'ghost');
+    if (d.star) this.kedricEsquive();
   }
 
+  monterVitesse(x, y) {
+    const niveau = Math.min(R.niveauMax, Math.floor(this.serie / R.esquivesParNiveau));
+    if (niveau <= this.niveau) return;
+    this.niveau = niveau;
+    jouerSon(this, 'kedric_niveau');
+    const t = texte(this, x, y - 50, niveau === R.niveauMax ? 'VITESSE MAX : 4"2 !' : 'VITESSE +1', 24, '#7fff7f').setDepth(905);
+    this.tweens.add({ targets: t, y: y - 90, alpha: 0, duration: 900, onComplete: () => t.destroy() });
+  }
+
+  // d = le plaqueur (null : rattrapé par un poursuivant, derrière toi)
   plaque(d, pourquoi) {
     const j = this.j;
     this.stats.plaquages++;
-    this.tentatives--;
-    this.serie = 0; this.niveau = 0; this.ghost = 0;
-    d.etat = 'plaqueur'; d.pos = this.pos + 0.25; d.x = j.x;
+    this.ghostArme = 0;
+    // plaqué par la ligne : arrêté sur la ligne d'engagement (pas de gain)
+    if (d && d.ligne) this.pos = Math.min(this.pos, this.ligne + 0.5);
+    if (d) { d.etat = 'plaqueur'; d.pos = this.pos + 0.25; d.x = j.x; }
     j.pose = 'plaque'; j.poseTemps = 99; j.saut = 0; j.rotation = 0;
     if (this.tuto) this.finTuto();
     jouerSon(this, 'kedric_plaque');
@@ -443,71 +535,137 @@ export class KedricCourse extends BossScene {
     flash(this, 0.55);
     onomatopee(this, LARGEUR / 2, 260, ['CRAAAC !', 'BAM !', 'SBAM !'], 64, '#ff5a5a');
     lignesImpact(this, LARGEUR / 2, 380, 0xffffff, 22, 260);
-    if (pourquoi) {
-      const t = texte(this, LARGEUR / 2, 330, pourquoi, 28, '#ffd84a', { fontStyle: 'bold' }).setDepth(910);
-      this.tweens.add({ targets: t, alpha: 0, delay: 1300, duration: 300, onComplete: () => t.destroy() });
+    const gain = Math.round(this.pos - this.ligne);
+    const t = texte(this, LARGEUR / 2, 330, (pourquoi ? pourquoi + '\n' : '') + (gain > 0 ? `+${gain} yards` : 'Aucun gain'), 28, '#ffd84a', { fontStyle: 'bold' }).setDepth(910);
+    this.tweens.add({ targets: t, alpha: 0, delay: 1400, duration: 300, onComplete: () => t.destroy() });
+    this.direCoach(d ? auHasard(REPLIQUES.plaque) : REPLIQUES.rattrape, 1600, true);
+    if (Math.random() < 0.5) this.danseKedric();
+    this.etat = 'pause';
+    this.aide.setVisible(false); this.alertePoursuite.setVisible(false);
+    this.attendre(R.apresAction, () => this.finAction());
+  }
+
+  // Fin d'une action (plaquage) : premier essai ? essai suivant ? ballon perdu ?
+  finAction() {
+    const P = this.pos;
+    if (P >= this.premier) {
+      this.essai = 1; this.ligne = P; this.premier = Math.min(EN_BUT, P + R.premierEssai);
+      jouerSon(this, 'kedric_niveau');
+      const t = texte(this, LARGEUR / 2, 230, 'PREMIER ESSAI !', 46, '#7fff7f', { fontStyle: 'bold italic', stroke: '#0b3d20', strokeThickness: 8 }).setDepth(910);
+      this.tweens.add({ targets: t, scale: 1.15, duration: 200, yoyo: true });
+      this.tweens.add({ targets: t, alpha: 0, delay: 1100, duration: 300, onComplete: () => t.destroy() });
+      if (Math.random() < 0.5) this.direCoach(auHasard(REPLIQUES.premierEssai));
+      this.etat = 'pause';
+      this.attendre(1.2, () => this.nouvelleAction());
+      return;
     }
-    this.direCoach(auHasard(REPLIQUES.plaque), 1600, true);
-    this.danseKedric();
-    this.etat = 'pause';
-    this.majHud();
-    this.attendre(R.pausePlaquage, () => {
-      if (this.tentatives <= 0) { this.finMatch(false); return; }
-      this.reprendreApresPlaquage();
-    });
+    this.essai++;
+    this.ligne = P;
+    if (this.essai > R.essais) { this.balleKedric(); return; }
+    this.nouvelleAction();
   }
 
-  reprendreApresPlaquage() {
+  // 4 essais ratés : Kédric récupère le ballon... et marque (c'est son show)
+  balleKedric() {
+    this.etat = 'pause';
+    this.score.ked += R.points;
     this.viderDefenseurs();
-    Object.assign(this.j, { pose: null, poseTemps: 0, saut: 0, rotation: 0, recharge: 0, voie: 0, x: 0 });
-    this.prochaine = 1.0;
-    if (this.duel) { this.duel.kedric = null; this.duel.phase = 'retour'; this.duel.attente = 0.4; }
-    const n = this.diff.tentatives - this.tentatives + 1;
-    const t = texte(this, LARGEUR / 2, 250, `${n}e TENTATIVE`, 44, '#ffffff', { fontStyle: 'bold italic', stroke: '#1d8a4a', strokeThickness: 8 }).setDepth(905);
-    const reste = texte(this, LARGEUR / 2, 300, this.tentatives === 1 ? 'DERNIÈRE CHANCE !' : `encore ${this.tentatives} plaquages permis`, 22, this.tentatives === 1 ? '#ff6b6b' : '#dddddd').setDepth(905);
-    jouerSon(this, 'kedric_sifflet');
-    this.etat = 'pause';
-    this.attendre(1.1, () => { t.destroy(); reste.destroy(); this.etat = 'jeu'; });
+    jouerSon(this, 'kedric_touchdown', { volume: 0.7 });
+    const e = encart(this, 'BALLON PERDU...', `Kédric marque !  TOI ${this.score.toi} - ${this.score.ked} KÉDRIC`, '#ff6b6b', 0x2a0b0b, 'kedric_coach');
+    this.direCoach(REPLIQUES.balle, 2200, true);
+    this.danseKedric();
+    this.attendre(2.6, () => { e.fermer(); this.finAttaque(false); });
   }
 
   // =================================================================
-  //  DEVIL BAT GHOST
+  //  LES POURSUIVANTS (derrière toi)
   // =================================================================
-  lancerGhost() {
+  ajouterPoursuivant(ecart = R.poursuite.depart, vitesse = this.diff.vitessePoursuite) {
+    if (this.poursuivants.length >= R.poursuite.max) return;
+    const s = this.add.sprite(0, HAUTEUR + 200, 'kedric_def_course').setOrigin(0.5, 1).setDepth(520);
+    const cote = this.poursuivants.length ? -this.poursuivants[0].cote : auHasard([-1, 1]);
+    this.poursuivants.push({ ecart, vitesse: R.vitesseBase * vitesse, cote, sprite: s });
+    if (Math.random() < 0.4) this.direCoach(auHasard(REPLIQUES.poursuite));
+  }
+
+  majPoursuivants(dt, v) {
+    let proche = Infinity;
+    for (const p of this.poursuivants) {
+      p.ecart += (v - p.vitesse) * dt;
+      if (p.ecart <= 0) { this.plaque(null, 'Rattrapé par derrière !\nEsquive d\'affilée pour aller plus vite.'); return; }
+      proche = Math.min(proche, p.ecart);
+    }
+    this.poursuivants = this.poursuivants.filter(p => {
+      if (p.ecart < R.poursuite.abandon) return true;
+      p.sprite.destroy();
+      const t = texte(this, LARGEUR / 2, 450, 'Il abandonne !', 22, '#7fff7f').setDepth(905);
+      this.tweens.add({ targets: t, alpha: 0, delay: 600, duration: 300, onComplete: () => t.destroy() });
+      return false;
+    });
+    if (proche < 2.5) {
+      this.alertePoursuite.setVisible(true).setText(proche < 1 ? '⚠ IL VA TE PLAQUER !' : '⚠ IL TE RATTRAPE !');
+      if (Math.floor(this.horloge * 4) !== Math.floor((this.horloge - dt) * 4)) jouerSon(this, 'kedric_pas', { volume: 0.5, rate: 0.7 });
+    } else this.alertePoursuite.setVisible(proche < R.poursuite.abandon).setText(proche < R.poursuite.abandon ? `poursuivant à ${proche.toFixed(0)} yards` : '');
+  }
+
+  // =================================================================
+  //  DEVIL BAT GHOST : le prochain défenseur est passé à coup sûr
+  // =================================================================
+  armerGhost() {
     this.jauge = 0; this.ghostAnnonce = false;
     this.stats.ghosts++;
+    this.ghostArme = R.ghost.fenetre;
+    this.serie = Math.max(this.serie, R.niveauMax * R.esquivesParNiveau);
+    this.niveau = R.niveauMax;
     jouerSon(this, 'kedric_ghost');
-    const e = encart(this, 'DEVIL BAT GHOST', 'Stop... and GO ! Personne ne peut te toucher !', '#9fe0ff', 0x061428);
-    this.gel = R.ghost.cinematique;
-    this.apresGel = () => { e.fermer(); this.ghost = R.ghost.duree; flash(this, 0.5, 0x9fe0ff); this.direCoach(REPLIQUES.ghost, 1500, true); };
+    flash(this, 0.4, 0x9fe0ff);
+    onomatopee(this, LARGEUR / 2, 250, 'DEVIL BAT GHOST !', 44, '#9fe0ff');
+  }
+
+  passeGhost(d) {
+    this.ghostArme = 0;
+    this.esquive(d, 'ghost');
+    jouerSon(this, 'kedric_parfait', { rate: 0.8 });
+    lignesImpact(this, ecranX(this.j.x, 0), VUE.pieds - 200, 0x9fe0ff, 24, 260);
+    onomatopee(this, ecranX(d.x, 0.5), VUE.pieds - 230, ['?!', 'Hein ?!', 'Où ?!'], 40, '#9fe0ff');
+    this.gel = R.ghost.gel;
+    this.direCoach(REPLIQUES.ghost, 1500, true);
   }
 
   // =================================================================
-  //  LE DUEL CONTRE KÉDRIC (dernière action)
+  //  LE DUEL CONTRE KÉDRIC (3e attaque et prolongation)
   // =================================================================
-  entreeKedric() {
-    this.duel = { vies: R.duel.vies, phase: 'retour', attente: 0, kedric: null, montre: 'bloc', vrai: 'bloc', feinteFaite: false, precedent: null };
-    jouerSon(this, 'kedric_touchdown', { volume: 0.6 });
-    const e = encart(this, 'KÉDRIC ENTRE EN JEU !', `« ${REPLIQUES.duel} »`, '#ffd84a', 0x1d1606, 'kedric_coach');
-    this.gel = 1.8;
-    this.apresGel = () => e.fermer();
-    this.danseKedric();
+  entreeKedric(k) {
+    this.duel = { vies: R.duel.vies, phase: 'danse', attente: entre(...R.duel.attente), kedric: k, montre: 'bloc', vrai: 'bloc', feinteFaite: false, precedent: null,
+      limite: k.pos + 20 };
+    k.etat = 'approche'; k.pos = this.pos + R.duel.distance;
+    if (!this.kedricVu) {
+      this.kedricVu = true;
+      jouerSon(this, 'kedric_touchdown', { volume: 0.6 });
+      const e = encart(this, 'KÉDRIC ENTRE EN JEU !', `« ${REPLIQUES.duel} »`, '#ffd84a', 0x1d1606, 'kedric_coach');
+      this.gel = 1.8;
+      this.apresGel = () => e.fermer();
+      this.danseKedric();
+    } else {
+      onomatopee(this, LARGEUR / 2, 220, 'KÉDRIC !', 44, '#ffd84a');
+      this.direCoach(auHasard(REPLIQUES.duelEsquive), 1200, true);
+    }
   }
 
   majDuel(dt) {
     const D = this.duel;
     if (D.vies <= 0) return;
+    const k = D.kedric;
     if (D.phase === 'retour') {
-      // il revient se placer devant toi (en dansant)
+      // il se relève et revient se placer devant toi (en dansant)
       D.attente -= dt;
       if (D.attente > 0) return;
-      if (D.kedric) { D.kedric.sprite.destroy(); D.kedric.ombre.destroy(); D.kedric.symbole.destroy(); this.defs = this.defs.filter(o => o !== D.kedric); }
-      D.kedric = this.ajouterDefenseur({ pos: this.pos + R.duel.distance, type: 'bloc', voie: this.j.voie, groupe: ++this.groupe, star: true });
+      k.etat = 'approche'; k.chute = 0; k.angle = 0; k.alerte = false; k.menace = false; k.sprite.setAlpha(1);
+      k.pos = this.pos + R.duel.distance;
       D.phase = 'danse'; D.attente = entre(...R.duel.attente);
       if (Math.random() < 0.6) this.direCoach(auHasard(REPLIQUES.duelEsquive), 1200, true);
       return;
     }
-    const k = D.kedric;
     if (D.phase === 'danse') {
       // il garde ses distances en se dandinant d'un couloir à l'autre
       k.pos = this.pos + R.duel.distance;
@@ -545,15 +703,15 @@ export class KedricCourse extends BossScene {
     }
   }
 
-  kedricEsquive(ghost) {
+  kedricEsquive() {
     const D = this.duel;
-    D.vies = ghost ? 0 : D.vies - 1;
+    D.vies--;
     D.phase = 'retour'; D.attente = 1.0;
     if (D.vies <= 0) {
       jouerSon(this, 'kedric_foule');
-      const e = encart(this, ghost ? 'IL N\'A RIEN VU !' : 'KÉDRIC EST PASSÉ !', 'Fonce jusqu\'à l\'en-but !', '#7fff7f', 0x0b2a16);
+      const e = encart(this, 'KÉDRIC EST PASSÉ !', 'Fonce jusqu\'à l\'en-but !', '#7fff7f', 0x0b2a16);
       this.gel = 1.1; this.apresGel = () => e.fermer();
-      this.direCoach(ghost ? REPLIQUES.ghost : 'NOOON ! Mon show !', 1600, true);
+      this.direCoach('NOOON ! Mon show !', 1600, true);
     } else {
       const t = texte(this, LARGEUR / 2, 200, `Kédric esquivé ! Encore ${D.vies}`, 26, '#ffd84a', { fontStyle: 'bold' }).setDepth(905);
       this.tweens.add({ targets: t, alpha: 0, delay: 900, duration: 300, onComplete: () => t.destroy() });
@@ -566,44 +724,54 @@ export class KedricCourse extends BossScene {
   touchdown() {
     this.etat = 'pause';
     this.stats.touchdowns++;
-    this.j.pose = 'victoire'; this.j.poseTemps = 99; this.ghost = 0;
+    this.score.toi += R.points;
+    this.j.pose = 'victoire'; this.j.poseTemps = 99; this.ghostArme = 0;
     if (this.tuto) this.finTuto();
-    if (this.numAction === 0 && this.diff.aide) Sauvegarde.marquerFait('kedric_tuto');
+    if (this.numAttaque === 0 && this.diff.aide) Sauvegarde.marquerFait('kedric_tuto');
+    for (const p of this.poursuivants) p.sprite.destroy();
+    this.poursuivants = []; this.alertePoursuite.setVisible(false); this.aide.setVisible(false);
     jouerSon(this, 'kedric_touchdown');
     jouerSon(this, 'kedric_foule');
     flash(this, 0.5, 0xffd84a);
-    const e = encart(this, 'TOUCHDOWN !!', `${this.stats.touchdowns} / ${ACTIONS.length}`, '#ffd84a', 0x0b2a16);
-    const fin = this.numAction >= ACTIONS.length - 1;
-    if (!fin) this.direCoach(REPLIQUES.touchdown[this.numAction % REPLIQUES.touchdown.length], 2000, true);
-    this.attendre(2.4, () => {
-      e.fermer();
-      this.viderDefenseurs();
-      if (fin) this.finMatch(true);
-      else this.debutAction(this.numAction + 1);
-    });
+    const e = encart(this, 'TOUCHDOWN !!', `TOI ${this.score.toi} - ${this.score.ked} KÉDRIC`, '#ffd84a', 0x0b2a16);
+    this.direCoach(auHasard(REPLIQUES.touchdown), 2000, true);
+    this.attendre(2.6, () => { e.fermer(); this.finAttaque(true); });
+  }
+
+  // Après chaque attaque : la suivante, la prolongation, ou la fin du match
+  finAttaque(marque) {
+    this.viderDefenseurs();
+    if (this.numAttaque >= R.attaques) { this.finMatch(marque); return; }   // prolongation : le premier qui marque
+    const n = this.numAttaque + 1, reste = R.attaques - n;
+    // perdu d'avance : même en marquant à chaque attaque restante, Kédric reste devant
+    if (this.score.ked > this.score.toi + R.points * reste) { this.finMatch(false); return; }
+    if (n < R.attaques) { this.debutAttaque(n); return; }
+    if (this.score.toi !== this.score.ked) { this.finMatch(this.score.toi > this.score.ked); return; }
+    this.debutAttaque(n);   // égalité : prolongation
   }
 
   finMatch(gagne) {
     etiquettesTactiles(ETIQUETTES_OK);
     this.etat = 'fin';
-    this.aide.setVisible(false);
+    this.aide.setVisible(false); this.bandeau.setVisible(false); this.alertePoursuite.setVisible(false);
     if (gagne) this.victoire(this.classement());
-    else this.defaite(`BALLE PERDUE !\nKédric : « ${REPLIQUES.defaite} »\nTouchdowns : ${this.stats.touchdowns} / ${ACTIONS.length}`);
+    else this.defaite(`Kédric gagne ${this.score.ked} à ${this.score.toi} !\nKédric : « ${REPLIQUES.defaite} »\nTouchdowns : ${this.stats.touchdowns}`);
   }
 
   cleRecord() { return cleRecord('kedric', this.nomDiff); }
 
-  // Rang S / A / B / C : plaquages, esquives parfaites, temps
+  // Rang S / A / B / C : l'écart au score, les plaquages, les esquives parfaites, le temps
   classement() {
-    let score = 100;
-    score -= this.stats.plaquages * 11;
-    score += Math.min(10, this.stats.parfaits * 0.6);
-    score -= Math.max(0, this.tempsTotal - R.tempsReference) * 0.35;
+    let score = 72;
+    score += (this.score.toi - this.score.ked) * 1.3;
+    score -= this.stats.plaquages * 1.6;
+    score += Math.min(10, this.stats.parfaits * 0.4);
+    score -= Math.max(0, this.tempsTotal - R.tempsReference) * 0.1;
     const rang = R.rangs.find(r => score >= r.seuil).rang;
     const complet = this.phase === 'action1';
     const record = complet ? Sauvegarde.proposerRecord(this.cleRecord(), rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record(this.cleRecord());
     this.rang = rang;
-    return `Kédric est battu !\nRANG ${rang}   -   temps ${formatTemps(this.tempsTotal)}` +
+    return `Kédric est battu ${this.score.toi} à ${this.score.ked} !\nRANG ${rang}   -   temps ${formatTemps(this.tempsTotal)}` +
       `\nPlaquages subis : ${this.stats.plaquages}   esquives : ${this.stats.esquives}` +
       `\nEsquives parfaites : ${this.stats.parfaits}` +
       (this.stats.ghosts ? `   Devil Bat Ghost : ${this.stats.ghosts}` : '') +
@@ -785,19 +953,19 @@ export class KedricCourse extends BossScene {
       const d0 = Math.max(-0.9, L - this.pos), d1 = Math.min(VUE.loin, L + 5 - this.pos);
       if (d1 <= d0) continue;
       let couleur = (Math.round(L / 5) % 2) ? 0x2f8a3a : 0x3a9a44;
-      if (L >= this.objectif) couleur = (L < this.objectif + 10) ? 0x15603a : 0x0f3a1c;
+      if (L >= EN_BUT) couleur = (L < EN_BUT + 10) ? 0x15603a : 0x0f3a1c;
       quad(d0, d1, -B, B, couleur);
     }
     // lignes des yards
     g.lineStyle(3, 0xffffff, 0.85);
     let iN = 0;
-    for (let L = Math.ceil((this.pos - 0.9) / 5) * 5; L < this.pos + VUE.loin && L <= this.objectif + 10; L += 5) {
+    for (let L = Math.ceil((this.pos - 0.9) / 5) * 5; L < this.pos + VUE.loin && L <= EN_BUT + 10; L += 5) {
       const d = L - this.pos, y = ecranY(d);
-      g.lineStyle(Math.max(1, 4 * echelle(d)), 0xffffff, L === this.objectif ? 1 : 0.8);
+      g.lineStyle(Math.max(1, 4 * echelle(d)), 0xffffff, L === EN_BUT ? 1 : 0.8);
       g.lineBetween(ecranX(-B, d), y, ecranX(B, d), y);
       // numéros des yards (comme sur un vrai terrain : 10, 20... 50... 20, 10)
-      const yardTerrain = 100 - this.objectif + L, n = yardTerrain <= 50 ? yardTerrain : 100 - yardTerrain;
-      if (L % 10 === 0 && n > 0 && L < this.objectif && iN < this.nombres.length - 1 && d > 0.5) {
+      const n = L <= 50 ? L : EN_BUT - L;
+      if (L % 10 === 0 && n > 0 && L < EN_BUT && iN < this.nombres.length - 1 && d > 0.5) {
         for (const s of [-1, 1]) {
           const t = this.nombres[iN++]; if (!t) break;
           const k = echelle(d);
@@ -814,15 +982,22 @@ export class KedricCourse extends BossScene {
       const d = L - this.pos; if (d < 0) continue;
       for (const x of [-0.5, 0.5]) { const y = ecranY(d); g.lineBetween(ecranX(x, d) - 6 * echelle(d), y, ecranX(x, d) + 6 * echelle(d), y); }
     }
+    // comme à la télé : ligne d'engagement (bleue) et ligne à atteindre pour le premier essai (jaune)
+    for (const [L, couleur] of [[this.ligne, 0x3fa7ff], [this.premier, 0xffd84a]]) {
+      const d = L - this.pos;
+      if (d < -0.9 || d > VUE.loin || L >= EN_BUT) continue;
+      g.lineStyle(Math.max(2, 6 * echelle(d)), couleur, 0.9);
+      g.lineBetween(ecranX(-B, d), ecranY(d), ecranX(B, d), ecranY(d));
+    }
     // l'en-but de Kédric : son nom écrit sur la pelouse
-    const dEB = this.objectif + 5 - this.pos;
+    const dEB = EN_BUT + 5 - this.pos;
     if (dEB < VUE.loin && dEB > 0) {
       const k = echelle(dEB);
       this.texteEnBut.setVisible(true).setPosition(LARGEUR / 2, ecranY(dEB)).setScale(k * 1.4, k * 0.6);
     } else this.texteEnBut.setVisible(false);
     // les poteaux (jaunes) au fond de l'en-but
     const p = this.poteaux; p.clear();
-    const dP = this.objectif + 10 - this.pos;
+    const dP = EN_BUT + 10 - this.pos;
     if (dP < VUE.loin) {
       const k = echelle(dP), x = LARGEUR / 2, y = ecranY(dP);
       p.lineStyle(Math.max(2, 9 * k), 0xffd84a, 1);
@@ -836,10 +1011,10 @@ export class KedricCourse extends BossScene {
   // Lignes de vitesse sur les côtés (à partir du niveau 3, et en Devil Bat Ghost)
   dessinerVitesse() {
     const g = this.lignesVitesse; g.clear();
-    const fort = this.ghost > 0 ? 1 : Math.max(0, this.niveau - 2) / 3;
+    const fort = this.ghostArme > 0 ? 1 : Math.max(0, this.niveau - 2) / 3;
     if (fort <= 0 || this.etat !== 'jeu') return;
     const cx = LARGEUR / 2, cy = VUE.horizon;
-    g.lineStyle(2, this.ghost > 0 ? 0x9fe0ff : 0xffffff, 0.25 + 0.35 * fort);
+    g.lineStyle(2, this.ghostArme > 0 ? 0x9fe0ff : 0xffffff, 0.25 + 0.35 * fort);
     for (let k = 0; k < 10 + fort * 14; k++) {
       const a = Math.random() * Math.PI * 2, r0 = 380 + Math.random() * 120, r1 = r0 + 120 + Math.random() * 200;
       const ax = Math.cos(a), ay = Math.sin(a) * 0.7;
@@ -857,39 +1032,48 @@ export class KedricCourse extends BossScene {
     let pose = j.poseTemps > 0 && j.pose ? j.pose : (j.saut > 0 ? 'saut' : j.rotation > 0 ? 'rotation' : 'course');
     const hauteur = j.saut > 0 ? Math.sin(Math.PI * (1 - j.saut / R.saut.duree)) * 80 : 0;
     const cle = 'kedric_toi_' + pose;
+    const enCourse = pose === 'course' && (this.etat === 'jeu' || this.etat === 'presnap') && this.gel <= 0 && !(this.etat === 'presnap');
     if (pose === 'course') {
       if (this.sprJ.texture.key !== cle || !this.sprJ.anims.isPlaying) this.sprJ.play(cle);
-      this.sprJ.anims.timeScale = this.etat === 'jeu' && this.gel <= 0 ? 1 + this.niveau * 0.16 + (this.ghost > 0 ? 0.6 : 0) : 0;
+      this.sprJ.anims.timeScale = enCourse ? 1 + this.niveau * 0.12 + (this.ghostArme > 0 ? 0.5 : 0) : 0;
     } else if (this.sprJ.texture.key !== cle) { this.sprJ.stop(); this.sprJ.setTexture(cle); }
-    // une illustration de course en une seule image : on la fait rebondir à chaque foulée (la planche de 16 images s'anime seule)
-    const foulee = pose === 'course' && this.estIllustre(cle) && this.textures.get(cle).frameTotal <= 2 && this.etat === 'jeu' && this.gel <= 0;
-    const pas = foulee ? Math.sin(this.horloge * (11 + this.niveau * 1.6 + (this.ghost > 0 ? 6 : 0))) : 0;
-    // course en plusieurs images : le corps monte quand un talon remonte et retombe quand le pied touche le sol
-    // (images paires = talon levé, impaires = pied au sol), avec un bruit de crampons et une touffe d'herbe à chaque appui
-    let saute = 0, tasse = 0, penche = 0;
-    if (pose === 'course' && !foulee && this.estIllustre(cle) && this.etat === 'jeu') {
-      const n = this.sprJ.anims.currentFrame ? this.sprJ.anims.currentFrame.index - 1 : 0;
-      const dt = Math.min(0.05, Math.max(0, this.horloge - (this.horlogeAffiche || this.horloge)));
-      const cible = n % 2 === 0 ? 1 : 0;
-      this.rebondJ = (this.rebondJ || 0) + (cible - (this.rebondJ || 0)) * Math.min(1, dt * 22);
-      saute = this.rebondJ * 12; tasse = (1 - this.rebondJ) * 0.03;
-      penche = n === 0 ? -2 : n === 2 ? 2 : 0;
-      if (n % 2 === 1 && this.imageJ !== n && this.gel <= 0) this.appui(xJ + (n === 1 ? 26 : -26));
-      this.imageJ = n;
+    // rebond continu calé sur l'animation : le corps est au plus bas quand un pied se pose (images 3 et 6 sur 6),
+    // au plus haut entre deux appuis ; bruit de crampons et touffe d'herbe à chaque appui.
+    // (une course dessinée en une seule image rebondit au même rythme)
+    let saute = 0, penche = 0;
+    if (enCourse) {
+      const n = this.textures.get(cle).frameTotal - 1;
+      let phase;
+      // 2 foulées par tour d'animation ; décalé d'1/6 pour que l'appui tombe au milieu des images « pieds au sol » (3e et 6e)
+      if (n > 1) {
+        const A = this.sprJ.anims, i = A.currentFrame ? A.currentFrame.index - 1 : 0;
+        const f = A.nextTick > 0 ? borne(A.accumulator / A.nextTick, 0, 1) : 0;   // avancement dans l'image en cours
+        phase = (i + f) / n * 2 + 1 / 6;
+      }
+      else phase = this.horloge * (2.6 + this.niveau * 0.3);
+      const u = (phase % 1);                                   // 0 = pied posé, 0,5 = en l'air
+      saute = Math.sin(Math.PI * u) * 7;
+      penche = Math.sin(Math.PI * 2 * phase / 2) * 1.5;
+      const appui = Math.floor(phase);
+      if (this.appuiJ !== appui) { if (this.appuiJ !== undefined) this.appui(xJ + (appui % 2 ? -26 : 26)); this.appuiJ = appui; }
     }
-    this.horlogeAffiche = this.horloge;
-    this.sprJ.setPosition(xJ, VUE.pieds + 8 - hauteur - Math.abs(pas) * 9 - saute).setScale(this.zoom(cle) * (1 + Math.abs(pas) * 0.02 + tasse), this.zoom(cle) * (1 - Math.abs(pas) * 0.02 - tasse));
-    this.sprJ.setAngle(j.rotation > 0 ? Math.sin(this.horloge * 30) * 6 : pas * 3 + penche);
+    this.sprJ.setPosition(xJ, VUE.pieds + 8 - hauteur - saute).setScale(this.zoom(cle));
+    this.sprJ.setAngle(j.rotation > 0 ? Math.sin(this.horloge * 30) * 6 : penche);
     this.ombreJ.setPosition(xJ, VUE.pieds + 4).setScale(1 - (hauteur + saute) / 200);
     // Devil Bat Ghost : images fantômes de chaque côté
     this.fantomes.forEach((f, k) => {
-      if (this.ghost > 0 && this.etat === 'jeu') {
+      if (this.ghostArme > 0 && this.etat === 'jeu') {
         const dec = Math.sin(this.horloge * 22 + k * 2.1) * (70 + k * 25);
         f.setTexture(this.sprJ.texture.key, this.sprJ.frame.name).setPosition(xJ + dec, this.sprJ.y).setScale(this.sprJ.scaleX, this.sprJ.scaleY).setAlpha(0.35 - k * 0.08);
       } else f.setAlpha(0);
     });
     // ---------- les défenseurs ----------
     for (const d of this.defs) this.afficherDefenseur(d);
+    // ---------- les poursuivants : on voit leur casque surgir en bas de l'écran quand ils se rapprochent ----------
+    for (const p of this.poursuivants) {
+      const z = this.zoom('kedric_def_course') * 1.25;
+      p.sprite.setPosition(xJ + p.cote * 150, HAUTEUR + 170 + p.ecart * 45 - Math.abs(Math.sin(this.horloge * 9)) * 8).setScale(z).setAlpha(0.95);
+    }
     this.majHud();
   }
 
@@ -899,8 +1083,8 @@ export class KedricCourse extends BossScene {
     if (d.etat === 'rate') pose = 'rate';
     else if (d.etat === 'plaqueur') pose = d.type === 'haut' ? 'bras' : 'plonge';
     else if (d.etat === 'passe') pose = 'course';
-    else if (d.star && this.duel && this.duel.phase === 'danse') pose = 'garde';
-    else if (!d.alerte) pose = 'course';
+    else if (d.etat === 'attend' || (d.star && this.duel && this.duel.phase === 'danse')) pose = 'garde';
+    else if (!d.alerte) pose = d.charge ? 'course' : 'garde';
     else {
       const ttc = dist / Math.max(1, this.vitesseRelative(d, this.vitesse()));
       pose = d.type === 'bas' ? (ttc > 0.3 ? 'bas' : 'plonge') : d.type === 'haut' ? 'bras' : 'garde';
@@ -930,10 +1114,10 @@ export class KedricCourse extends BossScene {
     d.sprite.setVisible(!(d.etat === 'plaqueur' && this.estIllustre('kedric_toi_plaque')));
     d.sprite.setDepth(500 - dist * 8 + (d.etat === 'plaqueur' ? 20 : 0));
     d.sprite.setAlpha(d.etat === 'rate' ? Math.max(0, 1 - d.chute * 0.9) : 1);
-    if (this.ghost > 0 && d.etat === 'approche') d.sprite.setTint(0xbbbbcc); else d.sprite.clearTint();
+    if (this.ghostArme > 0 && d.etat === 'approche') d.sprite.setTint(0xbbbbcc); else d.sprite.clearTint();
     d.ombre.setPosition(x, y + 2).setScale(k).setVisible(d.etat !== 'rate');
     // le symbole : ce qu'il faut faire
-    const S = d.etat === 'approche' && d.alerte && this.ghost <= 0 ? SYMBOLES[d.type === 'suiveur' ? (d.verrou ? 'verrou' : 'suiveur') : d.type] : null;
+    const S = d.etat === 'approche' && d.alerte && this.ghostArme <= 0 ? SYMBOLES[d.type === 'suiveur' ? (d.verrou ? 'verrou' : 'suiveur') : d.type] : null;
     if (S) {
       d.symbole.setVisible(true).setText(S.texte).setColor(S.couleur).setPosition(x, y - 215 * k - 18).setScale(Math.max(0.6, k * 1.3)).setDepth(890);
     } else d.symbole.setVisible(false);
@@ -941,7 +1125,7 @@ export class KedricCourse extends BossScene {
 
   // Aide près de toi : que faire contre le défenseur le plus proche (FACILE / NORMAL)
   majAide() {
-    if (!this.diff.aide || this.ghost > 0) { this.aide.setVisible(false); return; }
+    if (!this.diff.aide || this.ghostArme > 0) { this.aide.setVisible(false); return; }
     let proche = null;
     for (const d of this.defs) {
       if (d.etat !== 'approche' || !d.alerte || Math.abs(d.x - this.j.x) >= 0.5) continue;
@@ -965,10 +1149,10 @@ export class KedricCourse extends BossScene {
     const nom = texte(this, 0, 58, 'COACH KÉDRIC', 13, '#ffd84a');
     this.cadreCoach.add([fond, this.sprCoach, nom]);
     this.coachCrie = 0;
-    // en haut à droite : action, tentatives, distance
+    // en haut à droite : le score, l'attaque, l'essai
     this.hudAction = texte(this, LARGEUR - 150, 26, '', 22, '#ffd84a', { fontStyle: 'bold' }).setDepth(P);
-    this.hudTentatives = texte(this, LARGEUR - 150, 54, '', 18, '#ffffff').setDepth(P);
-    this.hudYards = texte(this, LARGEUR - 150, 80, '', 18, '#ffffff').setDepth(P);
+    this.hudTentatives = texte(this, LARGEUR - 150, 54, '', 17, '#ffffff').setDepth(P);
+    this.hudYards = texte(this, LARGEUR - 150, 80, '', 17, '#ffffff').setDepth(P);
     this.hudBarre = this.add.graphics().setDepth(P);
     // à gauche : la vitesse ; à droite : la jauge du Devil Bat Ghost
     this.hudVitesse = this.add.graphics().setDepth(P);
@@ -983,23 +1167,25 @@ export class KedricCourse extends BossScene {
     if (!this.hudAction) return;
     if (this.coachCrie > 0) this.coachCrie -= 1 / 60;
     this.sprCoach.setFrame(this.coachCrie > 0 ? 1 : 0);
-    const A = ACTIONS[this.numAction];
-    const t1 = `${A.nom} / ${ACTIONS.length}`;
+    const t1 = `TOI ${this.score.toi} - ${this.score.ked} KÉDRIC`;
     if (this.hudAction.text !== t1) this.hudAction.setText(t1);
-    const t2 = 'TENTATIVES ' + '●'.repeat(Math.max(0, this.tentatives)) + '○'.repeat(Math.max(0, this.diff.tentatives - this.tentatives));
+    const reste = this.premier >= EN_BUT ? 'BUT' : Math.ceil(this.premier - this.pos);
+    const t2 = reste !== 'BUT' && reste <= 0 ? 'PREMIER ESSAI ASSURÉ !' : `${nomEssai(this.essai)} & ${reste}`;
     if (this.hudTentatives.text !== t2) this.hudTentatives.setText(t2);
-    const reste = Math.max(0, Math.ceil(this.objectif - this.pos));
-    const t3 = `EN-BUT : ${reste} yards`;
+    const t3 = `${this.attaque.nom}  ·  en-but à ${Math.max(0, Math.ceil(EN_BUT - this.pos))}`;
     if (this.hudYards.text !== t3) this.hudYards.setText(t3);
     const b = this.hudBarre; b.clear();
-    b.fillStyle(0x000000, 0.5); b.fillRect(LARGEUR - 260, 96, 220, 10);
-    b.fillStyle(0x7fff7f, 1); b.fillRect(LARGEUR - 260, 96, 220 * borne(this.pos / this.objectif, 0, 1), 10);
-    b.lineStyle(2, 0xffffff, 0.8); b.strokeRect(LARGEUR - 260, 96, 220, 10);
+    const bx = LARGEUR - 260, bl = 220, f = (L) => bx + bl * borne(L / EN_BUT, 0, 1);
+    b.fillStyle(0x000000, 0.5); b.fillRect(bx, 96, bl, 10);
+    b.fillStyle(0x7fff7f, 1); b.fillRect(bx, 96, f(this.pos) - bx, 10);
+    b.fillStyle(0xffd84a, 1); b.fillRect(f(this.premier) - 1, 92, 3, 18);
+    b.lineStyle(2, 0xffffff, 0.8); b.strokeRect(bx, 96, bl, 10);
     // vitesse : 5 crans
     const v = this.hudVitesse; v.clear();
     for (let k = 0; k < R.niveauMax; k++) {
       const y = 410 - k * 44;
-      v.fillStyle(k < this.niveau || this.ghost > 0 ? (this.ghost > 0 ? 0x9fe0ff : [0x7fff7f, 0xb8ff5a, 0xffd84a, 0xff9a3c, 0xff4a4a][k]) : 0x000000, k < this.niveau || this.ghost > 0 ? 1 : 0.45);
+      const g2 = this.ghostArme > 0;
+      v.fillStyle(k < this.niveau || g2 ? (g2 ? 0x9fe0ff : [0x7fff7f, 0xb8ff5a, 0xffd84a, 0xff9a3c, 0xff4a4a][k]) : 0x000000, k < this.niveau || g2 ? 1 : 0.45);
       v.fillRect(20, y - 36, 28, 38);
       v.lineStyle(2, 0xffffff, 0.7); v.strokeRect(20, y - 36, 28, 38);
     }
@@ -1007,11 +1193,11 @@ export class KedricCourse extends BossScene {
     if (this.hudVitesseTexte.text !== t4) this.hudVitesseTexte.setText(t4);
     // jauge du Devil Bat Ghost
     const g = this.hudGhost; g.clear();
-    const plein = this.jauge >= this.diff.ghost, f = this.ghost > 0 ? this.ghost / R.ghost.duree : this.jauge / this.diff.ghost;
+    const plein = this.jauge >= this.diff.ghost, fj = this.ghostArme > 0 ? this.ghostArme / R.ghost.fenetre : this.jauge / this.diff.ghost;
     g.fillStyle(0x000000, 0.5); g.fillRect(LARGEUR - 48, 194, 28, 220);
-    g.fillStyle(plein && Math.floor(this.horloge * 6) % 2 ? 0xffffff : 0x9fe0ff, 1); g.fillRect(LARGEUR - 48, 194 + 220 * (1 - f), 28, 220 * f);
+    g.fillStyle(plein && Math.floor(this.horloge * 6) % 2 ? 0xffffff : 0x9fe0ff, 1); g.fillRect(LARGEUR - 48, 194 + 220 * (1 - fj), 28, 220 * fj);
     g.lineStyle(2, 0xffffff, 0.8); g.strokeRect(LARGEUR - 48, 194, 28, 220);
-    const t5 = plein && this.ghost <= 0 ? (estTactile() ? 'Ghost !' : 'ESPACE !') : '';
+    const t5 = plein && this.ghostArme <= 0 ? (estTactile() ? 'Ghost !' : 'ESPACE !') : '';
     if (this.hudPret.text !== t5) this.hudPret.setText(t5);
   }
 }

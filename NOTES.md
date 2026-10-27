@@ -6,7 +6,7 @@
 Copie de référence de la version finale : branche `greg-termine` (`version-1-greg` = état un peu plus ancien).
 **Étape 2 terminée : boss Lionel VALIDÉ par le propriétaire** (match de frisbee façon Windjammers, illustrations manga
 mains vides, entraînement, joystick, jauges du public, 3 supers, surprises, difficulté PERSO). En ligne sur `main`.
-**Étape 3 : boss Kédric — PREMIÈRE VERSION JOUABLE** (à faire essayer au propriétaire). Choix du propriétaire : tu portes le ballon
+**Étape 3 : boss Kédric — REFAIT après le 1er essai du propriétaire** (vrai match : essais, formations, poursuivants ; à réessayer). Choix du propriétaire : tu portes le ballon
 et tu traverses le terrain en esquivant les défenseurs qui reçoivent les ordres du coach Kédric, VUE DE DOS, esquives ◀ ▶ ▲ ▼,
 plus tu esquives plus tu accélères jusqu'au DEVIL BAT GHOST, référence graphique **Eyeshield 21**, Kédric = **showman frimeur**.
 ILLUSTRATIONS INTÉGRÉES (personnages) : 24 images Gemini du propriétaire, renommées `assets_inbox/kedric_*.jpg`, détourées par
@@ -226,46 +226,59 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
   - Terrain dessiné par le code (secours) dans l'esprit de Windjammers 2 (cage grillagée, rambardes, palmiers, ombres de palmes, public,
     ligne centrale jaune, poteaux jaunes rembourrés) : dessin du code, pas d'image du vrai jeu (droits d'auteur).
   - Ton joueur : nouvelle planche mains vides (le jeu pose le frisbee dans ses mains quand il le tient).
-- **Kédric** (`src/bosses/kedric/`) : course de football américain façon **Eyeshield 21**, vue de DOS (perspective : 3 couloirs).
-  - Tu portes le ballon (n°21, casque rouge) vers l'en-but de Kédric. 3 ACTIONS (90, 100, 110 yards) = 3 touchdowns pour gagner.
-  - Kédric, coach SHOWMAN (banane, lunettes noires, micro-casque, veste verte et or), crie ses COMBINAISONS dans un cadre en haut
-    à gauche (« LE MUR ! », « LA FAUX ! », « BLITZ !! »...) 2,4 s avant qu'elles arrivent ; il surgit en dansant après chaque plaquage.
-  - Défenseurs (maillot vert, casque blanc) : PLAQUEUR debout (◀ ▶ change de couloir), LA FAUX = plongeon aux jambes (▲ saute),
-    LA CORDE À LINGE = bras tendus (▼ baisse-toi en tournant), LE MUR = 2 couloirs bouchés, POT DE COLLE = te suit puis devient
-    ROUGE (verrouillé) 0,5 s avant le contact : esquiver après. Un symbole au-dessus de chaque défenseur dit quoi faire.
-  - Chaque esquive d'affilée : +1 dans la série ; 2 esquives = +1 niveau de VITESSE (5 niveaux ; niveau 5 = « 40 yards en 4"2 », comme
-    le n°21). Plus vite = le symbole apparaît plus tard. Plaqué = vitesse à zéro.
-  - Esquive au dernier moment = PARFAIT (jauge x2). Jauge pleine = DEVIL BAT GHOST (Espace / bouton Ghost) : petite cinématique,
-    puis 3 s d'invincibilité à pleine vitesse avec des images fantômes ; les défenseurs tombent (« Où ?! »).
-  - Tentatives : un nombre de plaquages permis par ACTION (FACILE 6, NORMAL 4, CHAMPION 3) ; plus aucune = BALLE PERDUE (défaite).
-    Après un plaquage on repart du même endroit.
-  - Action 3 « SHOWTIME » : à 30 yards de l'en-but, KÉDRIC ENTRE EN JEU (maillot doré n°1) : il danse puis charge 3 fois (plaqueur,
-    plongeon ou bras tendus, jamais deux fois le même) avec des FEINTES (NORMAL 35 %, CHAMPION 60 %, FACILE aucune) : son symbole
-    change au dernier moment (« FEINTE ! »). Le Devil Bat Ghost le passe d'un coup (« IL N'A RIEN VU ! »).
-  - Aides (FACILE / NORMAL) : « ▲ SAUTE ! » en bas de l'écran ; la première fois qu'un type de plaquage arrive (action 1), RALENTI
+- **Kédric** (`src/bosses/kedric/`) : MATCH de football américain façon **Eyeshield 21**, vu de DOS (perspective : 3 couloirs).
+  - REFONTE après essai du propriétaire (« trop de défenseurs pour être crédible, trop court, terrain fini trop vite, Devil Bat Ghost
+    trop efficace et trop facile, pas assez fun, course saccadée ») : vraies règles de football simplifiées.
+  - 3 ATTAQUES, chacune depuis tes 20 yards (en-but de Kédric à 100). 4 ESSAIS pour avancer de 10 yards (ligne jaune) ; sinon BALLON
+    PERDU : Kédric marque 7 (il danse). Touchdown = 7. Après 3 attaques, il faut plus de points que Kédric (égalité = PROLONGATION :
+    une attaque de plus, Kédric joue ; marquer = gagner). Perdu d'avance (Kédric trop loin devant) = fin du match.
+  - Chaque ACTION : Kédric place sa défense (FORMATIONS : 5 à 11 joueurs, comme un vrai match) et crie son nom (« BLITZ !! »,
+    « LA FAUX ! »...) ; bandeau « 2e ESSAI & 6 - sur tes 34 » ; 1,7 s pour se placer (◀ ▶ autorisés) puis « HUT ! HUT ! ».
+    Lignes télé sur la pelouse : ligne d'engagement (bleue), premier essai (jaune). Numéros du vrai terrain (10... 50... 10).
+  - La LIGNE de défense (4 yards) bouche 2 couloirs : place-toi face au trou ; en NORMAL (30 %) / CHAMPION (55 %) elle SE DÉCALE au
+    « HUT ! ». Plaqué par la ligne = arrêté sur la ligne (pas de gain). Les autres défenseurs sont en place puis FONCENT sur toi
+    quand tu es à 1,5 s (vitesse `charge`) ; plaqué = l'action s'arrête là où tu es.
+  - Types : PLAQUEUR (◀ ▶), plongeon aux JAMBES (▲), BRAS TENDUS (▼), POT DE COLLE (te suit, devient ROUGE 0,5 s avant : ◀ ▶ après),
+    MUR (2 couloirs, le trou choisi au dernier moment, jamais dans ton couloir). Près de l'en-but, la défense se resserre.
+  - VITESSE : 2 esquives d'affilée = +1 niveau (5 ; niveau 5 = « 40 yards en 4"2 »), repart de zéro à chaque action.
+  - POURSUIVANTS : un défenseur esquivé de côté peut se relever et te courir après (chance `poursuite`), et quand tu as passé toute
+    la défense, 2 ARRIÈRES reviennent en diagonale (« LES ARRIÈRES REVIENNENT ! », vitesse `angle` : seule une course rapide les sème).
+    On voit leur casque surgir en bas de l'écran ; « ⚠ IL TE RATTRAPE ! » ; rattrapé = plaqué par derrière.
+  - DEVIL BAT GHOST : la jauge ne se remplit qu'avec les esquives PARFAITES (FACILE 3, NORMAL 4, CHAMPION 5). Espace : vitesse
+    maximale, et le PROCHAIN défenseur dans les 1,6 s est passé à coup sûr (gel 0,45 s, « Où ?! ») ; sinon « Ghost dans le vide... ».
+  - 3e ATTAQUE (et prolongation) : KÉDRIC joue en dernier défenseur (maillot doré n°1). Quand tu arrives à 13 yards de lui : duel,
+    il danse puis charge 2 fois (plaqueur / plongeon / bras tendus, jamais deux fois le même) avec des FEINTES (NORMAL 35 %, CHAMPION
+    60 %). Le Ghost ne compte que pour UNE esquive. Grande entrée « KÉDRIC ENTRE EN JEU ! » la première fois.
+  - Aides (FACILE / NORMAL) : « ▲ SAUTE ! » en bas de l'écran ; la première fois qu'un type de plaquage arrive (1re attaque), RALENTI
     + explication (une seule fois : `Sauvegarde.fait('kedric_tuto')`). CHAMPION : aucune aide.
-  - Téléphone : croix tactile ▲ ◀ ▼ ▶ + bouton « Ghost » ; on peut aussi GLISSER le doigt sur l'écran (haut / bas / gauche / droite).
-  - Difficulté FACILE / NORMAL / CHAMPION (`src/bosses/kedric/difficulte.js`, copie propre à Kédric), record par difficulté.
-  - Fin : rang S/A/B/C (plaquages subis, esquives parfaites, temps), écran de victoire (ballon en or, Kédric à genoux en larmes, badge vert).
-  - Menu F1 : match depuis l'action 1, ou directement l'action 3 (duel contre Kédric).
-  - Tout l'équilibrage dans `src/bosses/kedric/reglages.js` (difficultés, combinaisons, ordre des combinaisons par action, duel).
-    Dessins provisoires : `src/bosses/kedric/dessins.js` ; bruitages : `outils/kedric/generer_sons.py` ; effets : `effets.js` (copie).
+  - HUD : score « TOI 7 - 0 KÉDRIC », essai et distance, attaque et en-but, barre avec la ligne du premier essai ; vitesse à gauche,
+    jauge GHOST à droite ; Kédric au micro en haut à gauche (bulles), il surgit en dansant après certains plaquages.
+  - Téléphone : croix tactile ▲ ◀ ▼ ▶ + bouton « Ghost » ; on peut aussi GLISSER le doigt sur l'écran.
+  - Difficulté FACILE / NORMAL / CHAMPION (`difficulte.js`, copie propre à Kédric), record par difficulté.
+  - Fin : rang S/A/B/C (écart au score, plaquages, parfaites, temps), écran de victoire (ballon en or, Kédric à genoux en larmes).
+  - Menu F1 : match complet, ou directement la 3e attaque à 7-7 (Kédric joue).
+  - Tout l'équilibrage dans `src/bosses/kedric/reglages.js` (difficultés, match, FORMATIONS, ordre des formations par attaque, duel).
+    Dessins provisoires : `dessins.js` ; bruitages : `outils/kedric/generer_sons.py` ; effets : `effets.js` (copie).
   - Le stade (tribunes, projecteurs) est dessiné une fois dans une image (des milliers de ronds redessinés à chaque image = jeu lent).
   - Toute la logique avance dans `pas(dt, touches)` (pas de minuteries Phaser) : les bots de test jouent en accéléré.
-  - Bots (ils lisent les symboles parfaitement, donc plus forts qu'un humain) : NORMAL bon / moyen gagnent, enfant ~1 fois sur 2 ;
-    FACILE enfant gagne ; CHAMPION moyen gagne encore souvent (un humain réagit moins vite au symbole). À ajuster après essai.
+  - Bots après la refonte (ils lisent les symboles parfaitement, donc plus forts qu'un humain) : NORMAL bon / moyen gagnent (9 à
+    16 actions, gains variés : 1 yard sur la ligne, 10-45 yards, parfois un touchdown de 50-80 yards), enfant gagne souvent 14-7
+    (15-30 actions) ; FACILE enfant gagne ; CHAMPION bon gagne. À ajuster après l'essai du propriétaire.
   - Musique de fond : `assets/audio/kedric/kedric_musique.mp3` (Eyeshield 21, « Code Name Eyeshield 21 », donnée par le propriétaire,
-    réduite en 64 kbit/s : 1,3 Mo, en boucle, volume 0,4 dans le manifeste de Kédric) + ambiance de stade générée, plus discrète ; badge provisoire = médaille verte au ballon (`icone: 'football'`).
+    réduite en 64 kbit/s : 1,3 Mo, en boucle, volume 0,4 dans le manifeste de Kédric) + ambiance de stade générée, plus discrète ;
+    badge provisoire = médaille verte au ballon (`icone: 'football'`).
   - ILLUSTRATIONS (assets_inbox/kedric_*.jpg → `outils/kedric/preparer_images.py` : fond retiré avec rembg isnet-anime, bords
     nettoyés, recadrées, enregistrées 1,5 fois plus grandes que l'écran, le jeu les réduit avec ZOOM_ILLUSTRE) :
-    toi de dos (course, saut, rotation, plaqué avec le plaqueur déjà dessus, victoire), défenseurs de face (course, garde, accroupi,
+    toi de dos (saut, rotation, plaqué avec le plaqueur déjà dessus, victoire), défenseurs de face (course, garde, accroupi,
     plongeon, bras tendus, sonné), Kédric en joueur (une seule image `kedric_star` : le jeu la penche / la couche selon l'attaque),
     Kédric coach (portrait qui te pointe, buste bras croisés / au micro, danse 2 images, défaite à genoux en larmes).
-    TA COURSE = 4 images choisies dans la planche du propriétaire (`assets_inbox/kedric_toi_course_planche.jpg`, 16 cases) par
-    `outils/kedric/decouper_course.py` → `kedric_toi_course4.png` : talon gauche levé, 2 pieds au sol, talon droit levé, 2 pieds au sol.
-    Les 16 poses jouées à la suite faisaient « se replier la jambe » à chaque pas (trop de poses jambe gauche levée) : refusé
-    par le propriétaire. Plus vite quand tu accélères. « On dirait qu'il glisse » : animation plus rapide, le corps monte quand un
-    talon remonte et retombe à chaque appui (l'ombre suit), bruit de crampons (`kedric_pas`) et touffe d'herbe à chaque appui. Les autres poses = une seule image (la course d'un défenseur rebondit à chaque foulée). Le plongeon illustré est retourné s'il vient de ta gauche.
+    Le plongeon illustré est retourné s'il vient de ta gauche ; la course d'un défenseur (une image) rebondit à chaque foulée.
+  - TA COURSE = 6 images (`kedric_toi_course6.png`, `outils/kedric/decouper_course.py`) tirées de la planche du propriétaire
+    (`assets_inbox/kedric_toi_course_planche.jpg`, 16 cases). Historique : 16 poses à la suite = « la jambe se replie à chaque pas »
+    (la planche lève presque toujours la jambe GAUCHE) ; 4 poses = « on dirait qu'il glisse » puis « trop saccadé ».
+    Solution : jambe gauche (talon levé, genou qui revient, appui), puis les MÊMES poses avec seulement les JAMBES retournées
+    (le haut du corps, le 21 et le ballon restent en place ; fondu à la ceinture), puis appui. Rebond du corps CONTINU calé sur
+    l'animation (au plus bas à chaque appui), petite bascule, crampons (`kedric_pas`) et touffe d'herbe à chaque appui.
     Images non utilisées : course de loin (kedric_toi_course_loin / _tres_loin / _2), autres courses du défenseur (_2 à _5 ;
     _4 porte des logos « Deimon / Devil Bats » d'Eyeshield 21, à éviter). Sur la danse « main sur la hanche », il reste un petit
     trait gris du décor près des jambes.
