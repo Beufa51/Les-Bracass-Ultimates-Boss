@@ -8,21 +8,22 @@ export const IDENTITE = { id: 'kedric', nom: 'Kédric' };
 //  parfait : fenêtre (s) de l'esquive PARFAITE juste avant le contact
 //  aide : texte « ▲ SAUTE ! » près de toi + ralenti la première fois qu'un plaquage apparaît
 //  feintes : chance que Kédric FEINTE (option kedric: true d'une course, en CHAMPION)
-//  ghost : esquives PARFAITES (ou réceptions parfaites) pour remplir la jauge du DEVIL BAT GHOST
+//  ghost : taille de la jauge du DEVIL BAT GHOST (une esquive ou une bonne réception : +1 ; PARFAITE : +2 ; voir REGLAGES.ghost)
+//  aideRouge : au battle de danse, la flèche que TU dois faire est déjà retournée sur ta piste (sinon : à toi d'inverser)
 //  murTardif : le trou des murs de 2 défenseurs n'est choisi qu'au dernier moment (sinon on le voit dès le placement)
 //  charge : vitesse des défenseurs qui foncent sur toi (en plus de ta course)
 //  poursuite : chance qu'un défenseur esquivé de côté se relève et te poursuive ;
 //  poursuiteEcart : il court ce nombre de yards / s plus vite que toi au moment où il part (le sprint le sème)
 //  fenetreShow : largeur des fenêtres de timing du SHOWTIME (x)
 export const DIFFICULTES = {
-  facile:   { nom: 'FACILE',   couleur: '#7fff7f', alerte: 1.8, parfait: 0.22, aide: true, feintes: 0, ghost: 3, vitesse: 0.9, murTardif: false,
-    charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, fenetreShow: 1.35,
+  facile:   { nom: 'FACILE',   couleur: '#7fff7f', alerte: 1.8, parfait: 0.22, aide: true, feintes: 0, ghost: 5, vitesse: 0.9, murTardif: false,
+    charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, fenetreShow: 1.35, aideRouge: true,
     texte: 'Les défenseurs préviennent tôt, Kédric danse lentement. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', alerte: 1.45, parfait: 0.17, aide: true, feintes: 0.3, ghost: 5, vitesse: 1, murTardif: false,
-    charge: 1.5, poursuite: 0.12, poursuiteEcart: 1.2, fenetreShow: 1,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', alerte: 1.45, parfait: 0.17, aide: true, feintes: 0.3, ghost: 6, vitesse: 1, murTardif: false,
+    charge: 1.5, poursuite: 0.12, poursuiteEcart: 1.2, fenetreShow: 1, aideRouge: true,
     texte: 'Le vrai match, et un vrai duel de frime contre Kédric.' },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', alerte: 0.95, parfait: 0.12, aide: false, feintes: 0.45, ghost: 6, vitesse: 1.06, murTardif: true,
-    charge: 3.0, poursuite: 0.2, poursuiteEcart: 1.5, fenetreShow: 0.8,
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', alerte: 0.95, parfait: 0.12, aide: false, feintes: 0.45, ghost: 9, vitesse: 1.06, murTardif: true,
+    charge: 3.0, poursuite: 0.2, poursuiteEcart: 1.5, fenetreShow: 0.8, aideRouge: false,
     texte: 'Pas d\'aide, défense rapide, timing serré au SHOWTIME. Pour les vrais.' },
 };
 
@@ -70,8 +71,9 @@ export const REGLAGES = {
   sprint: { parAppui: 0.5, max: 3.5, baisse: 0.8 },
   // ---------- Devil Bat Ghost ----------
   // Espace quand la jauge est pleine : vitesse maximale, le PROCHAIN défenseur (dans les 1,6 s) est passé à coup sûr.
-  // La jauge se garde d'une course à l'autre.
-  ghost: { fenetre: 1.6, gel: 0.45 },
+  // La jauge se garde d'une course à l'autre. parEsquive / parParfait : ce que rapporte une esquive (ou une bonne
+  // réception) / une esquive PARFAITE (ou une réception parfaite) ; la taille de la jauge dépend de la difficulté (ghost)
+  ghost: { fenetre: 1.6, gel: 0.45, parEsquive: 1, parParfait: 2 },
   // ---------- SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (showtime.js) ----------
   //  Kédric montre ses pas en rythme, puis « À TOI ! » : tu les refais sur les mêmes temps. FLÈCHE ROUGE = l'inverse.
   //  manches : nombre de pas de chaque manche ; rouges : flèches rouges par manche
@@ -84,6 +86,11 @@ export const REGLAGES = {
   showtime: { manches: [4, 6, 8], rouges: [0, 1, 1], musique: 'kedric_battle',
     passages: [{ debut: 1.385, temps: 0.3473 }, { debut: 22.069, temps: 0.3424 }, { debut: 54.969, temps: 0.3426 }],
     tempsParPas: 2, annonce: 4, pause: 1.0,
+    // l'écran d'annonce (Kédric sur scène, avant la 1re manche) : il dure au plus 'intro' s (une flèche le passe après
+    // 'introMini' s), sur le refrain de la musique (à 'introMusique' s)
+    intro: 9, introMini: 1.5, introMusique: 54.969,
+    // la piste des flèches : elles glissent vers le cercle (à gauche) ; appuie quand elles y arrivent
+    piste: { x: 330, y: 476, fin: 860, vitesse: 230 },
     parfait: 0.12, bien: 0.28, gain: { parfait: 11, bien: 8, rate: 10 }, kedricParPas: 2,
     parTouchdown: 15, avanceMax: 30 },
   // ---------- Kédric en personne sur le terrain (option : course avec kedric: true) ----------

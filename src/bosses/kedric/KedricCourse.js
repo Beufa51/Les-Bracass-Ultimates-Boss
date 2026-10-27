@@ -238,7 +238,7 @@ export class KedricCourse extends BossScene {
       const ecart = Math.abs(j.sautDebut - (this.horloge - (E.t - E.vol)));
       const x = ecranX(j.x, 0), y = VUE.pieds - 230;
       if (ecart <= R.envoi.parfait) {
-        this.stats.parfaits++; this.jauge = Math.min(this.diff.ghost, this.jauge + 1);
+        this.stats.parfaits++; this.remplirGhost(R.ghost.parParfait);
         jouerSon(this, 'kedric_parfait');
         onomatopee(this, LARGEUR / 2, 260, 'RÉCEPTION PARFAITE !', 44, '#7fe8ff');
         lignesImpact(this, x, y, 0x9fe0ff, 18, 180);
@@ -246,6 +246,7 @@ export class KedricCourse extends BossScene {
       } else if (ecart <= R.envoi.bien) {
         jouerSon(this, 'kedric_niveau');
         onomatopee(this, LARGEUR / 2, 260, 'BIEN ATTRAPÉ !', 38, '#7fff7f');
+        this.remplirGhost(R.ghost.parEsquive);
         this.debutRetour(2);
       } else {
         jouerSon(this, 'kedric_saut', { rate: 0.8 });
@@ -576,24 +577,30 @@ export class KedricCourse extends BossScene {
     if (comment !== 'ghost') {
       this.stats.esquives++;
       this.serie++;
+      // chaque esquive remplit la jauge du Ghost ; une PARFAITE la remplit plus
+      this.remplirGhost(parfait ? R.ghost.parParfait : R.ghost.parEsquive);
       if (parfait) {
         this.stats.parfaits++;
-        this.jauge = Math.min(this.diff.ghost, this.jauge + 1);
         jouerSon(this, 'kedric_parfait');
         onomatopee(this, x, y, 'PARFAIT !', 40, '#7fe8ff');
         lignesImpact(this, x, y + 60, 0x9fe0ff, 16, 150);
       } else jouerSon(this, 'kedric_esquive');
       this.monterVitesse(x, y);
-      if (this.jauge >= this.diff.ghost && !this.ghostAnnonce) {
-        this.ghostAnnonce = true;
-        jouerSon(this, 'kedric_niveau', { rate: 1.3 });
-        this.messageCentre(`DEVIL BAT GHOST PRÊT : ${estTactile() ? 'Ghost' : 'ESPACE'} !`, '#9fe0ff', 28, 1.3);
-      }
       // esquivé de côté, il peut se relever et te courir après (jamais quand Kédric est là)
       if ((comment === 'cote' || parfait) && !d.star && (d.type === 'bloc' || d.type === 'suiveur') && !this.duel
         && !this.defs.some(o => o.star) && Math.random() < this.diff.poursuite) this.ajouterPoursuivant();
     }
     if (d.star) this.kedricEsquive();
+  }
+
+  // la jauge du Devil Bat Ghost (gardée d'une course à l'autre) ; pleine : on prévient
+  remplirGhost(n) {
+    this.jauge = Math.min(this.diff.ghost, this.jauge + n);
+    if (this.jauge >= this.diff.ghost && !this.ghostAnnonce) {
+      this.ghostAnnonce = true;
+      jouerSon(this, 'kedric_niveau', { rate: 1.3 });
+      this.messageCentre(`DEVIL BAT GHOST PRÊT : ${estTactile() ? 'Ghost' : 'ESPACE'} !`, '#9fe0ff', 28, 1.3);
+    }
   }
 
   monterVitesse() {
@@ -848,13 +855,16 @@ export class KedricCourse extends BossScene {
     this.etat = 'pause';
     const td = this.stats.touchdowns;
     const depart = Math.max(-R.showtime.avanceMax, Math.min(R.showtime.avanceMax, (td - 1) * R.showtime.parTouchdown));
-    jouerSon(this, 'kedric_touchdown', { volume: 0.7 });
-    const avance = depart > 0 ? `${td} touchdowns : le public est déjà un peu pour toi !` : depart < 0 ? 'aucun touchdown : le public est pour lui...' : 'refais ses pas en rythme !';
-    const e = encart(this, 'BATTLE DE DANSE !', `Kédric te défie sur la CLASSE  -  ${avance}`, '#ffd84a', 0x1d1606, 'kedric_coach');
-    this.direCoach(td > 0 ? REPLIQUES.finale : REPLIQUES.finaleZero, 3000, true);
-    this.attendre(2.8, () => {
-      e.fermer();
-      this.lancerShowtime({ manches: R.showtime.manches, rouges: R.showtime.rouges, jauge: depart }, (gagne, bilan) => {
+    const avance = depart > 0 ? `${td} touchdowns : le public est déjà un peu pour toi !` : depart < 0 ? 'Aucun touchdown : le public est pour lui...' : `${td} touchdown : le public attend de voir...`;
+    // la transition : le stade s'éteint (fondu au noir), puis Kédric apparaît sur scène et lance le défi (showtime.js)
+    jouerSon(this, 'kedric_sifflet');
+    const noir = this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x000000).setDepth(928).setAlpha(0);   // sous le « SHOWTIME ! » (930)
+    this.tweens.add({ targets: noir, alpha: 1, duration: 600 });
+    onomatopee(this, LARGEUR / 2, HAUTEUR / 2, 'SHOWTIME !', 70, '#ffd84a');
+    this.attendre(1.2, () => {
+      this.tweens.add({ targets: noir, alpha: 0, duration: 500, onComplete: () => noir.destroy() });
+      this.lancerShowtime({ manches: R.showtime.manches, rouges: R.showtime.rouges, jauge: depart,
+        replique: td > 0 ? REPLIQUES.finale : REPLIQUES.finaleZero, sousTitre: avance }, (gagne, bilan) => {
         this.stats.parfaits += bilan.parfaits;
         if (gagne) {
           jouerSon(this, 'kedric_touchdown'); jouerSon(this, 'kedric_foule');

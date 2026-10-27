@@ -239,6 +239,15 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     et ligne qui ne se décale plus (sauf CHAMPION : `murTardif`, `decalage`), pot de colle figé 0,75 s avant, rangs derrière le
     prochain défenseur ESTOMPÉS, symbole placé à la hauteur de la pose (plus bas quand il plonge). Duel : tu restes face à Kédric
     (le terrain ne défile plus pendant le duel), sa charge dure toujours ≈ 1,2 s (avant, le bout du terrain la ralentissait).
+  - v6.1 (retours du propriétaire : Ghost jamais utilisé, battle mal annoncé, flèches dures à lire en rythme) :
+    GHOST : chaque esquive (et une bonne réception) remplit la jauge de 1, une PARFAITE de 2 (`REGLAGES.ghost.parEsquive /
+    parParfait`) ; jauge de 5 / 6 / 9 (FACILE / NORMAL / CHAMPION) : 2 à 3 Ghosts par match. BATTLE : transition (fondu au
+    noir + « SHOWTIME ! ») puis ÉCRAN D'ANNONCE sur scène : titre, Kédric au micro avec sa réplique dans une bulle, ton avance
+    au public, les règles ; une flèche lance la 1re manche (sinon au bout de 9 s), musique sur le refrain. PISTE DE FLÈCHES
+    façon jeu de rythme : les flèches glissent vers un cercle (à gauche, au-dessus des boutons tactiles) ; celles de Kédric
+    (petites) d'abord, il fait le pas quand elles touchent le cercle, puis les tiennes (grandes) : appuie quand elles y
+    arrivent, plus rien à mémoriser. Flèche rouge : en FACILE et NORMAL ta flèche est déjà retournée (`aideRouge`), en
+    CHAMPION à toi d'inverser.
   - v6 (demande du propriétaire : « trop de phases de football, on comprend rien ») : plus d'essais, de passes, de zone
     rouge, de « HUT ! » ni de dernier rideau. 3 COURSES (`REGLAGES.courses`, liste `COURSES`) : coup d'envoi, puis tout le
     terrain (160 yards) d'une traite ; la défense enchaîne les formations de la course, un rang tous les 10 yards
