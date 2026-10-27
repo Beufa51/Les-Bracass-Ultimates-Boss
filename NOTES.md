@@ -239,6 +239,16 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     et ligne qui ne se décale plus (sauf CHAMPION : `murTardif`, `decalage`), pot de colle figé 0,75 s avant, rangs derrière le
     prochain défenseur ESTOMPÉS, symbole placé à la hauteur de la pose (plus bas quand il plonge). Duel : tu restes face à Kédric
     (le terrain ne défile plus pendant le duel), sa charge dure toujours ≈ 1,2 s (avant, le bout du terrain la ralentissait).
+  - v5.2 (demande du propriétaire : « ça doit faire affrontement de boss ») : le battle se joue SUR SCÈNE (décor
+    `kedric_scene.jpg`, la scène de concert Devil Bats du propriétaire), Kédric en GRAND sur l'estrade (335 px), toi de dos au
+    premier plan, plus d'interface de match (seulement la jauge du PUBLIC, en haut). Musique du battle : Naruto, opening 2
+    « Haruka Kanata » (`kedric_battle.mp3`, ≈ 174 BPM) ; un pas tous les 2 temps (≈ 0,69 s), et chaque manche reprend la musique
+    à un autre passage (intro, couplet, refrain : `REGLAGES.showtime.passages`, mesurés par `outils/kedric/caler_battle.py`).
+    L'horloge du battle suit la musique quand elle joue (sinon le temps du jeu ; les bots mettent `scene.horlogeJeu = true`).
+    Plus simple : fenêtres de timing élargies (parfait 0,12 s, bien 0,28 s en NORMAL), 1 seule flèche rouge en manches 2 et 3,
+    décompte 3-2-1 avant que Kédric commence, grosses flèches. Sur écran tactile : 4 TRÈS GROS boutons (◀ ▶ sous le pouce
+    gauche, ▲ ▼ sous le pouce droit), ajout optionnel `dispositionDanse()` dans `src/core/tactile.js` ; et dans
+    `src/core/musique.js` : `arreterMusique`, `placerMusique`, `tempsMusique` (ajouts optionnels).
   - v5.1 (demande du propriétaire) : le SHOWTIME n'est plus qu'au BOSS DE FIN : plus de petite revanche après les touchdowns.
     Après les 3 attaques : si tu mènes au score, Kédric : « Tu m'as eu au football américain... mais tu ne m'auras pas sur la
     CLASSE ! Place au BATTLE DE DANSE ! » → le battle (3 manches) ; le gagner = victoire. Égalité ou retard au score = Kédric

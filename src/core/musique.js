@@ -57,3 +57,23 @@ export function jouerMusique(scene, cle) {
 export function majVolumeMusique() {
   for (const p of Object.values(pistes)) p.audio.volume = p.base * Sauvegarde.volume('musique');
 }
+
+// ---------- Ajouts optionnels (utilisés par le battle de danse de Kédric) ----------
+// Arrête une musique (elle ne repart plus toute seule au prochain appui)
+export function arreterMusique(cle) {
+  const p = pistes[cle];
+  if (p) { p.voulue = false; p.audio.pause(); }
+}
+
+// Place la lecture à 'secondes' (pour reprendre un passage précis du morceau)
+export function placerMusique(cle, secondes) {
+  const p = piste(cle);
+  if (p) try { p.audio.currentTime = secondes; } catch (e) { /* pas encore chargée : ignoré */ }
+}
+
+// Position de lecture en secondes, ou null si la musique ne joue pas vraiment (bloquée, en pause, en chargement)
+export function tempsMusique(cle) {
+  const p = pistes[cle];
+  if (!p || p.audio.paused || p.audio.seeking || p.audio.readyState < 3) return null;
+  return p.audio.currentTime;
+}

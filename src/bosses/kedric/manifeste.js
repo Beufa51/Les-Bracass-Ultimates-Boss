@@ -65,6 +65,8 @@ export const MANIFESTE = {
     kedric_toi_frime_droite: { fichier: 'sprites/kedric/kedric_toi_frime_droite.png', largeur: 234, hauteur: 326, images: 1, vitesse: 1, provisoire: { forme: 'coureurDos', pose: 'victoire' } },
     kedric_toi_frime_haut: { fichier: 'sprites/kedric/kedric_toi_frime_haut.png', largeur: 152, hauteur: 375, images: 1, vitesse: 1, provisoire: { forme: 'coureurDos', pose: 'victoire' } },
     kedric_toi_frime_bas: { fichier: 'sprites/kedric/kedric_toi_frime_bas.png', largeur: 256, hauteur: 232, images: 1, vitesse: 1, provisoire: { forme: 'coureurDos', pose: 'victoire' } },
+    // décor du battle de danse : la scène de concert (assets_inbox/kedric_scene.jpg recadré en 16/9, affiché en 960 x 540)
+    kedric_scene: { fichier: 'sprites/kedric/kedric_scene.jpg', largeur: 1365, hauteur: 768, images: 1, vitesse: 1 },
     kedric_trophee:  { fichier: null, largeur: 220, hauteur: 260, images: 1, vitesse: 1, provisoire: { forme: 'trophee' } },
     kedric_ballon:   { fichier: null, largeur: 40, hauteur: 40, images: 8, vitesse: 16, provisoire: { forme: 'ballon' } },
   },
@@ -72,6 +74,9 @@ export const MANIFESTE = {
   sons: {
     // musique de fond (jouée par src/core/musique.js, en boucle) : Eyeshield 21, « Code Name Eyeshield 21 », 64 kbit/s ; volume de 0 à 1
     kedric_musique:   { fichier: 'audio/kedric/kedric_musique.mp3', musique: true, volume: 0.4 },
+    // musique du battle de danse : Naruto, opening 2 « Haruka Kanata » (80 kbit/s, coupée à 88 s) ; les pas sont calés
+    // dessus (passages dans reglages.js, mesurés par outils/kedric/caler_battle.py)
+    kedric_battle:    { fichier: 'audio/kedric/kedric_battle.mp3', musique: true, volume: 0.5 },
     // générés par outils/kedric/generer_sons.py
     kedric_esquive:   { fichier: 'audio/kedric/kedric_esquive.wav', provisoire: { frequence: 700, duree: 0.06 } },
     kedric_pas:       { fichier: 'audio/kedric/kedric_pas.wav', provisoire: { frequence: 140, duree: 0.03 } },   // foulée

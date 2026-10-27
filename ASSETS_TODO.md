@@ -107,7 +107,7 @@ Kédric : coach showman — banane gominée noire, lunettes noires, micro-casque
 t-shirt noir, chaîne en or, pantalon blanc, baskets dorées. Ses joueurs : maillot vert à numéros dorés, casque blanc à bande verte.
 Ton coureur : vu de DOS, maillot rouge n°21, casque rouge à bande blanche, pantalon blanc, ballon sous le bras droit.
 Planches sur **fond blanc uni**, poses bien espacées.
-**Personnages : définitifs** (images du propriétaire, détourées par `outils/kedric/preparer_images.py`). Reste : trophée, stade, pelouse illustrée.
+**Personnages : définitifs** (images du propriétaire, détourées par `outils/kedric/preparer_images.py`). Reste : trophée, stade, pelouse illustrée. Décor du battle de danse : définitif.
 
 | Nom du fichier | Taille d'une case | Images | Statut | Description pour le générateur d'images |
 |---|---|---|---|---|
@@ -120,6 +120,7 @@ Planches sur **fond blanc uni**, poses bien espacées.
 | kedric_def_course.png | 220x200 | 4 | **définitif** | Défenseur de face qui fonce vers toi (4 images) |
 | kedric_def_garde / bas / plonge / bras / rate | 220x200 | 1 | **définitif** | De face : prêt à plaquer bras ouverts ; accroupi ; plongeon vers toi ; bras tendus en l'air ; assis sonné |
 | kedric_star_* | 220x200 | 1-4 | **définitif** | Mêmes poses pour Kédric en joueur (maillot doré n°1, casque vert à étoile, lunettes) |
+| kedric_scene.jpg | 1365x768 | 1 | **définitif** | Décor du battle de danse : scène de concert Devil Bats, public, projecteurs (image du propriétaire) |
 | kedric_trophee.png | 220x260 | 1 | provisoire | Ballon de football américain en or sur un socle |
 
 **Prompts pour Gemini** (une planche par prompt) :

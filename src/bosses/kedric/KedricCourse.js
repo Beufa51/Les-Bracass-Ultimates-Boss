@@ -942,12 +942,15 @@ export class KedricCourse extends BossScene {
     this.viderDefenseurs();
     this.etat = 'showtime';
     this.aide.setVisible(false);
+    // sur scène : plus d'interface de match (vitesse, ghost, score), seulement la jauge du public
+    this.elementsHud.forEach(o => o.setVisible(false));
     etiquettesTactiles({ haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: null, z: null, x: null });
     this.show = new Showtime(this, options, (gagne, bilan) => {
       this.etat = 'pause';
       this.attendre(1.4, () => {
         this.show.detruire(); this.show = null;
         this.bandeau.setVisible(false);
+        this.elementsHud.forEach(o => o.setVisible(true));
         etiquettesTactiles(ETIQUETTES_JEU);
         ensuite(gagne, bilan);
       });
@@ -1426,7 +1429,7 @@ export class KedricCourse extends BossScene {
   //  HUD
   // =================================================================
   creerHud() {
-    const P = 920;
+    const P = 920, avant = this.children.list.length;
     // Kédric au micro, en haut à gauche
     this.cadreCoach = this.add.container(86, 74).setDepth(P);
     const fond = this.add.rectangle(0, 0, 132, 132, 0x0b2a16).setStrokeStyle(4, 0xffd84a);
@@ -1447,6 +1450,7 @@ export class KedricCourse extends BossScene {
     this.hudGhost = this.add.graphics().setDepth(P);
     this.hudGhostTexte = texte(this, LARGEUR - 34, 182, 'GHOST', 12, '#9fe0ff').setDepth(P);
     this.hudPret = texte(this, LARGEUR - 34, 440, '', 13, '#9fe0ff', { fontStyle: 'bold' }).setDepth(P);
+    this.elementsHud = this.children.list.slice(avant);   // cachés pendant le battle de danse
   }
 
   majHud() {

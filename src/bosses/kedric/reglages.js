@@ -81,15 +81,19 @@ export const REGLAGES = {
   // Espace quand la jauge est pleine : vitesse maximale, le PROCHAIN défenseur (dans les 1,6 s) est passé à coup sûr,
   // et le dernier rideau ne t'arrête pas : c'est la grande percée.
   ghost: { fenetre: 1.6, gel: 0.45 },
-  // ---------- SHOWTIME : le DUEL DE FRIME contre Kédric (showtime.js) ----------
+  // ---------- SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (showtime.js) ----------
   //  Kédric montre ses pas en rythme, puis « À TOI ! » : tu les refais sur les mêmes temps. FLÈCHE ROUGE = l'inverse.
-  //  manches : nombre de pas de chaque manche de la finale ; rouges : flèches rouges par manche ; bpm : tempo par manche
-  //  parfait / bien : fenêtres de timing (s, x fenetreShow de la difficulté) ; gain : points de PUBLIC (la jauge va de -100 à +100)
-  //  kedricParPas : le public qu'il te prend à chaque pas qu'il montre ; tu gagnes la finale si la jauge finit au-dessus de 0
-  //  (-100 = perdu tout de suite). Chaque touchdown d'avance au score : +15 au départ (30 au plus).
-  //  Le battle n'a lieu que si tu as battu Kédric au football (plus de points que lui après les 3 attaques).
-  showtime: { manches: [4, 6, 8], rouges: [0, 1, 2], bpm: [88, 96, 104], annonce: 1.6, pause: 1.2,
-    parfait: 0.1, bien: 0.22, gain: { parfait: 11, bien: 7, rate: 12 }, kedricParPas: 2,
+  //  manches : nombre de pas de chaque manche ; rouges : flèches rouges par manche
+  //  Les pas sont calés sur la musique (kedric_battle, Naruto « Haruka Kanata ») : chaque manche reprend la musique à un
+  //  autre passage (intro, couplet, refrain). passages : début (s, sur un temps fort) et durée d'un temps (s) de chaque
+  //  passage, mesurés par outils/kedric/caler_battle.py ; tempsParPas : un pas tous les 2 temps (~0,69 s)
+  //  annonce : temps d'attente (en pas) avant que Kédric commence ; pause : entre deux manches (s)
+  //  parfait / bien : fenêtres de timing (s, x fenetreShow de la difficulté) ; gain : points de PUBLIC (de -100 à +100)
+  //  parTouchdown / avanceMax : ton avance au score donne un public de départ plus favorable
+  showtime: { manches: [4, 6, 8], rouges: [0, 1, 1], musique: 'kedric_battle',
+    passages: [{ debut: 1.385, temps: 0.3473 }, { debut: 22.069, temps: 0.3424 }, { debut: 54.969, temps: 0.3426 }],
+    tempsParPas: 2, annonce: 4, pause: 1.0,
+    parfait: 0.12, bien: 0.28, gain: { parfait: 11, bien: 8, rate: 10 }, kedricParPas: 2,
     parTouchdown: 15, avanceMax: 30 },
   // ---------- Kédric en personne sur le terrain (option : attaque avec kedric: true) ----------
   //  il garde l'en-but en zone rouge et prévient toujours pareil : danse → POSE (son attaque s'affiche) → CHARGE

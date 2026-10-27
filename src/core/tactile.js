@@ -14,6 +14,7 @@ const TOUCHES = {
 };
 
 const boutons = {};
+let croix = null, actions = null, placement = null;
 const DUREE_MINI = 70;   // millisecondes
 
 export function estTactile() {
@@ -38,15 +39,19 @@ export function installerTactile() {
       color: #fff; font: bold 17px monospace; padding: 0; touch-action: none; -webkit-tap-highlight-color: transparent; }
     .tactile button.appuye { background: rgba(255,216,74,0.65); color: #111; }
     .tactile button.cache { visibility: hidden; }
+    .tactile.gauche.danse { grid-template-columns: repeat(2, 124px); grid-template-rows: 124px; }
+    .tactile.droite.danse { grid-template-columns: 124px; grid-template-rows: repeat(2, 104px); }
+    .tactile.danse button { font-size: 46px; }
+    .tactile.danse button.cache { display: none; }
   `;
   document.head.appendChild(style);
 
-  const croix = document.createElement('div');
+  croix = document.createElement('div');
   croix.className = 'tactile gauche';
-  const actions = document.createElement('div');
+  actions = document.createElement('div');
   actions.className = 'tactile droite';
   // croix : ▲ au milieu en haut, ◀ ▼ ▶ en bas
-  const placement = { haut: [croix, '2', '1'], gauche: [croix, '1', '2'], bas: [croix, '2', '2'], droite: [croix, '3', '2'],
+  placement = { haut: [croix, '2', '1'], gauche: [croix, '1', '2'], bas: [croix, '2', '2'], droite: [croix, '3', '2'],
     x: [actions, '1 / span 2', '1'], z: [actions, '1', '2'], espace: [actions, '2', '2'] };
 
   for (const [nom, [parent, col, ligne]] of Object.entries(placement)) {
@@ -104,4 +109,17 @@ export function installerBoutonPause(action) {
   });
   b.addEventListener('pointerdown', (e) => { e.preventDefault(); action(); });
   document.body.appendChild(b);
+}
+
+// Disposition « danse » (optionnelle) : 4 très gros boutons, ◀ ▶ sous le pouce gauche, ▲ ▼ sous le pouce droit,
+// les autres boutons retirés. dispositionDanse(false) remet la disposition habituelle.
+export function dispositionDanse(actif) {
+  if (!croix) return;
+  croix.classList.toggle('danse', actif); actions.classList.toggle('danse', actif);
+  const danse = { gauche: [croix, '1', '1'], droite: [croix, '2', '1'], haut: [actions, '1', '1'], bas: [actions, '1', '2'] };
+  for (const [nom, [parent, col, ligne]] of Object.entries(actif ? danse : placement)) {
+    const b = boutons[nom];
+    b.style.gridColumn = col; b.style.gridRow = ligne;
+    if (b.parentNode !== parent) parent.appendChild(b);
+  }
 }
