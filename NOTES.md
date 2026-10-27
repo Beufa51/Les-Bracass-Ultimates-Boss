@@ -257,8 +257,7 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     saut / ta rotation / ta victoire penchée. IMAGES REÇUES ET INTÉGRÉES : planches `assets_inbox/kedric_frime_planche.jpg`
     (Kédric : pointe à gauche / à droite, doigt au ciel, grand écart, micro « à toi ! », clin d'œil = pose des flèches rouges)
     et `kedric_toi_frime_planche.jpg` (toi de dos : ballon à gauche / à droite, saut, à genoux), découpées par
-    `outils/kedric/decouper_frime.py` → `kedric_frime_*.png`, `kedric_toi_frime_*.png`. (`kedric_toi_course_seul.png` reçu
-    aussi : pas encore utilisé, à demander au propriétaire.) Bots : finale NORMAL moyen gagne nettement, enfant 2 fois sur 3, CHAMPION enfant perd.
+    `outils/kedric/decouper_frime.py` → `kedric_frime_*.png`, `kedric_toi_frime_*.png`. Bots : finale NORMAL moyen gagne nettement, enfant 2 fois sur 3, CHAMPION enfant perd.
   - v4.2 : BUG corrigé : le trou de la ligne (et des murs) était tiré au hasard POUR CHAQUE COULOIR → parfois 3 défenseurs
     = ligne complète impassable avec le symbole ◀ ▶ (détecté par un bot qui cherche les rangs qui bouchent les 3 couloirs).
     Terrain du KÉDRIC SHOW rallongé à 140 yards (réglage `terrain`, le milieu est le 70) ; finale à 40 yards de son en-but.
