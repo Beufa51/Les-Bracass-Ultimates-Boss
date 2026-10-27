@@ -239,6 +239,11 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     et ligne qui ne se décale plus (sauf CHAMPION : `murTardif`, `decalage`), pot de colle figé 0,75 s avant, rangs derrière le
     prochain défenseur ESTOMPÉS, symbole placé à la hauteur de la pose (plus bas quand il plonge). Duel : tu restes face à Kédric
     (le terrain ne défile plus pendant le duel), sa charge dure toujours ≈ 1,2 s (avant, le bout du terrain la ralentissait).
+  - v5.1 (demande du propriétaire) : le SHOWTIME n'est plus qu'au BOSS DE FIN : plus de petite revanche après les touchdowns.
+    Après les 3 attaques : si tu mènes au score, Kédric : « Tu m'as eu au football américain... mais tu ne m'auras pas sur la
+    CLASSE ! Place au BATTLE DE DANSE ! » → le battle (3 manches) ; le gagner = victoire. Égalité ou retard au score = Kédric
+    gagne au football (défaite). Bug corrigé : quand Kédric gagne le battle, il prenait la pose du perdant (à genoux) : il
+    fait maintenant son clin d'œil de star. Menu F1 : « Battle de danse direct (14-7) ».
   - v5 : KÉDRIC NE PLAQUE PLUS (« une star ne se salit pas les mains ») : on l'affronte au SHOWTIME, un DUEL DE FRIME EN
     RYTHME façon PaRappa / Simon (`showtime.js`, idée du joueur testeur validée par le propriétaire). Kédric montre ses pas
     (une pose, une grosse flèche de couleur ◀ bleu ▶ orange ▲ jaune ▼ violet, une note par direction), il tend le micro

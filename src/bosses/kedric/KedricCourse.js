@@ -139,7 +139,7 @@ export class KedricCourse extends BossScene {
     etiquettesTactiles(ETIQUETTES_OK);
     const tactile = estTactile();
     this.afficherIntro('KÉDRIC - Le Showman', [
-      '3 ATTAQUES puis la FINALE en 1 contre 1 contre Kédric',
+      '3 ATTAQUES : bats Kédric au football... puis au BATTLE DE DANSE !',
       'COUP D\'ENVOI : va sous le ballon, ▲ juste avant qu\'il arrive = SUPER RÉCEPTION',
       '4 ESSAIS pour avancer de 10 yards, sinon Kédric prend le ballon... et marque',
       '◀ ▶ : change de couloir      ▲ : saute      ▼ : baisse-toi en tournant',
@@ -162,8 +162,8 @@ export class KedricCourse extends BossScene {
     this.tempsTotal = 0;
     this.stats = { plaquages: 0, esquives: 0, parfaits: 0, ghosts: 0, touchdowns: 0, actions: 0, passes: 0 };
     this.jauge = 0;
-    // menu F1 : directement la finale, à 7 partout
-    if (this.phase === 'finale') { this.score = { toi: 7, ked: 7 }; this.debutFinale(); }
+    // menu F1 : directement le battle de danse (tu as gagné le football 14 à 7)
+    if (this.phase === 'finale') { this.score = { toi: 14, ked: 7 }; this.debutFinale(); }
     else { this.score = { toi: 0, ked: 0 }; this.debutAttaque(0); }
   }
 
@@ -932,22 +932,11 @@ export class KedricCourse extends BossScene {
     flash(this, 0.5, 0xffd84a);
     const e = encart(this, 'TOUCHDOWN !!', `TOI ${this.score.toi} - ${this.score.ked} KÉDRIC`, '#ffd84a', 0x0b2a16);
     this.direCoach(auHasard(REPLIQUES.touchdown), 2000, true);
-    this.attendre(2.6, () => {
-      e.fermer();
-      // Kédric veut sa revanche : 4 pas de frime (pour apprendre le SHOWTIME sans risque ; réussi = un cran de Ghost)
-      this.direCoach(REPLIQUES.revanche, 1800, true);
-      this.lancerShowtime({ manches: [R.showtime.revanche], rouges: [0], mini: true }, (gagne, bilan) => {
-        if (bilan.parfaits + bilan.bien >= R.showtime.revanche - 1) {
-          this.jauge = Math.min(this.diff.ghost, this.jauge + 1);
-          this.messageCentre('Le public t\'adore : +1 GHOST', '#9fe0ff', 28, 1.0);
-        } else this.messageCentre('Le public préfère Kédric...', '#aaaaaa', 24, 1.0);
-        this.attendre(1.2, () => this.finAttaque(true));
-      });
-    });
+    this.attendre(2.6, () => { e.fermer(); this.finAttaque(true); });
   }
 
   // =================================================================
-  //  SHOWTIME : le duel de frime contre Kédric (voir showtime.js)
+  //  SHOWTIME : le battle de danse contre Kédric, le boss de fin (voir showtime.js)
   // =================================================================
   lancerShowtime(options, ensuite) {
     this.viderDefenseurs();
@@ -966,8 +955,9 @@ export class KedricCourse extends BossScene {
   }
 
   // =================================================================
-  //  LA FINALE : SHOWTIME, le grand duel de frime contre Kédric (3 manches)
-  //  Ton avance au score te donne un public de départ plus favorable (ton retard, l'inverse).
+  //  LA FINALE : le BATTLE DE DANSE contre Kédric (3 manches), seulement si tu l'as battu au football
+  //  « Tu m'as eu au football américain... mais tu ne m'auras pas sur la CLASSE ! »
+  //  Ton avance au score te donne un public de départ plus favorable.
   // =================================================================
   debutFinale() {
     this.viderDefenseurs();
@@ -979,21 +969,19 @@ export class KedricCourse extends BossScene {
     const ecart = Math.round((this.score.toi - this.score.ked) / R.points);
     const depart = Math.max(-R.showtime.avanceMax, Math.min(R.showtime.avanceMax, ecart * R.showtime.parTouchdown));
     jouerSon(this, 'kedric_touchdown', { volume: 0.7 });
-    const avance = depart > 0 ? 'ton avance au score : le public est déjà un peu pour toi !' : depart < 0 ? 'ton retard au score : le public est pour lui...' : 'égalité au score.';
-    const e = encart(this, 'FINALE : SHOWTIME !', `Refais ses pas en rythme  -  ${avance}`, '#ffd84a', 0x1d1606, 'kedric_coach');
-    this.direCoach(REPLIQUES.finale, 2600, true);
+    const avance = depart > 0 ? 'ton avance au score : le public est déjà un peu pour toi !' : 'refais ses pas en rythme !';
+    const e = encart(this, 'BATTLE DE DANSE !', `Kédric veut sa revanche sur la CLASSE  -  ${avance}`, '#ffd84a', 0x1d1606, 'kedric_coach');
+    this.direCoach(REPLIQUES.finale, 3000, true);
     this.attendre(2.8, () => {
       e.fermer();
       this.lancerShowtime({ manches: R.showtime.manches, rouges: R.showtime.rouges, jauge: depart }, (gagne, bilan) => {
         this.stats.parfaits += bilan.parfaits;
         if (gagne) {
-          this.score.toi += R.points; this.stats.touchdowns++;
           jouerSon(this, 'kedric_touchdown'); jouerSon(this, 'kedric_foule');
           flash(this, 0.5, 0xffd84a);
-          const f = encart(this, 'LE PUBLIC EST À TOI !', `Kédric s'effondre... TOUCHDOWN !  TOI ${this.score.toi} - ${this.score.ked}`, '#ffd84a', 0x0b2a16);
+          const f = encart(this, 'LE PUBLIC EST À TOI !', `Kédric s'effondre... le nouveau showman, c'est toi !`, '#ffd84a', 0x0b2a16);
           this.attendre(2.4, () => { f.fermer(); this.finMatch(true); });
         } else {
-          this.score.ked += R.points;
           this.danseKedric();
           this.direCoach(REPLIQUES.defaite, 2000, true);
           this.attendre(2.0, () => this.finMatch(false));
@@ -1007,7 +995,9 @@ export class KedricCourse extends BossScene {
     this.viderDefenseurs();
     const n = this.numAttaque + 1;
     if (n < R.attaques) this.debutAttaque(n);
-    else this.debutFinale();
+    // le football est fini : si tu l'as battu, il veut sa revanche en dansant (le boss de fin) ; sinon, c'est lui qui gagne
+    else if (this.score.toi > this.score.ked) this.debutFinale();
+    else this.finMatch(false);
   }
 
   finMatch(gagne) {
@@ -1015,7 +1005,7 @@ export class KedricCourse extends BossScene {
     this.etat = 'fin';
     this.aide.setVisible(false); this.bandeau.setVisible(false); this.alertePoursuite.setVisible(false);
     if (gagne) this.victoire(this.classement());
-    else this.defaite(`${this.finale ? 'Kédric gagne la finale !' : 'Kédric gagne !'}  (${this.score.toi} - ${this.score.ked})\nKédric : « ${REPLIQUES.defaite} »\nTouchdowns : ${this.stats.touchdowns}`);
+    else this.defaite(`${this.finale ? 'Kédric gagne le battle de danse !' : 'Kédric gagne au football !'}  (${this.score.toi} - ${this.score.ked})\nKédric : « ${REPLIQUES.defaite} »\nTouchdowns : ${this.stats.touchdowns}`);
   }
 
   cleRecord() { return cleRecord('kedric', this.nomDiff); }
@@ -1468,7 +1458,7 @@ export class KedricCourse extends BossScene {
     const reste = this.premier >= EN_BUT ? 'BUT' : Math.ceil(this.premier - this.pos);
     let t2 = reste !== 'BUT' && reste <= 0 ? 'PREMIER ESSAI ASSURÉ !' : `${nomEssai(this.essai)} & ${reste}`;
     if (this.retour) t2 = 'RETOUR DE COUP D\'ENVOI';
-    if (this.finale) t2 = 'FINALE : SHOWTIME';
+    if (this.finale) t2 = 'BATTLE DE DANSE';
     if (this.hudTentatives.text !== t2) this.hudTentatives.setText(t2);
     const t3 = `${this.attaque.nom}  ·  en-but à ${Math.max(0, Math.ceil(EN_BUT - this.pos))}`;
     if (this.hudYards.text !== t3) this.hudYards.setText(t3);

@@ -1,5 +1,5 @@
 // =====================================================================
-// SHOWTIME : le DUEL DE FRIME contre Kédric (façon PaRappa / Simon).
+// SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (façon PaRappa / Simon).
 // Kédric montre une suite de pas en rythme (une pose, une flèche de couleur, un son par pas),
 // puis il te tend le micro : « À TOI ! ». Tu refais les mêmes pas, sur les mêmes temps (◀ ▶ ▲ ▼).
 // Une FLÈCHE ROUGE veut dire « fais l'INVERSE » (◀ ↔ ▶, ▲ ↔ ▼).
@@ -20,7 +20,7 @@ const SON = { gauche: 0.9, droite: 1.1, haut: 1.3, bas: 0.75 };   // une note pa
 const P = 600;   // profondeur d'affichage (sous le HUD et les encarts)
 
 export class Showtime {
-  // options : { manches: [4, 6, 8], rouges: [0, 0, 2], jauge: -30..30, mini: false } ; fin(gagne, bilan) appelé à la fin
+  // options : { manches: [4, 6, 8], rouges: [0, 1, 2], jauge: 0..30 } ; fin(gagne, bilan) appelé à la fin
   constructor(scene, options, fin) {
     this.s = scene; this.o = options; this.fin = fin;
     this.jauge = options.jauge || 0;
@@ -68,10 +68,10 @@ export class Showtime {
     const nr = (this.o.rouges || [])[this.manche] || 0;
     while (rouges.size < Math.min(nr, n - 1)) rouges.add(1 + Math.floor(Math.random() * (n - 1)));
     this.pas = seq.map((d, i) => ({ montre: d, rouge: rouges.has(i), attendu: rouges.has(i) ? INVERSE[d] : d, note: null }));
-    this.beat = 60 / (this.o.mini ? S.bpm[0] : S.bpm[Math.min(this.manche, S.bpm.length - 1)]);
+    this.beat = 60 / S.bpm[Math.min(this.manche, S.bpm.length - 1)];
     this.phase = 'annonce'; this.t = 0; this.iMontre = -1;
     this.rangee.forEach(o => o.destroy()); this.rangee = [];
-    const titre = this.o.mini ? `REVANCHE DE KÉDRIC : ${n} PAS` : `MANCHE ${this.manche + 1} / ${this.o.manches.length} : ${n} PAS`;
+    const titre = `MANCHE ${this.manche + 1} / ${this.o.manches.length} : ${n} PAS`;
     this.s.bandeau.setText(nr ? `${titre}  -  FLÈCHE ROUGE = fais l'INVERSE !` : titre).setColor(nr ? '#ff9a9a' : '#ffd84a').setVisible(true);
     this.poseKedric('portrait');
     this.poseToi(null);
@@ -144,12 +144,12 @@ export class Showtime {
     this.s.tweens.add({ targets: this.retour, scale: 1, duration: 120 });
     caseI.setColor(note === 'rate' ? '#ff6b6b' : note === 'parfait' ? '#7fe8ff' : '#7fff7f');
     // public tout à Kédric : perdu tout de suite (sinon on joue toutes les manches, pour le spectacle)
-    if (!this.o.mini && this.jauge <= -100) this.terminer(false);
+    if (this.jauge <= -100) this.terminer(false);
   }
 
   finManche() {
     if (this.termine) return;
-    if (this.manche >= this.o.manches.length - 1) { this.terminer(this.o.mini ? true : this.jauge > 0); return; }
+    if (this.manche >= this.o.manches.length - 1) { this.terminer(this.jauge > 0); return; }
     this.phase = 'bilan'; this.t = 0;
     this.poseKedric(this.jauge > 0 ? 'haut' : 'portrait');
   }
@@ -158,7 +158,8 @@ export class Showtime {
     if (this.termine) return;
     this.termine = true;
     this.phase = 'fin';
-    this.poseKedric(gagne ? 'defaite' : 'haut');
+    // tu gagnes : il s'effondre ; il gagne : clin d'œil de star (jamais la pose du perdant)
+    this.poseKedric(gagne ? 'defaite' : 'triche');
     this.poseToi(gagne ? 'haut' : null);
     this.fin(gagne, this.bilan);
   }

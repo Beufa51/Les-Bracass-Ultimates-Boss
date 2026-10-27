@@ -87,10 +87,10 @@ export const REGLAGES = {
   //  parfait / bien : fenêtres de timing (s, x fenetreShow de la difficulté) ; gain : points de PUBLIC (la jauge va de -100 à +100)
   //  kedricParPas : le public qu'il te prend à chaque pas qu'il montre ; tu gagnes la finale si la jauge finit au-dessus de 0
   //  (-100 = perdu tout de suite). Chaque touchdown d'avance au score : +15 au départ (30 au plus).
-  //  revanche : après chacun de tes touchdowns, Kédric veut sa revanche sur 4 pas (sans risque, réussie = +1 Ghost)
+  //  Le battle n'a lieu que si tu as battu Kédric au football (plus de points que lui après les 3 attaques).
   showtime: { manches: [4, 6, 8], rouges: [0, 1, 2], bpm: [88, 96, 104], annonce: 1.6, pause: 1.2,
     parfait: 0.1, bien: 0.22, gain: { parfait: 11, bien: 7, rate: 12 }, kedricParPas: 2,
-    parTouchdown: 15, avanceMax: 30, revanche: 4 },
+    parTouchdown: 15, avanceMax: 30 },
   // ---------- Kédric en personne sur le terrain (option : attaque avec kedric: true) ----------
   //  il garde l'en-but en zone rouge et prévient toujours pareil : danse → POSE (son attaque s'affiche) → CHARGE
   duel: { vies: 2, distance: 7, charge: 6, danse: 1.0, pose: 0.7, feinteAvant: 0.6 },
@@ -158,8 +158,7 @@ export const REPLIQUES = {
   passe: 'Une passe ?! Marquez-le !',
   incomplete: 'Incomplète ! Rends-moi ce ballon !',
   zoneRouge: 'Zone rouge ! Ici, c\'est MON territoire !',
-  finale: 'Une star ne plaque pas. On règle ça au SHOWTIME ! Suis mes pas... si tu peux !',
-  revanche: 'Tu crois savoir faire le show ? Montre-moi !',
+  finale: 'Tu m\'as eu au football américain... mais tu ne m\'auras pas sur la CLASSE ! Place au BATTLE DE DANSE !',
   touchdown: ['Ok ok... c\'était l\'échauffement.', 'Tu me voles la vedette, là !', 'Le public est pour MOI, hein !'],
   balle: 'Ballon pour MOI ! Regardez bien... TOUCHDOWN KÉDRIC !',
   premierEssai: ['Pfff... 10 yards, la belle affaire.', 'Les gars, réveillez-vous !'],
