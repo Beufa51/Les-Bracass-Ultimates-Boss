@@ -89,7 +89,7 @@ export class Showtime {
       if (i > this.iMontre && i < this.pas.length) {
         this.iMontre = i;
         const p = this.pas[i];
-        this.poseKedric(p.montre);
+        this.poseKedric(p.rouge ? 'triche' : p.montre);   // flèche rouge : il triche (clin d'œil)
         this.flecheKedric.setText(FLECHES[p.montre]).setColor(p.rouge ? '#ff3030' : COULEURS[p.montre]).setScale(1.3);
         this.s.tweens.add({ targets: this.flecheKedric, scale: 1, duration: 150 });
         jouerSon(this.s, 'kedric_alerte', { rate: SON[p.montre], volume: 0.9 });
@@ -210,7 +210,8 @@ export class Showtime {
     else if (pose === 'bas') { cle = 'kedric_danse'; image = 0; ecrase = 0.78; }
     else if (pose === 'defaite') cle = 'kedric_defaite';
     k.setTexture(cle, image).setFlipX(retourne);
-    const z = (pose === 'defaite' ? 220 : 265) / k.frame.height;   // assez petit pour ne pas cacher la jauge du public
+    // ses images de frime sont toutes à la même échelle (le grand écart est plus bas) ; les autres : mises à la bonne hauteur
+    const z = cle.startsWith('kedric_frime_') ? s.zoom(cle) : (pose === 'defaite' ? 220 : 265) / k.frame.height;
     k.setScale(z, z * ecrase);
   }
 

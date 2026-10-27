@@ -982,7 +982,6 @@ export class KedricCourse extends BossScene {
     const avance = depart > 0 ? 'ton avance au score : le public est déjà un peu pour toi !' : depart < 0 ? 'ton retard au score : le public est pour lui...' : 'égalité au score.';
     const e = encart(this, 'FINALE : SHOWTIME !', `Refais ses pas en rythme  -  ${avance}`, '#ffd84a', 0x1d1606, 'kedric_coach');
     this.direCoach(REPLIQUES.finale, 2600, true);
-    this.danseKedric();
     this.attendre(2.8, () => {
       e.fermer();
       this.lancerShowtime({ manches: R.showtime.manches, rouges: R.showtime.rouges, jauge: depart }, (gagne, bilan) => {

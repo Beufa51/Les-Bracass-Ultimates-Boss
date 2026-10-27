@@ -249,9 +249,11 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     départ (30 au plus). Après chacun de tes touchdowns : REVANCHE de 4 pas sans risque (réussie = +1 Ghost) pour apprendre.
     Fenêtres de timing x1,35 FACILE / x0,8 CHAMPION (`fenetreShow`). Plus de duel d'esquive (le code reste, option
     `kedric: true` sur une attaque). Images provisoires : ses 2 poses de danse (retournée pour ▶, écrasée pour ▼) et ton
-    saut / ta rotation / ta victoire penchée ; nouvelles images attendues (prompts Gemini donnés) : `kedric_frime_gauche /
-    droite / haut / bas / micro / triche` et `kedric_toi_frime_gauche / droite / haut / bas` (le jeu les prend dès qu'elles
-    sont dans le manifeste). Bots : finale NORMAL moyen gagne nettement, enfant 2 fois sur 3, CHAMPION enfant perd.
+    saut / ta rotation / ta victoire penchée. IMAGES REÇUES ET INTÉGRÉES : planches `assets_inbox/kedric_frime_planche.jpg`
+    (Kédric : pointe à gauche / à droite, doigt au ciel, grand écart, micro « à toi ! », clin d'œil = pose des flèches rouges)
+    et `kedric_toi_frime_planche.jpg` (toi de dos : ballon à gauche / à droite, saut, à genoux), découpées par
+    `outils/kedric/decouper_frime.py` → `kedric_frime_*.png`, `kedric_toi_frime_*.png`. (`kedric_toi_course_seul.png` reçu
+    aussi : pas encore utilisé, à demander au propriétaire.) Bots : finale NORMAL moyen gagne nettement, enfant 2 fois sur 3, CHAMPION enfant perd.
   - v4.2 : BUG corrigé : le trou de la ligne (et des murs) était tiré au hasard POUR CHAQUE COULOIR → parfois 3 défenseurs
     = ligne complète impassable avec le symbole ◀ ▶ (détecté par un bot qui cherche les rangs qui bouchent les 3 couloirs).
     Terrain du KÉDRIC SHOW rallongé à 140 yards (réglage `terrain`, le milieu est le 70) ; finale à 40 yards de son en-but.

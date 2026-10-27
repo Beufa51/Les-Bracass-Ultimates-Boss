@@ -52,6 +52,19 @@ export const MANIFESTE = {
     // danse : 1) main sur la hanche  2) disco, le doigt vers le ciel
     kedric_danse:    { fichier: 'sprites/kedric/kedric_danse.png', largeur: 200, hauteur: 450, images: 2, vitesse: 4, provisoire: { forme: 'kedric', pose: 'danse' } },
     kedric_defaite:  { fichier: 'sprites/kedric/kedric_defaite.png', largeur: 234, hauteur: 450, images: 1, vitesse: 1, provisoire: { forme: 'kedric', pose: 'defaite' } },
+    // ---------- SHOWTIME (duel de frime) : outils/kedric/decouper_frime.py ----------
+    // Kédric : il pointe à gauche / à droite, doigt au ciel, grand écart, micro tendu (« à toi ! »), clin d'œil (flèche rouge)
+    kedric_frime_gauche: { fichier: 'sprites/kedric/kedric_frime_gauche.png', largeur: 228, hauteur: 352, images: 1, vitesse: 1, provisoire: { forme: 'kedric', pose: 'danse' } },
+    kedric_frime_droite: { fichier: 'sprites/kedric/kedric_frime_droite.png', largeur: 165, hauteur: 353, images: 1, vitesse: 1, provisoire: { forme: 'kedric', pose: 'danse' } },
+    kedric_frime_haut: { fichier: 'sprites/kedric/kedric_frime_haut.png', largeur: 196, hauteur: 373, images: 1, vitesse: 1, provisoire: { forme: 'kedric', pose: 'danse' } },
+    kedric_frime_bas: { fichier: 'sprites/kedric/kedric_frime_bas.png', largeur: 224, hauteur: 192, images: 1, vitesse: 1, provisoire: { forme: 'kedric', pose: 'danse' } },
+    kedric_frime_micro: { fichier: 'sprites/kedric/kedric_frime_micro.png', largeur: 190, hauteur: 338, images: 1, vitesse: 1, provisoire: { forme: 'kedric', pose: 'danse' } },
+    kedric_frime_triche: { fichier: 'sprites/kedric/kedric_frime_triche.png', largeur: 163, hauteur: 398, images: 1, vitesse: 1, provisoire: { forme: 'kedric', pose: 'danse' } },
+    // toi, de dos : ballon tendu à gauche / à droite, saut, à genoux
+    kedric_toi_frime_gauche: { fichier: 'sprites/kedric/kedric_toi_frime_gauche.png', largeur: 254, hauteur: 331, images: 1, vitesse: 1, provisoire: { forme: 'coureurDos', pose: 'victoire' } },
+    kedric_toi_frime_droite: { fichier: 'sprites/kedric/kedric_toi_frime_droite.png', largeur: 234, hauteur: 326, images: 1, vitesse: 1, provisoire: { forme: 'coureurDos', pose: 'victoire' } },
+    kedric_toi_frime_haut: { fichier: 'sprites/kedric/kedric_toi_frime_haut.png', largeur: 152, hauteur: 375, images: 1, vitesse: 1, provisoire: { forme: 'coureurDos', pose: 'victoire' } },
+    kedric_toi_frime_bas: { fichier: 'sprites/kedric/kedric_toi_frime_bas.png', largeur: 256, hauteur: 232, images: 1, vitesse: 1, provisoire: { forme: 'coureurDos', pose: 'victoire' } },
     kedric_trophee:  { fichier: null, largeur: 220, hauteur: 260, images: 1, vitesse: 1, provisoire: { forme: 'trophee' } },
     kedric_ballon:   { fichier: null, largeur: 40, hauteur: 40, images: 8, vitesse: 16, provisoire: { forme: 'ballon' } },
   },
