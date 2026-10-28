@@ -846,7 +846,7 @@ export class KedricCourse extends BossScene {
   }
 
   // =================================================================
-  //  LA FINALE : le BATTLE DE DANSE contre Kédric (3 manches), après les courses
+  //  LA FINALE : le BATTLE DE DANSE contre Kédric (2 rounds), après les courses
   //  « Tu m'as eu au football américain... mais tu ne m'auras pas sur la CLASSE ! »
   //  Tes touchdowns mettent le public de ton côté au départ (aucun : il part du côté de Kédric).
   // =================================================================
@@ -867,7 +867,7 @@ export class KedricCourse extends BossScene {
     onomatopee(this, LARGEUR / 2, HAUTEUR / 2, 'SHOWTIME !', 70, '#ffd84a');
     this.attendre(1.2, () => {
       this.tweens.add({ targets: noir, alpha: 0, duration: 500, onComplete: () => noir.destroy() });
-      this.lancerShowtime({ manches: R.showtime.manches, rouges: R.showtime.rouges, jauge: depart,
+      this.lancerShowtime({ jauge: depart,
         replique: td > 0 ? REPLIQUES.finale : REPLIQUES.finaleZero, sousTitre: avance }, (gagne, bilan) => {
         this.stats.parfaits += bilan.parfaits;
         if (gagne) {

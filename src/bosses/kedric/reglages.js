@@ -76,24 +76,24 @@ export const REGLAGES = {
   // réception) / une esquive PARFAITE (ou une réception parfaite) ; la taille de la jauge dépend de la difficulté (ghost)
   ghost: { duree: 4, gel: 0.35, parEsquive: 1, parParfait: 2 },
   // ---------- SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (showtime.js) ----------
-  //  Kédric fait 4 pas en rythme, puis « À TOI ! » : tu les refais sur les mêmes temps, et ainsi de suite. FLÈCHE ROUGE = l'inverse.
-  //  manches : nombre de pas (les tiens) de chaque manche ; rouges : flèches rouges par manche (si la difficulté en a : flechesRouges)
-  //  Les pas sont calés sur la musique (kedric_battle, Naruto « Haruka Kanata ») : chaque manche reprend la musique à un
-  //  autre passage (intro, couplet, refrain). passages : début (s, sur un temps fort) et durée d'un temps (s) de chaque
-  //  passage, mesurés par outils/kedric/caler_battle.py ; tempsParPas : un pas tous les 2 temps (~0,69 s)
-  //  annonce : temps d'attente (en pas) avant que Kédric commence ; pause : entre deux manches (s)
+  //  Une SEULE SESSION CONTINUE : Kédric danse AVEC toi du début à la fin (plus de questions / réponses), et la musique
+  //  n'est JAMAIS replacée pendant le battle (elle démarre sur le refrain à l'annonce, puis file sans coupure).
+  //  rounds / dureeRound : 2 rounds d'1 minute de musique ; au round 2 : MÊMES RÈGLES, bandeau, la musique continue.
+  //  tempo : début du refrain (s, sur un temps fort) et durée d'un temps (s), mesurés par outils/kedric/caler_battle.py ;
+  //  tempsParPas : une flèche tous les 2 temps (~0,69 s) — toutes les flèches des 2 rounds sont calées sur cette grille.
+  //  annonce : temps d'attente (en pas) avant la première flèche (la transition depuis l'écran d'annonce est douce) ;
+  //  intro / introMini / introMusique : l'écran d'annonce (Kédric sur scène) dure au plus 'intro' s (une flèche le
+  //  passe après 'introMini' s), la musique démarre à 'introMusique' s (le refrain).
+  //  rougeChance : chance de FLÈCHE ROUGE par flèche (Kédric triche : fais l'inverse) ; CHAMPION seulement, jamais la 1re.
+  //  piste : les flèches TOMBENT dans 4 couloirs (◀ ▶ à gauche, ▲ ▼ à droite) jusqu'à la touche : vitesse de chute (px / s)
   //  parfait / bien : fenêtres de timing (s, x fenetreShow de la difficulté) ; gain : points de PUBLIC (de -100 à +100)
   //  parTouchdown / avanceMax : public de départ = (touchdowns - 1) x parTouchdown (aucun touchdown : il part pour Kédric)
-  //  phrase : Kédric fait 'phrase' pas, puis toi les mêmes 'phrase' pas, et ainsi de suite (questions / réponses)
-  showtime: { manches: [8, 12, 16], rouges: [0, 1, 2], phrase: 4, musique: 'kedric_battle',
-    passages: [{ debut: 1.385, temps: 0.3473 }, { debut: 22.069, temps: 0.3424 }, { debut: 54.969, temps: 0.3426 }],
-    tempsParPas: 2, annonce: 4, pause: 1.0,
-    // l'écran d'annonce (Kédric sur scène, avant la 1re manche) : il dure au plus 'intro' s (une flèche le passe après
-    // 'introMini' s), sur le refrain de la musique (à 'introMusique' s)
+  //  Le public est un KAMÉHAMÉHA père-fils (showtime.js) : PARFAIT = ta boule repousse celle de Kédric, RATÉ = elle recule.
+  showtime: { rounds: 2, dureeRound: 60, musique: 'kedric_battle',
+    tempo: { debut: 54.969, temps: 0.3426 }, tempsParPas: 2, annonce: 4,
     intro: 9, introMini: 1.5, introMusique: 54.969,
-    // les flèches TOMBENT dans 4 couloirs (◀ ▶ à gauche, ▲ ▼ à droite) jusqu'à la touche : vitesse de chute (pixels / s)
-    piste: { vitesse: 200 },
-    parfait: 0.12, bien: 0.28, gain: { parfait: 11, bien: 8, rate: 10 }, kedricParPas: 2,
+    piste: { vitesse: 200 }, rougeChance: 0.12,
+    parfait: 0.12, bien: 0.28, gain: { parfait: 2.5, bien: 1.8, rate: 2.2 },
     parTouchdown: 15, avanceMax: 30 },
   // ---------- Kédric en personne sur le terrain (option : course avec kedric: true) ----------
   //  il garde l'en-but et prévient toujours pareil : danse → POSE (son attaque s'affiche) → CHARGE

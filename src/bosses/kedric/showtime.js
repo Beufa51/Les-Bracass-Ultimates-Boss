@@ -1,16 +1,22 @@
 // =====================================================================
-// SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (façon PaRappa / jeu de rythme).
-// D'abord l'ANNONCE : Kédric sur scène (décor kedric_scene) lance le défi et explique les règles.
-// Puis chaque manche, en QUESTIONS / RÉPONSES, façon Guitar Hero / jeu de danse : les flèches TOMBENT dans 4 COULOIRS
-// (◀ ▶ à gauche, ▲ ▼ à droite) jusqu'à la touche à presser. Sur téléphone, chaque couloir est posé juste au-dessus de
-// son bouton (et le bouton à presser s'allume). Kédric fait 4 pas (ses flèches, petites et pâles : il prend la pose
-// quand elles arrivent en bas), puis « À TOI ! » : 4 grandes flèches, appuie quand elles arrivent sur la touche ; et on
-// recommence. Pas de bips : seulement la musique.
-// En CHAMPION seulement (diff.flechesRouges), des FLÈCHES ROUGES : Kédric triche, il faut faire l'INVERSE (◀ ↔ ▶, ▲ ↔ ▼).
-// La jauge du PUBLIC fait le tir à la corde : pile sur le temps = le public est pour toi.
-// Les pas sont calés sur la musique (kedric_battle) ; chaque manche la reprend à un autre passage. L'horloge de la
-// manche suit la musique quand elle joue, sinon le temps du jeu. Toute la logique avance dans maj(dt, touches) (pas de
-// minuteries Phaser) : les bots peuvent jouer en accéléré (scene.horlogeJeu = true : la musique est ignorée).
+// SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (façon DDR / jeu de danse).
+// Une SEULE SESSION CONTINUE : la musique (kedric_battle) démarre sur le refrain à l'annonce
+// et n'est JAMAIS REPLACÉE — pas de coupure entre l'annonce, le round 1 et le round 2.
+// À l'ANNONCE, Kédric sur scène (décor kedric_scene) lance le défi et explique les règles.
+// Puis les flèches TOMBENT dans 4 COULOIRS (◀ ▶ à gauche, ▲ ▼ à droite) jusqu'à la touche
+// à presser, PILE SUR LE RYTHME : toutes les flèches des 2 rounds sont générées d'un coup,
+// calées sur la grille des temps forts (une flèche tous les 'tempsParPas' temps ~0,69 s).
+// Kédric danse AVEC TOI du début à la fin : il prend la pose de chaque flèche
+// (plus de flèches de démo, plus de tour « À TOI ! »).
+// Après 1 minute de musique : ROUND 2, MÊMES RÈGLES (bandeau), la musique continue.
+// En CHAMPION seulement (diff.flechesRouges), des FLÈCHES ROUGES : Kédric triche, il faut
+// faire l'INVERSE (◀ ↔ ▶, ▲ ↔ ▼). Jamais sur la toute première flèche.
+// La jauge du public est un KAMÉHAMÉHA père-fils : ton faisceau BLEU part de la gauche,
+// celui de Kédric (DORÉ) de la droite ; la BOULE BLANCHE du point de CHOC se repousse selon
+// PARFAIT / BIEN / RATÉ — c'est elle qui désigne le gagnant (jauge > 0 à la fin = victoire).
+// L'horloge de la session suit la musique quand elle joue, sinon le temps du jeu. Toute la
+// logique avance dans maj(dt, touches) (pas de minuteries Phaser) : les bots peuvent jouer
+// en accéléré (scene.horlogeJeu = true : la musique est ignorée).
 // =====================================================================
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { texte } from '../../core/ui.js';
@@ -32,14 +38,15 @@ const KED = { x: 480, pieds: 392, hauteur: 335 };
 const TOI = { x: 480, pieds: HAUTEUR + 34, zoom: 0.85 };
 // les couloirs sans écran tactile (sur téléphone : au-dessus des boutons, voir calculerCouloirs)
 const COULOIRS = { x: { gauche: 105, droite: 215, haut: 745, bas: 855 }, cibleY: 455, largeur: 96, haut: 84 };
+// le KAMÉHAMÉHA du public, en haut : ton faisceau (bleu) part de la gauche, celui de Kédric (doré) de la droite ;
+// marge : où les faisceaux commencent ; portee : jusqu'où le point de choc peut se repousser
+const KHAM = { y: 36, h: 18, marge: 170, portee: 280 };
 
 export class Showtime {
-  // options : { manches: [4, 6, 8], rouges: [0, 1, 1], jauge: -30..30, replique, sousTitre } ;
-  // fin(gagne, bilan) appelé à la fin
+  // options : { jauge: -30..30, replique, sousTitre } ; fin(gagne, bilan) appelé à la fin
   constructor(scene, options, fin) {
     this.s = scene; this.o = options; this.fin = fin;
     this.jauge = options.jauge || 0;
-    this.manche = -1;
     this.bilan = { parfaits: 0, bien: 0, rates: 0 };
     this.el = []; this.notes = [];
     // le décor : la scène de concert (sinon une scène sombre et deux projecteurs dessinés)
@@ -56,18 +63,17 @@ export class Showtime {
     halo.fillStyle(0xfff3a8, 0.22); halo.fillEllipse(KED.x, KED.pieds - 4, 280, 44);
     this.kedric = this.ajout(scene.add.sprite(KED.x, KED.pieds, 'kedric_portrait').setOrigin(0.5, 1).setDepth(P + 2));
     this.toi = this.ajout(scene.add.sprite(TOI.x, TOI.pieds, 'kedric_toi_course', 0).setOrigin(0.5, 1).setDepth(P + 3));
-    // la jauge du public (tir à la corde), en haut : à gauche Kédric (vert), à droite toi (rouge)
+    // le KAMÉHAMÉHA du public, en haut : ton étiquette à gauche (bleu), celle de Kédric à droite (doré)
     this.jaugeG = this.ajout(scene.add.graphics().setDepth(P + 4));
     this.etiquettesJauge = [
-      texte(scene, LARGEUR / 2 - 290, 30, 'KÉDRIC', 18, '#7fff7f', { fontStyle: 'bold' }),
-      texte(scene, LARGEUR / 2 + 290, 30, 'TOI', 18, '#ff7f7f', { fontStyle: 'bold' }),
-      texte(scene, LARGEUR / 2, 56, 'PUBLIC', 14, '#ffffff'),
+      texte(scene, KHAM.marge - 20, 30, 'TOI', 18, '#7fe8ff', { fontStyle: 'bold' }).setOrigin(1, 0.5),
+      texte(scene, LARGEUR - KHAM.marge + 20, 30, 'KÉDRIC', 18, '#ff9a3c', { fontStyle: 'bold' }).setOrigin(0, 0.5),
+      texte(scene, LARGEUR / 2, 66, 'PUBLIC', 14, '#ffffff'),
     ].map(t => this.ajout(t.setDepth(P + 4)));
-    // les 4 couloirs : le fond, la touche en bas de chacun (un rond et sa flèche), qui joue (au-dessus de chaque paire)
+    // les 4 couloirs : le fond, la touche en bas de chacun (un rond et sa flèche)
     this.couloirsG = this.ajout(scene.add.graphics().setDepth(P + 5));
     this.touchesC = {};
     for (const n of DIRS) this.touchesC[n] = this.ajout(texte(scene, 0, 0, FLECHES[n], 40, '#ffffff', { fontStyle: 'bold' }).setDepth(P + 5).setAlpha(0.45));
-    this.etiquettesTour = [0, 1].map(() => this.ajout(texte(scene, 0, 0, '', 18, '#ffffff', { fontStyle: 'bold', strokeThickness: 6 }).setDepth(P + 7)));
     this.retour = this.ajout(texte(scene, 0, 0, '', 26, '#ffffff', { fontStyle: 'bold', strokeThickness: 7 }).setDepth(P + 7));
     this.c = COULOIRS;
     // la musique du battle (celle du match s'arrête) ; gros boutons tactiles (rangés pendant la pause)
@@ -95,7 +101,7 @@ export class Showtime {
   annonce() {
     const s = this.s;
     this.phase = 'intro'; this.T = 0;
-    placerMusique(S.musique, S.introMusique);   // sur le refrain
+    placerMusique(S.musique, S.introMusique);   // sur le refrain — la musique n'est plus jamais replacée
     this.poseKedric('micro');
     this.poseToi(null);
     this.etiquettesJauge.forEach(t => t.setVisible(false));
@@ -113,7 +119,10 @@ export class Showtime {
     }).setOrigin(0, 0.5).setDepth(P + 10).setAlpha(0);
     s.tweens.add({ targets: bulle, alpha: 1, delay: 300, duration: 250 });
     const regles = texte(s, LARGEUR / 2, HAUTEUR - 96,
-      'Kédric fait 4 pas... puis À TOI : les mêmes 4 pas ! Et on recommence.\nLes flèches TOMBENT jusqu\'aux touches : appuie quand elles arrivent en bas, en rythme.' + (estTactile() ? '\nLe bouton à presser S\'ALLUME de plus en plus fort jusqu\'au bon moment.' : '') +
+      'Une seule session : 2 ROUNDS de 1 minute, Kédric danse AVEC toi du début à la fin !\n' +
+      'Les flèches TOMBENT en rythme avec la musique : appuie quand elles arrivent en bas.' +
+      (estTactile() ? '\nLe bouton à presser S\'ALLUME de plus en plus fort jusqu\'au bon moment.' : '') +
+      '\nLe KAMÉHAMÉHA du public : PARFAIT = ta boule repousse la sienne, RATÉ = elle recule.\nÀ la fin, la boule du côté de KÉDRIC = il gagne le public !' +
       (this.s.diff.flechesRouges ? '\nFLÈCHE ROUGE = Kédric triche : fais l\'INVERSE !' : ''), 17, '#ffffff', { align: 'center', lineSpacing: 6 }).setDepth(P + 10);
     this.invite = texte(s, LARGEUR / 2, HAUTEUR - 22, 'Appuie sur une flèche quand tu es prêt !', 20, '#7fff7f', { fontStyle: 'bold' }).setDepth(P + 10).setAlpha(0);
     this.elAnnonce = [voile, titre, sous, bulle, regles, this.invite];
@@ -126,38 +135,46 @@ export class Showtime {
     this.elAnnonce = null;
   }
 
-  // ---------- une manche : questions / réponses sur un passage de la musique ----------
-  //  (en pas de musique depuis le début du passage) 0..annonce-1 : on se prépare ; puis, par groupes de 'phrase' pas :
-  //  Kédric fait ses pas, puis toi les mêmes (voir slotKedric / slotToi)
-  mancheSuivante() {
-    this.manche++;
-    const n = this.o.manches[this.manche];
-    const seq = [];
-    for (let i = 0; i < n; i++) {
-      let d;
-      do { d = ['gauche', 'droite', 'haut', 'bas'][Math.floor(Math.random() * 4)]; } while (i >= 2 && d === seq[i - 1] && d === seq[i - 2]);
-      seq.push(d);
-    }
-    // flèches rouges (fais l'inverse) : jamais sur le premier pas
-    const rouges = new Set();
-    const nr = this.s.diff.flechesRouges ? (this.o.rouges || [])[this.manche] || 0 : 0;
-    while (rouges.size < Math.min(nr, n - 1)) rouges.add(1 + Math.floor(Math.random() * (n - 1)));
-    this.pas = seq.map((d, i) => ({ montre: d, rouge: rouges.has(i), attendu: rouges.has(i) ? INVERSE[d] : d, note: null }));
-    // le passage de la musique : la manche commence pile sur un temps fort
-    const passage = S.passages[this.manche % S.passages.length];
-    this.origine = passage.debut;
-    this.duree = passage.temps * S.tempsParPas;   // durée d'un pas (s)
-    placerMusique(S.musique, this.origine);
+  // ---------- LA SESSION : on quitte l'écran d'annonce SANS replacer la musique ----------
+  // l'origine de la session est le temps musical ACTUEL : la transition annonce → danse est
+  // d'une douceur totale, la musique n'a pas une seule coupure jusqu'à la fin
+  demarrer() {
+    this.viderAnnonce();
+    this.etiquettesJauge.forEach(t => t.setVisible(true));
+    const m = tempsMusique(S.musique);
+    this.origine = m === null ? S.introMusique : m;   // le temps musical courant (jamais de re-placement)
+    this.T = 0;
+    this.duree = S.tempo.temps * S.tempsParPas;   // durée entre deux flèches (~0,69 s), calée sur la musique
     const fen = this.s.diff.fenetreShow;
     this.fenetre = { parfait: Math.min(S.parfait * fen, this.duree * 0.25), bien: Math.min(S.bien * fen, this.duree * 0.45) };
-    this.T = 0; this.phase = 'annonce'; this.dernierPas = -1; this.premierAToi = true;
+    this.parRound = Math.floor(S.dureeRound / this.duree);   // ~87 flèches par round
+    this.genererPas();   // TOUTES les flèches des 2 rounds, d'un coup
+    this.phase = 'annonce'; this.dernierPas = -1; this.finBandeau = null;
     this.calculerCouloirs();
     this.creerNotes();
-    const titre = `MANCHE ${this.manche + 1} / ${this.o.manches.length} : ${n} PAS, ${S.phrase} PAR ${S.phrase}`;
-    this.s.bandeau.setText(nr ? `${titre}  -  FLÈCHE ROUGE = fais l'INVERSE !` : titre).setColor(nr ? '#ff9a9a' : '#ffd84a').setVisible(true);
+    this.s.bandeau.setText(`ROUND 1 / ${S.rounds} : DANSE AVEC KÉDRIC !`).setColor('#ffd84a').setVisible(true);
     this.poseKedric('portrait');
     this.poseToi(null);
   }
+
+  // toutes les flèches des 2 rounds, calées sur la grille des temps forts de la musique ;
+  // flèche rouge (fais l'inverse) : CHAMPION seulement, par probabilité, jamais sur la toute première
+  genererPas() {
+    this.pas = [];
+    let prec = null, prec2 = null;
+    for (let j = 0; j < this.parRound * S.rounds; j++) {
+      let d;
+      do { d = DIRS[Math.floor(Math.random() * 4)]; } while (j >= 2 && d === prec && d === prec2);
+      const rouge = this.s.diff.flechesRouges && j > 0 && Math.random() < S.rougeChance;
+      this.pas.push({ montre: d, rouge, attendu: rouge ? INVERSE[d] : d, note: null });
+      prec2 = prec; prec = d;
+    }
+  }
+
+  // moment (s depuis le début de la session) de la flèche j : pile sur un temps fort de la grille
+  cible(j) { return (S.annonce + j) * this.duree; }
+  // le round de la flèche j (0 = premier)
+  roundDe(j) { return Math.floor(j / this.parRound); }
 
   // Les couloirs : sur téléphone, juste au-dessus des boutons ◀ ▶ ▲ ▼ (la flèche tombe jusqu'à la touche à presser) ;
   // sans écran tactile, à gauche et à droite de la scène
@@ -175,32 +192,22 @@ export class Showtime {
     this.c = { x, cibleY: Phaser.Math.Clamp(hautBoutons - largeur * 0.5, 240, 470), largeur, haut: 84 };
   }
 
-  // les flèches qui tombent : celles de Kédric (petites et pâles, il les danse), puis les tiennes (grandes, à toi de jouer)
+  // les flèches qui tombent : à toi de jouer les 2 rounds d'une traite (Kédric danse avec toi, il ne démontre plus)
   creerNotes() {
     this.viderNotes();
     this.pas.forEach((p, i) => {
-      const demo = texte(this.s, -99, 0, FLECHES[p.montre], 38, p.rouge ? '#ff3030' : COULEURS[p.montre], { fontStyle: 'bold', strokeThickness: 6 }).setDepth(P + 6);
-      this.notes.push({ t: this.slotKedric(i) * this.duree, objet: demo, demo: true, pas: p });
       // ta flèche (rouge si Kédric a triché : à toi de faire l'inverse)
       const tienne = texte(this.s, -99, 0, FLECHES[p.montre], 58, p.rouge ? '#ff3030' : COULEURS[p.montre], { fontStyle: 'bold', strokeThickness: 8 }).setDepth(P + 6);
-      this.notes.push({ t: this.cible(i), objet: tienne, demo: false, pas: p });
+      this.notes.push({ t: this.cible(i), objet: tienne, pas: p });
     });
   }
 
   viderNotes() { this.notes.forEach(n => n.objet.destroy()); this.notes = []; }
 
-  // les pas de musique (slots) du pas i : celui de Kédric, puis le tien une phrase plus tard
-  slotKedric(i) { return S.annonce + Math.floor(i / S.phrase) * 2 * S.phrase + i % S.phrase; }
-  slotToi(i) { return this.slotKedric(i) + S.phrase; }
-  // moment (s depuis le début du passage) de ton pas i
-  cible(i) { return this.slotToi(i) * this.duree; }
-  // à qui le tour au pas de musique k : 'kedric' ou 'toi'
-  tour(k) { return k < S.annonce || (k - S.annonce) % (2 * S.phrase) < S.phrase ? 'kedric' : 'toi'; }
-
-  // l'horloge de la manche : le temps du jeu, recalé sur la musique quand elle joue vraiment
+  // l'horloge de la session : le temps du jeu, recalé sur la musique quand elle joue vraiment
   horloge(dt) {
     this.T += dt;
-    if (this.phase === 'bilan' || this.phase === 'intro' || this.s.horlogeJeu) return;
+    if (this.phase === 'intro' || this.phase === 'fin' || this.s.horlogeJeu) return;
     const m = tempsMusique(S.musique);
     if (m === null) return;
     const ecart = (m - this.origine) - this.T;
@@ -215,53 +222,48 @@ export class Showtime {
     if (this.phase === 'intro') {
       // une flèche (après un petit moment), ou on y va tout seul
       if (this.T >= S.introMini && this.invite.alpha === 0) this.s.tweens.add({ targets: this.invite, alpha: { from: 1, to: 0.35 }, duration: 500, yoyo: true, repeat: -1 });
-      const appui = ['gauche', 'droite', 'haut', 'bas'].some(k => e[k]);
-      if ((appui && this.T >= S.introMini) || this.T >= S.intro) {
-        this.viderAnnonce();
-        this.etiquettesJauge.forEach(t => t.setVisible(true));
-        this.mancheSuivante();
-      }
+      const appui = DIRS.some(k => e[k]);
+      if ((appui && this.T >= S.introMini) || this.T >= S.intro) this.demarrer();
       this.afficher();
       return;
     }
-    const d = this.duree, n = this.pas.length, k = Math.floor(this.T / d);   // k : numéro du pas de musique en cours
+    const d = this.duree, n = this.pas.length, k = Math.floor(this.T / d);   // k : numéro du temps de musique en cours
     if (k > this.dernierPas) { this.dernierPas = k; this.surLeTemps(k); }
-    if (this.phase === 'annonce' && k >= S.annonce) { this.phase = 'jeu'; this.s.bandeau.setVisible(false); }
+    if (this.phase === 'annonce' && k >= S.annonce) { this.phase = 'jeu'; this.finBandeau = this.T + 1.5; }
     if (this.phase === 'jeu') {
-      for (const t of ['gauche', 'droite', 'haut', 'bas']) if (e[t]) this.appui(t);
+      for (const t of DIRS) if (e[t]) this.appui(t);
       for (let i = 0; i < n; i++) {
         const p = this.pas[i];
         if (p.note === null && this.T > this.cible(i) + this.fenetre.bien) this.noter(i, 'rate');
       }
-      if (!this.termine && this.pas.every(p => p.note !== null) && this.T > this.cible(n - 1) + d * 0.5) this.finManche();
-    } else if (this.phase === 'bilan') {
-      if (this.T >= this.finBilan) this.mancheSuivante();
+      // fin de la session (toutes les flèches jouées) : la boule du kaméhaméha désigne le gagnant
+      if (!this.termine && this.pas.every(p => p.note !== null) && this.T > this.cible(n - 1) + d * 0.5) this.terminer(this.jauge > 0);
     }
     this.afficher();
   }
 
-  // à chaque pas de musique : le décompte 3, 2, 1 ; Kédric fait son pas ; ou il te tend le micro
+  // à chaque temps de musique : le décompte 3, 2, 1 ; Kédric prend la pose de la flèche (il danse avec toi) ;
+  // au premier temps du round 2 : le bandeau, MÊMES RÈGLES, la musique continue sans coupure
   surLeTemps(k) {
-    if (this.phase === 'annonce' && k >= S.annonce - 3 && k < S.annonce) {
-      onomatopee(this.s, KED.x + 230, 300, String(S.annonce - k), 44, '#ffd84a');
+    const j = k - S.annonce;
+    if (j < 0) {
+      if (this.phase === 'annonce' && k >= S.annonce - 3 && k < S.annonce)
+        onomatopee(this.s, KED.x + 230, 300, String(S.annonce - k), 44, '#ffd84a');
       return;
     }
-    if (k < S.annonce || this.phase !== 'jeu' && this.phase !== 'annonce') return;
-    const i = this.pas.findIndex((p, j) => this.slotKedric(j) === k);
-    if (i >= 0) {
-      // Kédric fait son pas (sa flèche arrive en bas) ; flèche rouge : il triche (clin d'œil)
-      const p = this.pas[i];
-      this.poseKedric(p.rouge ? 'triche' : p.montre);
-      this.public(-S.kedricParPas);
-    } else if (this.tour(k) === 'toi' && this.tour(k - 1) === 'kedric') {
-      // il te tend le micro : à toi !
-      this.poseKedric('micro');
-      if (this.premierAToi) { this.premierAToi = false; onomatopee(this.s, KED.x, 150, 'À TOI !', 54, '#ffffff'); }
+    if (j >= this.pas.length) return;
+    const p = this.pas[j];
+    this.poseKedric(p.rouge ? 'triche' : p.montre);   // Kédric fait le pas en même temps que toi
+    if (j > 0 && j % this.parRound === 0) {
+      const num = this.roundDe(j) + 1;
+      this.s.bandeau.setText(`ROUND ${num} / ${S.rounds} : MÊMES RÈGLES !`).setColor('#ffd84a').setVisible(true);
+      this.finBandeau = this.T + 2.5;
+      onomatopee(this.s, LARGEUR / 2, 150, `ROUND ${num} !`, 54, '#ffd84a');
     }
   }
 
   appui(t) {
-    // le prochain pas pas encore noté, s'il est assez proche dans le temps
+    // la prochaine flèche pas encore notée, si elle est assez proche dans le temps
     const i = this.pas.findIndex(p => p.note === null);
     if (i < 0) return;
     const ecart = Math.abs(this.T - this.cible(i));
@@ -275,25 +277,20 @@ export class Showtime {
   noter(i, note) {
     const p = this.pas[i];
     p.note = note;
-    const n = this.notes.find(o => !o.demo && o.pas === p);
+    const n = this.notes[i];
     // le message au-dessus de la touche du pas
     const xc = this.c.x[p.attendu];
     this.retour.setPosition(Phaser.Math.Clamp(xc, 90, LARGEUR - 90), this.c.cibleY - this.c.largeur * 0.5 - 30);
-    if (note === 'parfait') { this.bilan.parfaits++; this.public(S.gain.parfait); this.retour.setText('PARFAIT !').setColor('#7fe8ff'); lignesImpact(this.s, xc, this.c.cibleY, 0x9fe0ff, 10, 70); }
+    // le point de CHOC du kaméhaméha : les faisceaux s'y affrontent, il bouge avec la jauge
+    const xChoc = this.pointChoc();
+    if (note === 'parfait') { this.bilan.parfaits++; this.public(S.gain.parfait); this.retour.setText('PARFAIT !').setColor('#7fe8ff'); lignesImpact(this.s, xc, this.c.cibleY, 0x9fe0ff, 10, 70); lignesImpact(this.s, xChoc, KHAM.y, 0xffffff, 12, 100); }
     else if (note === 'bien') { this.bilan.bien++; this.public(S.gain.bien); this.retour.setText('BIEN !').setColor('#7fff7f'); }
-    else { this.bilan.rates++; this.public(-S.gain.rate); this.retour.setText(p.rouge ? 'RATÉ ! (l\'inverse !)' : 'RATÉ !').setColor('#ff6b6b'); this.poseKedric('haut'); }
+    else { this.bilan.rates++; this.public(-S.gain.rate); this.retour.setText(p.rouge ? 'RATÉ ! (l\'inverse !)' : 'RATÉ !').setColor('#ff6b6b'); lignesImpact(this.s, xChoc, KHAM.y, 0xff6b6b, 12, 100); this.poseKedric('haut'); }
     this.s.tweens.killTweensOf(this.retour); this.retour.setAlpha(1).setScale(1.2);
     this.s.tweens.add({ targets: this.retour, scale: 1, duration: 120 });
-    if (n) { n.note = note; n.objet.setColor(note === 'rate' ? '#ff6b6b' : note === 'parfait' ? '#7fe8ff' : '#7fff7f'); }
-    // public tout à Kédric : perdu tout de suite (sinon on joue toutes les manches, pour le spectacle)
+    if (n) n.objet.setColor(note === 'rate' ? '#ff6b6b' : note === 'parfait' ? '#7fe8ff' : '#7fff7f');
+    // public tout à Kédric : sa boule t'a écrasé, perdu tout de suite
     if (this.jauge <= -100) this.terminer(false);
-  }
-
-  finManche() {
-    if (this.manche >= this.o.manches.length - 1) { this.terminer(this.jauge > 0); return; }
-    this.phase = 'bilan'; this.finBilan = this.T + S.pause;
-    eteindreBoutons();
-    this.poseKedric(this.jauge > 0 ? 'haut' : 'portrait');
   }
 
   terminer(gagne) {
@@ -310,19 +307,30 @@ export class Showtime {
 
   public(n) { this.jauge = Math.max(-100, Math.min(100, this.jauge + n)); }
 
+  // le point de choc du kaméhaméha : plus le public est pour toi, plus ta boule repousse celle de Kédric
+  pointChoc() { return LARGEUR / 2 + (this.jauge / 100) * KHAM.portee; }
+
   // ---------- affichage ----------
   afficher() {
-    // jauge du public
+    // le KAMÉHAMÉHA du public : ton faisceau BLEU depuis la gauche, le DORÉ de Kédric depuis la droite,
+    // la BOULE BLANCHE pulsante au point de choc — c'est ELLE qui désigne le gagnant
     const g = this.jaugeG; g.clear();
     if (this.phase !== 'intro') {
-      const x0 = LARGEUR / 2 - 240, w = 480, y = 22, h = 18;
-      g.fillStyle(0x000000, 0.5); g.fillRect(x0 - 4, y - 4, w + 8, h + 8);
-      g.fillStyle(0x1d8a4a, 1); g.fillRect(x0, y, w, h);
-      g.fillStyle(0xc8202c, 1); g.fillRect(x0 + w / 2 - (this.jauge / 100) * w / 2, y, w / 2 + (this.jauge / 100) * w / 2, h);
-      g.fillStyle(0xffffff, 1); g.fillRect(x0 + w / 2 - (this.jauge / 100) * w / 2 - 2, y - 5, 4, h + 10);
-      g.lineStyle(2, 0xffffff, 0.8); g.strokeRect(x0, y, w, h);
+      const y = KHAM.y, h = KHAM.h;
+      const cx = this.pointChoc();
+      const puls = 1 + 0.15 * Math.sin(this.T * 9);
+      // ton faisceau (bleu) et celui de Kédric (doré)
+      g.fillStyle(0x2f8fff, 0.9); g.fillRoundedRect(KHAM.marge, y - h / 2, Math.max(0, cx - KHAM.marge), h, h / 2);
+      g.fillStyle(0xffffff, 0.35); g.fillRect(KHAM.marge, y - 2, Math.max(0, cx - KHAM.marge), 4);
+      g.fillStyle(0xff9a3c, 0.9); g.fillRoundedRect(cx, y - h / 2, Math.max(0, LARGEUR - KHAM.marge - cx), h, h / 2);
+      g.fillStyle(0xffffff, 0.35); g.fillRect(cx, y - 2, Math.max(0, LARGEUR - KHAM.marge - cx), 4);
+      // la boule du point de choc (blanche, pulsante) : les impacts PARFAIT / RATÉ la frappent ici
+      g.fillStyle(0xffffff, 0.95); g.fillCircle(cx, y, h * 0.85 * puls);
+      g.lineStyle(3, 0xffffff, 0.9); g.strokeCircle(cx, y, h * 0.85 * puls + 4);
     }
-    // Kédric marque le temps : un petit rebond au début de chaque pas de musique
+    // le bandeau d'un round se range tout seul après un moment
+    if (this.finBandeau !== null && this.T > this.finBandeau) { this.s.bandeau.setVisible(false); this.finBandeau = null; }
+    // Kédric marque le temps : un petit rebond au début de chaque temps de musique
     const f = this.duree ? (this.T / this.duree) % 1 : 1;
     const boum = this.phase === 'intro' ? 0 : Math.max(0, 1 - f * 4);
     if (this.baseKedric && !this.termine) this.kedric.setScale(this.baseKedric.x, this.baseKedric.y * (1 - 0.035 * boum));
@@ -333,12 +341,10 @@ export class Showtime {
   // les flèches qui tombent jusqu'à elle
   afficherCouloirs(boum) {
     const g = this.couloirsG; g.clear();
-    const actif = ['annonce', 'jeu', 'bilan'].includes(this.phase);
-    this.etiquettesTour.forEach(t => t.setVisible(actif));
+    const actif = ['annonce', 'jeu', 'fin'].includes(this.phase);
     for (const n of DIRS) this.touchesC[n].setVisible(actif);
     if (!actif) { this.notes.forEach(n => n.objet.setVisible(false)); return; }
     const C = this.c, d = this.duree, w = C.largeur, v = PISTE.vitesse;
-    const aToi = this.phase === 'jeu' && this.tour(Math.floor(this.T / d + 0.5)) === 'toi';
     // la prochaine flèche à faire : sa touche s'éclaire (et le bouton du téléphone s'allume)
     let cible = null;
     const i = this.phase === 'jeu' ? this.pas.findIndex(p => p.note === null) : -1;
@@ -358,17 +364,13 @@ export class Showtime {
       g.lineStyle(allume ? 6 : 4, coul, allume ? 1 : 0.8); g.strokeCircle(x, C.cibleY, w * 0.45 + 3 * boum);
       this.touchesC[n].setPosition(x, C.cibleY).setAlpha(allume ? 0.9 : 0.45);
     }
-    // des petits traits en travers des couloirs, un par pas de musique (on voit venir le rythme)
+    // des petits traits en travers des couloirs, un par temps de musique (on voit venir le rythme)
     g.lineStyle(2, 0xffffff, 0.22);
     for (let k = Math.ceil(this.T / d); C.cibleY - (k * d - this.T) * v > C.haut; k++) {
       const y = C.cibleY - (k * d - this.T) * v;
       if (y > C.cibleY - w * 0.5) continue;
       for (const [a, b] of [['gauche', 'droite'], ['haut', 'bas']]) g.lineBetween(Math.min(C.x[a], C.x[b]) - w / 2 + 6, y, Math.max(C.x[a], C.x[b]) + w / 2 - 6, y);
     }
-    // qui joue : au-dessus de chaque paire de couloirs
-    const libelle = aToi ? 'À TOI !' : this.phase === 'bilan' ? '' : 'KÉDRIC';
-    [['gauche', 'droite'], ['haut', 'bas']].forEach(([a, b], k) =>
-      this.etiquettesTour[k].setPosition((C.x[a] + C.x[b]) / 2, C.haut - 14).setText(libelle).setColor(aToi ? '#ffd84a' : '#7fff7f'));
     // les flèches : elles tombent dans leur couloir et touchent la touche pile sur leur temps
     for (const n of this.notes) {
       const dt = n.t - this.T, y = C.cibleY - dt * v;
@@ -376,10 +378,10 @@ export class Showtime {
       n.objet.setVisible(visible);
       if (!visible) continue;
       n.objet.setPosition(C.x[n.pas.montre], y);
-      // passée la touche : elle s'efface ; celles de Kédric sont plus petites et plus pâles
+      // passée la touche : elle s'efface
       const efface = dt < 0 ? Math.max(0, 1 + dt / 0.3) : 1;
-      n.objet.setAlpha((n.demo ? 0.6 : 1) * efface);
-      if (!n.note) n.objet.setScale(Math.abs(dt) < 0.1 ? 1.12 : 1);
+      n.objet.setAlpha(efface);
+      if (!n.pas.note) n.objet.setScale(Math.abs(dt) < 0.1 ? 1.12 : 1);
     }
   }
 
