@@ -143,21 +143,38 @@ export class Showtime {
     const titre = texte(s, LARGEUR / 2, 62, 'BATTLE DE DANSE !', 64, '#ffd84a', { fontStyle: 'bold', strokeThickness: 12 }).setDepth(P + 10).setScale(0);
     s.tweens.add({ targets: titre, scale: 1, duration: 450, ease: 'Back.Out' });
     s.tweens.add({ targets: titre, angle: { from: -3, to: 3 }, duration: 700, yoyo: true, repeat: -1 });
-    const sous = texte(s, LARGEUR / 2, 112, this.o.sousTitre || '', 20, '#ffffff', { strokeThickness: 6 }).setDepth(P + 10);
+    const sous = texte(s, LARGEUR / 2, 130, this.o.sousTitre || '', 20, '#ffffff', { strokeThickness: 6 }).setDepth(P + 10);
     // sa réplique, dans une bulle à côté de lui
     const bulle = s.add.text(KED.x + 150, 240, `« ${this.o.replique || ''} »`, {
       fontFamily: 'monospace', fontSize: '19px', color: '#111111', backgroundColor: '#ffffff', padding: { x: 12, y: 8 },
       wordWrap: { width: 300 }, align: 'center',
     }).setOrigin(0, 0.5).setDepth(P + 10).setAlpha(0);
     s.tweens.add({ targets: bulle, alpha: 1, delay: 300, duration: 250 });
-    const regles = texte(s, LARGEUR / 2, HAUTEUR - 104,
-      `${S.manches.length} MANCHES (${Math.round(S.dureeRound)} s puis ${Math.round(S.manches[1].duree || S.dureeRound)} s), chacune sur SA musique : garde l'aiguille du public de TON côté !\n` +
-      'Les flèches TOMBENT en rythme : appuie quand elles arrivent en bas.' +
-      (estTactile() ? '\nLe bouton à presser S\'ALLUME de plus en plus fort jusqu\'au bon moment.' : '') +
-      '\nKédric est une star, il TRICHE : plancher GLACÉ, coupure de projecteurs, flèches DOUBLÉES\nen fin de manche... et un SOLO quand il sent qu\'il va perdre !' +
-      (this.s.diff.flechesRouges ? '\nFLÈCHE ROUGE = fais l\'INVERSE !' : ''), 17, '#ffffff', { align: 'center', lineSpacing: 6 }).setDepth(P + 10);
+    // les règles : sur téléphone, les 4 GROS boutons de danse couvrent le bas de l'écran —
+    // version COMPACTE, remontée au-dessus des boutons (repositionné juste après) ; plaque noire de lisibilité
+    const texteRegles = estTactile()
+      ? `${S.manches.length} MANCHES : garde l'aiguille du public de TON CÔTÉ !\nAppuie la flèche juste avant qu'elle ARRIVE EN BAS.\nKédric TRICHE : plancher GLACÉ, coupure, flèches DOUBLÉES... et un SOLO final !`
+      : `${S.manches.length} MANCHES (${Math.round(S.dureeRound)} s puis ${Math.round(S.manches[1].duree || S.dureeRound)} s), chacune sur SA musique : garde l'aiguille du public de TON côté !\n` +
+        'Les flèches TOMBENT en rythme : appuie quand elles arrivent en bas.' +
+        '\nKédric est une star, il TRICHE : plancher GLACÉ, coupure de projecteurs, flèches DOUBLÉES\nen fin de manche... et un SOLO quand il sent qu'il va perdre !' +
+        (this.s.diff.flechesRouges ? '\nFLÈCHE ROUGE = fais l\'INVERSE !' : '');
+    const regles = texte(s, LARGEUR / 2, HAUTEUR - 104, texteRegles, 17, '#ffffff',
+      { align: 'center', lineSpacing: 6, backgroundColor: '#000000c8', padding: { x: 16, y: 10 } }).setDepth(P + 10);
     this.invite = texte(s, LARGEUR / 2, HAUTEUR - 22, 'Appuie sur une flèche quand tu es prêt !', 20, '#7fff7f', { fontStyle: 'bold' }).setDepth(P + 10).setAlpha(0);
     this.elAnnonce = [voile, titre, sous, bulle, regles, this.invite];
+    // sur téléphone, les GROS boutons ◀ ▶ ▲ ▼ couvraient les textes du bas :
+    // on mesure où ils s'arrêtent et on remonte bulle + règles + invite au-dessus
+    if (estTactile()) {
+      const ecran = s.game.canvas.getBoundingClientRect();
+      const rects = DIRS.map(n => rectBouton(n)).filter(Boolean);
+      if (ecran.width && rects.length === 4) {
+        const ky = HAUTEUR / ecran.height;
+        const hautBoutons = Math.min(...rects.map(r => (r.top - ecran.top) * ky));
+        bulle.setPosition(bulle.x, Math.min(240, hautBoutons - 160));
+        regles.setPosition(LARGEUR / 2, hautBoutons - 34 - regles.height / 2);
+        invite.setPosition(LARGEUR / 2, hautBoutons - 18);
+      }
+    }
     jouerSon(s, 'kedric_foule', { volume: 0.8 });   // le public (pas de bips au battle : seulement la musique)
   }
 
@@ -438,8 +455,8 @@ export class Showtime {
       const sec = Math.ceil(t0 - this.T);
       if (sec !== this.dernierCompte) {
         this.dernierCompte = sec;
-        if (sec >= 1 && sec <= DECOMPTE) onomatopee(this.s, LARGEUR / 2, 190, String(sec), 62, '#ffd84a');
-        else if (sec === 0) onomatopee(this.s, LARGEUR / 2, 190, 'GO !', 78, '#7fff7f');
+        if (sec >= 1 && sec <= DECOMPTE) onomatopee(this.s, LARGEUR / 2, 148, String(sec), 62, '#ffd84a');
+        else if (sec === 0) onomatopee(this.s, LARGEUR / 2, 148, 'GO !', 78, '#7fff7f');
       }
     }
     const TL = this.T - this.debutManche, d = this.duree, k = Math.floor(TL / d);

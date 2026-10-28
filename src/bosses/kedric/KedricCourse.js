@@ -986,9 +986,9 @@ export class KedricCourse extends BossScene {
       'Poste : coach... et star du show',
       'Arme secrète : ses combinaisons',
       'Phrase culte : « C\'est MON show ! »',
-    ].join('\n'), 20, '#dddddd', { lineSpacing: 10 }).setDepth(1102));
+    ].join('\n'), 22, '#ffffff', { lineSpacing: 12 }).setDepth(1102));
     el.push(texte(this, 300, 460, (estTactile() ? 'OK' : 'ESPACE') + ' : sur le terrain !', 22, '#7fff7f').setDepth(1102));
-    el.push(bulle(this, LARGEUR - 190, 66, REPLIQUES.presentation, 99999).setDepth(1103));
+    el.push(bulle(this, LARGEUR - 190, 80, REPLIQUES.presentation, 99999).setDepth(1103));
     jouerSon(this, 'kedric_foule', { volume: 0.6 });
     this.time.delayedCall(500, () => {
       this.input.keyboard.once('keydown-SPACE', () => {
