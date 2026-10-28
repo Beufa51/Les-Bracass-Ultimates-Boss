@@ -1,6 +1,6 @@
 // =====================================================================
 // SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (façon DDR / jeu de danse).
-// DEUX MANCHES de ~45 SECONDES : la première sur la musique d'origine (reglages.js manches[0]),
+// DEUX MANCHES (~45 s puis 1 MINUTE) : la première sur la musique d'origine (reglages.js manches[0]),
 // la DEUXIÈME sur le GÉNÉRIQUE DRAGON BALL Z (manches[1]) — le morceau change entre les deux,
 // sans jamais être coupé en cours de manche. À la fin : la musique s'arrête net.
 // Les flèches TOMBENT dans 4 COULOIRS (◀ ▶ à gauche, ▲ ▼ à droite) jusqu'à la touche à
@@ -58,6 +58,9 @@ const NOIR = { visibilite: 0.3 };
 // la durée de l'ÉCRAN SUPER POUVOIR (façon supers de Lionel) : le battle s'arrête le temps
 // de l'écran, puis reprend PILE sur le piège, toujours dans le rythme
 const ECRAN_POUVOIR = 1.6;
+// le DÉCOMPTE avant la première flèche de chaque manche : 5 SECONDES PILE (5, 4, 3, 2, 1… GO !),
+// calées sur le tempo de CHAQUE morceau (le nombre de pas de battement est recalculé par manche)
+const DECOMPTE = 5;
 
 export class Showtime {
   // options : { jauge: -30..30, replique, sousTitre } ; fin(gagne, bilan) appelé à la fin
@@ -84,7 +87,7 @@ export class Showtime {
     this.toi = this.ajout(scene.add.sprite(TOI.x, TOI.pieds, 'kedric_toi_course', 0).setOrigin(0.5, 1).setDepth(P + 3));
     // le flash plein écran (feedback d'appui + écran SUPER POUVOIR) et le voile du noir
     this.flash = this.ajout(scene.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0xffffff, 0).setDepth(P + 9));
-    this.voileNoir = this.ajout(scene.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x000000, 0).setDepth(P + 5.5));
+    this.voileNoir = this.ajout(scene.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x000000, 0).setDepth(P + 8));   // P+8 : AU-DESSUS des touches, des flèches et des retours — un VRAI noir total
     // le KAMÉHAMÉHA du public : étiquettes aux deux bouts du rail (elles suivent this.yJauge)
     this.jaugeG = this.ajout(scene.add.graphics().setDepth(P + 4));
     this.yJauge = HAUTEUR - 12;   // le rail, tout en bas par défaut (remonté en haut sur téléphone)
@@ -96,7 +99,7 @@ export class Showtime {
     // les 4 couloirs : le fond, la touche en bas de chacun (un rond et sa flèche)
     this.couloirsG = this.ajout(scene.add.graphics().setDepth(P + 5));
     this.touchesC = {};
-    for (const n of DIRS) this.touchesC[n] = this.ajout(texte(scene, 0, 0, FLECHES[n], 40, '#ffffff', { fontStyle: 'bold' }).setDepth(P + 6).setAlpha(0.45));   // P+6 : visibles AU-DESSUS du voile du noir
+    for (const n of DIRS) this.touchesC[n] = this.ajout(texte(scene, 0, 0, FLECHES[n], 40, '#ffffff', { fontStyle: 'bold' }).setDepth(P + 6).setAlpha(0.45));   // P+6 : SOUS le voile du noir (P+8) : dans le noir total, on ne voit plus RIEN
     // le compte à rebours du GEL (au-dessus des couloirs gelés)
     this.gelCompte = this.ajout(texte(scene, LARGEUR / 2, 265, '', 24, '#dff6ff', { fontStyle: 'bold', strokeThickness: 7 }).setDepth(P + 6)).setVisible(false);
     this.retour = this.ajout(texte(scene, 0, 0, '', 26, '#ffffff', { fontStyle: 'bold', strokeThickness: 7 }).setDepth(P + 7));
@@ -148,7 +151,7 @@ export class Showtime {
     }).setOrigin(0, 0.5).setDepth(P + 10).setAlpha(0);
     s.tweens.add({ targets: bulle, alpha: 1, delay: 300, duration: 250 });
     const regles = texte(s, LARGEUR / 2, HAUTEUR - 104,
-      `${S.manches.length} MANCHES de ${Math.round(S.dureeRound)} SECONDES, chacune sur SA musique : garde l'aiguille du public de TON côté !\n` +
+      `${S.manches.length} MANCHES (${Math.round(S.dureeRound)} s puis ${Math.round(S.manches[1].duree || S.dureeRound)} s), chacune sur SA musique : garde l'aiguille du public de TON côté !\n` +
       'Les flèches TOMBENT en rythme : appuie quand elles arrivent en bas.' +
       (estTactile() ? '\nLe bouton à presser S\'ALLUME de plus en plus fort jusqu\'au bon moment.' : '') +
       '\nKédric est une star, il TRICHE : plancher GLACÉ, coupure de projecteurs, flèches DOUBLÉES\nen fin de manche... et un SOLO quand il sent qu\'il va perdre !' +
@@ -183,7 +186,7 @@ export class Showtime {
     const M = S.manches[this.numManche];
     this.musique = M.musique;
     this.duree = M.tempo.temps * S.tempsParPas;   // durée entre deux flèches, calée sur LE morceau de la manche
-    this.parRound = Math.floor(S.dureeRound / this.duree);
+    this.parRound = Math.floor((S.manches[this.numManche].duree || S.dureeRound) / this.duree);
     this.dernierPas = -1;
     this.gel = 0; this.noir = 0; this.techT = -99; this.dernierCompte = 99;   // techT : espacement mini ; dernierCompte : le décompte
     const fen = this.s.diff.fenetreShow;
@@ -218,13 +221,16 @@ export class Showtime {
     const champ = !!this.s.diff.flechesRouges;
     const rouge = champ ? S.rougeChance * 1.8 : S.rougeChance;
     this.dureeGel = champ ? S.piege.duree + 1 : S.piege.duree;   // en CHAMPION le gel dure plus longtemps
-    const attente = S.annonce + S.compte;   // les flèches attendent le DÉCOMPTE : pas de flèche direct à l'écran
+    this.comptes = [];   // le décompte de chaque manche, en pas de SA musique : DECOMPTE secondes pile
     let debut = 0;
     for (let r = 0; r < S.manches.length; r++) {
       const M = S.manches[r];
       const d = M.tempo.temps * S.tempsParPas;
-      const n = Math.floor(S.dureeRound / d);
+      const n = Math.floor((M.duree || S.dureeRound) / d);   // la manche dure SA durée (la chanson 2 : 'duree: 60' = 1 minute)
+      const compte = Math.max(1, Math.round(DECOMPTE / d));   // le décompte : DECOMPTE secondes, calées sur CE tempo
+      this.comptes.push(compte);
       this.tManches.push(debut);
+      const attente = S.annonce + compte;   // les flèches attendent le DÉCOMPTE : pas de flèche direct à l'écran
       const debutDoubles = (attente + n) * d - S.double.duree;
       let prec = null, prec2 = null;
       for (let j = 0; j < n; j++) {
@@ -277,7 +283,9 @@ export class Showtime {
     this.c = { x, cibleY: Phaser.Math.Clamp(hautBoutons - largeur * 0.5, 240, 470), largeur, haut: 84 };
     // sur téléphone, les boutons occupent le bas de l'écran : la jauge remonte EN HAUT (elle ne
     // doit jamais recouvrir les flèches, les touches à presser ni les boutons)
-    this.yJauge = 40;
+    // sur TÉLÉPHONE les boutons occupent le bas : SEULEMENT LÀ la jauge remonte en haut.
+    // Sur ORDINATEUR (pas d'écran tactile), le rail reste TOUT EN BAS, bien petit, sous les flèches.
+    this.yJauge = estTactile() && hautBoutons > HAUTEUR * 0.5 ? 40 : HAUTEUR - 12;
     this.etiquettesJauge[0].setPosition(24, this.yJauge);
     this.etiquettesJauge[1].setPosition(LARGEUR - 24, this.yJauge);
     this.etiquettesJauge[2].setPosition(LARGEUR / 2, this.yJauge - 16);
@@ -424,13 +432,13 @@ export class Showtime {
       this.bandeau('GO POUR LA DEUXIÈME CHANSON — VOUS ÊTES CHAUD, PUBLIC ?', '#ffd84a', 3.5);
     }
     // le DÉCOMPTE : les secondes restantes avant la première flèche de la manche, puis « GO ! »
-    // (S.compte pas de battement : le temps de se placer, les flèches ne tombent pas tout de suite)
+    // (DECOMPTE secondes pour se placer, calées sur le tempo : les flèches ne tombent pas tout de suite)
     {
-      const t0 = this.tManches[this.numManche] + (S.annonce + S.compte) * this.duree;
+      const t0 = this.tManches[this.numManche] + (S.annonce + this.comptes[this.numManche]) * this.duree;
       const sec = Math.ceil(t0 - this.T);
       if (sec !== this.dernierCompte) {
         this.dernierCompte = sec;
-        if (sec >= 1 && sec <= Math.ceil(S.compte * this.duree)) onomatopee(this.s, LARGEUR / 2, 190, String(sec), 62, '#ffd84a');
+        if (sec >= 1 && sec <= DECOMPTE) onomatopee(this.s, LARGEUR / 2, 190, String(sec), 62, '#ffd84a');
         else if (sec === 0) onomatopee(this.s, LARGEUR / 2, 190, 'GO !', 78, '#7fff7f');
       }
     }
@@ -477,7 +485,7 @@ export class Showtime {
 
   // à chaque temps de musique : Kédric prend la pose de la flèche (il danse avec toi)
   surLeTemps(k) {
-    const j = k - S.annonce - S.compte;   // le décompte a fait glisser les flèches de S.compte pas
+    const j = k - S.annonce - this.comptes[this.numManche];   // le décompte a fait glisser les flèches (DECOMPTE s, en pas de SA musique)
     if (j < 0) return;   // pendant le décompte : rien (les secondes s'affichent depuis maj())
     const p = this.pas.find(q => q.manche === this.numManche && q.slot === j);
     if (p) this.poseKedric(p.rouge ? 'triche' : p.montre);   // Kédric fait le pas en même temps que toi
@@ -536,6 +544,7 @@ export class Showtime {
     } else {
       this.bilan.rates++; this.public(-S.gain.rate);
       this.retour.setText(this.gele() ? 'GLACÉ !' : p.rouge ? 'RATÉ ! (l\'inverse !)' : 'RATÉ !').setColor('#ff6b6b');
+      if (!this.gele()) onomatopee(this.s, LARGEUR / 2, 150, 'RATÉ !', 54, '#ff6b6b');   // le public le VOIT : gros RATÉ bien marqué au milieu de l'écran
       lignesImpact(this.s, xChoc, this.yJauge, 0xff6b6b, 12, 100);
       if (!this.gele()) this.poseKedric('haut');
       this.consecParfaits = 0;
@@ -550,9 +559,9 @@ export class Showtime {
     this.s.tweens.add({ targets: tc, scale: 1, duration: echec ? 260 : 180 });
     this.s.tweens.killTweensOf(this.flash);
     this.flash.setFillStyle(echec ? 0xff3030 : note === 'parfait' ? 0x9fe0ff : 0x7fff7f, 0.3);
-    this.flash.setAlpha(0.3);
+    this.flash.setAlpha(echec ? 0.5 : 0.3);   // un RATÉ : le rouge INONDE l'écran, impossible à louper
     this.s.tweens.add({ targets: this.flash, alpha: 0, duration: echec ? 320 : 200 });
-    this.s.cameras.main.shake(echec ? 160 : 90, echec ? 0.008 : 0.003);
+    this.s.cameras.main.shake(echec ? 220 : 90, echec ? 0.013 : 0.003);
     this.s.tweens.killTweensOf(this.retour); this.retour.setAlpha(1).setScale(1.2);
     this.s.tweens.add({ targets: this.retour, scale: 1, duration: 120 });
     if (n) n.objet.setColor(note === 'rate' ? '#ff6b6b' : note === 'parfait' ? '#7fe8ff' : '#7fff7f');
@@ -581,7 +590,8 @@ export class Showtime {
   // ---------- affichage ----------
   afficher() {
     // la COUPURE de courant, comme une vraie : les projecteurs VACILLENT (quelques clignotements)
-    // puis MEURENT d'un coup — noir total, plus rien que les flèches de la fin (et les touches)
+    // puis MEURENT d'un coup — NOIR TOTAL, plus rien du tout : seule la DERNIÈRE flèche (juste
+    // avant de la presser) réapparaît au-dessus du voile, comme un éclair dans le noir
     if (this.noirOn()) {
       const dn = this.T - (this.noirDebut ?? this.T);
       this.voileNoir.setAlpha(dn > 0 && dn < 0.55 && Math.sin(dn * 60) < -0.3 ? 0.35 : 1);
@@ -686,6 +696,7 @@ export class Showtime {
       const dt = n.t - this.T, y = C.cibleY - dt * v;
       const visible = !n.pas.mange && y >= C.haut + 10 && dt > -0.3 && (!this.noirOn() || dt < NOIR.visibilite);
       n.objet.setVisible(visible);
+      n.objet.setDepth(visible && this.noirOn() ? P + 8.5 : P + 6);   // dans le noir total : seule la flèche de la fin s'affiche AU-DESSUS du voile
       if (!visible) continue;
       n.objet.setPosition(C.x[n.pas.montre], y);
       // passée la touche : elle s'efface

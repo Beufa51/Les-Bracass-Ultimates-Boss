@@ -89,14 +89,14 @@ export const REGLAGES = {
   //  parfait / bien : fenêtres de timing (s, x fenetreShow de la difficulté) ; gain : points de PUBLIC (de -100 à +100)
   //  parTouchdown / avanceMax : public de départ = (touchdowns - 1) x parTouchdown (aucun touchdown : il part pour Kédric)
   //  Le public est un KAMÉHAMÉHA père-fils (showtime.js) : PARFAIT = ta boule repousse celle de Kédric, RATÉ = elle recule.
-  showtime: { rounds: 2, dureeRound: 47,   // durée d'une manche en SECONDES de musique (45-50 s : raccourcir ici si besoin)
+  showtime: { rounds: 2, dureeRound: 47,   // durée de la MANCHE 1 en secondes (la manche 2 : 'duree' de sa propre ligne)
     pause: 2,
     manches: [
       { musique: 'kedric_battle', tempo: { debut: 54.969, temps: 0.3426 } },
-      { musique: 'kedric_dbz', tempo: { debut: 0, temps: 0.3896 } },
+      { musique: 'kedric_dbz', duree: 60, tempo: { debut: 0, temps: 0.3896 } },   // la chanson 2 : UNE MINUTE
     ],
     tempsParPas: 2, annonce: 4,
-    compte: 8,   // le DÉCOMPTE : 'compte' pas de battement (~5 s) entre le départ et la première flèche
+    // (le DÉCOMPTE 5-4-3-2-1-GO est dans showtime.js : DECOMPTE = 5 secondes PILE, calées sur le tempo de chaque morceau)
     intro: 9, introMini: 1.5, introMusique: 54.969,
     piste: { vitesse: 200 }, rougeChance: 0.12,
     piege: { nombre: 1, duree: 4 },   // par manche (CHAMPION : 1 s de plus)
@@ -106,7 +106,7 @@ export const REGLAGES = {
     double: { duree: 12 },
     combo: { nombre: 5, duree: 10, mult: 1.5 },
     drain: { seuil: 40, force: 0.15 },   // tu mènes trop : son public se rappelle à lui (jauge/s)
-    parfait: 0.12, bien: 0.28, gain: { parfait: 1.2, bien: 0.7, rate: 3.5 },   // raté = GROSSE pénalité
+    parfait: 0.12, bien: 0.28, gain: { parfait: 1.2, bien: 0.7, rate: 6 },   // raté = TRÈS GROSSE pénalité : le public te lâche VITE
     parTouchdown: 15, avanceMax: 30 },
   // ---------- Kédric en personne sur le terrain (option : course avec kedric: true) ----------
   //  il garde l'en-but et prévient toujours pareil : danse → POSE (son attaque s'affiche) → CHARGE
