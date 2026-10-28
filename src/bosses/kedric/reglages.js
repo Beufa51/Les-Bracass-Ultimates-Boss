@@ -89,11 +89,13 @@ export const REGLAGES = {
   //  parfait / bien : fenêtres de timing (s, x fenetreShow de la difficulté) ; gain : points de PUBLIC (de -100 à +100)
   //  parTouchdown / avanceMax : public de départ = (touchdowns - 1) x parTouchdown (aucun touchdown : il part pour Kédric)
   //  Le public est un KAMÉHAMÉHA père-fils (showtime.js) : PARFAIT = ta boule repousse celle de Kédric, RATÉ = elle recule.
-  showtime: { rounds: 2, dureeRound: 60, musique: 'kedric_battle',
+  showtime: { rounds: 1, dureeRound: 60, musique: 'kedric_battle',
     tempo: { debut: 54.969, temps: 0.3426 }, tempsParPas: 2, annonce: 4,
     intro: 9, introMini: 1.5, introMusique: 54.969,
     piste: { vitesse: 200 }, rougeChance: 0.12,
-    parfait: 0.12, bien: 0.28, gain: { parfait: 2.5, bien: 1.8, rate: 2.2 },
+    piege: { nombre: 2, duree: 4 },
+    solo: { seuil: 60, duree: 7, drain: 0.6, bonusParfait: 1.6 },
+    parfait: 0.12, bien: 0.28, gain: { parfait: 1.8, bien: 1.2, rate: 2.6 },
     parTouchdown: 15, avanceMax: 30 },
   // ---------- Kédric en personne sur le terrain (option : course avec kedric: true) ----------
   //  il garde l'en-but et prévient toujours pareil : danse → POSE (son attaque s'affiche) → CHARGE
