@@ -594,8 +594,12 @@ export class Showtime {
     // avant de la presser) réapparaît au-dessus du voile, comme un éclair dans le noir
     if (this.noirOn()) {
       const dn = this.T - (this.noirDebut ?? this.T);
+      // pendant l'écran SUPER POUVOIR (dn <= 0), le voile reste SOUS l'écran (P+8) ;
+      // pendant le VRAI noir (dn > 0), il monte AU-DESSUS DE TOUT (950) : HUD, bandeau,
+      // jauge, touches, onomatopées... plus RIEN ne reste allumé — une vraie coupure de courant
+      this.voileNoir.setDepth(dn > 0 ? 950 : P + 8);
       this.voileNoir.setAlpha(dn > 0 && dn < 0.55 && Math.sin(dn * 60) < -0.3 ? 0.35 : 1);
-    } else this.voileNoir.setAlpha(0);
+    } else { this.voileNoir.setAlpha(0); this.voileNoir.setDepth(P + 8); }
     // la JAUGE DU PUBLIC : rail fin + GRANDE AIGUILLE (elle glisse d'un côté ou de l'autre).
     // Placée là où elle ne gêne RIEN (this.yJauge) : en bas s'il y a la place, sinon en haut
     const g = this.jaugeG; g.clear();
@@ -648,7 +652,8 @@ export class Showtime {
       // (flèche rouge en CHAMPION : pas d'aide, c'est à toi d'inverser)
       if (dt < d * 1.5 && !this.pas[i].rouge) cible = { nom: this.pas[i].attendu, force: Math.max(0.15, Math.min(1, 1 - dt / (d * 1.5))), couleur };
     }
-    for (const n of DIRS) allumerBouton(n, cible && cible.nom === n ? cible.force : 0, cible ? cible.couleur : undefined);
+    const noirReel = this.noirOn() && this.T - (this.noirDebut ?? this.T) > 0;   // pendant le VRAI noir, les boutons du téléphone s'éteignent eux aussi
+    for (const n of DIRS) allumerBouton(n, !noirReel && cible && cible.nom === n ? cible.force : 0, cible ? cible.couleur : undefined);
     for (const n of DIRS) {
       const x = C.x[n];
       g.fillStyle(0x000000, 0.45); g.fillRoundedRect(x - w / 2, C.haut, w, C.cibleY - C.haut + w / 2, 14);
@@ -696,7 +701,7 @@ export class Showtime {
       const dt = n.t - this.T, y = C.cibleY - dt * v;
       const visible = !n.pas.mange && y >= C.haut + 10 && dt > -0.3 && (!this.noirOn() || dt < NOIR.visibilite);
       n.objet.setVisible(visible);
-      n.objet.setDepth(visible && this.noirOn() ? P + 8.5 : P + 6);   // dans le noir total : seule la flèche de la fin s'affiche AU-DESSUS du voile
+      n.objet.setDepth(visible && this.noirOn() && this.T - (this.noirDebut ?? this.T) > 0 ? 951 : P + 6);   // dans le VRAI noir : la flèche de la fin reste la seule lueur (au-dessus du voile 950)
       if (!visible) continue;
       n.objet.setPosition(C.x[n.pas.montre], y);
       // passée la touche : elle s'efface

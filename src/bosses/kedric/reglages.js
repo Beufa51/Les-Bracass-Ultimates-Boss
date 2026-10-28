@@ -95,7 +95,7 @@ export const REGLAGES = {
       { musique: 'kedric_battle', tempo: { debut: 54.969, temps: 0.3426 } },
       { musique: 'kedric_dbz', duree: 60, tempo: { debut: 0, temps: 0.3896 } },   // la chanson 2 : UNE MINUTE
     ],
-    tempsParPas: 2, annonce: 4,
+    tempsParPas: 2, annonce: 0,   // zéro temps mort : le décompte 5-4-3-2-1 démarre PILE quand la manche (et SA musique) démarrent
     // (le DÉCOMPTE 5-4-3-2-1-GO est dans showtime.js : DECOMPTE = 5 secondes PILE, calées sur le tempo de chaque morceau)
     intro: 9, introMini: 1.5, introMusique: 54.969,
     piste: { vitesse: 200 }, rougeChance: 0.12,
