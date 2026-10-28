@@ -48,10 +48,11 @@ const KED = { x: 480, pieds: 392, hauteur: 335 };
 const TOI = { x: 480, pieds: HAUTEUR + 34, zoom: 0.85 };
 // les couloirs sans écran tactile (sur téléphone : au-dessus des boutons, voir calculerCouloirs)
 const COULOIRS = { x: { gauche: 105, droite: 215, haut: 745, bas: 855 }, cibleY: 455, largeur: 96, haut: 84 };
-// le KAMÉHAMÉHA du public, EN BAS de l'écran (là où tes yeux sont) : un RAIL de gauche à droite
-// (ta moitié BLEUE, celle de Kédric DORÉE) et une GRANDE AIGUILLE BLANCHE pointée sur la boule
-// du point de choc — elle glisse d'un côté ou de l'autre au fil des réussites
-const KHAM = { y: HAUTEUR - 26, h: 12, marge: 170, portee: 280 };
+// le KAMÉHAMÉHA du public : un RAIL fin avec une GRANDE AIGUILLE pointée sur la boule du point
+// de choc (elle glisse d'un côté ou de l'autre au fil des réussites). Position : this.yJauge —
+// tout en bas s'il y a la place, sinon EN HAUT (sur téléphone les boutons occupent le bas) :
+// le rail ne recouvre JAMAIS les flèches, les touches à presser ni les boutons.
+const KHAM = { marge: 170, portee: 280 };
 // la coupure de courant : dans le noir, on ne voit une flèche que dans ses 'visibilite' dernières secondes
 const NOIR = { visibilite: 0.3 };
 // la durée de l'ÉCRAN SUPER POUVOIR (façon supers de Lionel) : le battle s'arrête le temps
@@ -84,12 +85,13 @@ export class Showtime {
     // le flash plein écran (feedback d'appui + écran SUPER POUVOIR) et le voile du noir
     this.flash = this.ajout(scene.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0xffffff, 0).setDepth(P + 9));
     this.voileNoir = this.ajout(scene.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x000000, 0).setDepth(P + 5.5));
-    // le KAMÉHAMÉHA du public, en bas : ton étiquette à gauche (bleu), celle de Kédric à droite (doré)
+    // le KAMÉHAMÉHA du public : étiquettes aux deux bouts du rail (elles suivent this.yJauge)
     this.jaugeG = this.ajout(scene.add.graphics().setDepth(P + 4));
+    this.yJauge = HAUTEUR - 12;   // le rail, tout en bas par défaut (remonté en haut sur téléphone)
     this.etiquettesJauge = [
-      texte(scene, KHAM.marge - 16, KHAM.y, 'TOI', 16, '#7fe8ff', { fontStyle: 'bold' }).setOrigin(1, 0.5),
-      texte(scene, LARGEUR - KHAM.marge + 16, KHAM.y, 'KÉDRIC', 16, '#ff9a3c', { fontStyle: 'bold' }).setOrigin(0, 0.5),
-      texte(scene, LARGEUR / 2, KHAM.y - 20, 'PUBLIC', 13, '#ffffff'),
+      texte(scene, 24, this.yJauge, 'TOI', 16, '#7fe8ff', { fontStyle: 'bold' }).setOrigin(0, 0.5),
+      texte(scene, LARGEUR - 24, this.yJauge, 'KÉDRIC', 16, '#ff9a3c', { fontStyle: 'bold' }).setOrigin(1, 0.5),
+      texte(scene, LARGEUR / 2, this.yJauge - 16, 'PUBLIC', 13, '#ffffff'),
     ].map(t => this.ajout(t.setDepth(P + 4)));
     // les 4 couloirs : le fond, la touche en bas de chacun (un rond et sa flèche)
     this.couloirsG = this.ajout(scene.add.graphics().setDepth(P + 5));
@@ -183,7 +185,7 @@ export class Showtime {
     this.duree = M.tempo.temps * S.tempsParPas;   // durée entre deux flèches, calée sur LE morceau de la manche
     this.parRound = Math.floor(S.dureeRound / this.duree);
     this.dernierPas = -1;
-    this.gel = 0; this.noir = 0; this.techT = -99;   // techT : horodatage de la dernière technique (espacement mini)
+    this.gel = 0; this.noir = 0; this.techT = -99; this.dernierCompte = 99;   // techT : espacement mini ; dernierCompte : le décompte
     const fen = this.s.diff.fenetreShow;
     this.fenetre = { parfait: Math.min(S.parfait * fen, this.duree * 0.25), bien: Math.min(S.bien * fen, this.duree * 0.45) };
     if (premiere) {
@@ -216,16 +218,17 @@ export class Showtime {
     const champ = !!this.s.diff.flechesRouges;
     const rouge = champ ? S.rougeChance * 1.8 : S.rougeChance;
     this.dureeGel = champ ? S.piege.duree + 1 : S.piege.duree;   // en CHAMPION le gel dure plus longtemps
+    const attente = S.annonce + S.compte;   // les flèches attendent le DÉCOMPTE : pas de flèche direct à l'écran
     let debut = 0;
     for (let r = 0; r < S.manches.length; r++) {
       const M = S.manches[r];
       const d = M.tempo.temps * S.tempsParPas;
       const n = Math.floor(S.dureeRound / d);
       this.tManches.push(debut);
-      const debutDoubles = (S.annonce + n) * d - S.double.duree;
+      const debutDoubles = (attente + n) * d - S.double.duree;
       let prec = null, prec2 = null;
       for (let j = 0; j < n; j++) {
-        const t = debut + (S.annonce + j) * d;
+        const t = debut + (attente + j) * d;
         const ajoute = (montre, double = false) => {
           const rougee = this.s.diff.flechesRouges && (r > 0 || j > 0) && Math.random() < rouge;
           this.pas.push({ montre, rouge: rougee, attendu: rougee ? INVERSE[montre] : montre, note: null, t, slot: j, manche: r, piege: false, declenche: false, double });
@@ -242,18 +245,18 @@ export class Showtime {
       }
       // les pièges (GEL) de cette manche : jamais trop près du début ni de la fin, et LOIN de la
       // coupure de courant (S.ecartTech d'écart minimum : deux techniques trop proches, c'est la mitraille)
-      const tNoirManche = S.noir.nombre > 0 ? (S.annonce + n * 0.4) * d : -1e9;
+      const tNoirManche = S.noir.nombre > 0 ? (attente + n * 0.4) * d : -1e9;
       const pieges = new Set();
       while (pieges.size < Math.min(S.piege.nombre, n - 14)) {
         const j = 8 + Math.floor(Math.random() * (n - 16));
         if (![...pieges].every(p => Math.abs(p - j) >= 8)) continue;
-        if (Math.abs((S.annonce + j) * d - tNoirManche) < S.ecartTech + ECRAN_POUVOIR) continue;   // pas collé au noir
+        if (Math.abs((attente + j) * d - tNoirManche) < S.ecartTech + ECRAN_POUVOIR) continue;   // pas collé au noir
         pieges.add(j);
       }
       for (const j of pieges) this.pas.filter(p => p.manche === r && p.slot === j).forEach(p => p.piege = true);
       // la coupure de courant de cette manche : vers 40 % de la manche
-      if (S.noir.nombre > 0) this.tNoirs.push(debut + (S.annonce + n * 0.4) * d);
-      debut = debut + (S.annonce + n) * d + 0.6 + S.pause;   // fin de la manche, puis une pause
+      if (S.noir.nombre > 0) this.tNoirs.push(debut + (attente + n * 0.4) * d);
+      debut = debut + (attente + n) * d + 0.6 + S.pause;   // fin de la manche, puis une pause
     }
   }
 
@@ -272,6 +275,12 @@ export class Showtime {
     DIRS.forEach((n, i) => { x[n] = Phaser.Math.Clamp((rects[i].left + rects[i].width / 2 - ecran.left) * kx, largeur / 2 + 4, LARGEUR - largeur / 2 - 4); });
     const hautBoutons = Math.min(...rects.map(r => (r.top - ecran.top) * ky));
     this.c = { x, cibleY: Phaser.Math.Clamp(hautBoutons - largeur * 0.5, 240, 470), largeur, haut: 84 };
+    // sur téléphone, les boutons occupent le bas de l'écran : la jauge remonte EN HAUT (elle ne
+    // doit jamais recouvrir les flèches, les touches à presser ni les boutons)
+    this.yJauge = 40;
+    this.etiquettesJauge[0].setPosition(24, this.yJauge);
+    this.etiquettesJauge[1].setPosition(LARGEUR - 24, this.yJauge);
+    this.etiquettesJauge[2].setPosition(LARGEUR / 2, this.yJauge - 16);
   }
 
   // les flèches qui tombent : à toi de jouer (Kédric danse avec toi, il ne démontre plus)
@@ -330,7 +339,7 @@ export class Showtime {
   // d'un écran, impossible à rater. Les flèches qui tomberaient PENDANT l'écran sont retirées
   // (aucune pénalité, aucune flèche perdue derrière le fond) : le battle reprend pile sur le
   // piège, toujours dans le rythme (pas plus de 2 écrans par manche : le gel et le noir).
-  superPouvoir(nom, couleur, info) {
+  superPouvoir(nom, couleur, info, opts = {}) {
     const s = this.s, cx = LARGEUR / 2, cy = HAUTEUR / 2, coul = Phaser.Display.Color.HexStringToColor(couleur).color;
     // les flèches qui tomberaient pendant l'écran sont retirées (jamais les pièges du gel)
     this.pas.forEach(p => { if (p.note === null && !p.declenche && p.t < this.T + ECRAN_POUVOIR) { p.note = 'esquive'; p.mange = true; } });
@@ -344,7 +353,8 @@ export class Showtime {
     const lignes = this.ajout(s.add.graphics().setDepth(P + 21).setPosition(cx, cy));
     for (let k = 0; k < 40; k++) {
       const a = (k / 40) * Math.PI * 2 + Math.random() * 0.1, r = 90 + Math.random() * 80;
-      lignes.lineStyle(2 + Math.random() * 4, k % 3 ? coul : 0xffffff, 0.3 + Math.random() * 0.4);
+      const cLignes = opts.coupure ? (k % 3 ? 0x555a66 : 0x888888) : (k % 3 ? coul : 0xffffff);   // coupure : lignes GRISES, des projecteurs qui meurent
+      lignes.lineStyle(2 + Math.random() * 4, cLignes, 0.3 + Math.random() * 0.4);
       lignes.lineBetween(Math.cos(a) * r, Math.sin(a) * r, Math.cos(a) * 900, Math.sin(a) * 900);
     }
     s.tweens.add({ targets: lignes, angle: 35, duration: ECRAN_POUVOIR * 1000 });
@@ -380,6 +390,11 @@ export class Showtime {
     s.tweens.add({ targets: titre, scale: 1, alpha: 1, delay: 220, duration: 220, ease: 'Back.Out',
       onComplete: () => s.cameras.main.shake(220, 0.014) });
     el.push(haut, titre);
+    if (opts.coupure) {
+      // la coupure : le titre CLIGNOTE comme un néon qui rend l'âme, et le « ZZZT ! » du disjoncteur
+      s.tweens.add({ targets: titre, alpha: { from: 0.55, to: 1 }, duration: 90, yoyo: true, repeat: 4 });
+      onomatopee(s, cx, cy + 130, 'ZZZT !', 44, '#9fe0ff');
+    }
     if (info) {
       const sous = this.ajout(texte(s, xt, cy + 66, info, 24, '#ffffff', { fontStyle: 'bold', strokeThickness: 7 }).setOrigin(0.5).setDepth(P + 26).setAlpha(0));
       s.tweens.add({ targets: sous, alpha: 1, delay: 420, duration: 200 });
@@ -406,8 +421,18 @@ export class Showtime {
       this.numManche++;
       this.debutManche = this.tManches[this.numManche];
       this.demarrerManche(false);
-      this.bandeau(`MANCHE ${this.numManche + 1} / ${this.tManches.length} : MÊMES RÈGLES !`, '#ffd84a', 2.5);
-      onomatopee(this.s, LARGEUR / 2, 150, `MANCHE ${this.numManche + 1} !`, 54, '#ffd84a');
+      this.bandeau('GO POUR LA DEUXIÈME CHANSON — VOUS ÊTES CHAUD, PUBLIC ?', '#ffd84a', 3.5);
+    }
+    // le DÉCOMPTE : les secondes restantes avant la première flèche de la manche, puis « GO ! »
+    // (S.compte pas de battement : le temps de se placer, les flèches ne tombent pas tout de suite)
+    {
+      const t0 = this.tManches[this.numManche] + (S.annonce + S.compte) * this.duree;
+      const sec = Math.ceil(t0 - this.T);
+      if (sec !== this.dernierCompte) {
+        this.dernierCompte = sec;
+        if (sec >= 1 && sec <= Math.ceil(S.compte * this.duree)) onomatopee(this.s, LARGEUR / 2, 190, String(sec), 62, '#ffd84a');
+        else if (sec === 0) onomatopee(this.s, LARGEUR / 2, 190, 'GO !', 78, '#7fff7f');
+      }
     }
     const TL = this.T - this.debutManche, d = this.duree, k = Math.floor(TL / d);
     if (k > this.dernierPas) { this.dernierPas = k; this.surLeTemps(k); }
@@ -427,7 +452,8 @@ export class Showtime {
       if (libre && calme && this.tNoirs.length && this.T >= this.tNoirs[0]) {
         this.tNoirs.shift();
         this.noir = this.T + ECRAN_POUVOIR + S.noir.duree;
-        this.superPouvoir('COUPURE DE COURANT !', '#ff9a9a', "ON NE VOIT LES FLÈCHES QU'À LA FIN !");
+        this.noirDebut = this.T + ECRAN_POUVOIR;   // juste après l'écran, les projecteurs vacillent avant de mourir
+        this.superPouvoir('COUPURE DE COURANT !', '#ff9a9a', "ON NE VOIT LES FLÈCHES QU'À LA FIN !", { coupure: true });
       }
       // le SOLO : quand il est à deux doigts de perdre, Kédric joue sa carte et draine le public
       if (libre && calme && !this.soloFait && this.T - this.debutManche > 10 && this.jauge > S.solo.seuil) {
@@ -451,12 +477,8 @@ export class Showtime {
 
   // à chaque temps de musique : Kédric prend la pose de la flèche (il danse avec toi)
   surLeTemps(k) {
-    const j = k - S.annonce;
-    if (j < 0) {
-      if (this.phase === 'annonce' && k >= S.annonce - 3 && k < S.annonce)
-        onomatopee(this.s, KED.x + 230, 300, String(S.annonce - k), 44, '#ffd84a');
-      return;
-    }
+    const j = k - S.annonce - S.compte;   // le décompte a fait glisser les flèches de S.compte pas
+    if (j < 0) return;   // pendant le décompte : rien (les secondes s'affichent depuis maj())
     const p = this.pas.find(q => q.manche === this.numManche && q.slot === j);
     if (p) this.poseKedric(p.rouge ? 'triche' : p.montre);   // Kédric fait le pas en même temps que toi
   }
@@ -499,7 +521,7 @@ export class Showtime {
       this.bilan.parfaits++;
       this.public(S.gain.parfait * mult + (this.solo() ? S.solo.bonusParfait : 0));
       this.retour.setText(this.solo() ? 'CONTRE-PARFAIT !' : 'PARFAIT !').setColor('#7fe8ff');
-      lignesImpact(this.s, xc, this.c.cibleY, 0x9fe0ff, 10, 70); lignesImpact(this.s, xChoc, KHAM.y, 0xffffff, 12, 100);
+      lignesImpact(this.s, xc, this.c.cibleY, 0x9fe0ff, 10, 70); lignesImpact(this.s, xChoc, this.yJauge, 0xffffff, 12, 100);
       // le COMBO : 5 PARFAITS d'affilée et la foule est à toi !
       this.consecParfaits++;
       if (this.consecParfaits >= S.combo.nombre && !this.combo()) {
@@ -514,7 +536,7 @@ export class Showtime {
     } else {
       this.bilan.rates++; this.public(-S.gain.rate);
       this.retour.setText(this.gele() ? 'GLACÉ !' : p.rouge ? 'RATÉ ! (l\'inverse !)' : 'RATÉ !').setColor('#ff6b6b');
-      lignesImpact(this.s, xChoc, KHAM.y, 0xff6b6b, 12, 100);
+      lignesImpact(this.s, xChoc, this.yJauge, 0xff6b6b, 12, 100);
       if (!this.gele()) this.poseKedric('haut');
       this.consecParfaits = 0;
     }
@@ -558,36 +580,36 @@ export class Showtime {
 
   // ---------- affichage ----------
   afficher() {
-    // le voile du noir (au-dessus des couloirs, SOUS les flèches : on ne voit que celles du dernier moment)
-    this.voileNoir.setAlpha(this.noirOn() ? 1 : 0);   // NOIR TOTAL : plus rien d'autre que les flèches de la fin (et les touches)
-    // la JAUGE DU PUBLIC, EN BAS (près des touches, là où tu joues) : ton faisceau BLEU depuis la gauche,
-    // le DORÉ de Kédric depuis la droite, la BOULE BLANCHE pulsante et la GRANDE AIGUILLE au point
-    // de choc — c'est ELLE qui désigne le gagnant : elle glisse d'un côté ou de l'autre
+    // la COUPURE de courant, comme une vraie : les projecteurs VACILLENT (quelques clignotements)
+    // puis MEURENT d'un coup — noir total, plus rien que les flèches de la fin (et les touches)
+    if (this.noirOn()) {
+      const dn = this.T - (this.noirDebut ?? this.T);
+      this.voileNoir.setAlpha(dn > 0 && dn < 0.55 && Math.sin(dn * 60) < -0.3 ? 0.35 : 1);
+    } else this.voileNoir.setAlpha(0);
+    // la JAUGE DU PUBLIC : rail fin + GRANDE AIGUILLE (elle glisse d'un côté ou de l'autre).
+    // Placée là où elle ne gêne RIEN (this.yJauge) : en bas s'il y a la place, sinon en haut
     const g = this.jaugeG; g.clear();
     if (this.phase !== 'intro') {
-      const y = KHAM.y, h = KHAM.h;
+      const y = this.yJauge, h = 8;
       const cx = this.pointChoc();
       const puls = 1 + 0.12 * Math.sin(this.T * 9);
-      // le rail (fond sombre) et les deux faisceaux
-      g.fillStyle(0x000000, 0.5); g.fillRoundedRect(KHAM.marge - 12, y - h / 2 - 5, LARGEUR - 2 * KHAM.marge + 24, h + 10, 8);
+      g.fillStyle(0x000000, 0.55); g.fillRoundedRect(KHAM.marge - 10, y - h / 2 - 4, LARGEUR - 2 * KHAM.marge + 20, h + 8, 6);
       g.fillStyle(0x2f8fff, 0.9); g.fillRoundedRect(KHAM.marge, y - h / 2, Math.max(0, cx - KHAM.marge), h, h / 2);
       g.fillStyle(0xffffff, 0.35); g.fillRect(KHAM.marge, y - 2, Math.max(0, cx - KHAM.marge), 4);
       g.fillStyle(0xff9a3c, 0.9); g.fillRoundedRect(cx, y - h / 2, Math.max(0, LARGEUR - KHAM.marge - cx), h, h / 2);
       g.fillStyle(0xffffff, 0.35); g.fillRect(cx, y - 2, Math.max(0, LARGEUR - KHAM.marge - cx), 4);
       // la boule du point de choc (blanche, pulsante) : les impacts PARFAIT / RATÉ la frappent ici
-      g.fillStyle(0xffffff, 0.95); g.fillCircle(cx, y, h * 0.9 * puls);
-      g.lineStyle(3, 0xffffff, 0.9); g.strokeCircle(cx, y, h * 0.9 * puls + 3);
-      // LA GRANDE AIGUILLE : le triangle qui pointe sur la boule depuis le bas de l'écran
+      g.fillStyle(0xffffff, 0.95); g.fillCircle(cx, y, h * 1.1 * puls);
+      // LA GRANDE AIGUILLE : le triangle qui pointe sur la boule par-dessus le rail
       // (bleu glacier quand tu mènes, doré quand Kédric mène — on voit d'un coup d'œil qui gagne)
-      const ay = HAUTEUR - 2;
       g.fillStyle(this.jauge >= 0 ? 0x7fe8ff : 0xff9a3c, 0.95);
-      g.fillTriangle(cx - 15, ay, cx + 15, ay, cx, y + h / 2 + 2);
+      g.fillTriangle(cx - 13, y + h / 2 + 2, cx + 13, y + h / 2 + 2, cx, y - 15);
       g.lineStyle(2, 0xffffff, 0.8);
-      g.lineBetween(cx - 15, ay, cx, y + h / 2 + 2); g.lineBetween(cx + 15, ay, cx, y + h / 2 + 2);
+      g.lineBetween(cx - 13, y + h / 2 + 2, cx, y - 15); g.lineBetween(cx + 13, y + h / 2 + 2, cx, y - 15);
       // le SOLO de Kédric : la boule luit et l'aiguille vibre
       if (this.solo()) { g.lineStyle(4, 0xffd84a, 0.7); g.strokeCircle(cx, y, h * 1.6 + 3 * Math.sin(this.T * 20)); }
       // la foule est à toi : ton faisceau luit vert
-      if (this.combo()) { g.lineStyle(3, 0x7fff7f, 0.6); g.strokeRoundedRect(KHAM.marge - 3, y - h / 2 - 3, Math.max(0, cx - KHAM.marge) + 6, h + 6, 8); }
+      if (this.combo()) { g.lineStyle(3, 0x7fff7f, 0.6); g.strokeRoundedRect(KHAM.marge - 3, y - h / 2 - 3, Math.max(0, cx - KHAM.marge) + 6, h + 6, 6); }
     }
     // le bandeau d'un évènement se range tout seul après un moment
     if (this.finBandeau !== null && this.T > this.finBandeau) { this.s.bandeau.setVisible(false); this.finBandeau = null; }

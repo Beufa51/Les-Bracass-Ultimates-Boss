@@ -96,6 +96,7 @@ export const REGLAGES = {
       { musique: 'kedric_dbz', tempo: { debut: 0, temps: 0.3896 } },
     ],
     tempsParPas: 2, annonce: 4,
+    compte: 8,   // le DÉCOMPTE : 'compte' pas de battement (~5 s) entre le départ et la première flèche
     intro: 9, introMini: 1.5, introMusique: 54.969,
     piste: { vitesse: 200 }, rougeChance: 0.12,
     piege: { nombre: 1, duree: 4 },   // par manche (CHAMPION : 1 s de plus)
