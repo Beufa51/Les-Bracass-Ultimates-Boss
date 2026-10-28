@@ -19,7 +19,7 @@ import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { installerJoystick } from './joystick.js';
-import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
+import { Sauvegarde, formatTemps, lignesDefis } from '../../core/sauvegarde.js';
 import { choisirDifficulte, cleRecord } from './difficulte.js';
 import { IDENTITE, TERRAIN as T, DIFFICULTES, REGLAGES as R, REPLIQUES } from './reglages.js';
 import { ETAPES, VITESSE_ENTRAINEMENT } from './entrainement.js';
@@ -861,11 +861,21 @@ export class LionelMatch extends BossScene {
     const complet = this.phase === 'set1';
     const record = complet ? Sauvegarde.proposerRecord(this.cleRecord(), rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record(this.cleRecord());
     this.rang = rang;
+    // LE BILAN DU COACH : réussites, erreurs + UN conseil pour progresser (et les défis de maîtrise)
+    const conseil = (this.stats.setsPerdus || 0) > 0 ? 'Conseil : garde ta position au fond du terrain : un lob mal placé coûte un set.'
+      : this.stats.concedes >= 8 ? 'Conseil : rattrape les lobs juste au-dessus du sol = SUPER LANCER.'
+      : 'Conseil : relance tout de suite après une réception = lancer PUISSANT, Lionel ne suit plus.';
     return `Lionel est battu !\nRANG ${rang}   -   temps ${formatTemps(this.tempsTotal)}` +
-      `\nSets ${this.sets.j} - ${this.sets.l}   points encaissés : ${this.stats.concedes}` +
+      `\nSets ${this.sets.j} - ${this.sets.l}   points marqués : ${this.stats.marques}   encaissés : ${this.stats.concedes}` +
       (record ? `\nRecord : rang ${record.rang} en ${formatTemps(record.temps)}` : '') +
       (this.stats.supers ? `\nSuper lancers : ${this.stats.supers}` : '') +
-      (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '');
+      (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '') +
+      '\n' + lignesDefis('lionel', [
+        { id: 'sec', nom: 'Gagner sans perdre un seul set', test: () => (this.stats.setsPerdus || 0) === 0 },
+        { id: 'troisSupers', nom: 'Marquer 3 SUPER LANCERS', test: () => this.stats.supers >= 3 },
+        { id: 'hermetique', nom: 'Encaisser moins de 8 points', test: () => this.stats.concedes < 8 },
+      ]).join('\n') +
+      `\n${conseil}`;
   }
 
   attendre(duree, ensuite) { this.attente = duree; this.apresAttente = ensuite; }

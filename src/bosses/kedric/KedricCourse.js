@@ -19,7 +19,7 @@ import { jouerMusique } from '../../core/musique.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
 import { estTactile, etiquettesTactiles, disposition } from '../../core/tactile.js';
-import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
+import { Sauvegarde, formatTemps, lignesDefis } from '../../core/sauvegarde.js';
 import { choisirDifficulte, cleRecord } from './difficulte.js';
 import { Showtime } from './showtime.js';
 import { IDENTITE, DIFFICULTES, VUE, REGLAGES as R, COURSES, COUVERTURE, FORMATIONS, VERROU_SUIVEUR, REPLIQUES } from './reglages.js';
@@ -869,6 +869,7 @@ export class KedricCourse extends BossScene {
       this.tweens.add({ targets: noir, alpha: 0, duration: 500, onComplete: () => noir.destroy() });
       this.lancerShowtime({ jauge: depart,
         replique: td > 0 ? REPLIQUES.finale : REPLIQUES.finaleZero, sousTitre: avance }, (gagne, bilan) => {
+        this.dernierBilanDanse = bilan;   // parfaits, biens, ratés, part du public : pour le bilan de victoire
         this.stats.parfaits += bilan.parfaits;
         if (gagne) {
           jouerSon(this, 'kedric_touchdown'); jouerSon(this, 'kedric_foule');
@@ -914,12 +915,28 @@ export class KedricCourse extends BossScene {
     const complet = this.phase === 'action1';
     const record = complet ? Sauvegarde.proposerRecord(this.cleRecord(), rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record(this.cleRecord());
     this.rang = rang;
+    // LE BILAN DU COACH : réussites, erreurs, part du public gagnée (battle) + UN conseil pour progresser
+    const bd = this.dernierBilanDanse;
+    const publicPourToi = bd ? Math.max(0, Math.min(100, Math.round(bd.jauge || 0))) : null;
+    const conseil = bd
+      ? (bd.rates >= 10 ? 'Conseil du coach : au battle, garde le rythme même piégé — chaque raté rend le public à Kédric.'
+        : bd.rates >= 5 ? 'Conseil du coach : vise le PARFAIT pile sur le temps : c\'est lui qui fait basculer le public.'
+        : 'Conseil du coach : enchaîne 5 PARFAITS d\'affilée : la foule est à toi (COMBO x1,5).')
+      : (this.stats.plaquages >= 3 ? 'Conseil du coach : esquive les plaqueurs PLUS TÔT, le symbole s\'affiche avant le contact.'
+        : 'Conseil du coach : les esquives PARFAITES remplissent le Devil Bat Ghost — garde-le pour les murs.');
     return `Kédric est battu au battle de danse !  Touchdowns : ${this.stats.touchdowns} / ${R.courses}\nRANG ${rang}   -   temps ${formatTemps(this.tempsTotal)}` +
       `\nPlaquages subis : ${this.stats.plaquages}   esquives : ${this.stats.esquives}` +
       `\nEsquives parfaites : ${this.stats.parfaits}` +
       (this.stats.ghosts ? `   Devil Bat Ghost : ${this.stats.ghosts}` : '') +
+      (publicPourToi !== null ? `\nBattle : ${bd.parfaits} parfaits, ${bd.bien} biens, ${bd.rates} ratés   -   public gagné : ${publicPourToi} %` : '') +
       (record ? `\nRecord : rang ${record.rang} en ${formatTemps(record.temps)}` : '') +
-      (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '');
+      (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '') +
+      '\n' + lignesDefis('kedric', [
+        { id: 'parfait40', nom: '40 esquives PARFAITES (courses + battle)', test: () => this.stats.parfaits >= 40 },
+        { id: 'sansGhost', nom: 'Gagner sans JAMAIS utiliser le Devil Bat Ghost', test: () => this.stats.ghosts === 0 },
+        { id: 'public80', nom: 'Battle gagné avec 80 % du public pour toi', test: () => publicPourToi !== null && publicPourToi >= 80 },
+      ]).join('\n') +
+      `\n${conseil}`;
   }
 
   // =================================================================

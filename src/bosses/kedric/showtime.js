@@ -579,7 +579,7 @@ export class Showtime {
     // tu gagnes : il s'effondre ; il gagne : clin d'œil de star (jamais la pose du perdant)
     this.poseKedric(gagne ? 'defaite' : 'triche');
     this.poseToi(gagne ? 'haut' : null);
-    this.fin(gagne, this.bilan);
+    this.fin(gagne, { ...this.bilan, jauge: Math.round(this.jauge) });   // + la part du public à la fin : pour le bilan de victoire
   }
 
   public(n) { this.jauge = Math.max(-100, Math.min(100, this.jauge + n)); }

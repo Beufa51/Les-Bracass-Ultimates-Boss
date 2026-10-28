@@ -21,7 +21,7 @@ import { IDENTITE, DIFFICULTES, REGLAGES as R, ATTAQUES, ENCHAINEMENTS, ENCHAINE
 import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from './effets.js';
 import { jouerClip } from '../../core/clips.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
-import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
+import { Sauvegarde, formatTemps, lignesDefis } from '../../core/sauvegarde.js';
 import { choisirDifficulte, cleRecord } from './difficulte.js';
 import { rangerBoutonPause } from './boutonPause.js';
 
@@ -1108,10 +1108,23 @@ export class GregCombat extends BossScene {
     const complet = (this.donnees.phase || 'round1') === 'round1';
     const record = complet ? Sauvegarde.proposerRecord(this.cleRecord(), rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record(this.cleRecord());
     const t = formatTemps;   // chrono au centième, comme Super Punch-Out
+    // LE BILAN DU COACH : réussites, erreurs + UN conseil pour progresser (et les défis de maîtrise)
+    const sr = this.statsRound || {};
+    const conseil = sr.tropTot >= 3 ? 'Conseil du coach : n\'attaque pas TROP TÔT — attends son « ! » pour frapper.'
+      : (sr.mauvaisCote || 0) >= 3 ? 'Conseil du coach : esquive du côté OPPOSÉ au poing (ou garde BASSE sur le jaune).'
+      : this.stats.recus >= 40 ? 'Conseil du coach : esquive plus, encaisse moins — chaque coup reçu te rapproche du tapis.'
+      : 'Conseil du coach : après une esquive, la fenêtre de CONTRE frappe trois fois plus fort.';
     return `${debut}\nRANG ${rang}   -   temps ${t(this.tempsTotal)}` +
       (record ? `\nRecord : rang ${record.rang} en ${t(record.temps)}` : '') +
       (this.secretFait ? '\n(Coup secret trouvé !)' : '') +
-      (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '');
+      (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '') +
+      `\nCoups donnés : ${Math.round(this.stats.donnes)}   reçus : ${Math.round(this.stats.recus)}   passages au tapis : ${this.j.downs}` +
+      '\n' + lignesDefis('greg', [
+        { id: 'ko', nom: 'Gagner par K.O. (pas aux points)', test: () => ko },
+        { id: 'jamaisTapis', nom: 'Ne JAMAIS aller au tapis', test: () => this.j.downs === 0 },
+        { id: 'cuirasse', nom: 'Moins de 30 coups reçus', test: () => this.stats.recus < 30 },
+      ]).join('\n') +
+      `\n${conseil}`;
   }
 
   // Écran de victoire : rayons dorés, Greg amoché qui te remet le trophée, ton rang et ton temps

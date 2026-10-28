@@ -40,6 +40,15 @@ export const Sauvegarde = {
   fait(cle) { return !!(donnees.faits || {})[cle]; },
   marquerFait(cle) { donnees.faits = { ...(donnees.faits || {}), [cle]: true }; ecrire(donnees); },
 
+  // DÉFIS DE MAÎTRISE d'un boss (une clé par défi, gardés pour toujours)
+  defis(id) { return (donnees.defis || {})[id] || {}; },
+  reussirDefi(id, cle) {
+    const deja = !!this.defis(id)[cle];
+    donnees.defis = { ...(donnees.defis || {}), [id]: { ...this.defis(id), [cle]: true } };
+    if (!deja) ecrire(donnees);
+    return !deja;   // true seulement la PREMIÈRE fois : l'écran de victoire peut le fêter
+  },
+
   // dernière difficulté choisie pour un boss
   difficulte(id) { return (donnees.difficultes || {})[id] || 'normal'; },
   reglerDifficulte(id, nom) { donnees.difficultes = { ...(donnees.difficultes || {}), [id]: nom }; ecrire(donnees); },
@@ -55,6 +64,21 @@ export const Sauvegarde = {
     return donnees.records[id];
   },
 };
+
+// Lignes de DÉFIS DE MAÎTRISE pour un écran de victoire : un défi réussi POUR LA PREMIÈRE
+// FOIS est fêté en ★, les déjà réussis restent cochés, les autres sont proposés pour la revanche.
+export function lignesDefis(idBoss, liste) {
+  const lignes = [];
+  for (const d of liste) {
+    if (d.test()) {
+      const nouveau = Sauvegarde.reussirDefi(idBoss, d.id);
+      lignes.push(`${nouveau ? '★ DÉFI RÉUSSI : ' : 'Défi déjà réussi : '}${d.nom}`);
+    } else {
+      lignes.push(`Défi à débloquer : ${d.nom}`);
+    }
+  }
+  return lignes;
+}
 
 // Temps au format 1'16"55
 export function formatTemps(x) {
