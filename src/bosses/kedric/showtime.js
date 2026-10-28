@@ -150,7 +150,10 @@ export class Showtime {
     this.etiquettesJauge.forEach(t => t.setVisible(true));
     const m = tempsMusique(S.musique);
     this.suiviMusique = null; this.tempsMusical = 0; this.dureePiste = null;   // suivi musical monotone (horloge)
-    this.origine = m === null ? S.introMusique : m;   // le temps musical courant (jamais de re-placement)
+    // la session démarre PILE SUR UN TEMPS du morceau (peu importe à quelle seconde l'écran d'annonce
+    // est quitté) : la grille des flèches reste calée sur les temps forts de la musique
+    const battement = S.tempo.temps;
+    this.origine = m === null ? S.introMusique : S.tempo.debut + Math.round((m - S.tempo.debut) / battement) * battement;
     this.T = 0;
     this.duree = S.tempo.temps * S.tempsParPas;   // durée entre deux flèches (~0,69 s), calée sur la musique
     const fen = this.s.diff.fenetreShow;
