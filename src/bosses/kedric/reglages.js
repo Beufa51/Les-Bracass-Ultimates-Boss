@@ -95,6 +95,9 @@ export const REGLAGES = {
     piste: { vitesse: 200 }, rougeChance: 0.12,
     piege: { nombre: 2, duree: 4 },
     solo: { seuil: 60, duree: 7, drain: 0.6, bonusParfait: 1.6 },
+    noir: { duree: 2.5 },
+    double: { duree: 15 },
+    combo: { nombre: 5, duree: 10, mult: 1.5 },
     parfait: 0.12, bien: 0.28, gain: { parfait: 1.8, bien: 1.2, rate: 2.6 },
     parTouchdown: 15, avanceMax: 30 },
   // ---------- Kédric en personne sur le terrain (option : course avec kedric: true) ----------
