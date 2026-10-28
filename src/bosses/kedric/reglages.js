@@ -55,9 +55,9 @@ export const REGLAGES = {
   points: 7,             // touchdown (transformation comprise)
   apresAction: 1.4,      // pause après un plaquage
   // ---------- Course ----------
-  vitesseBase: 6.0,      // yards / s au départ (40 yards en 6,7 s)
+  vitesseBase: 7.4,      // yards / s au départ (40 yards en 5,4 s) — le défilement de base est plus rapide
   pasVitesse: 0.7,       // + par niveau de vitesse
-  niveauMax: 5,          // niveau 5 = 9,5 yards / s = 40 yards en 4,2 s, comme le n°21 !
+  niveauMax: 5,          // niveau 5 = 10,9 yards / s = 40 yards en 3,7 s, comme le n°21 !
   esquivesParNiveau: 2,  // esquives d'affilée pour gagner un niveau de vitesse
   alerteParNiveau: 0.03, // le symbole apparaît 3 % plus tard par niveau de vitesse (plus vite = un peu plus dur)
   changementCouloir: 0.13,
@@ -89,7 +89,8 @@ export const REGLAGES = {
   //  parfait / bien : fenêtres de timing (s, x fenetreShow de la difficulté) ; gain : points de PUBLIC (de -100 à +100)
   //  parTouchdown / avanceMax : public de départ = (touchdowns - 1) x parTouchdown (aucun touchdown : il part pour Kédric)
   //  Le public est un KAMÉHAMÉHA père-fils (showtime.js) : PARFAIT = ta boule repousse celle de Kédric, RATÉ = elle recule.
-  showtime: { rounds: 2, dureeRound: 60, pause: 2,
+  showtime: { rounds: 2, dureeRound: 47,   // durée d'une manche en SECONDES de musique (45-50 s : raccourcir ici si besoin)
+    pause: 2,
     manches: [
       { musique: 'kedric_battle', tempo: { debut: 54.969, temps: 0.3426 } },
       { musique: 'kedric_dbz', tempo: { debut: 0, temps: 0.3896 } },
@@ -100,10 +101,11 @@ export const REGLAGES = {
     piege: { nombre: 1, duree: 4 },   // par manche (CHAMPION : 1 s de plus)
     solo: { seuil: 45, duree: 8, drain: 1.0, bonusParfait: 1.5 },
     noir: { nombre: 1, duree: 3 },   // par manche
+    ecartTech: 12,   // écart MINIMUM (s) entre deux techniques de Kédric (gel, noir, solo) : pas la mitraille
     double: { duree: 12 },
     combo: { nombre: 5, duree: 10, mult: 1.5 },
     drain: { seuil: 40, force: 0.15 },   // tu mènes trop : son public se rappelle à lui (jauge/s)
-    parfait: 0.12, bien: 0.28, gain: { parfait: 1.2, bien: 0.7, rate: 2.4 },
+    parfait: 0.12, bien: 0.28, gain: { parfait: 1.2, bien: 0.7, rate: 3.5 },   // raté = GROSSE pénalité
     parTouchdown: 15, avanceMax: 30 },
   // ---------- Kédric en personne sur le terrain (option : course avec kedric: true) ----------
   //  il garde l'en-but et prévient toujours pareil : danse → POSE (son attaque s'affiche) → CHARGE
@@ -166,3 +168,4 @@ export const REPLIQUES = {
   victoire: 'Tu... tu m\'as volé la vedette. Ok... tu es le nouveau showman.',
   defaite: 'Merci, merci ! Pas d\'autographes !',
 };
+
