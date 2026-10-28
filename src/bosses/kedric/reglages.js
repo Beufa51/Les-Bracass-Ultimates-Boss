@@ -91,8 +91,8 @@ export const REGLAGES = {
     // l'écran d'annonce (Kédric sur scène, avant la 1re manche) : il dure au plus 'intro' s (une flèche le passe après
     // 'introMini' s), sur le refrain de la musique (à 'introMusique' s)
     intro: 9, introMini: 1.5, introMusique: 54.969,
-    // la piste des flèches : elles glissent vers le cercle (à gauche) ; appuie quand elles y arrivent
-    piste: { x: 330, y: 476, fin: 860, vitesse: 230 },
+    // les flèches TOMBENT dans 4 couloirs (◀ ▶ à gauche, ▲ ▼ à droite) jusqu'à la touche : vitesse de chute (pixels / s)
+    piste: { vitesse: 200 },
     parfait: 0.12, bien: 0.28, gain: { parfait: 11, bien: 8, rate: 10 }, kedricParPas: 2,
     parTouchdown: 15, avanceMax: 30 },
   // ---------- Kédric en personne sur le terrain (option : course avec kedric: true) ----------

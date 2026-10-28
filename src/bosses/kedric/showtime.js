@@ -1,11 +1,11 @@
 // =====================================================================
 // SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (façon PaRappa / jeu de rythme).
 // D'abord l'ANNONCE : Kédric sur scène (décor kedric_scene) lance le défi et explique les règles.
-// Puis chaque manche, en QUESTIONS / RÉPONSES : les flèches glissent sur une PISTE vers un cercle. Kédric fait 4 pas
-// (ses flèches, petites : il prend la pose quand elles arrivent dans le cercle), puis « À TOI ! » : les mêmes 4 flèches
-// reviennent en grand et tu appuies (◀ ▶ ▲ ▼) quand elles arrivent dans le cercle ; et on recommence.
-// Sur téléphone, le bouton à presser S'ALLUME et brille de plus en plus fort jusqu'au bon moment : on peut jouer en
-// regardant ses pouces. Pas de bips : seulement la musique.
+// Puis chaque manche, en QUESTIONS / RÉPONSES, façon Guitar Hero / jeu de danse : les flèches TOMBENT dans 4 COULOIRS
+// (◀ ▶ à gauche, ▲ ▼ à droite) jusqu'à la touche à presser. Sur téléphone, chaque couloir est posé juste au-dessus de
+// son bouton (et le bouton à presser s'allume). Kédric fait 4 pas (ses flèches, petites et pâles : il prend la pose
+// quand elles arrivent en bas), puis « À TOI ! » : 4 grandes flèches, appuie quand elles arrivent sur la touche ; et on
+// recommence. Pas de bips : seulement la musique.
 // En CHAMPION seulement (diff.flechesRouges), des FLÈCHES ROUGES : Kédric triche, il faut faire l'INVERSE (◀ ↔ ▶, ▲ ↔ ▼).
 // La jauge du PUBLIC fait le tir à la corde : pile sur le temps = le public est pour toi.
 // Les pas sont calés sur la musique (kedric_battle) ; chaque manche la reprend à un autre passage. L'horloge de la
@@ -16,19 +16,22 @@ import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { texte } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique, arreterMusique, placerMusique, tempsMusique } from '../../core/musique.js';
-import { disposition, allumerBouton, eteindreBoutons, estTactile } from '../../core/tactile.js';
+import { disposition, allumerBouton, eteindreBoutons, estTactile, rectBouton } from '../../core/tactile.js';
 import { onomatopee, lignesImpact } from './effets.js';
 import { REGLAGES as R } from './reglages.js';
 
 const S = R.showtime;
 const PISTE = S.piste;
+const DIRS = ['gauche', 'droite', 'haut', 'bas'];
 const FLECHES = { gauche: '◀', droite: '▶', haut: '▲', bas: '▼' };
 const COULEURS = { gauche: '#3fa7ff', droite: '#ff9a3c', haut: '#ffd84a', bas: '#d9a0ff' };
 const INVERSE = { gauche: 'droite', droite: 'gauche', haut: 'bas', bas: 'haut' };
 const P = 600;   // profondeur d'affichage (au-dessus du terrain et du HUD, sous les encarts)
-// sur scène : Kédric en grand, debout sur l'estrade ; toi de dos, au premier plan à gauche
+// sur scène : Kédric en grand, debout sur l'estrade (entre les couloirs) ; toi de dos, au premier plan, en bas au milieu
 const KED = { x: 480, pieds: 392, hauteur: 335 };
-const TOI = { x: 205, pieds: HAUTEUR + 24, zoom: 1.3 };
+const TOI = { x: 480, pieds: HAUTEUR + 34, zoom: 0.85 };
+// les couloirs sans écran tactile (sur téléphone : au-dessus des boutons, voir calculerCouloirs)
+const COULOIRS = { x: { gauche: 105, droite: 215, haut: 745, bas: 855 }, cibleY: 455, largeur: 96, haut: 84 };
 
 export class Showtime {
   // options : { manches: [4, 6, 8], rouges: [0, 1, 1], jauge: -30..30, replique, sousTitre } ;
@@ -53,7 +56,6 @@ export class Showtime {
     halo.fillStyle(0xfff3a8, 0.22); halo.fillEllipse(KED.x, KED.pieds - 4, 280, 44);
     this.kedric = this.ajout(scene.add.sprite(KED.x, KED.pieds, 'kedric_portrait').setOrigin(0.5, 1).setDepth(P + 2));
     this.toi = this.ajout(scene.add.sprite(TOI.x, TOI.pieds, 'kedric_toi_course', 0).setOrigin(0.5, 1).setDepth(P + 3));
-    this.flecheKedric = this.ajout(texte(scene, 735, 190, '', 130, '#ffffff', { fontStyle: 'bold', strokeThickness: 14 }).setDepth(P + 4));
     // la jauge du public (tir à la corde), en haut : à gauche Kédric (vert), à droite toi (rouge)
     this.jaugeG = this.ajout(scene.add.graphics().setDepth(P + 4));
     this.etiquettesJauge = [
@@ -61,16 +63,19 @@ export class Showtime {
       texte(scene, LARGEUR / 2 + 290, 30, 'TOI', 18, '#ff7f7f', { fontStyle: 'bold' }),
       texte(scene, LARGEUR / 2, 56, 'PUBLIC', 14, '#ffffff'),
     ].map(t => this.ajout(t.setDepth(P + 4)));
-    // la piste des flèches (en bas) et son cercle
-    this.pisteG = this.ajout(scene.add.graphics().setDepth(P + 5));
-    this.etiquettePiste = this.ajout(texte(scene, PISTE.x, PISTE.y - 66, '', 20, '#ffffff', { fontStyle: 'bold', strokeThickness: 6 }).setDepth(P + 7));
-    this.retour = this.ajout(texte(scene, LARGEUR / 2 + 60, 405, '', 32, '#ffffff', { fontStyle: 'bold', strokeThickness: 8 }).setDepth(P + 7));
+    // les 4 couloirs : le fond, la touche en bas de chacun (un rond et sa flèche), qui joue (au-dessus de chaque paire)
+    this.couloirsG = this.ajout(scene.add.graphics().setDepth(P + 5));
+    this.touchesC = {};
+    for (const n of DIRS) this.touchesC[n] = this.ajout(texte(scene, 0, 0, FLECHES[n], 40, '#ffffff', { fontStyle: 'bold' }).setDepth(P + 5).setAlpha(0.45));
+    this.etiquettesTour = [0, 1].map(() => this.ajout(texte(scene, 0, 0, '', 18, '#ffffff', { fontStyle: 'bold', strokeThickness: 6 }).setDepth(P + 7)));
+    this.retour = this.ajout(texte(scene, 0, 0, '', 26, '#ffffff', { fontStyle: 'bold', strokeThickness: 7 }).setDepth(P + 7));
+    this.c = COULOIRS;
     // la musique du battle (celle du match s'arrête) ; gros boutons tactiles (rangés pendant la pause)
     arreterMusique('kedric_musique');
     jouerMusique(scene, S.musique);
     disposition('danse');
     this.surPause = () => { eteindreBoutons(); disposition('normale'); };
-    this.surReprise = () => disposition('danse');
+    this.surReprise = () => { disposition('danse'); this.calculerCouloirs(); };
     scene.events.on('pause', this.surPause); scene.events.on('resume', this.surReprise);
     this.annonce();
   }
@@ -108,7 +113,7 @@ export class Showtime {
     }).setOrigin(0, 0.5).setDepth(P + 10).setAlpha(0);
     s.tweens.add({ targets: bulle, alpha: 1, delay: 300, duration: 250 });
     const regles = texte(s, LARGEUR / 2, HAUTEUR - 96,
-      'Kédric fait 4 pas... puis À TOI : les mêmes 4 pas ! Et on recommence.\nAppuie sur la flèche quand elle arrive dans le CERCLE, en rythme.' + (estTactile() ? '\nLe bouton à presser S\'ALLUME de plus en plus fort jusqu\'au bon moment.' : '') +
+      'Kédric fait 4 pas... puis À TOI : les mêmes 4 pas ! Et on recommence.\nLes flèches TOMBENT jusqu\'aux touches : appuie quand elles arrivent en bas, en rythme.' + (estTactile() ? '\nLe bouton à presser S\'ALLUME de plus en plus fort jusqu\'au bon moment.' : '') +
       (this.s.diff.flechesRouges ? '\nFLÈCHE ROUGE = Kédric triche : fais l\'INVERSE !' : ''), 17, '#ffffff', { align: 'center', lineSpacing: 6 }).setDepth(P + 10);
     this.invite = texte(s, LARGEUR / 2, HAUTEUR - 22, 'Appuie sur une flèche quand tu es prêt !', 20, '#7fff7f', { fontStyle: 'bold' }).setDepth(P + 10).setAlpha(0);
     this.elAnnonce = [voile, titre, sous, bulle, regles, this.invite];
@@ -146,6 +151,7 @@ export class Showtime {
     const fen = this.s.diff.fenetreShow;
     this.fenetre = { parfait: Math.min(S.parfait * fen, this.duree * 0.25), bien: Math.min(S.bien * fen, this.duree * 0.45) };
     this.T = 0; this.phase = 'annonce'; this.dernierPas = -1; this.premierAToi = true;
+    this.calculerCouloirs();
     this.creerNotes();
     const titre = `MANCHE ${this.manche + 1} / ${this.o.manches.length} : ${n} PAS, ${S.phrase} PAR ${S.phrase}`;
     this.s.bandeau.setText(nr ? `${titre}  -  FLÈCHE ROUGE = fais l'INVERSE !` : titre).setColor(nr ? '#ff9a9a' : '#ffd84a').setVisible(true);
@@ -153,14 +159,30 @@ export class Showtime {
     this.poseToi(null);
   }
 
-  // les flèches de la piste : celles de Kédric (petites, il les danse), puis les tiennes (grandes, à toi de jouer)
+  // Les couloirs : sur téléphone, juste au-dessus des boutons ◀ ▶ ▲ ▼ (la flèche tombe jusqu'à la touche à presser) ;
+  // sans écran tactile, à gauche et à droite de la scène
+  calculerCouloirs() {
+    this.c = COULOIRS;
+    const ecran = this.s.game.canvas.getBoundingClientRect();
+    const rects = DIRS.map(n => rectBouton(n));
+    if (!ecran.width || !rects.every(r => r)) return;
+    const kx = LARGEUR / ecran.width, ky = HAUTEUR / ecran.height;
+    const largeur = Math.min(110, Math.min(...rects.map(r => r.width * kx)) * 0.8);
+    const x = {};
+    // (un bouton dans la marge noire sur le côté : son couloir reste au bord de l'écran)
+    DIRS.forEach((n, i) => { x[n] = Phaser.Math.Clamp((rects[i].left + rects[i].width / 2 - ecran.left) * kx, largeur / 2 + 4, LARGEUR - largeur / 2 - 4); });
+    const hautBoutons = Math.min(...rects.map(r => (r.top - ecran.top) * ky));
+    this.c = { x, cibleY: Phaser.Math.Clamp(hautBoutons - largeur * 0.5, 240, 470), largeur, haut: 84 };
+  }
+
+  // les flèches qui tombent : celles de Kédric (petites et pâles, il les danse), puis les tiennes (grandes, à toi de jouer)
   creerNotes() {
     this.viderNotes();
     this.pas.forEach((p, i) => {
-      const demo = texte(this.s, -99, PISTE.y, FLECHES[p.montre], 44, p.rouge ? '#ff3030' : COULEURS[p.montre], { fontStyle: 'bold', strokeThickness: 6 }).setDepth(P + 6);
+      const demo = texte(this.s, -99, 0, FLECHES[p.montre], 38, p.rouge ? '#ff3030' : COULEURS[p.montre], { fontStyle: 'bold', strokeThickness: 6 }).setDepth(P + 6);
       this.notes.push({ t: this.slotKedric(i) * this.duree, objet: demo, demo: true, pas: p });
       // ta flèche (rouge si Kédric a triché : à toi de faire l'inverse)
-      const tienne = texte(this.s, -99, PISTE.y, FLECHES[p.montre], 60, p.rouge ? '#ff3030' : COULEURS[p.montre], { fontStyle: 'bold', strokeThickness: 8 }).setDepth(P + 6);
+      const tienne = texte(this.s, -99, 0, FLECHES[p.montre], 58, p.rouge ? '#ff3030' : COULEURS[p.montre], { fontStyle: 'bold', strokeThickness: 8 }).setDepth(P + 6);
       this.notes.push({ t: this.cible(i), objet: tienne, demo: false, pas: p });
     });
   }
@@ -227,15 +249,12 @@ export class Showtime {
     if (k < S.annonce || this.phase !== 'jeu' && this.phase !== 'annonce') return;
     const i = this.pas.findIndex((p, j) => this.slotKedric(j) === k);
     if (i >= 0) {
-      // Kédric fait son pas (sa flèche arrive dans le cercle) ; flèche rouge : il triche (clin d'œil)
+      // Kédric fait son pas (sa flèche arrive en bas) ; flèche rouge : il triche (clin d'œil)
       const p = this.pas[i];
       this.poseKedric(p.rouge ? 'triche' : p.montre);
-      this.flecheKedric.setText(FLECHES[p.montre]).setColor(p.rouge ? '#ff3030' : COULEURS[p.montre]).setScale(1.3);
-      this.s.tweens.add({ targets: this.flecheKedric, scale: 1, duration: 150 });
       this.public(-S.kedricParPas);
     } else if (this.tour(k) === 'toi' && this.tour(k - 1) === 'kedric') {
       // il te tend le micro : à toi !
-      this.flecheKedric.setText('');
       this.poseKedric('micro');
       if (this.premierAToi) { this.premierAToi = false; onomatopee(this.s, KED.x, 150, 'À TOI !', 54, '#ffffff'); }
     }
@@ -257,9 +276,12 @@ export class Showtime {
     const p = this.pas[i];
     p.note = note;
     const n = this.notes.find(o => !o.demo && o.pas === p);
-    if (note === 'parfait') { this.bilan.parfaits++; this.public(S.gain.parfait); this.retour.setText('PARFAIT !').setColor('#7fe8ff'); lignesImpact(this.s, PISTE.x, PISTE.y, 0x9fe0ff, 10, 80); }
+    // le message au-dessus de la touche du pas
+    const xc = this.c.x[p.attendu];
+    this.retour.setPosition(Phaser.Math.Clamp(xc, 90, LARGEUR - 90), this.c.cibleY - this.c.largeur * 0.5 - 30);
+    if (note === 'parfait') { this.bilan.parfaits++; this.public(S.gain.parfait); this.retour.setText('PARFAIT !').setColor('#7fe8ff'); lignesImpact(this.s, xc, this.c.cibleY, 0x9fe0ff, 10, 70); }
     else if (note === 'bien') { this.bilan.bien++; this.public(S.gain.bien); this.retour.setText('BIEN !').setColor('#7fff7f'); }
-    else { this.bilan.rates++; this.public(-S.gain.rate); this.retour.setText(p.rouge ? 'RATÉ ! (flèche rouge = l\'inverse)' : 'RATÉ !').setColor('#ff6b6b'); this.poseKedric('haut'); }
+    else { this.bilan.rates++; this.public(-S.gain.rate); this.retour.setText(p.rouge ? 'RATÉ ! (l\'inverse !)' : 'RATÉ !').setColor('#ff6b6b'); this.poseKedric('haut'); }
     this.s.tweens.killTweensOf(this.retour); this.retour.setAlpha(1).setScale(1.2);
     this.s.tweens.add({ targets: this.retour, scale: 1, duration: 120 });
     if (n) { n.note = note; n.objet.setColor(note === 'rate' ? '#ff6b6b' : note === 'parfait' ? '#7fe8ff' : '#7fff7f'); }
@@ -304,52 +326,60 @@ export class Showtime {
     const f = this.duree ? (this.T / this.duree) % 1 : 1;
     const boum = this.phase === 'intro' ? 0 : Math.max(0, 1 - f * 4);
     if (this.baseKedric && !this.termine) this.kedric.setScale(this.baseKedric.x, this.baseKedric.y * (1 - 0.035 * boum));
-    this.afficherPiste(boum);
+    this.afficherCouloirs(boum);
   }
 
-  // la piste : une bande sombre, le cercle à gauche (il « bat » sur le temps), les flèches qui glissent vers lui
-  afficherPiste(boum) {
-    const c = this.pisteG; c.clear();
+  // les couloirs : fonds sombres, la touche en bas (elle « bat » sur le temps, s'éclaire quand c'est le moment),
+  // les flèches qui tombent jusqu'à elle
+  afficherCouloirs(boum) {
+    const g = this.couloirsG; g.clear();
     const actif = ['annonce', 'jeu', 'bilan'].includes(this.phase);
-    this.etiquettePiste.setVisible(actif);
+    this.etiquettesTour.forEach(t => t.setVisible(actif));
+    for (const n of DIRS) this.touchesC[n].setVisible(actif);
     if (!actif) { this.notes.forEach(n => n.objet.setVisible(false)); return; }
-    const d = this.duree;
+    const C = this.c, d = this.duree, w = C.largeur, v = PISTE.vitesse;
     const aToi = this.phase === 'jeu' && this.tour(Math.floor(this.T / d + 0.5)) === 'toi';
-    c.fillStyle(0x000000, 0.55); c.fillRoundedRect(PISTE.x - 56, PISTE.y - 46, PISTE.fin - PISTE.x + 90, 92, 46);
-    // le cercle : jaune quand ta flèche approche, bleu dans la fenêtre, blanc pile au bon moment ;
-    // et le bouton à presser s'allume (téléphone) de plus en plus fort jusqu'au bon moment
-    let couleur = aToi ? 0xffffff : 0x7fff7f, lueur = null;
+    // la prochaine flèche à faire : sa touche s'éclaire (et le bouton du téléphone s'allume)
+    let cible = null;
     const i = this.phase === 'jeu' ? this.pas.findIndex(p => p.note === null) : -1;
     if (i >= 0) {
       const dt = this.cible(i) - this.T, reste = Math.abs(dt);
-      const c2 = reste <= this.fenetre.parfait ? '#ffffff' : reste <= this.fenetre.bien ? '#3fa7ff' : '#ffd84a';
-      if (dt < d * 1.5) {
-        couleur = Phaser.Display.Color.HexStringToColor(c2).color;
-        // (flèche rouge en CHAMPION : pas d'aide, c'est à toi d'inverser)
-        if (!this.pas[i].rouge) lueur = { nom: this.pas[i].attendu, force: Math.max(0.15, Math.min(1, 1 - dt / (d * 1.5))), couleur: c2 };
-      }
+      const couleur = reste <= this.fenetre.parfait ? '#ffffff' : reste <= this.fenetre.bien ? '#3fa7ff' : '#ffd84a';
+      // (flèche rouge en CHAMPION : pas d'aide, c'est à toi d'inverser)
+      if (dt < d * 1.5 && !this.pas[i].rouge) cible = { nom: this.pas[i].attendu, force: Math.max(0.15, Math.min(1, 1 - dt / (d * 1.5))), couleur };
     }
-    for (const nom of ['gauche', 'droite', 'haut', 'bas']) allumerBouton(nom, lueur && lueur.nom === nom ? lueur.force : 0, lueur ? lueur.couleur : undefined);
-    c.fillStyle(couleur, 0.18 + 0.2 * boum); c.fillCircle(PISTE.x, PISTE.y, 42);
-    c.lineStyle(6, couleur, 1); c.strokeCircle(PISTE.x, PISTE.y, 42 + 5 * boum);
-    // des petits traits sur la piste, un par pas de musique (on voit venir le rythme)
-    c.lineStyle(2, 0xffffff, 0.25);
-    for (let k = Math.ceil(this.T / d); (k * d - this.T) * PISTE.vitesse + PISTE.x < PISTE.fin + 20; k++) {
-      const x = PISTE.x + (k * d - this.T) * PISTE.vitesse;
-      if (x > PISTE.x + 44) c.lineBetween(x, PISTE.y - 30, x, PISTE.y + 30);
+    for (const n of DIRS) allumerBouton(n, cible && cible.nom === n ? cible.force : 0, cible ? cible.couleur : undefined);
+    for (const n of DIRS) {
+      const x = C.x[n];
+      g.fillStyle(0x000000, 0.45); g.fillRoundedRect(x - w / 2, C.haut, w, C.cibleY - C.haut + w / 2, 14);
+      const allume = cible && cible.nom === n;
+      const coul = allume ? Phaser.Display.Color.HexStringToColor(cible.couleur).color : Phaser.Display.Color.HexStringToColor(COULEURS[n]).color;
+      g.fillStyle(coul, allume ? 0.25 + 0.35 * cible.force : 0.1 + 0.15 * boum); g.fillCircle(x, C.cibleY, w * 0.45);
+      g.lineStyle(allume ? 6 : 4, coul, allume ? 1 : 0.8); g.strokeCircle(x, C.cibleY, w * 0.45 + 3 * boum);
+      this.touchesC[n].setPosition(x, C.cibleY).setAlpha(allume ? 0.9 : 0.45);
     }
-    this.etiquettePiste.setText(aToi ? 'À TOI !' : this.phase === 'bilan' ? '' : 'KÉDRIC').setColor(aToi ? '#ffd84a' : '#7fff7f');
-    // les flèches : elles arrivent de la droite et touchent le cercle pile sur leur temps
+    // des petits traits en travers des couloirs, un par pas de musique (on voit venir le rythme)
+    g.lineStyle(2, 0xffffff, 0.22);
+    for (let k = Math.ceil(this.T / d); C.cibleY - (k * d - this.T) * v > C.haut; k++) {
+      const y = C.cibleY - (k * d - this.T) * v;
+      if (y > C.cibleY - w * 0.5) continue;
+      for (const [a, b] of [['gauche', 'droite'], ['haut', 'bas']]) g.lineBetween(Math.min(C.x[a], C.x[b]) - w / 2 + 6, y, Math.max(C.x[a], C.x[b]) + w / 2 - 6, y);
+    }
+    // qui joue : au-dessus de chaque paire de couloirs
+    const libelle = aToi ? 'À TOI !' : this.phase === 'bilan' ? '' : 'KÉDRIC';
+    [['gauche', 'droite'], ['haut', 'bas']].forEach(([a, b], k) =>
+      this.etiquettesTour[k].setPosition((C.x[a] + C.x[b]) / 2, C.haut - 14).setText(libelle).setColor(aToi ? '#ffd84a' : '#7fff7f'));
+    // les flèches : elles tombent dans leur couloir et touchent la touche pile sur leur temps
     for (const n of this.notes) {
-      const dt = n.t - this.T, x = PISTE.x + dt * PISTE.vitesse;
-      const visible = x <= PISTE.fin + 30 && dt > -0.35;
+      const dt = n.t - this.T, y = C.cibleY - dt * v;
+      const visible = y >= C.haut + 10 && dt > -0.3;
       n.objet.setVisible(visible);
       if (!visible) continue;
-      n.objet.setX(x);
-      // passée le cercle : elle s'efface ; celles de Kédric sont plus petites et plus pâles
-      const efface = dt < 0 ? Math.max(0, 1 + dt / 0.35) : 1;
-      n.objet.setAlpha((n.demo ? 0.75 : 1) * efface);
-      if (!n.note) n.objet.setScale(Math.abs(dt) < 0.12 ? 1.15 : 1);
+      n.objet.setPosition(C.x[n.pas.montre], y);
+      // passée la touche : elle s'efface ; celles de Kédric sont plus petites et plus pâles
+      const efface = dt < 0 ? Math.max(0, 1 + dt / 0.3) : 1;
+      n.objet.setAlpha((n.demo ? 0.6 : 1) * efface);
+      if (!n.note) n.objet.setScale(Math.abs(dt) < 0.1 ? 1.12 : 1);
     }
   }
 

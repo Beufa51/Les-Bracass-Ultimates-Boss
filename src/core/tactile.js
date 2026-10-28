@@ -40,7 +40,7 @@ export function installerTactile() {
     .tactile button.appuye { background: rgba(255,216,74,0.65); color: #111; }
     .tactile button.cache { visibility: hidden; }
     .tactile.gauche.danse { grid-template-columns: repeat(2, 124px); grid-template-rows: 124px; }
-    .tactile.droite.danse { grid-template-columns: 124px; grid-template-rows: repeat(2, 104px); }
+    .tactile.droite.danse { grid-template-columns: repeat(2, 124px); grid-template-rows: 124px; }
     .tactile.danse button { font-size: 46px; }
     .tactile.danse button.cache { display: none; }
     .tactile.gauche.separee { grid-template-columns: repeat(2, 96px); grid-template-rows: 96px; }
@@ -118,12 +118,12 @@ export function installerBoutonPause(action) {
 // Dispositions (optionnelles) des boutons, au choix d'un boss :
 //  'normale' : la croix à gauche, les actions à droite (par défaut)
 //  'separee' : ◀ ▶ sous le pouce gauche ; ▲ ▼ et les actions (Espace, Z) sous le pouce droit
-//  'danse'   : 4 TRÈS gros boutons, ◀ ▶ à gauche, ▲ ▼ à droite, le reste retiré
+//  'danse'   : 4 TRÈS gros boutons en ligne, ◀ ▶ à gauche, ▲ ▼ à droite, le reste retiré
 // Un boss qui change de disposition remet 'normale' en partant.
 const DISPOSITIONS = {
   separee: { gauche: ['croix', '1', '1'], droite: ['croix', '2', '1'], haut: ['actions', '1', '1'], bas: ['actions', '1', '2'],
     espace: ['actions', '2', '1'], z: ['actions', '2', '2'], x: ['actions', '3', '1'] },
-  danse: { gauche: ['croix', '1', '1'], droite: ['croix', '2', '1'], haut: ['actions', '1', '1'], bas: ['actions', '1', '2'] },
+  danse: { gauche: ['croix', '1', '1'], droite: ['croix', '2', '1'], haut: ['actions', '1', '1'], bas: ['actions', '2', '1'] },
 };
 export function disposition(nom = 'normale') {
   if (!croix) return;
@@ -152,3 +152,10 @@ export function allumerBouton(nom, force = 0, couleur = '#ffd84a') {
   b.style.borderColor = force <= 0 ? '' : couleur;
 }
 export function eteindreBoutons() { for (const nom of Object.keys(boutons)) allumerBouton(nom, 0); }
+
+// Où est un bouton à l'écran (rectangle de la page), ou null s'il n'est pas affiché (pas d'écran tactile, bouton caché)
+export function rectBouton(nom) {
+  const b = boutons[nom];
+  if (!b || b.classList.contains('cache') || !b.offsetParent) return null;
+  return b.getBoundingClientRect();
+}
