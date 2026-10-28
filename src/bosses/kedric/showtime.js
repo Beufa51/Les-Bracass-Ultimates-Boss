@@ -103,9 +103,13 @@ export class Showtime {
     arreterMusique('kedric_musique');
     jouerMusique(scene, this.musique);
     disposition('danse');
-    this.surPause = () => { eteindreBoutons(); disposition('normale'); };
+    this.surPause = () => { eteindreBoutons(); disposition('normale'); this.s.cameras.main.resetFX(); };
     this.surReprise = () => { disposition('danse'); this.calculerCouloirs(); };
     scene.events.on('pause', this.surPause); scene.events.on('resume', this.surReprise);
+    // ABANDON depuis la pause pendant le battle : detruire() ne sera jamais appelé (seule la fin l'appelle).
+    // Au shutdown de la scène, on éteint au moins les boutons (sinon ils restent allumés au hub) —
+    // sans relancer la musique du match : le shutdown s'en occupe déjà, lui.
+    scene.events.once('shutdown', () => eteindreBoutons());
     this.annonce();
   }
 
