@@ -356,8 +356,8 @@ export class Showtime {
     this.poseKedric('triche');
     const el = [];
     // le fond noir et les lignes de vitesse qui tournent
-    const fond = this.ajout(s.add.rectangle(cx, cy, LARGEUR, HAUTEUR, 0x05030c, 0).setDepth(P + 20));
-    s.tweens.add({ targets: fond, fillAlpha: 0.93, duration: 120 });
+    const fond = this.ajout(s.add.rectangle(cx, cy, LARGEUR, HAUTEUR, opts.coupure ? 0x000000 : 0x05030c, 0).setDepth(P + 20));   // coupure : NOIR PUR, la scène ne transparaît pas
+    s.tweens.add({ targets: fond, fillAlpha: opts.coupure ? 0.98 : 0.93, duration: 120 });
     const lignes = this.ajout(s.add.graphics().setDepth(P + 21).setPosition(cx, cy));
     for (let k = 0; k < 40; k++) {
       const a = (k / 40) * Math.PI * 2 + Math.random() * 0.1, r = 90 + Math.random() * 80;
@@ -595,9 +595,9 @@ export class Showtime {
     if (this.noirOn()) {
       const dn = this.T - (this.noirDebut ?? this.T);
       // pendant l'écran SUPER POUVOIR (dn <= 0), le voile reste SOUS l'écran (P+8) ;
-      // pendant le VRAI noir (dn > 0), il monte AU-DESSUS DE TOUT (950) : HUD, bandeau,
+      // pendant le VRAI noir (dn > 0), il monte AU-DESSUS DE TOUT (1099) : HUD, bandeau,
       // jauge, touches, onomatopées... plus RIEN ne reste allumé — une vraie coupure de courant
-      this.voileNoir.setDepth(dn > 0 ? 950 : P + 8);
+      this.voileNoir.setDepth(dn > 0 ? 1099 : P + 8);
       this.voileNoir.setAlpha(dn > 0 && dn < 0.55 && Math.sin(dn * 60) < -0.3 ? 0.35 : 1);
     } else { this.voileNoir.setAlpha(0); this.voileNoir.setDepth(P + 8); }
     // la JAUGE DU PUBLIC : rail fin + GRANDE AIGUILLE (elle glisse d'un côté ou de l'autre).
@@ -701,7 +701,7 @@ export class Showtime {
       const dt = n.t - this.T, y = C.cibleY - dt * v;
       const visible = !n.pas.mange && y >= C.haut + 10 && dt > -0.3 && (!this.noirOn() || dt < NOIR.visibilite);
       n.objet.setVisible(visible);
-      n.objet.setDepth(visible && this.noirOn() && this.T - (this.noirDebut ?? this.T) > 0 ? 951 : P + 6);   // dans le VRAI noir : la flèche de la fin reste la seule lueur (au-dessus du voile 950)
+      n.objet.setDepth(visible && this.noirOn() && this.T - (this.noirDebut ?? this.T) > 0 ? 1100 : P + 6);   // dans le VRAI noir : la flèche de la fin reste la seule lueur (au-dessus du voile 1099)
       if (!visible) continue;
       n.objet.setPosition(C.x[n.pas.montre], y);
       // passée la touche : elle s'efface

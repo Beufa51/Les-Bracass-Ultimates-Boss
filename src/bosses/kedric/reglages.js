@@ -55,7 +55,7 @@ export const REGLAGES = {
   points: 7,             // touchdown (transformation comprise)
   apresAction: 1.4,      // pause après un plaquage
   // ---------- Course ----------
-  vitesseBase: 7.4,      // yards / s au départ (40 yards en 5,4 s) — le défilement de base est plus rapide
+  vitesseBase: 8.6,      // yards / s au départ (40 yards en 4,7 s) — le défilement de base est encore un peu plus rapide
   pasVitesse: 0.7,       // + par niveau de vitesse
   niveauMax: 5,          // niveau 5 = 10,9 yards / s = 40 yards en 3,7 s, comme le n°21 !
   esquivesParNiveau: 2,  // esquives d'affilée pour gagner un niveau de vitesse
