@@ -6,8 +6,9 @@
 // Les flèches TOMBENT dans 4 COULOIRS (◀ ▶ à gauche, ▲ ▼ à droite) jusqu'à la touche à
 // presser, PILE SUR LE RYTHME (une flèche tous les 'tempsParPas' temps ; chaque manche a
 // le tempo de SON morceau, et la session se cale sur le TEMPS FORT le plus proche).
-// Kédric danse AVEC TOI et triche comme une vraie star — chaque piège est annoncé par un
-// GRAND ÉCRAN « SUPER POUVOIR » (impossible à rater, même concentré sur les touches) :
+// Kédric danse AVEC TOI et triche comme une vraie star — chaque piège coupe le battle le temps
+// d'un ÉCRAN SUPER POUVOIR (façon supers de Lionel : fond noir, lignes de vitesse, Kédric en
+// grand et son pouvoir en ÉNORME, ~1,5 s — impossible à rater, même concentré sur les touches) :
 //  - le GEL : il GLACE LE PLANCHER, tu ne peux plus appuyer pendant quelques secondes
 //    pendant que les flèches continuent de tomber (1 par manche, plus long en CHAMPION) ;
 //  - la COUPURE DE COURANT : un vrai noir, on ne voit les flèches qu'au tout dernier
@@ -51,6 +52,9 @@ const COULOIRS = { x: { gauche: 105, droite: 215, haut: 745, bas: 855 }, cibleY:
 const KHAM = { y: 36, h: 18, marge: 170, portee: 280 };
 // la coupure de courant : dans le noir, on ne voit une flèche que dans ses 'visibilite' dernières secondes
 const NOIR = { visibilite: 0.4 };
+// la durée de l'ÉCRAN SUPER POUVOIR (façon supers de Lionel) : le battle s'arrête le temps
+// de l'écran, puis reprend PILE sur le piège, toujours dans le rythme
+const ECRAN_POUVOIR = 1.6;
 
 export class Showtime {
   // options : { jauge: -30..30, replique, sousTitre } ; fin(gagne, bilan) appelé à la fin
@@ -89,6 +93,8 @@ export class Showtime {
     this.couloirsG = this.ajout(scene.add.graphics().setDepth(P + 5));
     this.touchesC = {};
     for (const n of DIRS) this.touchesC[n] = this.ajout(texte(scene, 0, 0, FLECHES[n], 40, '#ffffff', { fontStyle: 'bold' }).setDepth(P + 5).setAlpha(0.45));
+    // le compte à rebours du GEL (au-dessus des couloirs gelés)
+    this.gelCompte = this.ajout(texte(scene, LARGEUR / 2, 265, '', 24, '#dff6ff', { fontStyle: 'bold', strokeThickness: 7 }).setDepth(P + 6)).setVisible(false);
     this.retour = this.ajout(texte(scene, 0, 0, '', 26, '#ffffff', { fontStyle: 'bold', strokeThickness: 7 }).setDepth(P + 7));
     this.c = COULOIRS;
     // la musique de la 1re manche (celle du match s'arrête) ; gros boutons tactiles (rangés pendant la pause)
@@ -310,17 +316,68 @@ export class Showtime {
     this.finBandeau = this.T + duree;
   }
 
-  // l'ÉCRAN SUPER POUVOIR : une supercherie de Kédric annoncée EN GRAND — impossible à rater,
-  // même les yeux rivés sur les touches (pas plus de 2 par manche : le gel et le noir)
-  superPouvoir(nom, couleur, duree) {
-    onomatopee(this.s, LARGEUR / 2, HAUTEUR / 2 - 76, 'KÉDRIC UTILISE SON', 30, '#ffffff');
-    onomatopee(this.s, LARGEUR / 2, HAUTEUR / 2, nom, 72, couleur);
-    this.s.tweens.killTweensOf(this.flash);
-    this.flash.setFillStyle(0x000000, 0.55); this.flash.setAlpha(0.55);
-    this.s.tweens.add({ targets: this.flash, alpha: 0, duration: 800 });
-    this.s.cameras.main.shake(350, 0.012);
+  // l'ÉCRAN SUPER POUVOIR, comme les supers de Lionel : fond noir, lignes de vitesse qui
+  // tournent, Kédric en grand qui débarque de la droite et son pouvoir en ÉNORME — le temps
+  // d'un écran, impossible à rater. Les flèches qui tomberaient PENDANT l'écran sont retirées
+  // (aucune pénalité, aucune flèche perdue derrière le fond) : le battle reprend pile sur le
+  // piège, toujours dans le rythme (pas plus de 2 écrans par manche : le gel et le noir).
+  superPouvoir(nom, couleur, info) {
+    const s = this.s, cx = LARGEUR / 2, cy = HAUTEUR / 2, coul = Phaser.Display.Color.HexStringToColor(couleur).color;
+    // les flèches qui tomberaient pendant l'écran sont retirées (jamais les pièges du gel)
+    this.pas.forEach(p => { if (p.note === null && !p.declenche && p.t < this.T + ECRAN_POUVOIR) { p.note = 'esquive'; p.mange = true; } });
+    this.ecranT = this.T;   // un seul écran à la fois (les autres pièges attendent la fin)
     this.poseKedric('triche');
-    this.bandeau(nom, couleur, duree);
+    const el = [];
+    // le fond noir et les lignes de vitesse qui tournent
+    const fond = this.ajout(s.add.rectangle(cx, cy, LARGEUR, HAUTEUR, 0x05030c, 0).setDepth(P + 20));
+    s.tweens.add({ targets: fond, fillAlpha: 0.93, duration: 120 });
+    const lignes = this.ajout(s.add.graphics().setDepth(P + 21).setPosition(cx, cy));
+    for (let k = 0; k < 40; k++) {
+      const a = (k / 40) * Math.PI * 2 + Math.random() * 0.1, r = 90 + Math.random() * 80;
+      lignes.lineStyle(2 + Math.random() * 4, k % 3 ? coul : 0xffffff, 0.3 + Math.random() * 0.4);
+      lignes.lineBetween(Math.cos(a) * r, Math.sin(a) * r, Math.cos(a) * 900, Math.sin(a) * 900);
+    }
+    s.tweens.add({ targets: lignes, angle: 35, duration: ECRAN_POUVOIR * 1000 });
+    el.push(fond, lignes);
+    // Kédric en grand, qui débarque de la droite avec ses images rémanentes
+    const kx = 690;
+    const perso = this.ajout(s.add.image(LARGEUR + 260, HAUTEUR - 4, 'kedric_portrait').setOrigin(0.5, 1).setDepth(P + 24));
+    perso.setScale(430 / perso.height);
+    s.tweens.add({ targets: perso, x: kx, duration: 260, ease: 'Cubic.Out' });
+    el.push(perso);
+    for (let k = 1; k <= 3; k++) {
+      const fantome = this.ajout(s.add.image(LARGEUR + 260, HAUTEUR - 4, 'kedric_portrait').setOrigin(0.5, 1).setDepth(P + 23)
+        .setScale(perso.scaleX).setTint(coul).setAlpha(0.5 - k * 0.12));
+      s.tweens.add({ targets: fantome, x: kx + k * 48, duration: 260 + k * 60, ease: 'Cubic.Out' });
+      el.push(fantome);
+    }
+    // des étincelles qui jaillissent autour de lui
+    for (let k = 0; k < 22; k++) {
+      const e = this.ajout(s.add.star(kx, cy, 4, 3, 9, k % 2 ? coul : 0xffffff).setDepth(P + 25).setScale(0.4 + Math.random()));
+      const a = Math.random() * Math.PI * 2, d = 120 + Math.random() * 240;
+      s.tweens.add({ targets: e, x: kx + Math.cos(a) * d, y: cy + Math.sin(a) * d, angle: 360, alpha: 0,
+        delay: 150 + Math.random() * 300, duration: 700 + Math.random() * 400 });
+      el.push(e);
+    }
+    // le gros titre qui claque, à gauche, et l'info du piège en dessous
+    const xt = 330;
+    const haut = this.ajout(texte(s, xt, cy - 92, 'KÉDRIC UTILISE SON', 30, '#ffffff', { fontStyle: 'bold', strokeThickness: 8 }).setOrigin(0.5).setDepth(P + 26).setAlpha(0));
+    s.tweens.add({ targets: haut, alpha: 1, delay: 120, duration: 200 });
+    const titre = this.ajout(s.add.text(xt, cy - 10, nom, {
+      fontFamily: 'monospace', fontStyle: 'bold italic', fontSize: '66px', color: couleur, align: 'center',
+      stroke: '#000000', strokeThickness: 11, wordWrap: { width: 560 },
+    }).setOrigin(0.5).setDepth(P + 26).setScale(3).setAlpha(0).setAngle(-6));
+    s.tweens.add({ targets: titre, scale: 1, alpha: 1, delay: 220, duration: 220, ease: 'Back.Out',
+      onComplete: () => s.cameras.main.shake(220, 0.014) });
+    el.push(haut, titre);
+    if (info) {
+      const sous = this.ajout(texte(s, xt, cy + 66, info, 24, '#ffffff', { fontStyle: 'bold', strokeThickness: 7 }).setOrigin(0.5).setDepth(P + 26).setAlpha(0));
+      s.tweens.add({ targets: sous, alpha: 1, delay: 420, duration: 200 });
+      el.push(sous);
+    }
+    // puis tout se range en fondu et le battle reprend dans le rythme
+    s.tweens.add({ targets: el, alpha: 0, delay: ECRAN_POUVOIR * 1000 - 250, duration: 250 });
+    this.bandeau(nom, couleur, ECRAN_POUVOIR + 0.5);
   }
 
   // ---------- la boucle ----------
@@ -346,28 +403,27 @@ export class Showtime {
     if (k > this.dernierPas) { this.dernierPas = k; this.surLeTemps(k); }
     if (this.phase === 'annonce' && k >= S.annonce) { this.phase = 'jeu'; this.finBandeau = this.T + 1.5; }
     if (this.phase === 'jeu') {
-      // le PIÈGE : juste avant la flèche piégée, KÉDRIC GLACE LE PLANCHER — les flèches continuent de tomber
-      const i = this.pas.findIndex(p => p.note === null);
-      if (i >= 0 && this.pas[i].piege && !this.pas[i].declenche && this.pas[i].t - this.T <= 1.2) {
-        this.pas.filter(p => p.piege && p.manche === this.pas[i].manche && p.slot === this.pas[i].slot).forEach(p => p.declenche = true);
-        this.gel = this.T + this.dureeGel;
-        this.superPouvoir('PLANCHER GLACÉ !', '#9fe0ff', this.dureeGel + 0.5);
-        onomatopee(this.s, LARGEUR / 2, HAUTEUR / 2 + 76, `${Math.ceil(this.dureeGel)} SECONDES SANS APPUI !`, 26, '#9fe0ff');
+      // le PIÈGE : un écran plein jeu annonce le gel AVANT la flèche piégée (l'écran dure
+      // ECRAN_POUVOIR s, puis le plancher reste glacé : les flèches continuent de tomber)
+      const libre = this.T > (this.ecranT === undefined ? -9 : this.ecranT + ECRAN_POUVOIR);   // pas 2 écrans à la fois
+      const piegeProche = libre && this.pas.find(p => p.piege && !p.declenche && p.note === null && p.t - this.T <= ECRAN_POUVOIR + 0.8);
+      if (piegeProche) {
+        this.pas.filter(p => p.piege && p.manche === piegeProche.manche && p.slot === piegeProche.slot).forEach(p => p.declenche = true);
+        this.gel = this.T + ECRAN_POUVOIR + this.dureeGel;
+        this.superPouvoir('PLANCHER GLACÉ !', '#9fe0ff', `${Math.ceil(this.dureeGel)} SECONDES SANS APPUI !`);
       }
       // la COUPURE DE COURANT : les projecteurs s'éteignent, on ne voit plus les flèches au loin
-      if (this.tNoirs.length && this.T >= this.tNoirs[0]) {
+      if (libre && this.tNoirs.length && this.T >= this.tNoirs[0]) {
         this.tNoirs.shift();
-        this.noir = this.T + S.noir.duree;
-        this.superPouvoir('COUPURE DE COURANT !', '#ff9a9a', S.noir.duree + 0.5);
-        onomatopee(this.s, LARGEUR / 2, HAUTEUR / 2 + 76, 'LES LUMIÈRES !', 26, '#9a9aff');
+        this.noir = this.T + ECRAN_POUVOIR + S.noir.duree;
+        this.superPouvoir('COUPURE DE COURANT !', '#ff9a9a', "ON NE VOIT LES FLÈCHES QU'À LA FIN !");
       }
       // le SOLO : quand il est à deux doigts de perdre, Kédric joue sa carte et draine le public
-      if (!this.soloFait && this.T - this.debutManche > 10 && this.jauge > S.solo.seuil) {
+      if (libre && !this.soloFait && this.T - this.debutManche > 10 && this.jauge > S.solo.seuil) {
         this.soloFait = true;
-        this.soloJusqua = this.T + S.solo.duree;
-        this.superPouvoir('SOLO DE KÉDRIC !', '#ff9a3c', S.solo.duree + 0.5);
+        this.soloJusqua = this.T + ECRAN_POUVOIR + S.solo.duree;
+        this.superPouvoir('SOLO DE KÉDRIC !', '#ff9a3c', 'ENCHAÎNE LES PARFAITS POUR CONTRER !');
         this.poseKedric('micro');
-        onomatopee(this.s, LARGEUR / 2, HAUTEUR / 2 + 76, 'ENCHAÎNE LES PARFAITS POUR CONTRER !', 26, '#ffd84a');
       }
       if (this.solo()) this.public(-S.solo.drain * dt);        // son solo : le public glisse vers lui
       if (this.jauge > S.drain.seuil) this.public(-S.drain.force * dt);   // tu mènes trop : son public se rappelle à lui
@@ -492,7 +548,7 @@ export class Showtime {
   // ---------- affichage ----------
   afficher() {
     // le voile du noir (au-dessus des couloirs, SOUS les flèches : on ne voit que celles du dernier moment)
-    this.voileNoir.setAlpha(this.noirOn() ? 0.85 : 0);
+    this.voileNoir.setAlpha(this.noirOn() ? 0.97 : 0);   // vraiment noir : on ne voit plus QUE les flèches de la fin
     // le KAMÉHAMÉHA du public : ton faisceau BLEU depuis la gauche, le DORÉ de Kédric depuis la droite,
     // la BOULE BLANCHE pulsante au point de choc — c'est ELLE qui désigne le gagnant
     const g = this.jaugeG; g.clear();
@@ -528,7 +584,7 @@ export class Showtime {
     const g = this.couloirsG; g.clear();
     const actif = ['annonce', 'jeu', 'fin'].includes(this.phase);
     for (const n of DIRS) this.touchesC[n].setVisible(actif);
-    if (!actif) { this.notes.forEach(n => n.objet.setVisible(false)); return; }
+    if (!actif) { this.notes.forEach(n => n.objet.setVisible(false)); this.gelCompte.setVisible(false); return; }
     const C = this.c, d = this.duree, w = C.largeur, v = PISTE.vitesse;
     const TL = this.T - this.debutManche;
     // la prochaine flèche à faire : sa touche s'éclaire (et le bouton du téléphone s'allume)
@@ -557,16 +613,36 @@ export class Showtime {
       if (y > C.cibleY - w * 0.5) continue;
       for (const [a, b] of [['gauche', 'droite'], ['haut', 'bas']]) g.lineBetween(Math.min(C.x[a], C.x[b]) - w / 2 + 6, y, Math.max(C.x[a], C.x[b]) + w / 2 - 6, y);
     }
-    // le GEL en cours : le plancher est glacé — les couloirs gèlent, les flèches continuent de tomber
+    // le GEL en cours : le plancher est glacé — chaque touche est PRISONNIÈRE d'un bloc de
+    // glace (bloc bleu, fissures, glaçons qui pendent) : on comprend d'un coup d'œil qu'on
+    // ne peut plus appuyer, pendant que les flèches continuent de tomber
     if (this.gele()) {
-      g.fillStyle(0x9fe0ff, 0.3); g.fillRect(0, 0, LARGEUR, HAUTEUR);
-      g.fillStyle(0x000000, 0.55); g.fillRoundedRect(LARGEUR / 2 - 190, 250, 380, 54, 14);
+      const reste = Math.max(1, Math.ceil(this.gel - this.T));
+      g.fillStyle(0x9fe0ff, 0.14); g.fillRect(0, 0, LARGEUR, HAUTEUR);
+      for (const n of DIRS) {
+        const x = C.x[n];
+        g.fillStyle(0xbfefff, 0.5); g.fillCircle(x, C.cibleY, w * 0.52);
+        g.fillStyle(0x9fe0ff, 0.8); g.fillCircle(x, C.cibleY, w * 0.42);
+        g.lineStyle(3, 0xffffff, 0.9);   // les fissures de la glace
+        for (const [dx, dy] of [[-1, -1], [1, 1], [1, -1], [-1, 1]])
+          g.lineBetween(x, C.cibleY, x + dx * w * 0.38, C.cibleY + dy * w * 0.38);
+        g.fillStyle(0xdff6ff, 0.95);   // les glaçons qui pendent au-dessus de la touche
+        for (let k = -2; k <= 2; k++) {
+          const px = x + k * w * 0.19, lg = w * (0.1 + 0.05 * Math.abs(Math.sin(px)));
+          g.fillTriangle(px - 5, C.cibleY - w * 0.52, px + 5, C.cibleY - w * 0.52, px, C.cibleY - w * 0.52 + lg);
+        }
+        this.touchesC[n].setColor('#bfefff');
+      }
+      this.gelCompte.setVisible(true).setText(`PLANCHER GLACÉ ! ${reste} ${reste > 1 ? 'SECONDES' : 'SECONDE'} SANS APPUI`);
+    } else {
+      this.gelCompte.setVisible(false);
+      for (const n of DIRS) this.touchesC[n].setColor('#ffffff');
     }
     // les flèches : elles tombent dans leur couloir et touchent la touche pile sur leur temps ;
     // dans le NOIR, on ne les voit que dans leurs toutes dernières secondes de chute
     for (const n of this.notes) {
       const dt = n.t - this.T, y = C.cibleY - dt * v;
-      const visible = y >= C.haut + 10 && dt > -0.3 && (!this.noirOn() || dt < NOIR.visibilite);
+      const visible = !n.pas.mange && y >= C.haut + 10 && dt > -0.3 && (!this.noirOn() || dt < NOIR.visibilite);
       n.objet.setVisible(visible);
       if (!visible) continue;
       n.objet.setPosition(C.x[n.pas.montre], y);
@@ -611,3 +687,4 @@ export class Showtime {
     if (pose) { s.tweens.killTweensOf(t); t.setScale(t.scaleX * 1.08); s.tweens.add({ targets: t, scale: t.scaleX / 1.08, duration: 160 }); }
   }
 }
+
