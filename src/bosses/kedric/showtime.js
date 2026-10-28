@@ -142,6 +142,7 @@ export class Showtime {
     this.viderAnnonce();
     this.etiquettesJauge.forEach(t => t.setVisible(true));
     const m = tempsMusique(S.musique);
+    this.suiviMusique = null; this.tempsMusical = 0; this.dureePiste = null;   // suivi musical monotone (horloge)
     this.origine = m === null ? S.introMusique : m;   // le temps musical courant (jamais de re-placement)
     this.T = 0;
     this.duree = S.tempo.temps * S.tempsParPas;   // durée entre deux flèches (~0,69 s), calée sur la musique
@@ -205,14 +206,28 @@ export class Showtime {
   viderNotes() { this.notes.forEach(n => n.objet.destroy()); this.notes = []; }
 
   // l'horloge de la session : le temps du jeu, recalé sur la musique quand elle joue vraiment
+  // l'horloge de la session : le temps du jeu, recalé sur la musique quand elle joue vraiment.
+  // La piste du battle est en BOUCLE : quand elle reboucle, son temps de lecture repart du début ;
+  // on suit donc une horloge musicale MONOTONE (les tours de boucle s'additionnent), le temps de la
+  // session ne recule JAMAIS (c'est ce qui figeait les flèches au milieu du battle).
   horloge(dt) {
     this.T += dt;
     if (this.phase === 'intro' || this.phase === 'fin' || this.s.horlogeJeu) return;
     const m = tempsMusique(S.musique);
-    if (m === null) return;
-    const ecart = (m - this.origine) - this.T;
-    if (Math.abs(ecart) > 0.12) this.T += ecart;   // gros décalage (chargement, saut dans la musique) : on se cale d'un coup
-    else this.T += ecart * 0.1;                     // petit : en douceur
+    if (m === null) return;   // musique en pause / en chargement : le temps du jeu avance seul
+    if (this.suiviMusique === null) { this.suiviMusique = m; this.tempsMusical = m; }
+    let d = m - this.suiviMusique;
+    if (d < -1) {   // la lecture a sauté en arrière : REBOUCLEMENT de la piste (elle était arrivée au bout)
+      if (!this.dureePiste) this.dureePiste = Math.max(1, this.suiviMusique);   // là où elle était arrivée ≈ sa durée
+      if (Math.abs(this.suiviMusique - this.dureePiste) < 2) d += this.dureePiste;   // oui, c'est bien un tour de boucle
+      else d = 0;   // non (onglet caché, reprise de lecture) : on ignore le saut
+    }
+    this.suiviMusique = m;
+    this.tempsMusical += d;   // le temps musical CONTINU (rebouclé, il ne revient jamais en arrière)
+    const ecart = (this.tempsMusical - this.origine) - this.T;
+    if (Math.abs(ecart) <= 0.12) this.T += ecart * 0.1;        // petit décalage : en douceur
+    else if (ecart > 0) this.T += ecart;                       // la musique a pris de l'avance : on se cale d'un coup
+    else this.T += ecart * 0.05;                               // elle a pris du retard (onglet caché) : on rattrape en douceur
   }
 
   // ---------- la boucle ----------
@@ -286,6 +301,14 @@ export class Showtime {
     if (note === 'parfait') { this.bilan.parfaits++; this.public(S.gain.parfait); this.retour.setText('PARFAIT !').setColor('#7fe8ff'); lignesImpact(this.s, xc, this.c.cibleY, 0x9fe0ff, 10, 70); lignesImpact(this.s, xChoc, KHAM.y, 0xffffff, 12, 100); }
     else if (note === 'bien') { this.bilan.bien++; this.public(S.gain.bien); this.retour.setText('BIEN !').setColor('#7fff7f'); }
     else { this.bilan.rates++; this.public(-S.gain.rate); this.retour.setText(p.rouge ? 'RATÉ ! (l\'inverse !)' : 'RATÉ !').setColor('#ff6b6b'); lignesImpact(this.s, xChoc, KHAM.y, 0xff6b6b, 12, 100); this.poseKedric('haut'); }
+    // appuyé au bon moment : ça se SENT (petite vibration sur téléphone) et ça se VOIT (la touche éclate) ;
+    // raté : une vibration plus longue, on comprend tout de suite
+    if (note !== 'rate') {
+      if (navigator.vibrate) navigator.vibrate(note === 'parfait' ? 45 : 20);
+      const tc = this.touchesC[p.attendu];
+      this.s.tweens.killTweensOf(tc); tc.setScale(1.7);
+      this.s.tweens.add({ targets: tc, scale: 1, duration: 180 });
+    } else if (navigator.vibrate) navigator.vibrate(80);
     this.s.tweens.killTweensOf(this.retour); this.retour.setAlpha(1).setScale(1.2);
     this.s.tweens.add({ targets: this.retour, scale: 1, duration: 120 });
     if (n) n.objet.setColor(note === 'rate' ? '#ff6b6b' : note === 'parfait' ? '#7fe8ff' : '#7fff7f');
@@ -297,6 +320,7 @@ export class Showtime {
     if (this.termine) return;
     this.termine = true;
     this.phase = 'fin';
+    arreterMusique(S.musique);   // le battle est fini : la musique s'arrête net
     this.viderNotes();
     eteindreBoutons();
     // tu gagnes : il s'effondre ; il gagne : clin d'œil de star (jamais la pose du perdant)
