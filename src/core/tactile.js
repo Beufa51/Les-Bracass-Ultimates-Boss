@@ -138,3 +138,17 @@ export function disposition(nom = 'normale') {
 }
 // (ancienne forme, gardée) : dispositionDanse(true) = disposition('danse'), dispositionDanse(false) = 'normale'
 export function dispositionDanse(actif) { disposition(actif ? 'danse' : 'normale'); }
+
+// Allume un bouton (optionnel, ex. jeu de rythme : le bouton à presser brille de plus en plus fort) :
+// force de 0 (éteint) à 1 (maintenant !) ; couleur CSS de la lueur. eteindreBoutons() les éteint tous.
+const lueurs = {};
+export function allumerBouton(nom, force = 0, couleur = '#ffd84a') {
+  const b = boutons[nom];
+  if (!b) return;
+  const style = force <= 0 ? '' : `0 0 ${Math.round(8 + 28 * force)}px ${Math.round(2 + 10 * force)}px ${couleur}`;
+  if (lueurs[nom] === style) return;   // rien de changé : on ne touche pas à la page
+  lueurs[nom] = style;
+  b.style.boxShadow = style;
+  b.style.borderColor = force <= 0 ? '' : couleur;
+}
+export function eteindreBoutons() { for (const nom of Object.keys(boutons)) allumerBouton(nom, 0); }

@@ -245,6 +245,11 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     et ligne qui ne se décale plus (sauf CHAMPION : `murTardif`, `decalage`), pot de colle figé 0,75 s avant, rangs derrière le
     prochain défenseur ESTOMPÉS, symbole placé à la hauteur de la pose (plus bas quand il plonge). Duel : tu restes face à Kédric
     (le terrain ne défile plus pendant le duel), sa charge dure toujours ≈ 1,2 s (avant, le bout du terrain la ralentissait).
+  - v6.3 (battle) : plus aucun bip (seulement la musique et le public à l'annonce). Plus long : manches de 8, 12 et 16
+    pas, en QUESTIONS / RÉPONSES (`showtime.phrase` = 4 : Kédric fait 4 pas, puis toi les mêmes 4, et ainsi de suite ;
+    `slotKedric` / `slotToi`). Ergonomie : sur téléphone, le bouton à presser S'ALLUME (lueur jaune → bleue dans la
+    fenêtre → blanche pile sur le temps ; ajout optionnel `allumerBouton` / `eteindreBoutons` de `src/core/tactile.js`) : on
+    peut jouer en regardant ses pouces (pas d'aide sur les flèches rouges en CHAMPION).
   - v6.2 : boutons tactiles ◀ ▶ à gauche, ▲ ▼ + Ghost + Sprint à droite pendant tout le match (`disposition('separee')`,
     ajout optionnel de `src/core/tactile.js`, remis à 'normale' en quittant Kédric), comme au battle. DEVIL BAT GHOST : dure
     4 s (`REGLAGES.ghost.duree`) et passe TOUS les défenseurs pendant ce temps (sème aussi le poursuivant). Battle : plus de

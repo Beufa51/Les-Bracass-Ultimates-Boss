@@ -76,15 +76,16 @@ export const REGLAGES = {
   // réception) / une esquive PARFAITE (ou une réception parfaite) ; la taille de la jauge dépend de la difficulté (ghost)
   ghost: { duree: 4, gel: 0.35, parEsquive: 1, parParfait: 2 },
   // ---------- SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (showtime.js) ----------
-  //  Kédric montre ses pas en rythme, puis « À TOI ! » : tu les refais sur les mêmes temps. FLÈCHE ROUGE = l'inverse.
-  //  manches : nombre de pas de chaque manche ; rouges : flèches rouges par manche (si la difficulté en a : flechesRouges)
+  //  Kédric fait 4 pas en rythme, puis « À TOI ! » : tu les refais sur les mêmes temps, et ainsi de suite. FLÈCHE ROUGE = l'inverse.
+  //  manches : nombre de pas (les tiens) de chaque manche ; rouges : flèches rouges par manche (si la difficulté en a : flechesRouges)
   //  Les pas sont calés sur la musique (kedric_battle, Naruto « Haruka Kanata ») : chaque manche reprend la musique à un
   //  autre passage (intro, couplet, refrain). passages : début (s, sur un temps fort) et durée d'un temps (s) de chaque
   //  passage, mesurés par outils/kedric/caler_battle.py ; tempsParPas : un pas tous les 2 temps (~0,69 s)
   //  annonce : temps d'attente (en pas) avant que Kédric commence ; pause : entre deux manches (s)
   //  parfait / bien : fenêtres de timing (s, x fenetreShow de la difficulté) ; gain : points de PUBLIC (de -100 à +100)
   //  parTouchdown / avanceMax : public de départ = (touchdowns - 1) x parTouchdown (aucun touchdown : il part pour Kédric)
-  showtime: { manches: [4, 6, 8], rouges: [0, 1, 1], musique: 'kedric_battle',
+  //  phrase : Kédric fait 'phrase' pas, puis toi les mêmes 'phrase' pas, et ainsi de suite (questions / réponses)
+  showtime: { manches: [8, 12, 16], rouges: [0, 1, 2], phrase: 4, musique: 'kedric_battle',
     passages: [{ debut: 1.385, temps: 0.3473 }, { debut: 22.069, temps: 0.3424 }, { debut: 54.969, temps: 0.3426 }],
     tempsParPas: 2, annonce: 4, pause: 1.0,
     // l'écran d'annonce (Kédric sur scène, avant la 1re manche) : il dure au plus 'intro' s (une flèche le passe après

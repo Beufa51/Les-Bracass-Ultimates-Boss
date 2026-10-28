@@ -1,9 +1,11 @@
 // =====================================================================
 // SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (façon PaRappa / jeu de rythme).
 // D'abord l'ANNONCE : Kédric sur scène (décor kedric_scene) lance le défi et explique les règles.
-// Puis chaque manche : les flèches glissent sur une PISTE vers un cercle. Les premières sont celles de Kédric : quand
-// elles arrivent dans le cercle, il fait le pas (une pose, un son). Puis il te tend le micro : « À TOI ! » ; les mêmes
-// flèches reviennent, et tu appuies (◀ ▶ ▲ ▼) quand elles arrivent dans le cercle. Pas besoin de retenir la suite.
+// Puis chaque manche, en QUESTIONS / RÉPONSES : les flèches glissent sur une PISTE vers un cercle. Kédric fait 4 pas
+// (ses flèches, petites : il prend la pose quand elles arrivent dans le cercle), puis « À TOI ! » : les mêmes 4 flèches
+// reviennent en grand et tu appuies (◀ ▶ ▲ ▼) quand elles arrivent dans le cercle ; et on recommence.
+// Sur téléphone, le bouton à presser S'ALLUME et brille de plus en plus fort jusqu'au bon moment : on peut jouer en
+// regardant ses pouces. Pas de bips : seulement la musique.
 // En CHAMPION seulement (diff.flechesRouges), des FLÈCHES ROUGES : Kédric triche, il faut faire l'INVERSE (◀ ↔ ▶, ▲ ↔ ▼).
 // La jauge du PUBLIC fait le tir à la corde : pile sur le temps = le public est pour toi.
 // Les pas sont calés sur la musique (kedric_battle) ; chaque manche la reprend à un autre passage. L'horloge de la
@@ -14,7 +16,7 @@ import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { texte } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique, arreterMusique, placerMusique, tempsMusique } from '../../core/musique.js';
-import { disposition } from '../../core/tactile.js';
+import { disposition, allumerBouton, eteindreBoutons, estTactile } from '../../core/tactile.js';
 import { onomatopee, lignesImpact } from './effets.js';
 import { REGLAGES as R } from './reglages.js';
 
@@ -23,7 +25,6 @@ const PISTE = S.piste;
 const FLECHES = { gauche: '◀', droite: '▶', haut: '▲', bas: '▼' };
 const COULEURS = { gauche: '#3fa7ff', droite: '#ff9a3c', haut: '#ffd84a', bas: '#d9a0ff' };
 const INVERSE = { gauche: 'droite', droite: 'gauche', haut: 'bas', bas: 'haut' };
-const SON = { gauche: 0.9, droite: 1.1, haut: 1.3, bas: 0.75 };   // une note par direction
 const P = 600;   // profondeur d'affichage (au-dessus du terrain et du HUD, sous les encarts)
 // sur scène : Kédric en grand, debout sur l'estrade ; toi de dos, au premier plan à gauche
 const KED = { x: 480, pieds: 392, hauteur: 335 };
@@ -68,7 +69,7 @@ export class Showtime {
     arreterMusique('kedric_musique');
     jouerMusique(scene, S.musique);
     disposition('danse');
-    this.surPause = () => disposition('normale');
+    this.surPause = () => { eteindreBoutons(); disposition('normale'); };
     this.surReprise = () => disposition('danse');
     scene.events.on('pause', this.surPause); scene.events.on('resume', this.surReprise);
     this.annonce();
@@ -79,6 +80,7 @@ export class Showtime {
   detruire() {
     this.el.forEach(o => o.destroy()); this.viderNotes(); this.viderAnnonce(); this.el = [];
     this.s.events.off('pause', this.surPause); this.s.events.off('resume', this.surReprise);
+    eteindreBoutons();
     disposition('separee');   // la disposition du match de Kédric
     arreterMusique(S.musique);
     jouerMusique(this.s, 'kedric_musique');
@@ -105,13 +107,12 @@ export class Showtime {
       wordWrap: { width: 300 }, align: 'center',
     }).setOrigin(0, 0.5).setDepth(P + 10).setAlpha(0);
     s.tweens.add({ targets: bulle, alpha: 1, delay: 300, duration: 250 });
-    const regles = texte(s, LARGEUR / 2, HAUTEUR - 92,
-      'Kédric danse... puis il te tend le micro : À TOI !\nAppuie sur la flèche quand elle arrive dans le CERCLE, en rythme.' +
-      (this.s.diff.flechesRouges ? '\nFLÈCHE ROUGE = Kédric triche : fais l\'INVERSE !' : ''), 19, '#ffffff', { align: 'center', lineSpacing: 6 }).setDepth(P + 10);
+    const regles = texte(s, LARGEUR / 2, HAUTEUR - 96,
+      'Kédric fait 4 pas... puis À TOI : les mêmes 4 pas ! Et on recommence.\nAppuie sur la flèche quand elle arrive dans le CERCLE, en rythme.' + (estTactile() ? '\nLe bouton à presser S\'ALLUME de plus en plus fort jusqu\'au bon moment.' : '') +
+      (this.s.diff.flechesRouges ? '\nFLÈCHE ROUGE = Kédric triche : fais l\'INVERSE !' : ''), 17, '#ffffff', { align: 'center', lineSpacing: 6 }).setDepth(P + 10);
     this.invite = texte(s, LARGEUR / 2, HAUTEUR - 22, 'Appuie sur une flèche quand tu es prêt !', 20, '#7fff7f', { fontStyle: 'bold' }).setDepth(P + 10).setAlpha(0);
     this.elAnnonce = [voile, titre, sous, bulle, regles, this.invite];
-    jouerSon(s, 'kedric_touchdown', { volume: 0.7 });
-    jouerSon(s, 'kedric_foule', { volume: 0.8 });
+    jouerSon(s, 'kedric_foule', { volume: 0.8 });   // le public (pas de bips au battle : seulement la musique)
   }
 
   viderAnnonce() {
@@ -120,9 +121,9 @@ export class Showtime {
     this.elAnnonce = null;
   }
 
-  // ---------- une manche : Kédric montre, puis toi, sur un passage de la musique ----------
-  //  (en pas depuis le début du passage) 0..annonce-1 : on se prépare ; annonce + i : Kédric fait son pas i ;
-  //  annonce + n : il tend le micro ; annonce + n + 1 + i : ton pas i
+  // ---------- une manche : questions / réponses sur un passage de la musique ----------
+  //  (en pas de musique depuis le début du passage) 0..annonce-1 : on se prépare ; puis, par groupes de 'phrase' pas :
+  //  Kédric fait ses pas, puis toi les mêmes (voir slotKedric / slotToi)
   mancheSuivante() {
     this.manche++;
     const n = this.o.manches[this.manche];
@@ -144,9 +145,9 @@ export class Showtime {
     placerMusique(S.musique, this.origine);
     const fen = this.s.diff.fenetreShow;
     this.fenetre = { parfait: Math.min(S.parfait * fen, this.duree * 0.25), bien: Math.min(S.bien * fen, this.duree * 0.45) };
-    this.T = 0; this.phase = 'annonce'; this.iMontre = -1; this.dernierPas = -1;
+    this.T = 0; this.phase = 'annonce'; this.dernierPas = -1; this.premierAToi = true;
     this.creerNotes();
-    const titre = `MANCHE ${this.manche + 1} / ${this.o.manches.length} : ${n} PAS`;
+    const titre = `MANCHE ${this.manche + 1} / ${this.o.manches.length} : ${n} PAS, ${S.phrase} PAR ${S.phrase}`;
     this.s.bandeau.setText(nr ? `${titre}  -  FLÈCHE ROUGE = fais l'INVERSE !` : titre).setColor(nr ? '#ff9a9a' : '#ffd84a').setVisible(true);
     this.poseKedric('portrait');
     this.poseToi(null);
@@ -157,7 +158,7 @@ export class Showtime {
     this.viderNotes();
     this.pas.forEach((p, i) => {
       const demo = texte(this.s, -99, PISTE.y, FLECHES[p.montre], 44, p.rouge ? '#ff3030' : COULEURS[p.montre], { fontStyle: 'bold', strokeThickness: 6 }).setDepth(P + 6);
-      this.notes.push({ t: (S.annonce + i) * this.duree, objet: demo, demo: true, pas: p });
+      this.notes.push({ t: this.slotKedric(i) * this.duree, objet: demo, demo: true, pas: p });
       // ta flèche (rouge si Kédric a triché : à toi de faire l'inverse)
       const tienne = texte(this.s, -99, PISTE.y, FLECHES[p.montre], 60, p.rouge ? '#ff3030' : COULEURS[p.montre], { fontStyle: 'bold', strokeThickness: 8 }).setDepth(P + 6);
       this.notes.push({ t: this.cible(i), objet: tienne, demo: false, pas: p });
@@ -166,8 +167,13 @@ export class Showtime {
 
   viderNotes() { this.notes.forEach(n => n.objet.destroy()); this.notes = []; }
 
+  // les pas de musique (slots) du pas i : celui de Kédric, puis le tien une phrase plus tard
+  slotKedric(i) { return S.annonce + Math.floor(i / S.phrase) * 2 * S.phrase + i % S.phrase; }
+  slotToi(i) { return this.slotKedric(i) + S.phrase; }
   // moment (s depuis le début du passage) de ton pas i
-  cible(i) { return (S.annonce + this.pas.length + 1 + i) * this.duree; }
+  cible(i) { return this.slotToi(i) * this.duree; }
+  // à qui le tour au pas de musique k : 'kedric' ou 'toi'
+  tour(k) { return k < S.annonce || (k - S.annonce) % (2 * S.phrase) < S.phrase ? 'kedric' : 'toi'; }
 
   // l'horloge de la manche : le temps du jeu, recalé sur la musique quand elle joue vraiment
   horloge(dt) {
@@ -198,30 +204,8 @@ export class Showtime {
     }
     const d = this.duree, n = this.pas.length, k = Math.floor(this.T / d);   // k : numéro du pas de musique en cours
     if (k > this.dernierPas) { this.dernierPas = k; this.surLeTemps(k); }
-    if (this.phase === 'annonce') {
-      if (k >= S.annonce) { this.phase = 'montre'; this.s.bandeau.setVisible(false); }
-    }
-    if (this.phase === 'montre') {
-      // Kédric fait un pas à chaque temps (sa flèche arrive dans le cercle)
-      const i = k - S.annonce;
-      if (i > this.iMontre && i < n) {
-        this.iMontre = i;
-        const p = this.pas[i];
-        this.poseKedric(p.rouge ? 'triche' : p.montre);   // flèche rouge : il triche (clin d'œil)
-        this.flecheKedric.setText(FLECHES[p.montre]).setColor(p.rouge ? '#ff3030' : COULEURS[p.montre]).setScale(1.3);
-        this.s.tweens.add({ targets: this.flecheKedric, scale: 1, duration: 150 });
-        jouerSon(this.s, 'kedric_alerte', { rate: SON[p.montre], volume: 0.9 });
-        this.public(-S.kedricParPas);
-      }
-      if (i >= n) {
-        // il te tend le micro : à toi !
-        this.phase = 'toi';
-        this.flecheKedric.setText('');
-        this.poseKedric('micro');
-        onomatopee(this.s, KED.x, 150, 'À TOI !', 54, '#ffffff');
-        jouerSon(this.s, 'kedric_niveau');
-      }
-    } else if (this.phase === 'toi') {
+    if (this.phase === 'annonce' && k >= S.annonce) { this.phase = 'jeu'; this.s.bandeau.setVisible(false); }
+    if (this.phase === 'jeu') {
       for (const t of ['gauche', 'droite', 'haut', 'bas']) if (e[t]) this.appui(t);
       for (let i = 0; i < n; i++) {
         const p = this.pas[i];
@@ -234,10 +218,26 @@ export class Showtime {
     this.afficher();
   }
 
-  // à chaque pas de musique : pendant l'attente, le décompte 3, 2, 1
+  // à chaque pas de musique : le décompte 3, 2, 1 ; Kédric fait son pas ; ou il te tend le micro
   surLeTemps(k) {
     if (this.phase === 'annonce' && k >= S.annonce - 3 && k < S.annonce) {
       onomatopee(this.s, KED.x + 230, 300, String(S.annonce - k), 44, '#ffd84a');
+      return;
+    }
+    if (k < S.annonce || this.phase !== 'jeu' && this.phase !== 'annonce') return;
+    const i = this.pas.findIndex((p, j) => this.slotKedric(j) === k);
+    if (i >= 0) {
+      // Kédric fait son pas (sa flèche arrive dans le cercle) ; flèche rouge : il triche (clin d'œil)
+      const p = this.pas[i];
+      this.poseKedric(p.rouge ? 'triche' : p.montre);
+      this.flecheKedric.setText(FLECHES[p.montre]).setColor(p.rouge ? '#ff3030' : COULEURS[p.montre]).setScale(1.3);
+      this.s.tweens.add({ targets: this.flecheKedric, scale: 1, duration: 150 });
+      this.public(-S.kedricParPas);
+    } else if (this.tour(k) === 'toi' && this.tour(k - 1) === 'kedric') {
+      // il te tend le micro : à toi !
+      this.flecheKedric.setText('');
+      this.poseKedric('micro');
+      if (this.premierAToi) { this.premierAToi = false; onomatopee(this.s, KED.x, 150, 'À TOI !', 54, '#ffffff'); }
     }
   }
 
@@ -257,9 +257,9 @@ export class Showtime {
     const p = this.pas[i];
     p.note = note;
     const n = this.notes.find(o => !o.demo && o.pas === p);
-    if (note === 'parfait') { this.bilan.parfaits++; this.public(S.gain.parfait); jouerSon(this.s, 'kedric_parfait', { rate: SON[p.attendu] }); this.retour.setText('PARFAIT !').setColor('#7fe8ff'); lignesImpact(this.s, PISTE.x, PISTE.y, 0x9fe0ff, 10, 80); }
-    else if (note === 'bien') { this.bilan.bien++; this.public(S.gain.bien); jouerSon(this.s, 'kedric_esquive', { rate: SON[p.attendu] }); this.retour.setText('BIEN !').setColor('#7fff7f'); }
-    else { this.bilan.rates++; this.public(-S.gain.rate); jouerSon(this.s, 'kedric_alerte', { rate: 0.5 }); this.retour.setText(p.rouge ? 'RATÉ ! (flèche rouge = l\'inverse)' : 'RATÉ !').setColor('#ff6b6b'); this.poseKedric('haut'); }
+    if (note === 'parfait') { this.bilan.parfaits++; this.public(S.gain.parfait); this.retour.setText('PARFAIT !').setColor('#7fe8ff'); lignesImpact(this.s, PISTE.x, PISTE.y, 0x9fe0ff, 10, 80); }
+    else if (note === 'bien') { this.bilan.bien++; this.public(S.gain.bien); this.retour.setText('BIEN !').setColor('#7fff7f'); }
+    else { this.bilan.rates++; this.public(-S.gain.rate); this.retour.setText(p.rouge ? 'RATÉ ! (flèche rouge = l\'inverse)' : 'RATÉ !').setColor('#ff6b6b'); this.poseKedric('haut'); }
     this.s.tweens.killTweensOf(this.retour); this.retour.setAlpha(1).setScale(1.2);
     this.s.tweens.add({ targets: this.retour, scale: 1, duration: 120 });
     if (n) { n.note = note; n.objet.setColor(note === 'rate' ? '#ff6b6b' : note === 'parfait' ? '#7fe8ff' : '#7fff7f'); }
@@ -270,6 +270,7 @@ export class Showtime {
   finManche() {
     if (this.manche >= this.o.manches.length - 1) { this.terminer(this.jauge > 0); return; }
     this.phase = 'bilan'; this.finBilan = this.T + S.pause;
+    eteindreBoutons();
     this.poseKedric(this.jauge > 0 ? 'haut' : 'portrait');
   }
 
@@ -278,6 +279,7 @@ export class Showtime {
     this.termine = true;
     this.phase = 'fin';
     this.viderNotes();
+    eteindreBoutons();
     // tu gagnes : il s'effondre ; il gagne : clin d'œil de star (jamais la pose du perdant)
     this.poseKedric(gagne ? 'defaite' : 'triche');
     this.poseToi(gagne ? 'haut' : null);
@@ -308,28 +310,35 @@ export class Showtime {
   // la piste : une bande sombre, le cercle à gauche (il « bat » sur le temps), les flèches qui glissent vers lui
   afficherPiste(boum) {
     const c = this.pisteG; c.clear();
-    const actif = ['annonce', 'montre', 'toi', 'bilan'].includes(this.phase);
+    const actif = ['annonce', 'jeu', 'bilan'].includes(this.phase);
     this.etiquettePiste.setVisible(actif);
     if (!actif) { this.notes.forEach(n => n.objet.setVisible(false)); return; }
-    const aToi = this.phase === 'toi';
+    const d = this.duree;
+    const aToi = this.phase === 'jeu' && this.tour(Math.floor(this.T / d + 0.5)) === 'toi';
     c.fillStyle(0x000000, 0.55); c.fillRoundedRect(PISTE.x - 56, PISTE.y - 46, PISTE.fin - PISTE.x + 90, 92, 46);
-    // le cercle : bleu quand ta flèche est dans la fenêtre, blanc pile au bon moment
-    let couleur = aToi ? 0xffffff : 0x7fff7f;
-    const i = aToi ? this.pas.findIndex(p => p.note === null) : -1;
+    // le cercle : jaune quand ta flèche approche, bleu dans la fenêtre, blanc pile au bon moment ;
+    // et le bouton à presser s'allume (téléphone) de plus en plus fort jusqu'au bon moment
+    let couleur = aToi ? 0xffffff : 0x7fff7f, lueur = null;
+    const i = this.phase === 'jeu' ? this.pas.findIndex(p => p.note === null) : -1;
     if (i >= 0) {
-      const reste = Math.abs(this.cible(i) - this.T);
-      couleur = reste <= this.fenetre.parfait ? 0xffffff : reste <= this.fenetre.bien ? 0x3fa7ff : 0xffd84a;
+      const dt = this.cible(i) - this.T, reste = Math.abs(dt);
+      const c2 = reste <= this.fenetre.parfait ? '#ffffff' : reste <= this.fenetre.bien ? '#3fa7ff' : '#ffd84a';
+      if (dt < d * 1.5) {
+        couleur = Phaser.Display.Color.HexStringToColor(c2).color;
+        // (flèche rouge en CHAMPION : pas d'aide, c'est à toi d'inverser)
+        if (!this.pas[i].rouge) lueur = { nom: this.pas[i].attendu, force: Math.max(0.15, Math.min(1, 1 - dt / (d * 1.5))), couleur: c2 };
+      }
     }
+    for (const nom of ['gauche', 'droite', 'haut', 'bas']) allumerBouton(nom, lueur && lueur.nom === nom ? lueur.force : 0, lueur ? lueur.couleur : undefined);
     c.fillStyle(couleur, 0.18 + 0.2 * boum); c.fillCircle(PISTE.x, PISTE.y, 42);
     c.lineStyle(6, couleur, 1); c.strokeCircle(PISTE.x, PISTE.y, 42 + 5 * boum);
     // des petits traits sur la piste, un par pas de musique (on voit venir le rythme)
-    const d = this.duree;
     c.lineStyle(2, 0xffffff, 0.25);
     for (let k = Math.ceil(this.T / d); (k * d - this.T) * PISTE.vitesse + PISTE.x < PISTE.fin + 20; k++) {
       const x = PISTE.x + (k * d - this.T) * PISTE.vitesse;
       if (x > PISTE.x + 44) c.lineBetween(x, PISTE.y - 30, x, PISTE.y + 30);
     }
-    this.etiquettePiste.setText(aToi ? 'À TOI !' : this.phase === 'montre' || this.phase === 'annonce' ? 'KÉDRIC' : '').setColor(aToi ? '#ffd84a' : '#7fff7f');
+    this.etiquettePiste.setText(aToi ? 'À TOI !' : this.phase === 'bilan' ? '' : 'KÉDRIC').setColor(aToi ? '#ffd84a' : '#7fff7f');
     // les flèches : elles arrivent de la droite et touchent le cercle pile sur leur temps
     for (const n of this.notes) {
       const dt = n.t - this.T, x = PISTE.x + dt * PISTE.vitesse;
