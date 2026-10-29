@@ -157,7 +157,7 @@ export const REGLAGES = {
   // sans défense pendant 'duree' secondes : tous tes coups passent !
   etourdi: { parCoup: 15, parContre: 35, baisse: 18, duree: 1.8 },
   compteVocal: false,          // compte de l'arbitre à voix haute (japonais) ; false = seulement à l'écran
-  annonceur: true,             // voix de synthèse : "Box !", compte, "K.O. !" (si le navigateur en a une)
+  annonceur: false,            // voix de synthèse retirées : pas assez punchy — tout passe par l'écran et les sons             // voix de synthèse : "Box !", compte, "K.O. !" (si le navigateur en a une)
 
   // ---------- Moment secret : Greg baisse la garde un très court instant ----------
   // Une fois par round, à un moment au hasard (entre 'entre' secondes restantes). Pour réussir :

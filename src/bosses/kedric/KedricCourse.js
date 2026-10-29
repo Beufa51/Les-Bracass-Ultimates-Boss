@@ -71,6 +71,7 @@ export class KedricCourse extends BossScene {
     this.attente = 0; this.apresAttente = null;
     this.gel = 0;                 // jeu figé un instant (impact, cinématique)
     this.ralenti = 1;             // < 1 pendant l'explication d'un nouveau plaquage
+    this.ralentiDrame = 0;        // le ralenti DRAMATIQUE : temps RÉEL restant (se décompte dans pas())
     this.horloge = 0; this.memoire = {};
     this.nomDiff = 'normal'; this.diff = DIFFICULTES.normal;
     this.numAttaque = 0; this.attaque = COURSES[0];
@@ -364,6 +365,8 @@ export class KedricCourse extends BossScene {
     if (this.etat === 'showtime') { this.show.maj(dt, e); return; }
     if (this.etat !== 'jeu') return;
     if (this.gel > 0) { this.gel -= dt; if (this.gel <= 0 && this.apresGel) { const f = this.apresGel; this.apresGel = null; f(); } return; }
+    // le ralenti dramatique se décompte en temps RÉEL (dt), pas au ralenti
+    if (this.ralentiDrame > 0) { this.ralentiDrame -= dt; if (this.ralentiDrame <= 0) this.ralenti = 1; }
     this.majJeu(dt * this.ralenti);
   }
 
@@ -589,12 +592,17 @@ export class KedricCourse extends BossScene {
         lignesImpact(this, x, y + 60, 0x9fe0ff, 16, 150);
       } else jouerSon(this, 'kedric_esquive');
       this.monterVitesse(x, y);
+      // RALENTI DRAMATIQUE : une PARFAITE dans les derniers yards, ou Kédric lui-même esquivé près de l'en-but
+      if ((parfait && this.pos > EN_BUT - 18) || (d.star && this.pos > EN_BUT - 25)) this.dramatiser();
       // esquivé de côté, il peut se relever et te courir après (jamais quand Kédric est là)
       if ((comment === 'cote' || parfait) && !d.star && (d.type === 'bloc' || d.type === 'suiveur') && !this.duel
         && !this.defs.some(o => o.star) && Math.random() < this.diff.poursuite) this.ajouterPoursuivant();
     }
     if (d.star) this.kedricEsquive();
   }
+
+  // le RALENTI DRAMATIQUE : 0,7 s à 35 % de vitesse — réservé aux moments de flamme près de l'en-but
+  dramatiser() { this.ralenti = 0.35; this.ralentiDrame = 0.7; }
 
   // la jauge du Devil Bat Ghost (gardée d'une course à l'autre) ; pleine : on prévient
   remplirGhost(n) {
@@ -871,7 +879,10 @@ export class KedricCourse extends BossScene {
         replique: td > 0 ? REPLIQUES.finale : REPLIQUES.finaleZero, sousTitre: avance }, (gagne, bilan) => {
         this.dernierBilanDanse = bilan;   // parfaits, biens, ratés, part du public : pour le bilan de victoire
         this.stats.parfaits += bilan.parfaits;
-        if (gagne) {
+        if (bilan.entrainement) {
+          const f = encart(this, 'ENTRAÎNEMENT TERMINÉ !', `Parfaits : ${bilan.parfaits} - Ratés : ${bilan.rates}\nAucune défaite comptée, aucune victoire non plus.\nReviens gagner le vrai match !`, '#7fe8ff', 0x0b2230);
+          this.attendre(3.2, () => { f.fermer(); this.finMatch(false); });
+        } else if (gagne) {
           jouerSon(this, 'kedric_touchdown'); jouerSon(this, 'kedric_foule');
           flash(this, 0.5, 0xffd84a);
           const f = encart(this, 'LE PUBLIC EST À TOI !', `Kédric s'effondre... le nouveau showman, c'est toi !`, '#ffd84a', 0x0b2a16);

@@ -1,0 +1,13 @@
+name: Vérif syntaxe
+on: [push]
+jobs:
+  verif:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Chaque fichier JS doit se compiler
+        run: |
+          node -e 'const fs=require("fs"),path=require("path");let bad=0;(function walk(d){for(const f of fs.readdirSync(d)){const p=path.join(d,f);if(fs.statSync(p).isDirectory()){walk(p);}else if(p.endsWith(".js")){try{new Function(fs.readFileSync(p,"utf8").replace(/^import .*$/gm,"").replace(/^export /gm,""));console.log("OK  "+p);}catch(e){bad++;console.error("ERREUR "+p+" : "+e.message);}}}})("src");if(bad){console.error(bad+" fichier(s) cassé(s)");process.exit(1);}console.log("Tous les fichiers se compilent.");'

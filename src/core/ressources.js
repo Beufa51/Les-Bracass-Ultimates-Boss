@@ -4,6 +4,11 @@ import { MANIFESTE, manifesteDe } from './manifestes.js';
 import { FORMES } from './dessins.js';
 import { Sauvegarde } from './sauvegarde.js';
 
+// Coupure de courant (battle de Kédric) : coupe TOUS les effets sonores pendant le noir total
+// (la musique continue, c'est un jeu de rythme). Remis en route à la fin du noir.
+let sonsCoupes = false;
+export function couperSons(v) { sonsCoupes = v; }
+
 // À appeler dans preload() : charge les vrais fichiers PNG / sons d'un groupe
 // ('commun' = hub et badges, au démarrage ; sinon l'id d'un boss, en entrant chez lui).
 // Ce qui est déjà chargé n'est pas rechargé.
@@ -38,6 +43,7 @@ export function preparerVisuels(scene, groupe = 'commun') {
 export function jouerSon(scene, cle, options) {
   const e = MANIFESTE.sons[cle];
   if (!e) return;
+  if (sonsCoupes) return;   // coupure de courant : aucun effet sonore (la musique, elle, continue)
   const volSons = Sauvegarde.volume('sons');
   if (volSons <= 0) return;
   if (e.fichier && scene.cache.audio.exists(cle)) { scene.sound.play(cle, { ...options, volume: (options && options.volume || 1) * volSons }); return; }

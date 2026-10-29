@@ -27,7 +27,7 @@
 // =====================================================================
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { texte } from '../../core/ui.js';
-import { jouerSon } from '../../core/ressources.js';
+import { jouerSon, couperSons } from '../../core/ressources.js';
 import { jouerMusique, arreterMusique, placerMusique, tempsMusique } from '../../core/musique.js';
 import { disposition, allumerBouton, eteindreBoutons, estTactile, rectBouton } from '../../core/tactile.js';
 import { onomatopee, lignesImpact } from './effets.js';
@@ -58,6 +58,8 @@ const ECRAN_POUVOIR = 1.6;
 // le DÉCOMPTE avant la première flèche de chaque manche : 5 SECONDES PILE (5, 4, 3, 2, 1… GO !),
 // calées sur le tempo de CHAQUE morceau (le nombre de pas de battement est recalculé par manche)
 const DECOMPTE = 5;
+// CHAMPION : ce que Kédric CRIE quand tu rates (il nargue, la star — pas plus d'une fois toutes les 6 s)
+const PROVOQUES = ['Même pas proche !', 'Tu danses comme un frigo !', 'Le public dort !', 'C\'est tout ce que tu sais faire ?', 'La classe, ça ne s\'apprend pas !'];
 
 export class Showtime {
   // options : { jauge: -30..30, replique, sousTitre } ; fin(gagne, bilan) appelé à la fin
@@ -93,6 +95,8 @@ export class Showtime {
       texte(scene, LARGEUR - 24, this.yJauge, 'KÉDRIC', 16, '#ff9a3c', { fontStyle: 'bold' }).setOrigin(1, 0.5),
       texte(scene, LARGEUR / 2, this.yJauge - 16, 'PUBLIC', 13, '#ffffff'),
     ].map(t => this.ajout(t.setDepth(P + 4)));
+    // le COMPTEUR DE COMBO : les PARFAITS d'affilée, affiché au-dessus de la jauge
+    this.comboT = this.ajout(texte(scene, LARGEUR / 2, this.yJauge - 20, '', 22, '#7fff7f', { fontStyle: 'bold', strokeThickness: 6 }).setOrigin(0.5, 1).setDepth(P + 5)).setVisible(false);
     // les 4 couloirs : le fond, la touche en bas de chacun (un rond et sa flèche)
     this.couloirsG = this.ajout(scene.add.graphics().setDepth(P + 5));
     this.touchesC = {};
@@ -120,6 +124,7 @@ export class Showtime {
   detruire() {
     this.el.forEach(o => o.destroy()); this.viderNotes(); this.viderAnnonce(); this.el = [];
     this.s.events.off('pause', this.surPause); this.s.events.off('resume', this.surReprise);
+    couperSons(false);   // par sécurité : les effets sonores reprennent toujours à la fin du battle
     eteindreBoutons();
     disposition('separee');   // la disposition du match de Kédric
     arreterMusique(this.musique);
@@ -157,7 +162,7 @@ export class Showtime {
         (this.s.diff.flechesRouges ? '\nFLÈCHE ROUGE = fais l\'INVERSE !' : '');
     const regles = texte(s, LARGEUR / 2, HAUTEUR - 104, texteRegles, 17, '#ffffff',
       { align: 'center', lineSpacing: 6, backgroundColor: '#000000c8', padding: { x: 16, y: 10 } }).setDepth(P + 10);
-    this.invite = texte(s, LARGEUR / 2, HAUTEUR - 22, 'Appuie sur une flèche quand tu es prêt !', 20, '#7fff7f', { fontStyle: 'bold' }).setDepth(P + 10).setAlpha(0);
+    this.invite = texte(s, LARGEUR / 2, HAUTEUR - 22, 'Appuie sur une flèche quand tu es prêt !      X = ENTRAÎNEMENT (aucune défaite)', 18, '#7fff7f', { fontStyle: 'bold' }).setDepth(P + 10).setAlpha(0);
     this.elAnnonce = [voile, titre, sous, bulle, regles, this.invite];
     // sur téléphone, les GROS boutons ◀ ▶ ▲ ▼ couvraient les textes du bas :
     // on mesure où ils s'arrêtent et on remonte bulle + règles + invite au-dessus
@@ -432,7 +437,8 @@ export class Showtime {
     if (this.phase === 'intro') {
       if (this.T >= S.introMini && this.invite.alpha === 0) this.s.tweens.add({ targets: this.invite, alpha: { from: 1, to: 0.35 }, duration: 500, yoyo: true, repeat: -1 });
       const appui = DIRS.some(k => e[k]);
-      if ((appui && this.T >= S.introMini) || this.T >= S.intro) this.demarrer();
+      // X au moment de partir = ENTRAÎNEMENT : pas de drain, la jauge ne peut pas passer sous zéro
+      if ((appui && this.T >= S.introMini) || this.T >= S.intro) { this.entrainement = !!e.x; this.demarrer(); }
       this.afficher();
       return;
     }
@@ -475,7 +481,7 @@ export class Showtime {
         this.noirDebut = this.T + ECRAN_POUVOIR;   // juste après l'écran, les projecteurs vacillent avant de mourir
         this.superPouvoir('COUPURE DE COURANT !', '#ff9a9a', "3 SECONDES DE NOIR TOTAL : GARDE LE RYTHME EN TÊTE !", { coupure: true });
       }
-      if (this.jauge > S.drain.seuil) this.public(-S.drain.force * dt);   // tu mènes trop : son public se rappelle à lui
+      if (!this.entrainement && this.jauge > S.drain.seuil) this.public(-S.drain.force * dt);   // tu mènes trop : son public se rappelle à lui
       if (!this.gele()) for (const t of DIRS) if (e[t]) this.appui(t);
       for (let i = 0; i < this.pas.length; i++) {
         const p = this.pas[i];
@@ -550,6 +556,11 @@ export class Showtime {
       if (!this.gele()) onomatopee(this.s, LARGEUR / 2, 150, 'RATÉ !', 54, '#ff6b6b');   // le public le VOIT : gros RATÉ bien marqué au milieu de l'écran
       lignesImpact(this.s, xChoc, this.yJauge, 0xff6b6b, 12, 100);
       if (!this.gele()) this.poseKedric('haut');
+      // CHAMPION : la star NARGUE le raté (une fois toutes les 6 s maximum, sinon ça devient lourd)
+      if (this.s.diff && this.s.diff.nom === 'CHAMPION' && this.T - (this.derniereProvocation ?? -99) >= 6) {
+        this.derniereProvocation = this.T;
+        onomatopee(this.s, KED.x + 175, 335, PROVOQUES[Math.floor(Math.random() * PROVOQUES.length)], 21, '#ffd84a');
+      }
       this.consecParfaits = 0;
     }
     // ---------- le RETOUR FRAPPANT de l'appui ----------
@@ -576,16 +587,20 @@ export class Showtime {
     if (this.termine) return;
     this.termine = true;
     this.phase = 'fin';
+    couperSons(false);   // on ne quitte jamais le battle avec les sons coupés
     arreterMusique(this.musique);   // le battle est fini : la musique s'arrête net
     this.viderNotes();
     eteindreBoutons();
     // tu gagnes : il s'effondre ; il gagne : clin d'œil de star (jamais la pose du perdant)
     this.poseKedric(gagne ? 'defaite' : 'triche');
     this.poseToi(gagne ? 'haut' : null);
-    this.fin(gagne, { ...this.bilan, jauge: Math.round(this.jauge) });   // + la part du public à la fin : pour le bilan de victoire
+    this.fin(gagne, { ...this.bilan, entrainement: !!this.entrainement, jauge: Math.round(this.jauge) });   // + la part du public à la fin : pour le bilan de victoire
   }
 
-  public(n) { this.jauge = Math.max(-100, Math.min(100, this.jauge + n)); }
+  public(n) {
+    this.jauge = Math.max(-100, Math.min(100, this.jauge + n));
+    if (this.entrainement && this.jauge <= 0) this.jauge = 0.5;   // entraînement : AUCUNE défaite possible
+  }
 
   // le point de choc du kaméhaméha : plus le public est pour toi, plus ta boule repousse celle de Kédric
   pointChoc() { return LARGEUR / 2 + (this.jauge / 100) * KHAM.portee; }
@@ -602,6 +617,8 @@ export class Showtime {
     } else { this.voileNoir.setAlpha(0); this.voileNoir.setDepth(P + 8); }
     // la JAUGE DU PUBLIC : rail fin + GRANDE AIGUILLE (elle glisse d'un côté ou de l'autre).
     // Placée là où elle ne gêne RIEN (this.yJauge) : en bas s'il y a la place, sinon en haut
+    // pendant le VRAI noir : plus AUCUN effet sonore (la musique continue, c'est un jeu de rythme)
+    couperSons(this.noirOn() && this.T - (this.noirDebut ?? this.T) > 0);
     const g = this.jaugeG; g.clear();
     if (this.phase !== 'intro') {
       const y = this.yJauge, h = 8;
@@ -622,6 +639,11 @@ export class Showtime {
       g.lineBetween(cx - 13, y + h / 2 + 2, cx, y - 15); g.lineBetween(cx + 13, y + h / 2 + 2, cx, y - 15);
       // la foule est à toi : ton faisceau luit vert
       if (this.combo()) { g.lineStyle(3, 0x7fff7f, 0.6); g.strokeRoundedRect(KHAM.marge - 3, y - h / 2 - 3, Math.max(0, cx - KHAM.marge) + 6, h + 6, 6); }
+      // le COMPTEUR DE COMBO : les PARFAITS d'affilée (il grossit), puis le x1,5 quand la foule est à toi
+      const cc = this.consecParfaits || 0, enCombo = this.combo();
+      const tCombo = enCombo ? 'FOULE À TOI ! GAINS x' + S.combo.mult : cc >= 2 ? 'COMBO x' + cc : '';
+      this.comboT.setText(tCombo).setPosition(LARGEUR / 2, this.yJauge - 20).setVisible(!!tCombo);
+      this.comboT.setScale(enCombo ? 1.15 + 0.06 * Math.sin(this.T * 10) : 1);
     }
     // le bandeau d'un évènement se range tout seul après un moment
     if (this.finBandeau !== null && this.T > this.finBandeau) { this.s.bandeau.setVisible(false); this.finBandeau = null; }
