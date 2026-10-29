@@ -117,8 +117,10 @@ function cercle(ctx, w, h, p) {
   const r = Math.min(w, h) / 2 - 3;
   ctx.beginPath(); ctx.arc(w / 2, h / 2, r, 0, Math.PI * 2);
   remplir(ctx, degrade(ctx, 0, 0, 0, h, [[0, teinte(p.couleur, -0.4)], [1, teinte(p.couleur, 0.2)]]), 2);
-  ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(w / 2, h / 2, r - 6, 0, Math.PI * 2); ctx.stroke();
+  if (r > 8) {   // l'anneau intérieur seulement si le disque est assez grand (une petite pierre : rayon négatif interdit)
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(w / 2, h / 2, r - 6, 0, Math.PI * 2); ctx.stroke();
+  }
 }
 
 // Médaille : disque métallique, anneau, lettre gravée
@@ -128,8 +130,10 @@ function badge(ctx, w, h, p) {
   const g = ctx.createRadialGradient(cx - r * 0.4, cy - r * 0.4, 1, cx, cy, r * 1.2);
   g.addColorStop(0, teinte(p.couleur, 0.6)); g.addColorStop(0.5, p.couleur); g.addColorStop(1, teinte(p.couleur, -0.5));
   remplir(ctx, g, 2.5);
-  ctx.beginPath(); ctx.arc(cx, cy, r - 6, 0, Math.PI * 2);
-  ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2; ctx.stroke();
+  if (r > 8) {   // l'anneau seulement si la médaille est assez grande (rayon négatif interdit)
+    ctx.beginPath(); ctx.arc(cx, cy, r - 6, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 2; ctx.stroke();
+  }
   if (p.icone === 'frisbee') {
     // petit frisbee vu de 3/4 à la place de la lettre
     ctx.save(); ctx.translate(cx, cy + 1); ctx.rotate(-0.35);
