@@ -108,7 +108,7 @@ export const REGLAGES = {
     double: { duree: 12 },
     combo: { nombre: 5, duree: 10, mult: 1.5 },
     drain: { seuil: 40, force: 0.12 },   // tu mènes trop : son public se rappelle à lui (jauge/s, adouci : les pièges suffisent déjà)
-    parfait: 0.12, bien: 0.28, gain: { parfait: 2.1, bien: 1.4, rate: 5 },   // réussites encore PLUS GÉNÉREUSES (+25 %) : on remonte vite après les pièges (gel, noir) ; raté = toujours une grosse pénalité
+    parfait: 0.12, bien: 0.28, gain: { parfait: 2.1, bien: 1.4, rate: 6.5 },   // réussites généreuses, RATÉ punitif (-6,5) : le public rend VITE à Kédric quand on rate une flèche
     parTouchdown: 15, avanceMax: 30 },
   // ---------- Kédric en personne sur le terrain (option : course avec kedric: true) ----------
   //  il garde l'en-but et prévient toujours pareil : danse → POSE (son attaque s'affiche) → CHARGE

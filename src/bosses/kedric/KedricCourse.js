@@ -158,7 +158,7 @@ export class KedricCourse extends BossScene {
     this.jauge = 0;
     // menu F1 : directement le battle de danse (après 2 touchdowns)
     if (this.phase === 'finale') { this.score = { toi: 2 * R.points, ked: 0 }; this.stats.touchdowns = 2; this.debutFinale(); }
-    else { this.score = { toi: 0, ked: 0 }; this.debutAttaque(0); }
+    else { this.score = { toi: 0, ked: 0 }; this.points = 0; this.debutAttaque(0); }   // this.points : le SCORE DE SHOW (esquives x vitesse)
   }
 
   debutAttaque(n) {
@@ -243,6 +243,7 @@ export class KedricCourse extends BossScene {
       const x = ecranX(j.x, 0), y = VUE.pieds - 230;
       if (ecart <= R.envoi.parfait) {
         this.stats.parfaits++; this.remplirGhost(R.ghost.parParfait);
+        this.points += 30;   // la RÉCEPTION PARFAITE du coup d'envoi paie aussi
         jouerSon(this, 'kedric_parfait');
         onomatopee(this, LARGEUR / 2, 260, 'RÉCEPTION PARFAITE !', 44, '#7fe8ff');
         lignesImpact(this, x, y, 0x9fe0ff, 18, 180);
@@ -596,6 +597,10 @@ export class KedricCourse extends BossScene {
         lignesImpact(this, x, y + 60, 0x9fe0ff, 16, 150);
       } else jouerSon(this, 'kedric_esquive');
       this.monterVitesse(x, y);
+      // LE SCORE DE SHOW : plus tu es RAPIDE (chaque esquive monte le niveau de vitesse), plus l'esquive PAIE
+      const gagne = (parfait ? 20 : 10) * (1 + this.niveau);
+      this.points += gagne;
+      onomatopee(this, x, y + 40, '+' + gagne, 26, parfait ? '#7fe8ff' : '#dff6ff');
       // RALENTI DRAMATIQUE : une PARFAITE dans les derniers yards, ou Kédric lui-même esquivé près de l'en-but
       if ((parfait && this.pos > EN_BUT - 18) || (d.star && this.pos > EN_BUT - 25)) this.dramatiser();
       // esquivé de côté, il peut se relever et te courir après (jamais quand Kédric est là)
@@ -823,6 +828,8 @@ export class KedricCourse extends BossScene {
     this.etat = 'pause';
     this.stats.touchdowns++;
     this.score.toi += R.points;
+    const bonusTD = 100 + 20 * this.niveau;   // le TOUCHDOWN paie, et il paie PLUS si tu es arrivé à GRANDE vitesse
+    this.points += bonusTD;
     this.j.pose = 'victoire'; this.j.poseTemps = 99; this.ghostArme = 0;
     if (this.tuto) this.finTuto();
     this.viderPoursuivants(); this.aide.setVisible(false);
@@ -834,7 +841,7 @@ export class KedricCourse extends BossScene {
     onomatopee(this, LARGEUR / 2, 200, 'TOUCHDOWN !!', 76, '#ffd84a');
     lignesImpact(this, LARGEUR / 2, VUE.pieds - 260, 0xffd84a, 20, 240);
     this.attendre(1.2, () => {
-      const e = encart(this, 'TOUCHDOWN !!', `Tout le terrain d'une traite !  -  touchdowns : ${this.stats.touchdowns}`, '#ffd84a', 0x0b2a16);
+      const e = encart(this, 'TOUCHDOWN !!', `+${bonusTD} POINTS !  -  Score : ${this.points}`, '#ffd84a', 0x0b2a16);
       this.direCoach(auHasard(REPLIQUES.touchdown), 2000, true);
       this.attendre(2.6, () => { e.fermer(); this.finAttaque(true); });
     });
@@ -932,6 +939,7 @@ export class KedricCourse extends BossScene {
     score -= this.stats.plaquages * 1.2;
     score += Math.min(10, this.stats.parfaits * 0.4);
     score -= Math.max(0, this.tempsTotal - R.tempsReference) * 0.1;
+    score += Math.min(25, (this.points || 0) * 0.05);   // le SCORE DE SHOW (vitesse + esquives) compte pour le rang
     const rang = R.rangs.find(r => score >= r.seuil).rang;
     const complet = this.phase === 'action1';
     const record = complet ? Sauvegarde.proposerRecord(this.cleRecord(), rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record(this.cleRecord());
@@ -948,6 +956,7 @@ export class KedricCourse extends BossScene {
     return `Kédric est battu au battle de danse !  Touchdowns : ${this.stats.touchdowns} / ${R.courses}\nRANG ${rang}   -   temps ${formatTemps(this.tempsTotal)}` +
       `\nPlaquages subis : ${this.stats.plaquages}   esquives : ${this.stats.esquives}` +
       `\nEsquives parfaites : ${this.stats.parfaits}` +
+      `\nScore de course : ${this.points || 0} points` +
       (this.stats.ghosts ? `   Devil Bat Ghost : ${this.stats.ghosts}` : '') +
       (publicPourToi !== null ? `\nBattle : ${bd.parfaits} parfaits, ${bd.bien} biens, ${bd.rates} ratés   -   public gagné : ${publicPourToi} %` : '') +
       (record ? `\nRecord : rang ${record.rang} en ${formatTemps(record.temps)}` : '') +
@@ -965,8 +974,9 @@ export class KedricCourse extends BossScene {
   // =================================================================
   direCoach(message, duree = 1400, crie = false) {
     if (this.bulleCoach && this.bulleCoach.active) this.bulleCoach.destroy();
-    this.bulleCoach = bulle(this, 166, 136, `Kédric : « ${message} »`, duree).setOrigin(0, 1).setDepth(960);
-    this.bulleCoach.setWordWrapWidth(300);
+    // la bulle part du HAUT, à droite du portrait : elle DESCEND — plus JAMAIS de texte qui monte hors écran
+    this.bulleCoach = bulle(this, 166, 10, `Kédric : « ${message} »`, duree).setOrigin(0, 0).setDepth(960);
+    this.bulleCoach.setWordWrapWidth(420);
     if (crie) { this.coachCrie = 0.7; this.tweens.add({ targets: this.cadreCoach, scale: 1.08, duration: 90, yoyo: true }); }
   }
 
@@ -1363,6 +1373,7 @@ export class KedricCourse extends BossScene {
     this.hudAction = texte(this, LARGEUR - 150, 26, '', 22, '#ffd84a', { fontStyle: 'bold' }).setDepth(P);
     this.hudTentatives = texte(this, LARGEUR - 150, 54, '', 17, '#ffffff').setDepth(P);
     this.hudYards = texte(this, LARGEUR - 150, 80, '', 17, '#ffffff').setDepth(P);
+    this.hudScore = texte(this, LARGEUR - 150, 114, '', 17, '#7fe8ff', { fontStyle: 'bold' }).setDepth(P);   // le SCORE DE SHOW, en permanence : ÇA MOTIVE
     this.hudBarre = this.add.graphics().setDepth(P);
     // à gauche : la vitesse ; à droite : la jauge du Devil Bat Ghost
     this.hudVitesse = this.add.graphics().setDepth(P);
@@ -1385,6 +1396,8 @@ export class KedricCourse extends BossScene {
     if (this.hudTentatives.text !== t2) this.hudTentatives.setText(t2);
     const t3 = `${this.attaque.nom} ${Math.min(this.numAttaque + 1, R.courses)}/${R.courses}  ·  en-but à ${Math.max(0, Math.ceil(EN_BUT - this.pos))}`;
     if (this.hudYards.text !== t3) this.hudYards.setText(t3);
+    const tScore = `SCORE : ${this.points || 0}`;
+    if (this.hudScore.text !== tScore) this.hudScore.setText(tScore);
     const b = this.hudBarre; b.clear();
     const bx = LARGEUR - 260, bl = 220, f = (L) => bx + bl * borne(L / EN_BUT, 0, 1);
     b.fillStyle(0x000000, 0.5); b.fillRect(bx, 96, bl, 10);
