@@ -561,6 +561,12 @@ export class KedricCourse extends BossScene {
     // plongeon et bras tendus qui te suivent (et Kédric) : ◀ ▶ ne suffit pas, il faut ▲ ou ▼
     const colle = d.colle || (d.star && (type === 'bas' || type === 'haut'));
     const enFace = colle || Math.abs(d.x - j.x) < 0.5;
+    // BUGFIX COLLISION : ◀ ▶ pressé juste avant le contact mais le perso n'a pas fini de glisser
+    // de couloir → l'esquive COMPTE quand même (avant : plaqué alors que la réaction était la bonne)
+    if (enFace && !colle && this.horloge - j.changeT <= this.diff.parfait + 0.08 && Math.abs(d.x - j.voie) >= 0.5) {
+      this.esquive(d, this.horloge - j.changeT <= this.diff.parfait ? 'parfait' : 'cote');
+      return;
+    }
     if (this.tuto && this.tuto.d === d) this.finTuto();
     if (!enFace) {
       if (d.menace || d.star) this.esquive(d, this.horloge - j.changeT <= this.diff.parfait ? 'parfait' : 'cote');
@@ -890,7 +896,14 @@ export class KedricCourse extends BossScene {
     const noir = this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x000000).setDepth(928).setAlpha(0);   // sous le « SHOWTIME ! » (930)
     this.tweens.add({ targets: noir, alpha: 1, duration: 600 });
     onomatopee(this, LARGEUR / 2, HAUTEUR / 2, 'SHOWTIME !', 70, '#ffd84a');
-    this.attendre(1.2, () => {
+    // LE RÉCAP DU MATCH : ce que tu as réussi (et loupé) pendant les courses, AVANT de passer sur scène
+    const st = this.stats;
+    const recap = encart(this, 'FIN DU MATCH !',
+      `Touchdowns : ${st.touchdowns}/${R.courses} — Esquives : ${st.esquives} (${st.parfaits} PARFAITES) — Plaqué : ${st.plaquages}` +
+      `\nScore de course : ${this.points || 0} POINTS`,
+      '#7fe8ff', 0x0b2230, 'kedric_coach');
+    this.attendre(3.6, () => {
+      recap.fermer();
       this.tweens.add({ targets: noir, alpha: 0, duration: 500, onComplete: () => noir.destroy() });
       this.lancerShowtime({ jauge: depart,
         replique: td > 0 ? REPLIQUES.finale : REPLIQUES.finaleZero, sousTitre: avance }, (gagne, bilan) => {

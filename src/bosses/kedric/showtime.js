@@ -431,24 +431,26 @@ export class Showtime {
         delay: 150 + Math.random() * 300, duration: 700 + Math.random() * 400 });
       el.push(e);
     }
-    // le gros titre qui claque, à gauche, et l'info du piège en dessous
+    // le gros titre qui claque, à gauche — et les hauteurs de « KÉDRIC UTILISE SON » et de l'info
+    // sont MESURÉES d'après le retour à la ligne du titre : plus JAMAIS de textes qui se chevauchent
     const xt = 330;
-    const haut = this.ajout(texte(s, xt, cy - 92, 'KÉDRIC UTILISE SON', 30, '#ffffff', { fontStyle: 'bold', strokeThickness: 8 }).setOrigin(0.5).setDepth(P + 26).setAlpha(0));
-    s.tweens.add({ targets: haut, alpha: 1, delay: 120, duration: 200 });
     const titre = this.ajout(s.add.text(xt, cy - 10, nom, {
-      fontFamily: 'monospace', fontStyle: 'bold italic', fontSize: '66px', color: couleur, align: 'center',
-      stroke: '#000000', strokeThickness: 11, wordWrap: { width: 560 },
+      fontFamily: 'monospace', fontStyle: 'bold italic', fontSize: '56px', color: couleur, align: 'center',
+      stroke: '#000000', strokeThickness: 10, wordWrap: { width: 560 },
     }).setOrigin(0.5).setDepth(P + 26).setScale(3).setAlpha(0).setAngle(-6));
     s.tweens.add({ targets: titre, scale: 1, alpha: 1, delay: 220, duration: 220, ease: 'Back.Out',
       onComplete: () => s.cameras.main.shake(220, 0.014) });
+    const yTitreHaut = cy - 10 - titre.height / 2, yTitreBas = cy - 10 + titre.height / 2;
+    const haut = this.ajout(texte(s, xt, yTitreHaut - 44, 'KÉDRIC UTILISE SON', 30, '#ffffff', { fontStyle: 'bold', strokeThickness: 8 }).setOrigin(0.5).setDepth(P + 26).setAlpha(0));
+    s.tweens.add({ targets: haut, alpha: 1, delay: 120, duration: 200 });
     el.push(haut, titre);
     if (opts.coupure) {
       // la coupure : le titre CLIGNOTE comme un néon qui rend l'âme, et le « ZZZT ! » du disjoncteur
       s.tweens.add({ targets: titre, alpha: { from: 0.55, to: 1 }, duration: 90, yoyo: true, repeat: 4 });
-      onomatopee(s, cx, cy + 130, 'ZZZT !', 44, '#9fe0ff');
+      onomatopee(s, cx, yTitreBas + 96, 'ZZZT !', 44, '#9fe0ff');
     }
     if (info) {
-      const sous = this.ajout(texte(s, xt, cy + 66, info, 24, '#ffffff', { fontStyle: 'bold', strokeThickness: 7 }).setOrigin(0.5).setDepth(P + 26).setAlpha(0));
+      const sous = this.ajout(texte(s, xt, yTitreBas + 46, info, 24, '#ffffff', { fontStyle: 'bold', strokeThickness: 7 }).setOrigin(0.5).setDepth(P + 26).setAlpha(0));
       s.tweens.add({ targets: sous, alpha: 1, delay: 420, duration: 200 });
       el.push(sous);
     }
