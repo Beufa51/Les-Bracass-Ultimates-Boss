@@ -107,15 +107,16 @@ export class Showtime {
     this.c = COULOIRS;
     // la musique de la 1re manche (celle du match s'arrête) ; gros boutons tactiles (rangés pendant la pause)
     arreterMusique('kedric_musique');
-    jouerMusique(scene, this.musique);
+    // la musique de la manche démarre au GO ! (après le décompte) : silence pendant l'annonce,
+    // le morceau tombe PILE sur la première flèche, comme un vrai show
     disposition('danse');
-    this.surPause = () => { eteindreBoutons(); disposition('normale'); this.s.cameras.main.resetFX(); };
+    this.surPause = () => { eteindreBoutons(); disposition('normale'); couperSons(false); voileNoirTactile(false); this.s.cameras.main.resetFX(); };
     this.surReprise = () => { disposition('danse'); this.calculerCouloirs(); };
     scene.events.on('pause', this.surPause); scene.events.on('resume', this.surReprise);
     // ABANDON depuis la pause pendant le battle : detruire() ne sera jamais appelé (seule la fin l'appelle).
     // Au shutdown de la scène, on éteint au moins les boutons (sinon ils restent allumés au hub) —
     // sans relancer la musique du match : le shutdown s'en occupe déjà, lui.
-    scene.events.once('shutdown', () => eteindreBoutons());
+    scene.events.once('shutdown', () => { eteindreBoutons(); couperSons(false); voileNoirTactile(false); });
     this.annonce();
   }
 
@@ -135,7 +136,7 @@ export class Showtime {
   annonce() {
     const s = this.s;
     this.phase = 'intro'; this.T = 0;
-    placerMusique(this.musique, S.introMusique);   // sur le refrain de la 1re manche
+    // (plus de musique placée ici : elle démarre au GO, en même temps que les flèches)
     this.poseKedric('micro');
     this.poseToi(null);
     this.etiquettesJauge.forEach(t => t.setVisible(false));
@@ -207,7 +208,7 @@ export class Showtime {
     this.duree = M.tempo.temps * S.tempsParPas;   // durée entre deux flèches, calée sur LE morceau de la manche
     this.parRound = Math.floor((S.manches[this.numManche].duree || S.dureeRound) / this.duree);
     this.dernierPas = -1;
-    this.gel = 0; this.noir = 0; this.techT = -99; this.dernierCompte = 99;   // techT : espacement mini ; dernierCompte : le décompte
+    this.gel = 0; this.noir = 0; this.techT = -99; this.dernierCompte = 99; this.musiquePartee = false; this.goAffiche = false;   // techT : espacement mini ; la musique part au GO de CHAQUE manche
     const fen = this.s.diff.fenetreShow;
     this.fenetre = { parfait: Math.min(S.parfait * fen, this.duree * 0.25), bien: Math.min(S.bien * fen, this.duree * 0.45) };
     if (premiere) {
@@ -222,7 +223,7 @@ export class Showtime {
     } else {
       // MANCHE 2 : on change de morceau — l'horloge repart sur le temps du nouveau
       arreterMusique(S.manches[this.numManche - 1].musique);
-      jouerMusique(this.s, this.musique);
+      // (le nouveau morceau démarre au GO de cette manche, lui aussi)
       this.suiviMusique = null; this.tempsMusical = 0; this.dureePiste = null;
       this.origine = S.manches[this.numManche].tempo.debut;   // le morceau repart de son début : temps de référence
       this.poseKedric('micro');
@@ -330,7 +331,7 @@ export class Showtime {
     if (this.phase === 'intro' || this.phase === 'fin' || this.s.horlogeJeu) return;
     const m = tempsMusique(this.musique);
     if (m === null) return;   // musique en pause / en chargement : le temps du jeu avance seul
-    if (this.suiviMusique === null) { this.suiviMusique = m; this.tempsMusical = m; }
+    if (this.suiviMusique === null) { this.suiviMusique = m; this.tempsMusical = m; this.syncDepart = true; }   // 1res secondes d'un morceau : on se cale PILE dessus
     let d = m - this.suiviMusique;
     if (d < -1) {   // la lecture a sauté en arrière : REBOUCLEMENT de la piste (elle était arrivée au bout)
       if (!this.dureePiste) this.dureePiste = Math.max(1, this.suiviMusique);   // là où elle était arrivée ≈ sa durée
@@ -341,7 +342,11 @@ export class Showtime {
     this.tempsMusical += d;   // le temps musical CONTINU (rebouclé, il ne revient jamais en arrière)
     const TL = this.T - this.debutManche;   // temps local de la manche en cours
     const ecart = (this.tempsMusical - this.origine) - TL;
-    if (Math.abs(ecart) <= 0.12) this.T += ecart * 0.1;        // petit décalage : en douceur
+    if (this.syncDepart) {   // le morceau VIENT de démarrer (au GO) : cale d'un coup, la 1re flèche tombe sur le temps
+      if (Math.abs(ecart) <= 2) this.T += ecart;
+      else this.origine = this.tempsMusical - TL;   // le placement a raté (audio pas prêt) : on repart de là où il est vraiment
+      this.syncDepart = false;
+    } else if (Math.abs(ecart) <= 0.12) this.T += ecart * 0.1;        // petit décalage : en douceur
     else if (ecart > 0) this.T += ecart;                       // la musique a pris de l'avance : on se cale d'un coup
     else this.T += ecart * 0.05;                               // elle a pris du retard (onglet caché) : on rattrape en douceur
   }
@@ -456,8 +461,18 @@ export class Showtime {
       const sec = Math.ceil(t0 - this.T);
       if (sec !== this.dernierCompte) {
         this.dernierCompte = sec;
-        if (sec >= 1 && sec <= DECOMPTE) onomatopee(this.s, LARGEUR / 2, 148, String(sec), 62, '#ffd84a');
-        else if (sec === 0) onomatopee(this.s, LARGEUR / 2, 148, 'GO !', 78, '#7fff7f');
+        if (sec >= 1 && sec <= DECOMPTE && !this.goAffiche) onomatopee(this.s, LARGEUR / 2, 148, String(sec), 62, '#ffd84a');
+        else if (sec <= 0 && !this.goAffiche) {
+          this.goAffiche = true;
+          onomatopee(this.s, LARGEUR / 2, 148, 'GO !', 78, '#7fff7f');
+          // LA MUSIQUE DÉMARRE ICI (plus pendant l'annonce ni le décompte) : placée pile pour que
+          // la première flèche retombe exactement sur un TEMPS FORT du morceau
+          if (!this.musiquePartee) {
+            this.musiquePartee = true;
+            jouerMusique(this.s, this.musique);
+            placerMusique(this.musique, this.origine + (S.annonce + this.comptes[this.numManche]) * this.duree);
+          }
+        }
       }
     }
     const TL = this.T - this.debutManche, d = this.duree, k = Math.floor(TL / d);

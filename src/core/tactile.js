@@ -156,8 +156,11 @@ export function eteindreBoutons() { for (const nom of Object.keys(boutons)) allu
 
 // NOIR TOTAL (battle de Kédric) : les boutons de la page s'éteignent (quasi invisibles) —
 // le téléphone a un écran VRAIMENT noir comme le PC ; ils restent appuyables (garde le rythme en tête)
+let voileNoirDom = null;
 export function voileNoirTactile(actif) {
-  for (const p of [croix, actions]) if (p) p.classList.toggle('noir', actif);
+  if (!voileNoirDom) voileNoirDom = document.getElementById('noir');
+  if (voileNoirDom) voileNoirDom.style.display = actif ? 'block' : 'none';   // écran noir PAR-DESSUS tout (boutons compris)
+  for (const p of [croix, actions]) if (p) p.classList.toggle('noir', actif);   // (ceinture et bretelles)
 }
 
 // Où est un bouton à l'écran (rectangle de la page), ou null s'il n'est pas affiché (pas d'écran tactile, bouton caché)
