@@ -42,12 +42,17 @@ export class BossScene extends Phaser.Scene {
 
   // Affiche le titre et la liste des commandes, puis attend Espace
   afficherIntro(titre, commandes, quandPret) {
+    const liste = texte(this, LARGEUR / 2, 220, commandes.join('\n'), 20, '#ffffff', { lineSpacing: 6 }).setOrigin(0.5, 0).setDepth(1001);
+    // le texte vert se place SOUS les commandes, à la hauteur MESURÉE de la liste :
+    // plus jamais par-dessus (Kédric et ses 9 lignes de règles du match chevauchaient l'invite !)
+    const vert = texte(this, LARGEUR / 2,
+      Math.min(HAUTEUR - 14, Math.max(HAUTEUR - 45, 220 + liste.height + 16)),
+      `Appuie sur ${estTactile() ? 'OK' : 'ESPACE'} pour commencer`, 22, '#7fff7f').setDepth(1001);
     const elements = [
       voile(this, 0.85).setDepth(1000),
       texte(this, LARGEUR / 2, 120, titre, 40, '#ffd84a').setDepth(1001),
       texte(this, LARGEUR / 2, 190, 'COMMANDES', 22, '#aaaaaa').setDepth(1001),
-      texte(this, LARGEUR / 2, 220, commandes.join('\n'), 20, '#ffffff', { lineSpacing: 6 }).setOrigin(0.5, 0).setDepth(1001),
-      texte(this, LARGEUR / 2, 495, `Appuie sur ${estTactile() ? 'OK' : 'ESPACE'} pour commencer`, 22, '#7fff7f').setDepth(1001),
+      liste, vert,
     ];
     this.input.keyboard.once('keydown-SPACE', () => {
       elements.forEach(el => el.destroy());
