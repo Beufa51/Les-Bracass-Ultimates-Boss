@@ -82,8 +82,8 @@ export const REGLAGES = {
   //  tempo : début du refrain (s, sur un temps fort) et durée d'un temps (s), mesurés par outils/kedric/caler_battle.py ;
   //  tempsParPas : une flèche tous les 2 temps (~0,69 s) — toutes les flèches des 2 rounds sont calées sur cette grille.
   //  annonce : temps d'attente (en pas) avant la première flèche (la transition depuis l'écran d'annonce est douce) ;
-  //  intro / introMini / introMusique : l'écran d'annonce (Kédric sur scène) dure au plus 'intro' s (une flèche le
-  //  passe après 'introMini' s), la musique démarre à 'introMusique' s (le refrain).
+  //  intro / introMini : l'écran d'annonce (Kédric sur scène) dure au plus 'intro' s (une flèche le passe après
+  //  'introMini' s) ; la musique démarre au GO ! avec les flèches (plus pendant l'annonce).
   //  rougeChance : chance de FLÈCHE ROUGE par flèche (Kédric triche : fais l'inverse) ; CHAMPION seulement, jamais la 1re.
   //  piste : les flèches TOMBENT dans 4 couloirs (◀ ▶ à gauche, ▲ ▼ à droite) jusqu'à la touche : vitesse de chute (px / s)
   //  parfait / bien : fenêtres de timing (s, x fenetreShow de la difficulté) ; gain : points de PUBLIC (de -100 à +100)
@@ -92,8 +92,8 @@ export const REGLAGES = {
   showtime: { rounds: 2, dureeRound: 47,   // durée de la MANCHE 1 en secondes (la manche 2 : 'duree' de sa propre ligne)
     pause: 2,
     manches: [
-      { musique: 'kedric_battle', tempo: { debut: 54.969, temps: 0.3426 } },
-      { musique: 'kedric_dbz', duree: 60, tempo: { debut: 0, temps: 0.3896 } },   // la chanson 2 : UNE MINUTE
+      { musique: 'kedric_chala', tempo: { debut: 0, temps: 0.3896 } },   // la manche 1 : Cha-La Head-Cha-La, l'ouverture japonaise ORIGINALE de DBZ (1989, remasterisée) — 154 BPM
+      { musique: 'kedric_dbz', duree: 60, tempo: { debut: 0, temps: 0.3896 } },   // la chanson 2 : le générique VOSTFR — UNE MINUTE
     ],
     tempsParPas: 2, annonce: 0,   // zéro temps mort : le décompte 5-4-3-2-1 démarre PILE quand la manche (et SA musique) démarrent
     // (le DÉCOMPTE 5-4-3-2-1-GO est dans showtime.js : DECOMPTE = 5 secondes PILE, calées sur le tempo de chaque morceau)

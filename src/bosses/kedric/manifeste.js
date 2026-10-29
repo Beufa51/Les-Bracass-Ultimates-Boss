@@ -76,7 +76,10 @@ export const MANIFESTE = {
     kedric_musique:   { fichier: 'audio/kedric/kedric_musique.mp3', musique: true, volume: 0.4 },
     // musique du battle de danse : Naruto, opening 2 « Haruka Kanata » (80 kbit/s, coupée à 88 s) ; les pas sont calés
     // dessus (passages dans reglages.js, mesurés par outils/kedric/caler_battle.py)
-    kedric_battle:    { fichier: 'audio/kedric/kedric_battle.mp3', musique: true, volume: 0.5 },
+    kedric_battle:    { fichier: 'audio/kedric/kedric_battle.mp3', musique: true, volume: 0.5 },   // (ancienne manche 1 : Naruto « Haruka Kanata », gardée pour la retrouver)
+    // musique du battle de danse (MANCHE 1) : « Cha-La Head-Cha-La », l'OUVERTURE JAPONAISE ORIGINALE de DBZ (1989,
+    // remasterisée) ; même tempo que le générique de la manche 2 : ~154 BPM, un temps = 0,3896 s
+    kedric_chala:     { fichier: 'audio/kedric/kedric_chala.mp3', musique: true, volume: 0.5 },
     // musique du battle de danse : le GÉNÉRIQUE DRAGON BALL Z « Cha-La Head-Cha-La » (VOSTFR) ;
     // les flèches sont calées dessus (tempo dans reglages.js : ~154 BPM, un temps = 0,3896 s)
     kedric_dbz:       { fichier: 'audio/kedric/Générique-Dragon-Ball-Z-VOSTFR.mp3', musique: true, volume: 0.5 },
