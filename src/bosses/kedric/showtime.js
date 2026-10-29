@@ -437,7 +437,7 @@ export class Showtime {
     const titre = this.ajout(s.add.text(xt, cy - 10, nom, {
       fontFamily: 'monospace', fontStyle: 'bold italic', fontSize: '56px', color: couleur, align: 'center',
       stroke: '#000000', strokeThickness: 10, wordWrap: { width: 560 },
-    }).setOrigin(0.5).setDepth(P + 26).setScale(3).setAlpha(0).setAngle(-6));
+    }).setOrigin(0.5).setDepth(P + 26).setScale(2).setAlpha(0).setAngle(-6));
     s.tweens.add({ targets: titre, scale: 1, alpha: 1, delay: 220, duration: 220, ease: 'Back.Out',
       onComplete: () => s.cameras.main.shake(220, 0.014) });
     const yTitreHaut = cy - 10 - titre.height / 2, yTitreBas = cy - 10 + titre.height / 2;
@@ -447,16 +447,18 @@ export class Showtime {
     if (opts.coupure) {
       // la coupure : le titre CLIGNOTE comme un néon qui rend l'âme, et le « ZZZT ! » du disjoncteur
       s.tweens.add({ targets: titre, alpha: { from: 0.55, to: 1 }, duration: 90, yoyo: true, repeat: 4 });
-      onomatopee(s, cx, yTitreBas + 96, 'ZZZT !', 44, '#9fe0ff');
+      onomatopee(s, cx, yTitreBas + 122, 'ZZZT !', 44, '#9fe0ff');
     }
     if (info) {
-      const sous = this.ajout(texte(s, xt, yTitreBas + 46, info, 24, '#ffffff', { fontStyle: 'bold', strokeThickness: 7 }).setOrigin(0.5).setDepth(P + 26).setAlpha(0));
+      // l'explication passe à la ligne (480 px) : avant, une seule ligne de 730 px dépassait du bord gauche
+      const sous = this.ajout(texte(s, xt, yTitreBas + 48, info, 24, '#ffffff', { fontStyle: 'bold', strokeThickness: 7, wordWrap: { width: 480 } }).setOrigin(0.5).setDepth(P + 26).setAlpha(0));
       s.tweens.add({ targets: sous, alpha: 1, delay: 420, duration: 200 });
       el.push(sous);
     }
     // puis tout se range en fondu et le battle reprend dans le rythme
     s.tweens.add({ targets: el, alpha: 0, delay: ECRAN_POUVOIR * 1000 - 250, duration: 250 });
-    this.bandeau(nom, couleur, ECRAN_POUVOIR + 0.5);
+    // PLUS DE BANDEAU pendant l'écran : son ruban (profondeur 905) flottait AU-DESSUS de l'écran
+    // (P + 26 = 626) et COUPAIT le titre ÉNORME et l'explication — le nom est déjà affiché en grand
   }
 
   // ---------- la boucle ----------

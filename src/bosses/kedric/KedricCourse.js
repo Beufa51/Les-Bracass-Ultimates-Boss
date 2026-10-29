@@ -106,7 +106,7 @@ export class KedricCourse extends BossScene {
     this.sprJ.play('kedric_toi_course');
     this.aide = texte(this, LARGEUR / 2, 512, '', 26, '#ffffff', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 4 } }).setDepth(900).setVisible(false);
     // bandeau de l'action (avant le « HUT ! ») et alerte de poursuite
-    this.bandeau = texte(this, LARGEUR / 2, 214, '', 28, '#ffffff', { fontStyle: 'bold', backgroundColor: '#0b2a16dd', padding: { x: 16, y: 8 } }).setDepth(905).setVisible(false);
+    this.bandeau = texte(this, LARGEUR / 2, 214, '', 28, '#ffffff', { fontStyle: 'bold', backgroundColor: '#0b2a16dd', padding: { x: 16, y: 8 }, wordWrap: { width: 880 } }).setDepth(905).setVisible(false);   // retour à la ligne auto : plus JAMAIS de phrase qui déborde de l'écran
     this.alertePoursuite = texte(this, LARGEUR / 2, 470, '', 24, '#ff5a5a', { fontStyle: 'bold' }).setDepth(905).setVisible(false);
 
     this.creerHud();
@@ -203,7 +203,7 @@ export class KedricCourse extends BossScene {
     jouerSon(this, 'kedric_sifflet');
     jouerSon(this, 'kedric_plaque', { volume: 0.4, rate: 1.6 });   // le coup de pied
     this.direCoach(REPLIQUES.envoi, 1000, true);
-    this.bandeau.setText('COUP D\'ENVOI : va sous le ballon, ▲ PILE quand il arrive — PARFAIT = tu pars à PLEINE VITESSE !').setColor('#ffd84a').setVisible(true);
+    this.bandeau.setText('COUP D\'ENVOI : va sous le ballon !\n▲ PILE quand il arrive = SUPER RÉCEPTION !').setColor('#ffd84a').setVisible(true);
   }
 
   // le ballon part du fond du terrain
