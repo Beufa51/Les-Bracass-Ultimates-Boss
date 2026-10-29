@@ -107,8 +107,8 @@ export class Showtime {
     this.c = COULOIRS;
     // la musique de la 1re manche (celle du match s'arrête) ; gros boutons tactiles (rangés pendant la pause)
     arreterMusique('kedric_musique');
-    // la musique de la manche démarre au GO ! (après le décompte) : silence pendant l'annonce,
-    // le morceau tombe PILE sur la première flèche, comme un vrai show
+    // la musique entre 2 pas avant la 1re flèche de la manche : silence pendant l'annonce,
+    // le morceau attaque par son début, comme un vrai show
     disposition('danse');
     this.surPause = () => { eteindreBoutons(); disposition('normale'); couperSons(false); voileNoirTactile(false); this.s.cameras.main.resetFX(); };
     this.surReprise = () => { disposition('danse'); this.calculerCouloirs(); };
@@ -136,7 +136,7 @@ export class Showtime {
   annonce() {
     const s = this.s;
     this.phase = 'intro'; this.T = 0;
-    // (plus de musique placée ici : elle démarre au GO, en même temps que les flèches)
+    // (plus de musique placée ici : elle entre 2 pas avant la 1re flèche, depuis le début de la chanson)
     this.poseKedric('micro');
     this.poseToi(null);
     this.etiquettesJauge.forEach(t => t.setVisible(false));
@@ -208,7 +208,7 @@ export class Showtime {
     this.duree = M.tempo.temps * S.tempsParPas;   // durée entre deux flèches, calée sur LE morceau de la manche
     this.parRound = Math.floor((S.manches[this.numManche].duree || S.dureeRound) / this.duree);
     this.dernierPas = -1;
-    this.gel = 0; this.noir = 0; this.techT = -99; this.dernierCompte = 99; this.musiquePartee = false; this.goAffiche = false;   // techT : espacement mini ; la musique part au GO de CHAQUE manche
+    this.gel = 0; this.noir = 0; this.techT = -99; this.dernierCompte = 99; this.musiquePartee = false; this.goAffiche = false;   // techT : espacement mini ; la musique entre 2 pas avant la 1re flèche de CHAQUE manche
     const fen = this.s.diff.fenetreShow;
     this.fenetre = { parfait: Math.min(S.parfait * fen, this.duree * 0.25), bien: Math.min(S.bien * fen, this.duree * 0.45) };
     if (premiere) {
@@ -228,6 +228,11 @@ export class Showtime {
       this.origine = S.manches[this.numManche].tempo.debut;   // le morceau repart de son début : temps de référence
       this.poseKedric('micro');
     }
+    // LA MUSIQUE ENTRE 2 PAS AVANT LA PREMIÈRE FLÈCHE (fin du décompte) : le morceau attaque
+    // par SON DÉBUT — plus de 5 secondes sautées dans la chanson — il a le temps de se charger
+    // pendant les derniers « 2, 1 », et le GO tombe PILE sur un de ses temps
+    this.tMusique = this.tManches[this.numManche] + (S.annonce + this.comptes[this.numManche]) * this.duree - 2 * this.duree;
+    this.origine += 2 * this.duree - (S.annonce + this.comptes[this.numManche]) * this.duree;
   }
 
   // toutes les flèches des manches, chacune calée sur le tempo de SA musique.
@@ -454,6 +459,14 @@ export class Showtime {
       this.demarrerManche(false);
       this.bandeau('GO POUR LA DEUXIÈME CHANSON — VOUS ÊTES CHAUD, PUBLIC ?', '#ffd84a', 3.5);
     }
+    // LA MUSIQUE DÉMARRE 2 PAS AVANT LA PREMIÈRE FLÈCHE (pendant les derniers « 2, 1 » du
+    // décompte) : elle part du DÉBUT de la chanson, se charge à l'avance et le GO tombe PILE
+    // sur son temps — plus de musique qui arrive « d'un coup » après que les flèches sont parties
+    if (!this.musiquePartee && this.T >= this.tMusique) {
+      this.musiquePartee = true;
+      jouerMusique(this.s, this.musique);
+      placerMusique(this.musique, S.manches[this.numManche].tempo.debut);
+    }
     // le DÉCOMPTE : les secondes restantes avant la première flèche de la manche, puis « GO ! »
     // (DECOMPTE secondes pour se placer, calées sur le tempo : les flèches ne tombent pas tout de suite)
     {
@@ -465,13 +478,7 @@ export class Showtime {
         else if (sec <= 0 && !this.goAffiche) {
           this.goAffiche = true;
           onomatopee(this.s, LARGEUR / 2, 148, 'GO !', 78, '#7fff7f');
-          // LA MUSIQUE DÉMARRE ICI (plus pendant l'annonce ni le décompte) : placée pile pour que
-          // la première flèche retombe exactement sur un TEMPS FORT du morceau
-          if (!this.musiquePartee) {
-            this.musiquePartee = true;
-            jouerMusique(this.s, this.musique);
-            placerMusique(this.musique, this.origine + (S.annonce + this.comptes[this.numManche]) * this.duree);
-          }
+          // (la musique est déjà partie 2 pas plus tôt, depuis le DÉBUT de la chanson : le GO tombe pile sur son temps)
         }
       }
     }
