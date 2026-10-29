@@ -1,7 +1,7 @@
 // =====================================================================
 // SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (façon DDR / jeu de danse).
 // DEUX MANCHES (~45 s puis 1 MINUTE) : la première sur la musique d'origine (reglages.js manches[0]),
-// la DEUXIÈME sur le GÉNÉRIQUE DRAGON BALL Z (manches[1]) — le morceau change entre les deux,
+// la DEUXIÈME sur « WE GOTTA POWER », le 2e générique de DRAGON BALL Z (manches[1]) — le morceau change entre les deux,
 // sans jamais être coupé en cours de manche. À la fin : la musique s'arrête net.
 // Les flèches TOMBENT dans 4 COULOIRS (◀ ▶ à gauche, ▲ ▼ à droite) jusqu'à la touche à
 // presser, PILE SUR LE RYTHME (une flèche tous les 'tempsParPas' temps ; chaque manche a
