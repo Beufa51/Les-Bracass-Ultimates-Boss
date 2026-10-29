@@ -43,6 +43,7 @@ export function installerTactile() {
     .tactile.droite.danse { grid-template-columns: repeat(2, 124px); grid-template-rows: 124px; }
     .tactile.danse button { font-size: 46px; }
     .tactile.danse button.cache { display: none; }
+    .tactile.noir button { opacity: 0.04; }   // coupure de courant : la page est NOIRE, les boutons restent juste appuyables
     .tactile.gauche.separee { grid-template-columns: repeat(2, 96px); grid-template-rows: 96px; }
     .tactile.droite.separee { grid-template-columns: repeat(2, 84px); grid-template-rows: repeat(2, 76px); }
     .tactile.separee button.cache { display: none; }
@@ -152,6 +153,12 @@ export function allumerBouton(nom, force = 0, couleur = '#ffd84a') {
   b.style.borderColor = force <= 0 ? '' : couleur;
 }
 export function eteindreBoutons() { for (const nom of Object.keys(boutons)) allumerBouton(nom, 0); }
+
+// NOIR TOTAL (battle de Kédric) : les boutons de la page s'éteignent (quasi invisibles) —
+// le téléphone a un écran VRAIMENT noir comme le PC ; ils restent appuyables (garde le rythme en tête)
+export function voileNoirTactile(actif) {
+  for (const p of [croix, actions]) if (p) p.classList.toggle('noir', actif);
+}
 
 // Où est un bouton à l'écran (rectangle de la page), ou null s'il n'est pas affiché (pas d'écran tactile, bouton caché)
 export function rectBouton(nom) {

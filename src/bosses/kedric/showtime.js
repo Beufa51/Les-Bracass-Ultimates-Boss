@@ -29,7 +29,7 @@ import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { texte } from '../../core/ui.js';
 import { jouerSon, couperSons } from '../../core/ressources.js';
 import { jouerMusique, arreterMusique, placerMusique, tempsMusique } from '../../core/musique.js';
-import { disposition, allumerBouton, eteindreBoutons, estTactile, rectBouton } from '../../core/tactile.js';
+import { disposition, allumerBouton, eteindreBoutons, estTactile, rectBouton, voileNoirTactile } from '../../core/tactile.js';
 import { onomatopee, lignesImpact } from './effets.js';
 import { REGLAGES as R } from './reglages.js';
 
@@ -124,7 +124,7 @@ export class Showtime {
   detruire() {
     this.el.forEach(o => o.destroy()); this.viderNotes(); this.viderAnnonce(); this.el = [];
     this.s.events.off('pause', this.surPause); this.s.events.off('resume', this.surReprise);
-    couperSons(false);   // par sécurité : les effets sonores reprennent toujours à la fin du battle
+    couperSons(false); voileNoirTactile(false);   // par sécurité : sons ET boutons reviennent toujours à la fin du battle
     eteindreBoutons();
     disposition('separee');   // la disposition du match de Kédric
     arreterMusique(this.musique);
@@ -587,7 +587,7 @@ export class Showtime {
     if (this.termine) return;
     this.termine = true;
     this.phase = 'fin';
-    couperSons(false);   // on ne quitte jamais le battle avec les sons coupés
+    couperSons(false); voileNoirTactile(false);   // on ne quitte jamais le battle avec les sons coupés ni l'écran éteint
     arreterMusique(this.musique);   // le battle est fini : la musique s'arrête net
     this.viderNotes();
     eteindreBoutons();
@@ -619,6 +619,8 @@ export class Showtime {
     // Placée là où elle ne gêne RIEN (this.yJauge) : en bas s'il y a la place, sinon en haut
     // pendant le VRAI noir : plus AUCUN effet sonore (la musique continue, c'est un jeu de rythme)
     couperSons(this.noirOn() && this.T - (this.noirDebut ?? this.T) > 0);
+    // et sur TÉLÉPHONE : les boutons de la page s'éteignent eux aussi (écran VRAIMENT noir, mais appuyable)
+    voileNoirTactile(this.noirOn() && this.T - (this.noirDebut ?? this.T) > 0);
     const g = this.jaugeG; g.clear();
     if (this.phase !== 'intro') {
       const y = this.yJauge, h = 8;
