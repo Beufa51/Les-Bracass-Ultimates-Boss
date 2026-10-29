@@ -142,7 +142,7 @@ export class Showtime {
     this.etiquettesJauge.forEach(t => t.setVisible(false));
     const voile = s.add.graphics().setDepth(P + 8);
     voile.fillStyle(0x000000, 0.45); voile.fillRect(0, 0, LARGEUR, HAUTEUR);
-    voile.fillStyle(0x000000, 0.6); voile.fillRect(0, HAUTEUR - 170, LARGEUR, 170);
+    // (la plaque sombre du bas est dessinée PLUS TARD, à la hauteur RÉELLE des règles)
     const titre = texte(s, LARGEUR / 2, 62, 'BATTLE DE DANSE !', 64, '#ffd84a', { fontStyle: 'bold', strokeThickness: 12 }).setDepth(P + 10).setScale(0);
     s.tweens.add({ targets: titre, scale: 1, duration: 450, ease: 'Back.Out' });
     s.tweens.add({ targets: titre, angle: { from: -3, to: 3 }, duration: 700, yoyo: true, repeat: -1 });
@@ -165,18 +165,25 @@ export class Showtime {
       { align: 'center', lineSpacing: 6, backgroundColor: '#000000c8', padding: { x: 16, y: 10 } }).setDepth(P + 10);
     this.invite = texte(s, LARGEUR / 2, HAUTEUR - 22, 'Appuie sur une flèche quand tu es prêt !      X = ENTRAÎNEMENT (aucune défaite)', 18, '#7fff7f', { fontStyle: 'bold' }).setDepth(P + 10).setAlpha(0);
     this.elAnnonce = [voile, titre, sous, bulle, regles, this.invite];
-    // sur téléphone, les GROS boutons ◀ ▶ ▲ ▼ couvraient les textes du bas :
-    // on mesure où ils s'arrêtent et on remonte bulle + règles + invite au-dessus
-    if (estTactile()) {
-      const ecran = s.game.canvas.getBoundingClientRect();
-      const rects = DIRS.map(n => rectBouton(n)).filter(Boolean);
-      if (ecran.width && rects.length === 4) {
-        const ky = HAUTEUR / ecran.height;
-        const hautBoutons = Math.min(...rects.map(r => (r.top - ecran.top) * ky));
-        bulle.setPosition(bulle.x, Math.min(240, hautBoutons - 160));
-        regles.setPosition(LARGEUR / 2, hautBoutons - 34 - regles.height / 2);
-        this.invite.setPosition(LARGEUR / 2, hautBoutons - 18);
+    // PLUS JAMAIS DE TEXTES SUPERPOSÉS : on place tout à partir des HAUTEURS MESURÉES —
+    // l'invite SOUS les règles (jamais dessous... jamais DESSUS !), la bulle JAMAIS sur
+    // les règles, et sur téléphone tout reste AU-DESSUS des gros boutons ◀ ▶ ▲ ▼
+    {
+      let basEcran = HAUTEUR - 6;   // par défaut : le bas de l'écran
+      if (estTactile()) {
+        const ecran = s.game.canvas.getBoundingClientRect();
+        const rects = DIRS.map(n => rectBouton(n)).filter(Boolean);
+        if (ecran.width && rects.length === 4) {
+          const ky = HAUTEUR / ecran.height;
+          basEcran = Math.min(...rects.map(r => (r.top - ecran.top) * ky)) - 6;   // juste au-dessus des boutons
+        }
       }
+      this.invite.setPosition(LARGEUR / 2, basEcran - this.invite.height / 2);   // l'invite tout en bas, dans le vide
+      const hautInvite = this.invite.y - this.invite.height / 2;
+      regles.setPosition(LARGEUR / 2, hautInvite - 14 - regles.height / 2);   // les règles 14 px au-dessus de l'invite : PLUS DE CHEVAUCHEMENT
+      const hautRegles = regles.y - regles.height / 2;
+      bulle.setPosition(bulle.x, Math.min(240, hautRegles - bulle.height / 2 - 12));   // la bulle jamais sur les règles
+      voile.fillStyle(0x000000, 0.6); voile.fillRect(0, hautRegles - 16, LARGEUR, HAUTEUR - hautRegles + 16);   // la plaque du bas suit la hauteur réelle des règles
     }
     jouerSon(s, 'kedric_foule', { volume: 0.8 });   // le public (pas de bips au battle : seulement la musique)
   }
