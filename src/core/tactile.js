@@ -43,7 +43,8 @@ export function installerTactile() {
     .tactile.droite.danse { grid-template-columns: repeat(2, 124px); grid-template-rows: 124px; }
     .tactile.danse button { font-size: 46px; }
     .tactile.danse button.cache { display: none; }
-    .tactile.noir button { opacity: 0.04; }   // coupure de courant : la page est NOIRE, les boutons restent juste appuyables
+    .tactile.noir { z-index: 45; }   // AU-DESSUS du voile #noir (z-index 40) : on VOIT les boutons pendant la coupure
+    .tactile.noir button { opacity: 0.55; }   // coupure de courant : visibles en lumière faible — on peut continuer à appuyer
     .tactile.gauche.separee { grid-template-columns: repeat(2, 96px); grid-template-rows: 96px; }
     .tactile.droite.separee { grid-template-columns: repeat(2, 84px); grid-template-rows: repeat(2, 76px); }
     .tactile.separee button.cache { display: none; }
@@ -154,8 +155,8 @@ export function allumerBouton(nom, force = 0, couleur = '#ffd84a') {
 }
 export function eteindreBoutons() { for (const nom of Object.keys(boutons)) allumerBouton(nom, 0); }
 
-// NOIR TOTAL (battle de Kédric) : les boutons de la page s'éteignent (quasi invisibles) —
-// le téléphone a un écran VRAIMENT noir comme le PC ; ils restent appuyables (garde le rythme en tête)
+// NOIR TOTAL (battle de Kédric) : la page s'éteint, SAUF les boutons de danse qui passent
+// AU-DESSUS du voile (z-index 45) en lumière faible : on peut continuer à appuyer (garde le rythme en tête)
 let voileNoirDom = null;
 export function voileNoirTactile(actif) {
   if (!voileNoirDom) voileNoirDom = document.getElementById('noir');

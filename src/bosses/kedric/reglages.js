@@ -6,7 +6,7 @@ export const IDENTITE = { id: 'kedric', nom: 'Kédric' };
 // Niveaux de difficulté (choisis avant le match)
 //  alerte : le symbole (◀ ▶, ▲, ▼) apparaît sur le défenseur ce nombre de secondes avant le contact
 //  parfait : fenêtre (s) de l'esquive PARFAITE juste avant le contact
-//  aide : texte « ▲ SAUTE ! » près de toi + ralenti la première fois qu'un plaquage apparaît
+//  aide : SEULEMENT en mode ENTRAÎNEMENT : panneau « ▲ SAUTE ! » près de toi + ralenti à chaque nouveau plaquage
 //  feintes : chance que Kédric FEINTE (option kedric: true d'une course, en CHAMPION)
 //  ghost : taille de la jauge du DEVIL BAT GHOST (une esquive ou une bonne réception : +1 ; PARFAITE : +2 ; voir REGLAGES.ghost)
 //  flechesRouges : au battle de danse, Kédric triche avec des FLÈCHES ROUGES (fais l'inverse) ; seulement en CHAMPION
@@ -16,10 +16,13 @@ export const IDENTITE = { id: 'kedric', nom: 'Kédric' };
 //  poursuiteEcart : il court ce nombre de yards / s plus vite que toi au moment où il part (le sprint le sème)
 //  fenetreShow : largeur des fenêtres de timing du SHOWTIME (x)
 export const DIFFICULTES = {
-  facile:   { nom: 'FACILE',   couleur: '#7fff7f', alerte: 1.8, parfait: 0.22, aide: true, feintes: 0, ghost: 5, vitesse: 0.9, murTardif: false,
+  entrainement: { nom: 'ENTRAÎNEMENT', couleur: '#9fe0ff', alerte: 1.8, parfait: 0.22, aide: true, feintes: 0, ghost: 5, vitesse: 0.9, murTardif: false,
     charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, fenetreShow: 1.35, flechesRouges: false,
-    texte: 'Les défenseurs préviennent tôt, Kédric danse lentement. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', alerte: 1.45, parfait: 0.17, aide: true, feintes: 0.3, ghost: 6, vitesse: 1, murTardif: false,
+    texte: 'Idéal pour apprendre : FACILE + le panneau d\'aide + un RALENTI à chaque nouveau plaquage.' },
+  facile:   { nom: 'FACILE',   couleur: '#7fff7f', alerte: 1.8, parfait: 0.22, aide: false, feintes: 0, ghost: 5, vitesse: 0.9, murTardif: false,
+    charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, fenetreShow: 1.35, flechesRouges: false,
+    texte: 'Les défenseurs préviennent tôt, Kédric danse lentement. Sans explications.' },
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', alerte: 1.45, parfait: 0.17, aide: false, feintes: 0.3, ghost: 6, vitesse: 1, murTardif: false,
     charge: 1.5, poursuite: 0.12, poursuiteEcart: 1.2, fenetreShow: 1, flechesRouges: false,
     texte: 'Le vrai match, et un vrai duel de frime contre Kédric.' },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', alerte: 0.95, parfait: 0.12, aide: false, feintes: 0.45, ghost: 9, vitesse: 1.06, murTardif: true,

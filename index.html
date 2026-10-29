@@ -15,8 +15,8 @@
   <style>
     html, body { margin: 0; height: 100%; height: 100dvh; background: #111; overflow: hidden; touch-action: none; overscroll-behavior: none; }
     #jeu { width: 100%; height: 100%; }
-    /* coupure de courant (battle de Kédric) : écran noir PAR-DESSUS TOUT, même les boutons de la page.
-       pointer-events:none → les boutons restent appuyables À TRAVERS le voile (garde le rythme en tête) */
+    /* coupure de courant (battle de Kédric) : écran noir PAR-DESSUS tout. Les boutons de danse passent
+       AU-DESSUS (z-index 45, voir tactile.js) : on les VOIT pour continuer à appuyer (garde le rythme en tête) */
     #noir { display: none; position: fixed; inset: 0; z-index: 40; background: #000; pointer-events: none; }
     /* téléphone tenu en vertical : on demande de le tourner */
     #tourner { display: none; position: fixed; inset: 0; z-index: 50; background: #111; color: #ffd84a;

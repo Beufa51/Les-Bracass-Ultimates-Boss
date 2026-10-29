@@ -12,16 +12,17 @@ export function cleRecord(idBoss, nomDiff) { return nomDiff === 'normal' ? idBos
 // ensuite(nom, reglagesDeLaDifficulte) est appelé une fois le choix validé
 export function choisirDifficulte(scene, idBoss, difficultes, ensuite, son = 'ui_valider') {
   const noms = Object.keys(difficultes);
+  const espace = noms.length > 3 ? 236 : 260, taille = noms.length > 3 ? 230 : 236;   // 4 cartes (ENTRAÎNEMENT !) : on resserre pour tenir dans l'écran
   let i = Math.max(0, noms.indexOf(Sauvegarde.difficulte(idBoss)));
   etiquettesTactiles({ haut: null, bas: null, z: null, x: null, espace: 'OK' });
   const el = [];
   el.push(scene.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0b0b14, 0.95).setDepth(1100));
   el.push(texte(scene, LARGEUR / 2, 70, 'DIFFICULTÉ', 44, '#ffd84a').setDepth(1101));
   const cartes = noms.map((n, k) => {
-    const D = difficultes[n], x = LARGEUR / 2 + (k - (noms.length - 1) / 2) * 260;
-    const fond = scene.add.rectangle(x, 260, 236, 220, 0x1d1d30).setDepth(1101).setStrokeStyle(4, 0x555566);
+    const D = difficultes[n], x = LARGEUR / 2 + (k - (noms.length - 1) / 2) * espace;
+    const fond = scene.add.rectangle(x, 260, taille, 220, 0x1d1d30).setDepth(1101).setStrokeStyle(4, 0x555566);
     const titre = texte(scene, x, 190, D.nom, 28, D.couleur).setDepth(1102);
-    const desc = texte(scene, x, 275, D.texte, 15, '#dddddd', { wordWrap: { width: 210 } }).setDepth(1102);
+    const desc = texte(scene, x, 275, D.texte, 15, '#dddddd', { wordWrap: { width: taille - 24 } }).setDepth(1102);
     const rec = Sauvegarde.record(cleRecord(idBoss, n));
     const r = texte(scene, x, 350, rec ? `Record : ${rec.rang} ${formatTemps(rec.temps)}` : 'Pas encore de record', 13, '#aaaaaa').setDepth(1102);
     el.push(fond, titre, desc, r);

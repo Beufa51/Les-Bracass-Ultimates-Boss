@@ -45,7 +45,7 @@ const SYMBOLES = {
   suiveur: { texte: '◎', couleur: '#ff9a3c', aide: 'IL TE SUIT... attends qu\'il soit ROUGE !' },
   verrou: { texte: '◀ ▶', couleur: '#ff4a4a', aide: '◀ ▶  MAINTENANT !' },
 };
-// explications de la première fois (avec ralenti)
+// explications du mode ENTRAÎNEMENT (avec ralenti) : une fois par type de plaquage, à chaque partie
 const TUTO = {
   bloc: 'PLAQUEUR dans ton couloir : ◀ ou ▶ pour l\'éviter !',
   bas: 'Il plonge aux JAMBES : ▲ pour sauter par-dessus !',
@@ -535,8 +535,8 @@ export class KedricCourse extends BossScene {
       if (!d.alerte) {
         d.alerte = true;
         if (this.groupeSonne !== d.groupe) { this.groupeSonne = d.groupe; jouerSon(this, 'kedric_alerte'); }
-        // explication avec ralenti, la première fois (FACILE / NORMAL)
-        if (this.diff.aide && !Sauvegarde.fait('kedric_tuto') && this.numAttaque === 0 && enFace && !this.tutoVus[d.type] && TUTO[d.type]) this.debutTuto(d);
+        // explication avec ralenti (mode ENTRAÎNEMENT seulement : plus JAMAIS tout seul dans une première partie)
+        if (this.diff.aide && enFace && !this.tutoVus[d.type] && TUTO[d.type]) this.debutTuto(d);
       }
       if (enFace) d.menace = true;
     }
@@ -825,7 +825,6 @@ export class KedricCourse extends BossScene {
     this.score.toi += R.points;
     this.j.pose = 'victoire'; this.j.poseTemps = 99; this.ghostArme = 0;
     if (this.tuto) this.finTuto();
-    if (this.numAttaque === 0 && this.diff.aide) Sauvegarde.marquerFait('kedric_tuto');
     this.viderPoursuivants(); this.aide.setVisible(false);
     // LA CÉLÉBRATION : d'abord 1,2 s de LIESSE — pose de victoire, foule, flash, secousse, IMPACT géant
     jouerSon(this, 'kedric_touchdown');

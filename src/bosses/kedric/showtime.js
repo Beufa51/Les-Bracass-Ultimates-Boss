@@ -50,7 +50,7 @@ const COULOIRS = { x: { gauche: 105, droite: 215, haut: 745, bas: 855 }, cibleY:
 // tout en bas s'il y a la place, sinon EN HAUT (sur téléphone les boutons occupent le bas) :
 // le rail ne recouvre JAMAIS les flèches, les touches à presser ni les boutons.
 const KHAM = { marge: 170, portee: 280 };
-// la coupure de courant : pendant le vrai noir, on ne voit plus RIEN (ni la scène, ni les flèches, ni Kédric)
+// la coupure de courant : pendant le vrai noir, on ne voit plus RIEN (ni la scène, ni les flèches, ni Kédric) — SAUF les touches : on peut continuer à appuyer
 const NOIR = { visibilite: -1 };
 // la durée de l'ÉCRAN SUPER POUVOIR (façon supers de Lionel) : le battle s'arrête le temps
 // de l'écran, puis reprend PILE sur le piège, toujours dans le rythme
@@ -87,7 +87,7 @@ export class Showtime {
     this.toi = this.ajout(scene.add.sprite(TOI.x, TOI.pieds, 'kedric_toi_course', 0).setOrigin(0.5, 1).setDepth(P + 3));
     // le flash plein écran (feedback d'appui + écran SUPER POUVOIR) et le voile du noir
     this.flash = this.ajout(scene.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0xffffff, 0).setDepth(P + 9));
-    this.voileNoir = this.ajout(scene.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x000000, 0).setDepth(P + 8));   // P+8 : AU-DESSUS des touches, des flèches et des retours — un VRAI noir total
+    this.voileNoir = this.ajout(scene.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x000000, 0).setDepth(P + 8));   // P+8 : AU-DESSUS des flèches et des retours, SOUS les touches (P+9) — un VRAI noir total, mais on garde les touches en vue
     // le KAMÉHAMÉHA du public : étiquettes aux deux bouts du rail (elles suivent this.yJauge)
     this.jaugeG = this.ajout(scene.add.graphics().setDepth(P + 4));
     this.yJauge = HAUTEUR - 12;   // le rail, tout en bas par défaut (remonté en haut sur téléphone)
@@ -101,7 +101,7 @@ export class Showtime {
     // les 4 couloirs : le fond, la touche en bas de chacun (un rond et sa flèche)
     this.couloirsG = this.ajout(scene.add.graphics().setDepth(P + 5));
     this.touchesC = {};
-    for (const n of DIRS) this.touchesC[n] = this.ajout(texte(scene, 0, 0, FLECHES[n], 40, '#ffffff', { fontStyle: 'bold' }).setDepth(P + 6).setAlpha(0.45));   // P+6 : SOUS le voile du noir (P+8) : dans le noir total, on ne voit plus RIEN
+    for (const n of DIRS) this.touchesC[n] = this.ajout(texte(scene, 0, 0, FLECHES[n], 40, '#ffffff', { fontStyle: 'bold' }).setDepth(P + 9).setAlpha(0.45));   // P+9 : AU-DESSUS du voile du noir (P+8) : dans le noir total, on voit ENCORE les touches pour continuer à appuyer
     // le compte à rebours du GEL (au-dessus des couloirs gelés)
     this.gelCompte = this.ajout(texte(scene, LARGEUR / 2, 265, '', 24, '#dff6ff', { fontStyle: 'bold', strokeThickness: 7 }).setDepth(P + 6)).setVisible(false);
     this.retour = this.ajout(texte(scene, 0, 0, '', 26, '#ffffff', { fontStyle: 'bold', strokeThickness: 7 }).setDepth(P + 7));
