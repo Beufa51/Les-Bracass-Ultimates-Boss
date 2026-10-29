@@ -55,8 +55,9 @@ const NOIR = { visibilite: -1 };
 // la durée de l'ÉCRAN SUPER POUVOIR (façon supers de Lionel) : le battle s'arrête le temps
 // de l'écran, puis reprend PILE sur le piège, toujours dans le rythme
 const ECRAN_POUVOIR = 1.6;
-// le DÉCOMPTE avant la première flèche de chaque manche : 5 SECONDES PILE (5, 4, 3, 2, 1… GO !),
-// calées sur le tempo de CHAQUE morceau (le nombre de pas de battement est recalculé par manche)
+// le DÉCOMPTE avant la première flèche de chaque manche : 5 SECONDES MINIMUM (… 3, 2, 1, GO !),
+// calées sur le tempo de CHAQUE morceau — la manche 1 attend en plus le SILENCE du début de
+// son fichier (Cha-La : 8 s) : la chanson attaque PILE quand la 1re flèche apparaît
 const DECOMPTE = 5;
 // CHAMPION : ce que Kédric CRIE quand tu rates (il nargue, la star — pas plus d'une fois toutes les 6 s)
 const PROVOQUES = ['Même pas proche !', 'Tu danses comme un frigo !', 'Le public dort !', 'C\'est tout ce que tu sais faire ?', 'La classe, ça ne s\'apprend pas !'];
@@ -107,8 +108,8 @@ export class Showtime {
     this.c = COULOIRS;
     // la musique de la 1re manche (celle du match s'arrête) ; gros boutons tactiles (rangés pendant la pause)
     arreterMusique('kedric_musique');
-    // la musique entre 2 pas avant la 1re flèche de la manche : silence pendant l'annonce,
-    // le morceau attaque par son début, comme un vrai show
+    // la musique part du début du fichier pendant le décompte : silence pendant l'annonce,
+    // et le silence du fichier (Cha-La : 8 s) fait l'attente — comme un vrai show
     disposition('danse');
     this.surPause = () => { eteindreBoutons(); disposition('normale'); couperSons(false); voileNoirTactile(false); this.s.cameras.main.resetFX(); };
     this.surReprise = () => { disposition('danse'); this.calculerCouloirs(); };
@@ -136,7 +137,7 @@ export class Showtime {
   annonce() {
     const s = this.s;
     this.phase = 'intro'; this.T = 0;
-    // (plus de musique placée ici : elle entre 2 pas avant la 1re flèche, depuis le début de la chanson)
+    // (plus de musique placée ici : elle part du début du fichier, avec le décompte)
     this.poseKedric('micro');
     this.poseToi(null);
     this.etiquettesJauge.forEach(t => t.setVisible(false));
@@ -216,7 +217,7 @@ export class Showtime {
     this.duree = M.tempo.temps * S.tempsParPas;   // durée entre deux flèches, calée sur LE morceau de la manche
     this.parRound = Math.floor((S.manches[this.numManche].duree || S.dureeRound) / this.duree);
     this.dernierPas = -1;
-    this.gel = 0; this.noir = 0; this.techT = -99; this.dernierCompte = 99; this.musiquePartee = false; this.goAffiche = false;   // techT : espacement mini ; la musique entre 2 pas avant la 1re flèche de CHAQUE manche
+    this.gel = 0; this.noir = 0; this.techT = -99; this.dernierCompte = 99; this.musiquePartee = false; this.goAffiche = false;   // techT : espacement mini ; la musique part du début du fichier à CHAQUE manche
     const fen = this.s.diff.fenetreShow;
     this.fenetre = { parfait: Math.min(S.parfait * fen, this.duree * 0.25), bien: Math.min(S.bien * fen, this.duree * 0.45) };
     if (premiere) {
@@ -236,16 +237,17 @@ export class Showtime {
       this.origine = S.manches[this.numManche].tempo.debut;   // le morceau repart de son début : temps de référence
       this.poseKedric('micro');
     }
-    // LA MUSIQUE DÉMARRE AVANT QUE LA PREMIÈRE FLÈCHE N'APPARAISSSE en haut de son couloir :
-    // le pré-roll couvre TOUTE sa chute (arrondi en PAS ENTIERS pour rester pile sur les temps
-    // du morceau) — on n'entend JAMAIS de flèches tomber avant que la chanson n'attaque, le GO
-    // tombe sur un temps, et syncDepart cale les flèches avant la 1re d'entre elles
-    const t0Manche = this.tManches[this.numManche] + (S.annonce + this.comptes[this.numManche]) * this.duree;
+    // LA MUSIQUE PART DU TOUT DÉBUT DU FICHIER, SANS AUCUN PLACEMENT : le seek avant lecture
+    // échouait selon les navigateurs (première chanson muette !) — la manche 2, elle, n'a JAMAIS
+    // fait de seek (debut: 0) et s'entend toujours. Le SILENCE du début du fichier (8 s chez
+    // Cha-La) devient le pré-roll du décompte : la chanson attaque PILE quand la 1re flèche
+    // apparaît, le GO tombe sur un de ses temps, et syncDepart absorbe le chargement
+    const S0 = S.manches[this.numManche].tempo.debut;   // le silence au début du fichier
     const chute = (this.c.cibleY - this.c.haut) / PISTE.vitesse + 0.2;
-    const preroll = Math.max(2, Math.ceil(chute / this.duree)) * this.duree;
-    this.tMusique = t0Manche - preroll;
-    this.origine += preroll - (S.annonce + this.comptes[this.numManche]) * this.duree;
-    this.musiqueVerifiee = false;   // le placement sera VÉRIFIÉ à la 1re vraie lecture (certains navigateurs l'ignorent avant)
+    const m = Math.max(2, Math.ceil(chute / this.duree));   // en PAS ENTIERS : la grille reste pile sur les temps du morceau
+    const t0Manche = this.tManches[this.numManche] + (S.annonce + this.comptes[this.numManche]) * this.duree;
+    this.tMusique = t0Manche - S0 - m * this.duree;   // la musique démarre là (position 0 du fichier), sans seek
+    this.origine = this.debutManche - this.tMusique;   // position du fichier à TL=0 : la 1re flèche atterrit à S0 + m pas DANS la chanson
   }
 
   // toutes les flèches des manches, chacune calée sur le tempo de SA musique.
@@ -265,7 +267,9 @@ export class Showtime {
       const M = S.manches[r];
       const d = M.tempo.temps * S.tempsParPas;
       const n = Math.floor((M.duree || S.dureeRound) / d);   // la manche dure SA durée (la chanson 2 : 'duree: 60' = 1 minute)
-      const compte = Math.max(1, Math.round(DECOMPTE / d));   // le décompte : DECOMPTE secondes, calées sur CE tempo
+      const chute = (COULOIRS.cibleY - COULOIRS.haut) / PISTE.vitesse + 0.2;   // le temps de chute d'une flèche dans un couloir
+      const m = Math.max(2, Math.ceil(chute / d));   // le pré-roll AUDIBLE : la chanson attaque avant que la 1re flèche n'apparaisse
+      const compte = Math.ceil(M.tempo.debut / d) + Math.max(m, Math.round(DECOMPTE / d));   // décompte = le SILENCE du début du fichier, puis 5 secondes MINI
       this.comptes.push(compte);
       this.tManches.push(debut);
       const attente = S.annonce + compte;   // les flèches attendent le DÉCOMPTE : pas de flèche direct à l'écran
@@ -349,15 +353,6 @@ export class Showtime {
     if (this.phase === 'intro' || this.phase === 'fin' || this.s.horlogeJeu) return;
     const m = tempsMusique(this.musique);
     if (m === null) return;   // musique en pause / en chargement : le temps du jeu avance seul
-    // le placement demandé AVANT la lecture est parfois IGNORÉ par le navigateur : la musique
-    // démarrait alors au début du fichier (les 8 s de SILENCE de Cha-La !) et les flèches se
-    // calaient dessus — elles tombaient AVANT le début de la chanson. À la 1re vraie lecture,
-    // on VÉRIFIE où elle est et on la replace si besoin, AVANT le premier calage des flèches.
-    if (this.musiquePartee && !this.musiqueVerifiee && this.suiviMusique === null) {
-      this.musiqueVerifiee = true;
-      const pose = S.manches[this.numManche].tempo.debut;
-      if (Math.abs(m - pose) > 1) { placerMusique(this.musique, pose); return; }   // remplacée : le calage se fera à la frame suivante, sur la BONNE position
-    }
     if (this.suiviMusique === null) { this.suiviMusique = m; this.tempsMusical = m; this.syncDepart = true; }   // 1res secondes d'un morceau : on se cale PILE dessus
     let d = m - this.suiviMusique;
     if (d < -1) {   // la lecture a sauté en arrière : REBOUCLEMENT de la piste (elle était arrivée au bout)
@@ -370,7 +365,7 @@ export class Showtime {
     const TL = this.T - this.debutManche;   // temps local de la manche en cours
     const ecart = (this.tempsMusical - this.origine) - TL;
     if (this.syncDepart) {   // le morceau VIENT de démarrer (au GO) : cale d'un coup, la 1re flèche tombe sur le temps
-      if (Math.abs(ecart) <= 2) this.T += ecart;
+      if (Math.abs(ecart) <= (S.annonce + this.comptes[this.numManche]) * this.duree) this.T += ecart;   // chargement lent : l'horloge recule d'autant, le calage reste parfait
       else this.origine = this.tempsMusical - TL;   // le placement a raté (audio pas prêt) : on repart de là où il est vraiment
       this.syncDepart = false;
     } else if (Math.abs(ecart) <= 0.12) this.T += ecart * 0.1;        // petit décalage : en douceur
@@ -481,13 +476,12 @@ export class Showtime {
       this.demarrerManche(false);
       this.bandeau('GO POUR LA DEUXIÈME CHANSON — VOUS ÊTES CHAUD, PUBLIC ?', '#ffd84a', 3.5);
     }
-    // LA MUSIQUE DÉMARRE PENDANT LE DÉCOMPTE, AVANT QUE LA PREMIÈRE FLÈCHE N'APPARAISSSE :
-    // elle part du DÉBUT de la chanson et le GO tombe PILE sur son temps — on n'entend jamais
-    // de flèches tomber avant que la chanson n'attaque, plus de musique « d'un coup »
+    // LA MUSIQUE PART DU TOUT DÉBUT DU FICHIER pendant le décompte (ZÉRO placement : blindé
+    // sur tous les navigateurs) : son silence initial couvre l'attente, la chanson attaque
+    // PILE quand la 1re flèche apparaît, et le GO tombe sur un de ses temps
     if (!this.musiquePartee && this.T >= this.tMusique) {
       this.musiquePartee = true;
       jouerMusique(this.s, this.musique);
-      placerMusique(this.musique, S.manches[this.numManche].tempo.debut);
     }
     // le DÉCOMPTE : les secondes restantes avant la première flèche de la manche, puis « GO ! »
     // (DECOMPTE secondes pour se placer, calées sur le tempo : les flèches ne tombent pas tout de suite)
@@ -496,11 +490,11 @@ export class Showtime {
       const sec = Math.ceil(t0 - this.T);
       if (sec !== this.dernierCompte) {
         this.dernierCompte = sec;
-        if (sec >= 1 && sec <= DECOMPTE && !this.goAffiche) onomatopee(this.s, LARGEUR / 2, 148, String(sec), 62, '#ffd84a');
+        if (sec >= 1 && sec <= Math.ceil((S.annonce + this.comptes[this.numManche]) * this.duree) && !this.goAffiche) onomatopee(this.s, LARGEUR / 2, 148, String(sec), 62, '#ffd84a');
         else if (sec <= 0 && !this.goAffiche) {
           this.goAffiche = true;
           onomatopee(this.s, LARGEUR / 2, 148, 'GO !', 78, '#7fff7f');
-          // (la musique est déjà partie 2 pas plus tôt, depuis le DÉBUT de la chanson : le GO tombe pile sur son temps)
+          // (la musique est déjà partie avec le décompte : le GO tombe pile sur un temps de la chanson)
         }
       }
     }
