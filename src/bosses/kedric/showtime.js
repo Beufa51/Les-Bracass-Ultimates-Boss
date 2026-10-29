@@ -490,7 +490,7 @@ export class Showtime {
       const sec = Math.ceil(t0 - this.T);
       if (sec !== this.dernierCompte) {
         this.dernierCompte = sec;
-        if (sec >= 1 && sec <= Math.ceil((S.annonce + this.comptes[this.numManche]) * this.duree) && !this.goAffiche) onomatopee(this.s, LARGEUR / 2, 148, String(sec), 62, '#ffd84a');
+        if (sec >= 1 && sec <= DECOMPTE && !this.goAffiche) onomatopee(this.s, LARGEUR / 2, 148, String(sec), 62, '#ffd84a');   // 5-4-3-2-1 : le silence du fichier passe AVANT, sans chiffres
         else if (sec <= 0 && !this.goAffiche) {
           this.goAffiche = true;
           onomatopee(this.s, LARGEUR / 2, 148, 'GO !', 78, '#7fff7f');

@@ -847,6 +847,7 @@ export class KedricCourse extends BossScene {
   lancerShowtime(options, ensuite) {
     this.viderDefenseurs();
     this.etat = 'showtime';
+    if (this.tuto) this.finTuto();   // le panneau du tuto (« ◀ ▶ : CHANGE DE COULOIR »...) ne reste JAMAIS à l'écran pendant le battle
     this.aide.setVisible(false);
     // sur scène : plus d'interface de match (vitesse, ghost, score), seulement la jauge du public
     this.elementsHud.forEach(o => o.setVisible(false));
