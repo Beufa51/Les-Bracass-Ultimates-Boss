@@ -1,6 +1,6 @@
 // =====================================================================
 // SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (façon DDR / jeu de danse).
-// DEUX MANCHES (~45 s puis 1 MINUTE) : la première sur la musique d'origine (reglages.js manches[0]),
+// DEUX MANCHES D'1 MINUTE : la première sur la musique d'origine (reglages.js manches[0]),
 // la DEUXIÈME sur « WE GOTTA POWER », le 2e générique de DRAGON BALL Z (manches[1]) — le morceau change entre les deux,
 // sans jamais être coupé en cours de manche. À la fin : la musique s'arrête net.
 // Les flèches TOMBENT dans 4 COULOIRS (◀ ▶ à gauche, ▲ ▼ à droite) jusqu'à la touche à
@@ -157,7 +157,7 @@ export class Showtime {
     // version COMPACTE, remontée au-dessus des boutons (repositionné juste après) ; plaque noire de lisibilité
     const texteRegles = estTactile()
       ? `${S.manches.length} MANCHES : garde l'aiguille du public de TON CÔTÉ !\nAppuie la flèche juste avant qu'elle ARRIVE EN BAS.\nKédric TRICHE : plancher GLACÉ, coupure de courant, flèches DOUBLÉES !`
-      : `${S.manches.length} MANCHES (${Math.round(S.dureeRound)} s puis ${Math.round(S.manches[1].duree || S.dureeRound)} s), chacune sur SA musique : garde l'aiguille du public de TON côté !\n` +
+      : `${S.manches.length} MANCHES (${Math.round(S.manches[0].duree || S.dureeRound)} s puis ${Math.round(S.manches[1].duree || S.dureeRound)} s), chacune sur SA musique : garde l'aiguille du public de TON côté !\n` +
         'Les flèches TOMBENT en rythme : appuie quand elles arrivent en bas.' +
         '\nKédric est une star, il TRICHE : plancher GLACÉ, coupure de projecteurs, flèches DOUBLÉES\nen fin de manche !' +
         (this.s.diff.flechesRouges ? '\nFLÈCHE ROUGE = fais l\'INVERSE !' : '');
@@ -199,6 +199,7 @@ export class Showtime {
     this.viderAnnonce();
     this.etiquettesJauge.forEach(t => t.setVisible(true));
     this.numManche = 0;
+    this.T = 0;   // L'HORLOGE REPART À ZÉRO : avant, le temps de l'écran d'annonce comptait encore — le décompte sautait et les flèches partaient AVANT la chanson !
     this.debutManche = 0;   // la manche 1 commence à T = 0 (les flèches arrivent après 'annonce' temps)
     this.demarrerManche(true);
     this.calculerCouloirs();
@@ -235,11 +236,16 @@ export class Showtime {
       this.origine = S.manches[this.numManche].tempo.debut;   // le morceau repart de son début : temps de référence
       this.poseKedric('micro');
     }
-    // LA MUSIQUE ENTRE 2 PAS AVANT LA PREMIÈRE FLÈCHE (fin du décompte) : le morceau attaque
-    // par SON DÉBUT — plus de 5 secondes sautées dans la chanson — il a le temps de se charger
-    // pendant les derniers « 2, 1 », et le GO tombe PILE sur un de ses temps
-    this.tMusique = this.tManches[this.numManche] + (S.annonce + this.comptes[this.numManche]) * this.duree - 2 * this.duree;
-    this.origine += 2 * this.duree - (S.annonce + this.comptes[this.numManche]) * this.duree;
+    // LA MUSIQUE DÉMARRE AVANT QUE LA PREMIÈRE FLÈCHE N'APPARAISSSE en haut de son couloir :
+    // le pré-roll couvre TOUTE sa chute (arrondi en PAS ENTIERS pour rester pile sur les temps
+    // du morceau) — on n'entend JAMAIS de flèches tomber avant que la chanson n'attaque, le GO
+    // tombe sur un temps, et syncDepart cale les flèches avant la 1re d'entre elles
+    const t0Manche = this.tManches[this.numManche] + (S.annonce + this.comptes[this.numManche]) * this.duree;
+    const chute = (this.c.cibleY - this.c.haut) / PISTE.vitesse + 0.2;
+    const preroll = Math.max(2, Math.ceil(chute / this.duree)) * this.duree;
+    this.tMusique = t0Manche - preroll;
+    this.origine += preroll - (S.annonce + this.comptes[this.numManche]) * this.duree;
+    this.musiqueVerifiee = false;   // le placement sera VÉRIFIÉ à la 1re vraie lecture (certains navigateurs l'ignorent avant)
   }
 
   // toutes les flèches des manches, chacune calée sur le tempo de SA musique.
@@ -343,6 +349,15 @@ export class Showtime {
     if (this.phase === 'intro' || this.phase === 'fin' || this.s.horlogeJeu) return;
     const m = tempsMusique(this.musique);
     if (m === null) return;   // musique en pause / en chargement : le temps du jeu avance seul
+    // le placement demandé AVANT la lecture est parfois IGNORÉ par le navigateur : la musique
+    // démarrait alors au début du fichier (les 8 s de SILENCE de Cha-La !) et les flèches se
+    // calaient dessus — elles tombaient AVANT le début de la chanson. À la 1re vraie lecture,
+    // on VÉRIFIE où elle est et on la replace si besoin, AVANT le premier calage des flèches.
+    if (this.musiquePartee && !this.musiqueVerifiee && this.suiviMusique === null) {
+      this.musiqueVerifiee = true;
+      const pose = S.manches[this.numManche].tempo.debut;
+      if (Math.abs(m - pose) > 1) { placerMusique(this.musique, pose); return; }   // remplacée : le calage se fera à la frame suivante, sur la BONNE position
+    }
     if (this.suiviMusique === null) { this.suiviMusique = m; this.tempsMusical = m; this.syncDepart = true; }   // 1res secondes d'un morceau : on se cale PILE dessus
     let d = m - this.suiviMusique;
     if (d < -1) {   // la lecture a sauté en arrière : REBOUCLEMENT de la piste (elle était arrivée au bout)
@@ -466,9 +481,9 @@ export class Showtime {
       this.demarrerManche(false);
       this.bandeau('GO POUR LA DEUXIÈME CHANSON — VOUS ÊTES CHAUD, PUBLIC ?', '#ffd84a', 3.5);
     }
-    // LA MUSIQUE DÉMARRE 2 PAS AVANT LA PREMIÈRE FLÈCHE (pendant les derniers « 2, 1 » du
-    // décompte) : elle part du DÉBUT de la chanson, se charge à l'avance et le GO tombe PILE
-    // sur son temps — plus de musique qui arrive « d'un coup » après que les flèches sont parties
+    // LA MUSIQUE DÉMARRE PENDANT LE DÉCOMPTE, AVANT QUE LA PREMIÈRE FLÈCHE N'APPARAISSSE :
+    // elle part du DÉBUT de la chanson et le GO tombe PILE sur son temps — on n'entend jamais
+    // de flèches tomber avant que la chanson n'attaque, plus de musique « d'un coup »
     if (!this.musiquePartee && this.T >= this.tMusique) {
       this.musiquePartee = true;
       jouerMusique(this.s, this.musique);

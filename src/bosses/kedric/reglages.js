@@ -89,10 +89,10 @@ export const REGLAGES = {
   //  parfait / bien : fenêtres de timing (s, x fenetreShow de la difficulté) ; gain : points de PUBLIC (de -100 à +100)
   //  parTouchdown / avanceMax : public de départ = (touchdowns - 1) x parTouchdown (aucun touchdown : il part pour Kédric)
   //  Le public est un KAMÉHAMÉHA père-fils (showtime.js) : PARFAIT = ta boule repousse celle de Kédric, RATÉ = elle recule.
-  showtime: { rounds: 2, dureeRound: 47,   // durée de la MANCHE 1 en secondes (la manche 2 : 'duree' de sa propre ligne)
+  showtime: { rounds: 2, dureeRound: 47,   // durée de manche PAR DÉFAUT (chaque manche a maintenant SA 'duree' : les DEUX font 1 minute)
     pause: 2,
     manches: [
-      { musique: 'kedric_chala', tempo: { debut: 8, temps: 0.3896 } },   // la manche 1 : Cha-La Head-Cha-La, l'ouverture japonaise ORIGINALE de DBZ (1989, remasterisée) — 154 BPM
+      { musique: 'kedric_chala', duree: 60, tempo: { debut: 8, temps: 0.3896 } },   // la manche 1 : Cha-La Head-Cha-La, l'ouverture japonaise ORIGINALE de DBZ (1989, remasterisée) — 154 BPM — UNE MINUTE, comme la chanson 2
       { musique: 'kedric_dbz', duree: 60, tempo: { debut: 0, temps: 0.3896 } },   // la chanson 2 : « We Gotta Power » (le générique VOSTFR de DBZ) — UNE MINUTE
     ],
     tempsParPas: 2, annonce: 0,   // zéro temps mort : le décompte 5-4-3-2-1 démarre PILE quand la manche (et SA musique) démarrent
