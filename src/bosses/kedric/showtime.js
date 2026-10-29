@@ -156,7 +156,7 @@ export class Showtime {
       ? `${S.manches.length} MANCHES : garde l'aiguille du public de TON CÔTÉ !\nAppuie la flèche juste avant qu'elle ARRIVE EN BAS.\nKédric TRICHE : plancher GLACÉ, coupure, flèches DOUBLÉES... et un SOLO final !`
       : `${S.manches.length} MANCHES (${Math.round(S.dureeRound)} s puis ${Math.round(S.manches[1].duree || S.dureeRound)} s), chacune sur SA musique : garde l'aiguille du public de TON côté !\n` +
         'Les flèches TOMBENT en rythme : appuie quand elles arrivent en bas.' +
-        '\nKédric est une star, il TRICHE : plancher GLACÉ, coupure de projecteurs, flèches DOUBLÉES\nen fin de manche... et un SOLO quand il sent qu'il va perdre !' +
+        '\nKédric est une star, il TRICHE : plancher GLACÉ, coupure de projecteurs, flèches DOUBLÉES\nen fin de manche... et un SOLO quand il sent qu\'il va perdre !' +
         (this.s.diff.flechesRouges ? '\nFLÈCHE ROUGE = fais l\'INVERSE !' : '');
     const regles = texte(s, LARGEUR / 2, HAUTEUR - 104, texteRegles, 17, '#ffffff',
       { align: 'center', lineSpacing: 6, backgroundColor: '#000000c8', padding: { x: 16, y: 10 } }).setDepth(P + 10);
@@ -172,7 +172,7 @@ export class Showtime {
         const hautBoutons = Math.min(...rects.map(r => (r.top - ecran.top) * ky));
         bulle.setPosition(bulle.x, Math.min(240, hautBoutons - 160));
         regles.setPosition(LARGEUR / 2, hautBoutons - 34 - regles.height / 2);
-        invite.setPosition(LARGEUR / 2, hautBoutons - 18);
+        this.invite.setPosition(LARGEUR / 2, hautBoutons - 18);
       }
     }
     jouerSon(s, 'kedric_foule', { volume: 0.8 });   // le public (pas de bips au battle : seulement la musique)
