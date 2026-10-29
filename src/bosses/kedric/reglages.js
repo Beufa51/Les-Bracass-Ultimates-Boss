@@ -92,7 +92,7 @@ export const REGLAGES = {
   showtime: { rounds: 2, dureeRound: 47,   // durée de la MANCHE 1 en secondes (la manche 2 : 'duree' de sa propre ligne)
     pause: 2,
     manches: [
-      { musique: 'kedric_chala', tempo: { debut: 0, temps: 0.3896 } },   // la manche 1 : Cha-La Head-Cha-La, l'ouverture japonaise ORIGINALE de DBZ (1989, remasterisée) — 154 BPM
+      { musique: 'kedric_chala', tempo: { debut: 8, temps: 0.3896 } },   // la manche 1 : Cha-La Head-Cha-La, l'ouverture japonaise ORIGINALE de DBZ (1989, remasterisée) — 154 BPM
       { musique: 'kedric_dbz', duree: 60, tempo: { debut: 0, temps: 0.3896 } },   // la chanson 2 : « We Gotta Power » (le générique VOSTFR de DBZ) — UNE MINUTE
     ],
     tempsParPas: 2, annonce: 0,   // zéro temps mort : le décompte 5-4-3-2-1 démarre PILE quand la manche (et SA musique) démarrent
