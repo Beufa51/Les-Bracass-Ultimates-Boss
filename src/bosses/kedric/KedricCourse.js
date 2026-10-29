@@ -203,7 +203,7 @@ export class KedricCourse extends BossScene {
     jouerSon(this, 'kedric_sifflet');
     jouerSon(this, 'kedric_plaque', { volume: 0.4, rate: 1.6 });   // le coup de pied
     this.direCoach(REPLIQUES.envoi, 1000, true);
-    this.bandeau.setText('COUP D\'ENVOI : va sous le ballon, ▲ quand il arrive !').setColor('#ffd84a').setVisible(true);
+    this.bandeau.setText('COUP D\'ENVOI : va sous le ballon, ▲ PILE quand il arrive — PARFAIT = tu pars à PLEINE VITESSE !').setColor('#ffd84a').setVisible(true);
   }
 
   // le ballon part du fond du terrain
@@ -276,6 +276,10 @@ export class KedricCourse extends BossScene {
     this.bandeau.setVisible(false);
     this.niveau = niveau; this.serie = niveau * R.esquivesParNiveau;
     this.memoire = {};
+    // la réception se VOIT : plus tu l'as bien attrapé, plus tu pars vite (niveau de vitesse de départ)
+    if (niveau >= 3) this.messageCentre('DÉPART TURBO ! Réception PARFAITE : 3 crans de vitesse déjà montés !', '#ff9a3c', 24, 1.6);
+    else if (niveau === 2) this.messageCentre('BON DÉPART ! La vitesse est déjà à moitié montée !', '#7fff7f', 24, 1.6);
+    else this.messageCentre('Réception molle : tu pars de ZÉRO — reste synchro pour monter en vitesse !', '#ffffff', 22, 1.6);
   }
 
   // Toute la défense de la course, rang après rang jusqu'à l'en-but, dans l'ordre des formations de la course.
@@ -823,12 +827,18 @@ export class KedricCourse extends BossScene {
     if (this.tuto) this.finTuto();
     if (this.numAttaque === 0 && this.diff.aide) Sauvegarde.marquerFait('kedric_tuto');
     this.viderPoursuivants(); this.aide.setVisible(false);
+    // LA CÉLÉBRATION : d'abord 1,2 s de LIESSE — pose de victoire, foule, flash, secousse, IMPACT géant
     jouerSon(this, 'kedric_touchdown');
     jouerSon(this, 'kedric_foule');
     flash(this, 0.5, 0xffd84a);
-    const e = encart(this, 'TOUCHDOWN !!', `Tout le terrain d'une traite !  -  touchdowns : ${this.stats.touchdowns}`, '#ffd84a', 0x0b2a16);
-    this.direCoach(auHasard(REPLIQUES.touchdown), 2000, true);
-    this.attendre(2.6, () => { e.fermer(); this.finAttaque(true); });
+    this.cameras.main.shake(350, 0.008);
+    onomatopee(this, LARGEUR / 2, 200, 'TOUCHDOWN !!', 76, '#ffd84a');
+    lignesImpact(this, LARGEUR / 2, VUE.pieds - 260, 0xffd84a, 20, 240);
+    this.attendre(1.2, () => {
+      const e = encart(this, 'TOUCHDOWN !!', `Tout le terrain d'une traite !  -  touchdowns : ${this.stats.touchdowns}`, '#ffd84a', 0x0b2a16);
+      this.direCoach(auHasard(REPLIQUES.touchdown), 2000, true);
+      this.attendre(2.6, () => { e.fermer(); this.finAttaque(true); });
+    });
   }
 
   // =================================================================
