@@ -11,11 +11,8 @@
 // grand et son pouvoir en ÉNORME, ~1,5 s — impossible à rater, même concentré sur les touches) :
 //  - le GEL : il GLACE LE PLANCHER, tu ne peux plus appuyer pendant quelques secondes
 //    pendant que les flèches continuent de tomber (1 par manche, plus long en CHAMPION) ;
-//  - la COUPURE DE COURANT : un vrai noir, on ne voit les flèches qu'au tout dernier
-//    moment (1 par manche) ;
+//  - la COUPURE DE COURANT : 3 secondes de NOIR TOTAL — on ne voit plus RIEN du tout (1 par manche) ;
 //  - les FLÈCHES DOUBLÉES : dans les dernières secondes de chaque manche, deux à la fois ;
-//  - le SOLO : quand tu approaches la victoire, il fait un SOLO qui draine le public —
-//    contre-attaque : tes PARFAITS rapportent DOUBLE pendant son solo ;
 //  - le COMBO : 5 PARFAITS d'affilée et la foule est à toi (gains x1,5 pendant 10 s).
 // Et quand tu mènes trop large, son public à lui se rappelle à lui : la jauge glisse
 // doucement vers Kédric (drain passif) — il faut rester bon jusqu'au bout.
@@ -53,8 +50,8 @@ const COULOIRS = { x: { gauche: 105, droite: 215, haut: 745, bas: 855 }, cibleY:
 // tout en bas s'il y a la place, sinon EN HAUT (sur téléphone les boutons occupent le bas) :
 // le rail ne recouvre JAMAIS les flèches, les touches à presser ni les boutons.
 const KHAM = { marge: 170, portee: 280 };
-// la coupure de courant : dans le noir, on ne voit une flèche que dans ses 'visibilite' dernières secondes
-const NOIR = { visibilite: 0.3 };
+// la coupure de courant : pendant le vrai noir, on ne voit plus RIEN (ni la scène, ni les flèches, ni Kédric)
+const NOIR = { visibilite: -1 };
 // la durée de l'ÉCRAN SUPER POUVOIR (façon supers de Lionel) : le battle s'arrête le temps
 // de l'écran, puis reprend PILE sur le piège, toujours dans le rythme
 const ECRAN_POUVOIR = 1.6;
@@ -153,10 +150,10 @@ export class Showtime {
     // les règles : sur téléphone, les 4 GROS boutons de danse couvrent le bas de l'écran —
     // version COMPACTE, remontée au-dessus des boutons (repositionné juste après) ; plaque noire de lisibilité
     const texteRegles = estTactile()
-      ? `${S.manches.length} MANCHES : garde l'aiguille du public de TON CÔTÉ !\nAppuie la flèche juste avant qu'elle ARRIVE EN BAS.\nKédric TRICHE : plancher GLACÉ, coupure, flèches DOUBLÉES... et un SOLO final !`
+      ? `${S.manches.length} MANCHES : garde l'aiguille du public de TON CÔTÉ !\nAppuie la flèche juste avant qu'elle ARRIVE EN BAS.\nKédric TRICHE : plancher GLACÉ, coupure de courant, flèches DOUBLÉES !`
       : `${S.manches.length} MANCHES (${Math.round(S.dureeRound)} s puis ${Math.round(S.manches[1].duree || S.dureeRound)} s), chacune sur SA musique : garde l'aiguille du public de TON côté !\n` +
         'Les flèches TOMBENT en rythme : appuie quand elles arrivent en bas.' +
-        '\nKédric est une star, il TRICHE : plancher GLACÉ, coupure de projecteurs, flèches DOUBLÉES\nen fin de manche... et un SOLO quand il sent qu\'il va perdre !' +
+        '\nKédric est une star, il TRICHE : plancher GLACÉ, coupure de projecteurs, flèches DOUBLÉES\nen fin de manche !' +
         (this.s.diff.flechesRouges ? '\nFLÈCHE ROUGE = fais l\'INVERSE !' : '');
     const regles = texte(s, LARGEUR / 2, HAUTEUR - 104, texteRegles, 17, '#ffffff',
       { align: 'center', lineSpacing: 6, backgroundColor: '#000000c8', padding: { x: 16, y: 10 } }).setDepth(P + 10);
@@ -214,7 +211,7 @@ export class Showtime {
       const battement = M.tempo.temps;
       this.suiviMusique = null; this.tempsMusical = 0; this.dureePiste = null;
       this.origine = m === null ? M.tempo.debut : M.tempo.debut + Math.round((m - M.tempo.debut) / battement) * battement;
-      this.soloFait = false; this.soloJusqua = 0; this.comboJusqua = 0; this.consecParfaits = 0;
+      this.comboJusqua = 0; this.consecParfaits = 0;
       this.phase = 'annonce'; this.finBandeau = null;
       this.genererPas();   // toutes les flèches des 2 manches (pièges, doublées...), d'un coup
     } else {
@@ -348,8 +345,6 @@ export class Showtime {
   gele() { return this.gel > this.T; }
   // la coupure de courant est-elle en cours ?
   noirOn() { return this.noir > this.T; }
-  // le SOLO de Kédric est-il en cours ?
-  solo() { return this.soloJusqua > this.T; }
   // la foule est-elle à toi (combo de PARFAITS) ?
   combo() { return this.comboJusqua > this.T; }
 
@@ -478,16 +473,8 @@ export class Showtime {
         this.tNoirs.shift();
         this.noir = this.T + ECRAN_POUVOIR + S.noir.duree;
         this.noirDebut = this.T + ECRAN_POUVOIR;   // juste après l'écran, les projecteurs vacillent avant de mourir
-        this.superPouvoir('COUPURE DE COURANT !', '#ff9a9a', "ON NE VOIT LES FLÈCHES QU'À LA FIN !", { coupure: true });
+        this.superPouvoir('COUPURE DE COURANT !', '#ff9a9a', "3 SECONDES DE NOIR TOTAL : GARDE LE RYTHME EN TÊTE !", { coupure: true });
       }
-      // le SOLO : quand il est à deux doigts de perdre, Kédric joue sa carte et draine le public
-      if (libre && calme && !this.soloFait && this.T - this.debutManche > 10 && this.jauge > S.solo.seuil) {
-        this.soloFait = true;
-        this.soloJusqua = this.T + ECRAN_POUVOIR + S.solo.duree;
-        this.superPouvoir('SOLO DE KÉDRIC !', '#ff9a3c', 'ENCHAÎNE LES PARFAITS POUR CONTRER !');
-        this.poseKedric('micro');
-      }
-      if (this.solo()) this.public(-S.solo.drain * dt);        // son solo : le public glisse vers lui
       if (this.jauge > S.drain.seuil) this.public(-S.drain.force * dt);   // tu mènes trop : son public se rappelle à lui
       if (!this.gele()) for (const t of DIRS) if (e[t]) this.appui(t);
       for (let i = 0; i < this.pas.length; i++) {
@@ -542,10 +529,9 @@ export class Showtime {
     // la foule est à toi (combo) : tes réussites rapportent PLUS (x1,5)
     const mult = this.combo() ? S.combo.mult : 1;
     if (note === 'parfait') {
-      // pendant son SOLO, tes PARFAITS le contre-attaquent : DOUBLE gain
       this.bilan.parfaits++;
-      this.public(S.gain.parfait * mult + (this.solo() ? S.solo.bonusParfait : 0));
-      this.retour.setText(this.solo() ? 'CONTRE-PARFAIT !' : 'PARFAIT !').setColor('#7fe8ff');
+      this.public(S.gain.parfait * mult);
+      this.retour.setText('PARFAIT !').setColor('#7fe8ff');
       lignesImpact(this.s, xc, this.c.cibleY, 0x9fe0ff, 10, 70); lignesImpact(this.s, xChoc, this.yJauge, 0xffffff, 12, 100);
       // le COMBO : 5 PARFAITS d'affilée et la foule est à toi !
       this.consecParfaits++;
@@ -606,16 +592,13 @@ export class Showtime {
 
   // ---------- affichage ----------
   afficher() {
-    // la COUPURE de courant, comme une vraie : les projecteurs VACILLENT (quelques clignotements)
-    // puis MEURENT d'un coup — NOIR TOTAL, plus rien du tout : seule la DERNIÈRE flèche (juste
-    // avant de la presser) réapparaît au-dessus du voile, comme un éclair dans le noir
+    // la COUPURE de courant : l'écran SUPER POUVOIR annonce le piège, puis S.noir.duree
+    // SECONDES de NOIR ABSOLU : le voile monte AU-DESSUS DE TOUT (1099) — HUD, bandeau,
+    // jauge, touches, onomatopées, Kédric, les flèches... PLUS RIEN ne reste visible
     if (this.noirOn()) {
       const dn = this.T - (this.noirDebut ?? this.T);
-      // pendant l'écran SUPER POUVOIR (dn <= 0), le voile reste SOUS l'écran (P+8) ;
-      // pendant le VRAI noir (dn > 0), il monte AU-DESSUS DE TOUT (1099) : HUD, bandeau,
-      // jauge, touches, onomatopées... plus RIEN ne reste allumé — une vraie coupure de courant
-      this.voileNoir.setDepth(dn > 0 ? 1099 : P + 8);
-      this.voileNoir.setAlpha(dn > 0 && dn < 0.55 && Math.sin(dn * 60) < -0.3 ? 0.35 : 1);
+      this.voileNoir.setDepth(dn > 0 ? 1099 : P + 8);   // pendant l'écran (dn <= 0), le voile reste SOUS l'écran
+      this.voileNoir.setAlpha(1);   // noir SEC : aucun vacillement, on ne voit plus RIEN du tout
     } else { this.voileNoir.setAlpha(0); this.voileNoir.setDepth(P + 8); }
     // la JAUGE DU PUBLIC : rail fin + GRANDE AIGUILLE (elle glisse d'un côté ou de l'autre).
     // Placée là où elle ne gêne RIEN (this.yJauge) : en bas s'il y a la place, sinon en haut
@@ -637,8 +620,6 @@ export class Showtime {
       g.fillTriangle(cx - 13, y + h / 2 + 2, cx + 13, y + h / 2 + 2, cx, y - 15);
       g.lineStyle(2, 0xffffff, 0.8);
       g.lineBetween(cx - 13, y + h / 2 + 2, cx, y - 15); g.lineBetween(cx + 13, y + h / 2 + 2, cx, y - 15);
-      // le SOLO de Kédric : la boule luit et l'aiguille vibre
-      if (this.solo()) { g.lineStyle(4, 0xffd84a, 0.7); g.strokeCircle(cx, y, h * 1.6 + 3 * Math.sin(this.T * 20)); }
       // la foule est à toi : ton faisceau luit vert
       if (this.combo()) { g.lineStyle(3, 0x7fff7f, 0.6); g.strokeRoundedRect(KHAM.marge - 3, y - h / 2 - 3, Math.max(0, cx - KHAM.marge) + 6, h + 6, 6); }
     }
@@ -713,12 +694,11 @@ export class Showtime {
       for (const n of DIRS) this.touchesC[n].setColor('#ffffff');
     }
     // les flèches : elles tombent dans leur couloir et touchent la touche pile sur leur temps ;
-    // dans le NOIR, on ne les voit que dans leurs toutes dernières secondes de chute
+    // dans le NOIR TOTAL, on ne les voit PAS DU TOUT (garde le rythme en tête)
     for (const n of this.notes) {
       const dt = n.t - this.T, y = C.cibleY - dt * v;
       const visible = !n.pas.mange && y >= C.haut + 10 && dt > -0.3 && (!this.noirOn() || dt < NOIR.visibilite);
       n.objet.setVisible(visible);
-      n.objet.setDepth(visible && this.noirOn() && this.T - (this.noirDebut ?? this.T) > 0 ? 1100 : P + 6);   // dans le VRAI noir : la flèche de la fin reste la seule lueur (au-dessus du voile 1099)
       if (!visible) continue;
       n.objet.setPosition(C.x[n.pas.montre], y);
       // passée la touche : elle s'efface

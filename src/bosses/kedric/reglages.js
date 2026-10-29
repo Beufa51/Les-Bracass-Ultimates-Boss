@@ -100,9 +100,8 @@ export const REGLAGES = {
     intro: 9, introMini: 1.5, introMusique: 54.969,
     piste: { vitesse: 200 }, rougeChance: 0.12,
     piege: { nombre: 1, duree: 4 },   // par manche (CHAMPION : 1 s de plus)
-    solo: { seuil: 45, duree: 8, drain: 1.0, bonusParfait: 1.5 },
     noir: { nombre: 1, duree: 3 },   // par manche
-    ecartTech: 12,   // écart MINIMUM (s) entre deux techniques de Kédric (gel, noir, solo) : pas la mitraille
+    ecartTech: 12,   // écart MINIMUM (s) entre deux techniques de Kédric (gel, noir) : pas la mitraille
     double: { duree: 12 },
     combo: { nombre: 5, duree: 10, mult: 1.5 },
     drain: { seuil: 40, force: 0.15 },   // tu mènes trop : son public se rappelle à lui (jauge/s)
