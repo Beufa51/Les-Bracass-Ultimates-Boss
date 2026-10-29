@@ -27,12 +27,12 @@ export class BeufaInfiltration extends BossScene {
   create() {
     this.phase = 'intro';   // intro | cinema | jeu | attrape | fin
     this.touches = creerTouches(this);
-    etiquettesTactiles({ haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: null, z: 'Sprint', x: 'Pierre' });
+    etiquettesTactiles({ haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'OK', z: 'Sprint', x: 'Pierre' });   // Espace valide l'intro (bouton OK sur téléphone)
     this.cameras.main.setBackgroundColor('#0a0e15');
     this.programme = [];   // la file des « dans X secondes, fais ça » (décomptée dans update)
 
     // le sol de la base (nuit)
-    this.add.tileSprite(0, 0, LARGEUR, HAUTEUR, 'beufa_sol').setOrigin(0);
+    this.add.tileSprite(0, 0, LARGEUR, HAUTEUR, 'beufa_sol', 0).setOrigin(0);   // frame 0 explicite, comme le hub
 
     // les obstacles : ils bloquent le passage ET la vue
     this.obstacles = [];
