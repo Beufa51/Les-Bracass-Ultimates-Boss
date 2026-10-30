@@ -2,17 +2,22 @@
 // STYLE NÉS façon Metal Gear : pixel: 2 => chaque pixel logique fait 2 px, les couleurs
 // sont réduites comme sur console 8 bits, et chaque forme a du VOLUME (chapeau éclairé +
 // face sombre + ombre portée). Les COULEURS sont choisies « sur la grille 28 » du moteur.
-import { DALLE_NES, MUR_NES, MUR_NES_V, CONTENEUR_NES, CAISSE_NES, PROJECTEUR_NES, PORTE_NES, GARDE_NES, HEROS_NES, BEUFA_NES, PIERRE_NES } from './dessins.js';
+// fichier: null => dessin provisoire par code ; dès que Fabien ajoute de vrais PNG
+// (sprites/beufa/…), on remplace fichier: null par le chemin et TOUT le reste tient déjà.
+import { DALLE_NES, MUR_NES, MUR_NES_V, ROUTE_NES, CONTENEUR_NES, CAISSE_NES, SACS_NES, TABLE_NES, PROJECTEUR_NES, PORTE_NES, GARDE_NES, HEROS_NES, BEUFA_NES, PIERRE_NES } from './dessins.js';
 
 export const MANIFESTE = {
-  formes: { dalle_nes: DALLE_NES, mur_nes: MUR_NES, mur_nes_v: MUR_NES_V, conteneur_nes: CONTENEUR_NES, caisse_nes: CAISSE_NES, projecteur_nes: PROJECTEUR_NES, porte_nes: PORTE_NES, garde_nes: GARDE_NES, heros_nes: HEROS_NES, beufa_nes: BEUFA_NES, pierre_nes: PIERRE_NES },
+  formes: { dalle_nes: DALLE_NES, mur_nes: MUR_NES, mur_nes_v: MUR_NES_V, route_nes: ROUTE_NES, conteneur_nes: CONTENEUR_NES, caisse_nes: CAISSE_NES, sacs_nes: SACS_NES, table_nes: TABLE_NES, projecteur_nes: PROJECTEUR_NES, porte_nes: PORTE_NES, garde_nes: GARDE_NES, heros_nes: HEROS_NES, beufa_nes: BEUFA_NES, pierre_nes: PIERRE_NES },
   images: {
     beufa_sol:    { fichier: null, largeur: 128, hauteur: 128, images: 1, vitesse: 1, provisoire: { forme: 'dalle_nes', couleur: '#1c1c38', pixel: 2 } },
     beufa_mur:    { fichier: null, largeur: 64, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'mur_nes', couleur: '#545470', pixel: 2 } },
     beufa_mur_v:  { fichier: null, largeur: 20, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'mur_nes_v', couleur: '#545470', pixel: 2 } },
+    beufa_route:  { fichier: null, largeur: 128, hauteur: 128, images: 1, vitesse: 1, provisoire: { forme: 'route_nes', couleur: '#1c1c1c', pixel: 2 } },
     beufa_conteneur:       { fichier: null, largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#8c1c1c', pixel: 2 } },
     beufa_conteneur_olive: { fichier: null, largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
     beufa_caisse: { fichier: null, largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'caisse_nes', couleur: '#8c541c', pixel: 2 } },
+    beufa_sacs:   { fichier: null, largeur: 64, hauteur: 44, images: 1, vitesse: 1, provisoire: { forme: 'sacs_nes', couleur: '#8c7038', pixel: 2 } },
+    beufa_table:   { fichier: null, largeur: 140, hauteur: 90, images: 1, vitesse: 1, provisoire: { forme: 'table_nes', couleur: '#a88c54', pixel: 2 } },
     beufa_projecteur: { fichier: null, largeur: 36, hauteur: 36, images: 1, vitesse: 1, provisoire: { forme: 'projecteur_nes', couleur: '#383854', pixel: 2 } },
     beufa_porte:  { fichier: null, largeur: 72, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'porte_nes', couleur: '#545454', ouverte: true, pixel: 2 } },
     beufa_porte_verrouillee: { fichier: null, largeur: 64, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'porte_nes', couleur: '#545454', ouverte: false, pixel: 2 } },

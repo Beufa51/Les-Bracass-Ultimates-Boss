@@ -4,13 +4,13 @@
 // puis on agrandit sans lisser. Le VOLUME vient du trio NÉS : chapeau ÉCLAIRÉ +
 // face AVANT sombre + CONTOUR NOIR, plus une OMBRE PORTÉE sous chaque objet.
 //
-// DEUX LEÇS DE LA VERSION PRÉCÉDENTE (rendu « moche ») :
+// DEUX LEÇS DES VERSIONS PRÉCÉDENTES (rendu « moche ») :
 //  1. COULEURS « SUR LA GRILLE » : le moteur quantifie les canaux par 28 — on
 //     choisit des valeurs déjà multiples de 28 (0, 28, 56, 84…), sinon le bleu
 //     de la nuit glisse vers un gris boueux au rendu ;
-//  2. COUTURES : les carreaux pavés (sol, murs) sont dessinés SANS bord sur les
-//     côtés qui se juxtaposent — sinon chaque carreau trace son contour noir :
-//     des doubles lignes tous les 64 px, comme des carreaux cassés.
+//  2. COUTURES : les carreaux pavés (sol, route, murs) sont dessinés SANS bord
+//     sur les côtés qui se juxtaposent — sinon chaque carreau trace son contour
+//     noir : des doubles lignes tous les 64 px, comme des carreaux cassés.
 // Tout est tourné vers la DROITE (la scène fait le reste).
 // =====================================================================
 import { teinte, hasard } from '../../core/dessins.js';
@@ -33,6 +33,22 @@ export function DALLE_NES(ctx, w, h, p) {
   }
   ctx.fillStyle = '#545470';   // quelques gravats clairs
   for (let k = 0; k < 3; k++) ctx.fillRect(Math.floor(alea() * 3) * 32 + 10, Math.floor(alea() * 3) * 32 + 10, 3, 3);
+}
+
+// LA ROUTE (carreau 128, pavé en bande verticale de 70 px) : asphalte, lignes de
+// bord, pointillés au centre. La bande ne montre que le bout x 0-70 du carreau —
+// les lignes de bord et le pointillé y sont donc PILE dans la route.
+export function ROUTE_NES(ctx, w, h, p) {
+  ctx.fillStyle = '#1c1c1c'; ctx.fillRect(0, 0, w, h);
+  const alea = hasard(11);
+  ctx.fillStyle = '#282828';   // les granulats de l'asphalte
+  for (let k = 0; k < 26; k++) ctx.fillRect(Math.floor(alea() * 32) * 4, Math.floor(alea() * 32) * 4, 3, 3);
+  ctx.fillStyle = '#383838';
+  for (let k = 0; k < 10; k++) ctx.fillRect(Math.floor(alea() * 32) * 4, Math.floor(alea() * 32) * 4, 2, 2);
+  ctx.fillStyle = '#a8a8a8';   // les lignes de bord de la route
+  ctx.fillRect(0, 0, 4, h); ctx.fillRect(66, 0, 4, h);
+  ctx.fillStyle = '#e0e0e0';   // le pointillé central — répété à chaque carreau → régulier
+  ctx.fillRect(33, 8, 4, 44);
 }
 
 // UN MUR HORIZONTAL (bande 64 x 20, pavée le long des murs) : chapeau éclairé +
@@ -99,6 +115,47 @@ export function CAISSE_NES(ctx, w, h, p) {
   ctx.fillStyle = '#a8a8a8';   // rivets
   for (const [x, y] of [[4, 5], [w - 8, 5], [4, h - 21], [w - 8, h - 21]]) ctx.fillRect(x, y, 2, 2);
   ctx.strokeStyle = '#0a0a14'; ctx.lineWidth = 2; ctx.strokeRect(1, 1, w - 2, h - 2);
+}
+
+// LE POSTE DE CONTRÔLE : SACS DE SABLE empilés (64 x 44) — deux rangées de sacs
+// cousus, coutures apparentes, kaki, ombre portée. Bas, mais la vue passe par-dessus ?
+// NON dans notre moteur : ils coupent la vue comme une caisse.
+export function SACS_NES(ctx, w, h, p) {
+  ctx.fillStyle = '#1c1c1c';
+  ctx.beginPath(); ctx.ellipse(w / 2, h - 4, w / 2 - 4, 5, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = teinte(p.couleur, -0.35); ctx.fillRect(2, h - 16, w - 4, 13);   // la rangée du bas, à l'ombre
+  ctx.fillStyle = p.couleur; ctx.fillRect(2, 2, w - 4, h - 17);                   // la rangée du haut
+  ctx.fillStyle = teinte(p.couleur, 0.3); ctx.fillRect(2, 2, w - 4, 3);
+  ctx.strokeStyle = '#0a0a14'; ctx.lineWidth = 1;
+  for (let x = 10; x < w - 4; x += 12) ctx.strokeRect(x - 5, 3, 11, h - 20);   // les sacs, uns sur les autres
+  ctx.strokeStyle = teinte(p.couleur, -0.4);
+  for (let x = 16; x < w - 6; x += 12) { ctx.beginPath(); ctx.moveTo(x - 5, h - 19); ctx.lineTo(x + 6, h - 19); ctx.stroke(); }   // les coutures du bas
+  ctx.strokeStyle = '#0a0a14'; ctx.lineWidth = 2; ctx.strokeRect(1, 1, w - 2, h - 2);
+}
+
+// LA TABLE À CARTES (140 x 90) : le cœur du QG — cadre de bois, feutre, une carte
+// d'état-major : terres, côtes, LE FRONT en pointillés rouges, les axes d'attaque
+// bleus, les unités en blanc. Vue du dessus, lisible.
+export function TABLE_NES(ctx, w, h, p) {
+  ctx.fillStyle = '#1c1c1c';
+  ctx.beginPath(); ctx.ellipse(w / 2, h - 5, w / 2 - 6, 6, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#705438'; ctx.fillRect(3, 3, w - 6, h - 6);   // le cadre de bois
+  ctx.fillStyle = teinte('#705438', 0.25); ctx.fillRect(3, 3, w - 6, 3);
+  ctx.fillStyle = p.couleur; ctx.fillRect(8, 8, w - 16, h - 16);   // le feutre à carte
+  ctx.fillStyle = '#8c744c';   // une terre
+  ctx.beginPath(); ctx.moveTo(20, h - 14); ctx.lineTo(60, 22); ctx.lineTo(96, 40); ctx.lineTo(70, h - 12); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#70543c';   // une autre
+  ctx.beginPath(); ctx.moveTo(96, h - 22); ctx.lineTo(w - 16, h - 34); ctx.lineTo(w - 22, 30); ctx.lineTo(104, 34); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = '#c41c1c'; ctx.lineWidth = 2; ctx.setLineDash([5, 4]);   // LE FRONT, en pointillés rouges
+  ctx.beginPath(); ctx.moveTo(14, h / 2 + 6); ctx.bezierCurveTo(50, 18, 84, h - 18, w - 12, h / 2 - 4); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.strokeStyle = '#3870a8'; ctx.lineWidth = 2;   // les axes d'attaque, flèches bleues
+  ctx.beginPath(); ctx.moveTo(30, h - 16); ctx.lineTo(70, 34); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(70, 34); ctx.lineTo(63, 44); ctx.moveTo(70, 34); ctx.lineTo(80, 40); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(w - 26, h - 14); ctx.lineTo(102, 52); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(102, 52); ctx.lineTo(112, 50); ctx.moveTo(102, 52); ctx.lineTo(108, 60); ctx.stroke();
+  ctx.fillStyle = '#fcfcfc'; ctx.fillRect(52, 34, 5, 4); ctx.fillRect(84, h - 30, 5, 4);   // les unités
+  ctx.strokeStyle = '#0a0a14'; ctx.lineWidth = 2; ctx.strokeRect(3, 3, w - 6, h - 6);
 }
 
 // LA TOUR-PROJECTEUR AU BORD DE L'ÉCRAN (36 x 36) : un nid sur le mur, projecteur

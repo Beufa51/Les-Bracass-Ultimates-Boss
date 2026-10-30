@@ -5,14 +5,18 @@
 // une PORTE fait un fondu vers la pièce suivante, et se faire prendre renvoie à
 // L'ENTRÉE DE LA PIÈCE : un checkpoint par rencontre, jamais tout à refaire.
 //
-// La base : CONTENEURS et caisses qui coupent la vue, gardes en ronde avec leur
-// CÔNE DE VISION, et LES PROJECTEURS : des tours AU BORD DE L'ÉCRAN dont le HALO
-// lumineux voyage sur le sol — dans la salle du QG, les deux halos se REJOIGNENT
-// au milieu de la pièce. Le halo te voit : la jauge « ? » monte → « ! » + POURSUITE.
-// Touché = RENVOYÉ à l'entrée de la pièce, les gardes reprennent leurs rondes.
+// LA BASE, PENSÉE COMME UNE VRAIE BASE : la cour d'entrée a une ROUTE du portail
+// à la porte du QG (éclairée par LE projecteur du mur nord), une cour de stockage
+// à l'ouest, un motor pool à l'est, un poste de contrôle en sacs de sable ; la
+// salle du QG est un poste de commandement : rayonnages contre les murs, TABLE À
+// CARTES au centre — les deux projecteurs latéraux SE REJOIGNENT juste au-dessus.
+// Les gardes ne sont pas posés au hasard : CHACUN SURVEILLE quelque chose.
+//
+// Le cône d'un garde ou le halo d'un projecteur te voit : la jauge « ? » monte ;
+// pleine = « ! » + POURSUITE. Touché = RENVOYÉ à l'entrée de la pièce.
 // Z = sprint (rapide mais BRUYANT), X = lancer une PIERRE : les gardes iront voir ailleurs.
-// Toute la logique avance dans update() (pas de minuteries Phaser) : les bots de test
-// peuvent jouer en accéléré. (La phase 2 — le QUIZ de Beufa — arrive ensuite.)
+// Toute la logique avance dans update() (pas de minuteries Phaser). (La phase 2 —
+// le QUIZ de Beufa — arrive ensuite.)
 // =====================================================================
 import { BossScene } from '../../core/BossScene.js';
 import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
@@ -40,8 +44,8 @@ export class BeufaInfiltration extends BossScene {
     // sa TEINTE change avec la pièce (cour extérieure / salle du QG)
     this.sol = this.add.tileSprite(0, 0, LARGEUR, HAUTEUR, 'beufa_sol', 0).setOrigin(0);
 
-    // LA PIÈCE COURANTE : on ne charge QUE elle (murs, conteneurs, gardes, projecteurs…).
-    // Passer une porte détruit tout et charge la pièce suivante. Voir chargerPiece().
+    // LA PIÈCE COURANTE : on ne charge QUE elle (murs, route, conteneurs, gardes,
+    // projecteurs…). Passer une porte détruit tout et charge la pièce suivante.
     this.piece = 0;
     this.decor = [];      // tout ce qui disparaît au changement de pièce
     this.obstacles = [];  // ce qui bloque le passage ET la vue
@@ -73,14 +77,14 @@ export class BeufaInfiltration extends BossScene {
 
     this.afficherIntro('BEUFA - L\'INFILTRATION', [
       'La nuit est tombée sur la base de BEUFA. Une pièce, puis une autre — et au fond, SON QG.',
-      'Les gardes balayent et font leur ronde : OBSERVE depuis l\'entrée, puis file dans leur dos.',
+      'Les gardes balayent et font leur ronde : OBSERVE depuis le portail, puis file dans leur dos.',
       '◀ ▶ ▲ ▼ : bouger (silencieux)',
       (estTactile() ? 'Sprint' : 'Z') + ' : sprinter — plus rapide, mais les gardes proches T\'ENTENDENT',
       (estTactile() ? 'Pierre' : 'X') + ' : lancer une pierre — les gardes iront voir AILLEURS',
-      'Les CONTENEURS coupent la vue : colle-toi derrière pour épier et disparaître.',
+      'Conteneurs, sacs de sable, table à cartes : tout ce qui est haut COUPE LA VUE — colle-toi derrière.',
       'Les PROJECTEURS AU BORD balayent le sol : leur HALO file jusqu\'au MILIEU — passe quand il repart !',
       'Le cône d\'un garde te voit : la jauge « ? » monte — sors avant le « ! ».',
-      'Traverse la PORTE en HAUT de la cour, puis file à la PORTE DU QG, à droite de la salle.',
+      'Traverse la PORTE au NORD de la cour, puis file à la PORTE DU QG, à l\'est de la salle.',
       'Touché = renvoyé à l\'entrée DE LA PIÈCE ; le radar en haut à droite saute pendant les alertes.',
     ], () => this.cinema());
   }
@@ -96,6 +100,10 @@ export class BeufaInfiltration extends BossScene {
     this.projecteurs = [];
     if (this.pierre) { this.pierre.sprite.destroy(); this.pierre = null; }
     this.sol.setTint(P.teinteSol || 0xffffff);   // l'ambiance change : cour extérieure / salle du QG
+    // LA ROUTE : du portail à la porte, l'axe de la base — du décor, ça ne bloque pas
+    for (const [x, y, l, h] of (P.routes || [])) {
+      this.decor.push(this.add.tileSprite(x, y, l, h, 'beufa_route', 0).setOrigin(0.5).setDepth(5));
+    }
     for (const [x, y, l, h] of P.murs) {
       // murs façon NÉS : la bande se pave avec sa texture (chapeau éclairé + face sombre)
       const bande = (l >= h) ? this.add.tileSprite(x, y, l, h, 'beufa_mur', 0) : this.add.tileSprite(x, y, l, h, 'beufa_mur_v', 0);
@@ -118,6 +126,10 @@ export class BeufaInfiltration extends BossScene {
       this.decor.push(img);
       this.obstacles.push({ x, y, l, h });
     }
+    // LE POSTE DE CONTRÔLE : les nids de sacs de sable
+    for (const [x, y] of (P.sacs || [])) this.ajouterObstacle('beufa_sacs', x, y, 64, 44);
+    // LA TABLE À CARTES : le cœur du poste de commandement
+    for (const [x, y] of (P.tables || [])) this.ajouterObstacle('beufa_table', x, y, 140, 90);
     for (const [x, y] of P.caisses) this.ajouterObstacle('beufa_caisse', x, y, 64, 64);
     // LES PROJECTEURS : la tour est SUR le mur, au bord de l'écran ; son HALO voyage
     // de « depart » à « arrivee » (jusqu'au milieu de la pièce) puis revient.
@@ -135,7 +147,7 @@ export class BeufaInfiltration extends BossScene {
     this.hudTitre.setText('BEUFA — LA BASE · ' + P.nom);
   }
 
-  // la petite cinématique : Beufa traverse la cour et sort par la porte du haut
+  // la petite cinématique : Beufa remonte la route et sort par la porte du nord
   cinema() {
     this.phase = 'cinema';
     const beufa = this.add.sprite(480, 310, 'beufa_boss', 0).setDepth(40).setScale(1.5);
@@ -216,7 +228,7 @@ export class BeufaInfiltration extends BossScene {
       if (sprint) this.bruit();   // le sprint s'entend : les gardes proches se tournent vers toi
     } else this.sprJoueur.setFrame(0);
     if (vientDAppuyer(t.x) && this.pierres > 0) this.lancerPierre();
-    // LA SORTIE : la porte en haut (pièce suivante)… ou LA PORTE DU QG (victoire)
+    // LA SORTIE : la porte au nord (pièce suivante)… ou LA PORTE DU QG (victoire)
     const P = PIECES[this.piece];
     if (P.sortie === 'haut' && this.joueur.y < 36 && this.joueur.x > 445 && this.joueur.x < 515) this.changerDePiece(this.piece + 1);
     if (P.sortie === 'qg' && this.joueur.x > 906 && this.joueur.y > 190 && this.joueur.y < 250) this.reussite();
@@ -350,7 +362,7 @@ export class BeufaInfiltration extends BossScene {
     }
   }
 
-  // est-ce que CE garde te voit, là, maintenant ? (cône + distance + caisses qui coupent la vue)
+  // est-ce que CE garde te voit, là, maintenant ? (cône + distance + obstacles qui coupent la vue)
   vuPar(g) {
     const dx = this.joueur.x - g.x, dy = this.joueur.y - g.y, d = Math.hypot(dx, dy);
     if (d > R.garde.portee) return false;
