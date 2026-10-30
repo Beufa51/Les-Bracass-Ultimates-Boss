@@ -8,7 +8,7 @@ export const REGLAGES = {
   joueur: {
     vitesse: 120,      // marche (px/s) : silencieuse — LENTE, comme une infiltration
     sprint: 185,       // Z : plus rapide, mais les gardes proches T'ENTENDENT
-    rayon: 13,
+    rayon: 10,      // V25 : on frôle les caisses SANS être bloqué — les couloirs redeviennent passables
     bruit: 160,        // rayon (px) dans lequel un garde entend le sprint
     pierres: 5,        // X : lance une pierre pour attirer les gardes AILLEURS (la clé des plantés)
     porteePierre: 300, // elle VOLE LOIN : détourner un garde sans entrer dans son cône
@@ -84,20 +84,20 @@ export const PIECES = [
     routes: [ [480, 555, 70, 1080] ],   // L'AXE : du portail droit à la porte du QG
     conteneurs: [   // les GRANDES couvertures, elles coupent la vue
       [250, 470, 140, 52],                                // LE DÉPÔT : deux conteneurs face à face —
-      [250, 570, 140, 52, 'beufa_conteneur_olive'],       //   la ronde passe dans l'allée, tu tournes autour
+      [250, 570, 140, 52],       //   la ronde passe dans l'allée, tu tournes autour
       [700, 330, 140, 52],                                // LE MOTOR POOL : l'abri du véhicule
       [820, 700, 52, 140],                                //   et le fourgon garé contre l'est
       [600, 680, 140, 52],                                // LA COUVERTURE DU MILIEU : casse l'axe du sud
     ],
     sacs: [ [390, 515], [570, 515] ],   // LE POSTE DE CONTRÔLE au carrefour de l'axe
     caisses: [
-      [560, 1000],   // le bidon du portail : TA première couverture, au spawn
+      [560, 990],    // V25 : le bidon du portail — couloir sud DÉGAGÉ
       [420, 700],    // LE SLALOM DE L'AXE : deux plots — un pas de couverture entre
       [540, 420],    //   la sentinelle et le halo qui descend du QG
       [180, 400],    // le dépôt : pour tourner autour de la ronde de l'allée
       [352, 622],    //   l'angle sud du dépôt
       [884, 300],    // le motor pool : les bidons de l'angle nord-est
-      [884, 1000],   //   et le long du mur est
+      [864, 1000],   // V25 : et le long du mur est — couloir est DÉGAGÉ (passable)
       [300, 820],    // le coin du chien de garde, au sud-ouest
     ],
     projecteurs: [   // TROIS TOURS, une par zone : le QG, le dépôt, la voie est
@@ -131,19 +131,19 @@ export const PIECES = [
     portes: [ [325, 710, 0], [1430, 365, Math.PI / 2] ],   // l'entrée + LE BUREAU (il pulse dans la nuit)
     routes: [],
     conteneurs: [   // les RAYONNAGES du matériel : quatre couloirs traversent la salle
-      [250, 120, 140, 52, 'beufa_conteneur_olive'],   // le rayonnage nord-ouest
+      [250, 120, 140, 52],   // le rayonnage nord-ouest
       [690, 120, 140, 52],                            // le rayonnage nord
       [1130, 120, 140, 52],                           // le rayonnage nord-est
-      [150, 380, 52, 140, 'beufa_conteneur_olive'],   // le rayonnage de l'ouest
+      [150, 380, 52, 140],   // le rayonnage de l'ouest
       [1130, 380, 52, 140],                           // le rayonnage du centre-est
       [1250, 620, 140, 52],                           // le rayonnage du sud-est
     ],
     tables: [ [720, 360] ],   // LA TABLE DES CARTES : les deux halos la frôlent au-dessus
     sacs: [],
-    caisses: [ [500, 350], [60, 200], [1240, 120], [1380, 560], [700, 550] ],   // une couverture par couloir
+    caisses: [ [500, 350], [60, 200], [1240, 120], [1350, 540], [700, 550] ],   // une couverture par couloir
     projecteurs: [   // EN OPPOSITION DE PHASE : le plateau n'est jamais éclairé que d'UNE lumière
       { tour: [26, 360], depart: [70, 360], arrivee: [600, 360] },
-      { tour: [1414, 360], depart: [1370, 360], arrivee: [840, 360], phase: 4 },
+      { tour: [1414, 600], depart: [1370, 600], arrivee: [1050, 600], phase: 4 },   // V25 : déplacé au SUD — la PORTE DU BUREAU est dégagée
     ],
     gardes: [   // SIX menaces, chacune garde SON couloir :
       { chemin: [[150, 220], [150, 220]], scan: 45, scanBase: 0 },        // L'OFFICIER DE QUART : il balaie la salle vers l'est

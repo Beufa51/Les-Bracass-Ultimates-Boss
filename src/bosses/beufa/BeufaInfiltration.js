@@ -380,6 +380,10 @@ export class BeufaInfiltration extends BossScene {
       this.projecteurs.push({ tour: pr.tour, depart: pr.depart, arrivee: pr.arrivee, phase: pr.phase || 0, t: 0, hx: pr.depart[0], hy: pr.depart[1], jauge: 0, alerte });
     }
     this.gardes = P.gardes.map((g) => this.creerGarde(g));
+    // V25 : pendant l'INTRO la base n'est PAS ENCORE en poste — aucun garde ne
+    // bouge à l'écran avant que Beufa n'ait fait son apparition (cinéma() les cache
+    // aussi, et les restaure au passage en phase 'jeu').
+    if (this.phase === 'intro') for (const g of this.gardes) { g.sprite.setVisible(false); g.alerte.setVisible(false); }
     // le héros repart de la poche sûre de l'entrée — il peut OBSERVER avant de bouger
     this.joueur.x = P.entree.x; this.joueur.y = P.entree.y;
     this.sprJoueur.setPosition(this.joueur.x, this.joueur.y);
@@ -958,7 +962,7 @@ export class BeufaInfiltration extends BossScene {
     }
     // les FAISCEAUX des gardes : des poches de lumière le long du cône
     // (pas pendant la cinématique : leurs postes sont vides, Beufa est seul)
-    for (const g of this.phase === 'cinema' ? [] : this.gardes) {
+    for (const g of (this.phase === 'cinema' || this.phase === 'intro') ? [] : this.gardes) {   // V25 : intro aussi — postes vides
       for (let k = 1; k <= 3; k++)
         trou(g.x + Math.cos(g.angle) * R.garde.portee * k / 3.6, g.y + Math.sin(g.angle) * R.garde.portee * k / 3.6,
           R.garde.portee * 0.42 * (1 - k * 0.13), 0.8);
