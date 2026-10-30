@@ -350,7 +350,7 @@ export class BeufaInfiltration extends BossScene {
     }
     if (dx || dy) {
       this.joueur.angle = Math.atan2(dy, dx);
-      this.sprJoueur.setFrame(Math.floor(this.temps * (sprint ? 11 : 7)) % 2);
+      this.sprJoueur.setFrame(Math.floor(this.temps * (sprint ? 11 : 7)) % 4);
       if (sprint) this.bruit();   // le sprint s'entend : les gardes proches se tournent vers toi
     } else this.sprJoueur.setFrame(0);
     if (vientDAppuyer(t.x) && this.pierres > 0) this.lancerPierre();
@@ -664,7 +664,7 @@ export class BeufaInfiltration extends BossScene {
       const rebond = g.bouge ? Math.abs(Math.sin(this.temps * 13 + g.x * 0.05)) * 2 : 0;
       g.sprite.setPosition(g.x, g.y - rebond)
         .setRotation(g.angle + (g.bouge ? Math.sin(this.temps * 13 + g.x * 0.05) * 0.07 : 0))
-        .setFrame(g.bouge ? Math.floor(this.temps * 6) % 2 : 0);
+        .setFrame(g.bouge ? Math.floor(this.temps * 6) % 4 : 1);   // arrêt = pose immobile (frame 1)
       g.alerte.setPosition(g.x, g.y - 32).setScale(1 + Math.sin(this.temps * 18) * 0.12);
       this.dessinerCone(gg, g.x, g.y, g.angle, R.garde, g.etat === 'poursuite' ? 0xff5a5a : 0xffe9a0, null);
     }
