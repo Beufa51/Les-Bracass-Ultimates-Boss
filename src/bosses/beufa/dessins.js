@@ -375,3 +375,188 @@ export function PIERRE_NES(ctx, w, h, p) {
   ctx.fillStyle = teinte(p.couleur, 0.55); ctx.fillRect(2, 2, 3, 1);   // l'éclat
   ctx.strokeStyle = teinte(p.couleur, -0.6); ctx.lineWidth = 1; ctx.strokeRect(1, 2, w - 2, h - 4);
 }
+
+// =====================================================================
+// V28 — LE MATÉRIEL MILITAIRE : de VRAIS véhicules et bâtiments, dessinés
+// comme les autres (ombre portée, ramp 3-4 tons, raccords en trame, contour
+// teinté). Chaque forme est PROVISOIRE : dès que Fabien livre ses PNG, on
+// remplace fichier: null par le chemin dans le manifeste, rien d'autre à faire.
+// =====================================================================
+
+// LE CAMION MILITAIRE (176 x 72), tourné vers la DROITE : cabine à l'avant,
+// benne bâchée à l'arrière avec ses arceaux, roues aux coins, phares allumés.
+export function CAMION_NES(ctx, w, h, p) {
+  ctx.fillStyle = '#1c1c1c';
+  ctx.beginPath(); ctx.ellipse(w / 2, h - 4, w / 2 - 10, 6, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = teinte(p.couleur, -0.4); ctx.fillRect(3, h - 20, w - 52, 15);   // LA BENNE, face avant
+  trame(ctx, 3, h - 20, w - 52, 4, teinte(p.couleur, -0.2));
+  ctx.fillStyle = p.couleur; ctx.fillRect(3, 5, w - 52, h - 24);                 // la bâche, le chapeau
+  ctx.fillStyle = teinte(p.couleur, 0.3); ctx.fillRect(3, 5, w - 52, 4);
+  ctx.fillStyle = teinte(p.couleur, 0.5); ctx.fillRect(3, 5, w - 52, 2);
+  for (let x = 14; x < w - 66; x += 16) {   // les arceaux de la bâche, À CHANBORD
+    ctx.fillStyle = teinte(p.couleur, -0.3); ctx.fillRect(x, 10, 3, h - 30);
+    ctx.fillStyle = teinte(p.couleur, 0.2); ctx.fillRect(x, 10, 1, h - 30);
+    ctx.fillStyle = teinte(p.couleur, -0.45); ctx.fillRect(x + 2, 10, 1, h - 30);
+  }
+  ctx.fillStyle = '#00001c'; ctx.fillRect(3, h / 2 - 2, w - 52, 3);   // la couture de la bâche
+  ctx.fillStyle = teinte(p.couleur, 0.15); ctx.fillRect(3, h / 2 - 3, w - 52, 1);
+  ctx.fillStyle = teinte(p.couleur, -0.35); ctx.fillRect(w - 46, h - 20, 40, 14);   // LA CABINE, face
+  trame(ctx, w - 46, h - 20, 40, 3, teinte(p.couleur, -0.15));
+  ctx.fillStyle = p.couleur; ctx.fillRect(w - 46, 5, 40, h - 24);
+  ctx.fillStyle = teinte(p.couleur, 0.35); ctx.fillRect(w - 46, 5, 40, 4);
+  ctx.fillStyle = teinte(p.couleur, 0.55); ctx.fillRect(w - 46, 5, 40, 2);
+  ctx.fillStyle = '#5470a8'; ctx.fillRect(w - 18, 10, 12, h - 30);   // le pare-brise
+  ctx.fillStyle = '#a8c4e0'; ctx.fillRect(w - 16, 11, 8, 5);   // son reflet
+  ctx.fillStyle = '#00001c'; ctx.fillRect(w - 6, 5, 3, h - 24);   // la calandre
+  ctx.fillStyle = '#fce054'; ctx.fillRect(w - 3, 10, 3, 4); ctx.fillRect(w - 3, h - 26, 3, 4);   // les PHARES allumés
+  for (const [x, y] of [[14, 2], [14, h - 14], [w - 52, 2], [w - 52, h - 14], [w - 20, h - 14]]) {   // les roues
+    ctx.fillStyle = '#1c1c1c'; ctx.fillRect(x, y, 14, 12);
+    ctx.fillStyle = '#383838'; ctx.fillRect(x + 1, y + 1, 12, 4);
+  }
+  ctx.strokeStyle = '#00001c'; ctx.lineWidth = 2; ctx.strokeRect(1, 1, w - 2, h - 2);
+}
+
+// LA JEEP DE SERVICE (88 x 60), tournée vers la DROITE : capot, pare-brise,
+// arceau de sécurité, roue de secours dans le dos, phares allumés.
+export function JEEP_NES(ctx, w, h, p) {
+  ctx.fillStyle = '#1c1c1c';
+  ctx.beginPath(); ctx.ellipse(w / 2, h - 4, w / 2 - 8, 6, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = teinte(p.couleur, -0.4); ctx.fillRect(3, h - 18, w - 6, 14);
+  trame(ctx, 3, h - 18, w - 6, 4, teinte(p.couleur, -0.2));
+  ctx.fillStyle = p.couleur; ctx.fillRect(3, 4, w - 6, h - 20);
+  ctx.fillStyle = teinte(p.couleur, 0.3); ctx.fillRect(3, 4, w - 6, 3);
+  ctx.fillStyle = teinte(p.couleur, 0.5); ctx.fillRect(3, 4, w - 6, 1);
+  ctx.fillStyle = '#00001c'; ctx.fillRect(w - 36, 6, 2, h - 22);   // le montant du pare-brise
+  ctx.fillStyle = '#5470a8'; ctx.fillRect(w - 34, 8, 8, h - 26);   // le pare-brise
+  ctx.fillStyle = '#a8c4e0'; ctx.fillRect(w - 33, 9, 3, 5);
+  ctx.fillStyle = '#00001c'; ctx.fillRect(16, 10, 3, h - 30);   // l'arceau de sécurité
+  ctx.fillStyle = teinte(p.couleur, 0.2); ctx.fillRect(16, 10, 1, h - 30);
+  ctx.fillStyle = '#00001c'; ctx.fillRect(6, 8, 9, 9);   // la roue de secours
+  ctx.fillStyle = '#383838'; ctx.fillRect(7, 9, 7, 7);
+  ctx.fillStyle = '#8c8c8c'; ctx.fillRect(10, 12, 2, 2);
+  ctx.fillStyle = '#fce054'; ctx.fillRect(w - 5, 12, 3, 4); ctx.fillRect(w - 5, h - 26, 3, 4);   // les phares
+  for (const [x, y] of [[10, 2], [10, h - 13], [w - 26, 2], [w - 26, h - 13]]) {   // les roues
+    ctx.fillStyle = '#1c1c1c'; ctx.fillRect(x, y, 12, 11);
+    ctx.fillStyle = '#383838'; ctx.fillRect(x + 1, y + 1, 10, 3);
+  }
+  ctx.strokeStyle = '#00001c'; ctx.lineWidth = 2; ctx.strokeRect(1, 1, w - 2, h - 2);
+}
+
+// L'HÉLICOPTÈRE (184 x 100), vu du CIEL : fuselage, verrière, poutre de queue,
+// rotor de queue, et LE ROTOR PRINCIPAL : deux pales traversantes en croix.
+export function HELICO_NES(ctx, w, h, p) {
+  const cy = h / 2;
+  ctx.fillStyle = '#1c1c1c';
+  ctx.beginPath(); ctx.ellipse(w / 2, h - 5, w / 2 - 14, 8, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = teinte(p.couleur, -0.4); ctx.fillRect(4, cy + 2, 78, 8);   // LA POUTRE DE QUEUE
+  ctx.fillStyle = p.couleur; ctx.fillRect(4, cy - 10, 78, 12);
+  ctx.fillStyle = teinte(p.couleur, 0.3); ctx.fillRect(4, cy - 10, 78, 3);
+  ctx.fillStyle = '#1c1c1c'; ctx.fillRect(2, cy - 16, 5, 30);   // le rotor de queue
+  ctx.fillStyle = '#545454'; ctx.fillRect(3, cy - 1, 3, 6);
+  ctx.fillStyle = teinte(p.couleur, -0.25); ctx.fillRect(70, cy - 24, 16, 46);   // la dérive
+  ctx.fillStyle = teinte(p.couleur, 0.15); ctx.fillRect(70, cy - 24, 4, 46);
+  ctx.fillStyle = teinte(p.couleur, -0.45); ctx.fillRect(84, h - 26, 90, 18);   // LE FUSELAGE
+  trame(ctx, 84, h - 26, 90, 4, teinte(p.couleur, -0.2));
+  ctx.fillStyle = p.couleur; ctx.fillRect(84, 12, 90, h - 30);
+  ctx.fillStyle = teinte(p.couleur, 0.3); ctx.fillRect(84, 12, 90, 4);
+  ctx.fillStyle = teinte(p.couleur, 0.5); ctx.fillRect(84, 12, 90, 2);
+  ctx.fillStyle = '#5470a8'; ctx.fillRect(146, 18, 24, h - 44);   // LA VERRIÈRE du cockpit
+  ctx.fillStyle = '#a8c4e0'; ctx.fillRect(148, 20, 7, 9); ctx.fillRect(148, h - 34, 7, 6);
+  ctx.fillStyle = '#00001c'; ctx.fillRect(142, 16, 3, h - 32);   // son montant
+  ctx.fillStyle = '#00001c'; ctx.fillRect(100, 20, 2, h - 40); ctx.fillRect(122, 20, 2, h - 40);
+  ctx.fillStyle = '#383838'; ctx.fillRect(88, h - 12, 88, 4); ctx.fillRect(88, h - 8, 88, 4);   // les patins
+  ctx.fillStyle = '#00001c'; ctx.fillRect(124, cy - 4, 8, 8);   // LE ROTOR : le mât
+  ctx.fillStyle = '#1c1c1c'; ctx.fillRect(6, cy - 3, 122, 6);   // la pale avant-arrière
+  ctx.fillStyle = '#383838'; ctx.fillRect(6, cy - 2, 122, 2);
+  ctx.fillStyle = '#1c1c1c'; ctx.fillRect(124, 4, 6, h - 8);   // la pale gauche-droite
+  ctx.fillStyle = '#383838'; ctx.fillRect(125, 4, 2, h - 8);
+  ctx.strokeStyle = '#00001c'; ctx.lineWidth = 2; ctx.strokeRect(1, 1, w - 2, h - 2);
+}
+
+// LE RÉSERVOIR DE CARBURANT (96 x 96), vu du CIEL : cylindre à lumière de bord,
+// bandeau de chevrons JAUNES de danger, vanne centrale.
+export function RESERVOIR_NES(ctx, w, h, p) {
+  const c = w / 2;
+  ctx.fillStyle = '#1c1c1c';
+  ctx.beginPath(); ctx.ellipse(c, h - 6, w / 2 - 8, 8, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = teinte(p.couleur, -0.45); ctx.beginPath(); ctx.arc(c, c + 3, c - 5, 0, Math.PI * 2); ctx.fill();   // le flanc
+  ctx.fillStyle = p.couleur; ctx.beginPath(); ctx.arc(c, c, c - 8, 0, Math.PI * 2); ctx.fill();   // le dessus
+  ctx.fillStyle = teinte(p.couleur, 0.25); ctx.beginPath(); ctx.arc(c - 6, c - 6, c - 14, 0, Math.PI * 2); ctx.fill();   // la lumière du bord
+  ctx.fillStyle = teinte(p.couleur, 0.45); ctx.beginPath(); ctx.arc(c - 10, c - 10, c - 22, 0, Math.PI * 2); ctx.fill();   // l'éclat
+  ctx.strokeStyle = '#fce054'; ctx.lineWidth = 3;   // LE BANDEAU DE DANGER, chevrons jaunes
+  for (let k = 0; k < 8; k++) {
+    const a1 = k * Math.PI / 4, a2 = a1 + Math.PI / 8;
+    ctx.beginPath(); ctx.arc(c, c, c - 12, a1, a2); ctx.stroke();
+  }
+  ctx.fillStyle = '#00001c'; ctx.beginPath(); ctx.arc(c, c, 9, 0, Math.PI * 2); ctx.fill();   // la vanne
+  ctx.fillStyle = '#8c8c8c'; ctx.beginPath(); ctx.arc(c, c, 6, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#c4c4c4'; ctx.fillRect(c - 2, c - 4, 3, 3);
+  ctx.strokeStyle = '#00001c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(c, c, c - 3, 0, Math.PI * 2); ctx.stroke();
+}
+
+// LE MIRADOR (80 x 80), vu du CIEL : plateforme sur pilotis, garde-corps,
+// plancher à lattes, trappe d'échelle.
+export function MIRADOR_NES(ctx, w, h, p) {
+  ctx.fillStyle = '#1c1c1c';
+  ctx.beginPath(); ctx.ellipse(w / 2, h - 5, w / 2 - 10, 7, 0, 0, Math.PI * 2); ctx.fill();
+  for (const [x, y] of [[6, 4], [w - 14, 4], [6, h - 22], [w - 14, h - 22]]) {   // LES PILOTIS
+    ctx.fillStyle = '#383838'; ctx.fillRect(x, y, 8, 18);
+    ctx.fillStyle = '#545454'; ctx.fillRect(x, y, 8, 6);
+  }
+  ctx.fillStyle = teinte(p.couleur, -0.45); ctx.fillRect(6, h - 24, w - 12, 16);   // LA PLATEFORME
+  trame(ctx, 6, h - 24, w - 12, 4, teinte(p.couleur, -0.2));
+  ctx.fillStyle = p.couleur; ctx.fillRect(6, 8, w - 12, h - 30);   // le plancher
+  ctx.fillStyle = teinte(p.couleur, 0.3); ctx.fillRect(6, 8, w - 12, 4);
+  ctx.fillStyle = teinte(p.couleur, 0.5); ctx.fillRect(6, 8, w - 12, 2);
+  ctx.strokeStyle = teinte(p.couleur, -0.5); ctx.lineWidth = 1;   // les lattes du plancher
+  for (let x = 14; x < w - 12; x += 8) { ctx.beginPath(); ctx.moveTo(x, 13); ctx.lineTo(x, h - 27); ctx.stroke(); }
+  ctx.fillStyle = '#545454'; ctx.fillRect(6, 8, w - 12, 5); ctx.fillRect(6, h - 30, w - 12, 5);   // le garde-corps
+  ctx.fillStyle = '#8c8c8c'; ctx.fillRect(6, 8, w - 12, 2); ctx.fillRect(6, h - 27, w - 12, 2);
+  ctx.fillStyle = '#8c7038'; ctx.fillRect(w / 2 - 7, 16, 14, 10);   // la trappe d'échelle
+  ctx.fillStyle = '#54381c'; ctx.fillRect(w / 2 - 7, 16, 14, 2);
+  ctx.strokeStyle = '#00001c'; ctx.lineWidth = 2; ctx.strokeRect(2, 4, w - 4, h - 8);
+}
+
+// LA TENTE DE CAMP (148 x 96), vue du CIEL : deux pans de toile qui se
+// rejoignent au FAÎTE, coutures, bat-flap d'entrée, jupe à l'ombre.
+export function TENTE_NES(ctx, w, h, p) {
+  ctx.fillStyle = '#1c1c1c';
+  ctx.beginPath(); ctx.ellipse(w / 2, h - 5, w / 2 - 10, 7, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = teinte(p.couleur, -0.45); ctx.fillRect(8, h - 22, w - 16, 16);   // la jupe
+  trame(ctx, 8, h - 22, w - 16, 5, teinte(p.couleur, -0.2));
+  const demi = (w - 16) / 2;
+  ctx.fillStyle = p.couleur; ctx.fillRect(8, 6, demi, h - 24);                        // LE PAN ÉCLAIRÉ
+  ctx.fillStyle = teinte(p.couleur, -0.15); ctx.fillRect(8 + demi, 6, demi, h - 24);   // le pan sombre
+  trame(ctx, 8 + demi - 4, 6, 8, h - 24, teinte(p.couleur, -0.3));                  // leur raccord EN TRAME
+  ctx.fillStyle = teinte(p.couleur, 0.35); ctx.fillRect(8, 6, demi, 4);
+  ctx.fillStyle = teinte(p.couleur, 0.55); ctx.fillRect(8, 6, demi, 2);
+  ctx.strokeStyle = teinte(p.couleur, -0.5); ctx.lineWidth = 1;   // les coutures
+  for (let x = 18; x < w - 20; x += 16) { ctx.beginPath(); ctx.moveTo(x, 8); ctx.lineTo(x, h - 20); ctx.stroke(); }
+  ctx.fillStyle = '#00001c'; ctx.fillRect(6, 6, w - 12, 3);   // LE FAÎTE, la crête
+  ctx.fillStyle = teinte(p.couleur, 0.2); ctx.fillRect(6, 6, w - 12, 1);
+  ctx.fillStyle = teinte(p.couleur, -0.3); ctx.fillRect(w / 2 - 12, h - 26, 24, 10);   // le bat-flap
+  ctx.fillStyle = '#00001c'; ctx.fillRect(w / 2 - 12, h - 26, 24, 2);
+  ctx.strokeStyle = '#00001c'; ctx.lineWidth = 2; ctx.strokeRect(3, 3, w - 6, h - 6);
+}
+
+// LE RÂTELIER D'ARMES (140 x 52), vu du CIEL : longerons, crans, et LES FUSILS
+// couchés en travers — crosses biseautées, canons luisants.
+export function RATELIER_NES(ctx, w, h, p) {
+  ctx.fillStyle = '#1c1c1c';
+  ctx.beginPath(); ctx.ellipse(w / 2, h - 4, w / 2 - 8, 6, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = teinte(p.couleur, -0.4); ctx.fillRect(3, h - 16, w - 6, 13);
+  trame(ctx, 3, h - 16, w - 6, 4, teinte(p.couleur, -0.2));
+  ctx.fillStyle = p.couleur; ctx.fillRect(3, 3, w - 6, h - 18);   // le cadre, le chapeau
+  ctx.fillStyle = teinte(p.couleur, 0.3); ctx.fillRect(3, 3, w - 6, 3);
+  ctx.fillStyle = teinte(p.couleur, 0.5); ctx.fillRect(3, 3, w - 6, 1);
+  ctx.fillStyle = '#00001c'; ctx.fillRect(3, 8, w - 6, 2); ctx.fillRect(3, h - 22, w - 6, 2);   // les longerons
+  for (let k = 0; k < 5; k++) {   // LES FUSILS, couchés dans leurs crans
+    const x = 14 + k * 26;
+    ctx.fillStyle = '#54381c'; ctx.fillRect(x - 2, 10, 18, h - 26);   // la crosse
+    ctx.fillStyle = '#8c5428'; ctx.fillRect(x - 2, 10, 18, 3);        // son chant éclairé
+    ctx.fillStyle = '#1c1c1c'; ctx.fillRect(x + 8, h / 2 - 2, 18, 4); // le canon
+    ctx.fillStyle = '#545454'; ctx.fillRect(x + 8, h / 2 - 2, 18, 2); // son éclat
+  }
+  ctx.fillStyle = '#00001c'; ctx.fillRect(3, 3, 4, h - 6); ctx.fillRect(w - 7, 3, 4, h - 6);   // les montants
+  ctx.strokeStyle = '#00001c'; ctx.lineWidth = 2; ctx.strokeRect(1, 1, w - 2, h - 2);
+}

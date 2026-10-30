@@ -100,6 +100,11 @@ export const PIECES = [
       [550, 420, 52, 140],   //   et à l'est — un pas de couverture entre sentinelle et halo
       [575, 985, 140, 52],   // le conteneur du portail : TA première couverture
       [280, 820, 140, 52],   // le coin de la ronde sud-ouest
+      // V28 — LE MATÉRIEL : la cour vit, ce n'est pas un dépôt de boîtes
+      [130, 730, 148, 96, 'beufa_tente'],      // LA TENTE DES QUARTIERS, au sud-ouest
+      [760, 125, 96, 96, 'beufa_reservoir'],   // LA STATION DE CARBURANT du motor pool
+      [870, 125, 96, 96, 'beufa_reservoir'],
+      [600, 900, 80, 80, 'beufa_mirador'],      // LE MIRADOR DU PORTAIL, au carrefour sud
     ],
     sacs: [ [390, 515], [570, 515] ],   // LE POSTE DE CONTRÔLE au carrefour de l'axe
     caisses: [],
@@ -135,10 +140,20 @@ export const PIECES = [
     portesVerrouillees: [],
     portes: [ [10, 360, Math.PI / 2], [1430, 365, Math.PI / 2] ],   // l'entrée + LA PORTE DU PARC
     routes: [ [720, 360, 1460, 70] ],   // LA VOIE DE SERVICE : l'asphalte traverse le parc
-    conteneurs: [   // LES CAMIONS ET 4x4 DU PARC, parqués en rangées
-      [300, 150, 140, 52], [500, 150, 140, 52], [700, 150, 140, 52], [900, 150, 140, 52], [1100, 150, 140, 52],   // la rangée du nord
-      [400, 560, 140, 52], [600, 560, 140, 52], [800, 560, 140, 52], [1000, 560, 140, 52], [1200, 560, 140, 52],  // la rangée du sud
-      [1150, 360, 52, 140],   // LE CAMION DE PANNE, en travers de la voie de service
+    conteneurs: [   // V28 — LES VRAIS VÉHICULES DU PARC : camions, jeeps, hélicoptère
+      [300, 150, 72, 176, 'beufa_camion'],     // LA RANGÉE DE CAMIONS, garés en marche arrière au nord
+      [480, 150, 72, 176, 'beufa_camion'],
+      [660, 150, 72, 176, 'beufa_camion'],
+      [1200, 150, 184, 100, 'beufa_helico'],   // L'HÉLICOPTÈRE, sur son hélipad à l'est
+      [1050, 60, 88, 60, 'beufa_jeep'],        // les jeeps de service, de part et d'autre
+      [1050, 250, 88, 60, 'beufa_jeep'],
+      [300, 560, 176, 72, 'beufa_camion'],     // LA RANGÉE DU SUD, face à l'est
+      [520, 560, 176, 72, 'beufa_camion'],
+      [740, 560, 176, 72, 'beufa_camion'],
+      [960, 560, 176, 72, 'beufa_camion'],
+      [1000, 360, 80, 80, 'beufa_mirador'],    // LE MIRADOR DU PARC, planté sur la voie de service
+      [1190, 620, 96, 96, 'beufa_reservoir'],  // LA STATION DE CARBURANT, au sud-est
+      [1320, 620, 96, 96, 'beufa_reservoir'],
     ],
     sacs: [],
     caisses: [],
@@ -148,12 +163,12 @@ export const PIECES = [
       { tour: [1414, 520], depart: [1370, 520], arrivee: [700, 520], phase: 4 },
     ],
     gardes: [   // SIX menaces, le personnel du parc :
-      { chemin: [[300, 360], [1100, 360]] },                                  // LA RONDE DE LA VOIE : d'un bout à l'autre du parc
+      { chemin: [[300, 360], [900, 360]] },                                   // LA RONDE DE LA VOIE : jusqu'au mirador du milieu
       { chemin: [[880, 300], [880, 460]] },                                   // LE BALAYEUR DES RANGÉES : l'allée centrale
       { chemin: [[230, 200], [230, 200]], scan: 40, scanBase: Math.PI / 2 },  // LE PLANTÉ DU POSTE : il regarde l'entrée depuis le nord
       { chemin: [[300, 660], [1100, 660]] },                                  // LA RONDE DE L'ALLÉE SUD : entre les camions et le mur
       { chemin: [[1280, 360], [1280, 360]], scan: 50, scanBase: Math.PI },    // LE GARDIEN DE LA PORTE : il balaie la voie — passe dans son DOS
-      { chemin: [[1300, 100], [1300, 100]], scan: 50, scanBase: Math.PI / 2 }, // L'ŒIL DU NORD-EST : sur la rangée du nord
+      { chemin: [[1370, 90], [1370, 90]], scan: 50, scanBase: Math.PI / 2 },  // L'ŒIL DU NORD-EST : il veille sur l'hélipad
     ],
     entree: { x: 75, y: 360 },   // la poche sûre de la porte ouest
     sortie: 'est',                // atteindre LA PORTE DU PARC → l'arsenal
@@ -167,20 +182,21 @@ export const PIECES = [
       [227, 950, 434, 20], [733, 950, 434, 20], // le mur du sud : LA PORTE D'ENTRÉE (x 445-515)
       [10, 10, 20, 280], [10, 685, 20, 550],   // l'ouest + LE DÉPÔT DE MUNITIONS (verrouillé)
       [950, 490, 20, 940],                     // l'est : le mur des lance-roquettes
+      [480, 650, 20, 150],                     // V28 : LA CLOISON DES MUNITIONS — elle force le serpentin
     ],
     portesVerrouillees: [ [10, 345, 20, 120] ],
     portes: [ [480, 950, 0], [480, 10, 0] ],   // l'entrée + LA PORTE DU QG DE BEUFA
     routes: [],
     conteneurs: [   // LES RÂTELIERS D'ARMES : une grille en damier — on SERPENTE
-      [230, 180, 140, 52], [730, 180, 140, 52],   // la rangée des fusils
-      [480, 300, 140, 52],                        // le râtelier du centre
-      [230, 420, 140, 52], [730, 420, 140, 52],
-      [480, 540, 140, 52],
-      [230, 660, 140, 52], [730, 660, 140, 52],
-      [480, 780, 140, 52],
+      [230, 180, 140, 52, 'beufa_ratelier'], [730, 180, 140, 52, 'beufa_ratelier'],   // la rangée des fusils
+      [480, 300, 140, 52, 'beufa_ratelier'],                        // le râtelier du centre
+      [230, 420, 140, 52, 'beufa_ratelier'], [730, 420, 140, 52, 'beufa_ratelier'],
+      [480, 540, 140, 52, 'beufa_ratelier'],
+      [230, 660, 140, 52, 'beufa_ratelier'], [730, 660, 140, 52, 'beufa_ratelier'],
+      [480, 780, 140, 52, 'beufa_ratelier'],
     ],
     sacs: [],
-    caisses: [],
+    caisses: [ [100, 300], [300, 100], [860, 600] ],   // V28 : LES CAISSES DE MUNITIONS, dans les angles morts
     tables: [ [180, 70] ],   // LE POSTE DE L'ARMURIER, au pied de la porte du QG
     projecteurs: [   // LES DEUX GÉANTS de l'arsenal, en opposition — la lumière saute de râtelier en râtelier
       { tour: [10, 480], depart: [70, 480], arrivee: [600, 480] },
