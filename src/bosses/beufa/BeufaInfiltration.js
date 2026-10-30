@@ -102,6 +102,9 @@ export class BeufaInfiltration extends BossScene {
     vigCtx.fillRect(0, 0, LARGEUR, HAUTEUR);
     this.textures.addCanvas('beufa_vignette', vigCv);
     this.add.image(0, 0, 'beufa_vignette').setOrigin(0).setScrollFactor(0).setDepth(801);
+    // LES REFLETS DES LED des portes (vert = ouverte, rouge = verrouillée), en ADDITIF
+    this.lueurG = this.add.graphics().setDepth(802).setBlendMode(Phaser.BlendModes.ADD);
+    this.lueurs = [];
 
     this.alertes = 0; this.pierres = R.joueur.pierres; this.temps = 0; this.pierre = null;
     this.poussieres = []; this.prochPoussiere = 0;   // les petits nuages des pas (V10)
@@ -234,6 +237,7 @@ export class BeufaInfiltration extends BossScene {
     this.piece = i;
     const P = PIECES[i];
     for (const d of this.decor) d.destroy();   // la pièce précédente disparaît tout entière
+    this.lueurs = [];   // les reflets LED seront re-déclarés avec les portes
     this.decor = [];
     this.obstacles = [];
     this.gardes = [];
@@ -254,10 +258,14 @@ export class BeufaInfiltration extends BossScene {
     // les portes VERROUILLÉES des pièces à venir (prévues sur le plan) : dessinées, elles bloquent
     for (const [x, y, l, h] of (P.portesVerrouillees || [])) {
       this.decor.push(this.add.image(x, y, 'beufa_porte_verrouillee').setRotation(Math.PI / 2).setDepth(22));
+      this.lueurs.push({ x, y, c: 0xfc3838 });   // LED rouge
       this.obstacles.push({ x, y, l, h });
     }
     // les portes OUVERTES : l'entrée et la sortie de la pièce (LED verte, bande jaune)
-    for (const [x, y, rot] of (P.portes || [])) this.decor.push(this.add.image(x, y, 'beufa_porte').setRotation(rot).setDepth(10));
+    for (const [x, y, rot] of (P.portes || [])) {
+      this.decor.push(this.add.image(x, y, 'beufa_porte').setRotation(rot).setDepth(10));
+      this.lueurs.push({ x, y, c: 0x38fc38 });   // LED verte : sa lueur bave au sol
+    }
     // LES CONTENEURS : les GRANDES couvertures — elles bloquent le passage ET la vue
     for (const c of (P.conteneurs || [])) {
       const [x, y, l, h] = c;
@@ -796,6 +804,12 @@ export class BeufaInfiltration extends BossScene {
     // autour du HÉROS : on se voit toujours
     trou(this.joueur.x, this.joueur.y, 92, 0.85);
     ctx.globalCompositeOperation = 'source-over';
+    // les REFLETS des LED : deux cercles concentriques additifs, façon rétro SNES
+    this.lueurG.clear();
+    for (const l of this.lueurs) {
+      this.lueurG.fillStyle(l.c, 0.10); this.lueurG.fillCircle(l.x, l.y, 30);
+      this.lueurG.fillStyle(l.c, 0.08); this.lueurG.fillCircle(l.x, l.y, 18);
+    }
     this.nuitTex.refresh();
   }
 
