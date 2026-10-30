@@ -194,9 +194,13 @@ export const PIECES = [
       [480, 540, 140, 52, 'beufa_ratelier'],
       [230, 660, 140, 52, 'beufa_ratelier'], [730, 660, 140, 52, 'beufa_ratelier'],
       [480, 780, 140, 52, 'beufa_ratelier'],
+      // V29 — LE DÉCOR DE L'ARSENAL : des barils entre les rayons, la salle vit
+      [130, 160, 48, 48, 'beufa_baril'],   // le baril du nord-ouest : couverture dans le dos du planté
+      [800, 560, 48, 48, 'beufa_baril'],   // le baril de l'allée est, entre les rayons
+      [180, 880, 48, 48, 'beufa_baril'],   // le baril du dépôt sud : abri contre la ronde du sud
     ],
     sacs: [],
-    caisses: [ [100, 300], [300, 100], [860, 600] ],   // V28 : LES CAISSES DE MUNITIONS, dans les angles morts
+    caisses: [ [100, 300], [300, 100], [860, 600], [860, 80], [90, 895], [860, 880] ],   // V28 : les munitions + V29 : LES COINS DE LA SALLE habités
     tables: [ [180, 70] ],   // LE POSTE DE L'ARMURIER, au pied de la porte du QG
     projecteurs: [   // LES DEUX GÉANTS de l'arsenal, en opposition — la lumière saute de râtelier en râtelier
       { tour: [10, 480], depart: [70, 480], arrivee: [600, 480] },

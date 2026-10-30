@@ -6,10 +6,10 @@
 // (sprites/beufa/…), on remplace fichier: null par le chemin et TOUT le reste tient déjà.
 // fond: 'blanc' => le PNG arrive sur un FOND BLANC (le générateur ne fait pas la
 // transparence) : la scène retire CE blanc au chargement, sans toucher au dessin.
-import { DALLE_NES, MUR_NES, MUR_NES_V, ROUTE_NES, CONTENEUR_NES, CAISSE_NES, SACS_NES, TABLE_NES, PROJECTEUR_NES, PORTE_NES, GARDE_NES, HEROS_NES, BEUFA_NES, PIERRE_NES, CAMION_NES, JEEP_NES, HELICO_NES, RESERVOIR_NES, MIRADOR_NES, TENTE_NES, RATELIER_NES } from './dessins.js';
+import { DALLE_NES, MUR_NES, MUR_NES_V, ROUTE_NES, CONTENEUR_NES, CAISSE_NES, SACS_NES, TABLE_NES, PROJECTEUR_NES, PORTE_NES, GARDE_NES, HEROS_NES, BEUFA_NES, PIERRE_NES, CAMION_NES, JEEP_NES, HELICO_NES, RESERVOIR_NES, MIRADOR_NES, TENTE_NES, RATELIER_NES, BARIL_NES } from './dessins.js';
 
 export const MANIFESTE = {
-  formes: { dalle_nes: DALLE_NES, mur_nes: MUR_NES, mur_nes_v: MUR_NES_V, route_nes: ROUTE_NES, conteneur_nes: CONTENEUR_NES, caisse_nes: CAISSE_NES, sacs_nes: SACS_NES, table_nes: TABLE_NES, projecteur_nes: PROJECTEUR_NES, porte_nes: PORTE_NES, garde_nes: GARDE_NES, heros_nes: HEROS_NES, beufa_nes: BEUFA_NES, pierre_nes: PIERRE_NES, camion_nes: CAMION_NES, jeep_nes: JEEP_NES, helico_nes: HELICO_NES, reservoir_nes: RESERVOIR_NES, mirador_nes: MIRADOR_NES, tente_nes: TENTE_NES, ratelier_nes: RATELIER_NES },
+  formes: { dalle_nes: DALLE_NES, mur_nes: MUR_NES, mur_nes_v: MUR_NES_V, route_nes: ROUTE_NES, conteneur_nes: CONTENEUR_NES, caisse_nes: CAISSE_NES, sacs_nes: SACS_NES, table_nes: TABLE_NES, projecteur_nes: PROJECTEUR_NES, porte_nes: PORTE_NES, garde_nes: GARDE_NES, heros_nes: HEROS_NES, beufa_nes: BEUFA_NES, pierre_nes: PIERRE_NES, camion_nes: CAMION_NES, jeep_nes: JEEP_NES, helico_nes: HELICO_NES, reservoir_nes: RESERVOIR_NES, mirador_nes: MIRADOR_NES, tente_nes: TENTE_NES, ratelier_nes: RATELIER_NES, baril_nes: BARIL_NES },
   images: {
     beufa_sol:    { fichier: 'sprites/beufa/beufa_sol.jpg', fond: 'bord', largeur: 128, hauteur: 128, images: 1, vitesse: 1, provisoire: { forme: 'dalle_nes', couleur: '#1c1c38', pixel: 2 } },
     beufa_mur:    { fichier: 'sprites/beufa/beufa_mur.jpg', fond: 'bord', largeur: 64, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'mur_nes', couleur: '#545470', pixel: 2 } },
@@ -27,6 +27,7 @@ export const MANIFESTE = {
     beufa_mirador:    { fichier: 'sprites/beufa/beufa_mirador.jpg', fond: 'blanc', largeur: 80, hauteur: 80, images: 1, vitesse: 1, provisoire: { forme: 'mirador_nes', couleur: '#545038', pixel: 2 } },
     beufa_tente:      { fichier: 'sprites/beufa/beufa_tente.jpg', fond: 'blanc', largeur: 148, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'tente_nes', couleur: '#545438', pixel: 2 } },
     beufa_ratelier:   { fichier: 'sprites/beufa/beufa_ratelier.jpg', fond: 'blanc', largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'ratelier_nes', couleur: '#545038', pixel: 2 } },
+    beufa_baril:      { fichier: null, fond: 'blanc', largeur: 48, hauteur: 48, images: 1, vitesse: 1, provisoire: { forme: 'baril_nes', couleur: '#385454', pixel: 2 } },
     beufa_sacs:   { fichier: 'sprites/beufa/beufa_sacs.jpg', fond: 'blanc', largeur: 64, hauteur: 44, images: 1, vitesse: 1, provisoire: { forme: 'sacs_nes', couleur: '#8c7038', pixel: 2 } },
     beufa_table:   { fichier: 'sprites/beufa/beufa_table.jpg', fond: 'blanc', largeur: 140, hauteur: 90, images: 1, vitesse: 1, provisoire: { forme: 'table_nes', couleur: '#a88c54', pixel: 2 } },
     beufa_projecteur: { fichier: 'sprites/beufa/beufa_projecteur.jpg', fond: 'blanc', largeur: 36, hauteur: 36, images: 1, vitesse: 1, provisoire: { forme: 'projecteur_nes', couleur: '#383854', pixel: 2 } },

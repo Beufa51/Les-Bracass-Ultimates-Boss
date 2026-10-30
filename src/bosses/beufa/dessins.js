@@ -560,3 +560,23 @@ export function RATELIER_NES(ctx, w, h, p) {
   ctx.fillStyle = '#00001c'; ctx.fillRect(3, 3, 4, h - 6); ctx.fillRect(w - 7, 3, 4, h - 6);   // les montants
   ctx.strokeStyle = '#00001c'; ctx.lineWidth = 2; ctx.strokeRect(1, 1, w - 2, h - 2);
 }
+
+// LE BARIL DU DÉPÔT (48 x 48), vu du CIEL : cylindre à deux cerclages biseautés,
+// bouchon central — le petit monde de l'arsenal, comme le réservoir en miniature.
+export function BARIL_NES(ctx, w, h, p) {
+  const c = w / 2;
+  ctx.fillStyle = '#1c1c1c';
+  ctx.beginPath(); ctx.ellipse(c, h - 4, c - 6, 5, 0, 0, Math.PI * 2); ctx.fill();   // l'ombre : il POSE lourdement
+  ctx.fillStyle = teinte(p.couleur, -0.45); ctx.beginPath(); ctx.arc(c, c + 2, c - 4, 0, Math.PI * 2); ctx.fill();   // le flanc
+  ctx.fillStyle = p.couleur; ctx.beginPath(); ctx.arc(c, c, c - 7, 0, Math.PI * 2); ctx.fill();   // le dessus
+  trame(ctx, 4, c + 4, w - 8, 6, teinte(p.couleur, -0.2));   // le raccord du flanc, en trame
+  ctx.fillStyle = teinte(p.couleur, 0.25); ctx.beginPath(); ctx.arc(c - 5, c - 5, c - 12, 0, Math.PI * 2); ctx.fill();   // la lumière du bord
+  ctx.fillStyle = teinte(p.couleur, 0.45); ctx.beginPath(); ctx.arc(c - 8, c - 8, c - 18, 0, Math.PI * 2); ctx.fill();   // l'éclat
+  ctx.strokeStyle = teinte(p.couleur, -0.4); ctx.lineWidth = 2;   // LES DEUX CERCLAGES, biseautés
+  ctx.beginPath(); ctx.arc(c, c, c - 10, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(c, c, c - 16, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = '#00001c'; ctx.beginPath(); ctx.arc(c, c, 5, 0, Math.PI * 2); ctx.fill();   // le bouchon
+  ctx.fillStyle = '#8c8c8c'; ctx.beginPath(); ctx.arc(c, c, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#c4c4c4'; ctx.fillRect(c - 2, c - 3, 2, 2);   // son éclat
+  ctx.strokeStyle = '#00001c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(c, c, c - 2, 0, Math.PI * 2); ctx.stroke();
+}
