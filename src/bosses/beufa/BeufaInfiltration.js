@@ -137,7 +137,7 @@ export class BeufaInfiltration extends BossScene {
       'Conteneurs, sacs de sable, table à cartes : tout ce qui est haut COUPE LA VUE — colle-toi derrière.',
       'Les PROJECTEURS AU BORD balayent le sol : leur HALO file jusqu\'au MILIEU — passe quand il repart !',
       'Le cône d\'un garde te voit : la jauge « ? » monte — sors avant le « ! ».',
-      'La SORTIE pulse en vert dans la nuit : la porte au NORD de la cour, puis LE BUREAU DE BEUFA à l\'est du QG.',
+      'La SORTIE pulse en vert dans la nuit — QUATRE pièces : la cour, le parc des véhicules, l\'arsenal… puis LE BUREAU DE BEUFA dans SON QG.',
       'Touché = renvoyé à l\'entrée DE LA PIÈCE ; le radar (haut gauche) s\'efface quand tu marches.',
     ], () => this.cinema());
   }
@@ -507,6 +507,7 @@ export class BeufaInfiltration extends BossScene {
     // LA SORTIE : la porte au nord (pièce suivante)… ou LA PORTE DU QG (victoire)
     const P = PIECES[this.piece];
     if (P.sortie === 'haut' && this.joueur.y < 36 && this.joueur.x > 445 && this.joueur.x < 515) this.changerDePiece(this.piece + 1);
+    if (P.sortie === 'est' && this.joueur.x > 1396 && this.joueur.y > 330 && this.joueur.y < 400) this.changerDePiece(this.piece + 1);   // V27 : la porte EST d'une salle intermédiaire
     if (P.sortie === 'qg' && this.joueur.x > 1396 && this.joueur.y > 330 && this.joueur.y < 400) this.reussite();
   }
 
@@ -779,7 +780,7 @@ export class BeufaInfiltration extends BossScene {
     const cam = this.cameras.main;
     cam.stopFollow(); cam.setZoom(1); cam.centerOn(LARGEUR / 2, HAUTEUR / 2);
     jouerSon(this, 'beufa_reussi');
-    this.victoire('Le QG de BEUFA est infiltré en ' + formatTemps(this.temps) + ' ! Alertes déclenchées : ' + this.alertes + '. Les pièces suivantes de la base arrivent, puis le QUIZ !');
+    this.victoire('La base de BEUFA est infiltrée en ' + formatTemps(this.temps) + ' ! Alertes déclenchées : ' + this.alertes + '. QUATRE pièces traversées — le QUIZ arrive !');
   }
 
   // LA POUSSIÈRE DES PAS : elle monte, s'étale et s'efface — le sol de la base vit.

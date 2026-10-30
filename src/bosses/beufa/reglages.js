@@ -16,7 +16,7 @@ export const REGLAGES = {
   garde: {
     portee: 205,       // V23 : la nuit jouait POUR toi — les gardes voient PLUS LOIN
     angle: 26,         // demi-angle du cône (°)
-    reperage: 0.9,     // V23 : dans un cône, on se fait repérer VITE — fini le « ? » interminable
+    reperage: 0.55,    // V27 : dans un cône on est repéré EN UN CLIN D'ŒIL — la nuit ne pardonne plus
     vitesseRonde: 42,  // V23 : une ronde LENTE mais les fenêtres se referment PLUS VITE
     vitessePoursuite: 160,
     rayon: 14,
@@ -25,7 +25,7 @@ export const REGLAGES = {
   projecteur: {
     rayon: 62,        // V23 : les halos sont PLUS LARGE
     periode: 8,       // s d'un va-et-vient complet : la lumière file jusqu'au milieu puis REVIENT
-    reperage: 1.0,    // V23 : et ils repèrent PLUS VITE
+    reperage: 0.6,    // V27 : sous un halo, on est grillé presque aussitôt
   },
   alerte: {
     collective: 270,    // V23 : l'alerte se propage PLUS LOIN dans la base
@@ -59,21 +59,19 @@ export const REGLAGES = {
 // RÈGLES DE PLACEMENT : chaque cône laisse une FENÊTRE claire ; l'entrée de
 // chaque pièce reste une poche SÛRE d'où OBSERVER ; au moins deux routes vers
 // la sortie.
-// V24 — LE PASS DU DESIGNER SENIOR : la base n'est plus un écran, c'est un LIEU.
-// PIÈCE 1 = 960×1080, une cour DEUX FOIS plus profonde que l'écran : le portail
-// au SUD, un AXE central qui monte, un DÉPÔT à l'ouest, un MOTOR POOL à l'est,
-// et tout au nord LA PORTE DU QG sous SA tour. Trois zones, SEPT gardes, TROIS
-// halos : on avance par paliers, chaque zone a son horloge. PIÈCE 2 = 1440×720,
-// le QG EN LONGUEUR : on entre au sud-ouest, le bureau de Beufa est à l'extrême
-// EST — table des cartes au centre qu'un STRATÈGE tourne en boucle, deux halos
-// en opposition qui balaient le plateau. On ne « traverse » plus une pièce :
-// on l'INFILTRE.
+// V27 — QUATRE PIÈCES AVANT LE QUIZ (demande de Fabien). Chaque salle a SON
+// identité et SA mécanique : 1. LA COUR DU PORTAIL (l'extérieur, trois zones,
+// huit gardes) ; 2. LE PARC À VÉHICULES (traversée du parking d'ouest en est,
+// camions en rangées, phares en opposition, la voie de service balayée) ;
+// 3. L'ARSENAL (la grille des râteliers en damier : on SERPENTE entre les
+// rayons sous les yeux de l'armurier — la salle la plus serrée de la base) ;
+// 4. LE QG DE BEUFA (le poste de commandement, la table des cartes, le bureau).
 export const PIECES = [
-  { // ----- PIÈCE 1 : LA COUR DU PORTAIL — 960×1080, trois zones, sept gardes -----
-    nom: 'PIÈCE 1/2 · LA COUR DU PORTAIL',
-    l: 960, h: 1080,   // V24 : la cour déborde de l'écran — elle DÉFILE sous la caméra
+  { // ----- PIÈCE 1 : LA COUR DU PORTAIL — 960×1080, trois zones, huit gardes -----
+    nom: 'PIÈCE 1/4 · LA COUR DU PORTAIL',
+    l: 960, h: 1080,   // la cour déborde de l'écran — elle DÉFILE sous la caméra
     teinteSol: 0x9fc0a8,   // la cour est DEHORS : le sol tire vers l'herbe de nuit
-    murs: [   // [x, y, l, h] — x, y = CENTRES ; épaisseur 20 partout
+    murs: [
       [227, 10, 434, 20], [733, 10, 434, 20],     // le mur du QG : LA PORTE DE LA BASE (x 445-515)
       [227, 1070, 434, 20], [733, 1070, 434, 20], // le mur du portail — c'est par là qu'on arrive
       [10, 270, 20, 500], [10, 835, 20, 510],     // l'ouest : la PORTE DU DÉPÔT (verrouillée)
@@ -82,24 +80,30 @@ export const PIECES = [
     portesVerrouillees: [ [10, 550, 20, 60] ],
     portes: [ [480, 10, 0] ],          // LA PORTE DU QG (elle pulse dans la nuit)
     routes: [ [480, 555, 70, 1080] ],   // L'AXE : du portail droit à la porte du QG
-    conteneurs: [   // les GRANDES couvertures, elles coupent la vue
-      [250, 470, 140, 52],                                // LE DÉPÔT : deux conteneurs face à face —
-      [250, 570, 140, 52],       //   la ronde passe dans l'allée, tu tournes autour
-      [700, 330, 140, 52],                                // LE MOTOR POOL : l'abri du véhicule
-      [820, 700, 52, 140],                                //   et le fourgon garé contre l'est
-      [600, 680, 140, 52],                                // LA COUVERTURE DU MILIEU : casse l'axe du sud
-      // V26 : les caisses sont devenues des CONTENEURS (demande de Fabien — un seul type de couverture)
-      [575, 985, 140, 52],          // le conteneur du portail : TA première couverture, au spawn
-      [410, 660, 52, 140],          // LE SLALOM DE L'AXE, à l'ouest de la route
-      [550, 420, 52, 140],          //   et à l'est — un pas de couverture entre sentinelle et halo du QG
-      [180, 410, 140, 52],          // le dépôt : la couverture nord, pour tourner autour de la ronde
-      [300, 622, 140, 52],          //   l'angle sud du dépôt, empilé sur l'allée
-      [860, 250, 140, 52],          // le motor pool : le conteneur de l'angle nord-est
-      [860, 1015, 140, 52],         //   et le coin sud-est, sous le nez du rideau
-      [280, 820, 140, 52],          // le coin du chien de garde, au sud-ouest
+    conteneurs: [
+      // LE NORD (V27 : le quartier du SAS n'est plus vide)
+      [300, 150, 140, 52],   // LA BARAQUE DU POSTE, à l'ouest de l'axe — la couverture contre le SAS
+      [680, 100, 52, 140],   // LE FOURGON DU POSTE, à l'est — le guépard rôde derrière
+      // LE DÉPÔT
+      [250, 470, 140, 52],   // deux conteneurs face à face —
+      [250, 570, 140, 52],   //   la ronde passe dans l'allée, tu tournes autour
+      [180, 410, 140, 52],   // la couverture nord du dépôt
+      [300, 622, 140, 52],   // l'angle sud du dépôt, empilé sur l'allée
+      // LE MOTOR POOL
+      [700, 330, 140, 52],   // l'abri du véhicule
+      [820, 700, 52, 140],   // le fourgon garé contre l'est
+      [860, 250, 140, 52],   // le conteneur de l'angle nord-est
+      [860, 1015, 140, 52],  // le coin sud-est, sous le nez du rideau
+      // LE SUD ET L'AXE
+      [600, 680, 140, 52],   // LA COUVERTURE DU MILIEU : casse l'axe du sud
+      [410, 660, 52, 140],   // LE SLALOM DE L'AXE, à l'ouest de la route
+      [550, 420, 52, 140],   //   et à l'est — un pas de couverture entre sentinelle et halo
+      [575, 985, 140, 52],   // le conteneur du portail : TA première couverture
+      [280, 820, 140, 52],   // le coin de la ronde sud-ouest
     ],
     sacs: [ [390, 515], [570, 515] ],   // LE POSTE DE CONTRÔLE au carrefour de l'axe
-    caisses: [],   // V26 : plus de caisses — TOUTES les couvertures sont des CONTENEURS
+    caisses: [],
+    tables: [],
     projecteurs: [   // TROIS TOURS, une par zone : le QG, le dépôt, la voie est
       { tour: [480, 14], depart: [480, 70], arrivee: [480, 250] },     // le halo descend L'AXE jusqu'au SAS
       { tour: [10, 515], depart: [70, 515], arrivee: [390, 515] },     // le halo balaie L'ALLÉE DU DÉPÔT
@@ -107,19 +111,95 @@ export const PIECES = [
     ],
     gardes: [
       { chemin: [[480, 780], [480, 300]] },                                 // LA SENTINELLE DE L'AXE : la longue horloge du milieu
-      { chemin: [[150, 900], [400, 900]] },                                 // LE CHIEN DE GARDE : le quart sud-ouest
+      { chemin: [[150, 900], [400, 900]] },                                 // LA RONDE DU SUD-OUEST : le quart du portail
       { chemin: [[110, 515], [330, 515]] },                                 // LA RONDE DU DÉPÔT : dans l'allée, SOUS le halo
       { chemin: [[880, 380], [880, 760]] },                                 // LE MOTOR POOL : l'aller-retour de la voie est
       { chemin: [[480, 80], [480, 80]], scan: 55, scanBase: Math.PI / 2 },   // LE SAS DU QG : la PIERRE est la clé
       { chemin: [[600, 200], [900, 200]] },                                 // LE GUÉPARD DU NORD : l'approche nord-est du SAS
       { chemin: [[700, 940], [920, 940]] },                                 // LE RIDEAU DU SUD : il ferme le coin sud-est
+      { chemin: [[120, 120], [120, 120]], scan: 50, scanBase: 0 },           // L'ŒIL DU NORD-OUEST (V27) : il balaie la baraque du poste
     ],
-    entree: { x: 480, y: 1030 },  // le portail : une poche sûre — vérifiée contre les 7 cônes
-    sortie: 'haut',               // traverser LA PORTE DU QG → pièce suivante
+    entree: { x: 480, y: 1030 },
+    sortie: 'haut',               // traverser LA PORTE DU QG → le parc des véhicules
   },
-  { // ----- PIÈCE 2 : LE QG — 1440×720, infiltration en longueur, six gardes -----
-    nom: 'PIÈCE 2/2 · LE QG',
-    l: 1440, h: 720,   // V24 : la salle des opérations est DEUX FOIS plus large que l'écran
+  { // ----- PIÈCE 2 : LE PARC À VÉHICULES — 1440×720, la traversée du parking -----
+    nom: 'PIÈCE 2/4 · LE PARC À VÉHICULES',
+    l: 1440, h: 720,   // le parc est DEUX FOIS plus large que l'écran : on le traverse d'OUEST en EST
+    teinteSol: 0x9fc0a8,   // dehors : le bitume du parking
+    murs: [
+      [720, 10, 1440, 20],                         // le mur du nord
+      [720, 710, 1440, 20],                        // le mur du sud
+      [10, 170, 20, 300], [10, 570, 20, 320],      // l'ouest : LA PORTE D'ENTRÉE (y 320-410)
+      [1430, 170, 20, 300], [1430, 570, 20, 320],  // l'est : LA PORTE DU PARC (y 320-410)
+    ],
+    portesVerrouillees: [],
+    portes: [ [10, 360, Math.PI / 2], [1430, 365, Math.PI / 2] ],   // l'entrée + LA PORTE DU PARC
+    routes: [ [720, 360, 1460, 70] ],   // LA VOIE DE SERVICE : l'asphalte traverse le parc
+    conteneurs: [   // LES CAMIONS ET 4x4 DU PARC, parqués en rangées
+      [300, 150, 140, 52], [500, 150, 140, 52], [700, 150, 140, 52], [900, 150, 140, 52], [1100, 150, 140, 52],   // la rangée du nord
+      [400, 560, 140, 52], [600, 560, 140, 52], [800, 560, 140, 52], [1000, 560, 140, 52], [1200, 560, 140, 52],  // la rangée du sud
+      [1150, 360, 52, 140],   // LE CAMION DE PANNE, en travers de la voie de service
+    ],
+    sacs: [],
+    caisses: [],
+    tables: [],
+    projecteurs: [   // LES PHARES DU PARC, en opposition de phase : la voie n'est jamais éclairée que d'UNE lumière
+      { tour: [26, 200], depart: [70, 200], arrivee: [700, 200] },
+      { tour: [1414, 520], depart: [1370, 520], arrivee: [700, 520], phase: 4 },
+    ],
+    gardes: [   // SIX menaces, le personnel du parc :
+      { chemin: [[300, 360], [1100, 360]] },                                  // LA RONDE DE LA VOIE : d'un bout à l'autre du parc
+      { chemin: [[880, 300], [880, 460]] },                                   // LE BALAYEUR DES RANGÉES : l'allée centrale
+      { chemin: [[230, 200], [230, 200]], scan: 40, scanBase: Math.PI / 2 },  // LE PLANTÉ DU POSTE : il regarde l'entrée depuis le nord
+      { chemin: [[300, 660], [1100, 660]] },                                  // LA RONDE DE L'ALLÉE SUD : entre les camions et le mur
+      { chemin: [[1280, 360], [1280, 360]], scan: 50, scanBase: Math.PI },    // LE GARDIEN DE LA PORTE : il balaie la voie — passe dans son DOS
+      { chemin: [[1300, 100], [1300, 100]], scan: 50, scanBase: Math.PI / 2 }, // L'ŒIL DU NORD-EST : sur la rangée du nord
+    ],
+    entree: { x: 75, y: 360 },   // la poche sûre de la porte ouest
+    sortie: 'est',                // atteindre LA PORTE DU PARC → l'arsenal
+  },
+  { // ----- PIÈCE 3 : L'ARSENAL — 960×960, la grille des râteliers -----
+    nom: 'PIÈCE 3/4 · L\'ARSENAL',
+    l: 960, h: 960,   // la salle la plus SERRÉE de la base : on serpente entre les râteliers
+    teinteSol: 0xaab4d8,   // dedans : le béton bleuté
+    murs: [
+      [227, 10, 434, 20], [733, 10, 434, 20],   // le mur du nord : LA PORTE DU QG (x 445-515)
+      [227, 950, 434, 20], [733, 950, 434, 20], // le mur du sud : LA PORTE D'ENTRÉE (x 445-515)
+      [10, 10, 20, 280], [10, 685, 20, 550],   // l'ouest + LE DÉPÔT DE MUNITIONS (verrouillé)
+      [950, 490, 20, 940],                     // l'est : le mur des lance-roquettes
+    ],
+    portesVerrouillees: [ [10, 345, 20, 120] ],
+    portes: [ [480, 950, 0], [480, 10, 0] ],   // l'entrée + LA PORTE DU QG DE BEUFA
+    routes: [],
+    conteneurs: [   // LES RÂTELIERS D'ARMES : une grille en damier — on SERPENTE
+      [230, 180, 140, 52], [730, 180, 140, 52],   // la rangée des fusils
+      [480, 300, 140, 52],                        // le râtelier du centre
+      [230, 420, 140, 52], [730, 420, 140, 52],
+      [480, 540, 140, 52],
+      [230, 660, 140, 52], [730, 660, 140, 52],
+      [480, 780, 140, 52],
+    ],
+    sacs: [],
+    caisses: [],
+    tables: [ [180, 70] ],   // LE POSTE DE L'ARMURIER, au pied de la porte du QG
+    projecteurs: [   // LES DEUX GÉANTS de l'arsenal, en opposition — la lumière saute de râtelier en râtelier
+      { tour: [10, 480], depart: [70, 480], arrivee: [600, 480] },
+      { tour: [950, 360], depart: [890, 360], arrivee: [340, 360], phase: 4 },
+    ],
+    gardes: [   // SIX menaces, la salle des armes ne dort jamais :
+      { chemin: [[600, 60], [600, 60]], scan: 40, scanBase: Math.PI },        // L'ARMURIER : il balaie la porte du QG — passe dans son dos
+      { chemin: [[880, 240], [880, 540]] },                                  // LA RONDE DE L'EST : le couloir des lance-roquettes
+      { chemin: [[80, 540], [80, 780]] },                                    // LA RONDE DE L'OUEST : le couloir des caisses
+      { chemin: [[480, 480], [480, 480]], scan: 45, scanBase: -Math.PI / 2 }, // LE PLANTÉ DU CENTRE : il surveille la voie du nord
+      { chemin: [[160, 830], [400, 830]] },                                   // LA RONDE DU SUD : dans le dos de l'entrée
+      { chemin: [[80, 240], [80, 240]], scan: 45, scanBase: Math.PI / 2 },    // LE PLANTÉ DU NORD-OUEST : le couloir ouest
+    ],
+    entree: { x: 480, y: 900 },   // la poche sûre du sud
+    sortie: 'haut',               // traverser LA PORTE DU QG → LE QG DE BEUFA
+  },
+  { // ----- PIÈCE 4 : LE QG DE BEUFA — 1440×720, le poste de commandement -----
+    nom: 'PIÈCE 4/4 · LE QG DE BEUFA',
+    l: 1440, h: 720,   // la salle des opérations est DEUX FOIS plus large que l'écran
     teinteSol: 0xaab4d8,   // la salle est DEDANS : sol bleuté
     murs: [
       [720, 10, 1440, 20],                        // le mur du nord
@@ -132,24 +212,23 @@ export const PIECES = [
     routes: [],
     conteneurs: [   // les RAYONNAGES du matériel : quatre couloirs traversent la salle
       [250, 120, 140, 52],   // le rayonnage nord-ouest
-      [690, 120, 140, 52],                            // le rayonnage nord
-      [1130, 120, 140, 52],                           // le rayonnage nord-est
+      [690, 120, 140, 52],   // le rayonnage nord
+      [1130, 120, 140, 52],  // le rayonnage nord-est
+      [1300, 120, 140, 52],  // la rallonge de la rangée nord, à l'extrême est
       [150, 380, 52, 140],   // le rayonnage de l'ouest
-      [1130, 380, 52, 140],                           // le rayonnage du centre-est
-      [1250, 620, 140, 52],                           // le rayonnage du sud-est
-      // V26 : les caisses sont devenues des CONTENEURS (demande de Fabien)
-      [1300, 120, 140, 52],     // la rallonge de la rangée nord, à l'extrême est
-      [80, 170, 140, 52],       // le conteneur du couloir ouest, sous l'officier
-      [500, 350, 52, 140],      // le rayonnage du milieu — le stratège le frôle à l'est
-      [1350, 540, 52, 140],     // la couverture de l'approche du bureau, sous le cerbère
-      [700, 550, 140, 52],      // la couverture sud de la table à cartes
+      [80, 170, 140, 52],    // le conteneur du couloir ouest, sous l'officier
+      [1130, 380, 52, 140],  // le rayonnage du centre-est
+      [1250, 620, 140, 52],  // le rayonnage du sud-est
+      [500, 350, 52, 140],   // le rayonnage du milieu — le stratège le frôle à l'est
+      [1350, 540, 52, 140],  // la couverture de l'approche du bureau, sous le cerbère
+      [700, 550, 140, 52],   // la couverture sud de la table à cartes
     ],
-    tables: [ [720, 360] ],   // LA TABLE DES CARTES : les deux halos la frôlent au-dessus
     sacs: [],
-    caisses: [],   // V26 : plus de caisses — que des CONTENEURS et des rayonnages
+    caisses: [],
+    tables: [ [720, 360] ],   // LA TABLE DES CARTES : les deux halos la frôlent au-dessus
     projecteurs: [   // EN OPPOSITION DE PHASE : le plateau n'est jamais éclairé que d'UNE lumière
       { tour: [26, 360], depart: [70, 360], arrivee: [600, 360] },
-      { tour: [1414, 600], depart: [1370, 600], arrivee: [1050, 600], phase: 4 },   // V25 : déplacé au SUD — la PORTE DU BUREAU est dégagée
+      { tour: [1414, 600], depart: [1370, 600], arrivee: [1050, 600], phase: 4 },   // au SUD — la PORTE DU BUREAU est dégagée
     ],
     gardes: [   // SIX menaces, chacune garde SON couloir :
       { chemin: [[150, 220], [150, 220]], scan: 45, scanBase: 0 },        // L'OFFICIER DE QUART : il balaie la salle vers l'est
@@ -159,8 +238,9 @@ export const PIECES = [
       { chemin: [[560, 240], [880, 240], [880, 480], [560, 480]] },       // LE STRATÈGE : il fait LE TOUR DE LA TABLE en boucle
       { chemin: [[80, 350], [80, 600]] },                                // LE VEILLEUR : le couloir de l'ouest
     ],
-    entree: { x: 325, y: 660 },   // la poche sûre du sud-ouest — vérifiée contre les 6 cônes
-    sortie: 'qg',                 // atteindre LE BUREAU DE BEUFA → VICTOIRE
+    entree: { x: 325, y: 660 },   // la poche sûre du sud-ouest
+    sortie: 'qg',                 // atteindre LE BUREAU DE BEUFA → VICTOIRE (puis le QUIZ)
   },
 ];
+
 
