@@ -135,7 +135,7 @@ export class BeufaInfiltration extends BossScene {
       'Conteneurs, sacs de sable, table à cartes : tout ce qui est haut COUPE LA VUE — colle-toi derrière.',
       'Les PROJECTEURS AU BORD balayent le sol : leur HALO file jusqu\'au MILIEU — passe quand il repart !',
       'Le cône d\'un garde te voit : la jauge « ? » monte — sors avant le « ! ».',
-      'Traverse la PORTE au NORD de la cour, puis file à la PORTE DU QG, à l\'est de la salle.',
+      'La SORTIE pulse en vert dans la nuit : la porte au NORD de la cour, puis LE BUREAU DE BEUFA à l\'est du QG.',
       'Touché = renvoyé à l\'entrée DE LA PIÈCE ; le radar (haut gauche) s\'efface quand tu marches.',
     ], () => this.cinema());
   }
@@ -339,6 +339,14 @@ export class BeufaInfiltration extends BossScene {
       this.decor.push(this.add.image(x, y, 'beufa_porte').setRotation(rot).setDepth(10));
       this.lueurs.push({ x, y, c: 0x38fc38 });   // LED verte : sa lueur bave au sol
     }
+    // LA SORTIE : la porte la plus LOIN de l'entrée. Elle PULSE dans la nuit et
+    // cligne sur le radar — impossible de perdre l'objectif dans l'obscurité.
+    this.sortie = null;
+    for (const [x, y, rot] of (P.portes || [])) {
+      if (!this.sortie || Math.hypot(x - P.entree.x, y - P.entree.y) > Math.hypot(this.sortie.x - P.entree.x, this.sortie.y - P.entree.y))
+        this.sortie = { x, y };
+    }
+    if (this.sortie) this.lueurs.push({ x: this.sortie.x, y: this.sortie.y, c: 0x38fc38 });   // sa lueur est DOUBLÉE
     // LES CONTENEURS : les GRANDES couvertures — elles bloquent le passage ET la vue
     for (const c of (P.conteneurs || [])) {
       const [x, y, l, h] = c;
@@ -868,6 +876,11 @@ export class BeufaInfiltration extends BossScene {
     const pj = P(this.joueur.x, this.joueur.y);
     g.fillStyle(0xffffff, 1); g.fillCircle(pj.x, pj.y, 3);
     g.lineStyle(1.5, 0xffffff, 1); g.lineBetween(pj.x, pj.y, pj.x + Math.cos(this.joueur.angle) * 8, pj.y + Math.sin(this.joueur.angle) * 8);
+    if (this.sortie) {   // la sortie CLIGNE en vert sur la carte : l'objectif, toujours visible
+      const ps = P(this.sortie.x, this.sortie.y);
+      g.fillStyle(0x7fff7f, 0.6 + Math.sin(this.temps * 3) * 0.4);
+      g.fillCircle(ps.x, ps.y, 4.5);
+    }
   }
 
   // le cône de vision : 13 rayons qui s'arrêtent sur les conteneurs, les murs et les caisses.
@@ -921,6 +934,8 @@ export class BeufaInfiltration extends BossScene {
     }
     // autour du HÉROS : on se voit toujours
     trou(this.joueur.x, this.joueur.y, 92, 0.85);
+    // LA SORTIE PULSE : un phare vert dans la nuit — on ne perd JAMAIS l'objectif
+    if (this.sortie) trou(this.sortie.x, this.sortie.y, 66 + Math.sin(this.temps * 2.4) * 9, 0.95);
     ctx.globalCompositeOperation = 'source-over';
     // les REFLETS des LED : deux cercles concentriques additifs, façon rétro SNES
     this.lueurG.clear();
