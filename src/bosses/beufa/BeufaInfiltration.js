@@ -4,9 +4,11 @@
 // Ninja : un espace de rencontre = UN écran ; au-delà le joueur se perd). Passer
 // une PORTE fait un fondu vers la pièce suivante, et se faire prendre renvoie à
 // L'ENTRÉE DE LA PIÈCE : un checkpoint par rencontre, jamais tout à refaire.
-// La base : caisses, projecteurs qui balayent, gardes en ronde avec leur CÔNE DE
-// VISION — bloqué par les caisses et les murs.
-// Le cône d'un garde te voit : la jauge « ? » se remplit ; pleine = « ! » + POURSUITE.
+//
+// La base : CONTENEURS et caisses qui coupent la vue, gardes en ronde avec leur
+// CÔNE DE VISION, et LES PROJECTEURS : des tours AU BORD DE L'ÉCRAN dont le HALO
+// lumineux voyage sur le sol — dans la salle du QG, les deux halos se REJOIGNENT
+// au milieu de la pièce. Le halo te voit : la jauge « ? » monte → « ! » + POURSUITE.
 // Touché = RENVOYÉ à l'entrée de la pièce, les gardes reprennent leurs rondes.
 // Z = sprint (rapide mais BRUYANT), X = lancer une PIERRE : les gardes iront voir ailleurs.
 // Toute la logique avance dans update() (pas de minuteries Phaser) : les bots de test
@@ -34,21 +36,22 @@ export class BeufaInfiltration extends BossScene {
     this.cameras.main.setBackgroundColor('#0a0e15');
     this.programme = [];   // la file des « dans X secondes, fais ça » (décomptée dans update)
 
-    // le sol de la base (nuit) — le même carreau pave tout, sans couture
-    this.add.tileSprite(0, 0, LARGEUR, HAUTEUR, 'beufa_sol', 0).setOrigin(0);
+    // le sol de la base (nuit) — le même carreau pave tout, sans couture ;
+    // sa TEINTE change avec la pièce (cour extérieure / salle du QG)
+    this.sol = this.add.tileSprite(0, 0, LARGEUR, HAUTEUR, 'beufa_sol', 0).setOrigin(0);
 
-    // LA PIÈCE COURANTE : on ne charge QUE elle (murs, caisses, gardes…). Passer une
-    // porte détruit tout et charge la pièce suivante. Voir chargerPiece().
+    // LA PIÈCE COURANTE : on ne charge QUE elle (murs, conteneurs, gardes, projecteurs…).
+    // Passer une porte détruit tout et charge la pièce suivante. Voir chargerPiece().
     this.piece = 0;
     this.decor = [];      // tout ce qui disparaît au changement de pièce
     this.obstacles = [];  // ce qui bloque le passage ET la vue
-    this.gardes = []; this.tours = [];
+    this.gardes = []; this.projecteurs = [];
 
     // le héros (placé par chargerPiece, à l'entrée de la pièce)
     this.joueur = { x: 0, y: 0, angle: -Math.PI / 2 };
     this.sprJoueur = this.add.sprite(0, 0, 'beufa_heros', 0).setDepth(30);
 
-    // les cônes de vision (redessinés à chaque image : les rayons s'arrêtent sur les caisses)
+    // les cônes de vision et les halos (redessinés à chaque image)
     this.conesG = this.add.graphics().setDepth(15);
 
     // le RADAR façon MGS (en haut à droite) : LA PIÈCE COURANTE, les gardes et leurs cônes.
@@ -74,6 +77,8 @@ export class BeufaInfiltration extends BossScene {
       '◀ ▶ ▲ ▼ : bouger (silencieux)',
       (estTactile() ? 'Sprint' : 'Z') + ' : sprinter — plus rapide, mais les gardes proches T\'ENTENDENT',
       (estTactile() ? 'Pierre' : 'X') + ' : lancer une pierre — les gardes iront voir AILLEURS',
+      'Les CONTENEURS coupent la vue : colle-toi derrière pour épier et disparaître.',
+      'Les PROJECTEURS AU BORD balayent le sol : leur HALO file jusqu\'au MILIEU — passe quand il repart !',
       'Le cône d\'un garde te voit : la jauge « ? » monte — sors avant le « ! ».',
       'Traverse la PORTE en HAUT de la cour, puis file à la PORTE DU QG, à droite de la salle.',
       'Touché = renvoyé à l\'entrée DE LA PIÈCE ; le radar en haut à droite saute pendant les alertes.',
@@ -88,8 +93,9 @@ export class BeufaInfiltration extends BossScene {
     this.decor = [];
     this.obstacles = [];
     this.gardes = [];
-    this.tours = [];
+    this.projecteurs = [];
     if (this.pierre) { this.pierre.sprite.destroy(); this.pierre = null; }
+    this.sol.setTint(P.teinteSol || 0xffffff);   // l'ambiance change : cour extérieure / salle du QG
     for (const [x, y, l, h] of P.murs) {
       // murs façon NÉS : la bande se pave avec sa texture (chapeau éclairé + face sombre)
       const bande = (l >= h) ? this.add.tileSprite(x, y, l, h, 'beufa_mur', 0) : this.add.tileSprite(x, y, l, h, 'beufa_mur_v', 0);
@@ -104,12 +110,23 @@ export class BeufaInfiltration extends BossScene {
     }
     // les portes OUVERTES : l'entrée et la sortie de la pièce (LED verte, bande jaune)
     for (const [x, y, rot] of (P.portes || [])) this.decor.push(this.add.image(x, y, 'beufa_porte').setRotation(rot).setDepth(10));
-    for (const [x, y] of P.caisses) this.ajouterObstacle('beufa_caisse', x, y, 56, 56);
-    for (const [x, y] of (P.tours || [])) {
-      const obs = this.ajouterObstacle('beufa_tour', x, y, 72, 72);
-      const alerte = this.add.text(x, y - 46, '', styleAlerte).setOrigin(0.5).setDepth(940);
-      this.decor.push(alerte);
-      this.tours.push({ x, y, angle: Math.random() * Math.PI * 2, jauge: 0, obs, alerte });
+    // LES CONTENEURS : les GRANDES couvertures — elles bloquent le passage ET la vue
+    for (const c of (P.conteneurs || [])) {
+      const [x, y, l, h] = c;
+      const img = this.add.image(x, y, c[4] || 'beufa_conteneur').setDepth(21);
+      if (h > l) img.setRotation(Math.PI / 2);   // le conteneur vertical = le même, tourné
+      this.decor.push(img);
+      this.obstacles.push({ x, y, l, h });
+    }
+    for (const [x, y] of P.caisses) this.ajouterObstacle('beufa_caisse', x, y, 64, 64);
+    // LES PROJECTEURS : la tour est SUR le mur, au bord de l'écran ; son HALO voyage
+    // de « depart » à « arrivee » (jusqu'au milieu de la pièce) puis revient.
+    for (const pr of (P.projecteurs || [])) {
+      const face = Math.atan2(pr.arrivee[1] - pr.tour[1], pr.arrivee[0] - pr.tour[0]);
+      const sprite = this.add.image(pr.tour[0], pr.tour[1], 'beufa_projecteur').setDepth(22).setRotation(face);
+      const alerte = this.add.text(pr.tour[0], pr.tour[1] - 26, '', styleAlerte).setOrigin(0.5).setDepth(940);
+      this.decor.push(sprite, alerte);
+      this.projecteurs.push({ tour: pr.tour, depart: pr.depart, arrivee: pr.arrivee, t: 0, hx: pr.depart[0], hy: pr.depart[1], jauge: 0, alerte });
     }
     this.gardes = P.gardes.map((g) => this.creerGarde(g));
     // le héros repart de la poche sûre de l'entrée — il peut OBSERVER avant de bouger
@@ -167,7 +184,13 @@ export class BeufaInfiltration extends BossScene {
     this.pasJoueur(dt);
     this.pasPierre(dt);
     for (const g of this.gardes) this.pasGarde(g, dt);
-    for (const t of this.tours) t.angle += R.tour.balayage * Math.PI / 180 * dt;
+    // LES HALOS : un va-et-vient régulier (sinusoïde) de « depart » à « arrivee » —
+    // dans la salle du QG, les deux partent en même temps : ils SE REJOIGNENT au milieu
+    for (const pr of this.projecteurs) {
+      pr.t = (Math.sin(this.temps * Math.PI * 2 / R.projecteur.periode) + 1) / 2;
+      pr.hx = pr.depart[0] + (pr.arrivee[0] - pr.depart[0]) * pr.t;
+      pr.hy = pr.depart[1] + (pr.arrivee[1] - pr.depart[1]) * pr.t;
+    }
     this.detection(dt);
     this.afficher();
     this.majHud();
@@ -335,7 +358,7 @@ export class BeufaInfiltration extends BossScene {
     return !this.vueBloquee(g.x, g.y, this.joueur.x, this.joueur.y, null);
   }
 
-  // la ligne de vue coupe-t-elle un obstacle ? (exclu : l'obstacle D'UNE TOUR pour elle-même)
+  // la ligne de vue coupe-t-elle un obstacle ?
   vueBloquee(x1, y1, x2, y2, exclu) {
     return this.porteeVue(x1, y1, x2 - x1, y2 - y1, exclu) < 1;
   }
@@ -386,17 +409,15 @@ export class BeufaInfiltration extends BossScene {
         g.alerte.setText('!').setColor('#ff5a5a');
       }
     }
-    for (const t of this.tours) {
-      const demi = R.tour.angle * Math.PI / 180;
-      const dx = this.joueur.x - t.x, dy = this.joueur.y - t.y, d = Math.hypot(dx, dy);
-      const dedans = d < R.tour.portee
-        && Math.abs(normAngle(Math.atan2(dy, dx) - t.angle)) < demi
-        && !this.vueBloquee(t.x, t.y, this.joueur.x, this.joueur.y, t.obs);
+    // LES HALOS : dedans = repéré ; un conteneur entre le halo et toi fait OMBRE
+    for (const pr of this.projecteurs) {
+      const dx = this.joueur.x - pr.hx, dy = this.joueur.y - pr.hy, d = Math.hypot(dx, dy);
+      const dedans = d < R.projecteur.rayon && !this.vueBloquee(pr.hx, pr.hy, this.joueur.x, this.joueur.y, null);
       if (dedans) {
-        t.jauge += dt / R.tour.reperage;
-        if (t.jauge >= 1) { t.jauge = 0; this.declencherAlerte(this.gardeLePlusProche(t.x, t.y)); }
-      } else t.jauge = Math.max(0, t.jauge - dt / 0.5);
-      t.alerte.setText(t.jauge > 0.12 ? '?' : '').setColor('#ffd84a');
+        pr.jauge += dt / R.projecteur.reperage;
+        if (pr.jauge >= 1) { pr.jauge = 0; this.declencherAlerte(this.gardeLePlusProche(pr.hx, pr.hy)); }
+      } else pr.jauge = Math.max(0, pr.jauge - dt / 0.5);
+      pr.alerte.setText(pr.jauge > 0.12 ? '?' : '').setColor('#ffd84a');
     }
   }
 
@@ -442,7 +463,7 @@ export class BeufaInfiltration extends BossScene {
       g.x = g.chemin[0][0]; g.y = g.chemin[0][1]; g.point = 1;
       g.alerte.setText('');
     }
-    for (const t of this.tours) { t.jauge = 0; t.alerte.setText(''); }
+    for (const pr of this.projecteurs) { pr.jauge = 0; pr.alerte.setText(''); }
     if (this.pierre) { this.pierre.sprite.destroy(); this.pierre = null; }
     this.phase = 'jeu';
   }
@@ -459,9 +480,23 @@ export class BeufaInfiltration extends BossScene {
     this.sprJoueur.setPosition(this.joueur.x, this.joueur.y).setRotation(this.joueur.angle);
     const gg = this.conesG;
     gg.clear();
-    for (const t of this.tours) {
-      this.dessinerCone(gg, t.x, t.y, t.angle, R.tour, 0xfff3b0, t.obs);
-      t.alerte.setPosition(t.x, t.y - 46);
+    // LES HALOS : le faisceau de la tour vers son halo, puis le halo lui-même —
+    // cœur brillant, bord doux ; à deux, ils SE REJOIGNENT au milieu de la salle
+    for (const pr of this.projecteurs) {
+      const a = Math.atan2(pr.hy - pr.tour[1], pr.hx - pr.tour[0]);
+      const nx = Math.cos(a + Math.PI / 2), ny = Math.sin(a + Math.PI / 2);
+      gg.fillStyle(0xfff3b0, 0.06);
+      gg.fillPoints([
+        { x: pr.tour[0] + nx * 5, y: pr.tour[1] + ny * 5 },
+        { x: pr.tour[0] - nx * 5, y: pr.tour[1] - ny * 5 },
+        { x: pr.hx - nx * 26, y: pr.hy - ny * 26 },
+        { x: pr.hx + nx * 26, y: pr.hy + ny * 26 },
+      ], true);
+      gg.fillStyle(0xfff3b0, 0.10); gg.fillCircle(pr.hx, pr.hy, R.projecteur.rayon);
+      gg.fillStyle(0xfff3b0, 0.10); gg.fillCircle(pr.hx, pr.hy, R.projecteur.rayon * 0.66);
+      gg.fillStyle(0xfff8d0, 0.14); gg.fillCircle(pr.hx, pr.hy, R.projecteur.rayon * 0.38);
+      gg.lineStyle(1.5, 0xfff3b0, 0.35); gg.strokeCircle(pr.hx, pr.hy, R.projecteur.rayon);
+      pr.alerte.setPosition(pr.hx, pr.hy - R.projecteur.rayon - 8);
     }
     for (const g of this.gardes) {
       g.sprite.setPosition(g.x, g.y).setRotation(g.angle).setFrame(g.bouge ? Math.floor(this.temps * 6) % 2 : 0);
@@ -471,7 +506,7 @@ export class BeufaInfiltration extends BossScene {
     this.dessinerRadar();
   }
 
-  // le radar façon MGS : LA PIÈCE COURANTE dans un cercle — murs, gardes, cônes, héros.
+  // le radar façon MGS : LA PIÈCE COURANTE dans un cercle — murs, gardes, cônes, halos, héros.
   // NORMAL (vert) / RECHERCHE (orange) / ALERTE (rouge, radar coupé avec des parasites).
   dessinerRadar() {
     const g = this.radarG, cx = 858, cy = 128, rr = 64;
@@ -495,7 +530,11 @@ export class BeufaInfiltration extends BossScene {
     const P = (x, y) => ({ x: cx + (x - 480) * s, y: cy + (y - 270) * s });
     g.lineStyle(1, 0x35d035, 0.85);
     for (const o of this.obstacles) { const p = P(o.x - o.l / 2, o.y - o.h / 2); g.strokeRect(p.x, p.y, Math.max(1, o.l * s), Math.max(1, o.h * s)); }
-    for (const t of this.tours) { const p = P(t.x, t.y); g.fillStyle(0xffe9a0, 1); g.fillCircle(p.x, p.y, 2.5); }
+    for (const pr of this.projecteurs) {
+      const p = P(pr.hx, pr.hy);
+      g.fillStyle(0xfff3b0, 0.9); g.fillCircle(p.x, p.y, 3);
+      g.lineStyle(1, 0xfff3b0, 0.7); g.strokeCircle(p.x, p.y, R.projecteur.rayon * s);
+    }
     for (const gd of this.gardes) {
       const p = P(gd.x, gd.y);
       g.fillStyle(gd.etat === 'poursuite' ? 0xff5a5a : gd.etat === 'ronde' ? 0xffd84a : 0xffb347, 1);
@@ -508,7 +547,7 @@ export class BeufaInfiltration extends BossScene {
     g.lineStyle(1.5, 0xffffff, 1); g.lineBetween(pj.x, pj.y, pj.x + Math.cos(this.joueur.angle) * 8, pj.y + Math.sin(this.joueur.angle) * 8);
   }
 
-  // le cône de vision : 13 rayons qui s'arrêtent sur les caisses, les murs et les tours.
+  // le cône de vision : 13 rayons qui s'arrêtent sur les conteneurs, les murs et les caisses.
   // Deux passes de remplissage : le cœur du faisceau est plus dense — on lit le cône d'un coup d'œil.
   dessinerCone(g, x, y, angle, reglages, couleur, exclu) {
     const demi = reglages.angle * Math.PI / 180, nb = 13;
