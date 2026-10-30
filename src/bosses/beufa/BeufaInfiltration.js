@@ -185,15 +185,14 @@ export class BeufaInfiltration extends BossScene {
         const dL = Math.round(cL * k), dH = Math.round(cH * k);
         c2.drawImage(cv, x0, y0, cL, cH, Math.round((cibleL - dL) / 2), Math.round((cibleH - dH) / 2), dL, dH);
       }
-      // les frames sont RECONSTRUITES à la dimension du jeu
-      for (const nom of Object.keys(tex.frames)) if (nom !== '__BASE') tex.remove(nom);
-      for (let i = 0; i < n; i++) tex.add(i, 0, i * fL, 0, fL, fH);
-      source.image = final;   // la source devient le canvas final…
-      source.width = cibleL; source.height = cibleH;
-      const base = tex.frames.__BASE;
-      if (base) { base.width = cibleL; base.height = cibleH; base.cutWidth = cibleL; base.cutHeight = cibleH; base.sourceSizeWidth = cibleL; base.sourceSizeHeight = cibleH; }
-      tex.refresh();   // …rechargée côté GPU : tous les sprites suivent
-      source.__prete = true;
+      // On REMPLACE la texture par une texture canvas aux dimensions du jeu : refresh()
+      // n'existe pas sur les textures d'images dans cette version de Phaser, et ça nous
+      // évite toute manipulation interne. Les anims, les sprites et les pavages pointent
+      // par la CLÉ (beufa_garde, beufa_sol…) : ils suivent la nouvelle texture tout seuls.
+      this.textures.remove(tex);
+      const nt = this.textures.addCanvas(cle, final);
+      for (let i = 0; i < n; i++) nt.add(i, 0, i * fL, 0, fL, fH);   // les frames reconstruites
+      nt.source[0].__prete = true;   // déjà préparée : on n'y touchera plus (redémarrages)
     }
   }
 
