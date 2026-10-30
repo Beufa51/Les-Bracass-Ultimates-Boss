@@ -76,10 +76,14 @@ export class BeufaInfiltration extends BossScene {
     // la POUSSIÈRE DES PAS : de petits nuages gris qui montent et s'effacent
     this.poussiereG = this.add.graphics().setDepth(29);
 
-    // le RADAR façon MGS (en haut à droite) : LA PIÈCE COURANTE, les gardes et leurs cônes.
+    // le RADAR façon MGS (en haut à GAUCHE — le coin le moins joué des deux pièces) :
+    // LA PIÈCE COURANTE, les gardes et leurs cônes. En marche il S'EFFACE (alpha 0.07) :
+    // il ne cache JAMAIS ce que tu regardes — arrête-toi pour LIRE la carte.
     // Il se COUPE pendant une alerte — dans MGS aussi, le radar saute quand on te cherche.
     this.radarG = this.add.graphics().setDepth(901).setScrollFactor(0);
-    this.radarEtat = texte(this, 858, 204, 'NORMAL', 13, '#7fff7f').setDepth(901);
+    this.radarEtat = texte(this, 54, 174, 'NORMAL', 13, '#7fff7f').setOrigin(0.5, 0).setDepth(901);
+    // LE VISEUR DE LA PIERRE : un petit cercle là où elle TOMBERA — la diversion devient précise
+    this.viseeG = this.add.graphics().setDepth(15);
 
     // LA NUIT (le look des captures de référence) : un voile d'obscurité sur TOUT,
     // troué de lumière par les projecteurs, le long des cônes des gardes et autour
@@ -132,7 +136,7 @@ export class BeufaInfiltration extends BossScene {
       'Les PROJECTEURS AU BORD balayent le sol : leur HALO file jusqu\'au MILIEU — passe quand il repart !',
       'Le cône d\'un garde te voit : la jauge « ? » monte — sors avant le « ! ».',
       'Traverse la PORTE au NORD de la cour, puis file à la PORTE DU QG, à l\'est de la salle.',
-      'Touché = renvoyé à l\'entrée DE LA PIÈCE ; le radar en haut à droite saute pendant les alertes.',
+      'Touché = renvoyé à l\'entrée DE LA PIÈCE ; le radar (haut gauche) s\'efface quand tu marches.',
     ], () => this.cinema());
   }
 
@@ -355,7 +359,7 @@ export class BeufaInfiltration extends BossScene {
       const sprite = this.add.image(pr.tour[0], pr.tour[1], 'beufa_projecteur').setDepth(22).setRotation(face);
       const alerte = this.add.text(pr.tour[0], pr.tour[1] - 26, '', styleAlerte).setOrigin(0.5).setDepth(940);
       this.decor.push(sprite, alerte);
-      this.projecteurs.push({ tour: pr.tour, depart: pr.depart, arrivee: pr.arrivee, t: 0, hx: pr.depart[0], hy: pr.depart[1], jauge: 0, alerte });
+      this.projecteurs.push({ tour: pr.tour, depart: pr.depart, arrivee: pr.arrivee, phase: pr.phase || 0, t: 0, hx: pr.depart[0], hy: pr.depart[1], jauge: 0, alerte });
     }
     this.gardes = P.gardes.map((g) => this.creerGarde(g));
     // le héros repart de la poche sûre de l'entrée — il peut OBSERVER avant de bouger
@@ -436,7 +440,7 @@ export class BeufaInfiltration extends BossScene {
     // LES HALOS : un va-et-vient régulier (sinusoïde) de « depart » à « arrivee » —
     // dans la salle du QG, les deux partent en même temps : ils SE REJOIGNENT au milieu
     for (const pr of this.projecteurs) {
-      pr.t = (Math.sin(this.temps * Math.PI * 2 / R.projecteur.periode) + 1) / 2;
+      pr.t = (Math.sin((this.temps + (pr.phase || 0)) * Math.PI * 2 / R.projecteur.periode) + 1) / 2;
       pr.hx = pr.depart[0] + (pr.arrivee[0] - pr.depart[0]) * pr.t;
       pr.hy = pr.depart[1] + (pr.arrivee[1] - pr.depart[1]) * pr.t;
     }
@@ -545,7 +549,7 @@ export class BeufaInfiltration extends BossScene {
     const clac = texte(this, x, y, 'CLAC !', 20, '#dff6ff', { fontStyle: 'bold' }).setDepth(940);
     this.tweens.add({ targets: clac, alpha: 0, y: y - 20, duration: 700, onComplete: () => clac.destroy() });
     for (const g of this.gardes) {
-      if ((g.etat === 'ronde' || g.etat === 'retour') && Math.hypot(g.x - x, g.y - y) < 300) {
+      if ((g.etat === 'ronde' || g.etat === 'retour') && Math.hypot(g.x - x, g.y - y) < 360) {
         g.etat = 'verification'; g.verif = R.alerte.verification; g.vuX = x; g.vuY = y; g.jauge = 0; g.angleVerif = g.angle;
       }
     }
@@ -804,6 +808,17 @@ export class BeufaInfiltration extends BossScene {
       g.alerte.setPosition(g.x, g.y - 32).setScale(1 + Math.sin(this.temps * 18) * 0.12);
       this.dessinerCone(gg, g.x, g.y, g.angle, R.garde, g.etat === 'poursuite' ? 0xff5a5a : 0xffe9a0, null);
     }
+    // LE VISEUR DE LA PIERRE : là où elle tombera — viser une diversion devient un vrai choix
+    this.viseeG.clear();
+    if (this.pierres > 0) {
+      const pp = R.joueur.porteePierre;
+      const t = this.porteeVue(this.joueur.x, this.joueur.y, Math.cos(this.joueur.angle) * pp, Math.sin(this.joueur.angle) * pp, null);
+      const vx = this.joueur.x + Math.cos(this.joueur.angle) * pp * t, vy = this.joueur.y + Math.sin(this.joueur.angle) * pp * t;
+      this.viseeG.lineStyle(1.5, 0xffd84a, 0.55);
+      this.viseeG.strokeCircle(vx, vy, 7);
+      this.viseeG.fillStyle(0xffd84a, 0.45);
+      this.viseeG.fillCircle(vx, vy, 2);
+    }
     this.dessinerRadar();
   }
 
@@ -814,7 +829,10 @@ export class BeufaInfiltration extends BossScene {
     // à sa place, TAILLE INCHANGÉE, pendant que la caméra zoome et suit le héros
     const Z = this.cameras.main.zoom, u = 1 / Z;
     const g = this.radarG;
-    const cx = 480 + (858 - 480) * u, cy = 270 + (128 - 270) * u, rr = 64 * u;
+    const cx = 480 + (54 - 480) * u, cy = 270 + (118 - 270) * u, rr = 46 * u;
+    const opacite = this.heroBouge ? 0.07 : 0.92;   // en marche il s'efface : IL NE GÊNE PLUS LA VISIBILITÉ
+    g.alpha += (opacite - g.alpha) * 0.1;
+    this.radarEtat.setAlpha(g.alpha);
     const alerte = this.gardes.some(x => x.etat === 'poursuite');
     const recherche = this.gardes.some(x => x.etat === 'verification' || x.etat === 'retour');
     g.clear();
@@ -825,13 +843,13 @@ export class BeufaInfiltration extends BossScene {
     if (alerte) {   // radar coupé : des parasites défilent, comme dans MGS
       g.lineStyle(1, 0xff5a5a, 0.5);
       for (let k = 0; k < 8; k++) {
-        const d1 = cy + (-44 + k * 11) * u + (this.temps * 61 % 11) * u;
-        const d2 = cy + (-44 + k * 11) * u + (this.temps * 37 % 11) * u;
-        g.lineBetween(cx - rr + 6 * u, d1, cx + rr - 6 * u, d2);
+        const d1 = cy + (-34 + k * 9) * u + (this.temps * 61 % 9) * u;
+        const d2 = cy + (-34 + k * 9) * u + (this.temps * 37 % 9) * u;
+        g.lineBetween(cx - rr + 5 * u, d1, cx + rr - 5 * u, d2);
       }
       return;
     }
-    const s = 110 * u / LARGEUR;   // la pièce (un écran 960x540) tient dans le cercle
+    const s = 86 * u / LARGEUR;   // la pièce (un écran 960x540) tient dans le cercle
     const P = (x, y) => ({ x: cx + (x - 480) * s, y: cy + (y - 270) * s });
     g.lineStyle(1, 0x35d035, 0.85);
     for (const o of this.obstacles) { const p = P(o.x - o.l / 2, o.y - o.h / 2); g.strokeRect(p.x, p.y, Math.max(1, o.l * s), Math.max(1, o.h * s)); }
@@ -925,7 +943,7 @@ export class BeufaInfiltration extends BossScene {
     fixer(this.hudTemps, LARGEUR - 18, 20);
     fixer(this.hudPierres, 18, 44);
     fixer(this.hudAlertes, LARGEUR - 18, 44);
-    fixer(this.radarEtat, 858, 204);
+    fixer(this.radarEtat, 54, 174);
     if (this.hintBas) fixer(this.hintBas, LARGEUR / 2, HAUTEUR - 12);
     if (this.message) fixer(this.message, LARGEUR / 2, 150);
     this.radarG.setScrollFactor(0);

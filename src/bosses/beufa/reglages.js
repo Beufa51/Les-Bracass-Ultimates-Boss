@@ -10,8 +10,8 @@ export const REGLAGES = {
     sprint: 185,       // Z : plus rapide, mais les gardes proches T'ENTENDENT
     rayon: 13,
     bruit: 130,        // rayon (px) dans lequel un garde entend le sprint
-    pierres: 3,        // X : lance une pierre pour attirer les gardes AILLEURS
-    porteePierre: 160,
+    pierres: 5,        // X : lance une pierre pour attirer les gardes AILLEURS (la clé des plantés)
+    porteePierre: 300, // elle VOLE LOIN : détourner un garde sans entrer dans son cône
   },
   garde: {
     portee: 175,       // portée du cône de vision (px)
@@ -59,75 +59,83 @@ export const REGLAGES = {
 // RÈGLES DE PLACEMENT : chaque cône laisse une FENÊTRE claire ; l'entrée de
 // chaque pièce reste une poche SÛRE d'où OBSERVER ; au moins deux routes vers
 // la sortie.
+// V22 — LE PASS GAME DESIGN : une pièce de stealth se joue OBSERVER → PLANIFIER →
+// EXÉCUTER. Donc : (1) chaque menace est une HORLOGE qu'on lit depuis une poche sûre ;
+// (2) les couvertures forment des CHAPELETS le long des routes risquées (jamais de
+// traversée de plein vide) ; (3) TROIS routes par pièce — la frontale (pierre/timing),
+// la latérale sûre (lente), la maligne (derrière les cônes) ; (4) la PIERRE est la
+// CLÉ des plantés : le SAS et le Cerbère se contournent… ou s'ouvrent d'un CLAC.
 export const PIECES = [
-  { // ----- PIÈCE 1 : LA COUR D'ENTRÉE — portail, route, stockage, motor pool -----
+  { // ----- PIÈCE 1 : LA COUR D'ENTRÉE — apprendre les 3 horloges : ronde, halo, planté -----
     nom: 'PIÈCE 1/2 · LA COUR D\'ENTRÉE',
     teinteSol: 0x9fc0a8,   // la cour est DEHORS : le sol tire vers l'herbe de nuit
     murs: [   // [x, y, l, h] — x, y = CENTRES ; épaisseur 20 partout
       [227, 10, 434, 20], [733, 10, 434, 20],   // mur du nord : LA PORTE (x 445-515) de la salle du QG
       [480, 530, 960, 20],                      // mur du sud : LE PORTAIL (x 445-515), par où tu arrives
-      [10, 222, 20, 404], [10, 505, 20, 30],    // mur de l'ouest : PORTE VERROUILLÉE (y 424-490) — pièce à venir du plan
+      [10, 222, 20, 404], [10, 505, 20, 30],    // mur de l'ouest : PORTE VERROUILLÉE — pièce à venir
       [950, 270, 20, 540],                      // mur de l'est
     ],
     portesVerrouillees: [ [10, 457, 20, 66] ],
     portes: [ [480, 10, 0] ],          // LA SORTIE au nord (LED verte, bande jaune)
-    routes: [ [480, 270, 70, 540] ],   // LA ROUTE : du portail droit à la porte, l'axe de la base
-    conteneurs: [   // [x, y, l, h] (+ image optionnelle) — les GRANDES couvertures, elles coupent la vue
-      [250, 200, 140, 52],                                // la cour de STOCKAGE : deux conteneurs alignés
-      [250, 300, 140, 52, 'beufa_conteneur_olive'],       //   l'un contre l'autre — le garde ronde ENTRE eux
-      [820, 260, 52, 140],                                // le MOTOR POOL : le conteneur vertical contre l'est
+    routes: [ [480, 270, 70, 540] ],   // LA ROUTE : du portail à la porte, l'axe de la base
+    conteneurs: [   // les GRANDES couvertures, elles coupent la vue
+      [250, 200, 140, 52],                                // STOCKAGE : le couloir des deux conteneurs —
+      [250, 300, 140, 52, 'beufa_conteneur_olive'],       //   la ronde passe DEDANS : tourne autour par-derrière
+      [700, 112, 140, 52],                                // L'ABRI DU MOTOR POOL : casse la vue vers le SAS
+      [820, 260, 52, 140],                                // le conteneur vertical contre l'est
     ],
-    sacs: [ [390, 300], [570, 300] ],   // LE POSTE DE CONTRÔLE : deux nids de sacs, face à face sur la route
+    sacs: [ [390, 300], [570, 300] ],   // LE POSTE DE CONTRÔLE : deux nids face à face sur la route
     caisses: [
-      [180, 130],    // le stock : des caisses contre les conteneurs
-      [884, 100],    // le motor pool : des barils dans l'angle nord-est
-      [884, 450],    //   et le long du mur est
       [560, 470],    // le baril du portail : TA première couverture, juste au spawn
+      [420, 360],    // LE SLALOM DE LA ROUTE : deux plots en quinconce — un pas de couverture
+      [540, 220],    //   entre la sentinelle et le halo qui descend
+      [180, 130],    // le stock : pour tourner autour de la ronde du couloir
+      [352, 352],    //   l'angle sud du couloir — regardé par personne
+      [884, 100],    // le motor pool : les barils de l'angle nord-est
+      [884, 450],    //   et le long du mur est
     ],
-    projecteurs: [   // la tour est SUR le mur ; son HALO voyage de « depart » à « arrivee »
-      { tour: [480, 14], depart: [480, 60], arrivee: [480, 260] },   // IL ÉCLAIRE LA ROUTE, l'axe d'entrée de la base
+    projecteurs: [   // la tour du mur nord : son HALO DESCEND LA ROUTE — la 2e horloge
+      { tour: [480, 14], depart: [480, 70], arrivee: [480, 250] },
     ],
     gardes: [
-      { chemin: [[480, 330], [480, 150]] },                         // LA SENTINELLE DE LA ROUTE : elle monte sa garde sur l'asphalte
-      { chemin: [[110, 250], [400, 250]] },                         // LE STOCKAGE : sa ronde passe ENTRE les deux conteneurs
-      { chemin: [[700, 160], [700, 420]] },                         // LE MOTOR POOL : sa ronde fait l'aller-retour devant les barils
-      { chemin: [[480, 90], [480, 90]], scan: 40, scanBase: Math.PI / 2 },   // LE SAS : le planté de la porte du QG, il balaie
+      { chemin: [[480, 390], [480, 150]] },                       // LA SENTINELLE : la 1re horloge — traverse quand elle s'éloigne
+      { chemin: [[110, 250], [400, 250]] },                       // LE STOCKAGE : sa ronde tourne dans le couloir
+      { chemin: [[700, 160], [700, 420]] },                       // LE MOTOR POOL : l'aller-retour devant les barils
+      { chemin: [[480, 80], [480, 80]], scan: 55, scanBase: Math.PI / 2 },   // LE SAS : il BALAYE la porte — la PIERRE est la clé
     ],
     entree: { x: 480, y: 490 },   // le portail : une poche sûre, rien ne la voit
     sortie: 'haut',               // traverser la porte du nord → pièce suivante
   },
-  { // ----- PIÈCE 2 : LA SALLE DU QG — rayonnages, table à cartes, garde rapprochée -----
+  { // ----- PIÈCE 2 : LA SALLE DU QG — trois actes : les couloirs, le centre, la porte -----
     nom: 'PIÈCE 2/2 · LA SALLE DU QG',
     teinteSol: 0xaab4d8,   // la salle est DEDANS : sol bleuté
     murs: [
       [480, 10, 960, 20],                        // mur du nord
-      [227, 530, 434, 20], [733, 530, 434, 20],  // mur du sud : LA PORTE D'ENTRÉE (x 445-515), celle par laquelle tu arrives
-      [10, 35, 20, 30], [10, 317, 20, 406],      // mur de l'ouest : PORTE VERROUILLÉE (y 50-114) — pièce à venir du plan
-      [950, 102, 20, 165], [950, 388, 20, 264],  // mur de l'est : LA PORTE DU QG (y 185-255) — le bureau de BEUFA
+      [227, 530, 434, 20], [733, 530, 434, 20],  // mur du sud : LA PORTE D'ENTRÉE (x 445-515)
+      [10, 35, 20, 30], [10, 317, 20, 406],      // mur de l'ouest : PORTE VERROUILLÉE
+      [950, 102, 20, 165], [950, 388, 20, 264],  // mur de l'est : LA PORTE DU QG (y 185-255)
     ],
     portesVerrouillees: [ [10, 82, 20, 64] ],
-    portes: [ [480, 530, 0], [950, 220, Math.PI / 2] ],   // la porte d'entrée + LA PORTE DU QG (LED verte)
+    portes: [ [480, 530, 0], [950, 220, Math.PI / 2] ],   // la porte d'entrée + LA PORTE DU QG
     routes: [],
-    conteneurs: [   // les RAYONNAGES du poste : alignés contre les murs, comme du matériel entreposé
+    conteneurs: [   // les RAYONNAGES : la salle a des couloirs — ouest, nord, est
       [250, 120, 140, 52, 'beufa_conteneur_olive'],   // le rayonnage nord-ouest
       [690, 120, 140, 52],                            // le rayonnage nord-est
       [150, 380, 52, 140, 'beufa_conteneur_olive'],   // le rayonnage de l'ouest
-      [820, 380, 52, 140],                           // le rayonnage de l'est — il force le couloir du QG
+      [820, 380, 52, 140],                           // le rayonnage de l'est
     ],
-    tables: [ [480, 350] ],   // LA TABLE À CARTES : le cœur du poste de commandement
+    tables: [ [480, 350] ],   // LA TABLE À CARTES : les halos la frôlent au-dessus
     sacs: [],
-    caisses: [ [480, 220], [880, 150], [60, 250] ],   // des caisses entre les rayonnages et la table
-    projecteurs: [   // LES DEUX TOURS AU BORD : leurs halos filent du mur jusqu'au MILIEU —
-      { tour: [26, 270], depart: [70, 270], arrivee: [480, 270] },    // et SE REJOIGNENT juste au-dessus
-      { tour: [934, 270], depart: [890, 270], arrivee: [480, 270] }, // de la table à cartes
+    caisses: [ [480, 220], [60, 250], [880, 150] ],   // une couverture par couloir
+    projecteurs: [   // LES DEUX HALOS EN OPPOSITION DE PHASE : quand l'un file au
+      { tour: [26, 270], depart: [70, 270], arrivee: [480, 270] },                 // MILIEU, l'autre est REPARTI
+      { tour: [934, 270], depart: [890, 270], arrivee: [480, 270], phase: 4 },    // au mur : UNE lumière à la fois
     ],
-    gardes: [
-      { chemin: [[96, 81], [96, 81]], scan: 45, scanBase: Math.PI / 2 },    // LA BONBONNE de l'ouest : elle balaie le rayonnage
-      { chemin: [[864, 81], [864, 81]], scan: 45, scanBase: Math.PI / 2 },  // LA BONBONNE de l'est : elle couvre l'approche du QG
-      { chemin: [[340, 55], [620, 55]] },                                   // LA DOUBLE FLÈCHE du plan : la ronde ENTRE les deux bonbonnes
-      { chemin: [[640, 270], [890, 270]] },                                 // LA GARDE DU QG : elle boucle devant la porte du bureau, DANS les projecteurs
-      { chemin: [[120, 260], [360, 260]] },                                  // la ronde du couloir de l'ouest
-      { chemin: [[250, 440], [710, 440]] },                                 // la ronde du sud, entre l'entrée et la table à cartes
+    gardes: [   // QUATRE menaces LISIBLES, chacune garde UNE route :
+      { chemin: [[96, 81], [96, 81]], scan: 45, scanBase: Math.PI / 2 },    // LE COULOIR OUEST : la bonbonne balaie
+      { chemin: [[340, 60], [620, 60]] },                                   // LE HALL DU NORD : la ronde entre les rayonnages
+      { chemin: [[200, 420], [760, 420]] },                                 // LE SUD : la ronde sous la table — l'entrée reste une poche sûre
+      { chemin: [[864, 250], [864, 250]], scan: 50, scanBase: Math.PI },   // LE CERBÈRE : il balaie l'approche de LA PORTE DU QG
     ],
     entree: { x: 480, y: 492 },   // la poche sûre du sud
     sortie: 'qg',                 // atteindre LA PORTE DU QG à l'est → VICTOIRE
