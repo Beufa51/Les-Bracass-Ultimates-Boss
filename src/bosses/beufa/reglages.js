@@ -34,7 +34,7 @@ export const REGLAGES = {
     rattrape: 22,      // px : il te touche → RENVOYÉ à l'entrée de la pièce (jamais de mort)
   },
   vue: {
-    zoom: 1.6,   // la caméra RAPPROCHÉE : elle suit le héros — 1 = pièce entière, 2 = très proche
+    zoom: 1.4,   // la caméra RAPPROCHÉE : elle suit le héros — 1 = pièce entière, 2 = très proche
   },
 };
 

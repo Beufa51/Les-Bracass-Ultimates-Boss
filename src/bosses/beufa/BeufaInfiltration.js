@@ -67,6 +67,8 @@ export class BeufaInfiltration extends BossScene {
 
     // les cônes de vision et les halos (redessinés à chaque image)
     this.conesG = this.add.graphics().setDepth(15);
+    // la POUSSIÈRE DES PAS : de petits nuages gris qui montent et s'effacent
+    this.poussiereG = this.add.graphics().setDepth(29);
 
     // le RADAR façon MGS (en haut à droite) : LA PIÈCE COURANTE, les gardes et leurs cônes.
     // Il se COUPE pendant une alerte — dans MGS aussi, le radar saute quand on te cherche.
@@ -74,6 +76,7 @@ export class BeufaInfiltration extends BossScene {
     this.radarEtat = texte(this, 858, 204, 'NORMAL', 13, '#7fff7f').setDepth(901);
 
     this.alertes = 0; this.pierres = R.joueur.pierres; this.temps = 0; this.pierre = null;
+    this.poussieres = []; this.prochPoussiere = 0;   // les petits nuages des pas (V10)
 
     // le HUD
     this.hudTitre = texte(this, 18, 20, '', 20, '#ffd84a', { fontStyle: 'bold' }).setOrigin(0, 0.5).setDepth(900);
@@ -311,6 +314,7 @@ export class BeufaInfiltration extends BossScene {
     this.pasJoueur(dt);
     this.pasPierre(dt);
     for (const g of this.gardes) this.pasGarde(g, dt);
+    this.passePoussieres(dt);
     // LES HALOS : un va-et-vient régulier (sinusoïde) de « depart » à « arrivee » —
     // dans la salle du QG, les deux partent en même temps : ils SE REJOIGNENT au milieu
     for (const pr of this.projecteurs) {
@@ -338,6 +342,12 @@ export class BeufaInfiltration extends BossScene {
     const v = (sprint ? R.joueur.sprint : R.joueur.vitesse) * dt;
     this.bouger(this.joueur, dx * v, dy * v, R.joueur.rayon);
     this.heroBouge = !!(dx || dy);   // pour le balancement de marche (afficher)
+    // la POUSSIÈRE DES PAS : un petit nuage derrière le pied — il COURT, là
+    if (this.heroBouge && this.temps > this.prochPoussiere) {
+      this.prochPoussiere = this.temps + (sprint ? 0.055 : 0.09);
+      this.poussieres.push({ x: this.joueur.x - dx * 7, y: this.joueur.y - dy * 7 + 3,
+        t: 0, duree: sprint ? 0.5 : 0.38, r: sprint ? 3.6 : 2.4 });
+    }
     if (dx || dy) {
       this.joueur.angle = Math.atan2(dy, dx);
       this.sprJoueur.setFrame(Math.floor(this.temps * (sprint ? 11 : 7)) % 2);
@@ -408,7 +418,7 @@ export class BeufaInfiltration extends BossScene {
     const nx = p.x + p.dx * pas, ny = p.y + p.dy * pas;
     if (this.touche(nx, ny, 5) || p.reste <= 0) { this.pierreToucheSol(nx, ny); return; }
     p.x = nx; p.y = ny;
-    p.sprite.setPosition(nx, ny);
+    p.sprite.setPosition(nx, ny).setRotation(p.sprite.rotation + (p.dx >= 0 ? 12 : -12) * dt);   // elle ROULE en vol
   }
 
   pierreToucheSol(x, y) {
@@ -608,11 +618,28 @@ export class BeufaInfiltration extends BossScene {
     this.victoire('Le QG de BEUFA est infiltré en ' + formatTemps(this.temps) + ' ! Alertes déclenchées : ' + this.alertes + '. Les pièces suivantes de la base arrivent, puis le QUIZ !');
   }
 
+  // LA POUSSIÈRE DES PAS : elle monte, s'étale et s'efface — le sol de la base vit.
+  passePoussieres(dt) {
+    this.poussiereG.clear();
+    for (const p of this.poussieres) p.t += dt;
+    this.poussieres = this.poussieres.filter(p => p.t < p.duree);
+    for (const p of this.poussieres) {
+      const k = p.t / p.duree;
+      this.poussiereG.fillStyle(0x9aa4b4, 0.42 * (1 - k));
+      this.poussiereG.fillCircle(p.x + Math.sin(p.y * 12 + this.temps * 3) * k * 2, p.y - k * 4, p.r * (0.5 + k));
+    }
+  }
+
   // ---------- l'affichage ----------
   afficher() {
     // le balancement de marche : le top-down VIT, il ne glisse plus comme un pain
-    this.sprJoueur.setPosition(this.joueur.x, this.joueur.y)
-      .setRotation(this.joueur.angle + (this.heroBouge ? Math.sin(this.temps * 13) * 0.08 : 0));
+    // LE HÉROS VIT : rebond du pas, léger écrasement à la retombée — et
+    // quand il ne bouge pas, il RESPIRE (le plastron se soulève tout doucement)
+    const pasH = Math.abs(Math.sin(this.temps * 13));
+    const bob = this.heroBouge ? pasH * 3 : 0;
+    this.sprJoueur.setPosition(this.joueur.x, this.joueur.y - bob)
+      .setRotation(this.joueur.angle + (this.heroBouge ? Math.sin(this.temps * 13) * 0.08 : 0))
+      .setScale(1 + bob * 0.012, 1 - bob * 0.02 + (this.heroBouge ? 0 : Math.sin(this.temps * 2.2) * 0.015));
     const gg = this.conesG;
     gg.clear();
     // LES HALOS : le faisceau de la tour vers son halo, puis le halo lui-même —
@@ -631,13 +658,14 @@ export class BeufaInfiltration extends BossScene {
       gg.fillStyle(0xfff3b0, 0.10); gg.fillCircle(pr.hx, pr.hy, R.projecteur.rayon * 0.66);
       gg.fillStyle(0xfff8d0, 0.14); gg.fillCircle(pr.hx, pr.hy, R.projecteur.rayon * 0.38);
       gg.lineStyle(1.5, 0xfff3b0, 0.35); gg.strokeCircle(pr.hx, pr.hy, R.projecteur.rayon);
-      pr.alerte.setPosition(pr.hx, pr.hy - R.projecteur.rayon - 8);
+      pr.alerte.setPosition(pr.hx, pr.hy - R.projecteur.rayon - 8).setScale(1 + Math.sin(this.temps * 18 + 1) * 0.12);
     }
     for (const g of this.gardes) {
-      g.sprite.setPosition(g.x, g.y)
+      const rebond = g.bouge ? Math.abs(Math.sin(this.temps * 13 + g.x * 0.05)) * 2 : 0;
+      g.sprite.setPosition(g.x, g.y - rebond)
         .setRotation(g.angle + (g.bouge ? Math.sin(this.temps * 13 + g.x * 0.05) * 0.07 : 0))
         .setFrame(g.bouge ? Math.floor(this.temps * 6) % 2 : 0);
-      g.alerte.setPosition(g.x, g.y - 32);
+      g.alerte.setPosition(g.x, g.y - 32).setScale(1 + Math.sin(this.temps * 18) * 0.12);
       this.dessinerCone(gg, g.x, g.y, g.angle, R.garde, g.etat === 'poursuite' ? 0xff5a5a : 0xffe9a0, null);
     }
     this.dessinerRadar();
