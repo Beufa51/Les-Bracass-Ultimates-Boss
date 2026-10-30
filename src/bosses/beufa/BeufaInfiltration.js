@@ -207,21 +207,56 @@ export class BeufaInfiltration extends BossScene {
       }
       const cL = x1 - x0 + 1, cH = y1 - y0 + 1;
       // la TAILLE DU JEU : le canvas final = une frame × le nombre de frames
-      const fL = e.largeur, fH = e.hauteur, n = e.images || 1;
-      const cibleL = fL * n, cibleH = fH;
+      const fL = e.largeur, fH = e.hauteur;
+      let n = e.images || 1;
       const final = document.createElement('canvas');
-      final.width = cibleL; final.height = cibleH;
       const c2 = final.getContext('2d');
       c2.imageSmoothingEnabled = true;
       c2.imageSmoothingQuality = 'high';
-      const rapport = (cL / cH) / (cibleL / cibleH);
-      if (rapport >= 0.6 && rapport <= 1.67) {
-        c2.drawImage(cv, x0, y0, cL, cH, 0, 0, cibleL, cibleH);   // le dessin a le bon aspect : on l'étire
+      // LE DÉCOUPEUR DE PLANCHES : les générateurs d'images n'espacent JAMAIS leurs
+      // personnages régulièrement — un découpage en parts égales les COUPE en deux
+      // (persos « doublés » à l'écran). On détecte les VRAIS personnages par les
+      // COLONNES VIDES qui les séparent : chacun reçoit SA case, recentré dedans.
+      let personnages = null;
+      if (n > 1) {
+        const occupe = (x) => { for (let y = y0; y <= y1; y++) if (d[(y * L + x) * 4 + 3] > 8) return true; return false; };
+        const vus = [];
+        let s = -1;
+        for (let x = x0; x <= x1; x++) {
+          if (occupe(x) && s < 0) s = x;
+          else if (!occupe(x) && s >= 0) { vus.push([s, x - 1]); s = -1; }
+        }
+        if (s >= 0) vus.push([s, x1]);
+        if (vus.length >= 3 && vus.length <= 9) personnages = vus;
+      }
+      if (personnages) {
+        n = personnages.length;   // le VRAI nombre de cases de la planche l'emporte sur le manifeste
+        final.width = fL * n; final.height = fH;
+        personnages.forEach((seg, i) => {
+          let sy0 = H, sy1 = 0;   // la hauteur réelle de CE personnage
+          for (let y = y0; y <= y1; y++) for (let x = seg[0]; x <= seg[1]; x++)
+            if (d[(y * L + x) * 4 + 3] > 8) { if (y < sy0) sy0 = y; if (y > sy1) sy1 = y; }
+          const w = seg[1] - seg[0] + 1, h = sy1 - sy0 + 1;
+          if (w / h >= 0.7 && w / h <= 1.43) {   // aspect proche de la case : il la REMPLIT (taille stable d'une frame à l'autre)
+            c2.drawImage(cv, seg[0], sy0, w, h, i * fL, 0, fL, fH);
+          } else {   // trop étiré : on le fait juste RENTRER, centré
+            const k = Math.min(fL / w, fH / h);
+            const dL = Math.round(w * k), dH = Math.round(h * k);
+            c2.drawImage(cv, seg[0], sy0, w, h, i * fL + Math.round((fL - dL) / 2), Math.round((fH - dH) / 2), dL, dH);
+          }
+        });
       } else {
-        // trop différent : on fait RENTRER le dessin dans la cible, centré (rien n'est broyé)
-        const k = Math.min(cibleL / cL, cibleH / cH);
-        const dL = Math.round(cL * k), dH = Math.round(cH * k);
-        c2.drawImage(cv, x0, y0, cL, cH, Math.round((cibleL - dL) / 2), Math.round((cibleH - dH) / 2), dL, dH);
+        const cibleL = fL * n, cibleH = fH;
+        final.width = cibleL; final.height = cibleH;
+        const rapport = (cL / cH) / (cibleL / cibleH);
+        if (rapport >= 0.6 && rapport <= 1.67) {
+          c2.drawImage(cv, x0, y0, cL, cH, 0, 0, cibleL, cibleH);   // le dessin a le bon aspect : on l'étire
+        } else {
+          // trop différent : on fait RENTRER le dessin dans la cible, centré (rien n'est broyé)
+          const k = Math.min(cibleL / cL, cibleH / cH);
+          const dL = Math.round(cL * k), dH = Math.round(cH * k);
+          c2.drawImage(cv, x0, y0, cL, cH, Math.round((cibleL - dL) / 2), Math.round((cibleH - dH) / 2), dL, dH);
+        }
       }
       // On REMPLACE la texture par une texture canvas aux dimensions du jeu : refresh()
       // n'existe pas sur les textures d'images dans cette version de Phaser, et ça nous
