@@ -40,6 +40,8 @@ export class BeufaInfiltration extends BossScene {
     this.touches = creerTouches(this);
     etiquettesTactiles({ haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'OK', z: 'Sprint', x: 'Pierre' });   // Espace valide l'intro (bouton OK sur téléphone)
     this.cameras.main.setBackgroundColor('#0a0e15');
+    // la caméra ne montrera JAMAIS de bord noir : elle reste dans la pièce
+    this.cameras.main.setBounds(0, 0, LARGEUR, HAUTEUR);
     this.programme = [];   // la file des « dans X secondes, fais ça » (décomptée dans update)
 
     // LES IMAGES DE FABIEN arrivent GRANDES et sur FOND BLANC : on les prépare une fois
@@ -68,7 +70,7 @@ export class BeufaInfiltration extends BossScene {
 
     // le RADAR façon MGS (en haut à droite) : LA PIÈCE COURANTE, les gardes et leurs cônes.
     // Il se COUPE pendant une alerte — dans MGS aussi, le radar saute quand on te cherche.
-    this.radarG = this.add.graphics().setDepth(901);
+    this.radarG = this.add.graphics().setDepth(901).setScrollFactor(0);
     this.radarEtat = texte(this, 858, 204, 'NORMAL', 13, '#7fff7f').setDepth(901);
 
     this.alertes = 0; this.pierres = R.joueur.pierres; this.temps = 0; this.pierre = null;
@@ -78,7 +80,7 @@ export class BeufaInfiltration extends BossScene {
     this.hudTemps = texte(this, LARGEUR - 18, 20, '', 18, '#dff6ff').setOrigin(1, 0.5).setDepth(900);
     this.hudPierres = texte(this, 18, 44, '', 16, '#ffd84a').setOrigin(0, 0.5).setDepth(900);
     this.hudAlertes = texte(this, LARGEUR - 18, 44, '', 16, '#ff9a9a').setOrigin(1, 0.5).setDepth(900);
-    texte(this, LARGEUR / 2, HAUTEUR - 12, (estTactile() ? 'Sprint : bruyant !   Pierre : diversion   une pièce, puis l\'autre — jusqu\'au QG' : 'Z : sprint (bruyant)   X : pierre (diversion)   une pièce, puis l\'autre — jusqu\'au QG'), 13, '#8a94a4').setDepth(900);
+    this.hintBas = texte(this, LARGEUR / 2, HAUTEUR - 12, (estTactile() ? 'Sprint : bruyant !   Pierre : diversion   une pièce, puis l\'autre — jusqu\'au QG' : 'Z : sprint (bruyant)   X : pierre (diversion)   une pièce, puis l\'autre — jusqu\'au QG'), 13, '#8a94a4').setDepth(900);
     this.message = texte(this, LARGEUR / 2, 150, '', 40, '#ffffff', { fontStyle: 'bold', strokeThickness: 8 }).setOrigin(0.5).setDepth(950).setAlpha(0);
 
     this.chargerPiece(0);
@@ -269,6 +271,11 @@ export class BeufaInfiltration extends BossScene {
     });
     this.dans(3.1, () => {
       this.phase = 'jeu';
+      // LA CAMÉA RAPPROCHÉE (demande de Fabien : « on voit de trop loin ») : elle suit le
+      // héros et zoome en douceur — la pièce DÉFILE, le héros est GROS à l'écran.
+      const cam = this.cameras.main;
+      cam.startFollow(this.sprJoueur, true, 0.12, 0.12);
+      this.tweens.add({ targets: cam, zoom: R.vue.zoom, duration: 1100, ease: 'Sine.InOut' });
       this.messageCentre('INFILTRE-TOI JUSQU\'À SON QG !', '#ffd84a', 1.8);
     });
   }
@@ -298,6 +305,7 @@ export class BeufaInfiltration extends BossScene {
     for (const a of this.programme) a.t -= dt;
     this.programme.filter(a => a.t <= 0).forEach(a => a.fn());
     this.programme = this.programme.filter(a => a.t > 0);
+    this.majHudCamera();   // le HUD reste PUNTO à l'écran, même zoomé et suivi
     if (this.phase !== 'jeu') return;
     this.temps += dt;
     this.pasJoueur(dt);
@@ -329,6 +337,7 @@ export class BeufaInfiltration extends BossScene {
     const sprint = t.z.isDown && (dx || dy);
     const v = (sprint ? R.joueur.sprint : R.joueur.vitesse) * dt;
     this.bouger(this.joueur, dx * v, dy * v, R.joueur.rayon);
+    this.heroBouge = !!(dx || dy);   // pour le balancement de marche (afficher)
     if (dx || dy) {
       this.joueur.angle = Math.atan2(dy, dx);
       this.sprJoueur.setFrame(Math.floor(this.temps * (sprint ? 11 : 7)) % 2);
@@ -351,6 +360,7 @@ export class BeufaInfiltration extends BossScene {
     this.dans(0.5, () => {
       this.chargerPiece(i);
       this.joueur.angle = -Math.PI / 2;
+      this.cameras.main.centerOn(this.joueur.x, this.joueur.y);   // POSE la caméra sur l'entrée, sans glisser
       this.cameras.main.fadeIn(450);
       this.dans(0.2, () => {
         this.phase = 'jeu';
@@ -584,19 +594,25 @@ export class BeufaInfiltration extends BossScene {
     }
     for (const pr of this.projecteurs) { pr.jauge = 0; pr.alerte.setText(''); }
     if (this.pierre) { this.pierre.sprite.destroy(); this.pierre = null; }
+    this.cameras.main.centerOn(this.joueur.x, this.joueur.y);   // la caméra te REPOSE à l'entrée
     this.phase = 'jeu';
   }
 
   reussite() {
     if (this.phase !== 'jeu') return;
     this.phase = 'fin';
+    // l'écran de VICTOIRE (core) est en coordonnées plein écran : caméra d'aplomb
+    const cam = this.cameras.main;
+    cam.stopFollow(); cam.setZoom(1); cam.centerOn(LARGEUR / 2, HAUTEUR / 2);
     jouerSon(this, 'beufa_reussi');
     this.victoire('Le QG de BEUFA est infiltré en ' + formatTemps(this.temps) + ' ! Alertes déclenchées : ' + this.alertes + '. Les pièces suivantes de la base arrivent, puis le QUIZ !');
   }
 
   // ---------- l'affichage ----------
   afficher() {
-    this.sprJoueur.setPosition(this.joueur.x, this.joueur.y).setRotation(this.joueur.angle);
+    // le balancement de marche : le top-down VIT, il ne glisse plus comme un pain
+    this.sprJoueur.setPosition(this.joueur.x, this.joueur.y)
+      .setRotation(this.joueur.angle + (this.heroBouge ? Math.sin(this.temps * 13) * 0.08 : 0));
     const gg = this.conesG;
     gg.clear();
     // LES HALOS : le faisceau de la tour vers son halo, puis le halo lui-même —
@@ -618,7 +634,9 @@ export class BeufaInfiltration extends BossScene {
       pr.alerte.setPosition(pr.hx, pr.hy - R.projecteur.rayon - 8);
     }
     for (const g of this.gardes) {
-      g.sprite.setPosition(g.x, g.y).setRotation(g.angle).setFrame(g.bouge ? Math.floor(this.temps * 6) % 2 : 0);
+      g.sprite.setPosition(g.x, g.y)
+        .setRotation(g.angle + (g.bouge ? Math.sin(this.temps * 13 + g.x * 0.05) * 0.07 : 0))
+        .setFrame(g.bouge ? Math.floor(this.temps * 6) % 2 : 0);
       g.alerte.setPosition(g.x, g.y - 32);
       this.dessinerCone(gg, g.x, g.y, g.angle, R.garde, g.etat === 'poursuite' ? 0xff5a5a : 0xffe9a0, null);
     }
@@ -628,7 +646,11 @@ export class BeufaInfiltration extends BossScene {
   // le radar façon MGS : LA PIÈCE COURANTE dans un cercle — murs, gardes, cônes, halos, héros.
   // NORMAL (vert) / RECHERCHE (orange) / ALERTE (rouge, radar coupé avec des parasites).
   dessinerRadar() {
-    const g = this.radarG, cx = 858, cy = 128, rr = 64;
+    // le radar est dessiné en coordonnées COMPENSÉES du zoom : à l'écran, il reste
+    // à sa place, TAILLE INCHANGÉE, pendant que la caméra zoome et suit le héros
+    const Z = this.cameras.main.zoom, u = 1 / Z;
+    const g = this.radarG;
+    const cx = 480 + (858 - 480) * u, cy = 270 + (128 - 270) * u, rr = 64 * u;
     const alerte = this.gardes.some(x => x.etat === 'poursuite');
     const recherche = this.gardes.some(x => x.etat === 'verification' || x.etat === 'retour');
     g.clear();
@@ -639,13 +661,13 @@ export class BeufaInfiltration extends BossScene {
     if (alerte) {   // radar coupé : des parasites défilent, comme dans MGS
       g.lineStyle(1, 0xff5a5a, 0.5);
       for (let k = 0; k < 8; k++) {
-        const d1 = cy - 44 + k * 11 + (this.temps * 61 % 11);
-        const d2 = cy - 44 + k * 11 + (this.temps * 37 % 11);
-        g.lineBetween(cx - rr + 6, d1, cx + rr - 6, d2);
+        const d1 = cy + (-44 + k * 11) * u + (this.temps * 61 % 11) * u;
+        const d2 = cy + (-44 + k * 11) * u + (this.temps * 37 % 11) * u;
+        g.lineBetween(cx - rr + 6 * u, d1, cx + rr - 6 * u, d2);
       }
       return;
     }
-    const s = 110 / LARGEUR;   // la pièce (un écran 960x540) tient dans le cercle
+    const s = 110 * u / LARGEUR;   // la pièce (un écran 960x540) tient dans le cercle
     const P = (x, y) => ({ x: cx + (x - 480) * s, y: cy + (y - 270) * s });
     g.lineStyle(1, 0x35d035, 0.85);
     for (const o of this.obstacles) { const p = P(o.x - o.l / 2, o.y - o.h / 2); g.strokeRect(p.x, p.y, Math.max(1, o.l * s), Math.max(1, o.h * s)); }
@@ -682,6 +704,24 @@ export class BeufaInfiltration extends BossScene {
     g.lineStyle(1.5, couleur, 0.35); g.strokePoints(points, true);
   }
 
+  // le HUD reste PUNTO à l'écran pendant que la caméra zoome et suit le héros.
+  // Un objet scrollFactor 0 se positionne par rapport au CENTRE de l'écran : on le
+  // PLACE en coordonnées compensées (centre + écran/zoom) et on le réduit de 1/zoom :
+  // sa place et sa taille apparentes ne changent JAMAIS, quel que soit le zoom.
+  majHudCamera() {
+    const Z = this.cameras.main.zoom, cx = LARGEUR / 2, cy = HAUTEUR / 2;
+    const fixer = (o, x, y) => o.setScrollFactor(0).setScale(1 / Z)
+      .setPosition(cx + (x - cx) / Z, cy + (y - cy) / Z);
+    fixer(this.hudTitre, 18, 20);
+    fixer(this.hudTemps, LARGEUR - 18, 20);
+    fixer(this.hudPierres, 18, 44);
+    fixer(this.hudAlertes, LARGEUR - 18, 44);
+    fixer(this.radarEtat, 858, 204);
+    if (this.hintBas) fixer(this.hintBas, LARGEUR / 2, HAUTEUR - 12);
+    if (this.message) fixer(this.message, LARGEUR / 2, 150);
+    this.radarG.setScrollFactor(0);
+  }
+
   majHud() {
     this.hudTemps.setText(formatTemps(this.temps));
     this.hudAlertes.setText(this.alertes ? 'Alertes : ' + this.alertes : '');
@@ -689,8 +729,8 @@ export class BeufaInfiltration extends BossScene {
   }
 
   messageCentre(txt, couleur, duree) {
-    this.message.setText(txt).setColor(couleur).setAlpha(1).setScale(1.25);
-    this.tweens.add({ targets: this.message, scale: 1, duration: 150 });
+    // (le scale du message est géré par majHudCamera : lisible sous n'importe quel zoom)
+    this.message.setText(txt).setColor(couleur).setAlpha(1);
     this.tweens.add({ targets: this.message, alpha: 0, delay: duree * 1000, duration: 350 });
   }
 }

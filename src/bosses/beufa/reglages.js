@@ -33,6 +33,9 @@ export const REGLAGES = {
     verification: 3,   // s à fouiller avant de retourner à sa ronde
     rattrape: 22,      // px : il te touche → RENVOYÉ à l'entrée de la pièce (jamais de mort)
   },
+  vue: {
+    zoom: 1.6,   // la caméra RAPPROCHÉE : elle suit le héros — 1 = pièce entière, 2 = très proche
+  },
 };
 
 // LA BASE = LE PLAN DE FABIEN — UNE PIÈCE À L'ÉCRAN À LA FOIS (conseil de designer
