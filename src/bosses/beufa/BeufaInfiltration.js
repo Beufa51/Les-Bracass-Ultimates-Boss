@@ -31,6 +31,9 @@ import { jouerMusique } from '../../core/musique.js';
 
 const normAngle = (a) => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) a += Math.PI * 2; return a; };
 const styleAlerte = { fontFamily: 'monospace', fontStyle: 'bold', fontSize: '26px', color: '#ffd84a', stroke: '#000000', strokeThickness: 5 };
+// Les planches de Fabien (héros, garde) sont dessinées TÊTE EN HAUT de l'image : un quart
+// de tour pour qu'ils regardent DROIT DEVANT EUX dans la direction de marche.
+const ORIENTATION = Math.PI / 2;
 
 export class BeufaInfiltration extends BossScene {
   constructor() { super('BeufaInfiltration', IDENTITE); }
@@ -638,7 +641,7 @@ export class BeufaInfiltration extends BossScene {
     const pasH = Math.abs(Math.sin(this.temps * 13));
     const bob = this.heroBouge ? pasH * 3 : 0;
     this.sprJoueur.setPosition(this.joueur.x, this.joueur.y - bob)
-      .setRotation(this.joueur.angle + (this.heroBouge ? Math.sin(this.temps * 13) * 0.08 : 0))
+      .setRotation(this.joueur.angle + ORIENTATION + (this.heroBouge ? Math.sin(this.temps * 13) * 0.08 : 0))
       .setScale(1 + bob * 0.012, 1 - bob * 0.02 + (this.heroBouge ? 0 : Math.sin(this.temps * 2.2) * 0.015));
     const gg = this.conesG;
     gg.clear();
@@ -663,7 +666,7 @@ export class BeufaInfiltration extends BossScene {
     for (const g of this.gardes) {
       const rebond = g.bouge ? Math.abs(Math.sin(this.temps * 13 + g.x * 0.05)) * 2 : 0;
       g.sprite.setPosition(g.x, g.y - rebond)
-        .setRotation(g.angle + (g.bouge ? Math.sin(this.temps * 13 + g.x * 0.05) * 0.07 : 0))
+        .setRotation(g.angle + ORIENTATION + (g.bouge ? Math.sin(this.temps * 13 + g.x * 0.05) * 0.07 : 0))
         .setFrame(g.bouge ? Math.floor(this.temps * 6) % 4 : 1);   // arrêt = pose immobile (frame 1)
       g.alerte.setPosition(g.x, g.y - 32).setScale(1 + Math.sin(this.temps * 18) * 0.12);
       this.dessinerCone(gg, g.x, g.y, g.angle, R.garde, g.etat === 'poursuite' ? 0xff5a5a : 0xffe9a0, null);
