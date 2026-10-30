@@ -27,6 +27,7 @@ import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { formatTemps } from '../../core/sauvegarde.js';
 import { IDENTITE, REGLAGES as R, PIECES } from './reglages.js';
 import { manifesteDe } from '../../core/manifestes.js';
+import { jouerMusique } from '../../core/musique.js';
 
 const normAngle = (a) => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) a += Math.PI * 2; return a; };
 const styleAlerte = { fontFamily: 'monospace', fontStyle: 'bold', fontSize: '26px', color: '#ffd84a', stroke: '#000000', strokeThickness: 5 };
@@ -41,9 +42,11 @@ export class BeufaInfiltration extends BossScene {
     this.cameras.main.setBackgroundColor('#0a0e15');
     this.programme = [];   // la file des « dans X secondes, fais ça » (décomptée dans update)
 
-    // LES PNG DE FABIEN arrivent sur un FOND BLANC (le générateur ne fait pas de vraie
-    // transparence) : on le retire UNE FOIS, avant de dessiner quoi que ce soit.
-    this.retirerFondBlanc();
+    // LES IMAGES DE FABIEN arrivent GRANDES et sur FOND BLANC : on les prépare une fois
+    // (fond retiré, recadrées, mises à la TAILLE DU JEU) avant de dessiner quoi que ce soit.
+    this.preparerImages();
+    // la MUSIQUE d'infiltration (assets/audio/beufa/beufa_musique.mp3), en boucle
+    jouerMusique(this, 'beufa_musique');
 
     // le sol de la base (nuit) — le même carreau pave tout, sans couture ;
     // sa TEINTE change avec la pièce (cour extérieure / salle du QG)
@@ -94,19 +97,24 @@ export class BeufaInfiltration extends BossScene {
     ], () => this.cinema());
   }
 
-  // ---------- le FOND BLANC des PNG de Fabien → transparence ----------
-  // Le générateur d'images ne sait pas sortir de vraie transparence : Fabien demande
-  // un FOND BLANC, et on le retire au chargement. Uniquement le blanc RELIÉ AUX BORDS
-  // de l'image (un délavage depuis les bords) : le blanc à L'INTÉRIEUR du dessin
-  // (yeux, reflets, tableaux) reste bien opaque. Le liseré clair du JPG, collé au
-  // dessin, fond à moitié : il se voit à peine sur le sol de nuit.
-  retirerFondBlanc() {
+  // ---------- les IMAGES DE FABIEN : fond retiré, recadrées, à la taille du jeu ----------
+  // Ses JPG arrivent GRANDES (le générateur ne contrôle pas la taille) et sur FOND
+  // BLANC. Pour chaque image chargée, une seule fois :
+  //  1. fond 'blanc' (les sprites) : on retire le blanc RELIÉ AUX BORDS (un délavage)
+  //     — le blanc à L'INTÉRIEUR du dessin (yeux, reflets) reste opaque, et le liseré
+  //     clair du JPG collé au dessin fond à moitié ;
+  //  2. fond 'bord' (les textures plein cadre : sol, route, murs) : on enlève juste
+  //     d'éventuelles MARGES blanches, sans toucher au dessin ;
+  //  3. on RECADRE sur le contenu ;
+  //  4. on redessine le tout à la TAILLE DU JEU (déclarée dans le manifeste) ;
+  //  5. on RECONSTRUIT les frames de l'animation, à la bonne dimension.
+  preparerImages() {
     const m = manifesteDe(IDENTITE.id);
     for (const [cle, e] of Object.entries(m.images)) {
-      if (!e.fichier || e.fond !== 'blanc' || !this.textures.exists(cle)) continue;
+      if (!e.fichier || !this.textures.exists(cle)) continue;
       const tex = this.textures.get(cle);
       const source = tex.source[0];
-      if (!source || source.__fondRetire) continue;   // déjà nettoyé (le jeu peut redémarrer)
+      if (!source || source.__prete) continue;   // déjà préparée (le jeu peut redémarrer)
       const L = source.width, H = source.height;
       const cv = document.createElement('canvas');
       cv.width = L; cv.height = H;
@@ -115,38 +123,80 @@ export class BeufaInfiltration extends BossScene {
       const img = ctx.getImageData(0, 0, L, H);
       const d = img.data;
       const presqueBlanc = (k) => d[k] >= 238 && d[k + 1] >= 238 && d[k + 2] >= 238;
-      const vus = new Uint8Array(L * H);   // les pixels déjà traités (le fond, et les bords non blancs)
-      const pile = [];   // le délavage part des QUATRE BORDS de l'image
-      for (let x = 0; x < L; x++) { pile.push(x, (H - 1) * L + x); }
-      for (let y = 0; y < H; y++) { pile.push(y * L, y * L + L - 1); }
-      while (pile.length) {
-        const k = pile.pop();
-        if (k < 0 || k >= L * H || vus[k]) continue;
-        vus[k] = 1;
-        if (!presqueBlanc(k * 4)) continue;
-        d[k * 4 + 3] = 0;   // ce blanc-là est LE FOND : il disparaît
-        const x = k % L, y = (k - x) / L;
-        if (x > 0) pile.push(k - 1);
-        if (x < L - 1) pile.push(k + 1);
-        if (y > 0) pile.push(k - L);
-        if (y < H - 1) pile.push(k + L);
-      }
-      for (let k = 0; k < L * H; k++) {   // le liseré clair COLLÉ au dessin : à demi fondu
-        const a = k * 4;
-        if (vus[k] || d[a + 3] === 0) continue;
-        const x = k % L, y = (k - x) / L;
-        const voisinFond = (x > 0 && vus[k - 1] && d[(k - 1) * 4 + 3] === 0) || (x < L - 1 && vus[k + 1] && d[(k + 1) * 4 + 3] === 0) ||
-          (y > 0 && vus[k - L] && d[(k - L) * 4 + 3] === 0) || (y < H - 1 && vus[k + L] && d[(k + L) * 4 + 3] === 0);
-        if (voisinFond && d[a] >= 200 && d[a + 1] >= 200 && d[a + 2] >= 200) {
-          d[a + 3] = Math.round(d[a + 3] * (1 - (Math.min(d[a], d[a + 1], d[a + 2]) - 200) / 60));
+      let x0 = 0, y0 = 0, x1 = L - 1, y1 = H - 1;
+      if (e.fond === 'blanc') {
+        const vus = new Uint8Array(L * H);   // les pixels déjà traités (le fond, et les bords non blancs)
+        const pile = [];   // le délavage part des QUATRE BORDS de l'image
+        for (let x = 0; x < L; x++) { pile.push(x, (H - 1) * L + x); }
+        for (let y = 0; y < H; y++) { pile.push(y * L, y * L + L - 1); }
+        while (pile.length) {
+          const k = pile.pop();
+          if (k < 0 || k >= L * H || vus[k]) continue;
+          vus[k] = 1;
+          if (!presqueBlanc(k * 4)) continue;
+          d[k * 4 + 3] = 0;   // ce blanc-là est LE FOND : il disparaît
+          const x = k % L, y = (k - x) / L;
+          if (x > 0) pile.push(k - 1);
+          if (x < L - 1) pile.push(k + 1);
+          if (y > 0) pile.push(k - L);
+          if (y < H - 1) pile.push(k + L);
         }
+        for (let k = 0; k < L * H; k++) {   // le liseré clair COLLÉ au dessin : à demi fondu
+          const a = k * 4;
+          if (vus[k] || d[a + 3] === 0) continue;
+          const x = k % L, y = (k - x) / L;
+          const voisinFond = (x > 0 && vus[k - 1] && d[(k - 1) * 4 + 3] === 0) || (x < L - 1 && vus[k + 1] && d[(k + 1) * 4 + 3] === 0) ||
+            (y > 0 && vus[k - L] && d[(k - L) * 4 + 3] === 0) || (y < H - 1 && vus[k + L] && d[(k + L) * 4 + 3] === 0);
+          if (voisinFond && d[a] >= 200 && d[a + 1] >= 200 && d[a + 2] >= 200) {
+            d[a + 3] = Math.round(d[a + 3] * (1 - (Math.min(d[a], d[a + 1], d[a + 2]) - 200) / 60));
+          }
+        }
+        ctx.putImageData(img, 0, 0);
+        // le recadrage : la boîte du dessin resté opaque
+        x0 = L; y0 = H; x1 = -1; y1 = -1;
+        for (let y = 0; y < H; y++) for (let x = 0; x < L; x++) {
+          if (d[(y * L + x) * 4 + 3] > 8) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+        }
+        if (x1 < 0) { source.__prete = true; continue; }   // image entièrement blanche : on n'y touche pas
+      } else if (e.fond === 'bord') {
+        // les textures PLEIN CADRE : on enlève juste une éventuelle MARGE blanche uniforme
+        const ligneBlanche = (debut, pas, nombre) => { for (let i = 0; i < nombre; i++) if (!presqueBlanc((debut + i * pas) * 4)) return false; return true; };
+        while (y0 <= y1 && ligneBlanche(y0 * L, 1, L)) y0++;
+        while (y1 >= y0 && ligneBlanche(y1 * L, 1, L)) y1--;
+        while (x0 <= x1 && ligneBlanche(x0, L, H)) x0++;
+        while (x1 >= x0 && ligneBlanche(x1, L, H)) x1--;
+        if ((x1 - x0 + 1) * (y1 - y0 + 1) < 0.4 * L * H) { x0 = 0; y0 = 0; x1 = L - 1; y1 = H - 1; }   // dégénéré : on garde tout
       }
-      ctx.putImageData(img, 0, 0);
-      source.image = cv;   // la source devient le canvas nettoyé…
-      tex.refresh();       // …rechargée côté GPU : tous les sprites suivent, sans rien changer d'autre
-      source.__fondRetire = true;
+      const cL = x1 - x0 + 1, cH = y1 - y0 + 1;
+      // la TAILLE DU JEU : le canvas final = une frame × le nombre de frames
+      const fL = e.largeur, fH = e.hauteur, n = e.images || 1;
+      const cibleL = fL * n, cibleH = fH;
+      const final = document.createElement('canvas');
+      final.width = cibleL; final.height = cibleH;
+      const c2 = final.getContext('2d');
+      c2.imageSmoothingEnabled = true;
+      c2.imageSmoothingQuality = 'high';
+      const rapport = (cL / cH) / (cibleL / cibleH);
+      if (rapport >= 0.6 && rapport <= 1.67) {
+        c2.drawImage(cv, x0, y0, cL, cH, 0, 0, cibleL, cibleH);   // le dessin a le bon aspect : on l'étire
+      } else {
+        // trop différent : on fait RENTRER le dessin dans la cible, centré (rien n'est broyé)
+        const k = Math.min(cibleL / cL, cibleH / cH);
+        const dL = Math.round(cL * k), dH = Math.round(cH * k);
+        c2.drawImage(cv, x0, y0, cL, cH, Math.round((cibleL - dL) / 2), Math.round((cibleH - dH) / 2), dL, dH);
+      }
+      // les frames sont RECONSTRUITES à la dimension du jeu
+      for (const nom of Object.keys(tex.frames)) if (nom !== '__BASE') tex.remove(nom);
+      for (let i = 0; i < n; i++) tex.add(i, 0, i * fL, 0, fL, fH);
+      source.image = final;   // la source devient le canvas final…
+      source.width = cibleL; source.height = cibleH;
+      const base = tex.frames.__BASE;
+      if (base) { base.width = cibleL; base.height = cibleH; base.cutWidth = cibleL; base.cutHeight = cibleH; base.sourceSizeWidth = cibleL; base.sourceSizeHeight = cibleH; }
+      tex.refresh();   // …rechargée côté GPU : tous les sprites suivent
+      source.__prete = true;
     }
   }
+
   // ---------- UNE PIÈCE : on la charge, et rien d'autre n'existe ----------
   chargerPiece(i) {
     this.piece = i;
