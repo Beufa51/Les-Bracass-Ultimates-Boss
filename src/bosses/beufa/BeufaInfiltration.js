@@ -36,6 +36,7 @@ const styleAlerte = { fontFamily: 'monospace', fontStyle: 'bold', fontSize: '26p
 // LUI dans la direction de marche — donc DANS son cône de vision.
 const ORIENT_HEROS = -Math.PI / 2;  // planche héros : regarde vers le bas (vérifié au test de Fabien)
 const ORIENT_GARDE = -Math.PI / 2;  // planche garde : regarde vers le bas (demi-tour du fix crabe)
+const ORIENT_BOSS = -Math.PI / 2;    // planche boss : regarde vers le bas aussi (analyse : orteils vers le bas) — à confirmer au test
 
 export class BeufaInfiltration extends BossScene {
   constructor() { super('BeufaInfiltration', IDENTITE); }
@@ -219,30 +220,50 @@ export class BeufaInfiltration extends BossScene {
       // COLONNES VIDES qui les séparent : chacun reçoit SA case, recentré dedans.
       let personnages = null;
       if (n > 1) {
-        const occupe = (x) => { for (let y = y0; y <= y1; y++) if (d[(y * L + x) * 4 + 3] > 8) return true; return false; };
-        const vus = [];
-        let s = -1;
-        for (let x = x0; x <= x1; x++) {
-          if (occupe(x) && s < 0) s = x;
-          else if (!occupe(x) && s >= 0) { vus.push([s, x - 1]); s = -1; }
+        // les RANGÉES d'abord : Gemini peut livrer une planche sur UNE rangée… ou une
+        // GRILLE (la planche boss : 8 persos sur DEUX rangées). On découpe en bandes
+        // horizontales séparées par des lignes vides, puis chaque bande en colonnes :
+        // chaque perso reçoit SA case, dans l'ordre de lecture (haut, puis gauche→droite).
+        const ligneOccupee = (y) => { for (let x = x0; x <= x1; x++) if (d[(y * L + x) * 4 + 3] > 8) return true; return false; };
+        const colonneOccupee = (x, ry0, ry1) => { for (let y = ry0; y <= ry1; y++) if (d[(y * L + x) * 4 + 3] > 8) return true; return false; };
+        const bandes = [];
+        let b0 = -1;
+        for (let y = y0; y <= y1 + 1; y++) {
+          const occupee = y <= y1 && ligneOccupee(y);
+          if (occupee && b0 < 0) b0 = y;
+          else if (!occupee && b0 >= 0) { bandes.push([b0, y - 1]); b0 = -1; }
         }
-        if (s >= 0) vus.push([s, x1]);
-        if (vus.length >= 3 && vus.length <= 9) personnages = vus;
+        const vus = [];
+        for (const bd of bandes) {
+          let s = -1;
+          for (let x = x0; x <= x1 + 1; x++) {
+            const occupee = x <= x1 && colonneOccupee(x, bd[0], bd[1]);
+            if (occupee && s < 0) s = x;
+            else if (!occupee && s >= 0) { vus.push([s, x - 1, bd[0], bd[1]]); s = -1; }
+          }
+        }
+        // on jette les miettes (bruit JPG isolé) : un VRAI perso occupe l'essentiel
+        // de la hauteur de sa bande, et une largeur honnête — et on retient SA bbox
+        const bons = vus.filter((v) => {
+          let sy0 = v[3] + 1, sy1 = v[2] - 1;
+          for (let x = v[0]; x <= v[1]; x++) for (let y = v[2]; y <= v[3]; y++)
+            if (d[(y * L + x) * 4 + 3] > 8) { if (y < sy0) sy0 = y; if (y > sy1) sy1 = y; }
+          v[4] = sy0; v[5] = sy1;   // la vraie hauteur de CE perso (servira au dessin)
+          return (sy1 - sy0 + 1) >= (v[3] - v[2] + 1) * 0.35 && (v[1] - v[0] + 1) >= (x1 - x0 + 1) * 0.04;
+        });
+        if (bons.length >= 3 && bons.length <= 9) personnages = bons;
       }
       if (personnages) {
         n = personnages.length;   // le VRAI nombre de cases de la planche l'emporte sur le manifeste
         final.width = fL * n; final.height = fH;
         personnages.forEach((seg, i) => {
-          let sy0 = H, sy1 = 0;   // la hauteur réelle de CE personnage
-          for (let y = y0; y <= y1; y++) for (let x = seg[0]; x <= seg[1]; x++)
-            if (d[(y * L + x) * 4 + 3] > 8) { if (y < sy0) sy0 = y; if (y > sy1) sy1 = y; }
-          const w = seg[1] - seg[0] + 1, h = sy1 - sy0 + 1;
+          const w = seg[1] - seg[0] + 1, h = seg[5] - seg[4] + 1;
           if (w / h >= 0.7 && w / h <= 1.43) {   // aspect proche de la case : il la REMPLIT (taille stable d'une frame à l'autre)
-            c2.drawImage(cv, seg[0], sy0, w, h, i * fL, 0, fL, fH);
+            c2.drawImage(cv, seg[0], seg[4], w, h, i * fL, 0, fL, fH);
           } else {   // trop étiré : on le fait juste RENTRER, centré
             const k = Math.min(fL / w, fH / h);
             const dL = Math.round(w * k), dH = Math.round(h * k);
-            c2.drawImage(cv, seg[0], sy0, w, h, i * fL + Math.round((fL - dL) / 2), Math.round((fH - dH) / 2), dL, dH);
+            c2.drawImage(cv, seg[0], seg[4], w, h, i * fL + Math.round((fL - dL) / 2), Math.round((fH - dH) / 2), dL, dH);
           }
         });
       } else {
@@ -335,8 +356,16 @@ export class BeufaInfiltration extends BossScene {
   // la petite cinématique : Beufa remonte la route et sort par la porte du nord
   cinema() {
     this.phase = 'cinema';
-    const beufa = this.add.sprite(480, 310, 'beufa_boss', 0).setDepth(40).setScale(1.5);
-    this.tweens.add({ targets: beufa, x: 480, y: 60, duration: 2600, ease: 'Sine.InOut' });
+    // BEUFA EN PERSONNE : sa planche (8 cases, 2 rangées) regarde vers le bas de
+    // l'image → il monte vers le NORD (angle -π/2) avec sa rotation d'orientation,
+    // et ses JAMBES DÉFILENT sur le VRAI nombre de cases de la planche.
+    const beufa = this.add.sprite(480, 310, 'beufa_boss', 0).setDepth(40).setScale(1.5)
+      .setRotation(-Math.PI / 2 + ORIENT_BOSS);
+    const nbCases = Math.max(1, Object.keys(beufa.texture.frames).length - 1);   // moins le __BASE
+    this.tweens.add({
+      targets: beufa, x: 480, y: 60, duration: 2600, ease: 'Sine.InOut',
+      onUpdate: (tw) => beufa.setFrame(Math.floor(tw.elapsed / 130) % nbCases),   // le cycle de marche
+    });
     this.dans(0.6, () => {
       this.cineTexte = texte(this, LARGEUR / 2, HAUTEUR - 60, 'BEUFA : « La cour est à moi… et MON QG est au fond. Bouge pas ! »', 19, '#ffd84a', { backgroundColor: '#000000cc', padding: { x: 14, y: 8 } }).setDepth(960);
     });
