@@ -31,11 +31,10 @@ import { jouerMusique } from '../../core/musique.js';
 
 const normAngle = (a) => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) a += Math.PI * 2; return a; };
 const styleAlerte = { fontFamily: 'monospace', fontStyle: 'bold', fontSize: '26px', color: '#ffd84a', stroke: '#000000', strokeThickness: 5 };
-// Chaque planche a son SENS propre (vue de dessus) : le héros regarde vers la DROITE
-// de son image, le garde vers le BAS (on le voit de dos quand il monte). On ajuste la
-// rotation de chaque sprite pour qu'il regarde DROIT DEVANT LUI dans la direction de
-// marche — donc DANS son cône de vision.
-const ORIENT_HEROS = 0;             // planche héros : regarde vers la droite
+// Les planches de Fabien (héros ET garde, même batch) regardent vers le BAS de
+// l'image. On ajuste la rotation de chaque sprite pour qu'il regarde DROIT DEVANT
+// LUI dans la direction de marche — donc DANS son cône de vision.
+const ORIENT_HEROS = -Math.PI / 2;  // planche héros : regarde vers le bas (vérifié au test de Fabien)
 const ORIENT_GARDE = -Math.PI / 2;  // planche garde : regarde vers le bas (demi-tour du fix crabe)
 
 export class BeufaInfiltration extends BossScene {
