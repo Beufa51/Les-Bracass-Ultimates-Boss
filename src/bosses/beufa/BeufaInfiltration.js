@@ -332,7 +332,7 @@ export class BeufaInfiltration extends BossScene {
     this.decor.push(sprite, alerte);   // ils disparaîtront avec la pièce
     return {
       chemin: g.chemin, point: 1, x: g.chemin[0][0], y: g.chemin[0][1], angle: 0,
-      etat: 'ronde', jauge: 0, vuX: 0, vuY: 0, perdu: 0, verif: 0, bouge: false, pauseT: 0,
+      etat: 'ronde', jauge: 0, vuX: 0, vuY: 0, perdu: 0, verif: 0, bouge: false, pauseT: 0, anglePause: 0, angleVerif: 0,
       scan: g.scan || 0, scanBase: g.scanBase !== undefined ? g.scanBase : Math.PI / 2,
       sprite, alerte,
     };
@@ -465,12 +465,20 @@ export class BeufaInfiltration extends BossScene {
     this.tweens.add({ targets: clac, alpha: 0, y: y - 20, duration: 700, onComplete: () => clac.destroy() });
     for (const g of this.gardes) {
       if ((g.etat === 'ronde' || g.etat === 'retour') && Math.hypot(g.x - x, g.y - y) < 300) {
-        g.etat = 'verification'; g.verif = R.alerte.verification; g.vuX = x; g.vuY = y; g.jauge = 0;
+        g.etat = 'verification'; g.verif = R.alerte.verification; g.vuX = x; g.vuY = y; g.jauge = 0; g.angleVerif = g.angle;
       }
     }
   }
 
   // ---------- les gardes ----------
+  // il tourne PROGRESSIVEMENT vers sa cible : fini les demi-tours secs — il PIVOTE
+  // comme un vrai patrouilleur (et son cône de vision suit tout doux : plus lisible)
+  viser(g, cible, dt) {
+    const ecart = normAngle(cible - g.angle);
+    const pas = Math.min(Math.abs(ecart), 5.5 * dt);
+    g.angle = normAngle(g.angle + pas * Math.sign(ecart));
+  }
+
   pasGarde(g, dt) {
     g.bouge = false;
     if (g.etat === 'ronde') {
@@ -478,15 +486,16 @@ export class BeufaInfiltration extends BossScene {
         g.angle = g.scanBase + Math.sin(this.temps * 0.7) * g.scan * Math.PI / 180;
       } else if (g.pauseT > 0) {   // MGS : arrivé au bout de sa ronde, il S'ARRÊTE et regarde autour
         g.pauseT -= dt;
-        g.angle += Math.sin(this.temps * 2.4) * dt * 1.9;
+        g.angle = g.anglePause + Math.sin(this.temps * 2.4 + g.x * 0.05) * 1.15;   // droite-gauche, souplement
       } else {
         const cible = g.chemin[g.point];
         const dx = cible[0] - g.x, dy = cible[1] - g.y, d = Math.hypot(dx, dy);
-        if (d < 4) { g.point = (g.point + 1) % g.chemin.length; g.pauseT = R.garde.pause; }
+        if (d < 4) { g.point = (g.point + 1) % g.chemin.length; g.pauseT = R.garde.pause; g.anglePause = g.angle; }
         else {
-          const v = R.garde.vitesseRonde * dt / d;
+          const want = Math.atan2(dy, dx);
+          this.viser(g, want, dt);   // il PIVOTE en douceur — plus de demi-tour sec
+          const v = R.garde.vitesseRonde * Math.max(0.3, Math.cos(normAngle(want - g.angle))) * dt / d;
           g.x += dx * v; g.y += dy * v;
-          g.angle = Math.atan2(dy, dx);
           g.bouge = true;
         }
       }
@@ -494,23 +503,26 @@ export class BeufaInfiltration extends BossScene {
       if (this.vuPar(g)) { g.vuX = this.joueur.x; g.vuY = this.joueur.y; g.perdu = 0; }
       else {
         g.perdu += dt;
-        if (g.perdu > R.alerte.poursuiteMax) { g.etat = 'verification'; g.verif = R.alerte.verification; return; }
+        if (g.perdu > R.alerte.poursuiteMax) { g.etat = 'verification'; g.verif = R.alerte.verification; g.angleVerif = g.angle; return; }
       }
       const dx = g.vuX - g.x, dy = g.vuY - g.y, d = Math.hypot(dx, dy) || 1;
-      g.angle = Math.atan2(dy, dx);
-      this.bouger(g, dx / d * R.garde.vitessePoursuite * dt, dy / d * R.garde.vitessePoursuite * dt, R.garde.rayon);
+      const want = Math.atan2(dy, dx);
+      this.viser(g, want, dt);
+      const align = Math.max(0.3, Math.cos(normAngle(want - g.angle)));
+      this.bouger(g, dx / d * R.garde.vitessePoursuite * align * dt, dy / d * R.garde.vitessePoursuite * align * dt, R.garde.rayon);
       g.bouge = true;
       if (Math.hypot(this.joueur.x - g.x, this.joueur.y - g.y) < R.alerte.rattrape) this.attraper();
     } else if (g.etat === 'verification') {
       const dx = g.vuX - g.x, dy = g.vuY - g.y, d = Math.hypot(dx, dy);
       if (d > 6) {
-        const v = R.garde.vitesseRonde * 1.4 * dt / d;
+        const want = Math.atan2(dy, dx);
+        this.viser(g, want, dt);
+        const v = R.garde.vitesseRonde * 1.4 * Math.max(0.3, Math.cos(normAngle(want - g.angle))) * dt / d;
         this.bouger(g, dx * v, dy * v, R.garde.rayon);
-        g.angle = Math.atan2(dy, dx);
         g.bouge = true;
       } else {
         g.verif -= dt;
-        g.angle += dt * 2.4;   // il fouille des yeux à droite à gauche
+        g.angle = g.angleVerif + Math.sin(this.temps * 2.6 + g.x * 0.03) * 1.1;   // il fouille des yeux DROITE-GAUCHE (plus de toupie)
         if (g.verif <= 0) g.etat = 'retour';
       }
     } else if (g.etat === 'retour') {
@@ -518,9 +530,10 @@ export class BeufaInfiltration extends BossScene {
       const dx = cible[0] - g.x, dy = cible[1] - g.y, d = Math.hypot(dx, dy);
       if (d < 6) g.etat = 'ronde';
       else {
-        const v = R.garde.vitesseRonde * 1.4 * dt / d;
+        const want = Math.atan2(dy, dx);
+        this.viser(g, want, dt);
+        const v = R.garde.vitesseRonde * 1.4 * Math.max(0.3, Math.cos(normAngle(want - g.angle))) * dt / d;
         this.bouger(g, dx * v, dy * v, R.garde.rayon);
-        g.angle = Math.atan2(dy, dx);
         g.bouge = true;
       }
     }
@@ -698,10 +711,15 @@ export class BeufaInfiltration extends BossScene {
       pr.alerte.setPosition(pr.hx, pr.hy - R.projecteur.rayon - 8).setScale(1 + Math.sin(this.temps * 18 + 1) * 0.12);
     }
     for (const g of this.gardes) {
+      // lui aussi lève une petite POUSSIÈRE en marchant
+      if (g.bouge && this.temps > (g.prochPoussiere || 0)) {
+        g.prochPoussiere = this.temps + 0.13;
+        this.poussieres.push({ x: g.x - Math.cos(g.angle) * 7, y: g.y - Math.sin(g.angle) * 7 + 3, t: 0, duree: 0.35, r: 2.2 });
+      }
       const rebond = g.bouge ? Math.abs(Math.sin(this.temps * 13 + g.x * 0.05)) * 2 : 0;
       g.sprite.setPosition(g.x, g.y - rebond)
         .setRotation(g.angle + ORIENTATION + (g.bouge ? Math.sin(this.temps * 13 + g.x * 0.05) * 0.07 : 0))
-        .setFrame(g.bouge ? Math.floor(this.temps * 6) % 4 : 1);   // arrêt = pose immobile (frame 1)
+        .setFrame(g.bouge ? 0 : 1);   // UNE pose de marche : les poses de la planche sont incohérentes (fusil qui change de côté) — il ne clignote plus
       g.alerte.setPosition(g.x, g.y - 32).setScale(1 + Math.sin(this.temps * 18) * 0.12);
       this.dessinerCone(gg, g.x, g.y, g.angle, R.garde, g.etat === 'poursuite' ? 0xff5a5a : 0xffe9a0, null);
     }
