@@ -20,12 +20,12 @@ export const MANIFESTE = {
     beufa_caisse: { fichier: 'sprites/beufa/beufa_caisse.jpg', fond: 'blanc', largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'caisse_nes', couleur: '#8c541c', pixel: 2 } },
     // V28 — LE MATÉRIEL MILITAIRE (provisoire en pixel art ; dès que Fabien livre
     // les PNG dans sprites/beufa/, remplacer fichier: null par le chemin — dimensions identiques)
-    beufa_camion:     { fichier: null, fond: 'blanc', largeur: 176, hauteur: 72, images: 1, vitesse: 1, provisoire: { forme: 'camion_nes', couleur: '#385438', pixel: 2 } },
-    beufa_jeep:       { fichier: null, fond: 'blanc', largeur: 88, hauteur: 60, images: 1, vitesse: 1, provisoire: { forme: 'jeep_nes', couleur: '#38543c', pixel: 2 } },
+    beufa_camion:     { fichier: 'sprites/beufa/beufa_camion.jpg', fond: 'blanc', largeur: 176, hauteur: 72, images: 1, vitesse: 1, provisoire: { forme: 'camion_nes', couleur: '#385438', pixel: 2 } },
+    beufa_jeep:       { fichier: 'sprites/beufa/beufa_jeep.jpg', fond: 'blanc', largeur: 88, hauteur: 60, images: 1, vitesse: 1, provisoire: { forme: 'jeep_nes', couleur: '#38543c', pixel: 2 } },
     beufa_helico:     { fichier: 'sprites/beufa/beufa_helico.jpg', fond: 'blanc', largeur: 184, hauteur: 100, images: 1, vitesse: 1, provisoire: { forme: 'helico_nes', couleur: '#1c3854', pixel: 2 } },
     beufa_reservoir:  { fichier: 'sprites/beufa/beufa_reservoir.jpg', fond: 'blanc', largeur: 96, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'reservoir_nes', couleur: '#385454', pixel: 2 } },
     beufa_mirador:    { fichier: 'sprites/beufa/beufa_mirador.jpg', fond: 'blanc', largeur: 80, hauteur: 80, images: 1, vitesse: 1, provisoire: { forme: 'mirador_nes', couleur: '#545038', pixel: 2 } },
-    beufa_tente:      { fichier: null, fond: 'blanc', largeur: 148, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'tente_nes', couleur: '#545438', pixel: 2 } },
+    beufa_tente:      { fichier: 'sprites/beufa/beufa_tente.jpg', fond: 'blanc', largeur: 148, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'tente_nes', couleur: '#545438', pixel: 2 } },
     beufa_ratelier:   { fichier: 'sprites/beufa/beufa_ratelier.jpg', fond: 'blanc', largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'ratelier_nes', couleur: '#545038', pixel: 2 } },
     beufa_sacs:   { fichier: 'sprites/beufa/beufa_sacs.jpg', fond: 'blanc', largeur: 64, hauteur: 44, images: 1, vitesse: 1, provisoire: { forme: 'sacs_nes', couleur: '#8c7038', pixel: 2 } },
     beufa_table:   { fichier: 'sprites/beufa/beufa_table.jpg', fond: 'blanc', largeur: 140, hauteur: 90, images: 1, vitesse: 1, provisoire: { forme: 'table_nes', couleur: '#a88c54', pixel: 2 } },
