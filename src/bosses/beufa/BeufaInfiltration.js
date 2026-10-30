@@ -88,6 +88,21 @@ export class BeufaInfiltration extends BossScene {
     this.nuitTex = this.textures.addCanvas('beufa_nuit', this.nuitCv);
     this.nuitImg = this.add.image(0, 0, 'beufa_nuit').setOrigin(0).setDepth(800);
 
+    // LA VIGNETTE : les bords de l'ÉCRAN (pas de la pièce) s'assombrissent en douceur —
+    // le regard est guidé vers le centre, comme dans les captures de référence.
+    if (this.textures.exists('beufa_vignette')) this.textures.remove('beufa_vignette');
+    const vigCv = document.createElement('canvas');
+    vigCv.width = LARGEUR; vigCv.height = HAUTEUR;
+    const vigCtx = vigCv.getContext('2d');
+    const vg = vigCtx.createRadialGradient(LARGEUR / 2, HAUTEUR / 2, 330, LARGEUR / 2, HAUTEUR / 2, 640);
+    vg.addColorStop(0, 'rgba(2,4,12,0)');
+    vg.addColorStop(0.7, 'rgba(2,4,12,0.22)');
+    vg.addColorStop(1, 'rgba(2,4,12,0.55)');
+    vigCtx.fillStyle = vg;
+    vigCtx.fillRect(0, 0, LARGEUR, HAUTEUR);
+    this.textures.addCanvas('beufa_vignette', vigCv);
+    this.add.image(0, 0, 'beufa_vignette').setOrigin(0).setScrollFactor(0).setDepth(801);
+
     this.alertes = 0; this.pierres = R.joueur.pierres; this.temps = 0; this.pierre = null;
     this.poussieres = []; this.prochPoussiere = 0;   // les petits nuages des pas (V10)
 
@@ -764,10 +779,12 @@ export class BeufaInfiltration extends BossScene {
       ctx.fillStyle = gr;
       ctx.beginPath(); ctx.arc(x, y, rai, 0, Math.PI * 2); ctx.fill();
     };
-    // les HALOS des projecteurs (leurs tours restent éclairées aussi)
-    for (const pr of this.projecteurs) {
-      trou(pr.hx !== undefined ? pr.hx : pr.depart[0], pr.hy !== undefined ? pr.hy : pr.depart[1], R.projecteur.rayon + 26, 1);
-      trou(pr.tour[0], pr.tour[1], 34, 0.9);
+    // les HALOS des projecteurs (leurs tours restent éclairées aussi) —
+    // avec un léger SCINTILLEMENT : la lampe respire, la lumière semble vivante
+    for (const [pi, pr] of this.projecteurs.entries()) {
+      const flam = 1 + 0.04 * Math.sin(this.temps * 6.3 + pi * 2.4) + 0.02 * Math.sin(this.temps * 47 + pi * 5);
+      trou(pr.hx !== undefined ? pr.hx : pr.depart[0], pr.hy !== undefined ? pr.hy : pr.depart[1], (R.projecteur.rayon + 26) * flam, 1);
+      trou(pr.tour[0], pr.tour[1], 34 * flam, 0.9);
     }
     // les FAISCEAUX des gardes : des poches de lumière le long du cône
     for (const g of this.gardes) {
