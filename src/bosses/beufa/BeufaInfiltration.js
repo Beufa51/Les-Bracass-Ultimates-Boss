@@ -721,7 +721,7 @@ export class BeufaInfiltration extends BossScene {
       const rebond = g.bouge ? Math.abs(Math.sin(this.temps * 13 + g.x * 0.05)) * 2 : 0;
       g.sprite.setPosition(g.x, g.y - rebond)
         .setRotation(g.angle + ORIENT_GARDE + (g.bouge ? Math.sin(this.temps * 13 + g.x * 0.05) * 0.07 : 0))
-        .setFrame(g.bouge ? 0 : 1);   // UNE pose de marche : les poses de la planche sont incohérentes (fusil qui change de côté) — il ne clignote plus
+        .setFrame(g.bouge ? 0 : 2);   // marche = frame 0, arrêt = frame 2 : les DEUX ont le fusil du même côté (la planche alterne encore les côtés)
       g.alerte.setPosition(g.x, g.y - 32).setScale(1 + Math.sin(this.temps * 18) * 0.12);
       this.dessinerCone(gg, g.x, g.y, g.angle, R.garde, g.etat === 'poursuite' ? 0xff5a5a : 0xffe9a0, null);
     }
