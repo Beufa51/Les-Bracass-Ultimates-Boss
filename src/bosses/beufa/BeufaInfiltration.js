@@ -323,7 +323,10 @@ export class BeufaInfiltration extends BossScene {
     // et la caméra se POSE sur l'entrée (elle glissera ensuite derrière le héros).
     this.roomL = P.l || 960; this.roomH = P.h || 540;
     this.cameras.main.setBounds(0, 0, this.roomL, this.roomH);
-    this.cameras.main.centerOn(P.entree.x, P.entree.y);
+    // V26 : pendant l'INTRO, le panneau de texte du moteur (afficherIntro) est en
+    // coordonnées ÉCRAN : la caméra reste donc sur le HAUT, sinon le texte serait
+    // hors vue dans une salle plus grande. Ensuite (transition) : posée sur l'entrée.
+    this.cameras.main.centerOn(this.phase === 'intro' ? LARGEUR / 2 : P.entree.x, this.phase === 'intro' ? HAUTEUR / 2 : P.entree.y);
     if (this.sol) this.sol.destroy();
     this.sol = this.add.tileSprite(0, 0, this.roomL, this.roomH, 'beufa_sol', 0).setOrigin(0);
     this.sol.setTint(P.teinteSol || 0xffffff);   // l'ambiance change : cour extérieure / salle du QG

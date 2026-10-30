@@ -88,18 +88,18 @@ export const PIECES = [
       [700, 330, 140, 52],                                // LE MOTOR POOL : l'abri du véhicule
       [820, 700, 52, 140],                                //   et le fourgon garé contre l'est
       [600, 680, 140, 52],                                // LA COUVERTURE DU MILIEU : casse l'axe du sud
+      // V26 : les caisses sont devenues des CONTENEURS (demande de Fabien — un seul type de couverture)
+      [575, 985, 140, 52],          // le conteneur du portail : TA première couverture, au spawn
+      [410, 660, 52, 140],          // LE SLALOM DE L'AXE, à l'ouest de la route
+      [550, 420, 52, 140],          //   et à l'est — un pas de couverture entre sentinelle et halo du QG
+      [180, 410, 140, 52],          // le dépôt : la couverture nord, pour tourner autour de la ronde
+      [300, 622, 140, 52],          //   l'angle sud du dépôt, empilé sur l'allée
+      [860, 250, 140, 52],          // le motor pool : le conteneur de l'angle nord-est
+      [860, 1015, 140, 52],         //   et le coin sud-est, sous le nez du rideau
+      [280, 820, 140, 52],          // le coin du chien de garde, au sud-ouest
     ],
     sacs: [ [390, 515], [570, 515] ],   // LE POSTE DE CONTRÔLE au carrefour de l'axe
-    caisses: [
-      [560, 990],    // V25 : le bidon du portail — couloir sud DÉGAGÉ
-      [420, 700],    // LE SLALOM DE L'AXE : deux plots — un pas de couverture entre
-      [540, 420],    //   la sentinelle et le halo qui descend du QG
-      [180, 400],    // le dépôt : pour tourner autour de la ronde de l'allée
-      [352, 622],    //   l'angle sud du dépôt
-      [884, 300],    // le motor pool : les bidons de l'angle nord-est
-      [864, 1000],   // V25 : et le long du mur est — couloir est DÉGAGÉ (passable)
-      [300, 820],    // le coin du chien de garde, au sud-ouest
-    ],
+    caisses: [],   // V26 : plus de caisses — TOUTES les couvertures sont des CONTENEURS
     projecteurs: [   // TROIS TOURS, une par zone : le QG, le dépôt, la voie est
       { tour: [480, 14], depart: [480, 70], arrivee: [480, 250] },     // le halo descend L'AXE jusqu'au SAS
       { tour: [10, 515], depart: [70, 515], arrivee: [390, 515] },     // le halo balaie L'ALLÉE DU DÉPÔT
@@ -137,10 +137,16 @@ export const PIECES = [
       [150, 380, 52, 140],   // le rayonnage de l'ouest
       [1130, 380, 52, 140],                           // le rayonnage du centre-est
       [1250, 620, 140, 52],                           // le rayonnage du sud-est
+      // V26 : les caisses sont devenues des CONTENEURS (demande de Fabien)
+      [1300, 120, 140, 52],     // la rallonge de la rangée nord, à l'extrême est
+      [80, 170, 140, 52],       // le conteneur du couloir ouest, sous l'officier
+      [500, 350, 52, 140],      // le rayonnage du milieu — le stratège le frôle à l'est
+      [1350, 540, 52, 140],     // la couverture de l'approche du bureau, sous le cerbère
+      [700, 550, 140, 52],      // la couverture sud de la table à cartes
     ],
     tables: [ [720, 360] ],   // LA TABLE DES CARTES : les deux halos la frôlent au-dessus
     sacs: [],
-    caisses: [ [500, 350], [60, 200], [1240, 120], [1350, 540], [700, 550] ],   // une couverture par couloir
+    caisses: [],   // V26 : plus de caisses — que des CONTENEURS et des rayonnages
     projecteurs: [   // EN OPPOSITION DE PHASE : le plateau n'est jamais éclairé que d'UNE lumière
       { tour: [26, 360], depart: [70, 360], arrivee: [600, 360] },
       { tour: [1414, 600], depart: [1370, 600], arrivee: [1050, 600], phase: 4 },   // V25 : déplacé au SUD — la PORTE DU BUREAU est dégagée
