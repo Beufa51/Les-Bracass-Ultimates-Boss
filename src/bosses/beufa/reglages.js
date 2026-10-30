@@ -1,5 +1,5 @@
 // =====================================================================
-// Réglages du boss BEUFA : infiltration de nuit dans sa base militaire (vue du dessus, façon Metal Gear).
+// Réglages du boss BEUFA : infiltration de nuit dans sa base militaire (vue du dessus, façon Metal Gear NES).
 // TOUS les chiffres d'équilibrage sont ici : on peut les modifier sans risque.
 // =====================================================================
 export const IDENTITE = { id: 'beufa', nom: 'Beufa' };
@@ -31,46 +31,34 @@ export const REGLAGES = {
   alerte: {
     collective: 200,    // un « ! » met aussi en alerte les gardes à cette distance
     poursuiteMax: 4,   // s sans te voir avant que le garde aille vérifier sur place
-    verification: 3,   // s à fouiller les caisses avant de retourner à sa ronde
+    verification: 3,   // s à fouiller avant de retourner à sa ronde
     rattrape: 22,      // px : il te touche → RENVOYÉ au départ (jamais de mort)
   },
 };
 
-// LA BASE : des SALLES et des COULOIRS séparés par des MURS (x, y = CENTRES ; l, h = taille).
-// Les GAPS entre deux segments d'une même rangée sont des PORTES : on choisit son chemin
-// et on les passe au bon moment — c'est ÇA, l'infiltration. Le héros part du bas (la cour
-// d'entrée) ; LA PORTE DU QG est en haut au centre, dans son yard gardé.
+// LA BASE = LE PLAN DE FABIEN (photo du 30/10), pièce par pièce — en voici les 2 PREMIÈRES :
+// la pièce du BAS (l'entrée, où tu commences) et la pièce du HAUT (la salle du QG).
+// La PORTE entre les deux est au centre ; LA PORTE DU QG est en haut à droite.
+// Les 2 ouvertures à gauche sont les portes des pièces À VENIR (verrouillées pour l'instant).
 export const CARTE = {
-  murs: [
-    [10, 270, 20, 540], [950, 270, 20, 540], [480, 531, 960, 18],   // l'enceinte
-    [205, 9, 410, 18], [755, 9, 410, 18],   // le mur du haut : la PORTE DU QG reste ouverte (x 410 à 550)
-    // la rangée du milieu (y=400) : TROIS portes (x 160-235, 473-548, 728-803)
-    [90, 400, 140, 20], [354, 400, 238, 20], [638, 400, 180, 20], [871, 400, 137, 20],
-    // le HANGAR central : on entre par le SUD (x 440-520), on ressort par le NORD (x 540-620)
-    [390, 330, 100, 20], [570, 330, 100, 20],   // mur sud du hangar (porte au centre)
-    [450, 210, 220, 20],                        // mur nord du hangar (porte à droite)
-    [340, 270, 20, 120], [620, 270, 20, 120],   // flancs ouest / est
-    // la rangée du QG (y=150) : DEUX portes (x 250-330 et 630-710)
-    [135, 150, 230, 20], [480, 150, 300, 20], [825, 150, 230, 20],
+  murs: [   // [x, y, l, h] — x, y = CENTRES ; épaisseur 20 partout
+    [480, 10, 960, 20],                                // mur du haut de la pièce du haut
+    [227, 270, 434, 20], [733, 270, 434, 20],          // le mur du milieu : la PORTE (x 445-515) au centre
+    [480, 530, 960, 20],                               // mur du bas (l'entrée de la base)
+    [10, 30, 20, 40], [10, 267, 20, 306], [10, 513, 20, 34],   // mur de gauche : 2 portes à venir (y 50-114 et 420-496)
+    [950, 97, 20, 175], [950, 392, 20, 275],           // mur de droite : LA PORTE DU QG (y 185-255)
   ],
-  caisses: [   // 56 x 56 — des cachettes, pas des murs
-    [360, 480], [600, 480],
-    [120, 350], [250, 250], [285, 355],
-    [720, 350], [710, 250], [840, 355],
-    [270, 100], [690, 100],
+  portesVerrouillees: [ [10, 82, 20, 64], [10, 458, 20, 76] ],   // dessinées, elles bloquent (pièces suivantes du plan)
+  caisses: [   // 56 x 56 — le plan : 3 dans la pièce du haut, 4 alignées dans celle du bas
+    [240, 108], [480, 108], [720, 108],
+    [192, 432], [384, 432], [576, 432], [768, 432],
   ],
-  piliers: [   // 34 x 34 — devant les portes du hangar
-    [400, 370], [560, 370],
-  ],
-  tours: [[180, 210], [820, 210]],   // 72 x 72 : les projecteurs qui balayent les cours latérales
+  piliers: [],
+  tours: [[400, 150]],   // LE PROJECTEUR de la pièce du haut, au centre — il balaye
   gardes: [
-    { chemin: [[90, 465], [300, 465]] },             // la cour d'entrée, côté gauche
-    { chemin: [[660, 465], [870, 465]] },            // la cour d'entrée, côté droit
-    { chemin: [[90, 300], [310, 300]] },             // la cour latérale gauche
-    { chemin: [[650, 300], [870, 300]] },            // la cour latérale droite
-    { chemin: [[480, 275], [480, 275]], scan: 70 },  // LE PLANTÉ du hangar : il balaie le couloir
-    { chemin: [[330, 60], [630, 60]] },               // la ronde DEVANT la porte du QG
-    { chemin: [[290, 185], [290, 185]], scan: 60 },  // le planté de la porte gauche du QG
-    { chemin: [[670, 185], [670, 185]], scan: 60 },  // le planté de la porte droite du QG
+    { chemin: [[96, 81], [96, 81]], scan: 45, scanBase: -Math.PI / 2 },    // la bonbonne de GAUCHE, goulot vers le HAUT
+    { chemin: [[864, 81], [864, 81]], scan: 45, scanBase: -Math.PI / 2 },  // la bonbonne de DROITE, goulot vers le HAUT
+    { chemin: [[340, 55], [620, 55]] },   // la DOUBLE FLÈCHE : la ronde entre les deux bonbonnes
+    { chemin: [[96, 405], [96, 405]], scan: 55, scanBase: Math.PI },       // la bonbonne de la pièce du bas, vers la GAUCHE
   ],
 };

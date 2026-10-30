@@ -1,21 +1,24 @@
 // Manifeste du boss BEUFA : ses visuels et ses sons, rien de partagé avec les autres boss.
-// Tout est PROVISOIRE (dessiné par le code) en attendant les vrais visuels de Fabien.
-import { GARDE, HEROS, CAISSE, PILIER, TOUR, PORTE, BEUFA } from './dessins.js';
+// STYLE NÉS façon Metal Gear : pixel: 2 => chaque pixel logique fait 2 px, les couleurs sont
+// réduites comme sur console 8 bits, et chaque forme a du VOLUME (chapeau éclairé + face sombre + contour noir).
+import { DALLE_NES, MUR_NES, MUR_NES_V, CAISSE_NES, TOUR_NES, PORTE_NES, GARDE_NES, HEROS_NES, BEUFA_NES, PIERRE_NES } from './dessins.js';
 
 export const MANIFESTE = {
-  formes: { garde: GARDE, heros: HEROS, caisse: CAISSE, pilier: PILIER, tour: TOUR, porte_qg: PORTE, beufa: BEUFA },
+  formes: { dalle_nes: DALLE_NES, mur_nes: MUR_NES, mur_nes_v: MUR_NES_V, caisse_nes: CAISSE_NES, tour_nes: TOUR_NES, porte_nes: PORTE_NES, garde_nes: GARDE_NES, heros_nes: HEROS_NES, beufa_nes: BEUFA_NES, pierre_nes: PIERRE_NES },
   images: {
-    beufa_sol:    { fichier: null, largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'dalle', couleur: '#131a24' } },
-    beufa_caisse: { fichier: null, largeur: 56, hauteur: 56, images: 1, vitesse: 1, provisoire: { forme: 'caisse', couleur: '#7a5a30' } },
-    beufa_pilier: { fichier: null, largeur: 34, hauteur: 34, images: 1, vitesse: 1, provisoire: { forme: 'pilier', couleur: '#525c6a' } },
-    beufa_tour:   { fichier: null, largeur: 72, hauteur: 72, images: 1, vitesse: 1, provisoire: { forme: 'tour', couleur: '#2c3644' } },
-    beufa_porte:  { fichier: null, largeur: 140, hauteur: 44, images: 1, vitesse: 1, provisoire: { forme: 'porte_qg', couleur: '#3c4654' } },
-    beufa_garde:  { fichier: null, largeur: 48, hauteur: 48, images: 2, vitesse: 6, provisoire: { forme: 'garde', couleur: '#3b4a3a' } },
-    beufa_heros:  { fichier: null, largeur: 48, hauteur: 48, images: 2, vitesse: 7, provisoire: { forme: 'heros', couleur: '#c02b2b' } },
-    beufa_boss:   { fichier: null, largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'beufa', couleur: '#2e5a2e' } },
-    beufa_pierre: { fichier: null, largeur: 12, hauteur: 12, images: 1, vitesse: 1, provisoire: { forme: 'cercle', couleur: '#9aa3ad' } },
+    beufa_sol:    { fichier: null, largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'dalle_nes', couleur: '#131a24', pixel: 2 } },
+    beufa_mur:    { fichier: null, largeur: 64, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'mur_nes', couleur: '#5a6474', pixel: 2 } },
+    beufa_mur_v:  { fichier: null, largeur: 20, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'mur_nes_v', couleur: '#5a6474', pixel: 2 } },
+    beufa_caisse: { fichier: null, largeur: 56, hauteur: 56, images: 1, vitesse: 1, provisoire: { forme: 'caisse_nes', couleur: '#7a5a30', pixel: 2 } },
+    beufa_tour:   { fichier: null, largeur: 72, hauteur: 72, images: 1, vitesse: 1, provisoire: { forme: 'tour_nes', couleur: '#2c3644', pixel: 2 } },
+    beufa_porte:  { fichier: null, largeur: 72, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'porte_nes', couleur: '#3c4654', ouverte: true, pixel: 2 } },
+    beufa_porte_verrouillee: { fichier: null, largeur: 64, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'porte_nes', couleur: '#3c4654', ouverte: false, pixel: 2 } },
+    beufa_garde:  { fichier: null, largeur: 48, hauteur: 48, images: 2, vitesse: 6, provisoire: { forme: 'garde_nes', couleur: '#3b4a3a', pixel: 2 } },
+    beufa_heros:  { fichier: null, largeur: 48, hauteur: 48, images: 2, vitesse: 7, provisoire: { forme: 'heros_nes', couleur: '#2b3550', pixel: 2 } },
+    beufa_boss:   { fichier: null, largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'beufa_nes', couleur: '#2e5a2e', pixel: 2 } },
+    beufa_pierre: { fichier: null, largeur: 12, hauteur: 12, images: 1, vitesse: 1, provisoire: { forme: 'pierre_nes', couleur: '#9aa3ad', pixel: 2 } },
   },
-  // Sons : fichier null => petit « bip » provisoire (fréquence en Hz, durée en s)
+  // Sons : fichier null => petit « bip » 8 bits provisoire (fréquence en Hz, durée en s)
   sons: {
     beufa_soupcon: { fichier: null, provisoire: { frequence: 620, duree: 0.12 } },
     beufa_alerte:  { fichier: null, provisoire: { frequence: 880, duree: 0.3 } },

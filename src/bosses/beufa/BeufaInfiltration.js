@@ -37,7 +37,14 @@ export class BeufaInfiltration extends BossScene {
     // les obstacles : ils bloquent le passage ET la vue
     this.obstacles = [];
     for (const [x, y, l, h] of CARTE.murs) {
-      this.add.rectangle(x, y, l, h, 0x232d3d).setStrokeStyle(2, 0x111823);
+      // murs façon NÉS : la bande se pave avec sa texture (chapeau éclairé + face sombre = du VOLUME)
+      if (l >= h) this.add.tileSprite(x, y, l, h, 'beufa_mur', 0).setOrigin(0.5).setDepth(21);
+      else this.add.tileSprite(x, y, l, h, 'beufa_mur_v', 0).setOrigin(0.5).setDepth(21);
+      this.obstacles.push({ x, y, l, h });
+    }
+    // les portes VERROUILLÉES des pièces à venir (prévues sur le plan) : dessinées, elles bloquent
+    for (const [x, y, l, h] of (CARTE.portesVerrouillees || [])) {
+      this.add.image(x, y, 'beufa_porte_verrouillee').setRotation(Math.PI / 2).setDepth(22);
       this.obstacles.push({ x, y, l, h });
     }
     for (const [x, y] of CARTE.caisses) this.ajouterObstacle('beufa_caisse', x, y, 56, 56);
@@ -49,7 +56,7 @@ export class BeufaInfiltration extends BossScene {
     });
 
     // LA PORTE DU QG : tout en haut, au centre — la ligne d'arrivée
-    this.porte = this.add.image(480, 20, 'beufa_porte').setDepth(10);
+    this.porte = this.add.image(950, 220, 'beufa_porte').setRotation(Math.PI / 2).setDepth(10);   // LA PORTE DU QG : en haut à droite
 
     // le héros (il part de la poche du bas, entre les deux bas de ronde)
     this.joueur = { x: 480, y: 490, angle: -Math.PI / 2 };
@@ -73,7 +80,7 @@ export class BeufaInfiltration extends BossScene {
     this.hudTemps = texte(this, LARGEUR - 18, 20, '', 18, '#dff6ff').setOrigin(1, 0.5).setDepth(900);
     this.hudPierres = texte(this, 18, 44, '', 16, '#ffd84a').setOrigin(0, 0.5).setDepth(900);
     this.hudAlertes = texte(this, LARGEUR - 18, 44, '', 16, '#ff9a9a').setOrigin(1, 0.5).setDepth(900);
-    texte(this, LARGEUR / 2, HAUTEUR - 12, (estTactile() ? 'Sprint : bruyant !   Pierre : diversion   atteins la PORTE DU QG en haut' : 'Z : sprint (bruyant)   X : pierre (diversion)   atteins la PORTE DU QG en haut'), 13, '#8a94a4').setDepth(900);
+    texte(this, LARGEUR / 2, HAUTEUR - 12, (estTactile() ? 'Sprint : bruyant !   Pierre : diversion   atteins la PORTE DU QG en haut à droite' : 'Z : sprint (bruyant)   X : pierre (diversion)   atteins la PORTE DU QG en haut à droite'), 13, '#8a94a4').setDepth(900);
     this.message = texte(this, LARGEUR / 2, 150, '', 40, '#ffffff', { fontStyle: 'bold', strokeThickness: 8 }).setOrigin(0.5).setDepth(950).setAlpha(0);
 
     this.afficherIntro('BEUFA - L\'INFILTRATION', [
@@ -91,8 +98,8 @@ export class BeufaInfiltration extends BossScene {
   // la petite cinématique : Beufa monte à SA porte et la verrouille sous tes yeux
   cinema() {
     this.phase = 'cinema';
-    const beufa = this.add.sprite(480, 92, 'beufa_boss', 0).setDepth(40).setScale(1.5);
-    this.tweens.add({ targets: beufa, y: 46, duration: 1700, ease: 'Sine.InOut' });
+    const beufa = this.add.sprite(480, 230, 'beufa_boss', 0).setDepth(40).setScale(1.5);
+    this.tweens.add({ targets: beufa, x: 840, y: 222, duration: 2000, ease: 'Sine.InOut' });
     this.dans(0.5, () => {
       this.cineTexte = texte(this, LARGEUR / 2, HAUTEUR - 60, 'BEUFA : « Personne n\'entre dans MON QG. Je VEILLE ! »', 19, '#ffd84a', { backgroundColor: '#000000cc', padding: { x: 14, y: 8 } }).setDepth(960);
     });
@@ -119,7 +126,7 @@ export class BeufaInfiltration extends BossScene {
     return {
       chemin: g.chemin, point: 1, x: g.chemin[0][0], y: g.chemin[0][1], angle: 0,
       etat: 'ronde', jauge: 0, vuX: 0, vuY: 0, perdu: 0, verif: 0, bouge: false, pauseT: 0,
-      scan: g.scan || 0, scanBase: Math.PI / 2,
+      scan: g.scan || 0, scanBase: g.scanBase !== undefined ? g.scanBase : Math.PI / 2,
       sprite: this.add.sprite(g.chemin[0][0], g.chemin[0][1], 'beufa_garde', 0).setDepth(30),
       alerte: this.add.text(g.chemin[0][0], g.chemin[0][1] - 32, '', styleAlerte).setOrigin(0.5).setDepth(940),
     };
@@ -163,7 +170,7 @@ export class BeufaInfiltration extends BossScene {
     } else this.sprJoueur.setFrame(0);
     if (vientDAppuyer(t.x) && this.pierres > 0) this.lancerPierre();
     // LA PORTE : atteinte ?
-    if (this.joueur.y < 88 && Math.abs(this.joueur.x - 480) < 66) this.reussite();
+    if (this.joueur.x > 912 && this.joueur.y > 188 && this.joueur.y < 256) this.reussite();   // la PORTE DU QG
   }
 
   bouger(e, dx, dy, rayon) {
@@ -398,7 +405,7 @@ export class BeufaInfiltration extends BossScene {
     if (this.phase !== 'jeu') return;
     this.phase = 'fin';
     jouerSon(this, 'beufa_reussi');
-    this.victoire('Infiltration réussie en ' + formatTemps(this.temps) + ' ! Alertes déclenchées : ' + this.alertes + '. Le QUIZ de Beufa arrive bientôt !');
+    this.victoire('Pièces 1 et 2 infiltrées en ' + formatTemps(this.temps) + ' ! Alertes déclenchées : ' + this.alertes + '. Les pièces suivantes de la base arrivent, puis le QUIZ !');
   }
 
   // ---------- l'affichage ----------
