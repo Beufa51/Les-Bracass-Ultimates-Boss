@@ -78,6 +78,16 @@ export class BeufaInfiltration extends BossScene {
     this.radarG = this.add.graphics().setDepth(901).setScrollFactor(0);
     this.radarEtat = texte(this, 858, 204, 'NORMAL', 13, '#7fff7f').setDepth(901);
 
+    // LA NUIT (le look des captures de référence) : un voile d'obscurité sur TOUT,
+    // troué de lumière par les projecteurs, le long des cônes des gardes et autour
+    // du héros — l'obscurité devient un ALLIÉ : on se cache DANS l'ombre.
+    if (this.textures.exists('beufa_nuit')) this.textures.remove('beufa_nuit');
+    this.nuitCv = document.createElement('canvas');
+    this.nuitCv.width = LARGEUR; this.nuitCv.height = HAUTEUR;
+    this.nuitCtx = this.nuitCv.getContext('2d');
+    this.nuitTex = this.textures.addCanvas('beufa_nuit', this.nuitCv);
+    this.nuitImg = this.add.image(0, 0, 'beufa_nuit').setOrigin(0).setDepth(800);
+
     this.alertes = 0; this.pierres = R.joueur.pierres; this.temps = 0; this.pierre = null;
     this.poussieres = []; this.prochPoussiere = 0;   // les petits nuages des pas (V10)
 
@@ -312,6 +322,7 @@ export class BeufaInfiltration extends BossScene {
     this.programme.filter(a => a.t <= 0).forEach(a => a.fn());
     this.programme = this.programme.filter(a => a.t > 0);
     this.majHudCamera();   // le HUD reste PUNTO à l'écran, même zoomé et suivi
+    this.majNuit();        // la nuit et ses poches de lumière
     if (this.phase !== 'jeu') return;
     this.temps += dt;
     this.pasJoueur(dt);
@@ -733,6 +744,42 @@ export class BeufaInfiltration extends BossScene {
     const coeur = points.map((pt, idx) => idx === 0 ? pt : { x: x + (pt.x - x) * 0.55, y: y + (pt.y - y) * 0.55 });
     g.fillStyle(couleur, 0.10); g.fillPoints(coeur, true);
     g.lineStyle(1.5, couleur, 0.35); g.strokePoints(points, true);
+  }
+
+  // LE VOILE DE NUIT : l'obscurité couvre tout, puis on TROUE là où il y a de la
+  // lumière — les halos des projecteurs, les faisceaux des gardes, le héros. C'est
+  // ce contraste ombre/lumière qui fait le charme des jeux de référence de Fabien.
+  majNuit() {
+    const ctx = this.nuitCtx;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.clearRect(0, 0, LARGEUR, HAUTEUR);
+    ctx.fillStyle = 'rgba(4, 8, 22, 0.55)';
+    ctx.fillRect(0, 0, LARGEUR, HAUTEUR);
+    ctx.globalCompositeOperation = 'destination-out';
+    const trou = (x, y, rai, force) => {
+      const gr = ctx.createRadialGradient(x, y, 0, x, y, rai);
+      gr.addColorStop(0, 'rgba(0,0,0,' + force + ')');
+      gr.addColorStop(0.55, 'rgba(0,0,0,' + (force * 0.55).toFixed(3) + ')');
+      gr.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = gr;
+      ctx.beginPath(); ctx.arc(x, y, rai, 0, Math.PI * 2); ctx.fill();
+    };
+    // les HALOS des projecteurs (leurs tours restent éclairées aussi)
+    for (const pr of this.projecteurs) {
+      trou(pr.hx !== undefined ? pr.hx : pr.depart[0], pr.hy !== undefined ? pr.hy : pr.depart[1], R.projecteur.rayon + 26, 1);
+      trou(pr.tour[0], pr.tour[1], 34, 0.9);
+    }
+    // les FAISCEAUX des gardes : des poches de lumière le long du cône
+    for (const g of this.gardes) {
+      for (let k = 1; k <= 3; k++)
+        trou(g.x + Math.cos(g.angle) * R.garde.portee * k / 3.6, g.y + Math.sin(g.angle) * R.garde.portee * k / 3.6,
+          R.garde.portee * 0.42 * (1 - k * 0.13), 0.8);
+      trou(g.x, g.y, 26, 0.7);   // le garde lui-même reste lisible
+    }
+    // autour du HÉROS : on se voit toujours
+    trou(this.joueur.x, this.joueur.y, 92, 0.85);
+    ctx.globalCompositeOperation = 'source-over';
+    this.nuitTex.refresh();
   }
 
   // le HUD reste PUNTO à l'écran pendant que la caméra zoome et suit le héros.
