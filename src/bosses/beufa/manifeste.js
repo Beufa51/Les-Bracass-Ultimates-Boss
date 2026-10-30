@@ -1,7 +1,7 @@
 // Manifeste du boss BEUFA : ses visuels et ses sons, rien de partagé avec les autres boss.
-// STYLE NÉS façon Metal Gear : pixel: 2 => chaque pixel logique fait 2 px, les couleurs
-// sont réduites comme sur console 8 bits, et chaque forme a du VOLUME (chapeau éclairé +
-// face sombre + ombre portée). Les COULEURS sont choisies « sur la grille 28 » du moteur.
+// STYLE SNES 16 bits façon Metal Gear : pixel: 2 => chaque pixel logique fait 2 px,
+// chaque forme a du VOLUME en RAMPS DE 3-4 TONS + TRANSITIONS EN TRAME (damier 2 px, la
+// signature 16 bits) + ombre portée. Les COULEURS sont choisies « sur la grille 28 » du moteur.
 // fichier: null => dessin provisoire par code ; dès que Fabien ajoute de vrais PNG
 // (sprites/beufa/…), on remplace fichier: null par le chemin et TOUT le reste tient déjà.
 import { DALLE_NES, MUR_NES, MUR_NES_V, ROUTE_NES, CONTENEUR_NES, CAISSE_NES, SACS_NES, TABLE_NES, PROJECTEUR_NES, PORTE_NES, GARDE_NES, HEROS_NES, BEUFA_NES, PIERRE_NES } from './dessins.js';
