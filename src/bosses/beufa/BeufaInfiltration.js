@@ -46,8 +46,8 @@ export class BeufaInfiltration extends BossScene {
     this.touches = creerTouches(this);
     etiquettesTactiles({ haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'OK', z: 'Sprint', x: 'Pierre' });   // Espace valide l'intro (bouton OK sur téléphone)
     this.cameras.main.setBackgroundColor('#0a0e15');
-    // la caméra ne montrera JAMAIS de bord noir : elle reste dans la pièce
-    this.cameras.main.setBounds(0, 0, LARGEUR, HAUTEUR);
+    // V24 GRANDES SALLES : les bornes de la caméra sont posées PAR PIÈCE —
+    // une pièce peut être PLUS GRANDE que l'écran, elle défile sous la caméra.
     this.programme = [];   // la file des « dans X secondes, fais ça » (décomptée dans update)
 
     // LES IMAGES DE FABIEN arrivent GRANDES et sur FOND BLANC : on les prépare une fois
@@ -56,9 +56,8 @@ export class BeufaInfiltration extends BossScene {
     // la MUSIQUE d'infiltration (assets/audio/beufa/beufa_musique.mp3), en boucle
     jouerMusique(this, 'beufa_musique');
 
-    // le sol de la base (nuit) — le même carreau pave tout, sans couture ;
-    // sa TEINTE change avec la pièce (cour extérieure / salle du QG)
-    this.sol = this.add.tileSprite(0, 0, LARGEUR, HAUTEUR, 'beufa_sol', 0).setOrigin(0);
+    // V24 : le sol est recréé PAR PIÈCE aux dimensions de la salle (elle peut
+    // être plus grande que l'écran) — voir chargerPiece ; sa TEINTE change avec la pièce.
 
     // LA PIÈCE COURANTE : on ne charge QUE elle (murs, route, conteneurs, gardes,
     // projecteurs…). Passer une porte détruit tout et charge la pièce suivante.
@@ -84,6 +83,9 @@ export class BeufaInfiltration extends BossScene {
     this.radarEtat = texte(this, 54, 174, 'NORMAL', 13, '#7fff7f').setOrigin(0.5, 0).setDepth(901);
     // LE VISEUR DE LA PIERRE : un petit cercle là où elle TOMBERA — la diversion devient précise
     this.viseeG = this.add.graphics().setDepth(15);
+    // V24 LA FLÈCHE DE SORTIE : l'objectif est hors écran ? une flèche verte clignote
+    // au bord et pointe la porte — on ne tourne PLUS en rond dans le noir.
+    this.flecheG = this.add.graphics().setDepth(902).setScrollFactor(0);
 
     // LA NUIT (le look des captures de référence) : un voile d'obscurité sur TOUT,
     // troué de lumière par les projecteurs, le long des cônes des gardes et autour
@@ -316,6 +318,14 @@ export class BeufaInfiltration extends BossScene {
     this.gardes = [];
     this.projecteurs = [];
     if (this.pierre) { this.pierre.sprite.destroy(); this.pierre = null; }
+    // V24 GRANDES SALLES : chaque pièce a SES dimensions (l, h) — elle déborde de
+    // l'écran : le sol est recréé à SA taille, les bornes caméra la délimitent,
+    // et la caméra se POSE sur l'entrée (elle glissera ensuite derrière le héros).
+    this.roomL = P.l || 960; this.roomH = P.h || 540;
+    this.cameras.main.setBounds(0, 0, this.roomL, this.roomH);
+    this.cameras.main.centerOn(P.entree.x, P.entree.y);
+    if (this.sol) this.sol.destroy();
+    this.sol = this.add.tileSprite(0, 0, this.roomL, this.roomH, 'beufa_sol', 0).setOrigin(0);
     this.sol.setTint(P.teinteSol || 0xffffff);   // l'ambiance change : cour extérieure / salle du QG
     // LA ROUTE : du portail à la porte, l'axe de la base — du décor, ça ne bloque pas
     for (const [x, y, l, h] of (P.routes || [])) {
@@ -385,11 +395,14 @@ export class BeufaInfiltration extends BossScene {
     // les gardes NE SONT PAS ENCORE EN POSTE : Beufa inspecte la cour vide —
     // fini le géant qui traversait les gardes plantés au milieu de sa route.
     for (const g of this.gardes) { g.sprite.setVisible(false); g.alerte.setVisible(false); }
-    const beufa = this.add.sprite(480, 310, 'beufa_boss', 0).setDepth(40).setScale(0.8)
+    // V24 GRANDES SALLES : Beufa défile au MILIEU de la cour (qui déborde de
+    // l'écran) — la caméra se POSE sur son axe, puis rendra la main au héros.
+    this.cameras.main.centerOn(480, this.roomH / 2);
+    const beufa = this.add.sprite(480, this.roomH / 2 + 120, 'beufa_boss', 0).setDepth(40).setScale(0.8)
       .setRotation(-Math.PI / 2 + ORIENT_BOSS);
     const nbCases = Math.max(1, Object.keys(beufa.texture.frames).length - 1);   // moins le __BASE
     this.tweens.add({
-      targets: beufa, x: 480, y: 60, duration: 2600, ease: 'Sine.InOut',
+      targets: beufa, x: 480, y: this.roomH / 2 - 150, duration: 2600, ease: 'Sine.InOut',
       onUpdate: (tw) => beufa.setFrame(Math.floor(tw.elapsed / 130) % nbCases),   // le cycle de marche
     });
     this.dans(0.6, () => {
@@ -487,7 +500,7 @@ export class BeufaInfiltration extends BossScene {
     // LA SORTIE : la porte au nord (pièce suivante)… ou LA PORTE DU QG (victoire)
     const P = PIECES[this.piece];
     if (P.sortie === 'haut' && this.joueur.y < 36 && this.joueur.x > 445 && this.joueur.x < 515) this.changerDePiece(this.piece + 1);
-    if (P.sortie === 'qg' && this.joueur.x > 906 && this.joueur.y > 190 && this.joueur.y < 250) this.reussite();
+    if (P.sortie === 'qg' && this.joueur.x > 1396 && this.joueur.y > 330 && this.joueur.y < 400) this.reussite();
   }
 
   // le fondu de changement de pièce : l'écran s'éteint, la pièce suivante se charge
@@ -512,8 +525,8 @@ export class BeufaInfiltration extends BossScene {
   bouger(e, dx, dy, rayon) {
     e.x += dx; if (this.touche(e.x, e.y, rayon)) e.x -= dx;
     e.y += dy; if (this.touche(e.x, e.y, rayon)) e.y -= dy;
-    e.x = Phaser.Math.Clamp(e.x, 22, LARGEUR - 22);
-    e.y = Phaser.Math.Clamp(e.y, 22, HAUTEUR - 22);
+    e.x = Phaser.Math.Clamp(e.x, 22, (this.roomL || LARGEUR) - 22);   // V24 : bornes de LA pièce, pas de l'écran
+    e.y = Phaser.Math.Clamp(e.y, 22, (this.roomH || HAUTEUR) - 22);
   }
 
   touche(x, y, r) {
@@ -636,6 +649,7 @@ export class BeufaInfiltration extends BossScene {
   vuPar(g) {
     const dx = this.joueur.x - g.x, dy = this.joueur.y - g.y, d = Math.hypot(dx, dy);
     if (d > R.garde.portee) return false;
+    if (d < 44) return true;   // V24 CONSCIENCE PÉRIPHÉRIQUE : collé à un garde = repéré, même dans son dos
     if (Math.abs(normAngle(Math.atan2(dy, dx) - g.angle)) > R.garde.angle * Math.PI / 180) return false;
     return !this.vueBloquee(g.x, g.y, this.joueur.x, this.joueur.y, null);
   }
@@ -827,6 +841,24 @@ export class BeufaInfiltration extends BossScene {
       this.viseeG.fillStyle(0xffd84a, 0.45);
       this.viseeG.fillCircle(vx, vy, 2);
     }
+    // V24 : la flèche verte pointe la SORTIE quand elle est hors écran.
+    this.flecheG.clear();
+    if (this.sortie && this.phase === 'jeu') {
+      const camF = this.cameras.main, zf = camF.zoom;
+      const sx = (this.sortie.x - camF.scrollX) * zf, sy = (this.sortie.y - camF.scrollY) * zf;
+      const marge = 40;
+      if (sx < marge || sx > LARGEUR - marge || sy < marge || sy > HAUTEUR - marge) {
+        const px = Phaser.Math.Clamp(sx, marge, LARGEUR - marge) / zf;   // scrollFactor 0 : on divise par le zoom
+        const py = Phaser.Math.Clamp(sy, marge, HAUTEUR - marge) / zf;
+        const af = Math.atan2(sy - HAUTEUR / 2, sx - LARGEUR / 2);
+        this.flecheG.save();
+        this.flecheG.translateCanvas(px, py);
+        this.flecheG.rotateCanvas(af);
+        this.flecheG.fillStyle(0x7fff7f, 0.65 + Math.sin(this.temps * 5) * 0.35);
+        this.flecheG.fillTriangle(14, 0, -9, -10, -9, 10);
+        this.flecheG.restore();
+      }
+    }
     this.dessinerRadar();
   }
 
@@ -857,8 +889,8 @@ export class BeufaInfiltration extends BossScene {
       }
       return;
     }
-    const s = 86 * u / LARGEUR;   // la pièce (un écran 960x540) tient dans le cercle
-    const P = (x, y) => ({ x: cx + (x - 480) * s, y: cy + (y - 270) * s });
+    const s = 80 * u / Math.max(this.roomL || LARGEUR, this.roomH || HAUTEUR);   // V24 : la GRANDE pièce tient dans le cercle
+    const P = (x, y) => ({ x: cx + (x - (this.roomL || LARGEUR) / 2) * s, y: cy + (y - (this.roomH || HAUTEUR) / 2) * s });
     g.lineStyle(1, 0x35d035, 0.85);
     for (const o of this.obstacles) { const p = P(o.x - o.l / 2, o.y - o.h / 2); g.strokeRect(p.x, p.y, Math.max(1, o.l * s), Math.max(1, o.h * s)); }
     for (const pr of this.projecteurs) {
