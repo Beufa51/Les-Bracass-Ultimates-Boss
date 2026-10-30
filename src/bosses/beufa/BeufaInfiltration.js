@@ -58,8 +58,8 @@ export class BeufaInfiltration extends BossScene {
     // pose d'arrêt (jambes resserrées) — fini le « saccadé », les jambes VIVENT.
     this.nbFramesHeros = Math.max(1, Object.keys(this.textures.get('beufa_heros').frames).length - 1);
     this.nbFramesGarde = Math.max(1, Object.keys(this.textures.get('beufa_garde').frames).length - 1);
-    this.poseArretHeros = Math.min(5, this.nbFramesHeros - 1);
-    this.poseArretGarde = Math.min(4, this.nbFramesGarde - 1);
+    this.poseArretHeros = Math.min(1, this.nbFramesHeros - 1);
+    this.poseArretGarde = Math.min(1, this.nbFramesGarde - 1);
     // la MUSIQUE d'infiltration (assets/audio/beufa/beufa_musique.mp3), en boucle
     jouerMusique(this, 'beufa_musique');
 
