@@ -220,12 +220,18 @@ export class BeufaInfiltration extends BossScene {
       // COLONNES VIDES qui les séparent : chacun reçoit SA case, recentré dedans.
       let personnages = null;
       if (n > 1) {
-        // les RANGÉES d'abord : Gemini peut livrer une planche sur UNE rangée… ou une
-        // GRILLE (la planche boss : 8 persos sur DEUX rangées). On découpe en bandes
-        // horizontales séparées par des lignes vides, puis chaque bande en colonnes :
-        // chaque perso reçoit SA case, dans l'ordre de lecture (haut, puis gauche→droite).
-        const ligneOccupee = (y) => { for (let x = x0; x <= x1; x++) if (d[(y * L + x) * 4 + 3] > 8) return true; return false; };
-        const colonneOccupee = (x, ry0, ry1) => { for (let y = ry0; y <= ry1; y++) if (d[(y * L + x) * 4 + 3] > 8) return true; return false; };
+        // les RANGÉES d'abord (Gemini : une rangée… ou une GRILLE, cf. planche boss
+        // 2×4) : bandes horizontales séparées par des lignes vides, puis colonnes.
+        // ⚠️ LA LEÇON DES « GARDES DOUBLÉS » : UN SEUL POINT de poussière JPG posé
+        // dans un couloir blanc entre deux personnages rendait la colonne « occupée »
+        // → les 5 persos FUSIONNAIENT en un seul segment → retour au découpage en
+        // parts égales → chaque case coupait un garde en deux. Désormais une ligne
+        // ou colonne n'est occupée QUE SI l'encre y forme un TRAIT CONTINU (un vrai
+        // morceau de perso) : les poussières isolées ne comptent plus.
+        const filetH = Math.max(5, Math.round((y1 - y0 + 1) * 0.04));   // trait vertical minimum (4 % du contenu)
+        const filetL = Math.max(5, Math.round((x1 - x0 + 1) * 0.015));   // trait horizontal minimum (1,5 %)
+        const ligneOccupee = (y) => { let run = 0, max = 0; for (let x = x0; x <= x1 + 1; x++) { if (x <= x1 && d[(y * L + x) * 4 + 3] > 8) { run++; if (run > max) max = run; } else run = 0; } return max >= filetL; };
+        const colonneOccupee = (x, ry0, ry1) => { let run = 0, max = 0; for (let y = ry0; y <= ry1 + 1; y++) { if (y <= ry1 && d[(y * L + x) * 4 + 3] > 8) { run++; if (run > max) max = run; } else run = 0; } return max >= filetH; };
         const bandes = [];
         let b0 = -1;
         for (let y = y0; y <= y1 + 1; y++) {
@@ -243,11 +249,15 @@ export class BeufaInfiltration extends BossScene {
           }
         }
         // on jette les miettes (bruit JPG isolé) : un VRAI perso occupe l'essentiel
-        // de la hauteur de sa bande, et une largeur honnête — et on retient SA bbox
+        // de la hauteur de sa bande, une largeur honnête — et on retient SA bbox,
+        // elle aussi mesurée aux traits continus (pas aux poussières)
         const bons = vus.filter((v) => {
           let sy0 = v[3] + 1, sy1 = v[2] - 1;
-          for (let x = v[0]; x <= v[1]; x++) for (let y = v[2]; y <= v[3]; y++)
-            if (d[(y * L + x) * 4 + 3] > 8) { if (y < sy0) sy0 = y; if (y > sy1) sy1 = y; }
+          for (let y = v[2]; y <= v[3]; y++) {
+            let run = 0, max = 0;
+            for (let x = v[0]; x <= v[1] + 1; x++) { if (x <= v[1] && d[(y * L + x) * 4 + 3] > 8) { run++; if (run > max) max = run; } else run = 0; }
+            if (max >= 3) { if (y < sy0) sy0 = y; if (y > sy1) sy1 = y; }
+          }
           v[4] = sy0; v[5] = sy1;   // la vraie hauteur de CE perso (servira au dessin)
           return (sy1 - sy0 + 1) >= (v[3] - v[2] + 1) * 0.35 && (v[1] - v[0] + 1) >= (x1 - x0 + 1) * 0.04;
         });
@@ -279,6 +289,7 @@ export class BeufaInfiltration extends BossScene {
           c2.drawImage(cv, x0, y0, cL, cH, Math.round((cibleL - dL) / 2), Math.round((cibleH - dH) / 2), dL, dH);
         }
       }
+      console.log('[BEUFA] ' + cle + ' : ' + n + ' case' + (n > 1 ? 's' + (personnages ? ' détectées' : ' — PARTS ÉGALES (détection ratée)') : ''));
       // On REMPLACE la texture par une texture canvas aux dimensions du jeu : refresh()
       // n'existe pas sur les textures d'images dans cette version de Phaser, et ça nous
       // évite toute manipulation interne. Les anims, les sprites et les pavages pointent
@@ -359,7 +370,10 @@ export class BeufaInfiltration extends BossScene {
     // BEUFA EN PERSONNE : sa planche (8 cases, 2 rangées) regarde vers le bas de
     // l'image → il monte vers le NORD (angle -π/2) avec sa rotation d'orientation,
     // et ses JAMBES DÉFILENT sur le VRAI nombre de cases de la planche.
-    const beufa = this.add.sprite(480, 310, 'beufa_boss', 0).setDepth(40).setScale(1.5)
+    // les gardes NE SONT PAS ENCORE EN POSTE : Beufa inspecte la cour vide —
+    // fini le géant qui traversait les gardes plantés au milieu de sa route.
+    for (const g of this.gardes) { g.sprite.setVisible(false); g.alerte.setVisible(false); }
+    const beufa = this.add.sprite(480, 310, 'beufa_boss', 0).setDepth(40).setScale(0.8)
       .setRotation(-Math.PI / 2 + ORIENT_BOSS);
     const nbCases = Math.max(1, Object.keys(beufa.texture.frames).length - 1);   // moins le __BASE
     this.tweens.add({
@@ -376,6 +390,7 @@ export class BeufaInfiltration extends BossScene {
     });
     this.dans(3.1, () => {
       this.phase = 'jeu';
+      for (const g of this.gardes) { g.sprite.setVisible(true); g.alerte.setVisible(true); }   // les gardes entrent en poste
       // LA CAMÉA RAPPROCHÉE (demande de Fabien : « on voit de trop loin ») : elle suit le
       // héros et zoome en douceur — la pièce DÉFILE, le héros est GROS à l'écran.
       const cam = this.cameras.main;
@@ -879,7 +894,8 @@ export class BeufaInfiltration extends BossScene {
       trou(pr.tour[0], pr.tour[1], 34 * flam, 0.9);
     }
     // les FAISCEAUX des gardes : des poches de lumière le long du cône
-    for (const g of this.gardes) {
+    // (pas pendant la cinématique : leurs postes sont vides, Beufa est seul)
+    for (const g of this.phase === 'cinema' ? [] : this.gardes) {
       for (let k = 1; k <= 3; k++)
         trou(g.x + Math.cos(g.angle) * R.garde.portee * k / 3.6, g.y + Math.sin(g.angle) * R.garde.portee * k / 3.6,
           R.garde.portee * 0.42 * (1 - k * 0.13), 0.8);
