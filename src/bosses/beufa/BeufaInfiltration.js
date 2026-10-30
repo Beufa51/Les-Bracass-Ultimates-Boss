@@ -53,6 +53,13 @@ export class BeufaInfiltration extends BossScene {
     // LES IMAGES DE FABIEN arrivent GRANDES et sur FOND BLANC : on les prépare une fois
     // (fond retiré, recadrées, mises à la TAILLE DU JEU) avant de dessiner quoi que ce soit.
     this.preparerImages();
+    // V30 : les VRAIES PLANCHES DE MARCHE de Fabien (6-7 frames) — le nombre de
+    // frames RÉEL (détecté par le découpeur) l'emporte, et chaque planche a SA
+    // pose d'arrêt (jambes resserrées) — fini le « saccadé », les jambes VIVENT.
+    this.nbFramesHeros = Math.max(1, Object.keys(this.textures.get('beufa_heros').frames).length - 1);
+    this.nbFramesGarde = Math.max(1, Object.keys(this.textures.get('beufa_garde').frames).length - 1);
+    this.poseArretHeros = Math.min(5, this.nbFramesHeros - 1);
+    this.poseArretGarde = Math.min(4, this.nbFramesGarde - 1);
     // la MUSIQUE d'infiltration (assets/audio/beufa/beufa_musique.mp3), en boucle
     jouerMusique(this, 'beufa_musique');
 
@@ -500,9 +507,9 @@ export class BeufaInfiltration extends BossScene {
     }
     if (dx || dy) {
       this.joueur.angle = Math.atan2(dy, dx);
-      this.sprJoueur.setFrame(Math.floor(this.temps * (sprint ? 11 : 7)) % 4);
+      this.sprJoueur.setFrame(Math.floor(this.temps * (sprint ? 11 : 7)) % this.nbFramesHeros);
       if (sprint) this.bruit();   // le sprint s'entend : les gardes proches se tournent vers toi
-    } else this.sprJoueur.setFrame(0);
+    } else this.sprJoueur.setFrame(this.poseArretHeros);
     if (vientDAppuyer(t.x) && this.pierres > 0) this.lancerPierre();
     // LA SORTIE : la porte au nord (pièce suivante)… ou LA PORTE DU QG (victoire)
     const P = PIECES[this.piece];
@@ -834,7 +841,7 @@ export class BeufaInfiltration extends BossScene {
       const rebond = g.bouge ? Math.abs(Math.sin(this.temps * 13 + g.x * 0.05)) * 2 : 0;
       g.sprite.setPosition(g.x, g.y - rebond)
         .setRotation(g.angle + ORIENT_GARDE + (g.bouge ? Math.sin(this.temps * 13 + g.x * 0.05) * 0.07 : 0))
-        .setFrame(g.bouge ? 0 : 2);   // marche = frame 0, arrêt = frame 2 : les DEUX ont le fusil du même côté (la planche alterne encore les côtés)
+        .setFrame(g.bouge ? Math.floor(this.temps * 7 + g.x * 0.07) % this.nbFramesGarde : this.poseArretGarde);   // V30 : le VRAI cycle de jambes de la planche de Fabien
       g.alerte.setPosition(g.x, g.y - 32).setScale(1 + Math.sin(this.temps * 18) * 0.12);
       this.dessinerCone(gg, g.x, g.y, g.angle, R.garde, g.etat === 'poursuite' ? 0xff5a5a : 0xffe9a0, null);
     }

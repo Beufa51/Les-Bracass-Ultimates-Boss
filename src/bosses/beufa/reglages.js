@@ -198,6 +198,12 @@ export const PIECES = [
       [130, 160, 48, 48, 'beufa_baril'],   // le baril du nord-ouest : couverture dans le dos du planté
       [800, 560, 48, 48, 'beufa_baril'],   // le baril de l'allée est, entre les rayons
       [180, 880, 48, 48, 'beufa_baril'],   // le baril du dépôt sud : abri contre la ronde du sud
+      // V30 — LE POSTE DU CENTRE : quatre barils autour du planté — le VIDE au
+      // milieu de la salle est comblé, et ils couvrent l'approche du planté
+      [350, 480, 48, 48, 'beufa_baril'],
+      [610, 480, 48, 48, 'beufa_baril'],
+      [350, 600, 48, 48, 'beufa_baril'],
+      [610, 600, 48, 48, 'beufa_baril'],
     ],
     sacs: [],
     caisses: [ [100, 300], [300, 100], [860, 600], [860, 80], [90, 895], [860, 880] ],   // V28 : les munitions + V29 : LES COINS DE LA SALLE habités
