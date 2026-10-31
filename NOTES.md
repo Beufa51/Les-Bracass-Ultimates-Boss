@@ -518,3 +518,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Dos : `assets_inbox/beufa_heros_snake_dos.jpg`, rangée 1 seulement (la 2e est dessinée plus grande) → 6 images.
 - Profil : remplacé par `assets_inbox/beufa_heros_snake_profil2.jpg` rangée 1 (pistolet en main), 6 images.
   Sa rangée 2 (au repos + 3 poses de tir) n'est pas utilisée : à garder si on ajoute un tir ou une pose d'arrêt.
+
+## BEUFA — V40 : PROFIL SANS « CRABE » + SNAKE PLUS PETIT
+- Profil : seulement les images 1, 4, 6 de la rangée 1 de `beufa_heros_snake_profil2.jpg` (les 2, 3, 5 sont
+  presque de face → il semblait danser). 3 images : une vraie planche de profil (prompt « strict side view ») serait mieux.
+- Les 3 planches du héros : 56×70 (avant 64×80).
