@@ -139,6 +139,11 @@ export const PIECES = [
       [227, 10, 434, 20], [733, 10, 434, 20],
       [480, 710, 960, 20],
       [10, 360, 20, 720], [950, 360, 20, 720],
+      // V58 : LES PILIERS PORTEURS du hangar, engagés dans les murs (ils dépassent de 16 px, hors rondes et passages)
+      [300, 23, 28, 26], [660, 23, 28, 26],         // nord (de part et d'autre de la porte)
+      [200, 697, 28, 26], [760, 697, 28, 26],       // sud
+      [23, 160, 26, 28], [23, 440, 26, 28],         // ouest
+      [937, 200, 26, 28], [937, 560, 26, 28],       // est
     ],
     portesVerrouillees: [],
     portes: [ [480, 710, 0], [480, 10, 0] ],
@@ -177,6 +182,10 @@ export const PIECES = [
       [10, 165, 20, 330], [10, 470, 20, 140],
       [1430, 165, 20, 330], [1430, 470, 20, 140],   // est : LE BUREAU DE BEUFA (y 330-400)
       [1060, 110, 20, 200], [1060, 440, 20, 160],   // la cloison du bureau : on y entre par l'ouverture du milieu (y 210-360)
+      // V58 : LES PILIERS PORTEURS, engagés dans les murs (jamais devant le passage secret du nord, x 560-960)
+      [230, 23, 28, 26],                            // nord (à côté de la tour du portique)
+      [300, 517, 28, 26], [760, 517, 28, 26],       // sud (le 2e entre les deux étagères)
+      [23, 120, 26, 28], [23, 470, 26, 28],         // ouest (de part et d'autre de l'entrée)
     ],
     portesVerrouillees: [],
     portes: [ [10, 365, Math.PI / 2], [1430, 365, Math.PI / 2] ],
