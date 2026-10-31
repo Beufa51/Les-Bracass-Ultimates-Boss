@@ -72,7 +72,7 @@ export const PIECES = [
       [150, 170, 140, 52, 'beufa_conteneur_olive'],                         // le conteneur du nord-ouest
       [780, 110, 96, 96, 'beufa_reservoir'],         // LE RÉSERVOIR du nord-est (la variante passe entre lui et le mur)
       [820, 430, 140, 52],                           // LA COUVERTURE DU CHEMIN EST (variante)
-      [860, 620, 80, 80, 'beufa_mirador'],           // le mirador du portail (décor)
+      [860, 620, 68, 80, 'beufa_mirador'],           // le mirador du portail (décor)
       [370, 70, 64, 64, 'beufa_guerite'],            // V52 : la guérite de la porte du QG (petite couverture avant la sortie)
       [70, 640, 64, 64, 'beufa_palettes'],           // V52 : palettes dans le coin sud-ouest (hors des chemins)
     ],
@@ -111,6 +111,7 @@ export const PIECES = [
       [560, 455, 176, 72, 'beufa_camion'], [800, 455, 176, 72, 'beufa_camion'], [1040, 455, 176, 72, 'beufa_camion'],
       [1220, 480, 96, 96, 'beufa_reservoir'],        // la station : cache la dernière niche du gardien de la porte
       [1300, 90, 88, 60, 'beufa_jeep'],              // décor de l'angle nord-est
+      [360, 410, 16, 16, 'beufa_plot'], [392, 410, 16, 16, 'beufa_plot'], [1130, 320, 16, 16, 'beufa_plot'], [1170, 320, 16, 16, 'beufa_plot'],   // V55 : plots au bord de la route (hors des chemins des gardes)
       [1385, 495, 48, 48, 'beufa_pneus'], [250, 500, 48, 48, 'beufa_pneus'],   // V53 : pneus dans les coins (hors des chemins)
     ],
     decorsSol: [ [900, 385, 'beufa_huile', 0.6], [640, 330, 'beufa_huile', 0.6], [1180, 160, 'beufa_huile', 0.6] ],   // V53 : taches d'huile

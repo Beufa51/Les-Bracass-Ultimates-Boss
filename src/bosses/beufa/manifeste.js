@@ -23,12 +23,14 @@ export const MANIFESTE = {
     // les PNG dans sprites/beufa/, remplacer fichier: null par le chemin — dimensions identiques)
     beufa_camion:     { fichier: 'sprites/beufa/beufa_camion.jpg', fond: 'blanc', largeur: 176, hauteur: 72, images: 1, vitesse: 1, provisoire: { forme: 'camion_nes', couleur: '#385438', pixel: 2 } },
     beufa_camion_v:   { fichier: 'sprites/beufa/beufa_camion_v.jpg', fond: 'blanc', largeur: 72, hauteur: 176, images: 1, vitesse: 1, provisoire: { forme: 'camion_nes', couleur: '#385438', pixel: 2 } },
-    // V50 : l'étagère du QG (remplace les conteneurs de port posés DANS le bâtiment) ; verticale : l'horizontale tournée en attendant une bonne _v
+    // V50 : l'étagère du QG (remplace les conteneurs de port posés DANS le bâtiment) 
     beufa_etagere:    { fichier: 'sprites/beufa/beufa_etagere.jpg', fond: 'blanc', largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545454', pixel: 2 } },
+    beufa_etagere_v:  { fichier: 'sprites/beufa/beufa_etagere_v.jpg', fond: 'blanc', largeur: 52, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545454', pixel: 2 } },
+    beufa_plot:       { fichier: 'sprites/beufa/beufa_plot.jpg', fond: 'blanc', largeur: 20, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'baril_nes', couleur: '#d8701c', pixel: 2 } },
     beufa_jeep:       { fichier: 'sprites/beufa/beufa_jeep.jpg', fond: 'blanc', largeur: 88, hauteur: 60, images: 1, vitesse: 1, provisoire: { forme: 'jeep_nes', couleur: '#38543c', pixel: 2 } },
     beufa_helico:     { fichier: 'sprites/beufa/beufa_helico.jpg', fond: 'blanc', largeur: 184, hauteur: 100, images: 1, vitesse: 1, provisoire: { forme: 'helico_nes', couleur: '#1c3854', pixel: 2 } },
     beufa_reservoir:  { fichier: 'sprites/beufa/beufa_reservoir.jpg', fond: 'blanc', largeur: 96, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'reservoir_nes', couleur: '#385454', pixel: 2 } },
-    beufa_mirador:    { fichier: 'sprites/beufa/beufa_mirador.jpg', fond: 'blanc', largeur: 80, hauteur: 80, images: 1, vitesse: 1, provisoire: { forme: 'mirador_nes', couleur: '#545038', pixel: 2 } },
+    beufa_mirador:    { fichier: 'sprites/beufa/beufa_mirador.jpg', fond: 'blanc', largeur: 68, hauteur: 88, images: 1, vitesse: 1, provisoire: { forme: 'mirador_nes', couleur: '#545038', pixel: 2 } },
     beufa_tente:      { fichier: 'sprites/beufa/beufa_tente.jpg', fond: 'blanc', largeur: 148, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'tente_nes', couleur: '#545438', pixel: 2 } },
     beufa_ratelier:   { fichier: 'sprites/beufa/beufa_ratelier.jpg', fond: 'blanc', largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'ratelier_nes', couleur: '#545038', pixel: 2 } },
     beufa_baril:      { fichier: 'sprites/beufa/beufa_baril.jpg', fond: 'blanc', largeur: 34, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'baril_nes', couleur: '#385454', pixel: 2 } },

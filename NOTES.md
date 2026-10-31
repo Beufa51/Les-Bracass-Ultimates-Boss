@@ -635,3 +635,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   bureau de Beufa (1200,75, à la place de la caisse), 2 plantes (coins est du bureau), tapis au sol (1250,300).
 - Tailles du manifeste calées sur le format réel des images (bureau 120×94, consoles 132×40, munitions 70×38…).
 - Il ne reste à livrer que : étagère verticale (n°2), plot (n°18, à placer ensuite au parc), mirador (n°28).
+
+## BEUFA — V55 : DÉCORS TERMINÉS (tous en vue 3/4)
+- Étagère verticale (QG, rayonnages : plus de rotation), mirador (68×88, obstacle 68×80), 4 plots au bord de la
+  route du parc (petits obstacles 16×16, hors des chemins des gardes).
+- Tous les prompts de `propositions/beufa_prompts_decor_complets.md` sont livrés. Encore d'origine (jamais
+  signalés) : jeep, réservoir, hélico, sacs de sable, portes, sol, murs — à revoir seulement si le style choque.
