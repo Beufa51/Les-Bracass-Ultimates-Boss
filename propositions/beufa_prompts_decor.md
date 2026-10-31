@@ -21,7 +21,8 @@ Exceptions :
 Pixel art game asset, 16-bit SNES style like the original Metal Gear (1990) and Zelda: A Link to the Past,
 classic 3/4 TOP-DOWN view: we mainly see the TOP of the object, plus a thin strip of its FRONT face (the side
 facing the bottom of the image, about one quarter of the object's height) to show its volume. No left or right
-side faces, no vanishing point, no isometric angle. Light from the top-left: top surface lit, front face darker.
+side faces, no vanishing point, no isometric angle: ORTHOGRAPHIC projection, the top face is a perfect
+rectangle and the left and right edges are perfectly vertical straight lines. Light from the top-left: top surface lit, front face darker.
 Single object, centered, filling the image, pure white background, no cast shadow, no text, no grid, no border.
 Muted military night palette: olive drab, khaki, gunmetal grey, dark steel blue, rust; 3-4 shades per color
 with dithering, dark 1-pixel outline.
@@ -58,8 +59,9 @@ rifles lying side by side across it, barrels pointing up, plus a small row of am
 Long horizontal image, ratio 8:3.
 
 ### Caisse — `beufa_caisse.jpg` (en jeu 64×64 ; déjà corrigée, à refaire seulement si tu veux mieux)
-Object: ONE olive-drab military supply crate seen in 3/4 top-down view: lid with two metal straps, stencilled
-star, a small metal label plate. ONE crate only. Square image.
+Object: ONE olive-drab military supply crate seen in 3/4 top-down view, a chunky CUBE (as deep as it is wide,
+not a flat case): lid with two metal straps, stencilled star, a small metal label plate, the whole lid in the SAME
+olive color. ONE crate only. The whole drawing fits in a SQUARE.
 
 ### Conteneur — `beufa_conteneur.jpg` (rouille) et `beufa_conteneur_olive.jpg` (kaki) (en jeu 140×52)
 Object: a shipping container seen in 3/4 top-down view: its corrugated ROOF (ribs running across), corner
