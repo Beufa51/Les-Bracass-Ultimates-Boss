@@ -543,3 +543,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - `echelleCommune: 'hauteur'` (3 planches du héros) : chaque image ramenée à la même hauteur (la 2e rangée de la
   planche de face était dessinée plus grande que la 1re). `echelle: 0.92` sur la face (dessinée plus trapue).
 - Profil : « un peu plus fluide, pas génial » → une vraie planche de 8 images de profil réglerait ça.
+
+## BEUFA — V45 : VRAI PROFIL 8 IMAGES
+- `assets_inbox/beufa_heros_snake_profil8.jpg` : 8 vraies images de profil, mais elles se CHEVAUCHENT (bandana,
+  bottes). Découpe faite à la main (coupure aux colonnes les plus vides près de W/8, puis dans chaque case on
+  garde le perso et on jette les morceaux du voisin collés au bord) → beufa_heros_profil.jpg (8 images).
+  Les bouts de bandana qui débordaient chez le voisin sont un peu coupés.
