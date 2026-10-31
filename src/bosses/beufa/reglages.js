@@ -139,6 +139,7 @@ export const PIECES = [
   },
   { // ----- PIÈCE 3 : L'ARSENAL — 960×720 — « le veilleur et la ronde » -----
     nom: 'PIÈCE 3/4 · L\'ARSENAL',
+    marquagesSol: [ [480, 380, 304, 176] ],   // V66 : la zone d'explosifs balisée autour de la batterie de missiles
     l: 960, h: 720,
     teinteSol: 0xd2d8ee,
     murs: [
@@ -204,7 +205,7 @@ export const PIECES = [
       [150, 150, 132, 44, 'beufa_console'], [150, 494, 140, 52, 'beufa_etagere'],   // V54 : consoles radar au nord       // l'antichambre : la poche sûre
       [420, 130, 52, 140, 'beufa_etagere'], [420, 450, 52, 140, 'beufa_etagere'],       // les rayonnages de part et d'autre du portique de lumière
       [640, 494, 140, 52, 'beufa_etagere'], [880, 494, 140, 52, 'beufa_etagere'],       // la rangée sud : l'abri contre le stratège — V61 : collée au mur (avant : faux passage de 24 px derrière)
-      [640, 84, 140, 52, 'beufa_etagere'], [880, 84, 140, 52, 'beufa_etagere'],       // la rangée nord — DERRIÈRE elle, contre le mur, un PASSAGE SECRET (la variante)
+      [640, 84, 140, 52, 'beufa_console'], [880, 84, 140, 52, 'beufa_console'],       // V66 : postes d'opérateurs face à la table des cartes — la rangée nord — DERRIÈRE elle, contre le mur, un PASSAGE SECRET (la variante)
       [1200, 494, 140, 52, 'beufa_etagere'],                           // les archives du sas
       [1200, 42, 132, 44, 'beufa_console'],          // V62 : LE POSTE DE SÉCURITÉ (écrans) contre le mur — le bureau de Beufa ira dans la pièce du QUIZ
     ],

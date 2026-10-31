@@ -435,6 +435,14 @@ export class BeufaInfiltration extends BossScene {
         this.sortie = { x, y };
     }
     if (this.sortie) this.lueurs.push({ x: this.sortie.x, y: this.sortie.y, c: 0x38fc38 });   // sa lueur est DOUBLÉE
+    this.lampes = [];   // V66 : les lampadaires allumés (une lueur sur la tête, pas de flaque au sol : elle ferait croire qu'on y est vu)
+    // V66 : MARQUAGES AU SOL (zone d'explosifs…) : un cadre jaune peint, sous tout le reste
+    for (const [x, y, l, h] of (P.marquagesSol || [])) {
+      const m = this.add.graphics().setDepth(8);
+      m.lineStyle(4, 0xd8b81c, 0.55).strokeRect(x - l / 2, y - h / 2, l, h);
+      m.lineStyle(1, 0x1c1c1c, 0.6).strokeRect(x - l / 2 + 4, y - h / 2 + 4, l - 8, h - 8);
+      this.decor.push(m);
+    }
     // LES CONTENEURS : les GRANDES couvertures — elles bloquent le passage ET la vue
     for (const c of (P.conteneurs || [])) {
       const [x, y, l, h] = c;
@@ -451,6 +459,7 @@ export class BeufaInfiltration extends BossScene {
       else img.setOrigin(0.5, 1).setPosition(x + (c[5] || 0), y + h / 2);   // V60 : c[5] = décalage x de l'image (le mât du drapeau est à gauche de son image)
       this.decor.push(img);
       this.obstacles.push({ x, y, l, h });
+      if (cle === 'beufa_lampadaire') this.lampes.push({ x: x + (c[5] || 0), y: y + h / 2 - img.height + 14 });   // V66 : la TÊTE de la lampe
     }
     // V52 : le DÉCOR AU SOL (barrière, flaques…) : sous le joueur, ne bloque ni le passage ni la vue
     for (const [x, y, cle, alpha] of (P.decorsSol || [])) this.decor.push(this.add.image(x, y, cle).setDepth(8).setAlpha(alpha || 1));   // alpha : l'huile, trop noire, ne doit pas passer pour un trou
@@ -1102,6 +1111,7 @@ export class BeufaInfiltration extends BossScene {
           R.garde.portee * 0.42 * (1 - k * 0.13), 0.8);
       trou(g.x, g.y, 26, 0.7);   // le garde lui-même reste lisible
     }
+    for (const la of (this.lampes || [])) trou(la.x, la.y, 22, 0.8);   // V66 : les lampadaires brillent
     // autour du HÉROS : on se voit toujours
     trou(this.joueur.x, this.joueur.y, 92, 0.85);
     // LA SORTIE PULSE : un phare vert dans la nuit — on ne perd JAMAIS l'objectif

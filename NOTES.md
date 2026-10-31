@@ -732,3 +732,11 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   il signale bien le piège du QG.
 - Corrigé grâce à lui : camions sud du parc y 455 → 450 (passage de 34 px), plots collés par paires, missiles
   de la réserve collés au mur, piliers nord de l'arsenal 300/660 → 320/640. Bilan : 0 erreur, 0 avertissement.
+
+## BEUFA — V66 : RAPPORT DE LEVEL DESIGN (références du genre)
+- `propositions/beufa_rapport_level_design.md` : comparaison avec MGS (Shadow Moses), MGS V (Camp Omega),
+  Mark of the Ninja (règles de Nels Anderson), Thief (Randy Smith), Game Maker's Toolkit (narration environnementale).
+- Appliqué : lueur sur la tête des lampadaires (pas de flaque au sol, trompeuse) ; QG rangée nord = consoles
+  (postes d'opérateurs) ; `marquagesSol: [[x,y,l,h]]` = cadre jaune peint, autour des missiles de l'arsenal.
+- Prompt n°14 (caméra) : à la livraison, le portique du QG devient une CAMÉRA (même balayage ; dehors = projecteurs).
+- À décider par Fabien : projecteur sur le mirador ; lampadaires = vraie lumière qui repère Snake.
