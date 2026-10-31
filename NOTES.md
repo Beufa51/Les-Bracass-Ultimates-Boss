@@ -724,3 +724,11 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - La cloison du sas (x 1060, porte de 80 px) est SUPPRIMÉE avec son cadre de porte : elle bloquait juste avant
   la sortie, et n'a plus de raison d'être sans le bureau. L'est du QG est ouvert ; gardes, écrans, archives et
   tapis restent. (`portesInterieures` reste disponible dans le code pour la pièce du quiz.)
+
+## BEUFA — V65 : OUTIL DE VÉRIFICATION AUTOMATIQUE DES PIÈCES
+- `node outils/beufa_verif.mjs` (0,3 s, lit les vraies données de `reglages.js`) : à lancer après CHAQUE
+  changement de décor. Contrôle : chemin entrée → sortie avec le vrai rayon de Snake, rondes qui traversent
+  un obstacle (ERREURS), faux passages 10-34 px et zones inatteignables (AVERTISSEMENTS). Testé sur la V60 :
+  il signale bien le piège du QG.
+- Corrigé grâce à lui : camions sud du parc y 455 → 450 (passage de 34 px), plots collés par paires, missiles
+  de la réserve collés au mur, piliers nord de l'arsenal 300/660 → 320/640. Bilan : 0 erreur, 0 avertissement.

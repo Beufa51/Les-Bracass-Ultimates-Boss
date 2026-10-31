@@ -113,10 +113,10 @@ export const PIECES = [
       [560, 220, 72, 176, 'beufa_camion'], [720, 220, 72, 176, 'beufa_camion'],
       [880, 220, 72, 176, 'beufa_camion'], [1040, 220, 72, 176, 'beufa_camion'],
       // LA RANGÉE SUD : trois camions le long de la route — les niches entre eux sont à L'OMBRE du halo
-      [560, 455, 176, 72, 'beufa_camion'], [800, 455, 176, 72, 'beufa_camion'], [1040, 455, 176, 72, 'beufa_camion'],
+      [560, 450, 176, 72, 'beufa_camion'], [800, 450, 176, 72, 'beufa_camion'], [1040, 450, 176, 72, 'beufa_camion'],   // V65 : y 455 → 450, le passage derrière fait 34 px (avant : 29, piège)
       [1220, 480, 96, 96, 'beufa_reservoir'],        // la station : cache la dernière niche du gardien de la porte
       [1355, 53, 120, 66, 'beufa_jeep'],             // décor de l'angle nord-est — V61 : garée contre le mur (au-dessus du demi-tour du gardien, y 110)
-      [360, 410, 16, 16, 'beufa_plot'], [392, 410, 16, 16, 'beufa_plot'], [1130, 320, 16, 16, 'beufa_plot'], [1170, 320, 16, 16, 'beufa_plot'],   // V55 : plots au bord de la route (hors des chemins des gardes)
+      [368, 410, 16, 16, 'beufa_plot'], [384, 410, 16, 16, 'beufa_plot'], [1142, 320, 16, 16, 'beufa_plot'], [1158, 320, 16, 16, 'beufa_plot'],   // V65 : plots collés par paires   // V55 : plots au bord de la route (hors des chemins des gardes)
       [250, 318, 14, 12, 'beufa_lampadaire'], [1340, 318, 14, 12, 'beufa_lampadaire'],   // V60 : lampadaires au bord NORD de la route (au sud, le poteau montait par-dessus l'asphalte)
       [1396, 496, 48, 48, 'beufa_pneus'], [234, 496, 48, 48, 'beufa_pneus'],   // V53 : pneus dans les coins (hors des chemins)
     ],
@@ -146,7 +146,7 @@ export const PIECES = [
       [480, 710, 960, 20],
       [10, 360, 20, 720], [950, 360, 20, 720],
       // V58 : LES PILIERS PORTEURS du hangar, engagés dans les murs (ils dépassent de 16 px, hors rondes et passages)
-      [300, 23, 28, 26], [660, 23, 28, 26],         // nord (de part et d'autre de la porte)
+      [320, 23, 28, 26], [640, 23, 28, 26],         // nord (de part et d'autre de la porte) — V65 : 300/660 → 320/640 (recoin avec les missiles)
       [200, 697, 28, 26], [760, 697, 28, 26],       // sud
       [23, 160, 26, 28], [23, 440, 26, 28],         // ouest
       [937, 200, 26, 28], [937, 560, 26, 28],       // est
@@ -163,7 +163,7 @@ export const PIECES = [
       // V61 : L'ATELIER de l'entrée : caisses de munitions à déballer + l'établi (même emprise qu'avant)
       [295, 610, 70, 52, 'beufa_munitions'], [365, 610, 70, 52, 'beufa_munitions'], [630, 610, 140, 52, 'beufa_etabli'],
       // V61 : LA RÉSERVE DES MISSILES au nord-ouest, sous l'œil du veilleur (à la place de la table à cartes, même emprise)
-      [190, 68, 140, 45, 'beufa_missile'], [190, 113, 140, 45, 'beufa_missile'],
+      [190, 43, 140, 45, 'beufa_missile'], [190, 88, 140, 45, 'beufa_missile'],   // V65 : collés au mur nord (avant : 26 px derrière, piège)
       // L'ABRI DU VEILLEUR : la rangée nord, l'ombre juste avant la porte
       [610, 150, 140, 52, 'beufa_ratelier'],
       [870, 90, 70, 38, 'beufa_munitions'],          // V54 : caisses de munitions (à la place de la caisse du nord-est)
