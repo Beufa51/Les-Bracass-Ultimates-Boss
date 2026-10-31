@@ -100,3 +100,22 @@ white space between frames, every frame the SAME size, the SAME scale and the SA
 6. down (opposite of 2); 7. passing (opposite of 3); 8. up (opposite of 4).
 The legs must clearly change from frame to frame; the free arm swings opposite to the legs.
 Pure white background, no ground shadow, no text, no grid, no extra characters.
+
+## SNAKE — LES 3 DIRECTIONS SUR UNE SEULE PLANCHE (mêmes proportions partout)
+Pixel art sprite sheet, detailed 16-bit SNES style, slightly high camera angle, ONE character drawn 24 times
+with EXACTLY the same proportions, the same height and the same scale in every frame.
+Character: a tactical espionage soldier inspired by Solid Snake: muscular, broad shoulders, realistic adult
+proportions (head about 1/7 of the body height); short messy brown hair; light stubble; long dark navy-blue
+BANDANA tied around the forehead, knotted at the back, with two long tails; tight dark grey-blue sneaking suit;
+black tactical harness with straps over the shoulders and chest; black belt with pouches; black knee and elbow
+pads; black gloves; black combat boots; holster on the right thigh; black handgun held low in the right hand.
+Upright, careful walking posture (not hunched).
+3 ROWS of 8 frames each, a complete smooth WALK CYCLE in every row:
+- Row 1: seen from the FRONT, walking toward the camera (bottom of the image);
+- Row 2: seen from the BACK, walking away from the camera (top of the image), face not visible;
+- Row 3: STRICT SIDE VIEW at 90 degrees, walking toward the RIGHT, only one eye visible.
+Walk cycle in each row: 1. contact (one leg forward), 2. down, 3. passing (legs crossing), 4. up,
+5. contact (other leg forward), 6. down, 7. passing, 8. up. The legs clearly change from frame to frame,
+arms swing opposite to the legs. The head is at the same height in all frames of all rows.
+Large white space between frames: frames must NOT touch or overlap, bandana tails included.
+Pure white background, no ground shadow, no text, no grid, no extra characters.
