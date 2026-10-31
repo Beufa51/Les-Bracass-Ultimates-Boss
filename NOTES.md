@@ -508,3 +508,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   `beufa_heros_profil` (côtés, regarde à droite, miroir à gauche). Dos/profil absents → la face sert partout.
 - Prompts dos + profil : `propositions/beufa_prompts_marche.md`. À la livraison : les assembler en 1 rangée,
   les déposer dans assets/sprites/beufa/, ajouter leurs entrées au manifeste (copie de beufa_heros, echelleCommune).
+
+## BEUFA — V38 : PROFIL DE SNAKE BRANCHÉ
+- Original : `assets_inbox/beufa_heros_snake_profil.jpg` (2 rangées de 6). Rangée 1 = 3/4 profil vers la droite
+  → `beufa_heros_profil.jpg` (6 images, miroir à gauche). Rangée 2 (presque de face) NON utilisée.
+- Reste : planche de DOS (quand il monte, la face sert encore).
