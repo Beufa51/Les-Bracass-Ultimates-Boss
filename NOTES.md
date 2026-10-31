@@ -719,3 +719,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Rangées symétriques autour de l'axe x 480 : nord y 110 (conteneur olive 150 ↔ réservoir 810), milieu y 450
   (tente 160 ↔ conteneur est 800), alcôves 360 ↔ 600, portail 330 ↔ 630. Déplacements ≤ 60 px.
 - Vérifié par calcul : aucune ronde touchée, aucun faux passage.
+
+## BEUFA — V64 : SORTIE DU QG DÉGAGÉE
+- La cloison du sas (x 1060, porte de 80 px) est SUPPRIMÉE avec son cadre de porte : elle bloquait juste avant
+  la sortie, et n'a plus de raison d'être sans le bureau. L'est du QG est ouvert ; gardes, écrans, archives et
+  tapis restent. (`portesInterieures` reste disponible dans le code pour la pièce du quiz.)

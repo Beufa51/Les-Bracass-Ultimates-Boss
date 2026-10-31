@@ -185,14 +185,13 @@ export const PIECES = [
   },
   { // ----- PIÈCE 4 : LE QG DE BEUFA — 1440×540 — « tout ensemble » -----
     nom: 'PIÈCE 4/4 · LE QG DE BEUFA',
-    portesInterieures: [ [1060, 290, Math.PI / 2] ],   // V61 : la porte du SAS DE SÉCURITÉ (V62 : le bureau de Beufa, c'est la pièce du QUIZ, derrière la sortie est)
     l: 1440, h: 540,
     teinteSol: 0xd2d8ee,
     murs: [
       [720, 10, 1440, 20], [720, 530, 1440, 20],
       [10, 165, 20, 330], [10, 470, 20, 140],
       [1430, 165, 20, 330], [1430, 470, 20, 140],   // est : LE BUREAU DE BEUFA (y 330-400)
-      [1060, 130, 20, 240], [1060, 425, 20, 190],   // la cloison du bureau — V61 : une vraie PORTE (y 250-330) au lieu d'une brèche de 150 px
+      // V64 : plus de cloison devant la sortie (elle bloquait le passage ; le bureau de Beufa ira dans la pièce du quiz)
       // V58 : LES PILIERS PORTEURS, engagés dans les murs (jamais devant le passage secret du nord, x 560-960)
       [230, 23, 28, 26],                            // nord (à côté de la tour du portique)
       [300, 517, 28, 26], [760, 517, 28, 26],       // sud (le 2e entre les deux étagères)
