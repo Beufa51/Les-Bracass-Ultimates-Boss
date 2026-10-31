@@ -17,7 +17,6 @@ export default {
     { groupe: 'INFILTRATION', nom: 'Vitesse de marche (px/s)', objet: R.joueur, champ: 'vitesse', pas: 10, min: 80, max: 300 },
     { groupe: 'INFILTRATION', nom: 'Vitesse de sprint (px/s)', objet: R.joueur, champ: 'sprint', pas: 10, min: 100, max: 400 },
     { groupe: 'INFILTRATION', nom: 'Rayon d\'audition du sprint (px)', objet: R.joueur, champ: 'bruit', pas: 10, min: 40, max: 400 },
-    { groupe: 'INFILTRATION', nom: 'Pierres par tentative', objet: R.joueur, champ: 'pierres', pas: 1, min: 0, max: 9 },
     { groupe: 'GARDES', nom: 'Portée de vision (px)', objet: R.garde, champ: 'portee', pas: 10, min: 100, max: 350 },
     { groupe: 'GARDES', nom: 'Demi-angle du cône (°)', objet: R.garde, champ: 'angle', pas: 2, min: 10, max: 60 },
     { groupe: 'GARDES', nom: 'Temps de repérage avant le « ! » (s)', objet: R.garde, champ: 'reperage', pas: 0.05, min: 0.2, max: 2 },

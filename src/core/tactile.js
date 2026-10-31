@@ -11,6 +11,10 @@ const TOUCHES = {
   espace: { key: ' ',          code: 'Space',      keyCode: 32, texte: 'Espace' },
   z:      { key: 'z',          code: 'KeyZ',       keyCode: 90, texte: 'Z' },
   x:      { key: 'x',          code: 'KeyX',       keyCode: 88, texte: 'X' },
+  // DIAGONALES (optionnelles, cachées par défaut) : appuient sur DEUX flèches à la fois.
+  // Un boss les montre avec etiquettesTactiles({ hg: '◤', hd: '◥' }).
+  hg:     { combo: ['haut', 'gauche'], texte: '◤', optionnel: true },
+  hd:     { combo: ['haut', 'droite'], texte: '◥', optionnel: true },
 };
 
 const boutons = {};
@@ -22,6 +26,7 @@ export function estTactile() {
 }
 
 function envoyer(type, t) {
+  if (t.combo) { for (const n of t.combo) envoyer(type, TOUCHES[n]); return; }
   const ev = new KeyboardEvent(type, { key: t.key, code: t.code, bubbles: true, cancelable: true });
   Object.defineProperty(ev, 'keyCode', { get: () => t.keyCode });
   Object.defineProperty(ev, 'which', { get: () => t.keyCode });
@@ -58,12 +63,14 @@ export function installerTactile() {
   actions.className = 'tactile droite';
   // croix : ▲ au milieu en haut, ◀ ▼ ▶ en bas
   placement = { haut: [croix, '2', '1'], gauche: [croix, '1', '2'], bas: [croix, '2', '2'], droite: [croix, '3', '2'],
-    x: [actions, '1 / span 2', '1'], z: [actions, '1', '2'], espace: [actions, '2', '2'] };
+    x: [actions, '1 / span 2', '1'], z: [actions, '1', '2'], espace: [actions, '2', '2'],
+    hg: [croix, '1', '1'], hd: [croix, '3', '1'] };
 
   for (const [nom, [parent, col, ligne]] of Object.entries(placement)) {
     const t = TOUCHES[nom];
     const b = document.createElement('button');
     b.textContent = t.texte;
+    if (t.optionnel) b.classList.add('cache');
     b.style.gridColumn = col; b.style.gridRow = ligne;
     let enfonce = false, debut = 0;
     const appuyer = (e) => {
@@ -94,7 +101,7 @@ let dernieresEtiquettes = {};
 export function etiquettesTactiles(etiquettes = {}) {
   dernieresEtiquettes = etiquettes;
   for (const [nom, b] of Object.entries(boutons)) {
-    const e = nom in etiquettes ? etiquettes[nom] : TOUCHES[nom].texte;
+    const e = nom in etiquettes ? etiquettes[nom] : (TOUCHES[nom].optionnel ? null : TOUCHES[nom].texte);
     b.classList.toggle('cache', e === null);
     if (e !== null) b.textContent = e;
   }

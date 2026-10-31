@@ -435,7 +435,13 @@ Ses visuels et sons vont dans SON `manifeste.js` (noms commençant par le nom du
 `assets/sprites/<boss>/` et `assets/audio/<boss>/`. Si on a besoin d'un effet ou d'un écran d'un autre boss,
 on le COPIE dans le dossier du nouveau boss (pas de partage entre boss).
 
-## BEUFA — PROPOSITION DE REFONTE DE L'INFILTRATION (en attente d'accord)
-Proposition d'un game designer (non intégrée) : `propositions/beufa_infiltration/` (DESIGN.md, pieces.js, vues).
-4 pièces à 2-3 gardes, nouveaux réglages (repérage 0.8, zoom 1.15…), pierre supprimée, diagonales tactiles,
-bug du voile de nuit sur les pièces de 1440 px. Intégrer seulement après accord du propriétaire.
+## BEUFA — V28 : REFONTE DE L'INFILTRATION (intégrée, accord du propriétaire)
+Source : `propositions/beufa_infiltration/DESIGN.md` (plan, schémas, raisons) + banc d'essai du designer.
+- 4 pièces à 2-3 gardes, une nouveauté par pièce (cour / parc + lumière / arsenal + veilleur / QG).
+- Réglages : repérage 0.8, portée 180, angle 28, ronde 50, pause 1.5, projecteur 0.4, alerte 200/3, zoom 1.15.
+- Pierre supprimée (pierres: 0, bouton X caché, texte retiré ; le code de lancer reste, inactif).
+- Projecteur : alerte seulement un garde à < 400 px, sinon il vient vérifier.
+- Voile de nuit à la taille de la plus grande pièce (corrige la ligne nette sur les pièces de 1440).
+- Regard en bout de ronde ±40° (0.7 au lieu de 1.15). Astuce affichée à l'entrée de chaque pièce (ASTUCES).
+- core/tactile.js : diagonales ◤ ◥ optionnelles (hg/hd, cachées par défaut), activées par Beufa.
+- Reste : sprite du héros avec un soldat vert collé (découpage de planche), poids des fichiers (~32 Mo), tests réels.

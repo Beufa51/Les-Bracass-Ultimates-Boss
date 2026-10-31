@@ -24,6 +24,12 @@ import { texte } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
+const ASTUCES = [
+  'Reste hors des cônes — passe dans leur DOS',
+  'La LUMIÈRE te voit : attends-la dans une niche',
+  'Le veilleur tourne la tête : file quand il regarde ailleurs',
+  'Tout ce que tu as appris… une dernière fois !',
+];
 import { formatTemps } from '../../core/sauvegarde.js';
 import { IDENTITE, REGLAGES as R, PIECES } from './reglages.js';
 import { manifesteDe } from '../../core/manifestes.js';
@@ -44,7 +50,7 @@ export class BeufaInfiltration extends BossScene {
   create() {
     this.phase = 'intro';   // intro | cinema | jeu | transition | attrape | fin
     this.touches = creerTouches(this);
-    etiquettesTactiles({ haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'OK', z: 'Sprint', x: 'Pierre' });   // Espace valide l'intro (bouton OK sur téléphone)
+    etiquettesTactiles({ haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'OK', z: 'Sprint', x: null, hg: '◤', hd: '◥' });   // V28 : plus de pierre   // Espace valide l'intro (bouton OK sur téléphone)
     this.cameras.main.setBackgroundColor('#0a0e15');
     // V24 GRANDES SALLES : les bornes de la caméra sont posées PAR PIÈCE —
     // une pièce peut être PLUS GRANDE que l'écran, elle défile sous la caméra.
@@ -99,7 +105,8 @@ export class BeufaInfiltration extends BossScene {
     // du héros — l'obscurité devient un ALLIÉ : on se cache DANS l'ombre.
     if (this.textures.exists('beufa_nuit')) this.textures.remove('beufa_nuit');
     this.nuitCv = document.createElement('canvas');
-    this.nuitCv.width = LARGEUR; this.nuitCv.height = HAUTEUR;
+    // V28 : le voile couvre la PLUS GRANDE pièce (avant : 960×540 seulement → ligne nette au milieu des grandes pièces)
+    this.nuitCv.width = Math.max(LARGEUR, ...PIECES.map(p => p.l)); this.nuitCv.height = Math.max(HAUTEUR, ...PIECES.map(p => p.h));
     this.nuitCtx = this.nuitCv.getContext('2d');
     this.nuitTex = this.textures.addCanvas('beufa_nuit', this.nuitCv);
     this.nuitImg = this.add.image(0, 0, 'beufa_nuit').setOrigin(0).setDepth(800);
@@ -128,9 +135,9 @@ export class BeufaInfiltration extends BossScene {
     // le HUD
     this.hudTitre = texte(this, 18, 20, '', 20, '#ffd84a', { fontStyle: 'bold' }).setOrigin(0, 0.5).setDepth(900);
     this.hudTemps = texte(this, LARGEUR - 18, 20, '', 18, '#dff6ff').setOrigin(1, 0.5).setDepth(900);
-    this.hudPierres = texte(this, 18, 44, '', 16, '#ffd84a').setOrigin(0, 0.5).setDepth(900);
+    this.hudPierres = texte(this, 18, 44, '', 16, '#ffd84a').setOrigin(0, 0.5).setDepth(900).setVisible(R.joueur.pierres > 0);   // V28 : pierre supprimée → caché
     this.hudAlertes = texte(this, LARGEUR - 18, 44, '', 16, '#ff9a9a').setOrigin(1, 0.5).setDepth(900);
-    this.hintBas = texte(this, LARGEUR / 2, HAUTEUR - 12, (estTactile() ? 'Sprint : bruyant !   Pierre : diversion   une pièce, puis l\'autre — jusqu\'au QG' : 'Z : sprint (bruyant)   X : pierre (diversion)   une pièce, puis l\'autre — jusqu\'au QG'), 13, '#8a94a4').setDepth(900);
+    this.hintBas = texte(this, LARGEUR / 2, HAUTEUR - 12, (estTactile() ? 'Sprint : bruyant !   une pièce, puis l\'autre — jusqu\'au QG' : 'Z : sprint (bruyant)   une pièce, puis l\'autre — jusqu\'au QG'), 13, '#8a94a4').setDepth(900);
     this.message = texte(this, LARGEUR / 2, 150, '', 40, '#ffffff', { fontStyle: 'bold', strokeThickness: 8 }).setOrigin(0.5).setDepth(950).setAlpha(0);
 
     this.chargerPiece(0);
@@ -140,7 +147,6 @@ export class BeufaInfiltration extends BossScene {
       'Les gardes balayent et font leur ronde : OBSERVE depuis le portail, puis file dans leur dos.',
       '◀ ▶ ▲ ▼ : bouger (silencieux)',
       (estTactile() ? 'Sprint' : 'Z') + ' : sprinter — plus rapide, mais les gardes proches T\'ENTENDENT',
-      (estTactile() ? 'Pierre' : 'X') + ' : lancer une pierre — les gardes iront voir AILLEURS',
       'Conteneurs, sacs de sable, table à cartes : tout ce qui est haut COUPE LA VUE — colle-toi derrière.',
       'Les PROJECTEURS AU BORD balayent le sol : leur HALO file jusqu\'au MILIEU — passe quand il repart !',
       'Le cône d\'un garde te voit : la jauge « ? » monte — sors avant le « ! ».',
@@ -435,7 +441,7 @@ export class BeufaInfiltration extends BossScene {
       const cam = this.cameras.main;
       cam.startFollow(this.sprJoueur, true, 0.12, 0.12);
       this.tweens.add({ targets: cam, zoom: R.vue.zoom, duration: 1100, ease: 'Sine.InOut' });
-      this.messageCentre('INFILTRE-TOI JUSQU\'À SON QG !', '#ffd84a', 1.8);
+      this.messageCentre('INFILTRE-TOI JUSQU\'À SON QG !\n' + ASTUCES[0], '#ffd84a', 2.6);
     });
   }
 
@@ -532,7 +538,7 @@ export class BeufaInfiltration extends BossScene {
       this.cameras.main.fadeIn(450);
       this.dans(0.2, () => {
         this.phase = 'jeu';
-        this.messageCentre(PIECES[i].nom, '#ffd84a', 1.6);
+        this.messageCentre(PIECES[i].nom + (ASTUCES[i] ? '\n' + ASTUCES[i] : ''), '#ffd84a', 2.6);   // V28 : une astuce par pièce
       });
     });
   }
@@ -607,7 +613,7 @@ export class BeufaInfiltration extends BossScene {
         g.angle = g.scanBase + Math.sin(this.temps * 0.7) * g.scan * Math.PI / 180;
       } else if (g.pauseT > 0) {   // MGS : arrivé au bout de sa ronde, il S'ARRÊTE et regarde autour
         g.pauseT -= dt;
-        g.angle = g.anglePause + Math.sin(this.temps * 2.4 + g.x * 0.05) * 1.15;   // droite-gauche, souplement
+        g.angle = g.anglePause + Math.sin(this.temps * 2.4 + g.x * 0.05) * 0.7;   // V28 : ±40°, il ne voit plus dans son dos   // droite-gauche, souplement
       } else {
         const cible = g.chemin[g.point];
         const dx = cible[0] - g.x, dy = cible[1] - g.y, d = Math.hypot(dx, dy);
@@ -726,7 +732,15 @@ export class BeufaInfiltration extends BossScene {
       const dedans = d < R.projecteur.rayon && !this.vueBloquee(pr.hx, pr.hy, this.joueur.x, this.joueur.y, null);
       if (dedans) {
         pr.jauge += dt / R.projecteur.reperage;
-        if (pr.jauge >= 1) { pr.jauge = 0; this.declencherAlerte(this.gardeLePlusProche(pr.hx, pr.hy)); }
+        if (pr.jauge >= 1) {   // V28 : seul un garde PAS LOIN accourt ; sinon il vient juste vérifier
+          pr.jauge = 0;
+          const g = this.gardeLePlusProche(pr.hx, pr.hy);
+          if (g && Math.hypot(g.x - pr.hx, g.y - pr.hy) < 400) this.declencherAlerte(g);
+          else if (g && g.etat === 'ronde') {
+            g.etat = 'verification'; g.verif = R.alerte.verification; g.vuX = this.joueur.x; g.vuY = this.joueur.y; g.angleVerif = g.angle;
+            jouerSon(this, 'beufa_soupcon');
+          }
+        }
       } else pr.jauge = Math.max(0, pr.jauge - dt / 0.5);
       pr.alerte.setText(pr.jauge > 0.12 ? '?' : '').setColor('#ffd84a');
     }
@@ -952,9 +966,10 @@ export class BeufaInfiltration extends BossScene {
   majNuit() {
     const ctx = this.nuitCtx;
     ctx.globalCompositeOperation = 'source-over';
-    ctx.clearRect(0, 0, LARGEUR, HAUTEUR);
+    const lv = this.nuitCv.width, hv = this.nuitCv.height;
+    ctx.clearRect(0, 0, lv, hv);
     ctx.fillStyle = 'rgba(4, 8, 22, 0.55)';
-    ctx.fillRect(0, 0, LARGEUR, HAUTEUR);
+    ctx.fillRect(0, 0, lv, hv);
     ctx.globalCompositeOperation = 'destination-out';
     const trou = (x, y, rai, force) => {
       const gr = ctx.createRadialGradient(x, y, 0, x, y, rai);
