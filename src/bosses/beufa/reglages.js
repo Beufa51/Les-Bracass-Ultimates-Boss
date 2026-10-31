@@ -147,13 +147,14 @@ export const PIECES = [
       [410, 330, 140, 52, 'beufa_ratelier'], [550, 330, 140, 52, 'beufa_ratelier'],
       [410, 430, 140, 52, 'beufa_ratelier'], [550, 430, 140, 52, 'beufa_ratelier'],
       // le sas d'entrée
-      [330, 610, 140, 52, 'beufa_ratelier'], [630, 610, 140, 52, 'beufa_ratelier'],
+      [330, 610, 140, 52, 'beufa_missile'], [630, 610, 140, 52, 'beufa_etabli'],   // V54 : le missile et l'établi (à la place de 2 râteliers)
       // L'ABRI DU VEILLEUR : la rangée nord, l'ombre juste avant la porte
       [610, 150, 140, 52, 'beufa_ratelier'],
+      [870, 90, 70, 38, 'beufa_munitions'],          // V54 : caisses de munitions (à la place de la caisse du nord-est)
       [100, 200, 34, 48, 'beufa_baril'], [860, 420, 34, 48, 'beufa_baril'],   // V52 : obstacle = largeur du vrai baril
     ],
     sacs: [],
-    caisses: [ [90, 640], [870, 640], [870, 90] ],
+    caisses: [ [90, 640], [870, 640] ],
     tables: [ [190, 90] ],                           // le poste de l'armurier
     projecteurs: [],
     gardes: [
@@ -180,14 +181,17 @@ export const PIECES = [
     portes: [ [10, 365, Math.PI / 2], [1430, 365, Math.PI / 2] ],
     routes: [],
     conteneurs: [
-      [150, 150, 140, 52, 'beufa_etagere'], [150, 470, 140, 52, 'beufa_etagere'],       // l'antichambre : la poche sûre
+      [150, 150, 132, 44, 'beufa_console'], [150, 470, 140, 52, 'beufa_etagere'],   // V54 : consoles radar au nord       // l'antichambre : la poche sûre
       [420, 130, 52, 140, 'beufa_etagere'], [420, 430, 52, 140, 'beufa_etagere'],       // les rayonnages de part et d'autre du portique de lumière
       [640, 470, 140, 52, 'beufa_etagere'], [880, 470, 140, 52, 'beufa_etagere'],       // la rangée sud : l'abri contre le stratège
       [640, 84, 140, 52, 'beufa_etagere'], [880, 84, 140, 52, 'beufa_etagere'],       // la rangée nord — DERRIÈRE elle, contre le mur, un PASSAGE SECRET (la variante)
       [1200, 470, 140, 52, 'beufa_etagere'],                           // le classeur du bureau
+      [1200, 75, 120, 80, 'beufa_bureau'],           // V54 : LE BUREAU DE BEUFA (à la place de la caisse)
+      [1395, 55, 40, 40, 'beufa_plante'], [1395, 495, 40, 40, 'beufa_plante'],   // V54 : plantes dans les coins du bureau
     ],
+    decorsSol: [ [1250, 300, 'beufa_tapis'] ],   // V54 : le tapis de Beufa devant son bureau
     sacs: [],
-    caisses: [ [1150, 110] ],
+    caisses: [],
     tables: [ [760, 270] ],                           // LA TABLE DES CARTES : le stratège en fait le tour
     projecteurs: [
       { tour: [300, 14], depart: [300, 60], arrivee: [300, 480], phase: 3 },   // LE PORTIQUE de l'antichambre (on le connaît)

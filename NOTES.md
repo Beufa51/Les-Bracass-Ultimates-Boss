@@ -628,3 +628,10 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   pour des trous) + 2 piles de pneus (obstacles 48×48, coins hors chemins). `decorsSol` accepte un 4e nombre = alpha.
 - Plot refusé (un disque orange, pas un cône) : `assets_inbox/beufa_plot_refuse.jpg`, prompt n°18 corrigé.
 - Reste : étagère verticale (n°2), plot (n°18), mirador (n°28), décors 21-27 (arsenal, QG).
+
+## BEUFA — V54 : ARSENAL ET QG HABILLÉS
+- Arsenal : missile + établi (à la place des 2 râteliers du sud, même obstacle 140×52), munitions (870,90, à la
+  place de la caisse du nord-est). QG : consoles radar (150,150, à la place de l'étagère nord de l'antichambre),
+  bureau de Beufa (1200,75, à la place de la caisse), 2 plantes (coins est du bureau), tapis au sol (1250,300).
+- Tailles du manifeste calées sur le format réel des images (bureau 120×94, consoles 132×40, munitions 70×38…).
+- Il ne reste à livrer que : étagère verticale (n°2), plot (n°18, à placer ensuite au parc), mirador (n°28).
