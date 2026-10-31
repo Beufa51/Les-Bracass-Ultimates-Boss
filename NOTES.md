@@ -445,3 +445,7 @@ Source : `propositions/beufa_infiltration/DESIGN.md` (plan, schémas, raisons) +
 - Regard en bout de ronde ±40° (0.7 au lieu de 1.15). Astuce affichée à l'entrée de chaque pièce (ASTUCES).
 - core/tactile.js : diagonales ◤ ◥ optionnelles (hg/hd, cachées par défaut), activées par Beufa.
 - Reste : sprite du héros avec un soldat vert collé (découpage de planche), poids des fichiers (~32 Mo), tests réels.
+
+## KÉDRIC — COURSE : ANIMATION TIRÉE DE LA VIDÉO (v7.2)
+`assets_inbox/kedric_toi_course_video.mp4` → `outils/kedric/course_video.py` → `kedric_toi_course6.png` (8 images, 197×326, 12 i/s).
+Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'éloigne dans la vidéo), une foulée = 16 images vidéo.
