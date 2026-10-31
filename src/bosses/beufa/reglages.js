@@ -6,31 +6,31 @@ export const IDENTITE = { id: 'beufa', nom: 'Beufa' };
 
 export const REGLAGES = {
   joueur: {
-    vitesse: 130,      // marche (px/s) : silencieuse — LENTE, comme une infiltration
+    vitesse: 120,      // V32 : 130 avant — marche (px/s) : silencieuse — LENTE, comme une infiltration
     sprint: 200,       // Z : plus rapide, mais les gardes proches T'ENTENDENT
     rayon: 10,      // V25 : on frôle les caisses SANS être bloqué — les couloirs redeviennent passables
-    bruit: 130,        // rayon (px) dans lequel un garde entend le sprint
+    bruit: 180,        // V32 : 130 avant — rayon (px) dans lequel un garde entend le sprint
     pierres: 0,        // V28 : la pierre est SUPPRIMÉE (proposition du game designer)
     porteePierre: 300, // elle VOLE LOIN : détourner un garde sans entrer dans son cône
   },
   garde: {
-    portee: 210,       // V31 : trop facile → ils voient encore PLUS LOIN (180 avant)
-    angle: 34,         // V31 : demi-angle du cône (°) — cône plus large, moins facile à contourner (28 avant)
-    reperage: 0.8,     // V27 : dans un cône on est repéré EN UN CLIN D'ŒIL — la nuit ne pardonne plus
-    vitesseRonde: 65,  // V31 : ronde plus rapide, les fenêtres se referment plus vite (50 avant)
-    vitessePoursuite: 165, // V31 : 150 avant
+    portee: 240,       // V32 : ils voient encore PLUS LOIN (210 en V31, 180 avant)
+    angle: 40,         // V32 (34 en V31) : demi-angle du cône (°) — cône plus large, moins facile à contourner (28 avant)
+    reperage: 0.45,    // V32 (0.8 avant) : dans un cône on est repéré EN UN CLIN D'ŒIL — la nuit ne pardonne plus
+    vitesseRonde: 75,  // V32 (65 en V31) : ronde plus rapide, les fenêtres se referment plus vite (50 avant)
+    vitessePoursuite: 185, // V32 : 165 en V31, 150 avant — presque aussi rapide que ton sprint
     rayon: 14,
-    pause: 1.0,        // V31 : il s'arrête MOINS LONGTEMPS à chaque bout (1.5 avant)
+    pause: 0.7,        // V32 (1.0 en V31) : il s'arrête MOINS LONGTEMPS à chaque bout (1.5 avant)
   },
   projecteur: {
     rayon: 62,        // V23 : les halos sont PLUS LARGE
     periode: 8,       // s d'un va-et-vient complet : la lumière file jusqu'au milieu puis REVIENT
-    reperage: 0.4,    // V27 : sous un halo, on est grillé presque aussitôt
+    reperage: 0.25,   // V32 (0.4 avant) : sous un halo, on est grillé presque aussitôt
   },
   alerte: {
-    collective: 200,    // V23 : l'alerte se propage PLUS LOIN dans la base
-    poursuiteMax: 3,   // V23 : ils te cherchent PLUS LONGTEMPS
-    verification: 3,   // s à fouiller avant de retourner à sa ronde
+    collective: 320,    // V32 (200 avant) : l'alerte se propage PLUS LOIN dans la base
+    poursuiteMax: 5,   // V32 (3 avant) : ils te cherchent PLUS LONGTEMPS
+    verification: 4,   // V32 (3 avant) : s à fouiller avant de retourner à sa ronde
     rattrape: 24,      // px : il te touche → RENVOYÉ à l'entrée de la pièce (jamais de mort)
   },
   vue: {

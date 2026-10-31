@@ -468,3 +468,11 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Gardes : portée 180→210, angle 28→34°, ronde 50→65, pause 1.5→1.0, poursuite 150→165.
 - +1 garde par pièce (3/3/4/4) : ronde ouest (cour), patrouille de la route (parc), ronde ouest (arsenal),
   sentinelle de l'antichambre sous le portique (QG). Tout est dans `reglages.js`, à ajuster si trop dur.
+
+## BEUFA — V32 : ENCORE PLUS DIFFICILE (retour : « encore trop simple »)
+- Gardes : portée 240, angle 40°, repérage 0.45 s, ronde 75, pause 0.7, poursuite 185.
+- Projecteur repérage 0.25 ; alerte collective 320 px, poursuite 5 s, fouille 4 s.
+- Joueur : marche 120 (130 avant), le sprint s'entend à 180 px (130 avant).
+- Héros : Fabien veut changer son design et son animation. Planche attendue : `assets/sprites/beufa/beufa_heros.jpg`,
+  6 images côte à côte sur 1 rangée, fond blanc, vue du dessus, le héros REGARDE VERS LE BAS (ORIENT_HEROS).
+  Si le nombre d'images change, mettre `images:` à jour dans manifeste.js, puis `python3 outils/beufa_alleger.py`.
