@@ -538,3 +538,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 ## BEUFA — V43 : SACCADE DU PROFIL
 - La planche profil n'avait d'image « jambes croisées » que pour un pas sur deux (5 → 6 → 1 = écarté → mi → écarté).
   Ordre refait : 1,2,3,4,5,6,3,4 (8 images) → chaque pas passe par les jambes croisées.
+
+## BEUFA — V44 : SNAKE MÊME TAILLE DE FACE ET DE DOS
+- `echelleCommune: 'hauteur'` (3 planches du héros) : chaque image ramenée à la même hauteur (la 2e rangée de la
+  planche de face était dessinée plus grande que la 1re). `echelle: 0.92` sur la face (dessinée plus trapue).
+- Profil : « un peu plus fluide, pas génial » → une vraie planche de 8 images de profil réglerait ça.

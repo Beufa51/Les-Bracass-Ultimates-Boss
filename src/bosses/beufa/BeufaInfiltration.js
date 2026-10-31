@@ -319,11 +319,13 @@ export class BeufaInfiltration extends BossScene {
         final.width = fL * n; final.height = fH;
         // V36 : échelleCommune (héros Snake) : TOUTES les images à la même échelle, pieds alignés en bas,
         // sinon chaque image est étirée ou rétrécie à sa façon et le perso « saute » de taille.
-        const kCommun = e.echelleCommune ? Math.min(...personnages.map((sg) => Math.min(fL / (sg[1] - sg[0] + 1), fH / (sg[5] - sg[4] + 1)))) : 0;
+        const kCommun = e.echelleCommune ? (e.echelle || 1) * Math.min(...personnages.map((sg) => Math.min(fL / (sg[1] - sg[0] + 1), fH / (sg[5] - sg[4] + 1)))) : 0;   // V44 : `echelle` corrige une planche dessinée plus grosse
         personnages.forEach((seg, i) => {
           const w = seg[1] - seg[0] + 1, h = seg[5] - seg[4] + 1;
           if (kCommun) {
-            const dL = Math.round(w * kCommun), dH = Math.round(h * kCommun);
+            // V44 : 'hauteur' → chaque image ramenée à LA MÊME HAUTEUR (le générateur dessine certaines rangées plus grandes)
+            const k = e.echelleCommune === 'hauteur' ? Math.min((e.echelle || 1) * fH / h, fL / w) : kCommun;
+            const dL = Math.round(w * k), dH = Math.round(h * k);
             c2.drawImage(cv, seg[0], seg[4], w, h, i * fL + Math.round((fL - dL) / 2), fH - dH, dL, dH);
           } else if (w / h >= 0.7 && w / h <= 1.43) {   // aspect proche de la case : il la REMPLIT (taille stable d'une frame à l'autre)
             c2.drawImage(cv, seg[0], seg[4], w, h, i * fL, 0, fL, fH);
