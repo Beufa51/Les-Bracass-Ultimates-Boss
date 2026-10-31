@@ -558,3 +558,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   beufa_heros (face), beufa_heros_dos, beufa_heros_profil : 8 images chacune.
 - Manifeste : `echelleCommune: true` partout, plus d'`echelle` / `etirementL` (les 3 vues sortent à 70 px de haut).
   Les anciennes planches restent dans assets_inbox (snake, snake_dos, snake_profil*) si besoin.
+
+## BEUFA — V48 : PROFIL QUI NE GLISSE PLUS
+- La rangée profil de la planche 3 vues n'a QUE des pas écartés (écart des pieds 27-33 px) → glissade.
+  Images 3 et 7 remplacées par des « jambes croisées » FABRIQUÉES : copie des images 2 et 6, jambes resserrées
+  vers le centre des hanches (de plus en plus vers les pieds). Écarts : 32,27,16,29,32,28,17,30.
