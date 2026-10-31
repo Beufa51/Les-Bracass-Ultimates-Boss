@@ -563,3 +563,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - La rangée profil de la planche 3 vues n'a QUE des pas écartés (écart des pieds 27-33 px) → glissade.
   Images 3 et 7 remplacées par des « jambes croisées » FABRIQUÉES : copie des images 2 et 6, jambes resserrées
   vers le centre des hanches (de plus en plus vers les pieds). Écarts : 32,27,16,29,32,28,17,30.
+
+## BEUFA — V49 : PAS CALÉ + REBOND
+- `joueur.pas` 72 → 60 (cycle calé sur l'écart réel des pieds de Snake : les pieds glissent moins).
+- `joueur.rebond` 1.5 px : il monte un peu au passage des jambes (debout, ça fait vivre le pas). 0 = aucun.
+- Prompt « rangée profil seule » (passages jambes serrées imposés) dans propositions/beufa_prompts_marche.md.

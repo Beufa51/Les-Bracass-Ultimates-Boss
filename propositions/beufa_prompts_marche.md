@@ -119,3 +119,17 @@ Walk cycle in each row: 1. contact (one leg forward), 2. down, 3. passing (legs 
 arms swing opposite to the legs. The head is at the same height in all frames of all rows.
 Large white space between frames: frames must NOT touch or overlap, bandana tails included.
 Pure white background, no ground shadow, no text, no grid, no extra characters.
+
+## SNAKE — RANGÉE PROFIL SEULE (à refaire si la marche glisse encore)
+Joindre `assets_inbox/beufa_heros_snake_3vues.jpg` comme référence.
+Same character, same pixel art style, same proportions and same size as the THIRD ROW of the attached sheet.
+STRICT SIDE VIEW at 90 degrees, walking toward the RIGHT. 8 frames on ONE single row, large white space between
+frames, frames must NOT touch. The 8 frames MUST be clearly different, like a classic walk cycle chart:
+1. CONTACT: legs wide apart, front heel on the ground, back leg straight on its toes;
+2. DOWN: legs still apart, front knee bent, body at its lowest;
+3. PASSING: legs TOGETHER under the body, back leg lifted with knee bent, its foot passing next to the standing ankle;
+4. UP: standing leg straight, body at its highest, lifted leg swinging forward in front;
+5. CONTACT with the OTHER leg in front (mirror of 1); 6. DOWN (mirror of 2);
+7. PASSING (mirror of 3, legs together); 8. UP (mirror of 4).
+Frames 3 and 7 must show the legs together, NOT apart. The arms swing opposite to the legs.
+Pure white background, no ground shadow, no text, no extra characters.

@@ -8,7 +8,8 @@ export const REGLAGES = {
   joueur: {
     vitesse: 120,      // V32 : 130 avant — marche (px/s) : silencieuse — LENTE, comme une infiltration
     sprint: 200,       // Z : plus rapide, mais les gardes proches T'ENTENDENT
-    pas: 72,           // V33 : px parcourus pour UN cycle de marche complet (2 pas) — plus petit = jambes plus rapides
+    pas: 60,           // V49 : px parcourus pour UN cycle de marche complet (2 pas) — calé sur l'écart des pieds de Snake (72 avant)
+    rebond: 1.5,       // V49 : px dont il monte à chaque pas (0 = aucun)
     rayon: 10,      // V25 : on frôle les caisses SANS être bloqué — les couloirs redeviennent passables
     bruit: 180,        // V32 : 130 avant — rayon (px) dans lequel un garde entend le sprint
     pierres: 0,        // V28 : la pierre est SUPPRIMÉE (proposition du game designer)

@@ -893,7 +893,8 @@ export class BeufaInfiltration extends BossScene {
       : (cle === 'beufa_heros' ? this.poseArretHeros : 0);
     if (this.sprJoueur.texture.key !== cle) this.sprJoueur.setTexture(cle);
     this.sprJoueur.setFrame(imageH).setFlipX(miroir)
-      .setPosition(this.joueur.x, this.joueur.y - 10)   // les pieds sur la position (il est debout, plus haut que large)
+      // V49 : debout, il MONTE un peu à chaque pas (au passage des jambes) — le rebond que la planche n'a pas
+      .setPosition(this.joueur.x, this.joueur.y - 10 - (this.heroBouge ? R.joueur.rebond * Math.abs(Math.sin((this.joueur.distPas || 0) / R.joueur.pas * 2 * Math.PI)) : 0))
       .setRotation(0)
       .setScale(1, 1 + (this.heroBouge ? 0 : Math.sin(this.temps * 2.2) * 0.015));
     const gg = this.conesG;
