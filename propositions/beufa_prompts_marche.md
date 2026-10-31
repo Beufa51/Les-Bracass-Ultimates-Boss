@@ -78,3 +78,25 @@ we see his profile, the bandana tails flowing behind him to the left, the holste
 white space between frames: 1. contact, right leg forward; 2. down; 3. passing (legs together); 4. contact,
 left leg forward; 5. down; 6. passing. Arms swing opposite to the legs, slightly bent; the head stays at the
 same height in every frame. Pure white background, no ground shadow, no text, no extra characters.
+
+## SNAKE — PROFIL 8 IMAGES (prompt complet, sans image de référence)
+Pixel art sprite sheet, detailed 16-bit SNES style, slightly high camera angle.
+Character: a tactical espionage soldier inspired by Solid Snake: tall, muscular, broad shoulders; short messy
+brown hair; light stubble; long dark navy-blue BANDANA tied around the forehead, knotted at the back, with two
+long tails flowing behind him; tight dark grey-blue sneaking suit with visible muscle shading; black tactical
+harness with straps over the shoulders and chest; black belt with pouches; black knee pads and elbow pads;
+black gloves; black combat boots; holster on the right thigh. He holds a black handgun low in his right hand,
+pointing at the ground.
+STRICT SIDE VIEW at exactly 90 degrees, like a 2D side-scrolling game: he faces and walks toward the RIGHT edge
+of the image. Only ONE eye and ONE ear visible, nose and chest pointing right, the far arm and far leg partly
+hidden behind the body. Bandana tails flowing behind him to the left.
+8 frames of a complete, smooth WALK CYCLE, side by side on ONE single horizontal row, evenly spaced with clear
+white space between frames, every frame the SAME size, the SAME scale and the SAME head height:
+1. contact: near leg far forward, heel touching the ground, far leg far behind on its toes;
+2. down: near foot flat, knee bent, far leg starting to lift;
+3. passing: near leg straight under the body, far leg lifted and crossing it, knee bent;
+4. up: body slightly higher, far leg swinging forward;
+5. contact: FAR leg far forward, heel touching the ground, near leg far behind (opposite of frame 1);
+6. down (opposite of 2); 7. passing (opposite of 3); 8. up (opposite of 4).
+The legs must clearly change from frame to frame; the free arm swings opposite to the legs.
+Pure white background, no ground shadow, no text, no grid, no extra characters.
