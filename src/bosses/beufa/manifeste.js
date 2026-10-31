@@ -15,9 +15,9 @@ export const MANIFESTE = {
     beufa_mur:    { fichier: 'sprites/beufa/beufa_mur.jpg', fond: 'bord', largeur: 64, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'mur_nes', couleur: '#545470', pixel: 2 } },
     beufa_mur_v:  { fichier: 'sprites/beufa/beufa_mur_v.jpg', fond: 'bord', largeur: 20, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'mur_nes_v', couleur: '#545470', pixel: 2 } },
     beufa_route:  { fichier: 'sprites/beufa/beufa_route.jpg', fond: 'bord', largeur: 128, hauteur: 128, images: 1, vitesse: 1, provisoire: { forme: 'route_nes', couleur: '#1c1c1c', pixel: 2 } },
-    beufa_conteneur:       { fichier: 'sprites/beufa/beufa_conteneur.jpg', fond: 'blanc', largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#8c1c1c', pixel: 2 } },
-    beufa_conteneur_olive: { fichier: 'sprites/beufa/beufa_conteneur_olive.jpg', fond: 'blanc', largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
-    beufa_conteneur_v:     { fichier: 'sprites/beufa/beufa_conteneur_v.jpg', fond: 'blanc', largeur: 52, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#8c1c1c', pixel: 2 } },
+    beufa_conteneur:       { fichier: 'sprites/beufa/beufa_conteneur.jpg', fond: 'blanc', largeur: 140, hauteur: 100, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#8c1c1c', pixel: 2 } },
+    beufa_conteneur_olive: { fichier: 'sprites/beufa/beufa_conteneur_olive.jpg', fond: 'blanc', largeur: 140, hauteur: 100, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
+    beufa_conteneur_v:     { fichier: 'sprites/beufa/beufa_conteneur_v.jpg', fond: 'blanc', largeur: 52, hauteur: 178, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#8c1c1c', pixel: 2 } },
     beufa_caisse: { fichier: 'sprites/beufa/beufa_caisse.jpg', fond: 'blanc', largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'caisse_nes', couleur: '#8c541c', pixel: 2 } },
     // V28 — LE MATÉRIEL MILITAIRE (provisoire en pixel art ; dès que Fabien livre
     // les PNG dans sprites/beufa/, remplacer fichier: null par le chemin — dimensions identiques)

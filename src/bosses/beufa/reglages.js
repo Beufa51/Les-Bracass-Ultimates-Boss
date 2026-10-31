@@ -73,7 +73,7 @@ export const PIECES = [
       [780, 110, 96, 96, 'beufa_reservoir'],         // LE RÉSERVOIR du nord-est (la variante passe entre lui et le mur)
       [820, 430, 140, 52],                           // LA COUVERTURE DU CHEMIN EST (variante)
       [860, 620, 68, 80, 'beufa_mirador'],           // le mirador du portail (décor)
-      [370, 70, 64, 64, 'beufa_guerite'],            // V52 : la guérite de la porte du QG (petite couverture avant la sortie)
+      [370, 52, 64, 64, 'beufa_guerite'],            // V52 : la guérite de la porte du QG — V56 : COLLÉE au mur (plus de faux passage derrière)
       [70, 640, 64, 64, 'beufa_palettes'],           // V52 : palettes dans le coin sud-ouest (hors des chemins)
     ],
     decorsSol: [ [480, 680, 'beufa_barriere'], [250, 380, 'beufa_flaque', 0.8], [700, 200, 'beufa_flaque', 0.8] ],   // V52 : la barrière du portail (on passe dessus)

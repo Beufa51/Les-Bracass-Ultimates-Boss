@@ -641,3 +641,14 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   route du parc (petits obstacles 16×16, hors des chemins des gardes).
 - Tous les prompts de `propositions/beufa_prompts_decor_complets.md` sont livrés. Encore d'origine (jamais
   signalés) : jeep, réservoir, hélico, sacs de sable, portes, sol, murs — à revoir seulement si le style choque.
+
+## BEUFA — V56 : CONTENEURS À LA TAILLE DE SNAKE + TRI PAR Y + GUÉRITE
+- Conteneurs trop bas (Snake « à la cuisse ») : la FACE AVANT des images est étirée en hauteur (nervures
+  verticales → invisible) depuis `assets_inbox/*_3q.jpg` : 140×100 et 52×178 (avant 140×52 / 52×140).
+  L'EMPRISE AU SOL ne change pas (gameplay identique) : l'image est posée sur le bas de l'emprise et MONTE.
+- Tri par Y (vue 3/4) : `profondeurY(yBas) = 20 + yBas/1000` pour obstacles (bas de l'emprise), Snake
+  (pieds = y+25) et gardes (y+12). Murs 19.5, poussière 19.8. Snake derrière un conteneur = caché.
+- Guérite collée au mur nord (370,52) : plus de faux passage derrière.
+- PROCHAINE ÉTAPE (demande de Fabien) : passe de « level designer façon Kojima Productions » sur la
+  disposition des 4 pièces (cohérence visuelle : zones logiques, alignements, échelle des objets
+  — camions/étagères/tente sont aussi bas par rapport à Snake), SANS casser le gameplay qui lui plaît.

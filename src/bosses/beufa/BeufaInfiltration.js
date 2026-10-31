@@ -45,6 +45,9 @@ const styleAlerte = { fontFamily: 'monospace', fontStyle: 'bold', fontSize: '26p
 const ORIENT_GARDE = -Math.PI / 2;  // planche garde : regarde vers le bas (demi-tour du fix crabe)
 const ORIENT_BOSS = -Math.PI / 2;    // planche boss : regarde vers le bas aussi (analyse : orteils vers le bas) — à confirmer au test
 
+// V56 : TRI PAR Y (vue 3/4) — plus le bas d'un objet est bas à l'écran, plus il passe devant. 20 → 20.72.
+const profondeurY = (yBas) => 20 + yBas / 1000;
+
 export class BeufaInfiltration extends BossScene {
   constructor() { super('BeufaInfiltration', IDENTITE); }
 
@@ -83,12 +86,12 @@ export class BeufaInfiltration extends BossScene {
 
     // le héros (placé par chargerPiece, à l'entrée de la pièce)
     this.joueur = { x: 0, y: 0, angle: -Math.PI / 2 };
-    this.sprJoueur = this.add.sprite(0, 0, 'beufa_heros', 0).setDepth(30);
+    this.sprJoueur = this.add.sprite(0, 0, 'beufa_heros', 0).setDepth(30);   // V56 : profondeur recalculée à chaque image (tri par les pieds)
 
     // les cônes de vision et les halos (redessinés à chaque image)
     this.conesG = this.add.graphics().setDepth(15);
     // la POUSSIÈRE DES PAS : de petits nuages gris qui montent et s'effacent
-    this.poussiereG = this.add.graphics().setDepth(29);
+    this.poussiereG = this.add.graphics().setDepth(19.8);   // V56 : sous tout ce qui est trié par Y
 
     // le RADAR façon MGS (en haut à GAUCHE — le coin le moins joué des deux pièces) :
     // LA PIÈCE COURANTE, les gardes et leurs cônes. En marche il S'EFFACE (alpha 0.07) :
@@ -390,7 +393,7 @@ export class BeufaInfiltration extends BossScene {
     for (const [x, y, l, h] of P.murs) {
       // murs façon NÉS : la bande se pave avec sa texture (chapeau éclairé + face sombre)
       const bande = (l >= h) ? this.add.tileSprite(x, y, l, h, 'beufa_mur', 0) : this.add.tileSprite(x, y, l, h, 'beufa_mur_v', 0);
-      bande.setOrigin(0.5).setDepth(21);
+      bande.setOrigin(0.5).setDepth(19.5);   // V56 : sous les objets triés par Y (sinon un mur cacherait la tête de Snake)
       this.decor.push(bande);
       this.obstacles.push({ x, y, l, h });
     }
@@ -420,8 +423,11 @@ export class BeufaInfiltration extends BossScene {
       // V50 : posé à la verticale → sa version « _v » (dessinée debout, face avant en bas) si elle existe,
       // sinon l'horizontale tournée (la vue 3/4 aurait alors sa face avant sur le côté)
       const verticale = h > l && this.textures.exists(cle + '_v');
-      const img = this.add.image(x, y, verticale ? cle + '_v' : cle).setDepth(21);
+      const img = this.add.image(x, y, verticale ? cle + '_v' : cle).setDepth(profondeurY(y + h / 2));
       if (h > l && !verticale) img.setRotation(Math.PI / 2);
+      // V56 : VUE 3/4 — l'image est posée sur le BAS de son emprise au sol et MONTE au-dessus (un conteneur
+      // plus haut que Snake) ; l'emprise qui bloque ne change pas. Ce qui est derrière (plus haut) passe dessous.
+      else img.setOrigin(0.5, 1).setPosition(x, y + h / 2);
       this.decor.push(img);
       this.obstacles.push({ x, y, l, h });
     }
@@ -448,7 +454,7 @@ export class BeufaInfiltration extends BossScene {
     if (this.phase === 'intro') for (const g of this.gardes) { g.sprite.setVisible(false); g.alerte.setVisible(false); }
     // le héros repart de la poche sûre de l'entrée — il peut OBSERVER avant de bouger
     this.joueur.x = P.entree.x; this.joueur.y = P.entree.y;
-    this.sprJoueur.setPosition(this.joueur.x, this.joueur.y);
+    this.sprJoueur.setPosition(this.joueur.x, this.joueur.y).setDepth(profondeurY(this.joueur.y + 25));   // V56 : tri par les pieds
     this.hudTitre.setText('BEUFA — LA BASE · ' + P.nom);
   }
 
@@ -492,7 +498,7 @@ export class BeufaInfiltration extends BossScene {
   }
 
   ajouterObstacle(cle, x, y, l, h) {
-    this.decor.push(this.add.image(x, y, cle).setDepth(21));
+    this.decor.push(this.add.image(x, y, cle).setDepth(profondeurY(y + h / 2)));
     const o = { x, y, l, h };
     this.obstacles.push(o);
     return o;
@@ -905,6 +911,7 @@ export class BeufaInfiltration extends BossScene {
       // V49 : debout, il MONTE un peu à chaque pas (au passage des jambes) — le rebond que la planche n'a pas
       .setPosition(this.joueur.x, this.joueur.y - 10 - (this.heroBouge ? R.joueur.rebond * Math.abs(Math.sin((this.joueur.distPas || 0) / R.joueur.pas * 2 * Math.PI)) : 0))
       .setRotation(0)
+      .setDepth(profondeurY(this.joueur.y + 25))   // V56 : tri par les pieds (vue 3/4)
       .setScale(1, 1 + (this.heroBouge ? 0 : Math.sin(this.temps * 2.2) * 0.015));
     const gg = this.conesG;
     gg.clear();
@@ -933,7 +940,7 @@ export class BeufaInfiltration extends BossScene {
         this.poussieres.push({ x: g.x - Math.cos(g.angle) * 7, y: g.y - Math.sin(g.angle) * 7 + 3, t: 0, duree: 0.35, r: 2.2 });
       }
       const imageG = this.cyclePas(g, R.garde.pas, this.nbFramesGarde);   // V33 : cycle lié à la distance parcourue
-      g.sprite.setPosition(g.x, g.y)
+      g.sprite.setPosition(g.x, g.y).setDepth(profondeurY(g.y + 12))
         .setRotation(g.angle + ORIENT_GARDE)
         .setFrame(g.bouge ? imageG : this.poseArretGarde);
       g.alerte.setPosition(g.x, g.y - 32).setScale(1 + Math.sin(this.temps * 18) * 0.12);
