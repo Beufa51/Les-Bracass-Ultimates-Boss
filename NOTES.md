@@ -552,3 +552,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 
 ## BEUFA — V46 : PROFIL MOINS GRAND, MOINS FIN
 - Option manifeste `etirementL` (élargit sans grandir). Profil : `echelle: 0.88`, `etirementL: 1.3`.
+
+## BEUFA — V47 : SNAKE EN UNE SEULE PLANCHE (face, dos, profil)
+- `assets_inbox/beufa_heros_snake_3vues.jpg` (3 rangées × 8, mêmes proportions) découpée en 3 rangées →
+  beufa_heros (face), beufa_heros_dos, beufa_heros_profil : 8 images chacune.
+- Manifeste : `echelleCommune: true` partout, plus d'`echelle` / `etirementL` (les 3 vues sortent à 70 px de haut).
+  Les anciennes planches restent dans assets_inbox (snake, snake_dos, snake_profil*) si besoin.
