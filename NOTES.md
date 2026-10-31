@@ -652,3 +652,5 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - PROCHAINE ÉTAPE (demande de Fabien) : passe de « level designer façon Kojima Productions » sur la
   disposition des 4 pièces (cohérence visuelle : zones logiques, alignements, échelle des objets
   — camions/étagères/tente sont aussi bas par rapport à Snake), SANS casser le gameplay qui lui plaît.
+- V56b : conteneurs verticaux élargis 52 → 70 (image 70×214, emprise des 2 alcôves de la cour 70×140) :
+  même épaisseur que la face d'un conteneur horizontal. Validé par Fabien pour les horizontaux.

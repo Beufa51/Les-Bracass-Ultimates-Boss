@@ -66,8 +66,8 @@ export const PIECES = [
     routes: [ [480, 360, 70, 720] ],            // L'AXE : du portail à la porte
     conteneurs: [
       [330, 610, 140, 52], [630, 610, 140, 52],      // LE PORTAIL : la poche sûre d'où l'on observe
-      [360, 330, 52, 140],                           // L'ALCÔVE OUEST : l'ombre où attendre que la sentinelle reparte
-      [600, 330, 52, 140],                           // L'ALCÔVE EST : elle cache aussi l'axe de la ronde des réservoirs
+      [360, 330, 70, 140],                           // L'ALCÔVE OUEST : l'ombre où attendre que la sentinelle reparte
+      [600, 330, 70, 140],                           // L'ALCÔVE EST : elle cache aussi l'axe de la ronde des réservoirs
       [160, 470, 148, 96, 'beufa_tente'],            // la tente des quartiers (décor, couverture)
       [150, 170, 140, 52, 'beufa_conteneur_olive'],                         // le conteneur du nord-ouest
       [780, 110, 96, 96, 'beufa_reservoir'],         // LE RÉSERVOIR du nord-est (la variante passe entre lui et le mur)
