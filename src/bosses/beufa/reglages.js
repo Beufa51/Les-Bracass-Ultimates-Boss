@@ -34,6 +34,7 @@ export const REGLAGES = {
     rattrape: 24,      // px : il te touche → RENVOYÉ à l'entrée de la pièce (jamais de mort)
   },
   vue: {
+    nuit: 0.3,   // V29 : opacité du voile de nuit (0 = plein jour, 0.55 = l'ancienne nuit, trop sombre sur téléphone)
     zoom: 1.15,   // la caméra RAPPROCHÉE : elle suit le héros — 1 = pièce entière, 2 = très proche
   },
 };
@@ -49,7 +50,7 @@ export const PIECES = [
   { // ----- PIÈCE 1 : LA COUR DU PORTAIL — 960×720 — « le cône, l'ombre, le dos » -----
     nom: 'PIÈCE 1/4 · LA COUR DU PORTAIL',
     l: 960, h: 720,
-    teinteSol: 0x9fc0a8,
+    teinteSol: 0xcfe0d2,
     murs: [
       [227, 10, 434, 20], [733, 10, 434, 20],   // le nord : LA PORTE DU QG (x 445-515)
       [480, 710, 960, 20],                      // le sud : le portail (on arrive par là)
@@ -82,7 +83,7 @@ export const PIECES = [
   { // ----- PIÈCE 2 : LE PARC À VÉHICULES — 1440×540 — « la lumière » -----
     nom: 'PIÈCE 2/4 · LE PARC À VÉHICULES',
     l: 1440, h: 540,
-    teinteSol: 0x9fc0a8,
+    teinteSol: 0xcfe0d2,
     murs: [
       [720, 10, 1440, 20], [720, 530, 1440, 20],
       [10, 165, 20, 330], [10, 470, 20, 140],         // ouest : la porte d'entrée (y 330-400)
@@ -118,7 +119,7 @@ export const PIECES = [
   { // ----- PIÈCE 3 : L'ARSENAL — 960×720 — « le veilleur et la ronde » -----
     nom: 'PIÈCE 3/4 · L\'ARSENAL',
     l: 960, h: 720,
-    teinteSol: 0xaab4d8,
+    teinteSol: 0xd2d8ee,
     murs: [
       [227, 10, 434, 20], [733, 10, 434, 20],
       [480, 710, 960, 20],
@@ -152,7 +153,7 @@ export const PIECES = [
   { // ----- PIÈCE 4 : LE QG DE BEUFA — 1440×540 — « tout ensemble » -----
     nom: 'PIÈCE 4/4 · LE QG DE BEUFA',
     l: 1440, h: 540,
-    teinteSol: 0xaab4d8,
+    teinteSol: 0xd2d8ee,
     murs: [
       [720, 10, 1440, 20], [720, 530, 1440, 20],
       [10, 165, 20, 330], [10, 470, 20, 140],

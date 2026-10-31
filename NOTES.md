@@ -449,3 +449,7 @@ Source : `propositions/beufa_infiltration/DESIGN.md` (plan, schémas, raisons) +
 ## KÉDRIC — COURSE : ANIMATION TIRÉE DE LA VIDÉO (v7.2)
 `assets_inbox/kedric_toi_course_video.mp4` → `outils/kedric/course_video.py` → `kedric_toi_course6.png` (8 images, 197×326, 12 i/s).
 Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'éloigne dans la vidéo), une foulée = 16 images vidéo.
+
+## BEUFA — V29 : JOYSTICK + PLUS LUMINEUX
+- Sur téléphone : joystick de Lionel (importé de `src/bosses/lionel/joystick.js`, non modifié), croix cachée.
+- Nuit réglable `REGLAGES.vue.nuit` (0.3, avant 0.55) + menu dev « Obscurité de la nuit » ; vignette et teintes du sol éclaircies.

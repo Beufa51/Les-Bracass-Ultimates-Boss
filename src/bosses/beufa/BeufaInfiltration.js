@@ -24,6 +24,7 @@ import { texte } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
+import { installerJoystick } from '../lionel/joystick.js';   // V29 : le même joystick que Lionel (lu seulement, pas modifié)
 const ASTUCES = [
   'Reste hors des cônes — passe dans leur DOS',
   'La LUMIÈRE te voit : attends-la dans une niche',
@@ -50,7 +51,8 @@ export class BeufaInfiltration extends BossScene {
   create() {
     this.phase = 'intro';   // intro | cinema | jeu | transition | attrape | fin
     this.touches = creerTouches(this);
-    etiquettesTactiles({ haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'OK', z: 'Sprint', x: null, hg: '◤', hd: '◥' });   // V28 : plus de pierre   // Espace valide l'intro (bouton OK sur téléphone)
+    etiquettesTactiles({ haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'OK', z: 'Sprint', x: null, hg: '◤', hd: '◥' });
+    this.joystick = installerJoystick(this);   // V29 : sur téléphone, joystick 8 directions (la croix est cachée)   // V28 : plus de pierre   // Espace valide l'intro (bouton OK sur téléphone)
     this.cameras.main.setBackgroundColor('#0a0e15');
     // V24 GRANDES SALLES : les bornes de la caméra sont posées PAR PIÈCE —
     // une pièce peut être PLUS GRANDE que l'écran, elle défile sous la caméra.
@@ -119,8 +121,8 @@ export class BeufaInfiltration extends BossScene {
     const vigCtx = vigCv.getContext('2d');
     const vg = vigCtx.createRadialGradient(LARGEUR / 2, HAUTEUR / 2, 330, LARGEUR / 2, HAUTEUR / 2, 640);
     vg.addColorStop(0, 'rgba(2,4,12,0)');
-    vg.addColorStop(0.7, 'rgba(2,4,12,0.22)');
-    vg.addColorStop(1, 'rgba(2,4,12,0.55)');
+    vg.addColorStop(0.7, 'rgba(2,4,12,0.12)');
+    vg.addColorStop(1, 'rgba(2,4,12,0.35)');   // V29 : bords moins sombres
     vigCtx.fillStyle = vg;
     vigCtx.fillRect(0, 0, LARGEUR, HAUTEUR);
     this.textures.addCanvas('beufa_vignette', vigCv);
@@ -968,7 +970,7 @@ export class BeufaInfiltration extends BossScene {
     ctx.globalCompositeOperation = 'source-over';
     const lv = this.nuitCv.width, hv = this.nuitCv.height;
     ctx.clearRect(0, 0, lv, hv);
-    ctx.fillStyle = 'rgba(4, 8, 22, 0.55)';
+    ctx.fillStyle = 'rgba(4, 8, 22, ' + R.vue.nuit + ')';   // V29 : réglable (plus clair)
     ctx.fillRect(0, 0, lv, hv);
     ctx.globalCompositeOperation = 'destination-out';
     const trou = (x, y, rai, force) => {
