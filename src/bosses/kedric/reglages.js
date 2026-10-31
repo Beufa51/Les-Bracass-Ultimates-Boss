@@ -82,29 +82,35 @@ export const REGLAGES = {
   //  Une SEULE SESSION CONTINUE : Kédric danse AVEC toi du début à la fin (plus de questions / réponses), et la musique
   //  n'est JAMAIS replacée pendant le battle (elle démarre sur le refrain à l'annonce, puis file sans coupure).
   //  rounds / dureeRound : 2 rounds d'1 minute de musique ; au round 2 : MÊMES RÈGLES, bandeau, la musique continue.
-  //  tempo : début du refrain (s, sur un temps fort) et durée d'un temps (s), mesurés par outils/kedric/caler_battle.py ;
-  //  tempsParPas : une flèche tous les 2 temps (~0,69 s) — toutes les flèches des 2 rounds sont calées sur cette grille.
+  //  tempo : le 1er TEMPS FORT du morceau (s depuis le début du fichier) et la durée d'un temps (s), MESURÉS sur le
+  //  fichier par outils/kedric/caler_battle.py (ne pas deviner : un tempo faux = des flèches à côté de la musique) ;
+  //  tempsParPas : une flèche tous les N temps (chaque manche peut avoir le sien : sinon la valeur générale).
+  //  latence : décalage (s) des flèches pour compenser le retard du son (écouteurs Bluetooth : ~0,15 s) ; 0 = aucun.
   //  annonce : temps d'attente (en pas) avant la première flèche (la transition depuis l'écran d'annonce est douce) ;
   //  intro / introMini : l'écran d'annonce (Kédric sur scène) dure au plus 'intro' s (une flèche le passe après
   //  'introMini' s) ; la musique démarre au GO ! avec les flèches (plus pendant l'annonce).
   //  rougeChance : chance de FLÈCHE ROUGE par flèche (Kédric triche : fais l'inverse) ; CHAMPION seulement, jamais la 1re.
-  //  piste : les flèches TOMBENT dans 4 couloirs (◀ ▶ à gauche, ▲ ▼ à droite) jusqu'à la touche : vitesse de chute (px / s)
+  //  piste.chute : temps (s) pendant lequel on VOIT une flèche tomber avant qu'elle arrive sur sa touche (même durée
+  //  sur ordinateur et téléphone : la vitesse s'adapte à la hauteur des couloirs)
+  //  pieges : les TECHNIQUES de Kédric (2 par manche, annoncées par l'écran SUPER POUVOIR, 'duree' s chacune) :
+  //   FUMIGÈNE (la fumée cache le haut des couloirs : on voit les flèches au dernier moment, 'fumee' = part cachée),
+  //   FLÈCHES DORÉES (des leurres à NE PAS toucher, 'leurres' = part des flèches piégées),
+  //   TURBO (les flèches tombent 'turbo' fois plus vite, toujours sur le rythme).
   //  parfait / bien : fenêtres de timing (s, x fenetreShow de la difficulté) ; gain : points de PUBLIC (de -100 à +100)
   //  parTouchdown / avanceMax : public de départ = (touchdowns - 1) x parTouchdown (aucun touchdown : il part pour Kédric)
   //  Le public est un KAMÉHAMÉHA père-fils (showtime.js) : PARFAIT = ta boule repousse celle de Kédric, RATÉ = elle recule.
   showtime: { rounds: 2, dureeRound: 47,   // durée de manche PAR DÉFAUT (chaque manche a maintenant SA 'duree' : les DEUX font 1 minute)
     pause: 2,
     manches: [
-      { musique: 'kedric_chala', duree: 60, tempo: { debut: 8, temps: 0.3896 } },   // la manche 1 : Cha-La Head-Cha-La, l'ouverture japonaise ORIGINALE de DBZ (1989, remasterisée) — 154 BPM — UNE MINUTE, comme la chanson 2
-      { musique: 'kedric_dbz', duree: 60, tempo: { debut: 0, temps: 0.3896 } },   // la chanson 2 : « We Gotta Power » (le générique VOSTFR de DBZ) — UNE MINUTE
+      { musique: 'kedric_chala', duree: 60, tempo: { debut: 8.455, temps: 0.3895 }, tempsParPas: 2 },   // mesuré : 154 BPM, 1er temps fort à 8,455 s (le fichier commence par 8 s de silence)   // la manche 1 : Cha-La Head-Cha-La, l'ouverture japonaise ORIGINALE de DBZ (1989, remasterisée) — 154 BPM — UNE MINUTE, comme la chanson 2
+      { musique: 'kedric_dbz', duree: 60, tempo: { debut: 1.086, temps: 0.5293 }, tempsParPas: 1 },   // mesuré : 113 BPM (PAS le tempo de Cha-La !), 1er temps fort à 1,086 s ; une flèche par temps (~0,53 s) : la manche 2 accélère   // la chanson 2 : « We Gotta Power » (le générique VOSTFR de DBZ) — UNE MINUTE
     ],
     tempsParPas: 2, annonce: 0,   // zéro temps mort : le décompte 5-4-3-2-1 démarre PILE quand la manche (et SA musique) démarrent
     // (le DÉCOMPTE 5-4-3-2-1-GO est dans showtime.js : DECOMPTE = 5 secondes PILE, calées sur le tempo de chaque morceau)
     intro: 9, introMini: 1.5, introMusique: 54.969,
-    piste: { vitesse: 200 }, rougeChance: 0.12,
-    piege: { nombre: 1, duree: 4 },   // par manche (CHAMPION : 1 s de plus)
-    noir: { nombre: 1, duree: 3 },   // par manche
-    ecartTech: 12,   // écart MINIMUM (s) entre deux techniques de Kédric (gel, noir) : pas la mitraille
+    piste: { chute: 1.8 }, rougeChance: 0.12, latence: 0,
+    pieges: { duree: 6, fumee: 0.55, leurres: 0.4, turbo: 2 },
+    ecartTech: 12,   // écart MINIMUM (s) entre deux techniques de Kédric : pas la mitraille
     double: { duree: 12 },
     combo: { nombre: 5, duree: 10, mult: 1.5 },
     drain: { seuil: 40, force: 0.12 },   // tu mènes trop : son public se rappelle à lui (jauge/s, adouci : les pièges suffisent déjà)

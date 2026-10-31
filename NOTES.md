@@ -245,6 +245,14 @@ Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises 
     et ligne qui ne se décale plus (sauf CHAMPION : `murTardif`, `decalage`), pot de colle figé 0,75 s avant, rangs derrière le
     prochain défenseur ESTOMPÉS, symbole placé à la hauteur de la pose (plus bas quand il plonge). Duel : tu restes face à Kédric
     (le terrain ne défile plus pendant le duel), sa charge dure toujours ≈ 1,2 s (avant, le bout du terrain la ralentissait).
+  - v7.1 (après l'audit) : TEMPO MESURÉ sur les fichiers (librosa) — Cha-La 154 BPM, 1er temps fort 8,455 s (le jeu
+    attendait 8 s : flèches 60 ms en avance) ; We Gotta Power 113 BPM, 1er temps fort 1,086 s (le jeu utilisait le tempo de
+    Cha-La : flèches jusqu'à 0,2 s à côté). Chaque manche a son `tempsParPas` (manche 2 : une flèche par temps, ~0,53 s).
+    `showtime.latence` (réglages développeur) compense le retard du son (Bluetooth). Chute des flèches : une DURÉE
+    (`piste.chute` = 1,8 s, même temps sur PC et téléphone) ; sur téléphone la cible est AU MILIEU du bouton (couloirs plus
+    longs). Pièges : le GEL (ratés imposés) et la COUPURE (3 s de noir) sont RETIRÉS, remplacés par des pièges d'adresse
+    (`showtime.pieges`, 2 par manche) : FUMIGÈNE (le haut des couloirs caché), FLÈCHES DORÉES (leurres à ne pas toucher :
+    les toucher = « PIÈGE DORÉ », raté ; les laisser passer = rien), TURBO (chute 2 fois plus rapide, toujours en rythme).
   - v6.4 (battle, idée du propriétaire) : façon GUITAR HERO / jeu de danse : les flèches TOMBENT dans 4 COULOIRS
     (◀ ▶ à gauche, ▲ ▼ à droite, Kédric au milieu) jusqu'à la touche à presser. Sur téléphone, les 4 gros boutons sont
     en ligne (◀ ▶ | ▲ ▼) et chaque couloir est calé juste au-dessus de son bouton (`calculerCouloirs`, ajout optionnel

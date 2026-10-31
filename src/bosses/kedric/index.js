@@ -21,7 +21,9 @@ export default {
     { groupe: 'GHOST', nom: 'Durée du Devil Bat Ghost (s)', objet: R.ghost, champ: 'duree', pas: 0.5, min: 1, max: 10 },
     { groupe: 'GHOST', nom: 'Jauge : points par esquive', objet: R.ghost, champ: 'parEsquive', pas: 1, min: 0, max: 5 },
     { groupe: 'GHOST', nom: 'Jauge : points par esquive PARFAITE', objet: R.ghost, champ: 'parParfait', pas: 1, min: 0, max: 6 },
-    { groupe: 'BATTLE', nom: 'Vitesse de chute des flèches (pixels/s)', objet: R.showtime.piste, champ: 'vitesse', pas: 10, min: 100, max: 400 },
+    { groupe: 'BATTLE', nom: 'Temps de chute des flèches (s)', objet: R.showtime.piste, champ: 'chute', pas: 0.1, min: 0.8, max: 3 },
+    { groupe: 'BATTLE', nom: 'Décalage du son (s, Bluetooth ~0.15)', objet: R.showtime, champ: 'latence', pas: 0.01, min: -0.2, max: 0.4 },
+    { groupe: 'BATTLE', nom: 'Durée des pièges de Kédric (s)', objet: R.showtime.pieges, champ: 'duree', pas: 0.5, min: 2, max: 12 },
     ...['facile', 'normal', 'champion'].flatMap(n => [
       { groupe: D[n].nom, nom: 'Taille de la jauge Ghost', objet: D[n], champ: 'ghost', pas: 1, min: 1, max: 20 },
       { groupe: D[n].nom, nom: 'Vitesse de course (x)', objet: D[n], champ: 'vitesse', pas: 0.05, min: 0.5, max: 2 },
