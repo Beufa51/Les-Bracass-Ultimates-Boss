@@ -434,3 +434,8 @@ Copier `src/bosses/modele/` (avec son `manifeste.js`), renommer, puis dans `src/
 Ses visuels et sons vont dans SON `manifeste.js` (noms commençant par le nom du boss), ses fichiers dans
 `assets/sprites/<boss>/` et `assets/audio/<boss>/`. Si on a besoin d'un effet ou d'un écran d'un autre boss,
 on le COPIE dans le dossier du nouveau boss (pas de partage entre boss).
+
+## BEUFA — PROPOSITION DE REFONTE DE L'INFILTRATION (en attente d'accord)
+Proposition d'un game designer (non intégrée) : `propositions/beufa_infiltration/` (DESIGN.md, pieces.js, vues).
+4 pièces à 2-3 gardes, nouveaux réglages (repérage 0.8, zoom 1.15…), pierre supprimée, diagonales tactiles,
+bug du voile de nuit sur les pièces de 1440 px. Intégrer seulement après accord du propriétaire.
