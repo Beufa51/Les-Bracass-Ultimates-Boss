@@ -14,13 +14,13 @@ export const REGLAGES = {
     porteePierre: 300, // elle VOLE LOIN : détourner un garde sans entrer dans son cône
   },
   garde: {
-    portee: 180,       // V23 : la nuit jouait POUR toi — les gardes voient PLUS LOIN
-    angle: 28,         // demi-angle du cône (°)
+    portee: 210,       // V31 : trop facile → ils voient encore PLUS LOIN (180 avant)
+    angle: 34,         // V31 : demi-angle du cône (°) — cône plus large, moins facile à contourner (28 avant)
     reperage: 0.8,     // V27 : dans un cône on est repéré EN UN CLIN D'ŒIL — la nuit ne pardonne plus
-    vitesseRonde: 50,  // V23 : une ronde LENTE mais les fenêtres se referment PLUS VITE
-    vitessePoursuite: 150,
+    vitesseRonde: 65,  // V31 : ronde plus rapide, les fenêtres se referment plus vite (50 avant)
+    vitessePoursuite: 165, // V31 : 150 avant
     rayon: 14,
-    pause: 1.5,        // V23 : il s'arrête MOINS LONGTEMPS à chaque bout
+    pause: 1.0,        // V31 : il s'arrête MOINS LONGTEMPS à chaque bout (1.5 avant)
   },
   projecteur: {
     rayon: 62,        // V23 : les halos sont PLUS LARGE
@@ -40,10 +40,10 @@ export const REGLAGES = {
 };
 
 // LA BASE — VERSION « LISIBLE » : 4 pièces courtes, UNE nouveauté par pièce.
-// 1. LA COUR       : le cône, l'ombre des conteneurs, passer DANS LE DOS (2 gardes, 0 projecteur)
-// 2. LE PARC       : la LUMIÈRE (portique puis halo sur la route), les niches entre camions (2 gardes, 2 projecteurs)
-// 3. L'ARSENAL     : le VEILLEUR qui tourne la tête + la ronde en boucle (3 gardes, 0 projecteur)
-// 4. LE QG         : tout ensemble, une seule fois chaque chose (3 gardes, 1 projecteur)
+// 1. LA COUR       : le cône, l'ombre des conteneurs, passer DANS LE DOS (3 gardes, 0 projecteur)
+// 2. LE PARC       : la LUMIÈRE (portique puis halo sur la route), les niches entre camions (3 gardes, 2 projecteurs)
+// 3. L'ARSENAL     : le VEILLEUR qui tourne la tête + la ronde en boucle (4 gardes, 0 projecteur)
+// 4. LE QG         : tout ensemble, une seule fois chaque chose (4 gardes, 1 projecteur)
 // Aucune pièce n'exige la pierre. Sorties compatibles avec le code actuel :
 // 'haut' = porte x 445-515 en haut (pièces 960 de large), 'est'/'qg' = x > 1396, y 330-400 (pièces 1440 de large).
 export const PIECES = [
@@ -76,6 +76,7 @@ export const PIECES = [
     gardes: [
       { chemin: [[480, 400], [480, 150]] },          // LA SENTINELLE DE L'AXE : monte, regarde, redescend — l'horloge de la pièce
       { chemin: [[660, 300], [900, 300]] },          // LA RONDE DES RÉSERVOIRS : garde la variante est
+      { chemin: [[60, 300], [300, 300]] },           // V31 : LA RONDE DE L'OUEST : garde la variante ouest
     ],
     entree: { x: 480, y: 645 },
     sortie: 'haut',
@@ -112,6 +113,7 @@ export const PIECES = [
     gardes: [
       { chemin: [[470, 60], [1180, 60]] },           // LA RONDE DU NORD : la variante derrière les camions
       { chemin: [[1290, 470], [1290, 110]] },        // LE GARDIEN DE LA PORTE : passe quand il monte
+      { chemin: [[620, 365], [980, 365]] },          // V31 : LA PATROUILLE DE LA ROUTE : cache-toi dans une niche du nord
     ],
     entree: { x: 75, y: 365 },
     sortie: 'est',
@@ -146,6 +148,7 @@ export const PIECES = [
       { chemin: [[700, 530], [260, 530], [260, 230], [700, 230]] },        // LA RONDE DE L'ÎLOT : elle tourne autour (sens des aiguilles d'une montre) — tourne DERRIÈRE elle
       { chemin: [[380, 92], [380, 92]], scan: 50, scanBase: 0.2 },           // LE VEILLEUR DE LA PORTE : il tourne la tête — passe quand il regarde au sud
       { chemin: [[860, 520], [860, 260]] },                                // LA RONDE DE L'EST : elle garde le couloir des caisses — on la double quand elle REDESCEND
+      { chemin: [[90, 560], [90, 300]] },                                  // V31 : LA RONDE DE L'OUEST : ferme le couloir ouest
     ],
     entree: { x: 480, y: 645 },
     sortie: 'haut',
@@ -180,6 +183,7 @@ export const PIECES = [
       { chemin: [[560, 175], [960, 175], [960, 380], [560, 380]] },   // LE STRATÈGE : le tour de la table, en boucle (sens des aiguilles d'une montre)
       { chemin: [[1150, 200], [1150, 200]], scan: 55, scanBase: Math.PI / 2 },   // LE GARDE DU BUREAU : il balaie l'entrée du bureau
       { chemin: [[1330, 120], [1330, 300]] },                              // LE PLANTON : il garde la porte du bureau — passe quand il REMONTE
+      { chemin: [[250, 250], [250, 470]] },                                // V31 : LA SENTINELLE DE L'ANTICHAMBRE : sous le portique
     ],
     entree: { x: 75, y: 365 },
     sortie: 'qg',

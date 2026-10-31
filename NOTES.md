@@ -463,3 +463,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Test de fumée (Playwright) : 4 pièces chargées, héros qui bouge, aucune erreur ni fichier manquant.
   Le banc d'essai du bot (propositions/beufa_infiltration) n'a jamais été mis dans le dépôt.
 - Reste : test par de vrais joueurs (enfants, téléphone).
+
+## BEUFA — V31 : PLUS DIFFICILE (retour : « trop facile, on esquive trop »)
+- Gardes : portée 180→210, angle 28→34°, ronde 50→65, pause 1.5→1.0, poursuite 150→165.
+- +1 garde par pièce (3/3/4/4) : ronde ouest (cour), patrouille de la route (parc), ronde ouest (arsenal),
+  sentinelle de l'antichambre sous le portique (QG). Tout est dans `reglages.js`, à ajuster si trop dur.
