@@ -489,3 +489,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Bout de ronde : le regard part de l'angle d'arrivée (plus de saut) ; puis demi-tour SUR PLACE en piétinant
   (`garde.vitesseDemiTour` 3.2 rad/s, ~1 s), il ne repart qu'une fois tourné (avant : il reculait en pivotant).
 - Prompt du héros façon Solid Snake ajouté dans `propositions/beufa_prompts_marche.md`.
+
+## BEUFA — V35 : HÉROS FAÇON SNAKE
+- Original : `assets_inbox/beufa_heros_snake.jpg` (12 images en 2 rangées de 6, vue 3/4 face comme l'ancien).
+  Assemblé en 1 rangée de 12 → `assets/sprites/beufa/beufa_heros.jpg`, allégé (1777×250).
+- Manifeste : images 12, hauteur 62 (il est élancé : à 48 il paraissait plus petit que les gardes).
+  Découpeur : jusqu'à 12 personnages par planche (avant 9). Pose d'arrêt = image 5 (index 4).

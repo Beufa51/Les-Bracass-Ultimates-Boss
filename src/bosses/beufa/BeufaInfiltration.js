@@ -282,7 +282,7 @@ export class BeufaInfiltration extends BossScene {
           v[4] = sy0; v[5] = sy1;   // la vraie hauteur de CE perso (servira au dessin)
           return (sy1 - sy0 + 1) >= (v[3] - v[2] + 1) * 0.35 && (v[1] - v[0] + 1) >= (x1 - x0 + 1) * 0.04;
         });
-        if (bons.length >= 3 && bons.length <= 9) personnages = bons;
+        if (bons.length >= 3 && bons.length <= 12) personnages = bons;   // V35 : 12 pour la planche Snake
       }
       if (personnages) {
         n = personnages.length;   // le VRAI nombre de cases de la planche l'emporte sur le manifeste
