@@ -593,6 +593,6 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   (`beufa_ratelier.jpg`) : meuble plein, qui coupe la vue comme il bloque. Reflets des fusils gardés.
 
 ## BEUFA — PROMPTS DES DÉCORS
-- `propositions/beufa_prompts_decor.md` : bloc de style commun (vue du DESSUS stricte) + prompts des décors à refaire
+- `propositions/beufa_prompts_decor.md` : bloc de style commun (vue 3/4 du dessus, comme Snake) + prompts des décors à refaire
   (camion, tente, table, projecteur, baril, râtelier, caisse, conteneurs) + nouveaux éléments par pièce.
 - Incohérence notée : au QG, les « rayonnages » et le « classeur » sont des conteneurs de port → étagère/bureau proposés.
