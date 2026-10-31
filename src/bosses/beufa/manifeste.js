@@ -36,6 +36,7 @@ export const MANIFESTE = {
     beufa_garde:  { fichier: 'sprites/beufa/beufa_garde.jpg', fond: 'blanc', largeur: 48, hauteur: 48, images: 6, vitesse: 6, provisoire: { forme: 'garde_nes', couleur: '#385438', pixel: 2 } },
     beufa_heros:  { fichier: 'sprites/beufa/beufa_heros.jpg', fond: 'blanc', echelleCommune: true, largeur: 64, hauteur: 80, images: 10, vitesse: 7, provisoire: { forme: 'heros_nes', couleur: '#383854', pixel: 2 } },
     beufa_heros_profil: { fichier: 'sprites/beufa/beufa_heros_profil.jpg', fond: 'blanc', echelleCommune: true, largeur: 64, hauteur: 80, images: 6, vitesse: 7, provisoire: { forme: 'heros_nes', couleur: '#383854', pixel: 2 } },   // V38 : profil 3/4 (regarde à droite)
+    beufa_heros_dos: { fichier: 'sprites/beufa/beufa_heros_dos.jpg', fond: 'blanc', echelleCommune: true, largeur: 64, hauteur: 80, images: 6, vitesse: 7, provisoire: { forme: 'heros_nes', couleur: '#383854', pixel: 2 } },   // V39 : de dos (quand il monte)
     beufa_boss:   { fichier: 'sprites/beufa/beufa_boss.jpg', fond: 'blanc', largeur: 64, hauteur: 64, images: 8, vitesse: 7, provisoire: { forme: 'beufa_nes', couleur: '#1c541c', pixel: 2 } },
     beufa_pierre: { fichier: 'sprites/beufa/beufa_pierre.jpg', fond: 'blanc', largeur: 12, hauteur: 12, images: 1, vitesse: 1, provisoire: { forme: 'pierre_nes', couleur: '#8c8c8c', pixel: 2 } },
   },

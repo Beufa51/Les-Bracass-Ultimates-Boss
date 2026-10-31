@@ -513,3 +513,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Original : `assets_inbox/beufa_heros_snake_profil.jpg` (2 rangées de 6). Rangée 1 = 3/4 profil vers la droite
   → `beufa_heros_profil.jpg` (6 images, miroir à gauche). Rangée 2 (presque de face) NON utilisée.
 - Reste : planche de DOS (quand il monte, la face sert encore).
+
+## BEUFA — V39 : SNAKE COMPLET (face / dos / profil)
+- Dos : `assets_inbox/beufa_heros_snake_dos.jpg`, rangée 1 seulement (la 2e est dessinée plus grande) → 6 images.
+- Profil : remplacé par `assets_inbox/beufa_heros_snake_profil2.jpg` rangée 1 (pistolet en main), 6 images.
+  Sa rangée 2 (au repos + 3 poses de tir) n'est pas utilisée : à garder si on ajoute un tir ou une pose d'arrêt.
