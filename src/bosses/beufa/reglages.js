@@ -8,6 +8,7 @@ export const REGLAGES = {
   joueur: {
     vitesse: 120,      // V32 : 130 avant — marche (px/s) : silencieuse — LENTE, comme une infiltration
     sprint: 200,       // Z : plus rapide, mais les gardes proches T'ENTENDENT
+    pas: 72,           // V33 : px parcourus pour UN cycle de marche complet (2 pas) — plus petit = jambes plus rapides
     rayon: 10,      // V25 : on frôle les caisses SANS être bloqué — les couloirs redeviennent passables
     bruit: 180,        // V32 : 130 avant — rayon (px) dans lequel un garde entend le sprint
     pierres: 0,        // V28 : la pierre est SUPPRIMÉE (proposition du game designer)
@@ -16,16 +17,17 @@ export const REGLAGES = {
   garde: {
     portee: 240,       // V32 : ils voient encore PLUS LOIN (210 en V31, 180 avant)
     angle: 40,         // V32 (34 en V31) : demi-angle du cône (°) — cône plus large, moins facile à contourner (28 avant)
-    reperage: 0.45,    // V32 (0.8 avant) : dans un cône on est repéré EN UN CLIN D'ŒIL — la nuit ne pardonne plus
+    reperage: 0.8,     // V33 : retour au réglage d'avant (0.45 en V32, trop dur) — dans un cône on est repéré EN UN CLIN D'ŒIL — la nuit ne pardonne plus
     vitesseRonde: 75,  // V32 (65 en V31) : ronde plus rapide, les fenêtres se referment plus vite (50 avant)
     vitessePoursuite: 185, // V32 : 165 en V31, 150 avant — presque aussi rapide que ton sprint
     rayon: 14,
+    pas: 64,           // V33 : px pour un cycle de marche complet du garde
     pause: 0.7,        // V32 (1.0 en V31) : il s'arrête MOINS LONGTEMPS à chaque bout (1.5 avant)
   },
   projecteur: {
     rayon: 62,        // V23 : les halos sont PLUS LARGE
     periode: 8,       // s d'un va-et-vient complet : la lumière file jusqu'au milieu puis REVIENT
-    reperage: 0.25,   // V32 (0.4 avant) : sous un halo, on est grillé presque aussitôt
+    reperage: 0.4,    // V33 : retour au réglage d'avant — sous un halo, on est grillé presque aussitôt
   },
   alerte: {
     collective: 320,    // V32 (200 avant) : l'alerte se propage PLUS LOIN dans la base
@@ -77,6 +79,7 @@ export const PIECES = [
       { chemin: [[480, 400], [480, 150]] },          // LA SENTINELLE DE L'AXE : monte, regarde, redescend — l'horloge de la pièce
       { chemin: [[660, 300], [900, 300]] },          // LA RONDE DES RÉSERVOIRS : garde la variante est
       { chemin: [[60, 300], [300, 300]] },           // V31 : LA RONDE DE L'OUEST : garde la variante ouest
+      { chemin: [[700, 540], [900, 540]] },          // V33 : LA RONDE DU MIRADOR : surveille le départ est
     ],
     entree: { x: 480, y: 645 },
     sortie: 'haut',
@@ -114,6 +117,7 @@ export const PIECES = [
       { chemin: [[470, 60], [1180, 60]] },           // LA RONDE DU NORD : la variante derrière les camions
       { chemin: [[1290, 470], [1290, 110]] },        // LE GARDIEN DE LA PORTE : passe quand il monte
       { chemin: [[620, 365], [980, 365]] },          // V31 : LA PATROUILLE DE LA ROUTE : cache-toi dans une niche du nord
+      { chemin: [[430, 90], [430, 470]] },           // V33 : LA RONDE DU PORTIQUE : traverse la route juste après la lumière
     ],
     entree: { x: 75, y: 365 },
     sortie: 'est',
@@ -149,6 +153,7 @@ export const PIECES = [
       { chemin: [[380, 92], [380, 92]], scan: 50, scanBase: 0.2 },           // LE VEILLEUR DE LA PORTE : il tourne la tête — passe quand il regarde au sud
       { chemin: [[860, 520], [860, 260]] },                                // LA RONDE DE L'EST : elle garde le couloir des caisses — on la double quand elle REDESCEND
       { chemin: [[90, 560], [90, 300]] },                                  // V31 : LA RONDE DE L'OUEST : ferme le couloir ouest
+      { chemin: [[560, 92], [800, 92]] },                                  // V33 : LA RONDE DE LA PORTE : le côté est de la sortie
     ],
     entree: { x: 480, y: 645 },
     sortie: 'haut',
@@ -184,6 +189,7 @@ export const PIECES = [
       { chemin: [[1150, 200], [1150, 200]], scan: 55, scanBase: Math.PI / 2 },   // LE GARDE DU BUREAU : il balaie l'entrée du bureau
       { chemin: [[1330, 120], [1330, 300]] },                              // LE PLANTON : il garde la porte du bureau — passe quand il REMONTE
       { chemin: [[250, 250], [250, 470]] },                                // V31 : LA SENTINELLE DE L'ANTICHAMBRE : sous le portique
+      { chemin: [[1100, 400], [1380, 400]] },                              // V33 : LA RONDE DU BUREAU : devant la porte de Beufa
     ],
     entree: { x: 75, y: 365 },
     sortie: 'qg',

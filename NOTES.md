@@ -476,3 +476,11 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Héros : Fabien veut changer son design et son animation. Planche attendue : `assets/sprites/beufa/beufa_heros.jpg`,
   6 images côte à côte sur 1 rangée, fond blanc, vue du dessus, le héros REGARDE VERS LE BAS (ORIENT_HEROS).
   Si le nombre d'images change, mettre `images:` à jour dans manifeste.js, puis `python3 outils/beufa_alleger.py`.
+
+## BEUFA — V33 : REPÉRAGE D'AVANT + GARDES + MARCHE PLUS NATURELLE
+- Repérage remis à 0.8 (garde) / 0.4 (projecteur) ; le reste de V32 est gardé.
+- +1 garde par pièce (4/4/5/5) : ronde du mirador, ronde du portique, ronde de la porte (arsenal), ronde du bureau.
+- Marche : plus de rebond vertical ni de dandinement du sprite (faux en vue du dessus) ; l'image de marche suit
+  la DISTANCE parcourue (`cyclePas`, réglages `joueur.pas` 72 / `garde.pas` 64) → les pieds ne glissent plus.
+- Prompts des nouvelles planches (8 images) : `propositions/beufa_prompts_marche.md`. À la livraison : régler
+  la pose d'arrêt sur l'image 3 (index 2).

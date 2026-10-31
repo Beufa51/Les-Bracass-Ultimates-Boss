@@ -513,9 +513,10 @@ export class BeufaInfiltration extends BossScene {
       this.poussieres.push({ x: this.joueur.x - dx * 7, y: this.joueur.y - dy * 7 + 3,
         t: 0, duree: sprint ? 0.5 : 0.38, r: sprint ? 3.6 : 2.4 });
     }
+    const imagePas = this.cyclePas(this.joueur, R.joueur.pas, this.nbFramesHeros);
     if (dx || dy) {
       this.joueur.angle = Math.atan2(dy, dx);
-      this.sprJoueur.setFrame(Math.floor(this.temps * (sprint ? 11 : 7)) % this.nbFramesHeros);
+      this.sprJoueur.setFrame(imagePas);   // V33 : les jambes avancent AVEC le sol (pieds qui ne glissent plus)
       if (sprint) this.bruit();   // le sprint s'entend : les gardes proches se tournent vers toi
     } else this.sprJoueur.setFrame(this.poseArretHeros);
     if (vientDAppuyer(t.x) && this.pierres > 0) this.lancerPierre();
@@ -818,16 +819,25 @@ export class BeufaInfiltration extends BossScene {
     }
   }
 
+  // V33 : l'image de marche suit la DISTANCE parcourue, pas l'horloge : un cycle complet
+  // (pied gauche + pied droit) tous les `longueur` px, donc les pieds « accrochent » le sol.
+  cyclePas(o, longueur, n) {
+    const d = Math.hypot(o.x - (o.pasX ?? o.x), o.y - (o.pasY ?? o.y));
+    o.pasX = o.x; o.pasY = o.y;
+    if (d < 50) o.distPas = (o.distPas || 0) + d;   // > 50 px d'un coup = téléportation (rattrapé), on ignore
+    return Math.floor((o.distPas || 0) / longueur * n) % n;
+  }
+
   // ---------- l'affichage ----------
   afficher() {
     // le balancement de marche : le top-down VIT, il ne glisse plus comme un pain
     // LE HÉROS VIT : rebond du pas, léger écrasement à la retombée — et
     // quand il ne bouge pas, il RESPIRE (le plastron se soulève tout doucement)
-    const pasH = Math.abs(Math.sin(this.temps * 13));
-    const bob = this.heroBouge ? pasH * 3 : 0;
-    this.sprJoueur.setPosition(this.joueur.x, this.joueur.y - bob)
-      .setRotation(this.joueur.angle + ORIENT_HEROS + (this.heroBouge ? Math.sin(this.temps * 13) * 0.08 : 0))
-      .setScale(1 + bob * 0.012, 1 - bob * 0.02 + (this.heroBouge ? 0 : Math.sin(this.temps * 2.2) * 0.015));
+    // V33 : plus de rebond vers le haut de l'écran ni de dandinement (faux en vue du dessus) :
+    // c'est la planche qui anime la marche ; à l'arrêt, il respire toujours un peu.
+    this.sprJoueur.setPosition(this.joueur.x, this.joueur.y)
+      .setRotation(this.joueur.angle + ORIENT_HEROS)
+      .setScale(1, 1 + (this.heroBouge ? 0 : Math.sin(this.temps * 2.2) * 0.015));
     const gg = this.conesG;
     gg.clear();
     // LES HALOS : le faisceau de la tour vers son halo, puis le halo lui-même —
@@ -854,10 +864,10 @@ export class BeufaInfiltration extends BossScene {
         g.prochPoussiere = this.temps + 0.13;
         this.poussieres.push({ x: g.x - Math.cos(g.angle) * 7, y: g.y - Math.sin(g.angle) * 7 + 3, t: 0, duree: 0.35, r: 2.2 });
       }
-      const rebond = g.bouge ? Math.abs(Math.sin(this.temps * 13 + g.x * 0.05)) * 2 : 0;
-      g.sprite.setPosition(g.x, g.y - rebond)
-        .setRotation(g.angle + ORIENT_GARDE + (g.bouge ? Math.sin(this.temps * 13 + g.x * 0.05) * 0.07 : 0))
-        .setFrame(g.bouge ? Math.floor(this.temps * 7 + g.x * 0.07) % this.nbFramesGarde : this.poseArretGarde);   // V30 : le VRAI cycle de jambes de la planche de Fabien
+      const imageG = this.cyclePas(g, R.garde.pas, this.nbFramesGarde);   // V33 : cycle lié à la distance parcourue
+      g.sprite.setPosition(g.x, g.y)
+        .setRotation(g.angle + ORIENT_GARDE)
+        .setFrame(g.bouge ? imageG : this.poseArretGarde);
       g.alerte.setPosition(g.x, g.y - 32).setScale(1 + Math.sin(this.temps * 18) * 0.12);
       this.dessinerCone(gg, g.x, g.y, g.angle, R.garde, g.etat === 'poursuite' ? 0xff5a5a : 0xffe9a0, null);
     }
