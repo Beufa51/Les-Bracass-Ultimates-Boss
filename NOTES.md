@@ -692,3 +692,17 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Le panneau livré a une ombre au sol et un côté visible (pas tout à fait le style) : à refaire si ça choque.
 - Restent à livrer (V59) : n°6 à 11 (pompe, jerricans, panneau danger, casiers, tableau, bannière) + les 4
   prompts « hauteur » (camions, étagères).
+
+## BEUFA — V61 : CRÉDIBILITÉ « VRAIE BASE » (retours de Fabien)
+- BLOCAGE QG corrigé : la rangée du bas (étagères, classeur, rayonnage sud) laissait 20-24 px avant le mur
+  → on croyait passer derrière, Snake (Ø 20) restait coincé. Tout est COLLÉ au mur. Même règle pour palettes,
+  pneus, baril est et caisses de l'arsenal. RÈGLE : un objet est soit collé au mur, soit à ≥ 34 px (vrai passage).
+  Seule exception voulue : le passage secret derrière la rangée nord du QG (38 px).
+- QG : le bureau de Beufa est une vraie pièce : cloison avec une PORTE de 80 px (y 250-330) au lieu d'une
+  brèche de 150 px ; cadre de porte dessiné (`portesInterieures`, sans LED verte).
+- Arsenal en zones : RÉSERVE DES MISSILES au nord-ouest (2 missiles, à la place de la table à cartes, même
+  emprise, gardée par le veilleur) ; ATELIER à l'entrée (2 caisses de munitions + établi, à la place du missile seul).
+- Parc : jeeps à l'échelle de Snake (88×60 → 120×66), garées contre les murs.
+- Cour : panneau « interdit aux soldats » RETIRÉ (absurde dans une base militaire).
+- Vérifié par calcul : aucune ronde ne touche un obstacle, entrées libres. Reste : camions et étagères plus hauts
+  (prompts V57), prompts V59 n°6 à 11.

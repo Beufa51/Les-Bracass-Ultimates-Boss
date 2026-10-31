@@ -75,11 +75,10 @@ export const PIECES = [
       [820, 430, 140, 52],                           // LA COUVERTURE DU CHEMIN EST (variante)
       [860, 620, 68, 80, 'beufa_mirador'],           // le mirador du portail (décor)
       [370, 52, 88, 64, 'beufa_guerite'],            // V52 : la guérite de la porte du QG — V56 : COLLÉE au mur — V57 : image 96×96 (plus haute que Snake), emprise élargie à 88
-      [70, 640, 64, 64, 'beufa_palettes'],           // V52 : palettes dans le coin sud-ouest (hors des chemins)
+      [52, 668, 64, 64, 'beufa_palettes'],           // V52 : palettes dans le coin sud-ouest (hors des chemins)
       // V60 : BASE MILITAIRE — le drapeau en face de la guérite, deux lampadaires au portail, le panneau d'interdiction
       [560, 130, 20, 16, 'beufa_drapeau', 19],       // emprise = le socle ; l'image est décalée (le mât est à gauche du dessin)
       [400, 690, 14, 12, 'beufa_lampadaire'], [560, 690, 14, 12, 'beufa_lampadaire'],
-      [215, 688, 40, 12, 'beufa_panneau'],
     ],
     decorsSol: [ [480, 680, 'beufa_barriere'], [250, 380, 'beufa_flaque', 0.8], [700, 200, 'beufa_flaque', 0.8] ],   // V52 : la barrière du portail (on passe dessus)
     sacs: [ [395, 520], [565, 520] ],                // le poste de contrôle de l'axe
@@ -109,17 +108,17 @@ export const PIECES = [
     portes: [ [10, 365, Math.PI / 2], [1430, 365, Math.PI / 2] ],
     routes: [ [720, 365, 1460, 70] ],
     conteneurs: [
-      [150, 150, 88, 60, 'beufa_jeep'], [150, 470, 88, 60, 'beufa_jeep'],   // l'entrée : deux jeeps, la poche sûre
+      [150, 150, 120, 66, 'beufa_jeep'], [150, 487, 120, 66, 'beufa_jeep'],   // l'entrée : deux jeeps, la poche sûre — V61 : à l'échelle de Snake (88×60 → 120×66), celle du sud garée contre le mur
       // LA RANGÉE NORD : camions garés nez au mur — entre eux, des NICHES à l'ombre
       [560, 220, 72, 176, 'beufa_camion'], [720, 220, 72, 176, 'beufa_camion'],
       [880, 220, 72, 176, 'beufa_camion'], [1040, 220, 72, 176, 'beufa_camion'],
       // LA RANGÉE SUD : trois camions le long de la route — les niches entre eux sont à L'OMBRE du halo
       [560, 455, 176, 72, 'beufa_camion'], [800, 455, 176, 72, 'beufa_camion'], [1040, 455, 176, 72, 'beufa_camion'],
       [1220, 480, 96, 96, 'beufa_reservoir'],        // la station : cache la dernière niche du gardien de la porte
-      [1370, 90, 88, 60, 'beufa_jeep'],              // décor de l'angle nord-est — V57 : poussée à l'est (le gardien de la porte la traversait)
+      [1355, 53, 120, 66, 'beufa_jeep'],             // décor de l'angle nord-est — V61 : garée contre le mur (au-dessus du demi-tour du gardien, y 110)
       [360, 410, 16, 16, 'beufa_plot'], [392, 410, 16, 16, 'beufa_plot'], [1130, 320, 16, 16, 'beufa_plot'], [1170, 320, 16, 16, 'beufa_plot'],   // V55 : plots au bord de la route (hors des chemins des gardes)
       [250, 318, 14, 12, 'beufa_lampadaire'], [1340, 318, 14, 12, 'beufa_lampadaire'],   // V60 : lampadaires au bord NORD de la route (au sud, le poteau montait par-dessus l'asphalte)
-      [1385, 495, 48, 48, 'beufa_pneus'], [250, 500, 48, 48, 'beufa_pneus'],   // V53 : pneus dans les coins (hors des chemins)
+      [1396, 496, 48, 48, 'beufa_pneus'], [234, 496, 48, 48, 'beufa_pneus'],   // V53 : pneus dans les coins (hors des chemins)
     ],
     decorsSol: [ [900, 385, 'beufa_huile', 0.6], [640, 330, 'beufa_huile', 0.6], [1180, 160, 'beufa_huile', 0.6] ],   // V53 : taches d'huile
     sacs: [],
@@ -160,15 +159,18 @@ export const PIECES = [
       [410, 330, 140, 52, 'beufa_ratelier'], [550, 330, 140, 52, 'beufa_ratelier'],
       [410, 430, 140, 52, 'beufa_ratelier'], [550, 430, 140, 52, 'beufa_ratelier'],
       // le sas d'entrée
-      [330, 610, 140, 52, 'beufa_missile'], [630, 610, 140, 52, 'beufa_etabli'],   // V54 : le missile et l'établi (à la place de 2 râteliers)
+      // V61 : L'ATELIER de l'entrée : caisses de munitions à déballer + l'établi (même emprise qu'avant)
+      [295, 610, 70, 52, 'beufa_munitions'], [365, 610, 70, 52, 'beufa_munitions'], [630, 610, 140, 52, 'beufa_etabli'],
+      // V61 : LA RÉSERVE DES MISSILES au nord-ouest, sous l'œil du veilleur (à la place de la table à cartes, même emprise)
+      [190, 68, 140, 45, 'beufa_missile'], [190, 113, 140, 45, 'beufa_missile'],
       // L'ABRI DU VEILLEUR : la rangée nord, l'ombre juste avant la porte
       [610, 150, 140, 52, 'beufa_ratelier'],
       [870, 90, 70, 38, 'beufa_munitions'],          // V54 : caisses de munitions (à la place de la caisse du nord-est)
-      [100, 200, 34, 48, 'beufa_baril'], [912, 420, 34, 48, 'beufa_baril'],   // V57 : baril est contre le mur (la ronde de l'est le traversait) — V52 : obstacle = largeur du vrai baril
+      [100, 200, 34, 48, 'beufa_baril'], [923, 420, 34, 48, 'beufa_baril'],   // V57 : baril est contre le mur (la ronde de l'est le traversait) — V52 : obstacle = largeur du vrai baril
     ],
     sacs: [],
-    caisses: [ [90, 640], [870, 640] ],
-    tables: [ [190, 90] ],                           // le poste de l'armurier
+    caisses: [ [90, 668], [870, 668] ],   // V61 : collées au mur sud
+    tables: [],                                      // V61 : la table à cartes n'a rien à faire à l'arsenal (→ réserve des missiles)
     projecteurs: [],
     gardes: [
       { chemin: [[700, 530], [260, 530], [260, 230], [700, 230]] },        // LA RONDE DE L'ÎLOT : elle tourne autour (sens des aiguilles d'une montre) — tourne DERRIÈRE elle
@@ -182,13 +184,14 @@ export const PIECES = [
   },
   { // ----- PIÈCE 4 : LE QG DE BEUFA — 1440×540 — « tout ensemble » -----
     nom: 'PIÈCE 4/4 · LE QG DE BEUFA',
+    portesInterieures: [ [1060, 290, Math.PI / 2] ],   // V61 : la porte du bureau de Beufa
     l: 1440, h: 540,
     teinteSol: 0xd2d8ee,
     murs: [
       [720, 10, 1440, 20], [720, 530, 1440, 20],
       [10, 165, 20, 330], [10, 470, 20, 140],
       [1430, 165, 20, 330], [1430, 470, 20, 140],   // est : LE BUREAU DE BEUFA (y 330-400)
-      [1060, 110, 20, 200], [1060, 440, 20, 160],   // la cloison du bureau : on y entre par l'ouverture du milieu (y 210-360)
+      [1060, 130, 20, 240], [1060, 425, 20, 190],   // la cloison du bureau — V61 : une vraie PORTE (y 250-330) au lieu d'une brèche de 150 px
       // V58 : LES PILIERS PORTEURS, engagés dans les murs (jamais devant le passage secret du nord, x 560-960)
       [230, 23, 28, 26],                            // nord (à côté de la tour du portique)
       [300, 517, 28, 26], [760, 517, 28, 26],       // sud (le 2e entre les deux étagères)
@@ -198,11 +201,11 @@ export const PIECES = [
     portes: [ [10, 365, Math.PI / 2], [1430, 365, Math.PI / 2] ],
     routes: [],
     conteneurs: [
-      [150, 150, 132, 44, 'beufa_console'], [150, 470, 140, 52, 'beufa_etagere'],   // V54 : consoles radar au nord       // l'antichambre : la poche sûre
-      [420, 130, 52, 140, 'beufa_etagere'], [420, 430, 52, 140, 'beufa_etagere'],       // les rayonnages de part et d'autre du portique de lumière
-      [640, 470, 140, 52, 'beufa_etagere'], [880, 470, 140, 52, 'beufa_etagere'],       // la rangée sud : l'abri contre le stratège
+      [150, 150, 132, 44, 'beufa_console'], [150, 494, 140, 52, 'beufa_etagere'],   // V54 : consoles radar au nord       // l'antichambre : la poche sûre
+      [420, 130, 52, 140, 'beufa_etagere'], [420, 450, 52, 140, 'beufa_etagere'],       // les rayonnages de part et d'autre du portique de lumière
+      [640, 494, 140, 52, 'beufa_etagere'], [880, 494, 140, 52, 'beufa_etagere'],       // la rangée sud : l'abri contre le stratège — V61 : collée au mur (avant : faux passage de 24 px derrière)
       [640, 84, 140, 52, 'beufa_etagere'], [880, 84, 140, 52, 'beufa_etagere'],       // la rangée nord — DERRIÈRE elle, contre le mur, un PASSAGE SECRET (la variante)
-      [1200, 470, 140, 52, 'beufa_etagere'],                           // le classeur du bureau
+      [1200, 494, 140, 52, 'beufa_etagere'],                           // le classeur du bureau
       [1200, 75, 120, 80, 'beufa_bureau'],           // V54 : LE BUREAU DE BEUFA (à la place de la caisse)
       [1395, 55, 40, 40, 'beufa_plante'], [1395, 495, 40, 40, 'beufa_plante'],   // V54 : plantes dans les coins du bureau
     ],

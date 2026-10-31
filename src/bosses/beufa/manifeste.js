@@ -27,7 +27,7 @@ export const MANIFESTE = {
     beufa_etagere:    { fichier: 'sprites/beufa/beufa_etagere.jpg', fond: 'blanc', largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545454', pixel: 2 } },
     beufa_etagere_v:  { fichier: 'sprites/beufa/beufa_etagere_v.jpg', fond: 'blanc', largeur: 52, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545454', pixel: 2 } },
     beufa_plot:       { fichier: 'sprites/beufa/beufa_plot.jpg', fond: 'blanc', largeur: 20, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'baril_nes', couleur: '#d8701c', pixel: 2 } },
-    beufa_jeep:       { fichier: 'sprites/beufa/beufa_jeep.jpg', fond: 'blanc', largeur: 88, hauteur: 60, images: 1, vitesse: 1, provisoire: { forme: 'jeep_nes', couleur: '#38543c', pixel: 2 } },
+    beufa_jeep:       { fichier: 'sprites/beufa/beufa_jeep.jpg', fond: 'blanc', largeur: 120, hauteur: 66, images: 1, vitesse: 1, provisoire: { forme: 'jeep_nes', couleur: '#38543c', pixel: 2 } },
     beufa_helico:     { fichier: 'sprites/beufa/beufa_helico.jpg', fond: 'blanc', largeur: 184, hauteur: 100, images: 1, vitesse: 1, provisoire: { forme: 'helico_nes', couleur: '#1c3854', pixel: 2 } },
     beufa_reservoir:  { fichier: 'sprites/beufa/beufa_reservoir.jpg', fond: 'blanc', largeur: 96, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'reservoir_nes', couleur: '#385454', pixel: 2 } },
     beufa_mirador:    { fichier: 'sprites/beufa/beufa_mirador.jpg', fond: 'blanc', largeur: 84, hauteur: 110, images: 1, vitesse: 1, provisoire: { forme: 'mirador_nes', couleur: '#545038', pixel: 2 } },

@@ -418,6 +418,8 @@ export class BeufaInfiltration extends BossScene {
       this.lueurs.push({ x, y, c: 0xfc3838 });   // LED rouge
       this.obstacles.push({ x, y, l, h });
     }
+    // V61 : les portes INTÉRIEURES (le bureau de Beufa) : juste le cadre au sol, sans LED (ce n'est pas la sortie)
+    for (const [x, y, rot] of (P.portesInterieures || [])) this.decor.push(this.add.image(x, y, 'beufa_porte').setRotation(rot).setDepth(10));
     // les portes OUVERTES : l'entrée et la sortie de la pièce (LED verte, bande jaune)
     for (const [x, y, rot] of (P.portes || [])) {
       this.decor.push(this.add.image(x, y, 'beufa_porte').setRotation(rot).setDepth(10));
