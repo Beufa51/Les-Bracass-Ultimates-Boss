@@ -182,7 +182,8 @@ export class BeufaInfiltration extends BossScene {
       ctx.drawImage(source.image, 0, 0);
       const img = ctx.getImageData(0, 0, L, H);
       const d = img.data;
-      const presqueBlanc = (k) => d[k] >= 238 && d[k + 1] >= 238 && d[k + 2] >= 238;
+      const sb = e.seuilBlanc || 238;   // V42 : Snake → 200 (son JPG laisse un halo gris clair)
+      const presqueBlanc = (k) => d[k] >= sb && d[k + 1] >= sb && d[k + 2] >= sb;
       let x0 = 0, y0 = 0, x1 = L - 1, y1 = H - 1;
       if (e.fond === 'blanc') {
         const vus = new Uint8Array(L * H);   // les pixels déjà traités (le fond, et les bords non blancs)
@@ -216,6 +217,19 @@ export class BeufaInfiltration extends BossScene {
             }
             if (zone.length >= e.trousBlancs) for (const k of zone) d[k * 4 + 3] = 0;
           }
+        }
+        for (let passe = 0; passe < (e.liseré || 0); passe++) {   // V42 : on RONGE le halo gris clair collé au contour
+          const aEffacer = [];
+          for (let k = 0; k < L * H; k++) {
+            const a = k * 4;
+            if (d[a + 3] === 0) continue;
+            const mn = Math.min(d[a], d[a + 1], d[a + 2]), mx = Math.max(d[a], d[a + 1], d[a + 2]);
+            if (mn < 150 || mx - mn > 40) continue;   // seulement le gris clair / blanc, jamais les couleurs du dessin
+            const x = k % L, y = (k - x) / L;
+            if ((x > 0 && d[a - 1] === 0) || (x < L - 1 && d[a + 7] === 0) || (y > 0 && d[a - L * 4 + 3] === 0) || (y < H - 1 && d[a + L * 4 + 3] === 0)) aEffacer.push(a);
+          }
+          for (const a of aEffacer) { d[a + 3] = 0; }
+          for (const a of aEffacer) vus[a / 4] = 1;
         }
         for (let k = 0; k < L * H; k++) {   // le liseré clair COLLÉ au dessin : à demi fondu
           const a = k * 4;

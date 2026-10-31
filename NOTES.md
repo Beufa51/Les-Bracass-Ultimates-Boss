@@ -529,3 +529,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   Rangée 2 (presque de face) non utilisée.
 - Option manifeste `trousBlancs: N` : les zones blanches ENFERMÉES de plus de N px deviennent transparentes
   (trou entre pistolet et jambe). Mise à 25 sur les 3 planches du héros.
+
+## BEUFA — V42 : PLUS DE BLANC AUTOUR DE SNAKE
+- Options manifeste (3 planches du héros) : `seuilBlanc: 200` (fond = tout pixel ≥ 200, au lieu de 238),
+  `liseré: 3` (3 passes qui rongent le gris clair/blanc collé au contour, jamais les couleurs), `trousBlancs: 8`.
+- Reste : légère saccade de la marche de profil (la tête monte un peu sur les images « jambes croisées »).
