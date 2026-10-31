@@ -495,3 +495,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   Assemblé en 1 rangée de 12 → `assets/sprites/beufa/beufa_heros.jpg`, allégé (1777×250).
 - Manifeste : images 12, hauteur 62 (il est élancé : à 48 il paraissait plus petit que les gardes).
   Découpeur : jusqu'à 12 personnages par planche (avant 9). Pose d'arrêt = image 5 (index 4).
+
+## BEUFA — V36 : SNAKE NI DOUBLÉ NI PETIT
+- Cause : chaque image était mise à l'échelle à part (étirée si l'aspect ≈ carré, sinon rétrécie à cause du
+  bandana) → il changeait de taille d'une image à l'autre. Nouvelle option manifeste `echelleCommune: true`
+  (héros seulement) : même échelle pour toutes les images, pieds alignés en bas.
+- Images 6 et 12 de la planche (sans bandana) retirées → 10 images. Héros 64×80 (avant 48×62).

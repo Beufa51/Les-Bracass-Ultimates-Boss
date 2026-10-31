@@ -287,9 +287,15 @@ export class BeufaInfiltration extends BossScene {
       if (personnages) {
         n = personnages.length;   // le VRAI nombre de cases de la planche l'emporte sur le manifeste
         final.width = fL * n; final.height = fH;
+        // V36 : échelleCommune (héros Snake) : TOUTES les images à la même échelle, pieds alignés en bas,
+        // sinon chaque image est étirée ou rétrécie à sa façon et le perso « saute » de taille.
+        const kCommun = e.echelleCommune ? Math.min(...personnages.map((sg) => Math.min(fL / (sg[1] - sg[0] + 1), fH / (sg[5] - sg[4] + 1)))) : 0;
         personnages.forEach((seg, i) => {
           const w = seg[1] - seg[0] + 1, h = seg[5] - seg[4] + 1;
-          if (w / h >= 0.7 && w / h <= 1.43) {   // aspect proche de la case : il la REMPLIT (taille stable d'une frame à l'autre)
+          if (kCommun) {
+            const dL = Math.round(w * kCommun), dH = Math.round(h * kCommun);
+            c2.drawImage(cv, seg[0], seg[4], w, h, i * fL + Math.round((fL - dL) / 2), fH - dH, dL, dH);
+          } else if (w / h >= 0.7 && w / h <= 1.43) {   // aspect proche de la case : il la REMPLIT (taille stable d'une frame à l'autre)
             c2.drawImage(cv, seg[0], seg[4], w, h, i * fL, 0, fL, fH);
           } else {   // trop étiré : on le fait juste RENTRER, centré
             const k = Math.min(fL / w, fH / h);
