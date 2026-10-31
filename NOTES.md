@@ -484,3 +484,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   la DISTANCE parcourue (`cyclePas`, réglages `joueur.pas` 72 / `garde.pas` 64) → les pieds ne glissent plus.
 - Prompts des nouvelles planches (8 images) : `propositions/beufa_prompts_marche.md`. À la livraison : régler
   la pose d'arrêt sur l'image 3 (index 2).
+
+## BEUFA — V34 : DEMI-TOUR DES GARDES + PROMPT « SOLID SNAKE »
+- Bout de ronde : le regard part de l'angle d'arrivée (plus de saut) ; puis demi-tour SUR PLACE en piétinant
+  (`garde.vitesseDemiTour` 3.2 rad/s, ~1 s), il ne repart qu'une fois tourné (avant : il reculait en pivotant).
+- Prompt du héros façon Solid Snake ajouté dans `propositions/beufa_prompts_marche.md`.

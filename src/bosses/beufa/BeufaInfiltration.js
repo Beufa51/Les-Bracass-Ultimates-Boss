@@ -603,10 +603,11 @@ export class BeufaInfiltration extends BossScene {
   // ---------- les gardes ----------
   // il tourne PROGRESSIVEMENT vers sa cible : fini les demi-tours secs — il PIVOTE
   // comme un vrai patrouilleur (et son cône de vision suit tout doux : plus lisible)
-  viser(g, cible, dt) {
+  viser(g, cible, dt, vitesse = 5.5) {
     const ecart = normAngle(cible - g.angle);
-    const pas = Math.min(Math.abs(ecart), 5.5 * dt);
+    const pas = Math.min(Math.abs(ecart), vitesse * dt);
     g.angle = normAngle(g.angle + pas * Math.sign(ecart));
+    return pas;
   }
 
   pasGarde(g, dt) {
@@ -616,16 +617,23 @@ export class BeufaInfiltration extends BossScene {
         g.angle = g.scanBase + Math.sin(this.temps * 0.7) * g.scan * Math.PI / 180;
       } else if (g.pauseT > 0) {   // MGS : arrivé au bout de sa ronde, il S'ARRÊTE et regarde autour
         g.pauseT -= dt;
-        g.angle = g.anglePause + Math.sin(this.temps * 2.4 + g.x * 0.05) * 0.7;   // V28 : ±40°, il ne voit plus dans son dos   // droite-gauche, souplement
+        // V34 : le regard part de là où il regardait (plus de saut d'angle à l'arrivée)
+        g.angle = g.anglePause + Math.sin((R.garde.pause - g.pauseT) * 2.4) * 0.7;   // V28 : ±40°, il ne voit plus dans son dos   // droite-gauche, souplement
       } else {
         const cible = g.chemin[g.point];
         const dx = cible[0] - g.x, dy = cible[1] - g.y, d = Math.hypot(dx, dy);
         if (d < 4) { g.point = (g.point + 1) % g.chemin.length; g.pauseT = R.garde.pause; g.anglePause = g.angle; }
         else {
           const want = Math.atan2(dy, dx);
-          this.viser(g, want, dt);   // il PIVOTE en douceur — plus de demi-tour sec
-          const v = R.garde.vitesseRonde * Math.max(0.3, Math.cos(normAngle(want - g.angle))) * dt / d;
-          g.x += dx * v; g.y += dy * v;
+          if (Math.abs(normAngle(want - g.angle)) > 0.35) {
+            // V34 : DEMI-TOUR SUR PLACE : il s'arrête, pivote en piétinant (les pieds bougent), puis repart
+            const tourne = this.viser(g, want, dt, R.garde.vitesseDemiTour);
+            g.distPas = (g.distPas || 0) + tourne * R.garde.rayon * 1.6;
+          } else {
+            this.viser(g, want, dt);
+            const v = R.garde.vitesseRonde * dt / d;
+            g.x += dx * v; g.y += dy * v;
+          }
           g.bouge = true;
         }
       }

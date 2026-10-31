@@ -22,6 +22,7 @@ export const REGLAGES = {
     vitessePoursuite: 185, // V32 : 165 en V31, 150 avant — presque aussi rapide que ton sprint
     rayon: 14,
     pas: 64,           // V33 : px pour un cycle de marche complet du garde
+    vitesseDemiTour: 3.2, // V34 : rad/s quand il fait demi-tour sur place au bout de sa ronde (π ≈ 1 s)
     pause: 0.7,        // V32 (1.0 en V31) : il s'arrête MOINS LONGTEMPS à chaque bout (1.5 avant)
   },
   projecteur: {
