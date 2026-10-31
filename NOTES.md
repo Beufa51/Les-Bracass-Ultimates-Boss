@@ -706,3 +706,10 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Cour : panneau « interdit aux soldats » RETIRÉ (absurde dans une base militaire).
 - Vérifié par calcul : aucune ronde ne touche un obstacle, entrées libres. Reste : camions et étagères plus hauts
   (prompts V57), prompts V59 n°6 à 11.
+
+## BEUFA — V62 : REVUE COHÉRENCE (voir `propositions/beufa_audit_coherence.md`)
+- Le BUREAU DE BEUFA sort du QG (il ira dans la pièce du QUIZ, la phase suivante). L'est du QG devient le
+  SAS DE SÉCURITÉ : poste d'écrans contre le mur nord (1200,42), archives, tapis à l'emblème devant la porte
+  de sortie (1340,365). Plantes retirées. Rondes inchangées.
+- Arsenal = DÉPÔT DE MISSILES : les 4 râteliers de l'îlot central deviennent 4 missiles (même emprise).
+- Barbelés : `barbeles: ['s','o','e']` (cour) / `['n']` (parc) = seulement les côtés de l'ENCEINTE.

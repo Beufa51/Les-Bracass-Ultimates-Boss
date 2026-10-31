@@ -55,7 +55,7 @@ export const PIECES = [
   { // ----- PIÈCE 1 : LA COUR DU PORTAIL — 960×720 — « le cône, l'ombre, le dos » -----
     nom: 'PIÈCE 1/4 · LA COUR DU PORTAIL',
     l: 960, h: 720,
-    barbeles: true,   // V60 : barbelés sur le mur d'enceinte
+    barbeles: ['s', 'o', 'e'],   // V62 : barbelés SEULEMENT sur l'enceinte extérieure (portail au sud, côtés) — pas sur le mur vers le parc
     teinteSol: 0xcfe0d2,
     murs: [
       [227, 10, 434, 20], [733, 10, 434, 20],   // le nord : LA PORTE DU QG (x 445-515)
@@ -97,7 +97,7 @@ export const PIECES = [
   { // ----- PIÈCE 2 : LE PARC À VÉHICULES — 1440×540 — « la lumière » -----
     nom: 'PIÈCE 2/4 · LE PARC À VÉHICULES',
     l: 1440, h: 540,
-    barbeles: true,
+    barbeles: ['n'],   // V62 : seul le mur nord du parc est l'enceinte ; les autres donnent sur la cour et l'arsenal
     teinteSol: 0xcfe0d2,
     murs: [
       [720, 10, 1440, 20], [720, 530, 1440, 20],
@@ -156,8 +156,9 @@ export const PIECES = [
     routes: [],
     conteneurs: [
       // L'ÎLOT DES RÂTELIERS au centre : la ronde en fait le tour
-      [410, 330, 140, 52, 'beufa_ratelier'], [550, 330, 140, 52, 'beufa_ratelier'],
-      [410, 430, 140, 52, 'beufa_ratelier'], [550, 430, 140, 52, 'beufa_ratelier'],
+      // V62 : c'est LE DÉPÔT DE MISSILES : 4 missiles en batterie au centre (même emprise que les anciens râteliers)
+      [410, 330, 140, 52, 'beufa_missile'], [550, 330, 140, 52, 'beufa_missile'],
+      [410, 430, 140, 52, 'beufa_missile'], [550, 430, 140, 52, 'beufa_missile'],
       // le sas d'entrée
       // V61 : L'ATELIER de l'entrée : caisses de munitions à déballer + l'établi (même emprise qu'avant)
       [295, 610, 70, 52, 'beufa_munitions'], [365, 610, 70, 52, 'beufa_munitions'], [630, 610, 140, 52, 'beufa_etabli'],
@@ -184,7 +185,7 @@ export const PIECES = [
   },
   { // ----- PIÈCE 4 : LE QG DE BEUFA — 1440×540 — « tout ensemble » -----
     nom: 'PIÈCE 4/4 · LE QG DE BEUFA',
-    portesInterieures: [ [1060, 290, Math.PI / 2] ],   // V61 : la porte du bureau de Beufa
+    portesInterieures: [ [1060, 290, Math.PI / 2] ],   // V61 : la porte du SAS DE SÉCURITÉ (V62 : le bureau de Beufa, c'est la pièce du QUIZ, derrière la sortie est)
     l: 1440, h: 540,
     teinteSol: 0xd2d8ee,
     murs: [
@@ -205,11 +206,10 @@ export const PIECES = [
       [420, 130, 52, 140, 'beufa_etagere'], [420, 450, 52, 140, 'beufa_etagere'],       // les rayonnages de part et d'autre du portique de lumière
       [640, 494, 140, 52, 'beufa_etagere'], [880, 494, 140, 52, 'beufa_etagere'],       // la rangée sud : l'abri contre le stratège — V61 : collée au mur (avant : faux passage de 24 px derrière)
       [640, 84, 140, 52, 'beufa_etagere'], [880, 84, 140, 52, 'beufa_etagere'],       // la rangée nord — DERRIÈRE elle, contre le mur, un PASSAGE SECRET (la variante)
-      [1200, 494, 140, 52, 'beufa_etagere'],                           // le classeur du bureau
-      [1200, 75, 120, 80, 'beufa_bureau'],           // V54 : LE BUREAU DE BEUFA (à la place de la caisse)
-      [1395, 55, 40, 40, 'beufa_plante'], [1395, 495, 40, 40, 'beufa_plante'],   // V54 : plantes dans les coins du bureau
+      [1200, 494, 140, 52, 'beufa_etagere'],                           // les archives du sas
+      [1200, 42, 132, 44, 'beufa_console'],          // V62 : LE POSTE DE SÉCURITÉ (écrans) contre le mur — le bureau de Beufa ira dans la pièce du QUIZ
     ],
-    decorsSol: [ [1250, 300, 'beufa_tapis'] ],   // V54 : le tapis de Beufa devant son bureau
+    decorsSol: [ [1340, 365, 'beufa_tapis'] ],   // V62 : le tapis à l'emblème de Beufa mène à SA porte (la sortie, vers le quiz)
     sacs: [],
     caisses: [],
     tables: [ [760, 270] ],                           // LA TABLE DES CARTES : le stratège en fait le tour
@@ -218,10 +218,10 @@ export const PIECES = [
     ],
     gardes: [
       { chemin: [[560, 175], [960, 175], [960, 380], [560, 380]] },   // LE STRATÈGE : le tour de la table, en boucle (sens des aiguilles d'une montre)
-      { chemin: [[1150, 200], [1150, 200]], scan: 55, scanBase: Math.PI / 2 },   // LE GARDE DU BUREAU : il balaie l'entrée du bureau
-      { chemin: [[1330, 120], [1330, 300]] },                              // LE PLANTON : il garde la porte du bureau — passe quand il REMONTE
+      { chemin: [[1150, 200], [1150, 200]], scan: 55, scanBase: Math.PI / 2 },   // LE GARDE DU SAS : il balaie la porte du sas
+      { chemin: [[1330, 120], [1330, 300]] },                              // LE PLANTON : il garde la porte de Beufa — passe quand il REMONTE
       { chemin: [[250, 250], [250, 470]] },                                // V31 : LA SENTINELLE DE L'ANTICHAMBRE : sous le portique
-      { chemin: [[1100, 400], [1380, 400]] },                              // V33 : LA RONDE DU BUREAU : devant la porte de Beufa
+      { chemin: [[1100, 400], [1380, 400]] },                              // V33 : LA RONDE DU SAS : devant la porte de Beufa
     ],
     entree: { x: 75, y: 365 },
     sortie: 'qg',

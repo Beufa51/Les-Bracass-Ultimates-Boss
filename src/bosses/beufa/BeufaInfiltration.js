@@ -397,8 +397,10 @@ export class BeufaInfiltration extends BossScene {
       this.decor.push(bande);
       this.obstacles.push({ x, y, l, h });
       // V60 : LES BARBELÉS posés SUR le mur d'enceinte (pièces extérieures) — du décor, ils ne bloquent rien de plus
-      if (P.barbeles) {
-        const horiz = l >= h;
+      // V62 : P.barbeles = les côtés de l'ENCEINTE ('n','s','o','e') — jamais un mur qui donne sur une autre zone
+      const horiz = l >= h;
+      const cote = horiz ? (y < this.roomH / 2 ? 'n' : 's') : (x < this.roomL / 2 ? 'o' : 'e');
+      if (Array.isArray(P.barbeles) && P.barbeles.includes(cote)) {
         // coupés au droit des portes (le portail sud est peint sur un mur continu)
         let morceaux = horiz ? [[x - l / 2, x + l / 2]] : [[y - h / 2, y + h / 2]];
         for (const [px, py] of (P.portes || [])) {
