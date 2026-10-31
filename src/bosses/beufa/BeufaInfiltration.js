@@ -41,7 +41,7 @@ const styleAlerte = { fontFamily: 'monospace', fontStyle: 'bold', fontSize: '26p
 // Les planches de Fabien (héros ET garde, même batch) regardent vers le BAS de
 // l'image. On ajuste la rotation de chaque sprite pour qu'il regarde DROIT DEVANT
 // LUI dans la direction de marche — donc DANS son cône de vision.
-const ORIENT_HEROS = -Math.PI / 2;  // planche héros : regarde vers le bas (vérifié au test de Fabien)
+// V37 : ORIENT_HEROS n’est plus utilisé (Snake reste debout, planches face / dos / profil).
 const ORIENT_GARDE = -Math.PI / 2;  // planche garde : regarde vers le bas (demi-tour du fix crabe)
 const ORIENT_BOSS = -Math.PI / 2;    // planche boss : regarde vers le bas aussi (analyse : orteils vers le bas) — à confirmer au test
 
@@ -519,12 +519,11 @@ export class BeufaInfiltration extends BossScene {
       this.poussieres.push({ x: this.joueur.x - dx * 7, y: this.joueur.y - dy * 7 + 3,
         t: 0, duree: sprint ? 0.5 : 0.38, r: sprint ? 3.6 : 2.4 });
     }
-    const imagePas = this.cyclePas(this.joueur, R.joueur.pas, this.nbFramesHeros);
+    this.cyclePas(this.joueur, R.joueur.pas, 1);   // V33 : la distance parcourue fait avancer les jambes (image choisie dans afficher)
     if (dx || dy) {
       this.joueur.angle = Math.atan2(dy, dx);
-      this.sprJoueur.setFrame(imagePas);   // V33 : les jambes avancent AVEC le sol (pieds qui ne glissent plus)
       if (sprint) this.bruit();   // le sprint s'entend : les gardes proches se tournent vers toi
-    } else this.sprJoueur.setFrame(this.poseArretHeros);
+    }
     if (vientDAppuyer(t.x) && this.pierres > 0) this.lancerPierre();
     // LA SORTIE : la porte au nord (pièce suivante)… ou LA PORTE DU QG (victoire)
     const P = PIECES[this.piece];
@@ -849,8 +848,21 @@ export class BeufaInfiltration extends BossScene {
     // quand il ne bouge pas, il RESPIRE (le plastron se soulève tout doucement)
     // V33 : plus de rebond vers le haut de l'écran ni de dandinement (faux en vue du dessus) :
     // c'est la planche qui anime la marche ; à l'arrêt, il respire toujours un peu.
-    this.sprJoueur.setPosition(this.joueur.x, this.joueur.y)
-      .setRotation(this.joueur.angle + ORIENT_HEROS)
+    // V37 : SNAKE RESTE DEBOUT (dessin vu de face en 3/4, comme Metal Gear NES) : on ne le fait plus
+    // tourner, on CHANGE DE PLANCHE selon la direction : face (bas), dos (haut), profil (côtés, miroir à gauche).
+    // Tant que dos/profil n'existent pas, la planche de face sert partout.
+    const ca = Math.cos(this.joueur.angle), sa = Math.sin(this.joueur.angle);
+    let cle = 'beufa_heros', miroir = false;
+    if (Math.abs(ca) > Math.abs(sa) + 0.01) {
+      if (this.textures.exists('beufa_heros_profil')) { cle = 'beufa_heros_profil'; miroir = ca < 0; }   // la planche profil regarde à DROITE
+    } else if (sa < 0 && this.textures.exists('beufa_heros_dos')) cle = 'beufa_heros_dos';
+    const nH = Math.max(1, Object.keys(this.textures.get(cle).frames).length - 1);
+    const imageH = this.heroBouge ? Math.floor((this.joueur.distPas || 0) / R.joueur.pas * nH) % nH
+      : (cle === 'beufa_heros' ? this.poseArretHeros : 0);
+    if (this.sprJoueur.texture.key !== cle) this.sprJoueur.setTexture(cle);
+    this.sprJoueur.setFrame(imageH).setFlipX(miroir)
+      .setPosition(this.joueur.x, this.joueur.y - 10)   // les pieds sur la position (il est debout, plus haut que large)
+      .setRotation(0)
       .setScale(1, 1 + (this.heroBouge ? 0 : Math.sin(this.temps * 2.2) * 0.015));
     const gg = this.conesG;
     gg.clear();

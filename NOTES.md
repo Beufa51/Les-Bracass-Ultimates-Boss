@@ -501,3 +501,10 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   bandana) → il changeait de taille d'une image à l'autre. Nouvelle option manifeste `echelleCommune: true`
   (héros seulement) : même échelle pour toutes les images, pieds alignés en bas.
 - Images 6 et 12 de la planche (sans bandana) retirées → 10 images. Héros 64×80 (avant 48×62).
+
+## BEUFA — V37 : SNAKE DEBOUT (plus « allongé »)
+- La planche est vue de face (3/4) : la faire tourner selon la marche le couchait. Il reste debout (rotation 0)
+  et la planche change selon la direction : `beufa_heros` (face/bas), `beufa_heros_dos` (haut),
+  `beufa_heros_profil` (côtés, regarde à droite, miroir à gauche). Dos/profil absents → la face sert partout.
+- Prompts dos + profil : `propositions/beufa_prompts_marche.md`. À la livraison : les assembler en 1 rangée,
+  les déposer dans assets/sprites/beufa/, ajouter leurs entrées au manifeste (copie de beufa_heros, echelleCommune).

@@ -57,3 +57,24 @@ Only the legs and boots move; elbows move very little because the hands hold the
 very slightly. The helmet stays at exactly the same place in every frame. Same size, same scale, same center
 point in every frame, evenly spaced with clear white space between frames. Pure white background, no ground
 shadow, no text, no grid lines, no extra characters.
+
+## SNAKE — PLANCHES DOS ET PROFIL (V37 : il reste debout, une planche par direction)
+Joindre au générateur la planche de face (`assets_inbox/beufa_heros_snake.jpg`) comme référence.
+
+### Dos (quand il monte)
+Same character, same pixel art style, same size and same camera angle as the attached sprite sheet
+(slightly high 3/4 view), but seen FROM THE BACK: we see the back of his head, the bandana knot with its two
+long tails hanging down his back, the back of the sneaking suit and harness, the soles of the boots.
+He walks AWAY from the camera (toward the top of the image). 6 frames of a natural walking cycle on ONE single
+horizontal row, evenly spaced with clear white space between frames: 1. left foot forward, 2. passing,
+3. right foot up, 4. right foot forward, 5. passing, 6. left foot up. Opposite arm and leg swing together,
+the head stays at the same height. Pure white background, no ground shadow, no text, no extra characters.
+
+### Profil (quand il va à droite ; le jeu le retourne pour la gauche)
+Same character, same pixel art style, same size and same camera angle as the attached sprite sheet
+(slightly high 3/4 view), but seen FROM THE SIDE, facing and walking toward the RIGHT of the image:
+we see his profile, the bandana tails flowing behind him to the left, the holster on his thigh.
+6 frames of a natural, careful sneaking walking cycle on ONE single horizontal row, evenly spaced with clear
+white space between frames: 1. contact, right leg forward; 2. down; 3. passing (legs together); 4. contact,
+left leg forward; 5. down; 6. passing. Arms swing opposite to the legs, slightly bent; the head stays at the
+same height in every frame. Pure white background, no ground shadow, no text, no extra characters.
