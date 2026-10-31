@@ -675,7 +675,7 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Arsenal (8) et QG (5) : piliers engagés dans les murs (blocs de mur 28×26, dépassent de 16 px), même texture
   que les murs. Vérifié par calcul : à ≥ 24 px de tout obstacle, hors des rondes, jamais devant le passage
   secret du nord du QG (x 560-960). Rondes et emprises inchangées.
-- PROPOSÉ à Fabien (en attente de son choix, il faudra des images) : barbelés sur le mur d'enceinte (cour,
+- PROPOSÉ à Fabien — prompts écrits (V59) : `propositions/beufa_prompts_base_militaire.md` (11 prompts ; lignes de places du parc = par le code). Contenu : barbelés sur le mur d'enceinte (cour,
   parc ; posés SUR le mur, ne bloquent rien), lampadaires, mât + drapeau devant la porte du QG, panneau
   « ZONE MILITAIRE » au portail, marquages de places au sol (parc), pompe à carburant (prompt n°17 jamais
   livré), jerricans, panneau « DANGER EXPLOSIFS » (arsenal), casiers, carte murale et drapeau de Beufa (QG).
