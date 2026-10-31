@@ -201,6 +201,22 @@ export class BeufaInfiltration extends BossScene {
           if (y > 0) pile.push(k - L);
           if (y < H - 1) pile.push(k + L);
         }
+        if (e.trousBlancs) {   // V41 : les TROUS de fond enfermés (entre le pistolet et la jambe…) disparaissent
+          // aussi, s'ils dépassent `trousBlancs` pixels — les petits reflets blancs restent.
+          for (let k0 = 0; k0 < L * H; k0++) {
+            if (vus[k0] || !presqueBlanc(k0 * 4)) continue;
+            const zone = [], p2 = [k0];
+            vus[k0] = 1;
+            while (p2.length) {
+              const k = p2.pop(); zone.push(k);
+              const x = k % L, y = (k - x) / L;
+              for (const v of [x > 0 ? k - 1 : -1, x < L - 1 ? k + 1 : -1, y > 0 ? k - L : -1, y < H - 1 ? k + L : -1]) {
+                if (v >= 0 && !vus[v] && presqueBlanc(v * 4)) { vus[v] = 1; p2.push(v); }
+              }
+            }
+            if (zone.length >= e.trousBlancs) for (const k of zone) d[k * 4 + 3] = 0;
+          }
+        }
         for (let k = 0; k < L * H; k++) {   // le liseré clair COLLÉ au dessin : à demi fondu
           const a = k * 4;
           if (vus[k] || d[a + 3] === 0) continue;

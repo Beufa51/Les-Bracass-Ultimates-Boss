@@ -523,3 +523,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Profil : seulement les images 1, 4, 6 de la rangée 1 de `beufa_heros_snake_profil2.jpg` (les 2, 3, 5 sont
   presque de face → il semblait danser). 3 images : une vraie planche de profil (prompt « strict side view ») serait mieux.
 - Les 3 planches du héros : 56×70 (avant 64×80).
+
+## BEUFA — V41 : VRAI PROFIL DE SNAKE (6 pas)
+- `assets_inbox/beufa_heros_snake_profil3.jpg`, rangée 1 (6 vraies images de profil) → beufa_heros_profil.jpg.
+  Rangée 2 (presque de face) non utilisée.
+- Option manifeste `trousBlancs: N` : les zones blanches ENFERMÉES de plus de N px deviennent transparentes
+  (trou entre pistolet et jambe). Mise à 25 sur les 3 planches du héros.
