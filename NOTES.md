@@ -649,8 +649,24 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Tri par Y (vue 3/4) : `profondeurY(yBas) = 20 + yBas/1000` pour obstacles (bas de l'emprise), Snake
   (pieds = y+25) et gardes (y+12). Murs 19.5, poussière 19.8. Snake derrière un conteneur = caché.
 - Guérite collée au mur nord (370,52) : plus de faux passage derrière.
-- PROCHAINE ÉTAPE (demande de Fabien) : passe de « level designer façon Kojima Productions » sur la
-  disposition des 4 pièces (cohérence visuelle : zones logiques, alignements, échelle des objets
-  — camions/étagères/tente sont aussi bas par rapport à Snake), SANS casser le gameplay qui lui plaît.
+- Passe « level design » faite : voir V57.
 - V56b : conteneurs verticaux élargis 52 → 70 (image 70×214, emprise des 2 alcôves de la cour 70×140) :
   même épaisseur que la face d'un conteneur horizontal. Validé par Fabien pour les horizontaux.
+
+## BEUFA — V57 : PASSE LEVEL DESIGN (vérification des 4 pièces)
+- Bug corrigé : mirador et barils s'affichaient COUCHÉS à 90° (emprise plus haute que large → pivotés comme
+  un conteneur). Désormais on ne fait pivoter que si l'IMAGE est horizontale.
+- Rondes qui traversaient un décor (vérifié par calcul : plus aucune) : jeep du parc 1300→1370 (gardien de
+  la porte), baril est de l'arsenal 860→912 contre le mur (ronde de l'est). Chemins des gardes inchangés.
+- Échelle : guérite 64→96 (emprise 88×64), mirador 68×88→84×110 (emprise inchangée) : plus hauts que Snake.
+- Tente (148×96) : bonne échelle, gardée. Râteliers : meubles bas (~hanche), gardés.
+- Camions et étagères : dessinés presque vus du dessus (ancien prompt = face avant « fine ») → impossible à
+  étirer proprement. NOUVEAUX PROMPTS à générer : `propositions/beufa_prompts_hauteur.md` (camion 176×110,
+  camion_v 72×220, étagère 140×90, étagère_v 52×180). À la livraison : changer largeur/hauteur au manifeste,
+  l'emprise reste (le jeu pose l'image sur le bas de l'emprise).
+  ⚠️ Étagères nord du QG (y 84) : en plus haut elles cacheront Snake dans le passage secret derrière elles
+  (comme les conteneurs de la cour) — à valider par Fabien, sinon prévoir une silhouette de Snake.
+- Disposition : zones logiques cohérentes (portail/axe/quartiers, rangées de camions, îlot des râteliers,
+  antichambre/table/bureau), rien à déplacer. Restent d'un autre style (jamais en 3/4) : réservoir (vu
+  pile du dessus, ressemble à une plaque d'égout) et jeep — à refaire si Fabien le veut.
+

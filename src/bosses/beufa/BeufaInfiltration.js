@@ -424,7 +424,9 @@ export class BeufaInfiltration extends BossScene {
       // sinon l'horizontale tournée (la vue 3/4 aurait alors sa face avant sur le côté)
       const verticale = h > l && this.textures.exists(cle + '_v');
       const img = this.add.image(x, y, verticale ? cle + '_v' : cle).setDepth(profondeurY(y + h / 2));
-      if (h > l && !verticale) img.setRotation(Math.PI / 2);
+      // V57 : on ne fait pivoter que si l'IMAGE est horizontale (un conteneur sans « _v ») — le mirador et
+      // les barils, dessinés debout, s'affichaient couchés à 90°
+      if (h > l && !verticale && img.width > img.height) img.setRotation(Math.PI / 2);
       // V56 : VUE 3/4 — l'image est posée sur le BAS de son emprise au sol et MONTE au-dessus (un conteneur
       // plus haut que Snake) ; l'emprise qui bloque ne change pas. Ce qui est derrière (plus haut) passe dessous.
       else img.setOrigin(0.5, 1).setPosition(x, y + h / 2);

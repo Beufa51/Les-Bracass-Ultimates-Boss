@@ -73,7 +73,7 @@ export const PIECES = [
       [780, 110, 96, 96, 'beufa_reservoir'],         // LE RÉSERVOIR du nord-est (la variante passe entre lui et le mur)
       [820, 430, 140, 52],                           // LA COUVERTURE DU CHEMIN EST (variante)
       [860, 620, 68, 80, 'beufa_mirador'],           // le mirador du portail (décor)
-      [370, 52, 64, 64, 'beufa_guerite'],            // V52 : la guérite de la porte du QG — V56 : COLLÉE au mur (plus de faux passage derrière)
+      [370, 52, 88, 64, 'beufa_guerite'],            // V52 : la guérite de la porte du QG — V56 : COLLÉE au mur — V57 : image 96×96 (plus haute que Snake), emprise élargie à 88
       [70, 640, 64, 64, 'beufa_palettes'],           // V52 : palettes dans le coin sud-ouest (hors des chemins)
     ],
     decorsSol: [ [480, 680, 'beufa_barriere'], [250, 380, 'beufa_flaque', 0.8], [700, 200, 'beufa_flaque', 0.8] ],   // V52 : la barrière du portail (on passe dessus)
@@ -110,7 +110,7 @@ export const PIECES = [
       // LA RANGÉE SUD : trois camions le long de la route — les niches entre eux sont à L'OMBRE du halo
       [560, 455, 176, 72, 'beufa_camion'], [800, 455, 176, 72, 'beufa_camion'], [1040, 455, 176, 72, 'beufa_camion'],
       [1220, 480, 96, 96, 'beufa_reservoir'],        // la station : cache la dernière niche du gardien de la porte
-      [1300, 90, 88, 60, 'beufa_jeep'],              // décor de l'angle nord-est
+      [1370, 90, 88, 60, 'beufa_jeep'],              // décor de l'angle nord-est — V57 : poussée à l'est (le gardien de la porte la traversait)
       [360, 410, 16, 16, 'beufa_plot'], [392, 410, 16, 16, 'beufa_plot'], [1130, 320, 16, 16, 'beufa_plot'], [1170, 320, 16, 16, 'beufa_plot'],   // V55 : plots au bord de la route (hors des chemins des gardes)
       [1385, 495, 48, 48, 'beufa_pneus'], [250, 500, 48, 48, 'beufa_pneus'],   // V53 : pneus dans les coins (hors des chemins)
     ],
@@ -152,7 +152,7 @@ export const PIECES = [
       // L'ABRI DU VEILLEUR : la rangée nord, l'ombre juste avant la porte
       [610, 150, 140, 52, 'beufa_ratelier'],
       [870, 90, 70, 38, 'beufa_munitions'],          // V54 : caisses de munitions (à la place de la caisse du nord-est)
-      [100, 200, 34, 48, 'beufa_baril'], [860, 420, 34, 48, 'beufa_baril'],   // V52 : obstacle = largeur du vrai baril
+      [100, 200, 34, 48, 'beufa_baril'], [912, 420, 34, 48, 'beufa_baril'],   // V57 : baril est contre le mur (la ronde de l'est le traversait) — V52 : obstacle = largeur du vrai baril
     ],
     sacs: [],
     caisses: [ [90, 640], [870, 640] ],

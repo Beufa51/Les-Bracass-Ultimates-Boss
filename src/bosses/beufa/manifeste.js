@@ -30,12 +30,12 @@ export const MANIFESTE = {
     beufa_jeep:       { fichier: 'sprites/beufa/beufa_jeep.jpg', fond: 'blanc', largeur: 88, hauteur: 60, images: 1, vitesse: 1, provisoire: { forme: 'jeep_nes', couleur: '#38543c', pixel: 2 } },
     beufa_helico:     { fichier: 'sprites/beufa/beufa_helico.jpg', fond: 'blanc', largeur: 184, hauteur: 100, images: 1, vitesse: 1, provisoire: { forme: 'helico_nes', couleur: '#1c3854', pixel: 2 } },
     beufa_reservoir:  { fichier: 'sprites/beufa/beufa_reservoir.jpg', fond: 'blanc', largeur: 96, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'reservoir_nes', couleur: '#385454', pixel: 2 } },
-    beufa_mirador:    { fichier: 'sprites/beufa/beufa_mirador.jpg', fond: 'blanc', largeur: 68, hauteur: 88, images: 1, vitesse: 1, provisoire: { forme: 'mirador_nes', couleur: '#545038', pixel: 2 } },
+    beufa_mirador:    { fichier: 'sprites/beufa/beufa_mirador.jpg', fond: 'blanc', largeur: 84, hauteur: 110, images: 1, vitesse: 1, provisoire: { forme: 'mirador_nes', couleur: '#545038', pixel: 2 } },
     beufa_tente:      { fichier: 'sprites/beufa/beufa_tente.jpg', fond: 'blanc', largeur: 148, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'tente_nes', couleur: '#545438', pixel: 2 } },
     beufa_ratelier:   { fichier: 'sprites/beufa/beufa_ratelier.jpg', fond: 'blanc', largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'ratelier_nes', couleur: '#545038', pixel: 2 } },
     beufa_baril:      { fichier: 'sprites/beufa/beufa_baril.jpg', fond: 'blanc', largeur: 34, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'baril_nes', couleur: '#385454', pixel: 2 } },
     // V52 : nouveaux décors de la cour (guérite + palettes = obstacles ; barrière = décor au sol, on passe dessus)
-    beufa_guerite:    { fichier: 'sprites/beufa/beufa_guerite.jpg', fond: 'blanc', largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
+    beufa_guerite:    { fichier: 'sprites/beufa/beufa_guerite.jpg', fond: 'blanc', largeur: 96, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
     beufa_palettes:   { fichier: 'sprites/beufa/beufa_palettes.jpg', fond: 'blanc', largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'caisse_nes', couleur: '#545438', pixel: 2 } },
     beufa_barriere:   { fichier: 'sprites/beufa/beufa_barriere.jpg', fond: 'blanc', largeur: 140, hauteur: 18, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#8c1c1c', pixel: 2 } },
     // V53 : flaque et huile = décor au sol ; pneus = obstacle
