@@ -50,6 +50,12 @@ export const MANIFESTE = {
     beufa_console: { fichier: 'sprites/beufa/beufa_console.jpg', fond: 'blanc', largeur: 132, hauteur: 40, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
     beufa_plante: { fichier: 'sprites/beufa/beufa_plante.jpg', fond: 'blanc', largeur: 40, hauteur: 40, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#385438', pixel: 2 } },
     beufa_tapis: { fichier: 'sprites/beufa/beufa_tapis.jpg', fond: 'blanc', largeur: 160, hauteur: 100, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#701c1c', pixel: 2 } },
+    // V60 : base militaire — barbelés (pavés sur les murs de la cour et du parc), drapeau, lampadaires, panneau
+    beufa_barbeles:   { fichier: 'sprites/beufa/beufa_barbeles.jpg', fond: 'blanc', largeur: 128, hauteur: 24, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545454', pixel: 2 } },
+    beufa_barbeles_v: { fichier: 'sprites/beufa/beufa_barbeles_v.jpg', fond: 'blanc', largeur: 24, hauteur: 128, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545454', pixel: 2 } },
+    beufa_drapeau:    { fichier: 'sprites/beufa/beufa_drapeau.jpg', fond: 'blanc', largeur: 68, hauteur: 128, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#8c1c1c', pixel: 2 } },
+    beufa_lampadaire: { fichier: 'sprites/beufa/beufa_lampadaire.jpg', fond: 'blanc', largeur: 22, hauteur: 130, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545454', pixel: 2 } },
+    beufa_panneau:    { fichier: 'sprites/beufa/beufa_panneau.jpg', fond: 'blanc', largeur: 48, hauteur: 75, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#d8b81c', pixel: 2 } },
     beufa_sacs:   { fichier: 'sprites/beufa/beufa_sacs.jpg', fond: 'blanc', largeur: 64, hauteur: 44, images: 1, vitesse: 1, provisoire: { forme: 'sacs_nes', couleur: '#8c7038', pixel: 2 } },
     beufa_table:   { fichier: 'sprites/beufa/beufa_table.jpg', fond: 'blanc', largeur: 140, hauteur: 90, images: 1, vitesse: 1, provisoire: { forme: 'table_nes', couleur: '#a88c54', pixel: 2 } },
     beufa_projecteur: { fichier: 'sprites/beufa/beufa_projecteur.jpg', fond: 'blanc', largeur: 42, hauteur: 30, images: 1, vitesse: 1, provisoire: { forme: 'projecteur_nes', couleur: '#383854', pixel: 2 } },

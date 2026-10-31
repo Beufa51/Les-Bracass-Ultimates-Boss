@@ -396,6 +396,21 @@ export class BeufaInfiltration extends BossScene {
       bande.setOrigin(0.5).setDepth(19.5);   // V56 : sous les objets triés par Y (sinon un mur cacherait la tête de Snake)
       this.decor.push(bande);
       this.obstacles.push({ x, y, l, h });
+      // V60 : LES BARBELÉS posés SUR le mur d'enceinte (pièces extérieures) — du décor, ils ne bloquent rien de plus
+      if (P.barbeles) {
+        const horiz = l >= h;
+        // coupés au droit des portes (le portail sud est peint sur un mur continu)
+        let morceaux = horiz ? [[x - l / 2, x + l / 2]] : [[y - h / 2, y + h / 2]];
+        for (const [px, py] of (P.portes || [])) {
+          const c = horiz ? px : py, autre = horiz ? py : px, ici = horiz ? y : x;
+          if (Math.abs(autre - ici) > 15) continue;
+          morceaux = morceaux.flatMap(([a, b]) => (c + 40 <= a || c - 40 >= b) ? [[a, b]] : [[a, c - 40], [c + 40, b]].filter(([u, v]) => v - u > 4));
+        }
+        for (const [a, b] of morceaux) {
+          const t = horiz ? this.add.tileSprite((a + b) / 2, y, b - a, 24, 'beufa_barbeles', 0) : this.add.tileSprite(x, (a + b) / 2, 24, b - a, 'beufa_barbeles_v', 0);
+          this.decor.push(t.setOrigin(0.5).setDepth(19.6));
+        }
+      }
     }
     // les portes VERROUILLÉES des pièces à venir (prévues sur le plan) : dessinées, elles bloquent
     for (const [x, y, l, h] of (P.portesVerrouillees || [])) {
@@ -429,7 +444,7 @@ export class BeufaInfiltration extends BossScene {
       if (h > l && !verticale && img.width > img.height) img.setRotation(Math.PI / 2);
       // V56 : VUE 3/4 — l'image est posée sur le BAS de son emprise au sol et MONTE au-dessus (un conteneur
       // plus haut que Snake) ; l'emprise qui bloque ne change pas. Ce qui est derrière (plus haut) passe dessous.
-      else img.setOrigin(0.5, 1).setPosition(x, y + h / 2);
+      else img.setOrigin(0.5, 1).setPosition(x + (c[5] || 0), y + h / 2);   // V60 : c[5] = décalage x de l'image (le mât du drapeau est à gauche de son image)
       this.decor.push(img);
       this.obstacles.push({ x, y, l, h });
     }

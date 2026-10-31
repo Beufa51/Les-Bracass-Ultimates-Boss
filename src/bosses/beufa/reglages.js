@@ -55,6 +55,7 @@ export const PIECES = [
   { // ----- PIÈCE 1 : LA COUR DU PORTAIL — 960×720 — « le cône, l'ombre, le dos » -----
     nom: 'PIÈCE 1/4 · LA COUR DU PORTAIL',
     l: 960, h: 720,
+    barbeles: true,   // V60 : barbelés sur le mur d'enceinte
     teinteSol: 0xcfe0d2,
     murs: [
       [227, 10, 434, 20], [733, 10, 434, 20],   // le nord : LA PORTE DU QG (x 445-515)
@@ -75,6 +76,10 @@ export const PIECES = [
       [860, 620, 68, 80, 'beufa_mirador'],           // le mirador du portail (décor)
       [370, 52, 88, 64, 'beufa_guerite'],            // V52 : la guérite de la porte du QG — V56 : COLLÉE au mur — V57 : image 96×96 (plus haute que Snake), emprise élargie à 88
       [70, 640, 64, 64, 'beufa_palettes'],           // V52 : palettes dans le coin sud-ouest (hors des chemins)
+      // V60 : BASE MILITAIRE — le drapeau en face de la guérite, deux lampadaires au portail, le panneau d'interdiction
+      [560, 130, 20, 16, 'beufa_drapeau', 19],       // emprise = le socle ; l'image est décalée (le mât est à gauche du dessin)
+      [400, 690, 14, 12, 'beufa_lampadaire'], [560, 690, 14, 12, 'beufa_lampadaire'],
+      [215, 688, 40, 12, 'beufa_panneau'],
     ],
     decorsSol: [ [480, 680, 'beufa_barriere'], [250, 380, 'beufa_flaque', 0.8], [700, 200, 'beufa_flaque', 0.8] ],   // V52 : la barrière du portail (on passe dessus)
     sacs: [ [395, 520], [565, 520] ],                // le poste de contrôle de l'axe
@@ -93,6 +98,7 @@ export const PIECES = [
   { // ----- PIÈCE 2 : LE PARC À VÉHICULES — 1440×540 — « la lumière » -----
     nom: 'PIÈCE 2/4 · LE PARC À VÉHICULES',
     l: 1440, h: 540,
+    barbeles: true,
     teinteSol: 0xcfe0d2,
     murs: [
       [720, 10, 1440, 20], [720, 530, 1440, 20],
@@ -112,6 +118,7 @@ export const PIECES = [
       [1220, 480, 96, 96, 'beufa_reservoir'],        // la station : cache la dernière niche du gardien de la porte
       [1370, 90, 88, 60, 'beufa_jeep'],              // décor de l'angle nord-est — V57 : poussée à l'est (le gardien de la porte la traversait)
       [360, 410, 16, 16, 'beufa_plot'], [392, 410, 16, 16, 'beufa_plot'], [1130, 320, 16, 16, 'beufa_plot'], [1170, 320, 16, 16, 'beufa_plot'],   // V55 : plots au bord de la route (hors des chemins des gardes)
+      [250, 318, 14, 12, 'beufa_lampadaire'], [1340, 318, 14, 12, 'beufa_lampadaire'],   // V60 : lampadaires au bord NORD de la route (au sud, le poteau montait par-dessus l'asphalte)
       [1385, 495, 48, 48, 'beufa_pneus'], [250, 500, 48, 48, 'beufa_pneus'],   // V53 : pneus dans les coins (hors des chemins)
     ],
     decorsSol: [ [900, 385, 'beufa_huile', 0.6], [640, 330, 'beufa_huile', 0.6], [1180, 160, 'beufa_huile', 0.6] ],   // V53 : taches d'huile

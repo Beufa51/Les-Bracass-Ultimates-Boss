@@ -679,3 +679,16 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   parc ; posés SUR le mur, ne bloquent rien), lampadaires, mât + drapeau devant la porte du QG, panneau
   « ZONE MILITAIRE » au portail, marquages de places au sol (parc), pompe à carburant (prompt n°17 jamais
   livré), jerricans, panneau « DANGER EXPLOSIFS » (arsenal), casiers, carte murale et drapeau de Beufa (QG).
+
+## BEUFA — V60 : BARBELÉS, DRAPEAU, LAMPADAIRES, PANNEAU (prompts V59 n°1 à 5 livrés)
+- Originaux `assets_inbox/beufa_{barbeles,barbeles_v,drapeau,lampadaire,panneau}_3q.jpg` → sprites recadrés.
+- Barbelés : `barbeles: true` sur une pièce (cour, parc) = pavés SUR chaque mur (profondeur 19.6), coupés au
+  droit des portes. Ne bloquent rien de plus.
+- Cour : drapeau (560,130, emprise = socle 20×16) en face de la guérite ; 2 lampadaires au portail (400 et
+  560, y 690) ; panneau d'interdiction (215,688). Parc : 2 lampadaires au bord NORD de la route (250 et 1340).
+  Vérifié : rien ne touche une ronde, l'entrée ou un passage.
+- Nouveau : 6e valeur d'un conteneur = décalage x de l'image (le mât du drapeau est à gauche de son dessin ;
+  le chargeur recadre les marges blanches, donc on ne peut pas centrer le mât en ajoutant du blanc).
+- Le panneau livré a une ombre au sol et un côté visible (pas tout à fait le style) : à refaire si ça choque.
+- Restent à livrer (V59) : n°6 à 11 (pompe, jerricans, panneau danger, casiers, tableau, bannière) + les 4
+  prompts « hauteur » (camions, étagères).
