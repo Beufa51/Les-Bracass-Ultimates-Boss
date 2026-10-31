@@ -69,7 +69,7 @@ export const PIECES = [
       [360, 330, 52, 140],                           // L'ALCÔVE OUEST : l'ombre où attendre que la sentinelle reparte
       [600, 330, 52, 140],                           // L'ALCÔVE EST : elle cache aussi l'axe de la ronde des réservoirs
       [160, 470, 148, 96, 'beufa_tente'],            // la tente des quartiers (décor, couverture)
-      [150, 170, 140, 52],                           // le conteneur du nord-ouest
+      [150, 170, 140, 52, 'beufa_conteneur_olive'],                         // le conteneur du nord-ouest
       [780, 110, 96, 96, 'beufa_reservoir'],         // LE RÉSERVOIR du nord-est (la variante passe entre lui et le mur)
       [820, 430, 140, 52],                           // LA COUVERTURE DU CHEMIN EST (variante)
       [860, 620, 80, 80, 'beufa_mirador'],           // le mirador du portail (décor)
@@ -178,7 +178,7 @@ export const PIECES = [
       [150, 150, 140, 52], [150, 470, 140, 52],       // l'antichambre : la poche sûre
       [420, 130, 52, 140], [420, 430, 52, 140],       // les rayonnages de part et d'autre du portique de lumière
       [640, 470, 140, 52], [880, 470, 140, 52],       // la rangée sud : l'abri contre le stratège
-      [640, 84, 140, 52], [880, 84, 140, 52],         // la rangée nord — DERRIÈRE elle, contre le mur, un PASSAGE SECRET (la variante)
+      [640, 84, 140, 52, 'beufa_conteneur_olive'], [880, 84, 140, 52, 'beufa_conteneur_olive'],       // la rangée nord — DERRIÈRE elle, contre le mur, un PASSAGE SECRET (la variante)
       [1200, 470, 140, 52],                           // le classeur du bureau
     ],
     sacs: [],

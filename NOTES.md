@@ -578,3 +578,11 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   `beufa_heros_course_profil.jpg`. Rangée 1 = course de 3/4 (pas de face), rangée 2 = marche de dos : inutilisées.
 - En sprint (Z) vers la gauche/droite → planche course, cycle `joueur.pasCourse` 100 px. Haut/bas : la marche.
 - Reste (si voulu) : course de FACE et de DOS (redemander ces 2 rangées).
+
+## BEUFA — V47 : CAISSE ET CONTENEURS COHÉRENTS
+- Caisse : l'image contenait 2 caisses (bois « coffre de pirate » + kaki) → le jeu les réduisait côte à côte dans
+  64×32 alors que l'obstacle fait 64×64. Gardée : la caisse kaki seule (militaire, comme camion/jeep/tente).
+- Conteneur rouge : l'image était 2 conteneurs vus DE BOUT, étirés en 140×52. Remplacé par le long conteneur
+  (`beufa_conteneur_olive.jpg`, enfin branché) recoloré en rouille. Kaki utilisé : nord-ouest de la cour, rangée nord du QG.
+- Reste (il faut de nouvelles images, vue du DESSUS) : camion (de profil), tente et table (de face, pieds visibles),
+  projecteur (de côté), baril (encore dessiné par le code, style différent des images).
