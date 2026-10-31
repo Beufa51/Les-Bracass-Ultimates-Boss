@@ -425,6 +425,8 @@ export class BeufaInfiltration extends BossScene {
       this.decor.push(img);
       this.obstacles.push({ x, y, l, h });
     }
+    // V52 : le DÉCOR AU SOL (barrière, flaques…) : sous le joueur, ne bloque ni le passage ni la vue
+    for (const [x, y, cle] of (P.decorsSol || [])) this.decor.push(this.add.image(x, y, cle).setDepth(8));
     // LE POSTE DE CONTRÔLE : les nids de sacs de sable
     for (const [x, y] of (P.sacs || [])) this.ajouterObstacle('beufa_sacs', x, y, 64, 44);
     // LA TABLE À CARTES : le cœur du poste de commandement

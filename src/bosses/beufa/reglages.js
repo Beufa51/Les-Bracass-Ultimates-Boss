@@ -73,7 +73,10 @@ export const PIECES = [
       [780, 110, 96, 96, 'beufa_reservoir'],         // LE RÉSERVOIR du nord-est (la variante passe entre lui et le mur)
       [820, 430, 140, 52],                           // LA COUVERTURE DU CHEMIN EST (variante)
       [860, 620, 80, 80, 'beufa_mirador'],           // le mirador du portail (décor)
+      [370, 70, 64, 64, 'beufa_guerite'],            // V52 : la guérite de la porte du QG (petite couverture avant la sortie)
+      [70, 640, 64, 64, 'beufa_palettes'],           // V52 : palettes dans le coin sud-ouest (hors des chemins)
     ],
+    decorsSol: [ [480, 680, 'beufa_barriere'] ],   // V52 : la barrière du portail (on passe dessus)
     sacs: [ [395, 520], [565, 520] ],                // le poste de contrôle de l'axe
     caisses: [],
     tables: [],
@@ -145,7 +148,7 @@ export const PIECES = [
       [330, 610, 140, 52, 'beufa_ratelier'], [630, 610, 140, 52, 'beufa_ratelier'],
       // L'ABRI DU VEILLEUR : la rangée nord, l'ombre juste avant la porte
       [610, 150, 140, 52, 'beufa_ratelier'],
-      [100, 200, 48, 48, 'beufa_baril'], [860, 420, 48, 48, 'beufa_baril'],
+      [100, 200, 34, 48, 'beufa_baril'], [860, 420, 34, 48, 'beufa_baril'],   // V52 : obstacle = largeur du vrai baril
     ],
     sacs: [],
     caisses: [ [90, 640], [870, 640], [870, 90] ],

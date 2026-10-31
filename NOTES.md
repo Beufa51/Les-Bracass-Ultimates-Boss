@@ -616,3 +616,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Livrés et branchés (originaux `assets_inbox/*_3q.jpg`). `beufa_conteneur_v` : les alcôves de la cour ne sont plus tournées.
 - Le nouveau râtelier remplace celui de V48 (panneau sombre ajouté à la main).
 - Ajouté : prompt n°28 mirador (encore de face). Reste : étagère verticale (n°2), baril, projecteur, nouveaux décors 13-28.
+
+## BEUFA — V52 : BARIL, PROJECTEUR + 3 NOUVEAUX DÉCORS DE LA COUR
+- Baril (enfin une image ; 34×52, obstacle 34×48), projecteur (42×30, toujours tourné vers la pièce).
+- Cour : guérite (370,70, petite couverture près de la porte du QG), palettes (70,640, coin hors chemins),
+  barrière du portail en DÉCOR AU SOL (nouvelle liste `decorsSol: [x, y, clé]`, profondeur 8, ne bloque rien).
+- Reste : étagère verticale (n°2), mirador (n°28), décors 16-27 (flaque, parc, arsenal, QG).
