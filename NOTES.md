@@ -622,3 +622,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Cour : guérite (370,70, petite couverture près de la porte du QG), palettes (70,640, coin hors chemins),
   barrière du portail en DÉCOR AU SOL (nouvelle liste `decorsSol: [x, y, clé]`, profondeur 8, ne bloque rien).
 - Reste : étagère verticale (n°2), mirador (n°28), décors 16-27 (flaque, parc, arsenal, QG).
+
+## BEUFA — V53 : FLAQUES, HUILE, PNEUS
+- Cour : 2 flaques (décor au sol, alpha 0.8). Parc : 3 taches d'huile (alpha 0.6 : trop noires, elles passaient
+  pour des trous) + 2 piles de pneus (obstacles 48×48, coins hors chemins). `decorsSol` accepte un 4e nombre = alpha.
+- Plot refusé (un disque orange, pas un cône) : `assets_inbox/beufa_plot_refuse.jpg`, prompt n°18 corrigé.
+- Reste : étagère verticale (n°2), plot (n°18), mirador (n°28), décors 21-27 (arsenal, QG).

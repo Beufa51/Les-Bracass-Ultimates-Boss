@@ -36,6 +36,10 @@ export const MANIFESTE = {
     beufa_guerite:    { fichier: 'sprites/beufa/beufa_guerite.jpg', fond: 'blanc', largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
     beufa_palettes:   { fichier: 'sprites/beufa/beufa_palettes.jpg', fond: 'blanc', largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'caisse_nes', couleur: '#545438', pixel: 2 } },
     beufa_barriere:   { fichier: 'sprites/beufa/beufa_barriere.jpg', fond: 'blanc', largeur: 140, hauteur: 18, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#8c1c1c', pixel: 2 } },
+    // V53 : flaque et huile = décor au sol ; pneus = obstacle
+    beufa_flaque:     { fichier: 'sprites/beufa/beufa_flaque.jpg', fond: 'blanc', largeur: 64, hauteur: 40, images: 1, vitesse: 1, provisoire: { forme: 'pierre_nes', couleur: '#385470', pixel: 2 } },
+    beufa_huile:      { fichier: 'sprites/beufa/beufa_huile.jpg', fond: 'blanc', largeur: 60, hauteur: 44, images: 1, vitesse: 1, provisoire: { forme: 'pierre_nes', couleur: '#1c1c1c', pixel: 2 } },
+    beufa_pneus:      { fichier: 'sprites/beufa/beufa_pneus.jpg', fond: 'blanc', largeur: 48, hauteur: 48, images: 1, vitesse: 1, provisoire: { forme: 'baril_nes', couleur: '#1c1c1c', pixel: 2 } },
     beufa_sacs:   { fichier: 'sprites/beufa/beufa_sacs.jpg', fond: 'blanc', largeur: 64, hauteur: 44, images: 1, vitesse: 1, provisoire: { forme: 'sacs_nes', couleur: '#8c7038', pixel: 2 } },
     beufa_table:   { fichier: 'sprites/beufa/beufa_table.jpg', fond: 'blanc', largeur: 140, hauteur: 90, images: 1, vitesse: 1, provisoire: { forme: 'table_nes', couleur: '#a88c54', pixel: 2 } },
     beufa_projecteur: { fichier: 'sprites/beufa/beufa_projecteur.jpg', fond: 'blanc', largeur: 42, hauteur: 30, images: 1, vitesse: 1, provisoire: { forme: 'projecteur_nes', couleur: '#383854', pixel: 2 } },

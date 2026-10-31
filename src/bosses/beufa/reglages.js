@@ -76,7 +76,7 @@ export const PIECES = [
       [370, 70, 64, 64, 'beufa_guerite'],            // V52 : la guérite de la porte du QG (petite couverture avant la sortie)
       [70, 640, 64, 64, 'beufa_palettes'],           // V52 : palettes dans le coin sud-ouest (hors des chemins)
     ],
-    decorsSol: [ [480, 680, 'beufa_barriere'] ],   // V52 : la barrière du portail (on passe dessus)
+    decorsSol: [ [480, 680, 'beufa_barriere'], [250, 380, 'beufa_flaque', 0.8], [700, 200, 'beufa_flaque', 0.8] ],   // V52 : la barrière du portail (on passe dessus)
     sacs: [ [395, 520], [565, 520] ],                // le poste de contrôle de l'axe
     caisses: [],
     tables: [],
@@ -111,7 +111,9 @@ export const PIECES = [
       [560, 455, 176, 72, 'beufa_camion'], [800, 455, 176, 72, 'beufa_camion'], [1040, 455, 176, 72, 'beufa_camion'],
       [1220, 480, 96, 96, 'beufa_reservoir'],        // la station : cache la dernière niche du gardien de la porte
       [1300, 90, 88, 60, 'beufa_jeep'],              // décor de l'angle nord-est
+      [1385, 495, 48, 48, 'beufa_pneus'], [250, 500, 48, 48, 'beufa_pneus'],   // V53 : pneus dans les coins (hors des chemins)
     ],
+    decorsSol: [ [900, 385, 'beufa_huile', 0.6], [640, 330, 'beufa_huile', 0.6], [1180, 160, 'beufa_huile', 0.6] ],   // V53 : taches d'huile
     sacs: [],
     caisses: [],
     tables: [],
