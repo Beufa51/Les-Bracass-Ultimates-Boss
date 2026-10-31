@@ -611,3 +611,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Étagère verticale refusée (dessin trop fin et vide aux 2/3 → affichée 2× plus fine que son obstacle) : gardée
   dans `assets_inbox/beufa_etagere_v_3q.jpg`, prompt n°2 corrigé. Reste à livrer : `etagere_v`, `conteneur_v`
   (alcôves de la cour, encore tournées), puis les prompts 6 et 8 à 27.
+
+## BEUFA — V51 : CONTENEURS (kaki + vertical), TABLE, RÂTELIER, TENTE EN VUE 3/4
+- Livrés et branchés (originaux `assets_inbox/*_3q.jpg`). `beufa_conteneur_v` : les alcôves de la cour ne sont plus tournées.
+- Le nouveau râtelier remplace celui de V48 (panneau sombre ajouté à la main).
+- Ajouté : prompt n°28 mirador (encore de face). Reste : étagère verticale (n°2), baril, projecteur, nouveaux décors 13-28.
