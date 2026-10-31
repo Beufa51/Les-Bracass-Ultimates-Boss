@@ -586,3 +586,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   (`beufa_conteneur_olive.jpg`, enfin branché) recoloré en rouille. Kaki utilisé : nord-ouest de la cour, rangée nord du QG.
 - Reste (il faut de nouvelles images, vue du DESSUS) : camion (de profil), tente et table (de face, pieds visibles),
   projecteur (de côté), baril (encore dessiné par le code, style différent des images).
+
+## BEUFA — V48 : RÂTELIERS PLEINS
+- Le fond blanc entre les fusils restait visible (le jeu n'efface que le blanc relié au bord) : râtelier « troué »,
+  plus fin que son obstacle. Les zones blanches enfermées sont remplacées par un panneau de bois sombre à lattes
+  (`beufa_ratelier.jpg`) : meuble plein, qui coupe la vue comme il bloque. Reflets des fusils gardés.
