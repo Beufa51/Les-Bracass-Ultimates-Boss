@@ -145,15 +145,15 @@ export class BeufaInfiltration extends BossScene {
     this.chargerPiece(0);
 
     this.afficherIntro('BEUFA - L\'INFILTRATION', [
-      'La nuit est tombée sur la base de BEUFA. Une pièce, puis une autre — et au fond, SON QG.',
-      'Les gardes balayent et font leur ronde : OBSERVE depuis le portail, puis file dans leur dos.',
+      // V30 : lignes de 70 caractères au plus (avant, elles sortaient de l'écran des deux côtés)
+      'Nuit sur la base de BEUFA : 4 pièces, et au fond, SON QG.',
+      'OBSERVE les rondes des gardes, puis file dans leur DOS.',
       '◀ ▶ ▲ ▼ : bouger (silencieux)',
-      (estTactile() ? 'Sprint' : 'Z') + ' : sprinter — plus rapide, mais les gardes proches T\'ENTENDENT',
-      'Conteneurs, sacs de sable, table à cartes : tout ce qui est haut COUPE LA VUE — colle-toi derrière.',
-      'Les PROJECTEURS AU BORD balayent le sol : leur HALO file jusqu\'au MILIEU — passe quand il repart !',
-      'Le cône d\'un garde te voit : la jauge « ? » monte — sors avant le « ! ».',
-      'La SORTIE pulse en vert dans la nuit — QUATRE pièces : la cour, le parc des véhicules, l\'arsenal… puis LE BUREAU DE BEUFA dans SON QG.',
-      'Touché = renvoyé à l\'entrée DE LA PIÈCE ; le radar (haut gauche) s\'efface quand tu marches.',
+      (estTactile() ? 'Sprint' : 'Z') + ' : sprinter — mais les gardes proches T\'ENTENDENT',
+      'Conteneurs, sacs, véhicules : ils COUPENT LA VUE, cache-toi derrière.',
+      'Le HALO des projecteurs te voit aussi : passe quand il repart.',
+      'Dans un cône, la jauge « ? » monte : sors avant le « ! ».',
+      'La SORTIE pulse en vert. Touché = retour à l\'entrée de la pièce.',
     ], () => this.cinema());
   }
 

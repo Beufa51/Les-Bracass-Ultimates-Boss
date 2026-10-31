@@ -41,8 +41,8 @@ export const MANIFESTE = {
   // Sons : fichier null => petit « bip » 8 bits provisoire (fréquence en Hz, durée en s)
   sons: {
     // MUSIQUE DE FOND (jouée par src/core/musique.js, en boucle) : Metal Gear Solid « Intruder 2 »,
-    // déposée telle quelle par Fabien dans assets/audio/beufa/ — le nom du fichier est celui du dépôt.
-    beufa_musique:  { fichier: 'audio/beufa/Metal Gear Solid - Intruder 2 [EXTENDED] Music.mp3', musique: true, volume: 0.45 },
+    // déposée par Fabien, réencodée en 96 kb/s (22 → 11 Mo) par outils/beufa_alleger.py.
+    beufa_musique:  { fichier: 'audio/beufa/beufa_musique.mp3', musique: true, volume: 0.45 },
     beufa_soupcon: { fichier: null, provisoire: { frequence: 620, duree: 0.12 } },
     beufa_alerte:  { fichier: null, provisoire: { frequence: 880, duree: 0.3 } },
     beufa_attrape: { fichier: null, provisoire: { frequence: 150, duree: 0.4 } },

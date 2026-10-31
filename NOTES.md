@@ -444,7 +444,7 @@ Source : `propositions/beufa_infiltration/DESIGN.md` (plan, schémas, raisons) +
 - Voile de nuit à la taille de la plus grande pièce (corrige la ligne nette sur les pièces de 1440).
 - Regard en bout de ronde ±40° (0.7 au lieu de 1.15). Astuce affichée à l'entrée de chaque pièce (ASTUCES).
 - core/tactile.js : diagonales ◤ ◥ optionnelles (hg/hd, cachées par défaut), activées par Beufa.
-- Reste : sprite du héros avec un soldat vert collé (découpage de planche), poids des fichiers (~32 Mo), tests réels.
+- Reste : voir V30.
 
 ## KÉDRIC — COURSE : ANIMATION TIRÉE DE LA VIDÉO (v7.2)
 `assets_inbox/kedric_toi_course_video.mp4` → `outils/kedric/course_video.py` → `kedric_toi_course6.png` (8 images, 197×326, 12 i/s).
@@ -453,3 +453,13 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 ## BEUFA — V29 : JOYSTICK + PLUS LUMINEUX
 - Sur téléphone : joystick de Lionel (importé de `src/bosses/lionel/joystick.js`, non modifié), croix cachée.
 - Nuit réglable `REGLAGES.vue.nuit` (0.3, avant 0.55) + menu dev « Obscurité de la nuit » ; vignette et teintes du sol éclaircies.
+
+## BEUFA — V30 : ALLÉGEMENT + INTRO LISIBLE
+- Sprite du héros vérifié dans le jeu : 6 cases propres, aucun soldat collé (le découpeur de planches suffit).
+- Poids : 32 Mo → 12 Mo. Images ramenées à 3× leur taille en jeu (`outils/beufa_alleger.py`, 10,5 Mo → 0,75 Mo) ;
+  musique réencodée en 96 kb/s, durée intacte, renommée `assets/audio/beufa/beufa_musique.mp3` (22 → 11 Mo).
+  Nouvelle image livrée par Fabien : la déposer telle quelle puis relancer le script.
+- Intro : lignes raccourcies (≤ 70 caractères), elles sortaient de l'écran des deux côtés.
+- Test de fumée (Playwright) : 4 pièces chargées, héros qui bouge, aucune erreur ni fichier manquant.
+  Le banc d'essai du bot (propositions/beufa_infiltration) n'a jamais été mis dans le dépôt.
+- Reste : test par de vrais joueurs (enfants, téléphone).
