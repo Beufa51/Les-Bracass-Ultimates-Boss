@@ -572,3 +572,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 ## BEUFA — V50 : NOUVELLE RANGÉE PROFIL
 - `assets_inbox/beufa_heros_snake_profil_v2.jpg` rangée 1 → beufa_heros_profil.jpg (8 vraies images, plus de
   jambes fabriquées). Écart des pieds (px source) : 113, 90, 45, 105, 112, 106, 45, 106 → vrais passages en 3 et 7.
+
+## BEUFA — V51 : COURSE DE PROFIL (sprint)
+- `assets_inbox/beufa_heros_snake_course.jpg` : seule la rangée 3 (course de profil, 8 images) est bonne →
+  `beufa_heros_course_profil.jpg`. Rangée 1 = course de 3/4 (pas de face), rangée 2 = marche de dos : inutilisées.
+- En sprint (Z) vers la gauche/droite → planche course, cycle `joueur.pasCourse` 100 px. Haut/bas : la marche.
+- Reste (si voulu) : course de FACE et de DOS (redemander ces 2 rangées).

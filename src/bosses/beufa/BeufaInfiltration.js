@@ -542,6 +542,7 @@ export class BeufaInfiltration extends BossScene {
     if (t.bas.isDown) dy += 1;
     if (dx && dy) { dx *= Math.SQRT1_2; dy *= Math.SQRT1_2; }
     const sprint = t.z.isDown && (dx || dy);
+    this.heroSprint = !!sprint;   // V51 : pour l'animation de course
     const v = (sprint ? R.joueur.sprint : R.joueur.vitesse) * dt;
     this.bouger(this.joueur, dx * v, dy * v, R.joueur.rayon);
     this.heroBouge = !!(dx || dy);   // pour le balancement de marche (afficher)
@@ -887,9 +888,11 @@ export class BeufaInfiltration extends BossScene {
     let cle = 'beufa_heros', miroir = false;
     if (Math.abs(ca) > Math.abs(sa) + 0.01) {
       if (this.textures.exists('beufa_heros_profil')) { cle = 'beufa_heros_profil'; miroir = ca < 0; }   // la planche profil regarde à DROITE
+      if (this.heroSprint && this.heroBouge && this.textures.exists('beufa_heros_course_profil')) cle = 'beufa_heros_course_profil';   // V51 : il COURT
     } else if (sa < 0 && this.textures.exists('beufa_heros_dos')) cle = 'beufa_heros_dos';
     const nH = Math.max(1, Object.keys(this.textures.get(cle).frames).length - 1);
-    const imageH = this.heroBouge ? Math.floor((this.joueur.distPas || 0) / R.joueur.pas * nH) % nH
+    const pasH = cle === 'beufa_heros_course_profil' ? R.joueur.pasCourse : R.joueur.pas;   // V51 : foulée de course plus longue
+    const imageH = this.heroBouge ? Math.floor((this.joueur.distPas || 0) / pasH * nH) % nH
       : (cle === 'beufa_heros' ? this.poseArretHeros : 0);
     if (this.sprJoueur.texture.key !== cle) this.sprJoueur.setTexture(cle);
     this.sprJoueur.setFrame(imageH).setFlipX(miroir)

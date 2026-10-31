@@ -9,6 +9,7 @@ export const REGLAGES = {
     vitesse: 120,      // V32 : 130 avant — marche (px/s) : silencieuse — LENTE, comme une infiltration
     sprint: 200,       // Z : plus rapide, mais les gardes proches T'ENTENDENT
     pas: 60,           // V49 : px parcourus pour UN cycle de marche complet (2 pas) — calé sur l'écart des pieds de Snake (72 avant)
+    pasCourse: 100,    // V51 : px pour un cycle de COURSE complet (sprint de profil) — plus petit = jambes plus rapides
     rebond: 1.5,       // V49 : px dont il monte à chaque pas (0 = aucun)
     rayon: 10,      // V25 : on frôle les caisses SANS être bloqué — les couloirs redeviennent passables
     bruit: 180,        // V32 : 130 avant — rayon (px) dans lequel un garde entend le sprint
