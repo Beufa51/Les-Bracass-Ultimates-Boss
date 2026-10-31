@@ -534,3 +534,7 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Options manifeste (3 planches du héros) : `seuilBlanc: 200` (fond = tout pixel ≥ 200, au lieu de 238),
   `liseré: 3` (3 passes qui rongent le gris clair/blanc collé au contour, jamais les couleurs), `trousBlancs: 8`.
 - Reste : légère saccade de la marche de profil (la tête monte un peu sur les images « jambes croisées »).
+
+## BEUFA — V43 : SACCADE DU PROFIL
+- La planche profil n'avait d'image « jambes croisées » que pour un pas sur deux (5 → 6 → 1 = écarté → mi → écarté).
+  Ordre refait : 1,2,3,4,5,6,3,4 (8 images) → chaque pas passe par les jambes croisées.
