@@ -21,6 +21,9 @@ export const MANIFESTE = {
     // V28 — LE MATÉRIEL MILITAIRE (provisoire en pixel art ; dès que Fabien livre
     // les PNG dans sprites/beufa/, remplacer fichier: null par le chemin — dimensions identiques)
     beufa_camion:     { fichier: 'sprites/beufa/beufa_camion.jpg', fond: 'blanc', largeur: 176, hauteur: 72, images: 1, vitesse: 1, provisoire: { forme: 'camion_nes', couleur: '#385438', pixel: 2 } },
+    beufa_camion_v:   { fichier: 'sprites/beufa/beufa_camion_v.jpg', fond: 'blanc', largeur: 72, hauteur: 176, images: 1, vitesse: 1, provisoire: { forme: 'camion_nes', couleur: '#385438', pixel: 2 } },
+    // V50 : l'étagère du QG (remplace les conteneurs de port posés DANS le bâtiment) ; verticale : l'horizontale tournée en attendant une bonne _v
+    beufa_etagere:    { fichier: 'sprites/beufa/beufa_etagere.jpg', fond: 'blanc', largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545454', pixel: 2 } },
     beufa_jeep:       { fichier: 'sprites/beufa/beufa_jeep.jpg', fond: 'blanc', largeur: 88, hauteur: 60, images: 1, vitesse: 1, provisoire: { forme: 'jeep_nes', couleur: '#38543c', pixel: 2 } },
     beufa_helico:     { fichier: 'sprites/beufa/beufa_helico.jpg', fond: 'blanc', largeur: 184, hauteur: 100, images: 1, vitesse: 1, provisoire: { forme: 'helico_nes', couleur: '#1c3854', pixel: 2 } },
     beufa_reservoir:  { fichier: 'sprites/beufa/beufa_reservoir.jpg', fond: 'blanc', largeur: 96, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'reservoir_nes', couleur: '#385454', pixel: 2 } },

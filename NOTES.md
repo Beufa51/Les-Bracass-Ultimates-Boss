@@ -602,3 +602,12 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   Validée : orthographique, dessus + fine face avant, cube. C'est la RÉFÉRENCE de style pour les autres décors.
 - `propositions/beufa_prompts_decor_complets.md` : les 27 prompts COMPLETS (style + objet), dont les versions
   verticales `_v` (camion, conteneur, étagère) : à brancher à la livraison (aujourd'hui le jeu fait pivoter l'horizontale).
+
+## BEUFA — V50 : CAMIONS, CONTENEUR, ÉTAGÈRES EN VUE 3/4
+- Livrés (originaux `assets_inbox/*_3q.jpg`) : conteneur rouille, camion horizontal, camion VERTICAL, étagère.
+- Nouveau : un obstacle posé à la verticale prend la version `<clé>_v` si elle existe (sans rotation), sinon
+  l'horizontale tournée. `beufa_camion_v` branché (parc).
+- QG : les 9 « conteneurs de port » deviennent des `beufa_etagere` (antichambre, rayonnages, rangées, classeur).
+- Étagère verticale refusée (dessin trop fin et vide aux 2/3 → affichée 2× plus fine que son obstacle) : gardée
+  dans `assets_inbox/beufa_etagere_v_3q.jpg`, prompt n°2 corrigé. Reste à livrer : `etagere_v`, `conteneur_v`
+  (alcôves de la cour, encore tournées), puis les prompts 6 et 8 à 27.

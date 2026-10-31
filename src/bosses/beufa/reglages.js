@@ -175,11 +175,11 @@ export const PIECES = [
     portes: [ [10, 365, Math.PI / 2], [1430, 365, Math.PI / 2] ],
     routes: [],
     conteneurs: [
-      [150, 150, 140, 52], [150, 470, 140, 52],       // l'antichambre : la poche sûre
-      [420, 130, 52, 140], [420, 430, 52, 140],       // les rayonnages de part et d'autre du portique de lumière
-      [640, 470, 140, 52], [880, 470, 140, 52],       // la rangée sud : l'abri contre le stratège
-      [640, 84, 140, 52, 'beufa_conteneur_olive'], [880, 84, 140, 52, 'beufa_conteneur_olive'],       // la rangée nord — DERRIÈRE elle, contre le mur, un PASSAGE SECRET (la variante)
-      [1200, 470, 140, 52],                           // le classeur du bureau
+      [150, 150, 140, 52, 'beufa_etagere'], [150, 470, 140, 52, 'beufa_etagere'],       // l'antichambre : la poche sûre
+      [420, 130, 52, 140, 'beufa_etagere'], [420, 430, 52, 140, 'beufa_etagere'],       // les rayonnages de part et d'autre du portique de lumière
+      [640, 470, 140, 52, 'beufa_etagere'], [880, 470, 140, 52, 'beufa_etagere'],       // la rangée sud : l'abri contre le stratège
+      [640, 84, 140, 52, 'beufa_etagere'], [880, 84, 140, 52, 'beufa_etagere'],       // la rangée nord — DERRIÈRE elle, contre le mur, un PASSAGE SECRET (la variante)
+      [1200, 470, 140, 52, 'beufa_etagere'],                           // le classeur du bureau
     ],
     sacs: [],
     caisses: [ [1150, 110] ],

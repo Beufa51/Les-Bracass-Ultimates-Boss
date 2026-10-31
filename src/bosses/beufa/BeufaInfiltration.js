@@ -416,8 +416,12 @@ export class BeufaInfiltration extends BossScene {
     // LES CONTENEURS : les GRANDES couvertures — elles bloquent le passage ET la vue
     for (const c of (P.conteneurs || [])) {
       const [x, y, l, h] = c;
-      const img = this.add.image(x, y, c[4] || 'beufa_conteneur').setDepth(21);
-      if (h > l) img.setRotation(Math.PI / 2);   // le conteneur vertical = le même, tourné
+      const cle = c[4] || 'beufa_conteneur';
+      // V50 : posé à la verticale → sa version « _v » (dessinée debout, face avant en bas) si elle existe,
+      // sinon l'horizontale tournée (la vue 3/4 aurait alors sa face avant sur le côté)
+      const verticale = h > l && this.textures.exists(cle + '_v');
+      const img = this.add.image(x, y, verticale ? cle + '_v' : cle).setDepth(21);
+      if (h > l && !verticale) img.setRotation(Math.PI / 2);
       this.decor.push(img);
       this.obstacles.push({ x, y, l, h });
     }
