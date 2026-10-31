@@ -133,3 +133,23 @@ frames, frames must NOT touch. The 8 frames MUST be clearly different, like a cl
 7. PASSING (mirror of 3, legs together); 8. UP (mirror of 4).
 Frames 3 and 7 must show the legs together, NOT apart. The arms swing opposite to the legs.
 Pure white background, no ground shadow, no text, no extra characters.
+
+## SNAKE — COURSE (sprint), 3 directions sur une planche
+Joindre `assets_inbox/beufa_heros_snake_3vues.jpg` comme référence.
+Same character, same pixel art style, same proportions, same size and same layout as the attached sheet,
+but RUNNING FAST instead of walking. Body leaning forward, elbows bent at 90 degrees, arms pumping hard,
+handgun held tight in the right hand, bandana tails flying straight behind him.
+3 ROWS of 8 frames each, a complete smooth RUN CYCLE in every row:
+- Row 1: seen from the FRONT, running toward the camera (bottom of the image);
+- Row 2: seen from the BACK, running away from the camera (top of the image), face not visible;
+- Row 3: STRICT SIDE VIEW at 90 degrees, running toward the RIGHT, only one eye visible.
+Run cycle in each row, every frame clearly different:
+1. CONTACT: front foot lands under the knee, back leg extended behind;
+2. DOWN: front knee bent, body at its lowest, absorbing the landing;
+3. PASSING: back leg swings forward, knee high, foot tucked under the hips;
+4. FLIGHT: BOTH feet off the ground, legs wide apart, body at its highest;
+5. CONTACT with the OTHER foot (mirror of 1); 6. DOWN (mirror of 2);
+7. PASSING (mirror of 3); 8. FLIGHT (mirror of 4).
+Arms swing opposite to the legs. Every frame the same height scale; large white space between frames, frames
+must NOT touch or overlap, bandana tails included. Pure white background, no ground shadow, no motion lines,
+no dust, no text, no grid, no extra characters.
