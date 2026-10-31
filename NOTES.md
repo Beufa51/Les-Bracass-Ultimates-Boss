@@ -568,3 +568,7 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - `joueur.pas` 72 → 60 (cycle calé sur l'écart réel des pieds de Snake : les pieds glissent moins).
 - `joueur.rebond` 1.5 px : il monte un peu au passage des jambes (debout, ça fait vivre le pas). 0 = aucun.
 - Prompt « rangée profil seule » (passages jambes serrées imposés) dans propositions/beufa_prompts_marche.md.
+
+## BEUFA — V50 : NOUVELLE RANGÉE PROFIL
+- `assets_inbox/beufa_heros_snake_profil_v2.jpg` rangée 1 → beufa_heros_profil.jpg (8 vraies images, plus de
+  jambes fabriquées). Écart des pieds (px source) : 113, 90, 45, 105, 112, 106, 45, 106 → vrais passages en 3 et 7.
