@@ -549,3 +549,6 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   bottes). Découpe faite à la main (coupure aux colonnes les plus vides près de W/8, puis dans chaque case on
   garde le perso et on jette les morceaux du voisin collés au bord) → beufa_heros_profil.jpg (8 images).
   Les bouts de bandana qui débordaient chez le voisin sont un peu coupés.
+
+## BEUFA — V46 : PROFIL MOINS GRAND, MOINS FIN
+- Option manifeste `etirementL` (élargit sans grandir). Profil : `echelle: 0.88`, `etirementL: 1.3`.

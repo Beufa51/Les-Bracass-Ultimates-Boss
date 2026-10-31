@@ -325,7 +325,7 @@ export class BeufaInfiltration extends BossScene {
           if (kCommun) {
             // V44 : 'hauteur' → chaque image ramenée à LA MÊME HAUTEUR (le générateur dessine certaines rangées plus grandes)
             const k = e.echelleCommune === 'hauteur' ? Math.min((e.echelle || 1) * fH / h, fL / w) : kCommun;
-            const dL = Math.round(w * k), dH = Math.round(h * k);
+            const dL = Math.min(fL, Math.round(w * k * (e.etirementL || 1))), dH = Math.round(h * k);   // V46 : etirementL élargit (profil trop fin)
             c2.drawImage(cv, seg[0], seg[4], w, h, i * fL + Math.round((fL - dL) / 2), fH - dH, dL, dH);
           } else if (w / h >= 0.7 && w / h <= 1.43) {   // aspect proche de la case : il la REMPLIT (taille stable d'une frame à l'autre)
             c2.drawImage(cv, seg[0], seg[4], w, h, i * fL, 0, fL, fH);
