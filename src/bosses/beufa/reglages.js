@@ -69,10 +69,10 @@ export const PIECES = [
       [330, 610, 140, 52], [630, 610, 140, 52],      // LE PORTAIL : la poche sûre d'où l'on observe
       [360, 330, 70, 140],                           // L'ALCÔVE OUEST : l'ombre où attendre que la sentinelle reparte
       [600, 330, 70, 140],                           // L'ALCÔVE EST : elle cache aussi l'axe de la ronde des réservoirs
-      [160, 470, 148, 96, 'beufa_tente'],            // la tente des quartiers (décor, couverture)
-      [150, 170, 140, 52, 'beufa_conteneur_olive'],                         // le conteneur du nord-ouest
-      [780, 110, 96, 96, 'beufa_reservoir'],         // LE RÉSERVOIR du nord-est (la variante passe entre lui et le mur)
-      [820, 430, 140, 52],                           // LA COUVERTURE DU CHEMIN EST (variante)
+      [160, 450, 148, 96, 'beufa_tente'],            // la tente des quartiers — V63 : rangée du milieu (y 450), en miroir du conteneur est
+      [150, 110, 140, 52, 'beufa_conteneur_olive'],  // le conteneur du nord-ouest — V63 : rangée nord (y 110), en miroir du réservoir
+      [810, 110, 96, 96, 'beufa_reservoir'],         // LE RÉSERVOIR du nord-est (la variante passe entre lui et le mur) — V63 : x 810 = miroir exact du conteneur olive
+      [800, 450, 140, 52],                           // LA COUVERTURE DU CHEMIN EST (variante) — V63 : miroir de la tente (axe x 480)
       [860, 620, 68, 80, 'beufa_mirador'],           // le mirador du portail (décor)
       [370, 52, 88, 64, 'beufa_guerite'],            // V52 : la guérite de la porte du QG — V56 : COLLÉE au mur — V57 : image 96×96 (plus haute que Snake), emprise élargie à 88
       [52, 668, 64, 64, 'beufa_palettes'],           // V52 : palettes dans le coin sud-ouest (hors des chemins)

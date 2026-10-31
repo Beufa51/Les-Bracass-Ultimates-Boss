@@ -713,3 +713,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   de sortie (1340,365). Plantes retirées. Rondes inchangées.
 - Arsenal = DÉPÔT DE MISSILES : les 4 râteliers de l'îlot central deviennent 4 missiles (même emprise).
 - Barbelés : `barbeles: ['s','o','e']` (cour) / `['n']` (parc) = seulement les côtés de l'ENCEINTE.
+
+## BEUFA — V63 : COUR ALIGNÉE (validé par Fabien)
+- Rangées symétriques autour de l'axe x 480 : nord y 110 (conteneur olive 150 ↔ réservoir 810), milieu y 450
+  (tente 160 ↔ conteneur est 800), alcôves 360 ↔ 600, portail 330 ↔ 630. Déplacements ≤ 60 px.
+- Vérifié par calcul : aucune ronde touchée, aucun faux passage.
