@@ -600,3 +600,5 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 ## BEUFA — V49 : CAISSE EN VUE 3/4 (premier décor du nouveau prompt)
 - `assets_inbox/beufa_caisse_3q.jpg` (prompt de `propositions/beufa_prompts_decor.md`) → `beufa_caisse.jpg` allégée 240×240.
   Validée : orthographique, dessus + fine face avant, cube. C'est la RÉFÉRENCE de style pour les autres décors.
+- `propositions/beufa_prompts_decor_complets.md` : les 27 prompts COMPLETS (style + objet), dont les versions
+  verticales `_v` (camion, conteneur, étagère) : à brancher à la livraison (aujourd'hui le jeu fait pivoter l'horizontale).
