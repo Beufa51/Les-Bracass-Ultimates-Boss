@@ -893,3 +893,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   (`assets_inbox/` → réduits en 256×256 dans `assets/sprites/beufa/`, entrées ajoutées au manifeste).
 - Pas d'image « calme » (choix de Fabien) : le sourire la remplace. « machiavelique » livrée ensuite (V85).
   Une humeur sans image retombe sur le sourire.
+
+## BEUFA — V86 : SCÈNE DU BUREAU ILLUSTRÉE
+- `beufa_bureau_scene(_masque).jpg` (Fabien, pixel art couleur) en fond plein écran (1000×562, un peu plus grand
+  que l'écran pour que les secousses ne montrent pas de bord). Si présentes, elles remplacent bureau dessiné,
+  bannières, plantes et buste (`this.scene_`) ; le rideau passe de l'une à l'autre. Ancien décor gardé en secours.

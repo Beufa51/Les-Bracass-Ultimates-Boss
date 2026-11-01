@@ -51,6 +51,14 @@ export class BeufaQuiz extends BossScene {
 
   // ---------- le décor : le bureau de Beufa ----------
   creerBureau() {
+    // V86 : la SCÈNE illustrée de Fabien (Beufa à son bureau, avec / sans masque) remplace tout le décor dessiné.
+    // Un peu plus grande que l'écran (1000×562) : les secousses de Beufa ne montrent jamais de bord.
+    if (this.textures.exists('beufa_bureau_scene')) {
+      this.scene_ = true;
+      this.busteY = HAUTEUR / 2;
+      this.buste = this.add.image(LARGEUR / 2, this.busteY, this.masque ? 'beufa_bureau_scene_masque' : 'beufa_bureau_scene');
+      return;
+    }
     const g = this.add.graphics();
     g.fillStyle(0x1c2030).fillRect(0, 0, LARGEUR, 150);                    // le mur du fond
     g.fillStyle(0x2a3044).fillRect(0, 140, LARGEUR, 10);                   // la plinthe
@@ -177,7 +185,8 @@ export class BeufaQuiz extends BossScene {
         jouerSon(this, 'beufa_masque');
         this.cameras.main.shake(150, 0.004);
         this.masque = false;
-        this.buste.setTexture('beufa_buste'); this.buste.setScale(215 / this.buste.height);
+        if (this.scene_) this.buste.setTexture('beufa_bureau_scene');
+        else { this.buste.setTexture('beufa_buste'); this.buste.setScale(215 / this.buste.height); }
         this.visage('calme');
         this.time.delayedCall(700, () => {
           this.tweens.add({ targets: rideaux[0], x: 0, duration: 550, ease: 'Quad.Out' });
