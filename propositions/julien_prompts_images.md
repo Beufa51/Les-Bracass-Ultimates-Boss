@@ -89,3 +89,13 @@ Lignes « Wall: … » des autres murs :
 - `julien_mur_palissade.png` : `Wall: green wooden construction hoarding with torn posters.`
 - `julien_mur_lycee.png` : `Wall: light beige stone wall of a French high school, with one window in the middle.`
 - `julien_portail_lycee.png` : `Wall: green metal high-school gate with vertical bars and a blue plaque "LYCÉE" at the top, the school courtyard visible through the bars.`
+
+## 8. Gros objets du décor (une image par objet) — ajoutés après l'audit
+Prompt commun, en remplaçant la ligne « Object: … » :
+```
+Pixel art game sprite in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. A single object, seen strictly from the FRONT, standing on the ground, no perspective tilt, centered, filling most of the image height. Plain solid pure white background (#FFFFFF), no ground shadow, no frame, no other object.
+Object: …
+```
+- `julien_statue.jpg` : `Object: the bronze statue of Marianne from Place de la République in Paris, green patina, standing on a tall grey stone pedestal with the letters "RF", one arm raising an olive branch. Tall and narrow.`
+- `julien_camion.jpg` : `Object: a French riot police van (white and blue CRS van, "POLICE" written on it), seen strictly from the front, metal grille protecting the windscreen, blue lights on the roof. Wide image.`
+- `julien_colonne.jpg` : `Object: a dark green Parisian Morris advertising column, round, with a small dome roof, covered with colorful posters (cinema, theater, a protest poster). Tall and narrow.`
