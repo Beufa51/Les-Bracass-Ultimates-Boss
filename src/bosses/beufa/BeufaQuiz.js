@@ -298,8 +298,8 @@ export class BeufaQuiz extends BossScene {
     const eclat = this.add.ellipse(x0, Y, 90, 26, 0x2a7cff, 0.9).setDepth(903).setBlendMode(Phaser.BlendModes.ADD);
     const rayon = this.add.rectangle(x0, Y, 6, 200, 0x6ab4ff, 0.8).setDepth(903).setBlendMode(Phaser.BlendModes.ADD);
     const prog = { k: 0 };
-    jouerSon(this, 'beufa_psy');
-    this.tweens.add({ targets: prog, k: 1, duration: 1700, ease: 'Sine.InOut',
+    jouerSon(this, 'beufa_gameover');   // V89 : le vrai son (vidéo de Fabien) ; le dévoilement suit son rythme
+    this.tweens.add({ targets: prog, k: 1, duration: 3200, ease: 'Sine.InOut',
       onUpdate: () => {
         const bx = x0 + largeurT * prog.k;
         formeMasque.clear().fillStyle(0xffffff).fillRect(x0, Y - 80, largeurT * prog.k, 160);

@@ -112,6 +112,7 @@ export const MANIFESTE = {
     beufa_masque:  { fichier: null, provisoire: { frequence: 520, duree: 0.2 } },     // V82 : il enlève son masque
     beufa_bon:     { fichier: null, provisoire: { frequence: 880, duree: 0.15 } },
     beufa_faux:    { fichier: null, provisoire: { frequence: 120, duree: 0.45 } },
+    beufa_gameover: { fichier: 'audio/beufa/beufa_gameover.mp3' },   // V89 : GAME OVER de Metal Gear Solid (vidéo de Fabien, 9 s)
     beufa_tic:     { fichier: null, provisoire: { frequence: 1000, duree: 0.04 } },
     beufa_reussi:  { fichier: null, provisoire: { frequence: 740, duree: 0.3 } },
   },

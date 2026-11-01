@@ -911,3 +911,12 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   → glisse. Palliatif : `R.garde.pasProfil` 100 (au lieu de 120) + `R.garde.rebond` 1.5 px. Vraie solution :
   prompt « GARDE — PROFIL : UN SEUL PAS EN 4 POSES » dans `propositions/beufa_prompts_marche.md`
   (une fois livrée : 4 images, jouées 2 fois, comme Snake V79).
+
+## BEUFA — V89 : SON DU GAME OVER + GARDES DE PROFIL SANS GLISSADE (sans nouvelle planche)
+- Son : `assets/audio/beufa/beufa_gameover.mp3` (9 s, tiré de la vidéo MGS de Fabien, copie dans
+  `assets_inbox/beufa_gameover_mgs.mp4`) ; le dévoilement de « GAME OVER » dure 3,2 s pour suivre le son.
+- Gardes de profil : `fabriquerPasGardeProfil()` fabrique `beufa_garde_profil_pas` (8 images) à partir de l'image 1
+  de la planche : sous la hanche, chaque ligne est coupée au milieu des pieds et les 2 moitiés se rapprochent →
+  [écartées, mi-serrées, SERRÉES, mi-serrées] × 2 pas. Réglages : `R.garde.pasProfil` 56 (px pour 2 pas),
+  `profilHanche` 0.58, `profilSerrage` 0.36, `rebond` 1.5 (il monte au passage). Arrêt = jambes serrées.
+  Le prompt 4 poses (V88) reste utile si on veut mieux un jour, mais n'est plus nécessaire.

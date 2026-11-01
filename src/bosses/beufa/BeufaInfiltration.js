@@ -64,6 +64,7 @@ export class BeufaInfiltration extends BossScene {
     // LES IMAGES DE FABIEN arrivent GRANDES et sur FOND BLANC : on les prépare une fois
     // (fond retiré, recadrées, mises à la TAILLE DU JEU) avant de dessiner quoi que ce soit.
     this.preparerImages();
+    this.fabriquerPasGardeProfil();
     // V30 : les VRAIES PLANCHES DE MARCHE de Fabien (6-7 frames) — le nombre de
     // frames RÉEL (détecté par le découpeur) l'emporte, et chaque planche a SA
     // pose d'arrêt (jambes resserrées) — fini le « saccadé », les jambes VIVENT.
@@ -172,6 +173,46 @@ export class BeufaInfiltration extends BossScene {
   //  3. on RECADRE sur le contenu ;
   //  4. on redessine le tout à la TAILLE DU JEU (déclarée dans le manifeste) ;
   //  5. on RECONSTRUIT les frames de l'animation, à la bonne dimension.
+  // V89 : la planche PROFIL des gardes n'a que des poses « jambes écartées » → il glissait. Sans nouvelle planche,
+  // on FABRIQUE les poses manquantes : sous la ceinture, chaque ligne est coupée en deux au milieu des jambes et
+  // les deux moitiés se rapprochent (plus on descend, plus elles se rapprochent) → jambes qui se serrent puis
+  // s'écartent : 4 poses par pas [écartées, mi-serrées, SERRÉES (passage), mi-serrées], 2 pas = 8 images.
+  fabriquerPasGardeProfil() {
+    const cle = 'beufa_garde_profil', cible = 'beufa_garde_profil_pas';
+    if (!this.textures.exists(cle) || this.textures.exists(cible)) return;
+    const tex = this.textures.get(cle), f = tex.get(0), src = tex.getSourceImage();
+    const L = f.cutWidth, H = f.cutHeight;
+    const cv0 = document.createElement('canvas'); cv0.width = L; cv0.height = H;
+    const c0 = cv0.getContext('2d');
+    c0.drawImage(src, f.cutX, f.cutY, L, H, 0, 0, L, H);
+    const d = c0.getImageData(0, 0, L, H).data;
+    const plein = (x, y) => d[(y * L + x) * 4 + 3] > 40;
+    // le bas du perso (les semelles) et l'écart des pieds
+    let bas = H - 1;
+    while (bas > 0 && ![...Array(L).keys()].some((x) => plein(x, bas))) bas--;
+    let pg = L, pd = 0;
+    for (let y = bas - 3; y <= bas; y++) for (let x = 0; x < L; x++) if (plein(x, y)) { pg = Math.min(pg, x); pd = Math.max(pd, x); }
+    let haut = 0;
+    while (haut < bas && ![...Array(L).keys()].some((x) => plein(x, haut))) haut++;
+    const hanche = Math.round(haut + (bas - haut) * R.garde.profilHanche);   // le haut des jambes
+    const pivot = Math.round((pg + pd) / 2);
+    const ecart = (pd - pg) * R.garde.profilSerrage;   // de combien chaque pied se rapproche au passage
+    const poses = [0, 0.5, 1, 0.5];
+    const final = document.createElement('canvas'); final.width = L * 8; final.height = H;
+    const c = final.getContext('2d');
+    for (let i = 0; i < 8; i++) {
+      const k = poses[i % 4], ox = i * L;
+      c.drawImage(cv0, 0, 0, L, hanche, ox, 0, L, hanche);   // le haut du corps ne bouge pas
+      for (let y = hanche; y < H; y++) {
+        const dx = Math.round(ecart * k * Math.min(1, (y - hanche) / Math.max(1, bas - hanche)));
+        c.drawImage(cv0, 0, y, pivot, 1, ox + dx, y, pivot, 1);                       // jambe arrière → avance
+        c.drawImage(cv0, pivot, y, L - pivot, 1, ox + pivot - dx, y, L - pivot, 1);   // jambe avant → recule
+      }
+    }
+    const nt = this.textures.addCanvas(cible, final);
+    for (let i = 0; i < 8; i++) nt.add(i, 0, i * L, 0, L, H);
+  }
+
   preparerImages() {
     const m = manifesteDe(IDENTITE.id);
     for (const [cle, e] of Object.entries(m.images)) {
@@ -1021,15 +1062,18 @@ export class BeufaInfiltration extends BossScene {
         // V75 : le garde est DEBOUT en 3/4 comme Snake : on choisit la planche selon sa direction (plus de rotation)
         const cg = Math.cos(g.angle), sg = Math.sin(g.angle);
         let cleG = 'beufa_garde_face', arret = 2;
-        if (Math.abs(cg) > Math.abs(sg) + 0.01) { cleG = 'beufa_garde_profil'; arret = 3; }
+        if (Math.abs(cg) > Math.abs(sg) + 0.01) {
+          if (this.textures.exists('beufa_garde_profil_pas')) { cleG = 'beufa_garde_profil_pas'; arret = 2; }   // V89 : arrêt = jambes serrées
+          else { cleG = 'beufa_garde_profil'; arret = 3; }
+        }
         else if (sg < 0) cleG = 'beufa_garde_dos';
         if (g.sprite.texture.key !== cleG) g.sprite.setTexture(cleG);
         // V88 : de profil, pas plus court + petit rebond (la planche n'a pas de pose « jambes serrées » : il glissait)
-        const profil = cleG === 'beufa_garde_profil';
+        const profil = cleG.startsWith('beufa_garde_profil');
         const imageG = this.cyclePas(g, profil ? R.garde.pasProfil : R.garde.pasVue, 8);
-        const rebondG = profil && g.bouge ? R.garde.rebond * Math.abs(Math.sin((g.distPas || 0) / (R.garde.pasProfil / 4) * Math.PI)) : 0;
+        const rebondG = profil && g.bouge ? R.garde.rebond * Math.abs(Math.sin((g.distPas || 0) / (R.garde.pasProfil / 2) * Math.PI)) : 0;   // V89 : 2 pas par cycle, il monte au passage
         g.sprite.setPosition(g.x, g.y - 4 - rebondG).setDepth(profondeurY(g.y + 25))
-          .setRotation(0).setFlipX(cleG === 'beufa_garde_profil' && cg < 0)
+          .setRotation(0).setFlipX(profil && cg < 0)
           .setFrame(g.bouge ? imageG : arret);
         g.alerte.setPosition(g.x, g.y - 40).setScale(1 + Math.sin(this.temps * 18) * 0.12);
       } else {
