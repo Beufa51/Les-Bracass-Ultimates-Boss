@@ -152,7 +152,7 @@ large, cheveux plus courts…] », plutôt que de tout relancer.
 ```
 Use the attached pixel art portrait as the exact face of this character: same face, hair, facial hair, glasses and skin tone, unchanged.
 Pixel art in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading.
-Character: a French high-school teacher, no glasses, brown corduroy jacket with elbow patches over a light blue shirt and a red tie, beige trousers, brown shoes, a blue textbook under his arm. Full body, standing, seen strictly from the FRONT, facing the viewer, no perspective tilt. Head a bit large for the body (game sprite proportions) so the face stays readable.
+Character: a geeky French high-school teacher, no glasses, an open green and white track jacket over a black geek t-shirt with a retro survival-horror video game print (a foggy abandoned town and a tall red pyramid-shaped helmet, no logo, no text), dark jeans, sneakers, a blue textbook under his arm. Full body, standing, seen strictly from the FRONT, facing the viewer, no perspective tilt. Head a bit large for the body (game sprite proportions) so the face stays readable.
 Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame.
 ```
 

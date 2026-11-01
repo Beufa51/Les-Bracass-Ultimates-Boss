@@ -108,21 +108,22 @@ function julien(pose) {
     const rage = pose === 'rage', vaincu = pose === 'vaincu';
     const peau = rage ? '#e07a6a' : '#e5b48c';
     // jambes (pantalon beige) + chaussures
-    R(g, '#b9a37a', 16 + pas, 54, 7, 26); R(g, '#b9a37a', 25 - pas, 54, 7, 26);
+    R(g, '#2c3a55', 16 + pas, 54, 7, 26); R(g, '#2c3a55', 25 - pas, 54, 7, 26);
     R(g, '#3a2414', 15 + pas, 79, 9, 5); R(g, '#3a2414', 24 - pas, 79, 9, 5);
-    // veste en velours marron, chemise, cravate
-    R(g, '#7a5233', 12, 28, 24, 28); R(g, '#e9e4d8', 20, 28, 8, 14); R(g, '#a8322c', 23, 30, 3, 12);
-    R(g, '#5f3e25', 12, 54, 24, 2); R(g, '#c9a067', 13, 44, 4, 4);   // coudières
+    // veste ouverte vert et blanc sur un t-shirt geek noir (jeu d'horreur rétro : un casque pyramide rouge)
+    R(g, '#2f7a5a', 12, 28, 24, 28); R(g, '#e8e8e0', 12, 28, 2, 28); R(g, '#e8e8e0', 34, 28, 2, 28);
+    R(g, '#151515', 18, 28, 12, 26); g.fillStyle = '#b02a22'; g.beginPath(); g.moveTo(24, 32); g.lineTo(20, 40); g.lineTo(28, 40); g.fill();
+    R(g, '#245e46', 12, 54, 24, 2);
     // bras
     if (pose === 'bras' || rage) {
-      R(g, '#7a5233', 35, 6, 6, 24); ovale(g, peau, 38, 6, 3, 3);
+      R(g, '#2f7a5a', 35, 6, 6, 24); ovale(g, peau, 38, 6, 3, 3);
       if (!rage) { R(g, '#2f5fa8', 32, 0, 14, 8); R(g, '#f2ead2', 33, 1, 12, 1); }   // le livre au-dessus de sa tête
-      R(g, '#7a5233', rage ? 7 : 7, rage ? 6 : 28, 6, rage ? 24 : 20);
+      R(g, '#2f7a5a', rage ? 7 : 7, rage ? 6 : 28, 6, rage ? 24 : 20);
       if (rage) ovale(g, peau, 10, 6, 3, 3);
     } else if (pose === 'lance') {
-      R(g, '#7a5233', 34, 28, 12, 6); ovale(g, peau, 46, 31, 3, 3); R(g, '#7a5233', 7, 28, 6, 20);
+      R(g, '#2f7a5a', 34, 28, 12, 6); ovale(g, peau, 46, 31, 3, 3); R(g, '#2f7a5a', 7, 28, 6, 20);
     } else {
-      R(g, '#7a5233', 7, 28, 6, 22); R(g, '#7a5233', 35, 28, 6, 22);
+      R(g, '#2f7a5a', 7, 28, 6, 22); R(g, '#2f7a5a', 35, 28, 6, 22);
       ovale(g, peau, 10, 51, 3, 3); ovale(g, peau, 38, 51, 3, 3);
       R(g, '#2f5fa8', 36, 44, 9, 12);   // il tient un manuel
     }
