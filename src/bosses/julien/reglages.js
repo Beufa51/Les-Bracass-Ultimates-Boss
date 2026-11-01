@@ -102,7 +102,7 @@ export const REGLAGES = {
     eventail: 0.28,      // écart (radians) entre les 3 livres de l'éventail
     dico: { vitesse: 4.5, degats: 22, rebonds: 3, preavis: 0.8 },   // le dictionnaire rebondit sur les murs (pas sur les tables)
     copies: { nombre: 5, vitesse: 3, degats: 7, ecart: 0.22 },   // copies d'interro : lentes, en vague
-    mur: { vitesse: 2.4, degats: 12, ecart: 0.42, trou: 1.5, preavis: 1.1 },   // mur de copies : toute la largeur, UN trou ; passe au-dessus des tables
+    mur: { vitesse: 2.4, degats: 12, ecart: 0.3, trou: 1.6, preavis: 1.1 },   // mur de copies : toute la largeur, UN trou ; passe au-dessus des tables
     craies: { nombre: 5, intervalle: 0.11, vitesse: 9, degats: 4, dispersion: 0.07, preavis: 0.55 },   // rapides, petits dégâts
     aimant: { duree: 2, force: 2.4, preavis: 0.8, degats: 15 },   // « AU TABLEAU ! » : il t'attire (force < ta vitesse : cours vers le fond)
     confisque: { portee: 2.8, duree: 8, preavis: 0.7 },   // « CONFISQUÉ ! » : trop près, il prend ton arme

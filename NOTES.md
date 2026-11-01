@@ -1112,6 +1112,11 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   Sons ajoutés (`generer_sons.py`, à la fin : la foule n'est pas changée) : craie, papier, alarme.
   Testé (navigateur, sans bot de jeu complet) : toutes les attaques et les 3 phases sans erreur. À faire : faire
   jouer Fabien, équilibrer, puis A (le lycée).
+- CORRECTIONS D'AFFICHAGE (retour Fabien « beaucoup de bugs d'affichage ») : élève + table = UNE seule image
+  (`te_<k>_<pose>`, fabriquée dans `creerDecor`, le type de la table change selon la pose) → plus d'élève qui passe
+  devant / derrière sa table ; sarbacane en main dessinée (petit stylo tenu), plus l'image géante ; titre « JULIEN,
+  LE PROF » à gauche de la barre (le bouton II la cachait) ; annonces plus haut (elles cachaient Julien) ; mur de
+  copies plus dense et plus gros ; il se retourne seulement quand le mur (1,6 s) ou le dico (0,8 s) est parti.
 - IMAGES DE JULIEN LIVRÉES (photo du vrai Julien → portrait → corps entier `julien_reference.jpg` → 2 planches de
   4 poses `julien_prof_1/2.jpg`). Découpe : `python3 outils/julien/decouper_prof.py` (zones EXCLURE : texte
   « ART CLASS 101 » et livres volants effacés) → `julien_julien_<pose>.png` (marche0/1, bras, lance, touche, dos,

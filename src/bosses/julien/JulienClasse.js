@@ -65,7 +65,26 @@ export class JulienClasse extends JulienManif {
       const img = (n) => this.textures.exists('julien_' + n) ? this.textures.get('julien_' + n).getSourceImage() : null;
       for (const n of OBJETS_IMAGES) { const i = img(n); if (i) { T.spr[n] = i; T.hauteurs[n] = HAUTEURS_IMAGES_CLASSE[n]; } }
       for (const n of ELEVES_IMAGES) { const i = img(n); if (i) T.spr[n] = i; }
-      T.main.sarbacane = T.spr.sarbacane;
+      // chaque élève assis derrière SA table : une seule image (pas d'élève qui passe devant / derrière la table)
+      const tb = T.spr.table, ppu = tb.height / T.hauteurs.table;
+      for (let k = 0; k < 4; k++) for (const p of ['content', 'cache']) {
+        // l'élève est un peu plus grand et assis plus haut que le bas de la table : on voit son buste au-dessus
+        const el = T.spr[`eleve_${k}_${p}`], sh = 1.0 * ppu, sw = el.width * sh / el.height, leve = 0.16 * ppu;
+        const c = document.createElement('canvas'); c.width = Math.ceil(Math.max(tb.width, sw)); c.height = Math.ceil(Math.max(sh + leve, tb.height));
+        const g = c.getContext('2d');
+        g.drawImage(el, (c.width - sw) / 2, c.height - sh - leve, sw, sh);
+        g.drawImage(tb, (c.width - tb.width) / 2, c.height - tb.height);
+        T.spr[`te_${k}_${p}`] = c; T.hauteurs[`te_${k}_${p}`] = c.height / ppu;
+      }
+      // la sarbacane en main : un stylo vidé tenu dans la main, pointé vers le viseur
+      const m = document.createElement('canvas'); m.width = 105; m.height = 120;
+      const gm = m.getContext('2d');
+      gm.lineCap = 'round'; gm.strokeStyle = '#2f5fd0'; gm.lineWidth = 9; gm.beginPath(); gm.moveTo(78, 104); gm.lineTo(22, 22); gm.stroke();
+      gm.strokeStyle = '#e8ecf4'; gm.lineWidth = 3; gm.beginPath(); gm.moveTo(70, 90); gm.lineTo(26, 27); gm.stroke();
+      gm.fillStyle = '#1c2a6a'; gm.fillRect(62, 100, 43, 20);   // manche
+      gm.fillStyle = '#e8b48a'; gm.beginPath(); gm.ellipse(72, 96, 17, 13, -0.6, 0, Math.PI * 2); gm.fill();   // main
+      gm.fillStyle = '#c99470'; gm.fillRect(60, 86, 18, 4);
+      T.main.sarbacane = m;
       // bureau renversé (phase 3) : le bureau la tête en bas, pieds en l'air
       const b = T.spr.bureau, c = document.createElement('canvas'); c.width = b.width; c.height = b.height;
       const g = c.getContext('2d'); g.translate(0, b.height); g.scale(1, -1); g.drawImage(b, 0, 0);
@@ -88,10 +107,10 @@ export class JulienClasse extends JulienManif {
     this.lblFlics.setText('JULIEN');
     this.lblLycee.setText('PHASE');
     this.txtPhase = texte(this, 868, VUE_H * 2 + 58, '', 32, '#ffd84a');
-    this.txtBoss = texte(this, LARGEUR / 2, 14, 'JULIEN, LE PROF', 16, '#ffd84a').setStroke('#000', 4).setDepth(5);
+    this.txtBoss = texte(this, LARGEUR / 2 - 212, 34, 'JULIEN, LE PROF', 16, '#ffd84a').setOrigin(1, 0.5).setStroke('#000', 4).setDepth(5);   // à gauche de la barre (le bouton II est au milieu)
     this.txtMsg.setY(66);   // les répliques sous la barre de vie de Julien
-    this.txtAnnonce = texte(this, LARGEUR / 2, 150, '', 30, '#ffd84a').setStroke('#000', 6).setDepth(5);   // l'attaque qui arrive
-    this.txtConseil = texte(this, LARGEUR / 2, 186, '', 16, '#ffffff').setStroke('#000', 4).setDepth(5);
+    this.txtAnnonce = texte(this, LARGEUR / 2, 102, '', 30, '#ffd84a').setStroke('#000', 6).setDepth(5);   // l'attaque qui arrive
+    this.txtConseil = texte(this, LARGEUR / 2, 130, '', 16, '#ffffff').setStroke('#000', 4).setDepth(5);
     this.txtEleves = texte(this, LARGEUR / 2, VUE_H * 2 - 24, '', 16, '#9fd8ff').setStroke('#000', 4).setDepth(5);
     this.annonceT = 0; this.elevesT = 0;
     this.dessiner(0);
@@ -146,7 +165,7 @@ export class JulienClasse extends JulienManif {
       const o = { type, x: px, y: py, solide: !!RAYONS_CLASSE[type], rayon: RAYONS_CLASSE[type] || 0.3, actif: true, n: 0 };
       this.objets.push(o);
       if (type === 'bureau') this.bureau = o;
-      if (c === 'e') this.eleves.push({ x: px, y: py - 0.5, k: this.eleves.length % 4, t: 0, ph: Math.random() * 6 });   // assis à sa table
+      if (c === 'e') { o.type = `te_${this.eleves.length % 4}_content`; } if (c === 'e') this.eleves.push({ x: px, y: py, k: this.eleves.length % 4, t: 0, ph: Math.random() * 6, table: o });   // assis à sa table (une seule image : élève + table)
       return '.';
     }).join(''));
     this.sortie = null; this.sortieCases = new Set();
@@ -155,11 +174,6 @@ export class JulienClasse extends JulienManif {
     this.zonesVues = new Set(); this.portailOuvert = true; this.temps = 0;
   }
 
-  // les élèves assis ne se traversent pas (mais ne bloquent pas les tirs : ce ne sont pas des objets solides)
-  libre(x, y, r, ignore) {
-    if (!super.libre(x, y, r, ignore)) return false;
-    return !(this.eleves || []).some(e => Math.hypot(e.x - x, e.y - y) < r + 0.25);
-  }
 
   // la sarbacane (une arme, pas une recharge) ; une arme confisquée ne se ramasse pas en attendant
   ramasser() {
@@ -336,7 +350,7 @@ export class JulienClasse extends JulienManif {
       return;
     }
     this.lancerMotif(e, voit);
-    e.etat = 'lance'; e.t = 0.35;
+    e.etat = 'lance'; e.t = e.motif === 'mur' ? 1.6 : e.motif === 'dico' ? 0.8 : 0.35;   // il se retourne quand le mur / le dico est passé
   }
 
   // fin d'une attaque : après une grosse (ou parfois une petite en phase 2-3), il se retourne au tableau
@@ -451,7 +465,12 @@ export class JulienClasse extends JulienManif {
     const C = RG.classe;
     this.annonceT -= dt; if (this.annonceT <= 0) { this.txtAnnonce.setText(''); this.txtConseil.setText(''); }
     this.elevesT -= dt; if (this.elevesT <= 0) this.txtEleves.setText('');
-    for (const el of this.eleves) el.t -= dt;
+    // les élèves (dessinés AVEC leur table) : contents (bras en l'air) quand ça bouge pour toi, cachés quand ça chauffe
+    const chaud = this.noir || this.alarme || this.julien.etat === 'aimant';
+    for (const el of this.eleves) {
+      el.t -= dt;
+      el.table.type = `te_${el.k}_${el.t > 0 || (!chaud && this.julien.phase === 1) ? 'content' : 'cache'}`;
+    }
     if (this.confisque && (this.confisque.t -= dt) <= 0) {   // il te rend ton arme
       const id = this.confisque.id; this.confisque = null;
       this.j.armes.add(id); this.message(`Julien te rend tes ${armeDe(id).nom.toLowerCase()}. « Et que je ne vous y reprenne pas ! »`, 2.5);
@@ -572,14 +591,7 @@ export class JulienClasse extends JulienManif {
     const s = this.T.spr, H = this.T.hauteurs;
     for (const b of this.livres) {
       const g = b.genre === 'mur' ? 'copie' : b.genre;
-      liste.push({ x: b.x, y: b.y, toile: s[g], haut: H[g], z: (b.genre === 'mur' ? 0.55 : 0.42) + (b.genre !== 'craie' ? Math.sin(b.t * 9 + b.ph) * 0.04 : 0) });
-    }
-    // les élèves : contents (bras en l'air) quand ça bouge pour toi, cachés quand ça chauffe
-    const chaud = this.noir || this.alarme || this.julien.etat === 'aimant';
-    for (const el of this.eleves) {
-      const pose = el.t > 0 || (!chaud && this.julien.phase === 1) ? 'content' : 'cache';
-      const saut = pose === 'content' && el.t > 0 ? Math.abs(Math.sin(this.time.now / 140 + el.ph)) * 0.04 : 0;
-      liste.push({ x: el.x, y: el.y, toile: s[`eleve_${el.k}_${pose}`], haut: H.eleve, z: saut });
+      liste.push({ x: b.x, y: b.y, toile: s[g], haut: b.genre === 'mur' ? 0.3 : H[g], z: (b.genre === 'mur' ? 0.3 : 0.42) + (b.genre !== 'craie' ? Math.sin(b.t * 9 + b.ph) * 0.04 : 0) });
     }
   }
 
