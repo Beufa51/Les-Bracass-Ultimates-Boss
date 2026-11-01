@@ -8,8 +8,8 @@ export const REGLAGES = {
   joueur: {
     vitesse: 120,      // V32 : 130 avant — marche (px/s) : silencieuse — LENTE, comme une infiltration
     sprint: 200,       // Z : plus rapide, mais les gardes proches T'ENTENDENT
-    pas: 60,           // V49 : px parcourus pour UN cycle de marche complet (2 pas) — calé sur l'écart des pieds de Snake (72 avant)
-    pasFace: 60,       // V77 : planches face (11 images) / dos (12) = UN cycle de 2 pas → un pas / 30 px
+    pas: 70,           // V81 : 60 → 70 (jambes un peu trop rapides de profil) — V49 : px parcourus pour UN cycle de marche complet (2 pas) — calé sur l'écart des pieds de Snake (72 avant)
+    pasFace: 70,       // V81 : 60 → 70 (un pas / 35 px) — V77 : planches face (11 images) / dos (12) = UN cycle de 2 pas → un pas / 30 px
     pasCourse: 100,    // V51 : px pour un cycle de COURSE complet (sprint de profil) — plus petit = jambes plus rapides
     balancement: 1.5,  // V74 : px dont le corps se décale vers le pied posé (marche de face/dos)
     penche: 0.04,      // V74 : rad dont il penche vers le pied posé (≈ 2°)

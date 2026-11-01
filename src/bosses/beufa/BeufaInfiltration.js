@@ -980,12 +980,12 @@ export class BeufaInfiltration extends BossScene {
     // V74 : de FACE et de DOS, la planche bouge à peine les jambes → on ajoute le TRANSFERT DE POIDS d'un pied sur
     // l'autre : le corps se décale et penche légèrement du côté du pied posé, une fois à chaque pas (30 px)
     const faceDos = this.heroBouge && (cle === 'beufa_heros' || cle === 'beufa_heros_dos');
-    const appui = faceDos ? Math.sin((this.joueur.distPas || 0) / R.joueur.pas * 2 * Math.PI) : 0;
+    const appui = faceDos ? Math.sin((this.joueur.distPas || 0) / R.joueur.pasFace * 2 * Math.PI) : 0;   // V81 : calé sur la planche face/dos
     this.sprJoueur.setFrame(imageH).setFlipX(miroir)
       // V80 : de profil, PAS de rebond ajouté : les poses ont leur propre descente (genou plié), il la contrariait
       // V72 : Snake 58 px (70 avant, trop grand face aux décors) : centre à y-4 → pieds toujours à y+25
       // V49 : debout, il MONTE un peu à chaque pas (au passage des jambes) — le rebond que la planche n'a pas
-      .setPosition(this.joueur.x + appui * R.joueur.balancement, this.joueur.y - 4 - (this.heroBouge && cle !== 'beufa_heros_profil' ? R.joueur.rebond * Math.abs(Math.sin((this.joueur.distPas || 0) / R.joueur.pas * 2 * Math.PI)) : 0))
+      .setPosition(this.joueur.x + appui * R.joueur.balancement, this.joueur.y - 4 - (this.heroBouge && cle !== 'beufa_heros_profil' ? R.joueur.rebond * Math.abs(Math.sin((this.joueur.distPas || 0) / R.joueur.pasFace * 2 * Math.PI)) : 0))
       .setRotation(appui * R.joueur.penche)
       .setDepth(profondeurY(this.joueur.y + 25))   // V56 : tri par les pieds (vue 3/4)
       .setScale(1, 1 + (this.heroBouge ? 0 : Math.sin(this.temps * 2.2) * 0.015));

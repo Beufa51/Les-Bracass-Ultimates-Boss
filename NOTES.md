@@ -849,3 +849,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   (lignes 25-45 %). Mesuré : buste stable à 0,4 px près.
 - `echelleCommune: 'hauteur'` (V79) grossissait de 7 % la pose genou plié → retour à l'échelle commune, pieds au
   sol : Snake s'abaisse naturellement de 4 px. Le rebond ajouté par le code est coupé de profil (il le contrariait).
+
+## BEUFA — V81 : JAMBES DE SNAKE UN PEU PLUS LENTES
+- `pas` (profil) et `pasFace` (face/dos) 60 → 70 : un pas tous les 35 px au lieu de 30 (−15 % de cadence),
+  vitesse de déplacement inchangée. Balancement et rebond de face/dos calés sur `pasFace`. Réglage à affiner en jouant
+  (plus grand = jambes plus lentes ; au-delà de ~80 les pieds glissent).
