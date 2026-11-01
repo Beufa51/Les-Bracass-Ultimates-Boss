@@ -81,6 +81,7 @@ export const MANIFESTE = {
     beufa_attrape: { fichier: null, provisoire: { frequence: 150, duree: 0.4 } },
     beufa_pierre:  { fichier: null, provisoire: { frequence: 320, duree: 0.09 } },
     beufa_verrou:  { fichier: null, provisoire: { frequence: 210, duree: 0.25 } },
+    beufa_flaque:  { fichier: null, provisoire: { frequence: 980, duree: 0.06 } },   // V68 : « plic » dans une flaque
     beufa_reussi:  { fichier: null, provisoire: { frequence: 740, duree: 0.3 } },
   },
 };

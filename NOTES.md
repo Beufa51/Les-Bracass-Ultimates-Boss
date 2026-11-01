@@ -747,3 +747,11 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - `propositions/beufa_recherche_metal_gear.md` : 9 principes de Metal Gear + 5 propositions de gameplay (A flaques
   bruyantes, B conduit d'aération, C objet dans le danger, D gardes qui se couvrent dans la cour, E angle mort sous
   la caméra) → À VALIDER par Fabien.
+
+## BEUFA — V68 : FLAQUES BRUYANTES (A) + ANGLE MORT SOUS LA CAMÉRA (E) — validés par Fabien
+- A (Metal Gear 2) : marcher DANS une flaque (`beufa_flaque` des `decorsSol`, ellipse 30×17 sous les pieds) =
+  « plic » (son provisoire 980 Hz) + ronds dans l'eau + `bruit(R.joueur.bruitFlaque = 150)` (les gardes en ronde
+  à < 150 px se tournent vers Snake). Une fois toutes les 0,45 s. Les 2 flaques de la cour sont sur les variantes
+  ouest et est. Astuce de la cour mise à jour.
+- E (MGS) : le halo de la caméra du QG part de y 130 (avant 60) → collé au mur nord sous la caméra, on n'est
+  jamais dans le halo. Astuce du QG mise à jour. Testé dans le jeu (Playwright) : 1 bruit en traversant une flaque.

@@ -12,6 +12,7 @@ export const REGLAGES = {
     pasCourse: 100,    // V51 : px pour un cycle de COURSE complet (sprint de profil) — plus petit = jambes plus rapides
     rebond: 1.5,       // V49 : px dont il monte à chaque pas (0 = aucun)
     rayon: 10,      // V25 : on frôle les caisses SANS être bloqué — les couloirs redeviennent passables
+    bruitFlaque: 150,  // V68 : rayon (px) dans lequel un garde entend Snake marcher dans une flaque
     bruit: 180,        // V32 : 130 avant — rayon (px) dans lequel un garde entend le sprint
     pierres: 0,        // V28 : la pierre est SUPPRIMÉE (proposition du game designer)
     porteePierre: 300, // elle VOLE LOIN : détourner un garde sans entrer dans son cône
@@ -214,7 +215,7 @@ export const PIECES = [
     caisses: [],
     tables: [ [760, 270] ],                           // LA TABLE DES CARTES : le stratège en fait le tour
     projecteurs: [
-      { tour: [300, 14], depart: [300, 60], arrivee: [300, 480], phase: 3, camera: true },   // LE PORTIQUE de l'antichambre — V67 : une CAMÉRA (dedans, pas de projecteur), même balayage
+      { tour: [300, 14], depart: [300, 130], arrivee: [300, 480], phase: 3, camera: true },   // V68 : départ 60 → 130 = L'ANGLE MORT sous la caméra (collé au mur nord, elle ne te voit pas)   // LE PORTIQUE de l'antichambre — V67 : une CAMÉRA (dedans, pas de projecteur), même balayage
     ],
     gardes: [
       { chemin: [[560, 175], [960, 175], [960, 380], [560, 380]] },   // LE STRATÈGE : le tour de la table, en boucle (sens des aiguilles d'une montre)

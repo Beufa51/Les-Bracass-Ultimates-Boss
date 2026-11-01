@@ -26,10 +26,10 @@ import { jouerSon } from '../../core/ressources.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { installerJoystick } from '../lionel/joystick.js';   // V29 : le même joystick que Lionel (lu seulement, pas modifié)
 const ASTUCES = [
-  'Reste hors des cônes — passe dans leur DOS',
+  'Reste hors des cônes — passe dans leur DOS. Évite les FLAQUES : ça s\'entend !',
   'La LUMIÈRE te voit : attends-la dans une niche',
   'Le veilleur tourne la tête : file quand il regarde ailleurs',
-  'Tout ce que tu as appris… une dernière fois !',
+  'Tout ce que tu as appris… La CAMÉRA ne voit pas juste SOUS elle !',
 ];
 import { formatTemps } from '../../core/sauvegarde.js';
 import { IDENTITE, REGLAGES as R, PIECES } from './reglages.js';
@@ -136,6 +136,7 @@ export class BeufaInfiltration extends BossScene {
 
     this.alertes = 0; this.pierres = R.joueur.pierres; this.temps = 0; this.pierre = null;
     this.poussieres = []; this.prochPoussiere = 0;   // les petits nuages des pas (V10)
+    this.ronds = [];   // V68 : les ronds dans l'eau quand Snake marche dans une flaque
 
     // le HUD
     this.hudTitre = texte(this, 18, 20, '', 20, '#ffd84a', { fontStyle: 'bold' }).setOrigin(0, 0.5).setDepth(900);
@@ -462,6 +463,7 @@ export class BeufaInfiltration extends BossScene {
       if (cle === 'beufa_lampadaire') this.lampes.push({ x: x + (c[5] || 0), y: y + h / 2 - img.height + 14 });   // V66 : la TÊTE de la lampe
     }
     // V52 : le DÉCOR AU SOL (barrière, flaques…) : sous le joueur, ne bloque ni le passage ni la vue
+    this.flaques = (P.decorsSol || []).filter((d) => d[2] === 'beufa_flaque').map(([x, y]) => ({ x, y }));   // V68 : elles font du bruit
     for (const [x, y, cle, alpha] of (P.decorsSol || [])) this.decor.push(this.add.image(x, y, cle).setDepth(8).setAlpha(alpha || 1));   // alpha : l'huile, trop noire, ne doit pas passer pour un trou
     // LE POSTE DE CONTRÔLE : les nids de sacs de sable
     for (const [x, y] of (P.sacs || [])) this.ajouterObstacle('beufa_sacs', x, y, 64, 44);
@@ -598,6 +600,14 @@ export class BeufaInfiltration extends BossScene {
     if (dx || dy) {
       this.joueur.angle = Math.atan2(dy, dx);
       if (sprint) this.bruit();   // le sprint s'entend : les gardes proches se tournent vers toi
+      // V68 (Metal Gear 2 : les sols bruyants) : marcher DANS une flaque fait « plic » — contourne-la
+      const fl = (this.flaques || []).find((f) => ((this.joueur.x - f.x) / 30) ** 2 + ((this.joueur.y + 20 - f.y) / 17) ** 2 < 1);
+      if (fl && this.temps > (this.prochPlic || 0)) {
+        this.prochPlic = this.temps + 0.45;
+        this.bruit(R.joueur.bruitFlaque);
+        jouerSon(this, 'beufa_flaque');
+        this.ronds.push({ x: this.joueur.x, y: this.joueur.y + 20, t: 0 });
+      }
     }
     if (vientDAppuyer(t.x) && this.pierres > 0) this.lancerPierre();
     // LA SORTIE : la porte au nord (pièce suivante)… ou LA PORTE DU QG (victoire)
@@ -640,9 +650,9 @@ export class BeufaInfiltration extends BossScene {
     return false;
   }
 
-  bruit() {
+  bruit(rayon = R.joueur.bruit) {
     for (const g of this.gardes) {
-      if (g.etat === 'ronde' && Math.hypot(g.x - this.joueur.x, g.y - this.joueur.y) < R.joueur.bruit) {
+      if (g.etat === 'ronde' && Math.hypot(g.x - this.joueur.x, g.y - this.joueur.y) < rayon) {
         g.angle = Math.atan2(this.joueur.y - g.y, this.joueur.x - g.x);
         g.jauge = Math.max(g.jauge, 0.2);
       }
@@ -900,6 +910,13 @@ export class BeufaInfiltration extends BossScene {
     this.poussiereG.clear();
     for (const p of this.poussieres) p.t += dt;
     this.poussieres = this.poussieres.filter(p => p.t < p.duree);
+    for (const r of this.ronds) r.t += dt;
+    this.ronds = this.ronds.filter((r) => r.t < 0.6);
+    for (const r of this.ronds) {   // V68 : deux ronds qui s'élargissent : « ici, ça fait du bruit »
+      const k = r.t / 0.6;
+      this.poussiereG.lineStyle(2, 0xbfe0ff, 0.7 * (1 - k)).strokeEllipse(r.x, r.y, 20 + 40 * k, 10 + 20 * k);
+      if (k > 0.3) this.poussiereG.lineStyle(1, 0xbfe0ff, 0.5 * (1 - k)).strokeEllipse(r.x, r.y, 8 + 40 * (k - 0.3), 4 + 20 * (k - 0.3));
+    }
     for (const p of this.poussieres) {
       const k = p.t / p.duree;
       this.poussiereG.fillStyle(0x9aa4b4, 0.42 * (1 - k));
