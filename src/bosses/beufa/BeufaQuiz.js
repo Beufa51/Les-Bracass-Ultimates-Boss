@@ -55,7 +55,7 @@ export class BeufaQuiz extends BossScene {
     // Un peu plus grande que l'écran (1000×562) : les secousses de Beufa ne montrent jamais de bord.
     if (this.textures.exists('beufa_bureau_scene')) {
       this.scene_ = true;
-      this.busteY = HAUTEUR / 2;
+      this.busteY = HAUTEUR / 2 - 30;   // V87 : remontée pour que ses mains restent au-dessus du codec
       this.buste = this.add.image(LARGEUR / 2, this.busteY, this.masque ? 'beufa_bureau_scene_masque' : 'beufa_bureau_scene');
       return;
     }
@@ -124,9 +124,10 @@ export class BeufaQuiz extends BossScene {
       this.add.rectangle(x, 24, 38, 34, 0x000000, 0.6).setStrokeStyle(2, 0x888888).setDepth(60);
       return texte(this, x, 24, '✕', 30, '#ff3838').setDepth(61).setVisible(false);
     });
-    this.chronoFond = this.add.rectangle(LARGEUR / 2, 52, 404, 12, 0x000000, 0.7).setStrokeStyle(1, 0x888888).setDepth(60).setVisible(false);
-    this.chronoBarre = this.add.rectangle(LARGEUR / 2 - 200, 52, 400, 8, VERT).setOrigin(0, 0.5).setDepth(61).setVisible(false);
-    this.chronoTexte = texte(this, LARGEUR / 2 + 230, 52, '', 16, '#ffffff').setOrigin(0, 0.5).setDepth(61);
+    // V87 : le chrono en haut à gauche (au centre, il passait sur le visage de Beufa)
+    this.chronoFond = this.add.rectangle(170, 52, 304, 12, 0x000000, 0.7).setStrokeStyle(1, 0x888888).setDepth(60).setVisible(false);
+    this.chronoBarre = this.add.rectangle(20, 52, 300, 8, VERT).setOrigin(0, 0.5).setDepth(61).setVisible(false);
+    this.chronoTexte = texte(this, 332, 52, '', 16, '#ffffff').setOrigin(0, 0.5).setDepth(61);
   }
 
   // ---------- le dialogue (machine à écrire) ----------
@@ -333,7 +334,7 @@ export class BeufaQuiz extends BossScene {
     if (this.etape === 'question') {
       this.reste -= dt;
       const k = Math.max(0, this.reste / R.quiz.temps);
-      this.chronoBarre.width = 400 * k;
+      this.chronoBarre.width = 300 * k;
       this.chronoBarre.setFillStyle(this.reste < 10 ? 0xff3838 : VERT);
       this.chronoTexte.setText(Math.ceil(Math.max(0, this.reste)) + ' s');
       if (this.reste < 10 && this.dernierTic === 99) this.visage('machiavelique');   // il savoure ton stress

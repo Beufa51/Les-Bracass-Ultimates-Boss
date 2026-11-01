@@ -898,3 +898,7 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - `beufa_bureau_scene(_masque).jpg` (Fabien, pixel art couleur) en fond plein écran (1000×562, un peu plus grand
   que l'écran pour que les secousses ne montrent pas de bord). Si présentes, elles remplacent bureau dessiné,
   bannières, plantes et buste (`this.scene_`) ; le rideau passe de l'une à l'autre. Ancien décor gardé en secours.
+
+## BEUFA — V87 : NOUVELLE SCÈNE SANS MASQUE (choix de Fabien)
+- `beufa_bureau_scene.jpg` remplacée ; scène remontée de 30 px (mains visibles au-dessus du codec) ;
+  chrono déplacé en haut à gauche, 300 px de large (au centre il passait sur le visage).
