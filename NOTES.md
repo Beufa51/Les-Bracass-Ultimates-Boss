@@ -828,3 +828,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   genou monte puis redescende : face = 8,0,9,4,2,1,6,7,4,3,5 (11 images), dos = 3,2,7,4,0,5,6,1,6,0,9,8 (12).
   Un cycle = 2 pas (`pasFace: 60`) → une image tous les ~5 px. Arrêt : face image 3, dos image 4 (pieds à plat).
 - Vérifié dans le jeu : 11 images chargées, image changée à chaque 6 px.
+
+## BEUFA — V78 : SNAKE ENTIER (tête de dos, pieds de face)
+- Chargeur : aux genoux (face) et au cou (dos), aucune ligne n'a de trait d'encre long → la rangée était coupée en
+  2 BANDES (comme 2 rangées de persos) et on perdait la tête ou les pieds. Les bandes reliées par des lignes d'encre
+  sont maintenant FUSIONNÉES. Vérifié sur les textures du jeu : face, dos et gardes entiers.

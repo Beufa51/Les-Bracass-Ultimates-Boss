@@ -303,6 +303,11 @@ export class BeufaInfiltration extends BossScene {
           while (bd[1] < bas && encre(bd[1] + 1)) bd[1]++;
           while (bd[0] > haut && encre(bd[0] - 1)) bd[0]--;
         });
+        // V78 : deux bandes reliées par des lignes d'encre = LE MÊME personnage (cou fin de dos, jambes écartées de
+        // face : aucune ligne n'y a de trait long) → on les fusionne, sinon la tête ou les pieds sautaient
+        for (let i = 0; i + 1 < bandes.length;) {
+          if (bandes[i + 1][0] - bandes[i][1] <= 1) { bandes[i][1] = bandes[i + 1][1]; bandes.splice(i + 1, 1); } else i++;
+        }
         const vus = [];
         for (const bd of bandes) {
           let s = -1;
