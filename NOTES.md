@@ -1078,6 +1078,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   faisait « plonk » (surtout avec le café) → `bouclierBaisse(e)` ; le lanceur caché derrière un mur visait ta position
   ACTUELLE à travers les murs → il vise là où il t'a vu (`vuX`, `vuY`). Aucune erreur dans la console. Plaisir : rien de
   bloquant, le niveau 1 est jugé prêt (restent en option : BAC, LBD, policiers en hauteur, sono, clé + porte).
+- BUG ANDROID (rectangle de sol gris périmé quand on s'arrête, vu sur le téléphone de Fabien, pas reproduit en
+  émulation) : le sol n'est plus écrit par putImageData dans la vue (toile accélérée par la carte graphique) ; il est
+  calculé sur une petite toile à part (`willReadFrequently`) puis collé par drawImage (`raycaster.js`, fonction sol).
 - RETOUR FABIEN (manif) « les CRS disparaissent n'importe où, trop dur, pas assez de soins » → CORRIGÉ :
   fuite : le policier prend la direction la plus dégagée qui l'éloigne de toi (`directionFuite`, 16 directions) et ne
   disparaît que quand tu ne le vois plus (`visible` : dans le champ de vision et pas derrière un mur) — `RG.fuite`.

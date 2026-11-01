@@ -59,7 +59,14 @@ function sol(ctx, l, h, mi, cam, decor) {
       fx += pasX; fy += pasY;
     }
   }
-  ctx.putImageData(S.image, 0, mi);
+  // le sol est calculé sur une petite toile À PART (gérée par le processeur), puis collée d'un bloc : écrire les pixels
+  // directement dans la vue (putImageData) laissait des morceaux de sol périmés sur les téléphones Android
+  if (!S.toile) {
+    S.toile = document.createElement('canvas'); S.toile.width = S.image.width; S.toile.height = S.image.height;
+    S.ctxToile = S.toile.getContext('2d', { willReadFrequently: true });
+  }
+  S.ctxToile.putImageData(S.image, 0, 0);
+  ctx.drawImage(S.toile, 0, mi);
   ctx.fillStyle = S.brume; ctx.fillRect(0, mi, l, h - mi);   // plus sombre au loin
 }
 
