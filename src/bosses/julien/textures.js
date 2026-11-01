@@ -249,3 +249,54 @@ export function texturesMain() {
   });
   return { tient: main(false), lance: main(true) };
 }
+
+// ---------------------------------------------------------------- vraies images (assets/sprites/julien/)
+// Faites par outils/julien/decouper_planches.py à partir des planches de assets_inbox/julien/.
+// Une image absente de cette liste garde son dessin provisoire ci-dessus.
+const SPRITES = [
+  ...['marche0', 'marche1', 'bras', 'lance', 'touche', 'fuite'].map(p => 'lanceur_' + p),
+  ...['marche0', 'marche1', 'cri', 'charge', 'essouffle', 'touche', 'fuite'].map(p => 'bouclier_' + p),
+  ...[0, 1, 2, 3, 4, 5, 6, 7].map(n => 'manifestant_' + n),
+  'barriere', 'poubelle', 'oeufs', 'sandwich', 'oeuf', 'splat', 'grenade', 'nuage',
+];
+const MURS = { 1: 'mur_briques' };   // à compléter quand les autres murs arrivent (2 immeuble, 3 boutique, 4 tag, 5 palissade, 6 lycée, 7 portail)
+const MAINS = { tient: 'main_tient', lance: 'main_lance' };
+// hauteur dans le monde (1 = un mur) avec les vraies images : leur cadre inclut bras levés, pancartes, fumée…
+const HAUTEURS_IMAGES = { lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barriere: 0.45, poubelle: 0.5, oeufs: 0.2,
+  sandwich: 0.1, oeuf: 0.08, splat: 0.12, grenade: 0.16, nuage: 1.0 };
+export const HAUTEURS_PROVISOIRES = { lanceur: 0.82, bouclier: 0.86, manifestant: 1.0, barriere: 0.42, poubelle: 0.5, oeufs: 0.18,
+  sandwich: 0.14, oeuf: 0.08, splat: 0.1, grenade: 0.1, nuage: 0.9 };
+
+const tous = () => [...SPRITES, ...Object.values(MURS), ...Object.values(MAINS), 'tetes'];
+
+// dans preload() : demande le chargement des images (une seule fois)
+export function chargerImages(scene) {
+  for (const n of tous()) if (!scene.textures.exists('julien_' + n)) scene.load.image('julien_' + n, `assets/sprites/julien/julien_${n}.png`);
+}
+
+// dans create() : remplace les dessins provisoires par les images chargées ; renvoie le nombre de manifestants différents
+export function appliquerImages(scene, T) {
+  const img = (n) => scene.textures.exists('julien_' + n) ? scene.textures.get('julien_' + n).getSourceImage() : null;
+  T.hauteurs = { ...HAUTEURS_PROVISOIRES };
+  let manif = 4;
+  for (const n of SPRITES) {
+    const i = img(n);
+    if (!i) continue;
+    T.spr[n] = i;
+    const type = n.split('_')[0];
+    if (HAUTEURS_IMAGES[type]) T.hauteurs[type] = HAUTEURS_IMAGES[type];
+    if (type === 'manifestant') manif = Math.max(manif, +n.split('_')[1] + 1);
+  }
+  for (const [code, n] of Object.entries(MURS)) { const i = img(n); if (i) T.murs[code] = i; }
+  for (const [pose, n] of Object.entries(MAINS)) { const i = img(n); if (i) T.main[pose] = i; }
+  T.main.image = !!img('main_tient');
+  T.nbManif = manif;
+  // tête du héros : planche de 20 cases sur une ligne → 20 images de la texture Phaser
+  T.tetes = false;
+  if (scene.textures.exists('julien_tetes')) {
+    const tex = scene.textures.get('julien_tetes');
+    const src = tex.getSourceImage(), fw = src.width / 20;
+    if (!tex.has(0)) for (let k = 0; k < 20; k++) tex.add(k, 0, k * fw, 0, fw, src.height);
+    T.tetes = true;
+  }
+}

@@ -968,7 +968,13 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   TÉLÉPHONE (`tactileFps.js`, demande « intuitif ») : joystick pouce gauche (avancer/reculer/pas de côté, à fond =
   courir), glisser à droite = tourner (réglage `glisser`), tape à droite ou gros bouton ŒUF = lancer ; croix cachée en jeu.
 - PROMPTS DES IMAGES : `propositions/julien_prompts_images.md` (style Doom 93, livraison dans `assets_inbox/julien/`).
-- À FAIRE : vrais sons et images (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
+- IMAGES LIVRÉES (V1) : policier, CRS, 8 manifestants (2 planches), objets, main, tête (2 planches), mur en briques.
+  Découpe : `python3 outils/julien/decouper_planches.py` (centres des poses en tête du script ; grilles de Gemini
+  effacées ; poses d'un même perso au même cadre). Branchement : `textures.js` (listes SPRITES / MURS / MAINS,
+  HAUTEURS_IMAGES) ; image absente = dessin provisoire. Tête : `julien_tetes.png` = 20 cases (5 niveaux × g/face/d,
+  puis aïe g, aïe d, tousse, content, KO) ; regards manquants de la planche Gemini = miroir (liste TETES du script).
+  CRS : 10 poses livrées, 7 utilisées. MANQUENT : les 6 autres murs (immeuble, boutique, tag, palissade, lycée, portail).
+- À FAIRE : vrais sons, les 6 murs manquants (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,
   dictionnaire qui rebondit ; copies d'interro sous 50 % ; on riposte avec boulettes/craies) et le badge.

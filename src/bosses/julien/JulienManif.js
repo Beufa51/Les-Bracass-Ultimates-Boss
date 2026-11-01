@@ -13,7 +13,7 @@ import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, REGLAGES as RG } from './reglages.js';
 import { PLAN_MANIF, OBJETS } from './niveau_manif.js';
 import { rendre, murEn, vueLibre } from './raycaster.js';
-import { texturesMurs, texturesSprites, texturesMain } from './textures.js';
+import { texturesMurs, texturesSprites, texturesMain, chargerImages, appliquerImages } from './textures.js';
 import { toileVisage, niveauVisage } from './visage.js';
 import { installerTactileFps } from './tactileFps.js';
 
@@ -31,9 +31,17 @@ function degrade(h, haut, bas) {
 export class JulienManif extends BossScene {
   constructor() { super('JulienManif', IDENTITE); }
 
+  preload() {
+    chargerImages(this);   // vraies images (assets/sprites/julien/), avant la barre de chargement commune
+    super.preload();
+  }
+
   create() {
-    if (!T) T = { murs: texturesMurs(), spr: texturesSprites(), main: texturesMain(),
-      ciel: degrade(VUE_H / 2, '#7f8fa3', '#c9cdd0'), sol: degrade(VUE_H / 2, '#4a4a4e', '#2a2a2c') };
+    if (!T) {
+      T = { murs: texturesMurs(), spr: texturesSprites(), main: texturesMain(),
+        ciel: degrade(VUE_H / 2, '#7f8fa3', '#c9cdd0'), sol: degrade(VUE_H / 2, '#4a4a4e', '#2a2a2c') };
+      appliquerImages(this, T);
+    }
     etiquettesTactiles({ espace: 'OK', z: null, x: null });   // intro : seulement OK (les boutons du jeu arrivent au départ)
     this.cameras.main.setBackgroundColor('#000000');
 
@@ -56,6 +64,8 @@ export class JulienManif extends BossScene {
     texte(this, 660, yb + 20, 'POLICIERS REPOUSSÉS', 14, '#c9b48a');
     this.txtFlics = texte(this, 660, yb + 58, '', 32, '#9fd0ff');
     texte(this, 868, yb + 20, 'LYCÉE', 14, '#c9b48a');
+    // tête du héros (vraie image, en haute résolution par-dessus la barre)
+    this.tete = T.tetes ? this.add.image(LARGEUR / 2, yb + 50, 'julien_tetes', 0).setDisplaySize(82, 84) : null;
     this.txtMsg = texte(this, 16, 14, '', 18, '#ffffff').setOrigin(0, 0).setStroke('#000', 4);
     this.msgT = 0;
 
@@ -389,21 +399,24 @@ export class JulienManif extends BossScene {
     const cam = { x: j.x, y: j.y, dx, dy, px: -dy * FOV, py: dx * FOV };
     const liste = [];
     for (const o of this.objets) if (o.actif) {
-      const t = o.type === 'manifestant' ? s['manifestant_' + (o.n % 4)] : s[o.type];
-      const haut = { barriere: 0.42, poubelle: 0.5, manifestant: 1.0, oeufs: 0.18, sandwich: 0.14 }[o.type];
+      const t = o.type === 'manifestant' ? s['manifestant_' + (o.n % T.nbManif)] : s[o.type];
+      const haut = T.hauteurs[o.type];
       liste.push({ x: o.x, y: o.y, toile: t, haut, z: o.type === 'manifestant' ? Math.abs(Math.sin(this.time.now / 300 + o.n)) * 0.03 : 0 });
     }
-    for (const e of this.ennemis) if (e.actif) liste.push({ x: e.x, y: e.y, toile: this.imageEnnemi(e), haut: e.type === 'bouclier' ? 0.86 : 0.82, z: 0 });
-    for (const o of this.oeufs) liste.push({ x: o.x, y: o.y, toile: s.oeuf, haut: 0.08, z: 0.42 });
-    for (const gr of this.grenades) liste.push({ x: gr.x, y: gr.y, toile: s.grenade, haut: 0.1, z: gr.z });
-    for (const sp of this.splats) liste.push({ x: sp.x, y: sp.y, toile: s.splat, haut: 0.1, z: 0.38 });
-    for (const n of this.nuages) liste.push({ x: n.x, y: n.y, toile: s.nuage, haut: 0.9 + 0.1 * Math.sin(n.t * 3), z: 0 });
+    for (const e of this.ennemis) if (e.actif) liste.push({ x: e.x, y: e.y, toile: this.imageEnnemi(e), haut: T.hauteurs[e.type], z: 0 });
+    for (const o of this.oeufs) liste.push({ x: o.x, y: o.y, toile: s.oeuf, haut: T.hauteurs.oeuf, z: 0.42 });
+    for (const gr of this.grenades) liste.push({ x: gr.x, y: gr.y, toile: s.grenade, haut: T.hauteurs.grenade, z: gr.z });
+    for (const sp of this.splats) liste.push({ x: sp.x, y: sp.y, toile: s.splat, haut: T.hauteurs.splat, z: 0.38 });
+    for (const n of this.nuages) liste.push({ x: n.x, y: n.y, toile: s.nuage, haut: T.hauteurs.nuage + 0.1 * Math.sin(n.t * 3), z: 0 });
 
     rendre(g, L, VUE_H, this.plan, cam, T.murs, liste, T.ciel, T.sol);
 
     // main qui tient l'œuf
     const bx = Math.sin(j.bob) * 5, by = Math.abs(Math.cos(j.bob)) * 4;
-    if (j.lanceT > 0) g.drawImage(T.main.lance, L / 2 + 50, VUE_H - 82, 90, 80);
+    if (T.main.image) {   // vraies images (210×240) : le bras sort du bas de l'écran
+      if (j.lanceT > 0) g.drawImage(T.main.lance, L / 2 + 30, VUE_H - 128, 112, 128);
+      else if (j.oeufs > 0) g.drawImage(T.main.tient, L / 2 + 60 + bx, VUE_H - 110 + by, 105, 120);
+    } else if (j.lanceT > 0) g.drawImage(T.main.lance, L / 2 + 50, VUE_H - 82, 90, 80);
     else if (j.oeufs > 0) g.drawImage(T.main.tient, L / 2 + 70 + bx, VUE_H - 70 + by, 90, 80);
     // voile de gaz et flash rouge
     if (j.gaz > 0) { g.fillStyle = `rgba(190,205,160,${0.5 * j.gaz})`; g.fillRect(0, 0, L, VUE_H); }
@@ -424,7 +437,11 @@ export class JulienManif extends BossScene {
     for (const x of [92, 236, 400]) { g.fillStyle = '#2c251e'; g.fillRect(x, y0 + 3, 2, H - y0 - 6); }
     // tête du héros au milieu, dans son cadre
     g.fillStyle = '#1a1612'; g.fillRect(L / 2 - 21, y0 + 3, 42, 44);
-    g.drawImage(toileVisage(niveauVisage(j.vie, RG.joueur.vie), j.regard, j.expr), L / 2 - 17, y0 + 5);
+    const niveau = niveauVisage(j.vie, RG.joueur.vie);
+    if (this.tete) {   // planche : 5 niveaux × (gauche, face, droite), puis aïe gauche, aïe droite, tousse, content, KO
+      const f = { aie: j.regard > 0 ? 16 : 15, tousse: 17, content: 18, ko: 19 }[j.expr] ?? niveau * 3 + j.regard + 1;
+      this.tete.setFrame(f);
+    } else g.drawImage(toileVisage(niveau, j.regard, j.expr), L / 2 - 17, y0 + 5);
     // boussole vers le lycée
     if (this.sortie) {
       const ang = Math.atan2(this.sortie.y - j.y, this.sortie.x - j.x) - j.a;
