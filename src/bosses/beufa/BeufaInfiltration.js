@@ -991,11 +991,25 @@ export class BeufaInfiltration extends BossScene {
         g.prochPoussiere = this.temps + 0.13;
         this.poussieres.push({ x: g.x - Math.cos(g.angle) * 7, y: g.y - Math.sin(g.angle) * 7 + 3, t: 0, duree: 0.35, r: 2.2 });
       }
-      const imageG = this.cyclePas(g, R.garde.pas, this.nbFramesGarde);   // V33 : cycle lié à la distance parcourue
-      g.sprite.setPosition(g.x, g.y).setDepth(profondeurY(g.y + 12))
-        .setRotation(g.angle + ORIENT_GARDE)
-        .setFrame(g.bouge ? imageG : this.poseArretGarde);
-      g.alerte.setPosition(g.x, g.y - 32).setScale(1 + Math.sin(this.temps * 18) * 0.12);
+      if (this.textures.exists('beufa_garde_face')) {
+        // V75 : le garde est DEBOUT en 3/4 comme Snake : on choisit la planche selon sa direction (plus de rotation)
+        const cg = Math.cos(g.angle), sg = Math.sin(g.angle);
+        let cleG = 'beufa_garde_face', arret = 2;
+        if (Math.abs(cg) > Math.abs(sg) + 0.01) { cleG = 'beufa_garde_profil'; arret = 3; }
+        else if (sg < 0) cleG = 'beufa_garde_dos';
+        if (g.sprite.texture.key !== cleG) g.sprite.setTexture(cleG);
+        const imageG = this.cyclePas(g, R.garde.pasVue, 8);
+        g.sprite.setPosition(g.x, g.y - 4).setDepth(profondeurY(g.y + 25))
+          .setRotation(0).setFlipX(cleG === 'beufa_garde_profil' && cg < 0)
+          .setFrame(g.bouge ? imageG : arret);
+        g.alerte.setPosition(g.x, g.y - 40).setScale(1 + Math.sin(this.temps * 18) * 0.12);
+      } else {
+        const imageG = this.cyclePas(g, R.garde.pas, this.nbFramesGarde);   // V33 : cycle lié à la distance parcourue
+        g.sprite.setPosition(g.x, g.y).setDepth(profondeurY(g.y + 12))
+          .setRotation(g.angle + ORIENT_GARDE)
+          .setFrame(g.bouge ? imageG : this.poseArretGarde);
+        g.alerte.setPosition(g.x, g.y - 32).setScale(1 + Math.sin(this.temps * 18) * 0.12);
+      }
       this.dessinerCone(gg, g.x, g.y, g.angle, R.garde, g.etat === 'poursuite' ? 0xff5a5a : 0xffe9a0, null);
     }
     // LE VISEUR DE LA PIERRE : là où elle tombera — viser une diversion devient un vrai choix

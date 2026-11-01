@@ -804,3 +804,11 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Vraie solution : nouvelle planche face/dos en 4 poses très marquées (prompt « SNAKE — FACE ET DOS EN 4 POSES »
   dans `propositions/beufa_prompts_marche.md`). À la livraison : découper 2 rangées × 4 → beufa_heros / _dos,
   `pasFace` 240 → 60 (4 images = 2 pas), garder balancement/penche si ça aide.
+
+## BEUFA — V75 : GARDES DEBOUT EN 3/4 (planche 3 vues livrée)
+- `assets_inbox/beufa_garde_3vues.jpg` (3 rangées × 8, espacement OK : écart mini 9 px) découpée en
+  `beufa_garde_face/_dos/_profil.jpg` (52×58, échelle commune, comme Snake). Images 5-8 = doublons de 1-4 :
+  8 images = 4 pas → `R.garde.pasVue: 120` (un pas / 30 px).
+- `afficher()` : planche choisie selon `g.angle` (profil si horizontal, miroir à gauche ; dos si vers le haut ;
+  face sinon), plus de rotation ; pose d'arrêt face/dos image 2, profil image 3 ; pieds à y+25 (tri Y comme Snake).
+  L'ancienne planche vue de dessus `beufa_garde` reste en secours si les 3 vues manquent.
