@@ -977,7 +977,16 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
 - MUSIQUE : « At Doom's Gate » (DOOM E1M1, déposée par Fabien) → `assets/audio/julien/julien_musique.mp3` (mono 64 kb/s, 1 Mo), en boucle dès l'arrivée dans le niveau.
 - AUDIT LEVEL DESIGN + DÉCORS (Fabien : « pas très jouable, faiblard ») : `propositions/julien_audit_manif.md`
   (nouveau parcours en 5 zones, portail verrouillé, cordon de CRS, tableau de fin façon Doom, murs hauts, sol texturé,
-  ciel panoramique, variantes de murs sans panneau, gros objets). En attente du choix de Fabien.
+  ciel panoramique, variantes de murs sans panneau, gros objets).
+- FAIT (étape 1 de l'audit, parcours + règles) : nouveau plan 34 × 43 en 5 zones (`outils/julien/plan_manif.py` le
+  génère et vérifie le chemin) : boulevard dans la foule (avenue bloquée par 2 camions de CRS + barrières), ruelle
+  taguée (1 CRS) OU passage commerçant (1 lanceur), place avec statue (abri), rue du lycée avec CORDON de 3 CRS,
+  parvis : portail FERMÉ jusqu'à la fuite de tous les policiers du parvis, arrivée dans la cour. 14 policiers.
+  Messages à l'entrée de chaque zone (`ZONES`), 2 murs secrets (`X`, `Z` : on pousse dedans), tableau de fin façon
+  Doom (POLICIERS / OBJETS / SECRETS / TEMPS / PAR 3:30), aide à la visée (`aide`, `aideTactile`), petit viseur,
+  alerte entre policiers (6 cases) et au bruit d'un œuf écrasé, œufs : 15 au départ, boîtes de 8 (7 boîtes).
+  Statue, camion de CRS, colonne Morris : dessins provisoires (images à demander).
+- RESTE de l'audit : étape 2 (murs hauts, sol texturé, ciel panoramique, murs sans panneau), images F, rondes des policiers.
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,

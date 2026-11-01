@@ -223,6 +223,29 @@ export function texturesSprites() {
     ovale(g, '#d39a4a', 18, 9, 16, 6); R(g, '#5fb04a', 4, 9, 28, 2); R(g, '#e2a8a0', 5, 10, 26, 2);
     for (let x = 8; x < 30; x += 6) R(g, '#b07a30', x, 5, 3, 1);
   });
+  S.statue = toile(64, 128, (g) => {   // Marianne sur son socle (place de la République)
+    R(g, '#8d8a80', 6, 84, 52, 44); R(g, '#a5a296', 6, 84, 52, 4); R(g, '#77746b', 10, 96, 44, 2);
+    R(g, '#9b988c', 12, 72, 40, 14);
+    ecrire(g, 'RF', 32, 108, 10, '#5d5a52');
+    R(g, '#3f6b5a', 24, 30, 16, 44); R(g, '#355d4e', 20, 50, 24, 24);   // robe
+    ovale(g, '#3f6b5a', 32, 24, 7, 8);                                   // tête
+    R(g, '#3f6b5a', 38, 6, 5, 28); ovale(g, '#e0b040', 40, 6, 5, 5);    // bras levé + flamme
+    R(g, '#2d4e42', 26, 18, 12, 3);                                      // bonnet
+  });
+  S.camion = toile(128, 80, (g) => {   // camion de CRS vu de face
+    R(g, '#e8ecef', 6, 8, 116, 58); R(g, '#1d3f8f', 6, 40, 116, 10);
+    R(g, '#2a3440', 14, 14, 100, 22); R(g, 'rgba(160,200,230,0.4)', 18, 16, 40, 8);
+    for (let x = 16; x < 114; x += 6) R(g, '#6a7480', x, 14, 2, 22);      // grille de protection
+    ecrire(g, 'POLICE', 64, 45, 8, '#ffffff');
+    R(g, '#c9a227', 12, 54, 14, 6); R(g, '#c9a227', 102, 54, 14, 6);      // phares
+    R(g, '#1d3f8f', 52, 2, 24, 6); R(g, '#3fa0ff', 56, 2, 6, 6); R(g, '#3fa0ff', 66, 2, 6, 6);   // gyrophares
+    R(g, '#111', 10, 66, 22, 14); R(g, '#111', 96, 66, 22, 14); R(g, '#333', 6, 62, 116, 6);
+  });
+  S.colonne = toile(40, 112, (g) => {   // colonne Morris
+    R(g, '#2f5a3a', 4, 100, 32, 12); R(g, '#2f5a3a', 8, 18, 24, 84);
+    R(g, '#f0e6c8', 10, 24, 20, 30); ecrire(g, 'CINÉ', 20, 32, 6, '#a22'); R(g, '#ffd84a', 10, 58, 20, 36); ecrire(g, 'MANIF', 20, 70, 5, '#222');
+    ovale(g, '#2f5a3a', 20, 14, 16, 6); ovale(g, '#264a30', 20, 6, 8, 6); R(g, '#264a30', 19, 0, 2, 4);
+  });
   S.oeuf = toile(10, 12, (g) => { ovale(g, '#fffaf0', 5, 6, 4, 5.5); R(g, '#fff', 3, 3, 1, 2); });
   S.splat = toile(22, 14, (g) => { ovale(g, '#fff6d8', 11, 8, 10, 5); ovale(g, '#ffc928', 12, 8, 4, 3); ovale(g, '#fff6d8', 3, 4, 2, 2); ovale(g, '#fff6d8', 19, 3, 2, 2); });
   S.grenade = toile(12, 12, (g) => { R(g, '#3b4038', 3, 2, 6, 9); R(g, '#c8b030', 3, 2, 6, 2); ovale(g, 'rgba(220,220,210,0.7)', 6, 1, 3, 2); });
@@ -266,7 +289,7 @@ const MAINS = { tient: 'main_tient', lance: 'main_lance' };
 const HAUTEURS_IMAGES = { lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barriere: 0.45, poubelle: 0.5, oeufs: 0.2,
   sandwich: 0.1, oeuf: 0.08, splat: 0.12, grenade: 0.16, nuage: 1.0 };
 export const HAUTEURS_PROVISOIRES = { lanceur: 0.82, bouclier: 0.86, manifestant: 1.0, barriere: 0.42, poubelle: 0.5, oeufs: 0.18,
-  sandwich: 0.14, oeuf: 0.08, splat: 0.1, grenade: 0.1, nuage: 0.9 };
+  sandwich: 0.14, oeuf: 0.08, splat: 0.1, grenade: 0.1, nuage: 0.9, statue: 1.7, camion: 0.95, colonne: 1.35 };
 
 const tous = () => [...SPRITES, ...Object.values(MURS), ...Object.values(MAINS), 'tetes'];
 

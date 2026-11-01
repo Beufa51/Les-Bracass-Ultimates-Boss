@@ -14,11 +14,13 @@ export const REGLAGES = {
     rayon: 0.25,         // taille du joueur pour les collisions
   },
   oeufs: {
-    depart: 12,          // œufs au départ
+    depart: 15,          // œufs au départ
     maxi: 30,
     cadence: 0.35,       // secondes entre 2 lancers
     vitesse: 9,          // vitesse de l'œuf
-    boite: 6,            // œufs dans une boîte ramassée
+    boite: 8,            // œufs dans une boîte ramassée
+    aide: 0.10,          // aide à la visée (clavier) : un œuf lancé à moins de 0,10 radian (≈ 6°) d'un policier part sur lui
+    aideTactile: 0.17,   // aide à la visée au doigt (≈ 10°)
   },
   sandwich: 25,          // vie rendue par un sandwich
   lanceur: {             // policier qui lance des lacrymos

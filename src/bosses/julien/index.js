@@ -17,6 +17,8 @@ export default {
     { groupe: 'JOUEUR', nom: 'Vitesse de rotation', objet: R.joueur, champ: 'rotation', pas: 0.2, min: 1, max: 5 },
     { groupe: 'ŒUFS', nom: 'Œufs au départ', objet: R.oeufs, champ: 'depart', pas: 1, min: 0, max: 30 },
     { groupe: 'ŒUFS', nom: 'Œufs par boîte', objet: R.oeufs, champ: 'boite', pas: 1, min: 1, max: 20 },
+    { groupe: 'ŒUFS', nom: 'Aide à la visée clavier (radians)', objet: R.oeufs, champ: 'aide', pas: 0.02, min: 0, max: 0.4 },
+    { groupe: 'ŒUFS', nom: 'Aide à la visée au doigt (radians)', objet: R.oeufs, champ: 'aideTactile', pas: 0.02, min: 0, max: 0.5 },
     { groupe: 'POLICIERS', nom: 'Lanceur : œufs pour le faire fuir', objet: R.lanceur, champ: 'vie', pas: 1, min: 1, max: 10 },
     { groupe: 'POLICIERS', nom: 'Lanceur : secondes entre 2 lacrymos', objet: R.lanceur, champ: 'cadence', pas: 0.2, min: 0.8, max: 6 },
     { groupe: 'POLICIERS', nom: 'CRS : œufs pour le faire fuir', objet: R.bouclier, champ: 'vie', pas: 1, min: 1, max: 10 },

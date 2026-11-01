@@ -12,7 +12,7 @@ import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, REGLAGES as RG } from './reglages.js';
-import { PLAN_MANIF, OBJETS } from './niveau_manif.js';
+import { PLAN_MANIF, OBJETS, SECRETS, ZONES, PARVIS, PAR } from './niveau_manif.js';
 import { rendre, murEn, vueLibre } from './raycaster.js';
 import { texturesMurs, texturesSprites, texturesMain, chargerImages, appliquerImages } from './textures.js';
 import { toileVisage, niveauVisage } from './visage.js';
@@ -88,7 +88,7 @@ export class JulienManif extends BossScene {
       'Les lacrymos piquent : sors vite du nuage.',
       'Le bouclier arrête les œufs, SAUF quand le CRS',
       'est essoufflé après sa charge : esquive de côté puis vise !',
-    ], () => { etiquettesTactiles({ z: null, x: null, espace: null }); if (this.tactile) this.tactile.activer(true); this.enJeu = true; this.message('Direction le lycée ! Le portail est au nord.'); });
+    ], () => { etiquettesTactiles({ z: null, x: null, espace: null }); if (this.tactile) this.tactile.activer(true); this.enJeu = true; });
   }
 
   // ------------------------------------------------------------------ niveau
@@ -98,19 +98,23 @@ export class JulienManif extends BossScene {
       regard: 0, regardT: 1.2, expr: 'normal', exprT: 0, rouge: 0, gaz: 0 };
     this.ennemis = []; this.objets = []; this.oeufs = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.sortie = null;
+    this.secrets = new Map(); this.secretsTrouves = 0;
     let nm = 0;
     this.plan = this.plan.map((ligne, y) => [...ligne].map((c, x) => {
       const px = x + 0.5, py = y + 0.5;
       if (c === 'J') { this.j.x = px; this.j.y = py; return '.'; }
-      if (c === 'S') { if (!this.sortie) this.sortie = { x: px + 0.5, y: py }; return '.'; }
+      if (c === 'S') return '.';
+      if (SECRETS[c]) { this.secrets.set(`${x},${y}`, true); return SECRETS[c]; }
       const type = OBJETS[c];
       if (!type) return c;
       if (type === 'lanceur' || type === 'bouclier') {
         this.ennemis.push({ type, x: px, y: py, vie: RG[type].vie, etat: 'attente', t: 1 + Math.random(), anim: 0, bouge: false,
-          vuX: px, vuY: py, alerte: false, cdx: 0, cdy: 0, actif: true });
+          vuX: px, vuY: py, alerte: false, cdx: 0, cdy: 0, actif: true,
+          parvis: x >= PARVIS.x0 && x <= PARVIS.x1 && y >= PARVIS.y0 && y <= PARVIS.y1 });
       } else {
-        const solide = type === 'barriere' || type === 'poubelle' || type === 'manifestant';
-        const o = { type, x: px, y: py, solide, rayon: type === 'barriere' ? 0.45 : 0.3, actif: true, n: nm };
+        const solide = type !== 'oeufs' && type !== 'sandwich';
+        const rayon = { barriere: 0.45, statue: 0.75, camion: 1.05, colonne: 0.4 }[type] || 0.3;
+        const o = { type, x: px, y: py, solide, rayon, actif: true, n: nm };
         if (type === 'manifestant') nm++;
         this.objets.push(o);
       }
@@ -118,11 +122,15 @@ export class JulienManif extends BossScene {
     }).join(''));
     this.sortieCases = new Set();
     PLAN_MANIF.forEach((l, y) => [...l].forEach((c, x) => { if (c === 'S') this.sortieCases.add(`${x},${y}`); }));
+    const cs = [...this.sortieCases].map(k => k.split(',').map(Number));
+    this.sortie = { x: cs.reduce((a, c) => a + c[0], 0) / cs.length + 0.5, y: cs[0][1] + 0.5 };   // la boussole vise la cour
     this.total = this.ennemis.length;
     this.repousses = 0;
+    this.totalObjets = this.objets.filter(o => !o.solide).length; this.ramasses = 0;
+    this.zonesVues = new Set(); this.portailOuvert = false; this.temps = 0;
   }
 
-  message(t) { this.txtMsg.setText(t); this.msgT = 2.8; }
+  message(t, duree = 2.8) { this.txtMsg.setText(t); this.msgT = duree; }
 
   // collision : murs + objets solides (cercle). ignore : l'entité qui bouge (pour ne pas se bloquer elle-même)
   libre(x, y, r, ignore) {
@@ -164,7 +172,12 @@ export class JulienManif extends BossScene {
       this.ennemis.forEach(e => this.ia(e, dt));
       this.projectiles(dt);
       this.ramasser();
+      this.temps += dt;
       const j = this.j;
+      ZONES.forEach((z, i) => {   // message à la première entrée dans une zone
+        if (!this.zonesVues.has(i) && j.x >= z.x0 && j.x < z.x1 + 1 && j.y >= z.y0 && j.y < z.y1 + 1) { this.zonesVues.add(i); this.message(this.portailOuvert && z.ouvert ? z.ouvert : z.texte, 4.5); }
+      });
+      if (!this.portailOuvert && this.ennemis.every(e => !e.parvis || !e.actif || e.etat === 'fuite')) this.ouvrirPortail();
       if (this.sortieCases.has(`${j.x | 0},${j.y | 0}`)) this.finNiveau();
     }
     this.majVisage(dt);
@@ -197,6 +210,11 @@ export class JulienManif extends BossScene {
     const my = (dy * avance * R.vitesse + dx * cote * R.vitesseCote) * dt;
     this.deplacer(j, mx, my, R.rayon);
     if (mx || my) j.bob += dt * 9;
+    // mur secret : il s'ouvre quand on pousse dedans en avançant
+    if (avance > 0) {
+      const k = `${(j.x + dx * 0.5) | 0},${(j.y + dy * 0.5) | 0}`;
+      if (this.secrets.get(k)) this.ouvrirSecret(k);
+    }
     // les policiers ne se traversent pas
     for (const e of this.ennemis) if (e.actif && e.etat !== 'fuite') {
       const d = Math.hypot(j.x - e.x, j.y - e.y);
@@ -207,10 +225,47 @@ export class JulienManif extends BossScene {
     if ((k.z.isDown || c.ctrl.isDown || tirTactile) && j.recharge <= 0) {
       if (j.oeufs > 0) {
         j.oeufs--; j.recharge = RG.oeufs.cadence; j.lanceT = 0.18;
-        this.oeufs.push({ x: j.x + dx * 0.3, y: j.y + dy * 0.3, dx, dy, t: 0 });
+        const [vx, vy] = this.viser(dx, dy);
+        this.oeufs.push({ x: j.x + vx * 0.3, y: j.y + vy * 0.3, dx: vx, dy: vy, t: 0 });
         jouerSon(this, 'julien_lancer');
       } else if (vientDAppuyer(k.z) || vientDAppuyer(c.ctrl) || tirTactile) { this.message('Plus d\'œufs ! Cherche une boîte.'); j.recharge = 0.5; }
     }
+  }
+
+  // Aide à la visée : un œuf lancé presque vers un policier (écart < aide) part droit sur lui
+  viser(dx, dy) {
+    const j = this.j;
+    let meilleur = this.tactile ? RG.oeufs.aideTactile : RG.oeufs.aide, vx = dx, vy = dy;
+    for (const e of this.ennemis) if (e.actif && e.etat !== 'fuite') {
+      const ox = e.x - j.x, oy = e.y - j.y, d = Math.hypot(ox, oy);
+      if (d > 12 || d < 0.3) continue;
+      const ecart = Math.abs(Math.atan2(dx * oy - dy * ox, dx * ox + dy * oy));
+      if (ecart < meilleur && vueLibre(this.plan, j.x, j.y, e.x, e.y)) { meilleur = ecart; vx = ox / d; vy = oy / d; }
+    }
+    return [vx, vy];
+  }
+
+  // un policier qui te repère (ou entend un œuf s'écraser) prévient ses collègues proches
+  alerter(x, y, rayon) {
+    for (const e of this.ennemis) if (e.actif && !e.alerte && Math.hypot(e.x - x, e.y - y) < rayon) {
+      e.alerte = true; e.vuX = this.j.x; e.vuY = this.j.y; e.t = 0.8 + Math.random() * 0.6;
+    }
+  }
+
+  ouvrirSecret(k) {
+    this.secrets.set(k, false);
+    const [x, y] = k.split(',').map(Number);
+    this.plan[y] = this.plan[y].slice(0, x) + '.' + this.plan[y].slice(x + 1);
+    this.secretsTrouves++;
+    jouerSon(this, 'julien_ramasse', { rate: 0.7 });
+    this.message('PASSAGE SECRET !');
+  }
+
+  ouvrirPortail() {
+    this.portailOuvert = true;
+    this.plan = this.plan.map(l => l.replace(/7/g, '.'));
+    jouerSon(this, 'julien_fuite', { rate: 0.6 });
+    this.message('Le parvis est libre : le CPE ouvre le portail ! Entre vite !', 4);
   }
 
   ia(e, dt) {
@@ -218,7 +273,7 @@ export class JulienManif extends BossScene {
     const j = this.j, R = RG[e.type];
     const ox = j.x - e.x, oy = j.y - e.y, d = Math.hypot(ox, oy);
     const voit = j.vie > 0 && d < R.vue && vueLibre(this.plan, e.x, e.y, j.x, j.y);
-    if (voit) { e.vuX = j.x; e.vuY = j.y; if (!e.alerte) { e.alerte = true; e.t = 0.6 + Math.random() * 0.6; } }
+    if (voit) { e.vuX = j.x; e.vuY = j.y; if (!e.alerte) { e.alerte = true; e.t = 0.6 + Math.random() * 0.6; this.alerter(e.x, e.y, 6); } }
     e.t -= dt; e.bouge = false;
     const marcher = (vx, vy, vitesse) => {
       const n = Math.hypot(vx, vy); if (n < 0.01) return true;
@@ -302,7 +357,7 @@ export class JulienManif extends BossScene {
       o.t += dt;
       const pas = RG.oeufs.vitesse * dt;
       o.x += o.dx * pas; o.y += o.dy * pas;
-      if (murEn(this.plan, o.x, o.y) || o.t > 2) { o.fini = true; this.splats.push({ x: o.x - o.dx * 0.12, y: o.y - o.dy * 0.12, t: 1.5 }); jouerSon(this, 'julien_splat', { rate: 1.3 }); continue; }
+      if (murEn(this.plan, o.x, o.y) || o.t > 2) { o.fini = true; this.alerter(o.x, o.y, 2.5); this.splats.push({ x: o.x - o.dx * 0.12, y: o.y - o.dy * 0.12, t: 1.5 }); jouerSon(this, 'julien_splat', { rate: 1.3 }); continue; }
       for (const b of this.objets) if (b.actif && b.solide && Math.hypot(b.x - o.x, b.y - o.y) < b.rayon) {
         o.fini = true; this.splats.push({ x: o.x, y: o.y, t: 1.2 });
         if (b.type === 'manifestant') this.message('« Hé ! Pas sur nous ! »');
@@ -350,7 +405,7 @@ export class JulienManif extends BossScene {
         j.vie = Math.min(RG.joueur.vie, j.vie + RG.sandwich);
         this.message(`Un sandwich, ça requinque ! (+${RG.sandwich})`);
       } else continue;
-      o.actif = false;
+      o.actif = false; this.ramasses++;
       jouerSon(this, 'julien_ramasse');
       j.expr = 'content'; j.exprT = 0.9;
     }
@@ -360,12 +415,27 @@ export class JulienManif extends BossScene {
     this.enJeu = false; this.termine = true; if (this.tactile) this.tactile.activer(false);
     jouerSon(this, 'julien_ramasse');
     etiquettesTactiles({ espace: 'OK', z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
-    voile(this, 0.8).setDepth(1000);
-    texte(this, LARGEUR / 2, 150, 'TU AS ATTEINT LE LYCÉE !', 44, '#ffd84a').setDepth(1001);
-    texte(this, LARGEUR / 2, 240, `Policiers repoussés : ${this.repousses} / ${this.total}      Vie : ${Math.ceil(this.j.vie)}`, 22, '#ffffff').setDepth(1001);
-    texte(this, LARGEUR / 2, 300, 'Mais Julien t\'attend en classe… (niveau 2 bientôt)', 22, '#9fd0ff').setDepth(1001);
-    texte(this, LARGEUR / 2, HAUTEUR - 60, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, 20, '#aaaaaa').setDepth(1001);
-    this.attendreRetour(800);
+    this.txtMsg.setText(''); this.msgT = 0;
+    voile(this, 0.85).setDepth(1000);
+    const pc = (a, b) => b ? `${Math.round(100 * a / b)}%` : '—';
+    const mmss = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+    texte(this, LARGEUR / 2, 70, 'LA MANIF : TERMINÉ', 40, '#ffd84a').setDepth(1001);
+    const lignes = [
+      ['POLICIERS', pc(this.repousses, this.total)], ['OBJETS', pc(this.ramasses, this.totalObjets)],
+      ['SECRETS', pc(this.secretsTrouves, this.secrets.size)], ['TEMPS', mmss(this.temps)], ['PAR', mmss(PAR)],
+    ];
+    lignes.forEach(([nom, val], n) => {   // les lignes apparaissent une par une, comme dans Doom
+      this.time.delayedCall(400 + n * 450, () => {
+        texte(this, LARGEUR / 2 - 40, 150 + n * 52, nom, 30, '#ff5a3c').setOrigin(1, 0.5).setDepth(1001);
+        texte(this, LARGEUR / 2 + 40, 150 + n * 52, val, 30, '#ffffff').setOrigin(0, 0.5).setDepth(1001);
+        jouerSon(this, 'julien_lancer');
+      });
+    });
+    this.time.delayedCall(400 + lignes.length * 450, () => {
+      texte(this, LARGEUR / 2, 430, 'Mais Julien t\'attend en classe… (niveau 2 bientôt)', 22, '#9fd0ff').setDepth(1001);
+      texte(this, LARGEUR / 2, HAUTEUR - 50, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, 20, '#aaaaaa').setDepth(1001);
+      this.attendreRetour(300);
+    });
   }
 
   // ------------------------------------------------------------------ tête du héros
@@ -420,6 +490,9 @@ export class JulienManif extends BossScene {
       else if (j.oeufs > 0) g.drawImage(T.main.tient, L / 2 + 60 + bx, VUE_H - 110 + by, 105, 120);
     } else if (j.lanceT > 0) g.drawImage(T.main.lance, L / 2 + 50, VUE_H - 82, 90, 80);
     else if (j.oeufs > 0) g.drawImage(T.main.tient, L / 2 + 70 + bx, VUE_H - 70 + by, 90, 80);
+    // petit viseur au centre
+    g.fillStyle = 'rgba(0,0,0,0.6)'; g.fillRect(L / 2 - 4, VUE_H / 2 - 1, 9, 3); g.fillRect(L / 2 - 1, VUE_H / 2 - 4, 3, 9);
+    g.fillStyle = 'rgba(255,255,255,0.85)'; g.fillRect(L / 2 - 3, VUE_H / 2, 7, 1); g.fillRect(L / 2, VUE_H / 2 - 3, 1, 7);
     // voile de gaz et flash rouge
     if (j.gaz > 0) { g.fillStyle = `rgba(190,205,160,${0.5 * j.gaz})`; g.fillRect(0, 0, L, VUE_H); }
     if (j.rouge > 0) { g.fillStyle = `rgba(200,0,0,${j.rouge * 0.6})`; g.fillRect(0, 0, L, VUE_H); }
