@@ -1078,6 +1078,10 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   faisait « plonk » (surtout avec le café) → `bouclierBaisse(e)` ; le lanceur caché derrière un mur visait ta position
   ACTUELLE à travers les murs → il vise là où il t'a vu (`vuX`, `vuY`). Aucune erreur dans la console. Plaisir : rien de
   bloquant, le niveau 1 est jugé prêt (restent en option : BAC, LBD, policiers en hauteur, sono, clé + porte).
+- SARBACANE EN MAIN (Fabien : « moche ») : dessin provisoire refait en gros pixels (`mainSarbacane` dans
+  JulienClasse.js : poing, tube de Bic transparent, manche ; pose de tir avec la boulette). Vraie image à faire :
+  prompt `julien_main_sarbacane.jpg` (section 9a de `julien_prompts_images.md`), découpe déjà prévue dans
+  `decouper_planches.py` (centres À AJUSTER) → `julien_main_sarbacane(_tir).png`, branchée automatiquement.
 - BUG ANDROID (rectangle de sol gris périmé quand on s'arrête, vu sur le téléphone de Fabien, pas reproduit en
   émulation) : le sol n'est plus écrit par putImageData dans la vue (toile accélérée par la carte graphique) ; il est
   calculé sur une petite toile à part (`willReadFrequently`) puis collé par drawImage (`raycaster.js`, fonction sol).

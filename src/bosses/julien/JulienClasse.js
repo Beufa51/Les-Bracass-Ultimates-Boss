@@ -43,12 +43,38 @@ const ANNONCES = {
   craies: ['CRAIES !', 'Des craies en rafale : planque-toi derrière une TABLE !'],
 };
 
+// Dessin provisoire de la main qui tient la sarbacane (stylo Bic vidé), en gros pixels comme les vraies mains :
+// dessiné en 35 × 40 puis agrandi ×3 (105 × 120). souffle : la boulette part (joues… non : un petit nuage de souffle).
+function mainSarbacane(souffle) {
+  const p = document.createElement('canvas'); p.width = 35; p.height = 40;
+  const g = p.getContext('2d');
+  const R = (c, x, y, l = 1, h = 1) => { g.fillStyle = c; g.fillRect(x, y, l, h); };
+  const O = (c, x, y, rx, ry) => { g.fillStyle = c; g.beginPath(); g.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); g.fill(); };
+  // le tube : du poing vers le viseur (en haut à gauche) ; plastique transparent, fin contour, reflet blanc
+  const tube = (x0, y0, x1, y1, w, c) => { g.strokeStyle = c; g.lineWidth = w; g.lineCap = 'round'; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); };
+  tube(22, 24, 7, 5, 4.2, '#4d5d7a'); tube(22, 24, 7, 5, 2.6, '#dfe7f2'); tube(21, 22, 8, 6, 0.9, '#ffffff');
+  tube(20, 22, 9, 8, 0.8, '#b8c6da');
+  R('#1d3fa8', 5, 3, 3, 3); R('#3a64d8', 6, 3, 1, 1);   // le bout bleu (bouchon du Bic)
+  if (souffle) { O('#f2efe6', 3, 1.5, 2, 1.6); R('#c8c4b8', 3, 2); R('#ffffff', 0, 4); R('#ffffff', 1, 0); }   // la boulette part
+  // la manche du sweat (bleu marine) qui monte du bas à droite, avec son poignet côtelé
+  g.fillStyle = '#10183a'; g.beginPath(); g.moveTo(17, 40); g.lineTo(22, 29); g.lineTo(31, 27); g.lineTo(35, 33); g.lineTo(35, 40); g.fill();
+  g.fillStyle = '#24316a'; g.beginPath(); g.moveTo(19, 40); g.lineTo(23, 31); g.lineTo(31, 29); g.lineTo(34, 34); g.lineTo(34, 40); g.fill();
+  g.fillStyle = '#34458a'; g.fillRect(22, 30, 9, 2);
+  // le poing : contour, peau, ombre en bas ; 4 phalanges sur le devant ; le pouce par-dessus le tube
+  O('#5a3420', 22, 25, 7.2, 6.2); O('#e0a47a', 22, 24.6, 6.2, 5.2); O('#b97d58', 23, 27.5, 5, 2.4);
+  for (let k = 0; k < 4; k++) { O('#5a3420', 17.4 + k * 0.6, 21.5 + k * 2, 2.6, 1.3); O('#eab58c', 17.6 + k * 0.6, 21.2 + k * 2, 2, 0.8); }
+  O('#5a3420', 22.5, 19.5, 3.4, 2.2); O('#e0a47a', 22.5, 19.2, 2.6, 1.5); R('#f4c9a2', 21, 18.5, 2, 1);   // le pouce
+  const c = document.createElement('canvas'); c.width = 105; c.height = 120;
+  const gc = c.getContext('2d'); gc.imageSmoothingEnabled = false; gc.drawImage(p, 0, 0, 105, 120);
+  return c;
+}
+
 export class JulienClasse extends JulienManif {
   constructor() { super('JulienClasse'); }
 
   // vraies images de Julien (outils/julien/decouper_prof.py) ; image absente = dessin provisoire
   preload() {
-    for (const n of [...POSES_PROF.map(p => 'julien_' + p), ...Object.values(MURS_IMAGES), ...OBJETS_IMAGES, ...ELEVES_IMAGES]) {
+    for (const n of [...POSES_PROF.map(p => 'julien_' + p), ...Object.values(MURS_IMAGES), ...OBJETS_IMAGES, ...ELEVES_IMAGES, 'main_sarbacane', 'main_sarbacane_tir']) {
       if (!this.textures.exists('julien_' + n)) this.load.image('julien_' + n, `assets/sprites/julien/julien_${n}.png`);
     }
     super.preload();
@@ -76,15 +102,9 @@ export class JulienClasse extends JulienManif {
         g.drawImage(tb, (c.width - tb.width) / 2, c.height - tb.height);
         T.spr[`te_${k}_${p}`] = c; T.hauteurs[`te_${k}_${p}`] = c.height / ppu;
       }
-      // la sarbacane en main : un stylo vidé tenu dans la main, pointé vers le viseur
-      const m = document.createElement('canvas'); m.width = 105; m.height = 120;
-      const gm = m.getContext('2d');
-      gm.lineCap = 'round'; gm.strokeStyle = '#2f5fd0'; gm.lineWidth = 9; gm.beginPath(); gm.moveTo(78, 104); gm.lineTo(22, 22); gm.stroke();
-      gm.strokeStyle = '#e8ecf4'; gm.lineWidth = 3; gm.beginPath(); gm.moveTo(70, 90); gm.lineTo(26, 27); gm.stroke();
-      gm.fillStyle = '#1c2a6a'; gm.fillRect(62, 100, 43, 20);   // manche
-      gm.fillStyle = '#e8b48a'; gm.beginPath(); gm.ellipse(72, 96, 17, 13, -0.6, 0, Math.PI * 2); gm.fill();   // main
-      gm.fillStyle = '#c99470'; gm.fillRect(60, 86, 18, 4);
-      T.main.sarbacane = m;
+      // la sarbacane en main : vraie image si livrée (julien_main_sarbacane / _tir), sinon dessin en pixel art
+      if (img('main_sarbacane')) { T.main.sarbacane = img('main_sarbacane'); T.main.sarbacane_tir = img('main_sarbacane_tir') || T.main.sarbacane; }
+      else { T.main.sarbacane = mainSarbacane(false); T.main.sarbacane_tir = mainSarbacane(true); }
       // bureau renversé (phase 3) : le bureau la tête en bas, pieds en l'air
       const b = T.spr.bureau, c = document.createElement('canvas'); c.width = b.width; c.height = b.height;
       const g = c.getContext('2d'); g.translate(0, b.height); g.scale(1, -1); g.drawImage(b, 0, 0);

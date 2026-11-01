@@ -114,6 +114,7 @@ Remplacer POSES par :
 - `julien_main_pancarte.jpg` : `1) the hand holding a wooden stick with a cardboard protest sign "NON !" held up, ready; 2) the sign swung forward and to the left, hitting (motion blur lines).`
 - `julien_main_tomates.jpg` : `1) the hand holding a big ripe red tomato, ready to throw; 2) the arm extended forward, hand open, the tomato just thrown (no tomato visible).`
 - `julien_main_eau.jpg` : `1) the hand holding a big colorful plastic water gun (orange and blue Super Soaker style); 2) the same water gun firing a jet of water forward.`
+- `julien_main_sarbacane.jpg` (niveau 2, la classe) : `1) the hand holding an emptied clear plastic Bic ballpoint pen tube (no ink, blue end cap) used as a peashooter, raised toward the center of the screen as if about to blow into it, a small crumpled ball of white paper visible inside the tube; 2) the same, a small white paper ball just shot out of the tip of the tube toward the center, tiny puff lines.`
 - `julien_main_fumigenes.jpg` : `1) the hand holding a lit pink smoke flare (protest smoke torch) with pink smoke rising; 2) the arm extended forward, hand open, the flare just thrown (no flare visible).`
 
 ### 9b. Objets (une planche) — `julien_objets_armes.jpg`

@@ -31,6 +31,8 @@ GROUPES = {
     'main_tomates': ('julien_main_tomates.jpg', 240, [('main_tomates', (330, 330)), ('main_tomates_tir', (1060, 370))]),
     'main_eau': ('julien_main_eau.jpg', 240, [('main_eau', (340, 460)), ('main_eau_tir', (1130, 420))]),
     'main_fumigenes': ('julien_main_fumigenes.jpg', 240, [('main_fumigenes', (360, 330)), ('main_fumigenes_tir', (1060, 500))]),
+    # niveau 2 : centres À AJUSTER quand l'image sera livrée
+    'main_sarbacane': ('julien_main_sarbacane.jpg', 240, [('main_sarbacane', (340, 400)), ('main_sarbacane_tir', (1100, 400))]),
     # élèves assis (rangée du haut ; celle du bas est un doublon) : A content, A caché, B…, D caché
     'eleves': ('julien_eleves.jpg', 180, [(f'eleve_{k // 2}_{"content" if k % 2 == 0 else "cache"}', (x, 200))
         for k, x in enumerate([115, 300, 465, 630, 815, 990, 1165, 1325])]),
