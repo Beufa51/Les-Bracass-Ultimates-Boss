@@ -48,6 +48,14 @@ OBJETS_ARMES = ('julien_objets_armes.jpg', [
     ('tomates', (245, 215), 90), ('eau_pistolet', (760, 240), 70), ('fumigenes', (1215, 215), 90),
     ('tomate', (240, 585), 40), ('splat_rouge', (760, 580), 50), ('fumee', (1210, 570), 160)])
 
+# objets qui manquaient (bonus, sac et nuage de farine, goutte d'eau, fumigène en vol) ; 2e sac de farine ignoré
+OBJETS_BONUS = ('julien_objets_bonus.jpg', [
+    ('echarpe', (176, 190), 60), ('cafe', (528, 200), 55), ('kway', (880, 180), 55), ('farine', (1232, 190), 90),
+    (None, (176, 576), 90), ('nuage_farine', (528, 570), 160), ('eau', (880, 570), 24), ('fumi', (1232, 560), 50)])
+
+# murs de la CLASSE (niveau 2) : 2 de large pour 3 de haut, réduits à 128 × 192 ; le tableau est coupé en 3
+MURS_CLASSE = ['mur_classe', 'mur_classe_affiche', 'fenetres_classe', 'porte_classe']
+
 # Tête du héros : 5 niveaux d'amochage × regard (gauche, face, droite), puis les expressions.
 # ('rLcC', miroir ?) : la planche des regards ne suit pas exactement la demande → regards manquants = miroir d'un autre.
 TETES = [
@@ -192,12 +200,14 @@ def main():
     planche.save(SORTIE + 'julien_tetes.png')
     print('   tetes', L, 'x 96 ×', len(cases))
 
-    for fichier, liste in (OBJETS, OBJETS_ARMES):
+    for fichier, liste in (OBJETS, OBJETS_ARMES, OBJETS_BONUS):
         if not os.path.exists(ENTREE + fichier):
             continue
         img = charger(fichier)
         masques, _ = poses(img, [c for _, c, _ in liste])
         for (nom, _, h), m in zip(liste, masques):
+            if nom is None or m is None:
+                continue
             i = detourer(img, m)
             i = i.resize((max(1, round(i.width * h / i.height)), h), Image.LANCZOS)
             i.save(SORTIE + f'julien_{nom}.png')
@@ -222,7 +232,7 @@ def main():
         print('  ', nom, i.size)
 
     # murs : carré réduit à 128 × 128
-    for nom in ['mur_briques', 'mur_immeuble', 'mur_boutique', 'mur_tag', 'mur_palissade', 'mur_lycee', 'portail_lycee', 'mur_boutique2']:
+    for nom in ['mur_briques', 'mur_immeuble', 'mur_boutique', 'mur_tag', 'mur_palissade', 'mur_lycee', 'portail_lycee', 'mur_boutique2', 'mur_rideau']:
         if os.path.exists(ENTREE + f'julien_{nom}.jpg'):
             mur = Image.open(ENTREE + f'julien_{nom}.jpg').convert('RGB')
             if nom in SANS_PANNEAU:
@@ -234,6 +244,16 @@ def main():
                 mur = propre
             mur.resize((128, 128), Image.LANCZOS).save(SORTIE + f'julien_{nom}.png')
             print('  ', nom, '128 x 128', '(+ version avec panneau)' if nom in SANS_PANNEAU else '')
+
+    for nom in MURS_CLASSE:
+        if os.path.exists(ENTREE + f'julien_{nom}.jpg'):
+            Image.open(ENTREE + f'julien_{nom}.jpg').convert('RGB').resize((128, 192), Image.LANCZOS).save(SORTIE + f'julien_{nom}.png')
+            print('  ', nom, '128 x 192')
+    if os.path.exists(ENTREE + 'julien_tableau.jpg'):
+        t = Image.open(ENTREE + 'julien_tableau.jpg').convert('RGB')
+        for k in range(3):
+            t.crop((k * t.width // 3, 0, (k + 1) * t.width // 3, t.height)).resize((128, 192), Image.LANCZOS).save(SORTIE + f'julien_tableau_{k}.png')
+        print('   tableau 3 x 128 x 192')
 
 
 if __name__ == '__main__':

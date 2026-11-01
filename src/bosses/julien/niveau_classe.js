@@ -1,12 +1,12 @@
 // Plan du niveau 2 : LA SALLE DE CLASSE (le nord est en haut). Julien fait les cent pas devant le tableau ;
 // toi, tu entres par la porte du fond. Les TABLES bloquent les livres : ce sont tes abris.
 //
-// Murs (chiffres) : 1 mur de la classe (affiches), 2 tableau noir, 3 fenêtres, 4 porte (fermée).
+// Murs (chiffres) : 1 mur de la classe (affiches), 3 fenêtres, 4 porte (fermée), 5 6 7 tableau (gauche, milieu, droite).
 // Sol : '.' vide, 'J' départ (regarde vers le tableau), 'U' Julien.
 // Objets : 'd' table d'élève (bloque, abri), 'q' bureau du prof (bloque), 'o' boîte d'œufs, 't' cagette de tomates,
 //          's' sandwich.
 export const PLAN_CLASSE = [
-  '111112222211111',
+  '111111567111111',
   '1.............3',
   '1......U......3',
   '1...q.........3',
@@ -19,7 +19,7 @@ export const PLAN_CLASSE = [
   '1..d...d...d..3',
   '1.............3',
   '1s....J.....o.3',
-  '111111144111111',
+  '111111141111111',
 ];
 
 export const OBJETS_CLASSE = { d: 'table', q: 'bureau', o: 'oeufs', t: 'tomates', s: 'sandwich' };

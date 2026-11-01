@@ -21,6 +21,8 @@ import { construireDecorClasse, spritesClasse, HAUTEURS_CLASSE } from './decor_c
 
 const L = 480, VUE_H = 222;   // comme JulienManif
 const hasard = (liste) => liste[(Math.random() * liste.length) | 0];
+// vraies images des murs de la classe (outils/julien/decouper_planches.py) : code du plan → image
+const MURS_IMAGES = { 1: 'mur_classe', 3: 'fenetres_classe', 4: 'porte_classe', 5: 'tableau_0', 6: 'tableau_1', 7: 'tableau_2', a: 'mur_classe_affiche' };
 const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'dos', 'rage', 'vaincu'];
 const RANGEES = [1.6, 2.5, 3.4, 4.5, 5.5, 7.5, 9.5, 11.5];   // allées où Julien peut marcher en phase 3
 
@@ -29,7 +31,9 @@ export class JulienClasse extends JulienManif {
 
   // vraies images de Julien (outils/julien/decouper_prof.py) ; image absente = dessin provisoire
   preload() {
-    for (const p of POSES_PROF) if (!this.textures.exists('julien_julien_' + p)) this.load.image('julien_julien_' + p, `assets/sprites/julien/julien_julien_${p}.png`);
+    for (const n of [...POSES_PROF.map(p => 'julien_' + p), ...Object.values(MURS_IMAGES)]) {
+      if (!this.textures.exists('julien_' + n)) this.load.image('julien_' + n, `assets/sprites/julien/julien_${n}.png`);
+    }
     super.preload();
   }
 
@@ -41,6 +45,13 @@ export class JulienClasse extends JulienManif {
       for (const p of POSES_PROF) if (this.textures.exists('julien_julien_' + p)) T.spr['julien_' + p] = this.textures.get('julien_julien_' + p).getSourceImage();
       Object.assign(T.hauteurs, HAUTEURS_CLASSE);
       T.classe = construireDecorClasse(this.ctx, L, VUE_H);
+      const img = (n) => this.textures.exists('julien_' + n) ? this.textures.get('julien_' + n).getSourceImage() : null;
+      for (const [code, n] of Object.entries(MURS_IMAGES)) {
+        const i = img(n); if (!i || code === 'a') continue;
+        const m = T.classe.murs;
+        if (code === '1') m[1] = [i, img('mur_classe_affiche') || i];   // une case sur 6 : la carte de France
+        else m[code] = i;
+      }
     }
     return T.classe;
   }

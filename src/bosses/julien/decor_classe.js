@@ -58,6 +58,7 @@ export function mursClasse() {
     R(g, '#5a3c22', 10, 10, 44, 86); R(g, '#7a5432', 13, 13, 38, 83); R(g, '#a8c8d8', 20, 18, 24, 18);
     ovale(g, '#d8b040', 46, 60, 2.5, 2.5); ecrire(g, 'SALLE 12', 32, 46, 6, '#f2e6c8');
   });
+  M[5] = M[6] = M[7] = M[2];   // tableau en 3 morceaux (vraies images : tableau_0, _1, _2)
   return M;
 }
 
@@ -94,7 +95,7 @@ export function construireDecorClasse(ctx, l, hVue) {
   const brume = ctx.createLinearGradient(0, mi, 0, hVue);
   brume.addColorStop(0, 'rgba(40,38,34,0.55)'); brume.addColorStop(0.4, 'rgba(40,38,34,0.15)'); brume.addColorStop(1, 'rgba(40,38,34,0)');
   return {
-    murs: mursClasse(), etages: {}, hauteurs: { 1: HAUT_MUR, 2: HAUT_MUR, 3: HAUT_MUR, 4: HAUT_MUR },
+    murs: mursClasse(), etages: {}, hauteurs: { 1: HAUT_MUR, 2: HAUT_MUR, 3: HAUT_MUR, 4: HAUT_MUR, 5: HAUT_MUR, 6: HAUT_MUR, 7: HAUT_MUR },
     ciel: plafond(mi), sombre: new Uint8Array(W * H), neons: new Set(), neonEteint: 0,
     sol: { genres, largeur: W, textures: solsClasse(), image, buf: new Uint32Array(image.data.buffer), brume },
   };

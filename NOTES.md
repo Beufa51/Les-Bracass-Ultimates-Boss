@@ -1102,6 +1102,13 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   rage, vaincu ; 240 px). Branchées dans `JulienClasse` (`POSES_PROF`). La pose « dos » (au tableau) attend le
   combat refait (B). La photo du vrai Julien n'est PAS dans le dépôt (public). Tenue : veste verte, t-shirt geek
   (Silent Hill) ; il aime les t-shirts de jeux d'horreur (Silent Hill, Resident Evil).
+- IMAGES LIVRÉES (lot 2), découpées par `decouper_planches.py` : MANIF → bonus (écharpe, café, K-Way), sac et nuage
+  de farine, goutte d'eau, fumigène en vol (`OBJETS_BONUS`, branchés dans `SPRITES`), rideau de fer (mur 9) ;
+  CLASSE → murs 128×192 (`MURS_CLASSE` : mur nu, mur + carte de France une case sur 6, fenêtres, porte), tableau
+  coupé en 3 (`tableau_0/1/2`, murs 5 6 7 du plan ; une seule porte). Branchés dans `JulienClasse` (`MURS_IMAGES`).
+  EN ATTENTE du mini-niveau « le lycée » (dans `assets_inbox/julien/`, pas encore découpés) : murs casiers, couloir
+  (panneau d'affichage), cantine ; planches surveillant (6 poses), cantinière (6), fayot (4).
+  MANQUENT encore : objets de la classe (table, bureau, livre, dico, copie, craie, sarbacane…) et élèves assis.
 - PROMPTS des images du niveau 2 + images manquantes de la manif : `propositions/julien_prompts_images.md`, sections
   10 à 16 (Julien 8 poses, objets de la classe, élèves assis, ennemis du lycée, murs, bonus de la manif, rideau de fer).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
