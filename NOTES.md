@@ -943,3 +943,11 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Le son de réussite ne joue plus 2 fois à la victoire (« bon » au dialogue, « réussi » au rang).
 - 60 questions (30 ajoutées en V92).
 - `beufa_musique.mp3` : 5 premières minutes en boucle, mono 56 kb/s (11 → 2,1 Mo ; original dans l'historique git).
+
+## JULIEN — PROCHAINE ÉTAPE (rien de commencé : `src/bosses/julien/index.js` vide, aucune image)
+Questions à poser à Fabien avant de coder (comme pour les autres boss) :
+1. Le jeu : quel genre / quel jeu de référence (ex. Greg = Punch-Out, Lionel = Windjammers, Beufa = Metal Gear) ?
+2. Julien : sa personnalité, ce qu'il aime, ses expressions / répliques typiques (blagues entre amis).
+3. Comment on gagne / on perd, et en combien de temps environ (2, 5, 10 min ?).
+4. Les images : as-tu une photo ou un pixel art de Julien ? Style voulu (manga, pixel art, cartoon…) ?
+5. Musique de référence ? Couleur et icône du badge ?
