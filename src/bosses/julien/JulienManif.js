@@ -87,6 +87,7 @@ export class JulienManif extends BossScene {
     T.decor.vus = new Uint8Array(this.plan[0].length * this.plan.length);   // murs déjà vus (la carte n'affiche qu'eux)
     T.decor.speciaux = this.indicesSecrets();
     this.installerBoutonCarte();
+    this.bloquerRaccourcisNavigateur();
     this.agrandirCroix();
     this.joy = RG.joueur.tactile.joystick ? installerJoystick(this) : null;   // téléphone : joystick à gauche (sinon la croix)
     this.tactile = estTactile();   // téléphone : croix = avancer / reculer / pas de côté, ↺ ↻ = tourner, ŒUF en haut
@@ -222,6 +223,26 @@ export class JulienManif extends BossScene {
     this.repousses = 0;
     this.totalObjets = this.objets.filter(o => !o.solide).length; this.ramasses = 0;
     this.zonesVues = new Set(); this.portailOuvert = false; this.temps = 0;
+  }
+
+  // Alt + ← / → (pas de côté, comme Doom) = « page précédente / suivante » pour le navigateur : on l'en empêche
+  // pendant la manif ; et si le navigateur revient quand même en arrière, on reste sur le jeu.
+  bloquerRaccourcisNavigateur() {
+    const touche = (e) => {
+      if (e.altKey && e.key && e.key.startsWith('Arrow')) e.preventDefault();
+      if (e.key === 'Alt') e.preventDefault();   // Alt seul : pas de menu du navigateur
+    };
+    const retour = () => history.pushState({ manif: true }, '');
+    // APRÈS Phaser (il ignore les touches déjà « bloquées ») : on s'inscrit en dernier, sans « capture »
+    window.addEventListener('keydown', touche);
+    window.addEventListener('keyup', touche);
+    history.pushState({ manif: true }, '');
+    window.addEventListener('popstate', retour);
+    this.events.once('shutdown', () => {
+      window.removeEventListener('keydown', touche);
+      window.removeEventListener('keyup', touche);
+      window.removeEventListener('popstate', retour);
+    });
   }
 
   // Téléphone : flèches de gauche plus grandes dans la manif (remises comme avant en partant)

@@ -1056,6 +1056,8 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
 - Retours Fabien : un peu dur en Bloqueur → lacrymo 14 → 10 / s, charge du CRS 18 → 14, lacrymo toutes les 3,0 s
   (au lieu de 2,6) ; bouts blancs sous le fourgon (trait de sol de Gemini entre les roues) → retiré au découpage
   (`SEULS`) ; bouton ARME trop près de LANCER → monté à 250 px du bas, 140 px de large.
+- Alt + ← faisait « page précédente » dans le navigateur (sortie du jeu) → `bloquerRaccourcisNavigateur` (preventDefault
+  sur Alt + flèches et Alt seul, + garde d'historique pendant la manif).
 - À FAIRE (audit Doom) : point 3 : BAC en civil, tireur de LBD, policiers en hauteur, sono (BFG). Point 4 : clé + porte + boucle.
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
