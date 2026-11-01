@@ -1022,8 +1022,12 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   Délégué de classe, Bloqueur (normal), Anarchiste.
   RANG de fin (`RANGS`) : score policiers 50 / secrets 20 / objets 10 / temps 20 → Fayot, Délégué de classe,
   Leader étudiant, Che Guevara du lycée ; record (rang court + temps) affiché au hub sous la porte.
-- RESTE de l'audit fun : BAC en civil + canon à eau, sono (BFG) ; images des bonus et de la goutte d'eau ;
-  pistolet à eau pose 2 à refaire (prompt v3 donné à Fabien).
+- Retours Fabien (suite) : tomates une à la fois (2 de dégâts, gros recul) ; pistolet à eau : on garde l'image AU
+  REPOS même en tirant (le jet de l'image faisait doublon avec les gouttes) → la pose 2 n'est plus utile ;
+  CRS 8 → 5 (cordon = 2 CRS + barrière ; parvis 1 ; place 1) ; plus de jaune d'œuf sur les policiers touchés par
+  tomate / eau / pancarte / fumée (`variantesTaches` : le jaune des images touché/fuite devient rouge ou disparaît ;
+  `e.dernier`) ; téléphone : croix 96 px et symboles plus gros dans la manif.
+- RESTE de l'audit fun : BAC en civil + canon à eau, sono (BFG) ; images des bonus.
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,

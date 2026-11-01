@@ -350,6 +350,31 @@ export function chargerImages(scene) {
 }
 
 // dans create() : remplace les dessins provisoires par les images chargées ; renvoie le nombre de manifestants différents
+// Les images « touché » et « fuite » ont du jaune d'œuf : variantes où ce jaune devient tomate (rouge)
+// ou disparaît (propre : pancarte, eau, fumée)
+function recolorer(src, couleur) {
+  const c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
+  const g = c.getContext('2d'); g.drawImage(src, 0, 0);
+  const im = g.getImageData(0, 0, c.width, c.height), d = im.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const r = d[i], v = d[i + 1], b = d[i + 2];
+    if (d[i + 3] > 0 && r > 150 && v > 100 && b < 120 && r - b > 80 && v > r * 0.55) {
+      const k = (r + v) / 510;   // garde le relief
+      d[i] = couleur[0] * k; d[i + 1] = couleur[1] * k; d[i + 2] = couleur[2] * k;
+    }
+  }
+  g.putImageData(im, 0, 0);
+  return c;
+}
+export function variantesTaches(T) {
+  for (const [p, propre] of [['lanceur_', [40, 52, 96]], ['bouclier_', [34, 36, 42]]]) for (const pose of ['touche', 'fuite']) {
+    const s = T.spr[p + pose];
+    if (!s) continue;
+    T.spr[p + pose + '_rouge'] = recolorer(s, [235, 40, 30]);
+    T.spr[p + pose + '_propre'] = recolorer(s, propre);
+  }
+}
+
 export function appliquerImages(scene, T) {
   const img = (n) => scene.textures.exists('julien_' + n) ? scene.textures.get('julien_' + n).getSourceImage() : null;
   T.hauteurs = { ...HAUTEURS_PROVISOIRES };

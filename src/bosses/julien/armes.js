@@ -1,7 +1,7 @@
 // Les ARMES du héros (façon Doom : touches 1 à 5 ; bouton ARME sur téléphone qui passe à la suivante).
 //  1 PANCARTE  : corps à corps, infinie ; un CRS frappé baisse son bouclier (étourdi) → vite, un œuf !
 //  2 ŒUFS      : l'arme de base
-//  3 TOMATES   : 3 tomates en éventail, très fortes de près, font reculer
+//  3 TOMATES   : une tomate vaut 2 œufs et fait bien reculer
 //  4 PISTOLET À EAU : jet continu, petits dégâts, ÉTEINT les nuages de lacrymo
 //  5 FUMIGÈNES : nuage coloré ; les policiers dedans ne te voient plus et s'étouffent ; caché dedans, tu es invisible
 // Les projectiles partagent une seule liste (scene.tirs) : { genre, x, y, dx, dy, t, ... }.
@@ -22,7 +22,7 @@ export const armeDe = (id) => ARMES.find(a => a.id === id);
 export const RECHARGES = {
   oeufs: () => ({ n: RG.oeufs.boite, maxi: RG.oeufs.maxi, txt: `Une boîte d'œufs ! (+${RG.oeufs.boite})` }),
   tomates: () => ({ n: RG.tomates.cagette, maxi: RG.tomates.maxi, txt: `Une cagette de tomates ! (+${RG.tomates.cagette})`,
-    trouve: 'Des TOMATES ! (touche 3 / ARME) : 3 tomates d\'un coup, terrible de près.' }),
+    trouve: 'Des TOMATES ! (touche 3 / ARME) : une tomate vaut deux œufs.' }),
   eau: () => ({ n: RG.eau.bouteille, maxi: RG.eau.maxi, txt: 'De l\'eau pour le pistolet !',
     trouve: 'Un PISTOLET À EAU ! (touche 4 / ARME) : il ÉTEINT les lacrymos.' }),
   fumigenes: () => ({ n: RG.fumigenes.boite, maxi: RG.fumigenes.maxi, txt: `Des fumigènes ! (+${RG.fumigenes.boite})`,
@@ -70,8 +70,7 @@ export function tirer(scene, dx, dy, appui, nouveau) {
     jouerSon(scene, 'julien_lancer');
   } else if (j.arme === 'tomates') {
     j.recharge = RG.tomates.cadence; j.lanceT = 0.25;
-    const base = Math.atan2(vy, vx);
-    for (const e of [-RG.tomates.ecart, 0, RG.tomates.ecart]) ajout('tomate', Math.cos(base + e), Math.sin(base + e));
+    ajout('tomate', vx, vy);
     jouerSon(scene, 'julien_lancer', { rate: 0.8 });
   } else if (j.arme === 'eau') {
     j.recharge = RG.eau.cadence; j.lanceT = 0.1;
@@ -110,7 +109,7 @@ function frapper(scene, dx, dy) {
     scene.message('BONK ! Son bouclier tombe : vite, vise-le !', 1.5);
     return;
   }
-  scene.toucherEnnemi(cible, P.degats, { recul });
+  scene.toucherEnnemi(cible, P.degats, { recul, tache: null });
 }
 
 // Fait avancer les tirs (œufs, tomates, eau, fumigènes) et les fumées colorées
@@ -147,7 +146,7 @@ export function avancerTirs(scene, dt) {
     if (o.fini) continue;
     for (const e of scene.ennemis) if (e.actif && e.etat !== 'fuite' && Math.hypot(e.x - o.x, e.y - o.y) < 0.35) {
       o.fini = true;
-      scene.toucherEnnemi(e, R.degats, { recul: [o.dx * R.recul, o.dy * R.recul], silencieux: o.genre === 'eau', rouge: o.genre === 'tomate' });
+      scene.toucherEnnemi(e, R.degats, { recul: [o.dx * R.recul, o.dy * R.recul], silencieux: o.genre === 'eau', tache: o.genre === 'oeuf' ? 'oeuf' : o.genre === 'tomate' ? 'tomate' : null });
       break;
     }
   }

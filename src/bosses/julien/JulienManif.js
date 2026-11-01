@@ -15,7 +15,7 @@ import { IDENTITE, REGLAGES as RG, DIFFICULTES, RANGS } from './reglages.js';
 import { Sauvegarde } from '../../core/sauvegarde.js';
 import { PLAN_MANIF, OBJETS, SECRETS, ZONES, PARVIS, PAR } from './niveau_manif.js';
 import { rendre, murEn, vueLibre } from './raycaster.js';
-import { texturesMurs, texturesSprites, texturesMain, chargerImages, appliquerImages } from './textures.js';
+import { texturesMurs, texturesSprites, texturesMain, chargerImages, appliquerImages, variantesTaches } from './textures.js';
 import { construireDecor } from './decor.js';
 import { ARMES, armeDe, RECHARGES, choisirArme, armeSuivante, tirer, avancerTirs, dansFumee } from './armes.js';
 import { toileVisage, niveauVisage } from './visage.js';
@@ -42,6 +42,7 @@ export class JulienManif extends BossScene {
     if (!T) {
       T = { murs: texturesMurs(), spr: texturesSprites(), main: texturesMain() };
       appliquerImages(this, T);
+      variantesTaches(T);
     }
     etiquettesTactiles({ espace: 'OK', z: null, x: null });   // intro : seulement OK (les boutons du jeu arrivent au départ)
     this.cameras.main.setBackgroundColor('#000000');
@@ -83,6 +84,7 @@ export class JulienManif extends BossScene {
     this.carte = false;
     T.decor.vus = new Uint8Array(this.plan[0].length * this.plan.length);   // murs déjà vus (la carte n'affiche qu'eux)
     this.installerBoutonCarte();
+    this.agrandirCroix();
     this.tactile = estTactile();   // téléphone : croix = avancer / reculer / pas de côté, ↺ ↻ = tourner, ŒUF en haut
     this.enJeu = false;
     jouerMusique(this, 'julien_musique');   // « At Doom's Gate », en boucle
@@ -174,6 +176,17 @@ export class JulienManif extends BossScene {
     this.repousses = 0;
     this.totalObjets = this.objets.filter(o => !o.solide).length; this.ramasses = 0;
     this.zonesVues = new Set(); this.portailOuvert = false; this.temps = 0;
+  }
+
+  // Téléphone : flèches de gauche plus grandes dans la manif (remises comme avant en partant)
+  agrandirCroix() {
+    const croix = document.querySelector('.tactile.gauche');
+    if (!croix) return;
+    const avant = croix.getAttribute('style') || '';
+    croix.style.gridTemplateColumns = 'repeat(3, 96px)'; croix.style.gridTemplateRows = 'repeat(2, 96px)';
+    const boutons = [...document.querySelectorAll('.tactile button')], polices = boutons.map(b => b.style.fontSize);
+    boutons.forEach(b => { b.style.fontSize = '30px'; });   // flèches ET ↺ ↻ bien lisibles
+    this.events.once('shutdown', () => { croix.setAttribute('style', avant); boutons.forEach((b, i) => { b.style.fontSize = polices[i]; }); });
   }
 
   // Téléphone : bouton CARTE en haut à droite (sur ordinateur : TAB ou M)
@@ -414,12 +427,14 @@ export class JulienManif extends BossScene {
   }
 
   // degats : 1 = un œuf ; options : recul [dx, dy], perceBouclier (fumée), silencieux (eau, fumée : pas de son ni de sursaut)
-  toucherEnnemi(e, degats = 1, { recul = null, perceBouclier = false, silencieux = false, rouge = false } = {}) {
+  // tache : 'oeuf' (jaune), 'tomate' (rouge) ou null (pancarte, eau, fumée : pas de trace)
+  toucherEnnemi(e, degats = 1, { recul = null, perceBouclier = false, silencieux = false, tache = null } = {}) {
     if (recul) this.deplacer(e, recul[0], recul[1], 0.28);
     if (e.type === 'bouclier' && e.etat !== 'essouffle' && !perceBouclier) { if (!silencieux) jouerSon(this, 'julien_plonk'); return; }
     e.vie -= degats;
+    e.dernier = tache || 'propre';   // pour l'image « touché » / « fuite » : jaune, rouge ou sans trace
     // il garde la trace : jaune d'œuf ou tomate sur l'uniforme (4 au plus)
-    if (!silencieux && (e.taches || (e.taches = [])).length < 4) e.taches.push({ o: Math.random() * 1.6 - 0.8, h: 0.3 + Math.random() * 0.35, rouge });
+    if (tache && (e.taches || (e.taches = [])).length < 4) e.taches.push({ o: Math.random() * 1.6 - 0.8, h: 0.3 + Math.random() * 0.35, rouge: tache === 'tomate' });
     if (!silencieux) jouerSon(this, 'julien_splat');
     if (e.vie <= 0) {
       e.etat = 'fuite'; e.t = 1.8; this.repousses++;
@@ -541,8 +556,9 @@ export class JulienManif extends BossScene {
   // ------------------------------------------------------------------ dessin
   imageEnnemi(e) {
     const s = T.spr, p = e.type + '_';
-    if (e.etat === 'fuite') return s[p + 'fuite'];
-    if (e.etat === 'touche') return s[p + 'touche'];
+    const v = e.dernier === 'tomate' ? '_rouge' : e.dernier === 'propre' ? '_propre' : '';   // les images ont du jaune d'œuf
+    if (e.etat === 'fuite') return s[p + 'fuite' + v] || s[p + 'fuite'];
+    if (e.etat === 'touche') return s[p + 'touche' + v] || s[p + 'touche'];
     if (e.type === 'lanceur') {
       if (e.etat === 'prepare') return s[p + 'bras'];
       if (e.etat === 'lance') return s[p + 'lance'];
@@ -573,7 +589,7 @@ export class JulienManif extends BossScene {
     }
     for (const o of this.tirs) {
       if (o.genre === 'fumi') liste.push({ x: o.x, y: o.y, toile: s.fumi, haut: 0.14, z: o.z });
-      else liste.push({ x: o.x, y: o.y, toile: s[o.genre], haut: o.genre === 'eau' ? 0.05 : T.hauteurs.oeuf, z: o.genre === 'eau' ? 0.4 : 0.42 });
+      else if (o.genre !== 'eau' || o.t > 0.05) liste.push({ x: o.x, y: o.y, toile: s[o.genre], haut: o.genre === 'eau' ? 0.05 : T.hauteurs.oeuf, z: o.genre === 'eau' ? 0.4 : 0.42 });
     }
     for (const f of this.fumees) liste.push({ x: f.x, y: f.y, toile: s.fumee, haut: 1.3 + 0.1 * Math.sin(f.t * 2), z: 0 });
     for (const gr of this.grenades) liste.push({ x: gr.x, y: gr.y, toile: s.grenade, haut: T.hauteurs.grenade, z: gr.z });
@@ -589,7 +605,7 @@ export class JulienManif extends BossScene {
       else if (j.mun.oeufs > 0) g.drawImage(T.main.tient, L / 2 + 60 + bx, VUE_H - 110 + by, 105, 120);
     } else {
       const m = T.main[j.arme] || T.main.tient, frappe = j.lanceT > 0;
-      const img = frappe && T.main[j.arme + '_tir'] ? T.main[j.arme + '_tir'] : m;
+      const img = frappe && j.arme !== 'eau' && T.main[j.arme + '_tir'] ? T.main[j.arme + '_tir'] : m;   // eau : le jet, ce sont les gouttes
       if (j.arme === 'eau') g.drawImage(img, L / 2 - 52 + bx * 0.5, VUE_H - 118 + by + (frappe ? 4 : 0), 112, 120);   // tenu à deux mains, au centre
       else g.drawImage(img, L / 2 + (frappe ? 30 : 60) + bx, VUE_H - (frappe ? 125 : 110) + by, 105, 120);
     }

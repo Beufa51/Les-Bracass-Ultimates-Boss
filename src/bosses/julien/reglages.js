@@ -41,7 +41,7 @@ export const REGLAGES = {
   },
   // AUTRES ARMES (touches 1 à 5 ; bouton ARME sur téléphone). La 1re cagette / pistolet / fumigène trouvé donne l'arme.
   pancarte: { cadence: 0.45, portee: 1.4, degats: 1, recul: 0.7, etourdit: 1.4 },   // un CRS frappé baisse son bouclier (etourdit s)
-  tomates: { cagette: 10, maxi: 40, cadence: 0.8, vitesse: 8, duree: 0.9, ecart: 0.13, degats: 1, recul: 0.3 },   // 3 tomates en éventail
+  tomates: { cagette: 10, maxi: 40, cadence: 0.6, vitesse: 8, duree: 0.9, degats: 2, recul: 0.5 },   // une tomate = 2 œufs, fait bien reculer
   eau: { bouteille: 120, maxi: 300, cadence: 0.07, vitesse: 11, duree: 0.45, degats: 0.2, recul: 0.06, eteint: 0.3 },   // eteint : s de lacrymo en moins par goutte
   fumigenes: { boite: 3, maxi: 9, cadence: 1.0, distance: 5, vol: 0.8, duree: 6, rayon: 1.6, degats: 1 },   // degats : par seconde dans la fumée
   sandwich: 25,          // vie rendue par un sandwich

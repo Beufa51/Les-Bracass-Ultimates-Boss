@@ -2,7 +2,7 @@
 // Le nord est en haut. Parcours en 5 zones (voir propositions/julien_audit_manif.md) :
 //  1 BOULEVARD (en bas) : départ dans la foule, zone sûre ; l'avenue du milieu est bloquée par des camions de CRS
 //  2a RUELLE TAGUÉE (à gauche) : un CRS seul (apprendre le pas de côté) ; 2b PASSAGE (à droite) : un lanceur seul
-//  3 PLACE : statue au centre (abri) ; 4 RUE DU LYCÉE : cordon de 3 CRS ; 5 PARVIS : portail fermé tant que la
+//  3 PLACE : statue au centre (abri) ; 4 RUE DU LYCÉE : cordon de 2 CRS + barrière ; 5 PARVIS : portail fermé tant que la
 //  police est là (vague finale), puis on entre dans la cour (cases S).
 //
 // Murs (chiffres) : 1 briques, 2 immeuble crème, 3 tabac (briques), 4 mur tagué, 5 palissade, 6 mur du lycée,
@@ -24,22 +24,22 @@ export const PLAN_MANIF = [
   '1112221112..b........b..1112221112',
   '1112221112......B.......1112221112',
   '1112221112.ot........cs.1112221112',
-  '2221112221...b.....B..b.2221112221',
+  '2221112221...b........b.2221112221',
   '222111222111228...3221112221112221',
   '222111222111223.P.8221112221112221',
   '222111222111223...8221112221112221',
-  '111222111222118BBB3112221112221112',
+  '111222111222118BbB3112221112221112',
   '111222111222113...8112221112221112',
   '111222111222113...8112221112221112',
   '111222111222118w..3112221112221112',
-  '222111222111223.oK8221112221112221',
+  '222111222111223..K8221112221112221',
   '222111222111223...8221112221112221',
   '222111......................112221',
   '222111.P..................P.112221',
   '111222...b..f...........b...221112',
   '111222..o...................221112',
   '111222..........T...........221112',
-  '111222.....B..........B.....221112',
+  '111222.....B................221112',
   '222111..........f........s..112221',
   '222111..p...............p...112221',
   '222111.e.w..k........k....t.112221',
