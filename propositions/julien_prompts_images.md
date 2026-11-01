@@ -134,14 +134,14 @@ Les sections 13 et 14 ne servent QUE si on fait le mini-niveau « le lycée » (
 Gemini perd la ressemblance quand il doit dessiner en même temps 8 poses en pixel art à partir d'une photo.
 On sépare donc : d'abord le VISAGE (une image qu'on refait jusqu'à ce qu'il ressemble), puis le corps entier
 à partir de CE visage, puis les poses, 4 par 4.
-Astuce : remplir la ligne « Distinctive features » avec 3 à 5 détails qui font qu'on le reconnaît (Claude peut
-les écrire si la photo est déposée dans `assets_inbox/julien/julien_photo.jpg`).
+Astuce : remplir la ligne « Distinctive features » avec 3 à 5 détails qui font qu'on le reconnaît (déjà remplie d'après la photo de Fabien ;
+la photo n'est PAS mise dans le dépôt, qui est public).
 
 ### 10a. Portrait de référence — `julien_portrait.png` (joindre la PHOTO ; recommencer jusqu'à ce qu'il ressemble)
 ```
 Turn the person in the attached photo into a pixel art portrait in the style of the DOOM (1993) status-bar face: digitized, 90s look, limited color palette, visible chunky pixels, strong shading.
 LIKENESS IS THE TOP PRIORITY: copy exactly his face shape, eyes, eyebrows, nose, mouth, ears, hairline and hairstyle, facial hair, glasses (or none), skin tone and apparent age from the photo. Do not beautify, do not make him younger, do not change his proportions, no caricature.
-Distinctive features: …
+Distinctive features: man around 40, long oval face, thick dark brown hair, messy and tousled, a few strands falling on the forehead; short full salt-and-pepper beard, grey on the chin and cheeks, darker mustache; warm closed-mouth smile; eyes narrowed and crinkled by the smile; straight, fairly long nose; light skin with rosy cheeks; no glasses.
 Head and shoulders only, seen strictly from the front, neutral expression, looking at the viewer.
 Plain solid pure white background (#FFFFFF), no text, no frame.
 ```
@@ -152,7 +152,7 @@ large, cheveux plus courts…] », plutôt que de tout relancer.
 ```
 Use the attached pixel art portrait as the exact face of this character: same face, hair, facial hair, glasses and skin tone, unchanged.
 Pixel art in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading.
-Character: a French high-school teacher, brown corduroy jacket with elbow patches over a light blue shirt and a red tie, beige trousers, brown shoes, a blue textbook under his arm. Full body, standing, seen strictly from the FRONT, facing the viewer, no perspective tilt. Head a bit large for the body (game sprite proportions) so the face stays readable.
+Character: a French high-school teacher, no glasses, brown corduroy jacket with elbow patches over a light blue shirt and a red tie, beige trousers, brown shoes, a blue textbook under his arm. Full body, standing, seen strictly from the FRONT, facing the viewer, no perspective tilt. Head a bit large for the body (game sprite proportions) so the face stays readable.
 Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame.
 ```
 

@@ -126,15 +126,18 @@ function julien(pose) {
       ovale(g, peau, 10, 51, 3, 3); ovale(g, peau, 38, 51, 3, 3);
       R(g, '#2f5fa8', 36, 44, 9, 12);   // il tient un manuel
     }
-    // tête : chauve sur le dessus, cheveux gris sur les côtés, lunettes, moustache
+    // tête (ressemblance du vrai Julien) : visage allongé, cheveux bruns épais en bataille, barbe courte
+    // poivre et sel, yeux plissés par le sourire, pas de lunettes
     ovale(g, peau, 24, 17, 9, 11);
-    R(g, '#9a9a96', 14, 14, 3, 8); R(g, '#9a9a96', 31, 14, 3, 8);
-    R(g, '#222', 17, 15, 6, 4); R(g, '#222', 25, 15, 6, 4); R(g, '#222', 23, 16, 2, 1);
-    R(g, '#cfe8ff', 18, 16, 4, 2); R(g, '#cfe8ff', 26, 16, 4, 2);
-    R(g, '#6b6b66', 20, 23, 8, 2);
+    ovale(g, '#3a2a1e', 24, 8, 10, 5); R(g, '#3a2a1e', 14, 8, 3, 8); R(g, '#3a2a1e', 31, 8, 3, 7);   // cheveux
+    R(g, '#4a372a', 18, 11, 5, 2); R(g, '#6f6a62', 30, 9, 2, 2);                                      // mèche, quelques gris
+    ovale(g, '#8d8a84', 24, 25, 8, 4); R(g, '#8d8a84', 15, 19, 3, 6); R(g, '#8d8a84', 30, 19, 3, 6);  // barbe grise
+    R(g, '#5a4a3e', 20, 22, 8, 1);                                                                    // moustache plus foncée
+    R(g, '#2a1e16', 18, 16, 4, 1); R(g, '#2a1e16', 26, 16, 4, 1);                                     // yeux plissés
+    R(g, '#2a1e16', 18, 13, 4, 1); R(g, '#2a1e16', 26, 13, 4, 1);                                     // sourcils
     if (rage) { R(g, '#3a0a0a', 21, 26, 6, 3); R(g, '#222', 17, 12, 6, 2); R(g, '#222', 25, 12, 6, 2); }
     else if (pose === 'touche' || vaincu) ovale(g, '#3a0a0a', 24, 27, 3, 2);
-    else R(g, '#5a2a1a', 21, 26, 6, 1);
+    else R(g, '#5a2a1a', 21, 24, 6, 1);
     if (pose === 'touche') { ovale(g, '#fff6d8', 28, 10, 6, 4); ovale(g, '#ffc928', 29, 10, 3, 2); }   // œuf sur le crâne
     if (vaincu) { for (const [x, y] of [[14, 2], [24, 0], [34, 2]]) ecrire(g, '★', x, y + 4, 7, '#ffd84a'); }
   });
