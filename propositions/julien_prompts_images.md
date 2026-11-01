@@ -4,6 +4,8 @@ Tout est vu de FACE, comme dans Doom : les personnages regardent toujours le jou
 Chaque prompt = le BLOC DE STYLE (collé tel quel) + le texte de l'image voulue.
 Livraison : déposer les images dans `assets_inbox/julien/` avec le nom indiqué ; Claude les découpe, enlève le fond et
 les branche (elles remplacent les dessins provisoires de `textures.js` et `visage.js`).
+Les personnages et objets DOIVENT être bien séparés (gros espace blanc entre chaque pose), sinon le découpage
+automatique est impossible : la phrase « IMPORTANT: … SEPARATED … » est dans les blocs de style.
 Conseil : une planche à la fois ; si Gemini mélange les cases, demander les poses une par une (même prompt, « single pose: … »).
 
 ## BLOC DE STYLE (personnages et objets)
@@ -12,6 +14,7 @@ limited color palette, visible chunky pixels, strong shading. Full body, seen st
 viewer, standing on the ground, no perspective tilt. Plain solid pure white background (#FFFFFF), no shadow on the
 ground, no text, no frame. Each pose in its own equal-size cell, all characters at exactly the same scale,
 feet aligned on the same bottom line. Humorous, cartoonish French street-protest theme, no blood, no gore.
+IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no part of a character, weapon, shield, sign or effect may touch or overlap another pose or the cell border; nothing sticks out of its own cell.
 
 ## 1. Policier lanceur de lacrymos — `julien_policier.png`
 French riot police officer in navy blue uniform, dark blue helmet with raised clear visor, black boots, holding a
@@ -56,6 +59,8 @@ BLOC DE STYLE TÊTE :
 Pixel art portrait in the exact style of the DOOM (1993) status bar face (Doomguy's mugshot): head and shoulders,
 seen from the front, digitized gritty 90s pixel art, limited palette. A young French student, messy brown hair,
 navy blue hoodie. Plain pure white background. Each face in its own equal-size cell, same scale and same position.
+IMPORTANT: every face is clearly SEPARATED from the others by a wide empty white gap; no hair, shoulder or hoodie
+may touch another face or the cell border.
 
 ### 6a. `julien_tete_regards.png` — 5 rangées × 3 colonnes
 Columns: 1) eyes looking to the LEFT; 2) looking straight ahead; 3) eyes looking to the RIGHT.
