@@ -841,3 +841,4 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Ancienne planche gardée : `assets_inbox/beufa_heros_profil_V48_sauvegarde.jpg` → la recopier dans
   `assets/sprites/beufa/beufa_heros_profil.jpg` (et remettre `echelleCommune: true`) pour revenir en arrière.
 - La course de profil reste l'ancienne planche.
+- V79b : pose 4 (genou trop haut) RETIRÉE → cycle contact, bas, passage × 2 (6 images, `pas` 60 inchangé).
