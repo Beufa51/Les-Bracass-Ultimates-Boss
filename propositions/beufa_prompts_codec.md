@@ -35,8 +35,7 @@ Expression: CALM and confident, neutral mouth, slightly lowered eyelids, the col
 everything. He wears the SAME SHIRT as in the photo (same type of shirt and collar), no jacket, no uniform. No text, no frame, no UI, no logo. 1:1 square image.
 
 ## 2. MACHIAVÉLIQUE
-Same character, same framing, same green codec style and scanlines as the previous image. Keep exactly the same head (same
-hair length, same beard length), same shirt as in the photo. Keep exactly the same head (same hair length, same beard length), same shirt as in
+Same character, same framing, same green codec style and scanlines as the previous image. Keep exactly the same head (same hair length, same beard length), same shirt as in
 the photo. Only the expression changes: MACHIAVELLIAN — a wide sly smirk on one side of the mouth, eyebrows angled down toward the nose, eyes
 narrowed, head tilted slightly down so the shadows darken his eyes, like a villain who just set a trap.
 No text, no frame. 1:1 square image.
