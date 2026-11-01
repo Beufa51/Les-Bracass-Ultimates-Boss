@@ -21,13 +21,13 @@ export const MANIFESTE = {
     beufa_caisse: { fichier: 'sprites/beufa/beufa_caisse.jpg', fond: 'blanc', largeur: 64, hauteur: 64, images: 1, vitesse: 1, provisoire: { forme: 'caisse_nes', couleur: '#8c541c', pixel: 2 } },
     // V28 — LE MATÉRIEL MILITAIRE (provisoire en pixel art ; dès que Fabien livre
     // les PNG dans sprites/beufa/, remplacer fichier: null par le chemin — dimensions identiques)
-    beufa_camion:     { fichier: 'sprites/beufa/beufa_camion.jpg', fond: 'blanc', largeur: 176, hauteur: 72, images: 1, vitesse: 1, provisoire: { forme: 'camion_nes', couleur: '#385438', pixel: 2 } },
-    beufa_camion_v:   { fichier: 'sprites/beufa/beufa_camion_v.jpg', fond: 'blanc', largeur: 72, hauteur: 176, images: 1, vitesse: 1, provisoire: { forme: 'camion_nes', couleur: '#385438', pixel: 2 } },
+    beufa_camion:     { fichier: 'sprites/beufa/beufa_camion.jpg', fond: 'blanc', largeur: 176, hauteur: 110, images: 1, vitesse: 1, provisoire: { forme: 'camion_nes', couleur: '#385438', pixel: 2 } },
+    beufa_camion_v:   { fichier: 'sprites/beufa/beufa_camion_v.jpg', fond: 'blanc', largeur: 72, hauteur: 178, images: 1, vitesse: 1, provisoire: { forme: 'camion_nes', couleur: '#385438', pixel: 2 } },
     // V50 : l'étagère du QG (remplace les conteneurs de port posés DANS le bâtiment) 
-    beufa_etagere:    { fichier: 'sprites/beufa/beufa_etagere.jpg', fond: 'blanc', largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545454', pixel: 2 } },
-    beufa_etagere_v:  { fichier: 'sprites/beufa/beufa_etagere_v.jpg', fond: 'blanc', largeur: 52, hauteur: 140, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545454', pixel: 2 } },
+    beufa_etagere:    { fichier: 'sprites/beufa/beufa_etagere.jpg', fond: 'blanc', largeur: 140, hauteur: 98, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545454', pixel: 2 } },
+    beufa_etagere_v:  { fichier: 'sprites/beufa/beufa_etagere_v.jpg', fond: 'blanc', largeur: 52, hauteur: 212, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545454', pixel: 2 } },
     beufa_plot:       { fichier: 'sprites/beufa/beufa_plot.jpg', fond: 'blanc', largeur: 20, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'baril_nes', couleur: '#d8701c', pixel: 2 } },
-    beufa_jeep:       { fichier: 'sprites/beufa/beufa_jeep.jpg', fond: 'blanc', largeur: 120, hauteur: 66, images: 1, vitesse: 1, provisoire: { forme: 'jeep_nes', couleur: '#38543c', pixel: 2 } },
+    beufa_jeep:       { fichier: 'sprites/beufa/beufa_jeep.jpg', fond: 'blanc', largeur: 120, hauteur: 81, images: 1, vitesse: 1, provisoire: { forme: 'jeep_nes', couleur: '#38543c', pixel: 2 } },
     beufa_helico:     { fichier: 'sprites/beufa/beufa_helico.jpg', fond: 'blanc', largeur: 184, hauteur: 100, images: 1, vitesse: 1, provisoire: { forme: 'helico_nes', couleur: '#1c3854', pixel: 2 } },
     beufa_reservoir:  { fichier: 'sprites/beufa/beufa_reservoir.jpg', fond: 'blanc', largeur: 96, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'reservoir_nes', couleur: '#385454', pixel: 2 } },
     beufa_mirador:    { fichier: 'sprites/beufa/beufa_mirador.jpg', fond: 'blanc', largeur: 84, hauteur: 110, images: 1, vitesse: 1, provisoire: { forme: 'mirador_nes', couleur: '#545038', pixel: 2 } },
@@ -60,7 +60,13 @@ export const MANIFESTE = {
     beufa_table:   { fichier: 'sprites/beufa/beufa_table.jpg', fond: 'blanc', largeur: 140, hauteur: 90, images: 1, vitesse: 1, provisoire: { forme: 'table_nes', couleur: '#a88c54', pixel: 2 } },
     beufa_projecteur: { fichier: 'sprites/beufa/beufa_projecteur.jpg', fond: 'blanc', largeur: 42, hauteur: 30, images: 1, vitesse: 1, provisoire: { forme: 'projecteur_nes', couleur: '#383854', pixel: 2 } },
     // V67 : caméra de surveillance (QG). Dessin provisoire par le code — prompt n°14 : remplacer fichier: null à la livraison
-    beufa_camera: { fichier: null, largeur: 42, hauteur: 30, images: 1, vitesse: 1, provisoire: { forme: 'camera_nes', couleur: '#8c8ca8', pixel: 1 } },
+    beufa_camera: { fichier: 'sprites/beufa/beufa_camera.jpg', fond: 'blanc', largeur: 58, hauteur: 22, images: 1, vitesse: 1, provisoire: { forme: 'camera_nes', couleur: '#8c8ca8', pixel: 1 } },
+    // V69 : livrés par Fabien — station-service (pompe), arsenal (panneau danger), QG (casiers, tableau) ; bannière = pièce du QUIZ (pas encore placée)
+    beufa_pompe:          { fichier: 'sprites/beufa/beufa_pompe.jpg', fond: 'blanc', largeur: 40, hauteur: 77, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#385438', pixel: 2 } },
+    beufa_panneau_danger: { fichier: 'sprites/beufa/beufa_panneau_danger.jpg', fond: 'blanc', largeur: 30, hauteur: 69, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#d8b81c', pixel: 2 } },
+    beufa_casiers:        { fichier: 'sprites/beufa/beufa_casiers.jpg', fond: 'blanc', largeur: 140, hauteur: 102, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
+    beufa_tableau:        { fichier: 'sprites/beufa/beufa_tableau.jpg', fond: 'blanc', largeur: 120, hauteur: 105, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
+    beufa_banniere:       { fichier: 'sprites/beufa/beufa_banniere.jpg', fond: 'blanc', largeur: 40, hauteur: 121, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#701c1c', pixel: 2 } },
     beufa_porte:  { fichier: 'sprites/beufa/beufa_porte.jpg', fond: 'blanc', largeur: 72, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'porte_nes', couleur: '#545454', ouverte: true, pixel: 2 } },
     beufa_porte_verrouillee: { fichier: 'sprites/beufa/beufa_porte_verrouillee.jpg', fond: 'blanc', largeur: 64, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'porte_nes', couleur: '#545454', ouverte: false, pixel: 2 } },
     beufa_garde:  { fichier: 'sprites/beufa/beufa_garde.jpg', fond: 'blanc', largeur: 48, hauteur: 48, images: 6, vitesse: 6, provisoire: { forme: 'garde_nes', couleur: '#385438', pixel: 2 } },

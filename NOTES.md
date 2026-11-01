@@ -755,3 +755,13 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   ouest et est. Astuce de la cour mise à jour.
 - E (MGS) : le halo de la caméra du QG part de y 130 (avant 60) → collé au mur nord sous la caméra, on n'est
   jamais dans le halo. Astuce du QG mise à jour. Testé dans le jeu (Playwright) : 1 bruit en traversant une flaque.
+
+## BEUFA — V69 : 11 IMAGES LIVRÉES (camions, étagères, jeep, caméra, pompe, panneau danger, casiers, tableau, bannière)
+- Originaux `assets_inbox/*_3q.jpg` (ceux des camions/étagères REMPLACENT les anciens vus d'en haut). Camion
+  vertical livré en 2 morceaux (dessus + face avant détachée) : recollé (bâche + toit 45-860, face avant 1345-fin).
+- Tailles du jeu (emprises INCHANGÉES, l'image monte au-dessus) : camion 176×110, camion_v 72×178, étagère 140×98,
+  étagère_v 52×212, jeep 120×81, caméra 58×22 (vraie image, plus de dessin provisoire).
+- Placés : pompe (parc, 1150,506, contre le réservoir) ; panneau danger (arsenal, 326,296, coin de la zone balisée) ;
+  casiers (QG, 150,494, à la place de l'étagère de l'entrée = vestiaire) ; tableau de briefing (QG, 880,84, à la
+  place d'une console, face à la table). Bannière : en réserve pour la pièce du QUIZ.
+- Vérif : 0 erreur, 0 avertissement. Manquent encore : réservoir 3/4 (n°12), jerricans (n°7).
