@@ -97,7 +97,7 @@ export class BeufaQuiz extends BossScene {
   }
 
   // V83 : les EXPRESSIONS du codec (images de Fabien : beufa_codec_masque / _calme / _choque / _surpris /
-  // _machiavelique). Tant qu'une image manque, on garde le portrait actuel.
+  // _machiavelique / _souriant). Tant qu'une image manque, on garde le portrait actuel.
   visage(humeur) {
     const cle = this.masque ? 'beufa_codec_masque' : `beufa_codec_${humeur}`;
     const t = this.textures.exists(cle) ? cle : (this.masque ? 'beufa_portrait_masque' : 'beufa_portrait');
@@ -237,7 +237,7 @@ export class BeufaQuiz extends BossScene {
         this.bons++;
         jouerSon(this, 'beufa_bon');
         this.serie = (this.serie || 0) + 1;
-        this.visage(this.serie >= 3 ? 'choque' : 'surpris');   // 3 bonnes d'affilée : il n'en revient pas
+        this.visage(this.serie >= 3 ? 'choque' : this.serie === 2 ? 'surpris' : 'souriant');   // 3 d'affilée : il n'en revient pas
         this.dire([hasard(BRAVOS)], () => this.questionSuivante());
       } else {
         this.erreurs++;

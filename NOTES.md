@@ -881,9 +881,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 ## BEUFA — V83 : RIDEAU + EXPRESSIONS DU CODEC
 - Le masque ne s'enlève plus par un flash : un RIDEAU (2 panneaux noirs liserés vert) se ferme, Beufa est changé
   derrière, le rideau se rouvre sur Beufa sans masque à son bureau.
-- `visage(humeur)` dans `BeufaQuiz.js` : masque / calme / machiavelique / surpris / choque, selon le moment
+- `visage(humeur)` dans `BeufaQuiz.js` : masque / calme / machiavelique / souriant / surpris / choque, selon le moment
   (tableau dans `propositions/beufa_prompts_codec.md`). Clés attendues : `beufa_codec_<humeur>` ; tant qu'elles
   n'existent pas, le portrait actuel reste. NE PAS ajouter d'entrée `fichier: null` au manifeste (le dessin
   provisoire créerait la clé et remplacerait le vrai portrait) : ajouter les entrées seulement quand les images arrivent.
 - Prompts Gemini des 5 portraits codec (style MGS PS1, vert) : `propositions/beufa_prompts_codec.md`.
-- Reste : recevoir les 5 images (`assets_inbox/beufa_codec_*.jpg`), les préparer (carré, ~120 px) et les brancher.
+- Reste : recevoir les 6 images (`assets_inbox/beufa_codec_*.jpg`), les préparer (carré, ~120 px) et les brancher.

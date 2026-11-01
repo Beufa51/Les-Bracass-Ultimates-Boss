@@ -6,7 +6,7 @@ puis demander les autres « same character, same framing, only the expression ch
 
 Une fois reçues, les déposer dans `assets_inbox/` avec ces noms exacts, et Claude les branche :
 `beufa_codec_masque.jpg`, `beufa_codec_calme.jpg`, `beufa_codec_choque.jpg`, `beufa_codec_surpris.jpg`,
-`beufa_codec_machiavelique.jpg`.
+`beufa_codec_machiavelique.jpg`, `beufa_codec_souriant.jpg`.
 
 Quand elles s'affichent dans le jeu :
 | Image | Moment |
@@ -14,7 +14,8 @@ Quand elles s'affichent dans le jeu :
 | masque | toute la lecture des pensées (avant le rideau) |
 | calme | après le rideau, et pendant chaque question |
 | machiavelique | « début du quiz », erreur, temps écoulé, 10 dernières secondes, GAME OVER |
-| surpris | bonne réponse |
+| souriant | 1re bonne réponse d'une série (« pas mal… ») |
+| surpris | 2 bonnes réponses d'affilée |
 | choque | 3 bonnes réponses d'affilée, et la victoire |
 
 ## Bloc de style (commun, déjà inclus dans chaque prompt)
@@ -51,6 +52,12 @@ Same character, same framing, same green codec style and scanlines. Keep exactly
 the photo. Only the expression changes: SHOCKED —
 eyes very wide with small pupils, eyebrows up and pinched, jaw dropped, a drop of sweat on the temple, sharp
 dramatic shadows, like a boss who cannot believe he is losing. No text, no frame. 1:1 square image.
+
+## 6. SOURIANT
+Same character, same framing, same green codec style and scanlines. Keep exactly the same head (same hair length,
+same beard length), same shirt as in the photo. Only the expression changes: SMILING — a warm, genuine friendly
+smile showing a little of the teeth, relaxed eyebrows, eyes slightly squinted by the smile, small smile lines at
+the corners of the eyes, like a boss who is amused and pleased. No text, no frame. 1:1 square image.
 
 ## 5. MASQUÉ (façon Psycho Mantis)
 Same character, same framing, same green codec style and scanlines. Now his whole face is hidden behind a
