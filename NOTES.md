@@ -975,6 +975,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   puis aïe g, aïe d, tousse, content, KO) ; regards manquants de la planche Gemini = miroir (liste TETES du script).
   CRS : 10 poses livrées, 7 utilisées. MURS : les 7 livrés + un 2e tabac en pierre (mur n°8 du plan).
 - MUSIQUE : « At Doom's Gate » (DOOM E1M1, déposée par Fabien) → `assets/audio/julien/julien_musique.mp3` (mono 64 kb/s, 1 Mo), en boucle dès l'arrivée dans le niveau.
+- AUDIT LEVEL DESIGN + DÉCORS (Fabien : « pas très jouable, faiblard ») : `propositions/julien_audit_manif.md`
+  (nouveau parcours en 5 zones, portail verrouillé, cordon de CRS, tableau de fin façon Doom, murs hauts, sol texturé,
+  ciel panoramique, variantes de murs sans panneau, gros objets). En attente du choix de Fabien.
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,
