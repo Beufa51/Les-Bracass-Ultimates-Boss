@@ -998,6 +998,10 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
 - SONS : 12 bruitages rétro fabriqués par `outils/julien/generer_sons.py` (WAV) + ambiance de manif en boucle
   `julien_foule.mp3` (foule, tambours, sifflets) jouée avec la musique ; toux dans le gaz (1 fois / 1,3 s).
   Voix à enregistrer par Fabien (facultatif) : « Dispersez-vous ! », « Aïe ! », toux, « Beurk ! ».
+- Retours Fabien : sifflets agaçants → retirés (CRS = cri grave grésillant, fuite = petits pas pressés, ambiance =
+  foule + tambour) ; trop d'œufs pour gagner → lanceur 2 œufs, CRS 2 œufs (pendant l'essoufflement).
+- CARTE façon Doom (TAB ou M ; bouton CARTE en haut à droite sur téléphone) : filigrane, nord en haut, seulement les
+  murs déjà vus (le raycaster les note dans `decor.vus`), portail en jaune, flèche blanche = toi.
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,

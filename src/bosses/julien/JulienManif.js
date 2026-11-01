@@ -68,6 +68,10 @@ export class JulienManif extends BossScene {
     // commandes de Doom (1993), tout au clavier : Alt + ← → pas de côté (ou , et .), Ctrl tirer, Maj courir
     this.cotes = this.input.keyboard.addKeys({ alt: K.ALT, ctrl: K.CTRL, maj: K.SHIFT, virgule: K.COMMA, point: K.PERIOD,
       q: K.Q, d: K.D });
+    this.touchesCarte = this.input.keyboard.addKeys({ tab: K.TAB, m: K.M });
+    this.carte = false;
+    T.decor.vus = new Uint8Array(this.plan[0].length * this.plan.length);   // murs déjà vus (la carte n'affiche qu'eux)
+    this.installerBoutonCarte();
     this.tactile = estTactile();   // téléphone : croix = avancer / reculer / pas de côté, ↺ ↻ = tourner, ŒUF en haut
     this.enJeu = false;
     jouerMusique(this, 'julien_musique');   // « At Doom's Gate », en boucle
@@ -79,6 +83,7 @@ export class JulienManif extends BossScene {
       tact ? '▲ ▼ : avancer / reculer      ◀ ▶ : pas de côté' : '↑ ↓ : avancer / reculer      ← → : tourner',
       tact ? '↺ ↻ : tourner' : 'ALT + ← → (ou , et .) : pas de côté',
       tact ? 'ŒUF : lancer un œuf' : 'CTRL : lancer un œuf      MAJ : courir',
+      tact ? 'CARTE (en haut à droite) : la carte, comme dans Doom' : 'TAB ou M : la carte, comme dans Doom',
       'Les lacrymos piquent : sors vite du nuage.',
       'Le bouclier arrête les œufs, SAUF quand le CRS',
       'est essoufflé après sa charge : esquive de côté puis vise !',
@@ -127,6 +132,19 @@ export class JulienManif extends BossScene {
     this.zonesVues = new Set(); this.portailOuvert = false; this.temps = 0;
   }
 
+  // Téléphone : bouton CARTE en haut à droite (sur ordinateur : TAB ou M)
+  installerBoutonCarte() {
+    if (!estTactile()) return;
+    const b = document.createElement('button');
+    b.textContent = 'CARTE';
+    Object.assign(b.style, { position: 'fixed', top: '6px', right: '8px', height: '34px', padding: '0 10px', zIndex: 11,
+      border: '2px solid rgba(255,255,255,0.55)', borderRadius: '10px', background: 'rgba(20,20,30,0.45)', color: '#fff',
+      font: 'bold 14px monospace', touchAction: 'none' });
+    b.addEventListener('pointerdown', (e) => { e.preventDefault(); if (this.enJeu) this.carte = !this.carte; });
+    document.body.appendChild(b);
+    this.events.once('shutdown', () => b.remove());
+  }
+
   message(t, duree = 2.8) { this.txtMsg.setText(t); this.msgT = duree; }
 
   // collision : murs + objets solides (cercle). ignore : l'entité qui bouge (pour ne pas se bloquer elle-même)
@@ -165,6 +183,7 @@ export class JulienManif extends BossScene {
   update(temps, delta) {
     const dt = Math.min(delta / 1000, 0.05);
     if (this.enJeu && !this.termine) {
+      if (vientDAppuyer(this.touchesCarte.tab) || vientDAppuyer(this.touchesCarte.m)) this.carte = !this.carte;
       this.bougerJoueur(dt);
       this.ennemis.forEach(e => this.ia(e, dt));
       this.projectiles(dt);
@@ -500,11 +519,35 @@ export class JulienManif extends BossScene {
     if (j.gaz > 0) { g.fillStyle = `rgba(190,205,160,${0.5 * j.gaz})`; g.fillRect(0, 0, L, VUE_H); }
     if (j.rouge > 0) { g.fillStyle = `rgba(200,0,0,${j.rouge * 0.6})`; g.fillRect(0, 0, L, VUE_H); }
 
+    if (this.carte) this.dessinerCarte(g);
     this.dessinerBarre(g, cam);
     this.toile.refresh();
     this.txtVie.setText(`${Math.ceil(j.vie)}%`);
     this.txtOeufs.setText(`${j.oeufs}`);
     this.txtFlics.setText(`${this.repousses} / ${this.total}`);
+  }
+
+  // Carte en filigrane façon Doom : murs déjà vus (rouge), portail (jaune), toi (flèche blanche) ; le nord en haut
+  dessinerCarte(g) {
+    const E = 7, j = this.j, p = this.plan, vus = T.decor.vus, W = p[0].length, H = p.length;
+    const ox = Math.round(L / 2 - j.x * E), oy = Math.round(VUE_H / 2 - j.y * E);
+    g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillRect(0, 0, L, VUE_H);
+    const mur = (x, y) => murEn(p, x, y) !== 0;
+    for (const [couleur, filtre] of [['rgba(255,80,60,0.9)', (c) => c !== 7], ['rgba(255,216,74,0.95)', (c) => c === 7]]) {
+      g.fillStyle = couleur;
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+        if (!vus[y * W + x] || !mur(x, y) || !filtre(murEn(p, x, y))) continue;
+        const X = ox + x * E, Y = oy + y * E;
+        if (!mur(x, y - 1)) g.fillRect(X, Y, E + 1, 1);
+        if (!mur(x, y + 1)) g.fillRect(X, Y + E, E + 1, 1);
+        if (!mur(x - 1, y)) g.fillRect(X, Y, 1, E + 1);
+        if (!mur(x + 1, y)) g.fillRect(X + E, Y, 1, E + 1);
+      }
+    }
+    const cx = L / 2, cy = VUE_H / 2, dx = Math.cos(j.a), dy = Math.sin(j.a);
+    g.fillStyle = '#ffffff'; g.beginPath();
+    g.moveTo(cx + dx * 6, cy + dy * 6); g.lineTo(cx - dx * 4 - dy * 4, cy - dy * 4 + dx * 4); g.lineTo(cx - dx * 4 + dy * 4, cy - dy * 4 - dx * 4);
+    g.fill();
   }
 
   dessinerBarre(g, cam) {

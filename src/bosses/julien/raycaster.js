@@ -88,6 +88,7 @@ export function rendre(ctx, l, h, plan, cam, decor, sprites) {
       if (hm <= plusHaut) continue;   // caché par un mur plus proche au moins aussi haut
       const perp = Math.max(0.01, cote === 0 ? distX - ddx : distY - ddy);
       touches[n++] = { code, cote, perp, cx, cy, hm };
+      if (decor.vus) decor.vus[cy * decor.sol.largeur + cx] = 1;   // pour la carte : ce mur a été vu
       plusHaut = hm;
       if (hm >= 3) break;
     }

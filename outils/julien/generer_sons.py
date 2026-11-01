@@ -44,9 +44,10 @@ d = 0.18; x = t(d)
 ecrire('julien_plonk', (np.sin(2 * np.pi * 620 * x) + 0.6 * np.sin(2 * np.pi * 1390 * x)) * env(d, 0.001, 0.04)
        + 0.4 * passe_haut(bruit(d), 2000) * env(d, 0.001, 0.01), 0.6)
 
-# policier qui s'enfuit : sifflet à coulisse qui descend (comique)
-d = 0.6
-ecrire('julien_fuite', glisse(d, 1300, 320) * env(d, 0.01, 0.4) * (1 + 0.15 * np.sin(2 * np.pi * 9 * t(d))), 0.5)
+# policier qui s'enfuit : petits pas pressés qui s'éloignent (Fabien : pas de sifflet, c'était agaçant)
+pas = [passe_bas(bruit(0.05), 900) * env(0.05, 0.001, 0.012) * (1 - k / 7) + 0.4 * glisse(0.05, 140, 90) * env(0.05, 0.001, 0.015) * (1 - k / 7)
+       for k in range(7)]
+ecrire('julien_fuite', coller(*[coller(p, silence(0.045)) for p in pas]), 0.6)
 
 # héros touché : grognement « hmpf » (scie filtrée qui descend)
 d = 0.22
@@ -62,10 +63,11 @@ gaz = bande(bruit(d), 1800, 7000) * np.clip(x / 0.05, 0, 1) * np.exp(-x / 0.45)
 gaz[:int(SR * 0.04)] += 0.8 * passe_bas(bruit(0.04), 900)
 ecrire('julien_gaz', gaz, 0.55)
 
-# CRS qui va charger : sifflet de police à deux tons, trillé
-d = 0.55; x = t(d)
-trille = np.where(np.sin(2 * np.pi * 26 * x) > 0, 2900, 2500)
-ecrire('julien_cri', np.sin(2 * np.pi * np.cumsum(trille) / SR) * env(d, 0.01, 0.5), 0.45)
+# CRS qui va charger : cri grave dans le casque « HAAA ! » (voix grésillante, pas de sifflet)
+d = 0.45; x = t(d)
+voix = glisse(d, 150, 120, scie) * (1 + 0.08 * np.sin(2 * np.pi * 6 * x))
+voix = np.tanh(3 * bande(voix, 350, 1600))   # grésillement de mégaphone
+ecrire('julien_cri', voix * np.clip(x / 0.03, 0, 1) * np.exp(-np.maximum(0, x - 0.25) / 0.08), 0.5)
 
 # objet ramassé : petit arpège rétro
 notes = [523, 659, 784, 1047]
@@ -86,7 +88,7 @@ ecrire('julien_portail', grince * 0.6 + clang, 0.7)
 d = 0.8; x = t(d)
 ecrire('julien_secret', passe_bas(bruit(d), 300) * np.sin(np.pi * x / d) + 0.3 * passe_bas(glisse(d, 60, 45, scie), 400) * np.sin(np.pi * x / d), 0.8)
 
-# ambiance de manif en boucle (8 s) : brouhaha de foule, tambours, sifflets au loin
+# ambiance de manif en boucle (8 s) : brouhaha de foule et tambour (sans sifflets)
 d = 8.0; x = t(d)
 foule = np.zeros_like(x)
 for f0, f1 in [(250, 900), (500, 1600), (900, 2600)]:   # voix mélangées : bruit filtré qui ondule
@@ -95,9 +97,6 @@ foule *= 0.8
 for k in range(16):   # tambour de manif (2 coups par seconde)
     p = int(SR * k * 0.5); n = int(SR * 0.25)
     foule[p:p + n] += 1.4 * glisse(0.25, 110, 55) * env(0.25, 0.001, 0.06)
-for p in [1.3, 4.1, 6.6]:   # sifflets au loin
-    i = int(SR * p); n = int(SR * 0.35)
-    foule[i:i + n] += 0.35 * np.sin(2 * np.pi * 2600 * t(0.35)) * env(0.35, 0.02, 0.2)
 n = int(SR * 0.5)   # raccord de boucle : fondu croisé du début et de la fin
 foule[:n] = foule[:n] * np.linspace(0, 1, n) + foule[-n:] * np.linspace(1, 0, n)
 foule = foule[:-n]

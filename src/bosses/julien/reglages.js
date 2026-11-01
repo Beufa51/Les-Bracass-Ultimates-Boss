@@ -23,7 +23,7 @@ export const REGLAGES = {
   },
   sandwich: 25,          // vie rendue par un sandwich
   lanceur: {             // policier qui lance des lacrymos
-    vie: 3,              // œufs pour le faire fuir
+    vie: 2,              // œufs pour le faire fuir
     vitesse: 1.3,
     vue: 9,              // distance à laquelle il te repère
     distance: 4.5,       // il essaie de rester à cette distance
@@ -31,7 +31,7 @@ export const REGLAGES = {
     preavis: 0.6,        // il lève le bras ce temps-là AVANT de lancer (pour que tu le voies venir)
   },
   bouclier: {            // CRS au bouclier : les œufs s'écrasent sur le bouclier, SAUF quand il est essoufflé après une charge
-    vie: 4,
+    vie: 2,              // œufs (seulement quand il est essoufflé)
     vitesse: 1.1,
     vue: 8,
     porteeCharge: 6,     // il charge quand tu es à moins de ça
