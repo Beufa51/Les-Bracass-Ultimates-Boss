@@ -316,7 +316,7 @@ export class JulienManif extends BossScene {
     // Téléphone (demande de Fabien) : ◀ ▶ = pas de côté ; boutons ↺ (touche Z) et ↻ (Espace) = tourner ; ŒUF (touche X).
     const modeCote = this.tactile || c.alt.isDown || k.x.isDown;
     const maj = !this.tactile && (c.maj.isDown || k.espace.isDown);
-    const course = (R.toujoursCourir ? !maj : maj) ? R.course : 1;   // toujours courir : Maj fait marcher
+    const course = this.tactile ? (R.tactile.courir ? R.course : 1) : ((R.toujoursCourir ? !maj : maj) ? R.course : 1);   // toujours courir : Maj fait marcher
     let tourne = 0, avance = 0, cote = 0;
     if (k.gauche.isDown) { if (modeCote) cote -= 1; else tourne -= 1; }
     if (k.droite.isDown) { if (modeCote) cote += 1; else tourne += 1; }
@@ -330,7 +330,7 @@ export class JulienManif extends BossScene {
     if (k.haut.isDown) avance += course;
     if (k.bas.isDown) avance -= course;
     cote = Math.sign(cote) * course;
-    j.a += tourne * R.rotation * dt;
+    j.a += tourne * (this.tactile ? R.tactile.rotation : R.rotation) * dt;
     const dx = Math.cos(j.a), dy = Math.sin(j.a);
     const v = j.cafe > 0 ? RG.bonus.cafeVitesse : 1;   // café serré : plus rapide
     const mx = (dx * avance * R.vitesse + -dy * cote * R.vitesseCote) * dt * v;

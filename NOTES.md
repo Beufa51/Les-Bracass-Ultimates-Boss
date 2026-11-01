@@ -1046,6 +1046,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   `majFourgon`) ; LUMIÈRE : ruelle sombre (`SOMBRE`, murs + sol assombris), néons des vitrines de la rue du lycée
   qui grésillent (`NEONS`) ; changement d'arme animé (0,3 s, pas de tir pendant) ; tableau des munitions sous
   « policiers repoussés ». Sons farine / fourgon / rideau.
+- Retours Fabien : bouts blancs sur les manifestants → `detourer(nettoyer=True)` (trous blancs enfermés > 20 px
+  rendus transparents + liseré clair retiré ; manifestants et policier, PAS le CRS à cause des reflets du bouclier) ;
+  trop rapide sur téléphone → `RG.joueur.tactile` (pas de course, rotation 2,0).
 - À FAIRE (audit Doom) : point 3 : BAC en civil, tireur de LBD, policiers en hauteur, sono (BFG). Point 4 : clé + porte + boucle.
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;

@@ -117,8 +117,11 @@ def poses(img, centres):
     return [np.isin(lab, c) if c else None for c in choix], dessin
 
 
-def detourer(img, m):
-    """Image RGBA de la pose : boîte englobante, fond (blanc relié au bord) transparent."""
+def detourer(img, m, nettoyer=False):
+    """Image RGBA de la pose : boîte englobante, fond (blanc relié au bord) transparent.
+    nettoyer (personnages) : les TROUS blancs enfermés (entre un bras levé et la pancarte…) deviennent transparents
+    s'ils sont assez larges (> 20 px dans les 2 sens : on garde les rayures d'une marinière, les yeux, les baskets),
+    et le liseré clair autour de la silhouette est retiré."""
     ys, xs = np.where(m)
     y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
     bloc = img[y0:y1, x0:x1]
@@ -128,6 +131,17 @@ def detourer(img, m):
     lab, _ = nd.label(clair)
     bords = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
     transparent = np.isin(lab, list(bords))
+    if nettoyer:
+        mn, mx = bloc.min(axis=2), bloc.max(axis=2)
+        blanc = (mn > 225) & (mx - mn < 30)
+        lab2, n2 = nd.label(blanc & ~transparent)
+        for i, sl in enumerate(nd.find_objects(lab2)):
+            if sl and sl[0].stop - sl[0].start > 20 and sl[1].stop - sl[1].start > 20:
+                transparent |= lab2 == i + 1
+        clair = (mn > 205) & (mx - mn < 40)
+        for _ in range(3):   # liseré : pixel clair qui touche le transparent
+            voisin = nd.binary_dilation(transparent)
+            transparent |= voisin & clair
     alpha = np.where(transparent, 0, 255).astype(np.uint8)
     rgba = np.dstack([bloc.clip(0, 255).astype(np.uint8), alpha])
     return Image.fromarray(rgba, 'RGBA')
@@ -159,7 +173,7 @@ def main():
                 print('  !! pose introuvable :', nom)
                 continue
             noms.append(nom)
-            ims.append(detourer(img, m))
+            ims.append(detourer(img, m, nettoyer=groupe in ('policier', 'manif1', 'manif2')))   # pas le CRS : les reflets blancs du bouclier
         if groupe.startswith('tete'):
             for n, i in zip(noms, ims):
                 morceaux[n] = i
