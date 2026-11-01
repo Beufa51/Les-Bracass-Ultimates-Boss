@@ -1108,7 +1108,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   coupé en 3 (`tableau_0/1/2`, murs 5 6 7 du plan ; une seule porte). Branchés dans `JulienClasse` (`MURS_IMAGES`).
   EN ATTENTE du mini-niveau « le lycée » (dans `assets_inbox/julien/`, pas encore découpés) : murs casiers, couloir
   (panneau d'affichage), cantine ; planches surveillant (6 poses), cantinière (6), fayot (4).
-  MANQUENT encore : objets de la classe (table, bureau, livre, dico, copie, craie, sarbacane…) et élèves assis.
+  Lot 3 : OBJETS DE LA CLASSE (`OBJETS_CLASSE`, traits de grille effacés par `TRAITS`) : table (avec sa chaise),
+  bureau, livre, dico, copie BRANCHÉS (`OBJETS_IMAGES` dans JulienClasse) ; craie, sarbacane, extincteur, cartable,
+  canette découpés pour plus tard ; ÉLÈVES ASSIS `eleve_<0-3>_<content|cache>` découpés (pour le combat refait, B).
 - PROMPTS des images du niveau 2 + images manquantes de la manif : `propositions/julien_prompts_images.md`, sections
   10 à 16 (Julien 8 poses, objets de la classe, élèves assis, ennemis du lycée, murs, bonus de la manif, rideau de fer).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;

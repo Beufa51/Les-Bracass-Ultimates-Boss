@@ -23,6 +23,9 @@ const L = 480, VUE_H = 222;   // comme JulienManif
 const hasard = (liste) => liste[(Math.random() * liste.length) | 0];
 // vraies images des murs de la classe (outils/julien/decouper_planches.py) : code du plan → image
 const MURS_IMAGES = { 1: 'mur_classe', 3: 'fenetres_classe', 4: 'porte_classe', 5: 'tableau_0', 6: 'tableau_1', 7: 'tableau_2', a: 'mur_classe_affiche' };
+// vraies images des objets (table avec sa chaise, bureau, projectiles) et leur hauteur dans le monde
+const OBJETS_IMAGES = ['table', 'bureau', 'livre', 'dico', 'copie'];
+const HAUTEURS_IMAGES_CLASSE = { table: 0.72, bureau: 0.62, livre: 0.15, dico: 0.17, copie: 0.15 };
 const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'dos', 'rage', 'vaincu'];
 const RANGEES = [1.6, 2.5, 3.4, 4.5, 5.5, 7.5, 9.5, 11.5];   // allées où Julien peut marcher en phase 3
 
@@ -31,7 +34,7 @@ export class JulienClasse extends JulienManif {
 
   // vraies images de Julien (outils/julien/decouper_prof.py) ; image absente = dessin provisoire
   preload() {
-    for (const n of [...POSES_PROF.map(p => 'julien_' + p), ...Object.values(MURS_IMAGES)]) {
+    for (const n of [...POSES_PROF.map(p => 'julien_' + p), ...Object.values(MURS_IMAGES), ...OBJETS_IMAGES]) {
       if (!this.textures.exists('julien_' + n)) this.load.image('julien_' + n, `assets/sprites/julien/julien_${n}.png`);
     }
     super.preload();
@@ -46,6 +49,7 @@ export class JulienClasse extends JulienManif {
       Object.assign(T.hauteurs, HAUTEURS_CLASSE);
       T.classe = construireDecorClasse(this.ctx, L, VUE_H);
       const img = (n) => this.textures.exists('julien_' + n) ? this.textures.get('julien_' + n).getSourceImage() : null;
+      for (const n of OBJETS_IMAGES) { const i = img(n); if (i) { T.spr[n] = i; T.hauteurs[n] = HAUTEURS_IMAGES_CLASSE[n]; } }
       for (const [code, n] of Object.entries(MURS_IMAGES)) {
         const i = img(n); if (!i || code === 'a') continue;
         const m = T.classe.murs;

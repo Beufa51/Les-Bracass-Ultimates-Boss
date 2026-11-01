@@ -31,6 +31,9 @@ GROUPES = {
     'main_tomates': ('julien_main_tomates.jpg', 240, [('main_tomates', (330, 330)), ('main_tomates_tir', (1060, 370))]),
     'main_eau': ('julien_main_eau.jpg', 240, [('main_eau', (340, 460)), ('main_eau_tir', (1130, 420))]),
     'main_fumigenes': ('julien_main_fumigenes.jpg', 240, [('main_fumigenes', (360, 330)), ('main_fumigenes_tir', (1060, 500))]),
+    # élèves assis (rangée du haut ; celle du bas est un doublon) : A content, A caché, B…, D caché
+    'eleves': ('julien_eleves.jpg', 180, [(f'eleve_{k // 2}_{"content" if k % 2 == 0 else "cache"}', (x, 200))
+        for k, x in enumerate([115, 300, 465, 630, 815, 990, 1165, 1325])]),
     'tete_regards': ('julien_tete_regards.jpg', 96, [
         (f'r{r}c{c}', (140 + c * 281, 140 + r * 255)) for r in range(3) for c in range(5)]),
     'tete_expr': ('julien_tete_expressions.jpg', 96, [
@@ -52,6 +55,17 @@ OBJETS_ARMES = ('julien_objets_armes.jpg', [
 OBJETS_BONUS = ('julien_objets_bonus.jpg', [
     ('echarpe', (176, 190), 60), ('cafe', (528, 200), 55), ('kway', (880, 180), 55), ('farine', (1232, 190), 90),
     (None, (176, 576), 90), ('nuage_farine', (528, 570), 160), ('eau', (880, 570), 24), ('fumi', (1232, 560), 50)])
+
+# objets de la CLASSE (niveau 2) ; la 2e copie est ignorée
+OBJETS_CLASSE = ('julien_objets_classe.jpg', [
+    ('table', (145, 190), 110), ('bureau', (495, 190), 120), ('livre', (825, 185), 50), ('dico', (1060, 190), 60),
+    ('copie', (1290, 185), 50), (None, (115, 555), 50), ('craie', (350, 555), 24), ('sarbacane', (565, 570), 70),
+    ('extincteur', (820, 560), 110), ('cartable', (1055, 580), 80), ('canette', (1290, 580), 50)])
+
+# traits de grille que le nettoyage automatique rate (cases de largeurs différentes selon la rangée) :
+# planche → [(x0, y0, x1, y1), ...] effacés en blanc
+TRAITS = {'julien_objets_classe.jpg': [(x - 3, 0, x + 4, 386) for x in (292, 703, 938, 1173)]
+          + [(x - 3, 380, x + 4, 768) for x in (234, 469, 703, 938, 1173)] + [(0, 380, 1408, 388)]}
 
 # murs de la CLASSE (niveau 2) : 2 de large pour 3 de haut, réduits à 128 × 192 ; le tableau est coupé en 3
 MURS_CLASSE = ['mur_classe', 'mur_classe_affiche', 'fenetres_classe', 'porte_classe']
@@ -200,10 +214,12 @@ def main():
     planche.save(SORTIE + 'julien_tetes.png')
     print('   tetes', L, 'x 96 ×', len(cases))
 
-    for fichier, liste in (OBJETS, OBJETS_ARMES, OBJETS_BONUS):
+    for fichier, liste in (OBJETS, OBJETS_ARMES, OBJETS_BONUS, OBJETS_CLASSE):
         if not os.path.exists(ENTREE + fichier):
             continue
-        img = charger(fichier)
+        img = charger(fichier).copy()
+        for x0, y0, x1, y1 in TRAITS.get(fichier, []):
+            img[y0:y1, x0:x1] = 255
         masques, _ = poses(img, [c for _, c, _ in liste])
         for (nom, _, h), m in zip(liste, masques):
             if nom is None or m is None:
