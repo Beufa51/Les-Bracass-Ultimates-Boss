@@ -131,10 +131,11 @@ Mêmes règles qu'au-dessus (un prompt = une image, poses bien séparées, fond 
 Les sections 13 et 14 ne servent QUE si on fait le mini-niveau « le lycée » (voir `julien_audit_classe.md`).
 
 ## 10. Julien, le prof (le boss) — `julien_prof.png`
-⚠️ Adapter la ligne « Character » au VRAI Julien (cheveux, barbe, lunettes, tenue…) : c'est la ligne qui compte.
+⚠️ JOINDRE LA PHOTO du vrai Julien dans Gemini avec ce prompt (la ressemblance vient de la photo).
 ```
+Use the attached photo as the reference for this character: keep his face, hairstyle, facial hair, glasses (if any), skin tone and build so that he is clearly RECOGNIZABLE, slightly caricatured in a funny way (bigger head, expressive face). Do not copy the photo's background or pose.
 Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. Humorous, cartoonish French high-school theme, no blood, no gore.
-Character: a French high-school teacher in his forties, glasses, short hair, light stubble, brown corduroy jacket with elbow patches over a light blue shirt and a red tie, beige trousers, brown shoes. Full body, seen strictly from the FRONT, facing the viewer, no perspective tilt.
+Character: the man from the photo as a French high-school teacher, brown corduroy jacket with elbow patches over a light blue shirt and a red tie, beige trousers, brown shoes. Full body, seen strictly from the FRONT, facing the viewer, no perspective tilt.
 8 poses in one row, each in its own equal-size cell, same scale, feet aligned on the same bottom line:
 1) walking, left foot forward, a blue textbook under his arm; 2) walking, right foot forward; 3) holding a thick book high above his head with both hands, about to throw it, angry eyebrows; 4) arm thrown forward, just released the book; 5) hit in the face by an egg, flinching, egg yolk on his glasses and jacket; 6) seen from the BACK, writing on an invisible blackboard with a piece of chalk, arm raised; 7) furious, red face, both fists raised, shouting, tie askew; 8) defeated, sitting on the floor, dizzy, glasses crooked, egg yolk all over.
 Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
