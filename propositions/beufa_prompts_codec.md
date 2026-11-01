@@ -38,31 +38,31 @@ Expression: SMILING — a warm, genuine friendly smile showing a little of the t
 squinted by the smile, small smile lines at the corners of the eyes, like a boss who is amused and pleased. He wears the SAME SHIRT as in the photo (same type of shirt and collar), no jacket, no uniform. No text, no frame, no UI, no logo. 1:1 square image.
 
 ## 2. CALME
-Same character, same framing, same green codec style and scanlines as the previous image. Keep exactly the same head
+Same character, same framing, same style as the previous image: friendly CARTOON caricature in clean 16-bit pixel art, monochrome phosphor green codec screen, simple flat shading, soft lighting, nothing realistic or scary, CRT scanlines. Keep exactly the same head
 (same hair length, same beard length), same shirt as in the photo. Only the expression changes: CALM and confident,
-neutral mouth, slightly lowered eyelids, the cold look of a boss who controls everything. No text, no frame.
+relaxed closed mouth with a tiny confident hint of a smile, calm friendly eyes, the cool look of a boss who controls everything. No text, no frame.
 1:1 square image.
 
 ## 3. MACHIAVÉLIQUE
-Same character, same framing, same green codec style and scanlines as the previous image. Keep exactly the same head (same hair length, same beard length), same shirt as in
+Same character, same framing, same style as the previous image: friendly CARTOON caricature in clean 16-bit pixel art, monochrome phosphor green codec screen, simple flat shading, soft lighting, nothing realistic or scary, CRT scanlines. Keep exactly the same head (same hair length, same beard length), same shirt as in
 the photo. Only the expression changes: MACHIAVELLIAN — a wide sly smirk on one side of the mouth, eyebrows angled down toward the nose, eyes
 narrowed, like a cartoon villain who just set a funny trap, playful not scary.
 No text, no frame. 1:1 square image.
 
 ## 4. SURPRIS
-Same character, same framing, same green codec style and scanlines. Keep exactly the same head (same hair length, same beard length), same shirt as in
+Same character, same framing, same style as the previous image: friendly CARTOON caricature in clean 16-bit pixel art, monochrome phosphor green codec screen, simple flat shading, soft lighting, nothing realistic or scary, CRT scanlines. Keep exactly the same head (same hair length, same beard length), same shirt as in
 the photo. Only the expression changes: SURPRISED —
 eyebrows raised high, eyes wide open, mouth slightly open (« oh ? »), head pulled back a little. Surprised but
 still in control, not afraid. No text, no frame. 1:1 square image.
 
 ## 5. CHOQUÉ
-Same character, same framing, same green codec style and scanlines. Keep exactly the same head (same hair length, same beard length), same shirt as in
+Same character, same framing, same style as the previous image: friendly CARTOON caricature in clean 16-bit pixel art, monochrome phosphor green codec screen, simple flat shading, soft lighting, nothing realistic or scary, CRT scanlines. Keep exactly the same head (same hair length, same beard length), same shirt as in
 the photo. Only the expression changes: SHOCKED —
 eyes very wide with small pupils, eyebrows up and pinched, jaw dropped, a big cartoon drop of sweat on the temple,
 comic and exaggerated, like a boss who cannot believe he is losing. No text, no frame. 1:1 square image.
 
 ## 6. MASQUÉ (façon Psycho Mantis)
-Same character, same framing, same green codec style and scanlines. Now his whole face is hidden behind a
+Same character, same framing, same style as the previous image: friendly CARTOON caricature in clean 16-bit pixel art, monochrome phosphor green codec screen, simple flat shading, soft lighting, nothing realistic or scary, CRT scanlines. Now his whole face is hidden behind a
 PSYCHO MANTIS style gas mask: a smooth leather-like face mask fitting the skull, two big round dark glass eye
 lenses, a corrugated breathing hose hanging from the mouth area down to the chest, a high collar. His hair stays
 visible on top, exactly the same hair length as in the photo, and he still wears the same shirt as in the photo. Head slightly tilted to the side, mysterious but cartoon and fun, not scary, faint psychic glow around the head.
