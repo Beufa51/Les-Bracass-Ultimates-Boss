@@ -1002,6 +1002,8 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   foule + tambour) ; trop d'œufs pour gagner → lanceur 2 œufs, CRS 2 œufs (pendant l'essoufflement).
 - CARTE façon Doom (TAB ou M ; bouton CARTE en haut à droite sur téléphone) : filigrane, nord en haut, seulement les
   murs déjà vus (le raycaster les note dans `decor.vus`), portail en jaune, flèche blanche = toi.
+- AUDIT FUN (joueur) : `propositions/julien_audit_fun.md` (armes pancarte/tomates/pistolet à eau/fumigène/sono, bonus,
+  BAC / drone / canon à eau / commissaire, événements, jus, difficultés, rang de fin). En attente du choix de Fabien.
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
