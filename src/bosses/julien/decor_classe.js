@@ -4,7 +4,7 @@
 import { PLAN_CLASSE } from './niveau_classe.js';
 
 const HAUT_MUR = 1.5;   // la classe est un peu plus haute que la vue (plafond au-dessus)
-export const HAUTEURS_CLASSE = { table: 0.5, bureau: 0.58, julien: 1.1, livre: 0.11, dico: 0.15, copie: 0.13 };
+export const HAUTEURS_CLASSE = { table: 0.5, bureau: 0.58, julien: 1.1, livre: 0.11, dico: 0.15, copie: 0.13, craie: 0.05, boulette: 0.05, sarbacane: 0.3, eleve: 0.85 };
 
 function toile(l, h, dessin) {
   const c = document.createElement('canvas'); c.width = l; c.height = h;
@@ -84,7 +84,11 @@ function solsClasse() {
   const parquet = texture32((g) => {   // estrade du prof
     for (let y = 0; y < 32; y += 8) { g.fillStyle = y % 16 ? '#8a5f38' : '#7a5230'; g.fillRect(0, y, 32, 8); g.fillStyle = '#5c3e22'; g.fillRect(0, y, 32, 1); g.fillRect((y * 3) % 32, y, 1, 8); }
   });
-  return [lino, parquet];
+  // versions sombres (lumière éteinte, phase 2 : decor.sombre) : même place + 16
+  const sombre = (tx) => tx.map(p => (p & 0xff000000) | ((((p >> 16) & 255) * 0.35) << 16) | ((((p >> 8) & 255) * 0.35) << 8) | ((p & 255) * 0.4));
+  const sols = [lino, parquet];
+  sols[16] = sombre(lino); sols[17] = sombre(parquet);
+  return sols;
 }
 
 export function construireDecorClasse(ctx, l, hVue) {
@@ -163,6 +167,15 @@ export function spritesClasse() {
   S.copie = toile(16, 20, (g) => {
     R(g, '#f6f3ea', 0, 0, 16, 20); for (let y = 4; y < 20; y += 3) R(g, '#9fb6d8', 1, y, 14, 1);
     R(g, '#d84a4a', 3, 0, 1, 20); ecrire(g, '0/20', 9, 3, 4, '#d84a4a');
+  });
+  S.craie = toile(14, 4, (g) => R(g, '#f4f4ee', 0, 0, 14, 4));
+  S.boulette = toile(10, 10, (g) => { ovale(g, '#f2efe6', 5, 5, 4.5, 4.5); R(g, '#c8c4b8', 3, 4, 4, 1); });
+  S.sarbacane = toile(10, 40, (g) => { R(g, '#3a6ad0', 3, 0, 4, 40); R(g, '#e8e8f0', 3, 0, 4, 6); });
+  for (let k = 0; k < 4; k++) for (const p of ['content', 'cache']) S[`eleve_${k}_${p}`] = toile(40, 60, (g) => {   // dessin provisoire
+    const c = ['#3a5ab0', '#4a8a3a', '#b04a4a', '#8a6ab0'][k];
+    R(g, '#6b4626', 4, 34, 32, 4); R(g, '#3c3c40', 6, 38, 3, 22); R(g, '#3c3c40', 31, 38, 3, 22);
+    if (p === 'content') { R(g, c, 10, 16, 20, 20); ovale(g, '#e8b48a', 20, 10, 7, 8); R(g, c, 4, 2, 5, 16); R(g, c, 31, 2, 5, 16); }
+    else { R(g, c, 10, 22, 20, 14); ovale(g, '#3a2a1a', 20, 22, 8, 6); }
   });
   return S;
 }

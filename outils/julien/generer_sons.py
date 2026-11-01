@@ -141,4 +141,17 @@ with wave.open(f'{out}/julien_foule.wav', 'wb') as w:
 import subprocess, os   # l'ambiance (longue) en mp3 pour rester légère
 subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', f'{out}/julien_foule.wav', '-ac', '1', '-b:a', '48k', f'{out}/julien_foule.mp3'], check=True)
 os.remove(f'{out}/julien_foule.wav')
+
+# ---- NIVEAU 2 (la classe) ----
+# craie qui crisse sur le tableau (Julien écrit DE DOS / craies en rafale)
+d = 0.45; x = t(d)
+crisse = np.sin(2 * np.pi * (2300 + 300 * np.sin(2 * np.pi * 9 * x)) * x) * (0.6 + 0.4 * (np.sin(2 * np.pi * 23 * x) > 0))
+ecrire('julien_craie', (crisse + 0.4 * bande(bruit(d), 2500, 7000)) * np.sin(np.pi * x / d) ** 0.5, 0.35)
+# feuilles de papier (« Sortez une feuille ! » : le mur de copies)
+d = 0.5; x = t(d)
+ecrire('julien_papier', bande(bruit(d), 1500, 7000) * (0.5 + 0.5 * np.abs(np.sin(2 * np.pi * 7 * x))) * np.sin(np.pi * x / d), 0.5)
+# sonnerie d'alarme incendie (cloche rapide)
+d = 1.2; x = t(d)
+cloche = np.sin(2 * np.pi * 1450 * x) + 0.5 * np.sin(2 * np.pi * 2900 * x) + 0.3 * np.sin(2 * np.pi * 3700 * x)
+ecrire('julien_alarme', cloche * (0.4 + 0.6 * (np.sin(2 * np.pi * 18 * x) > 0)), 0.4)
 print('bruitages générés dans', out)

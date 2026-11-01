@@ -86,7 +86,7 @@ export class JulienManif extends BossScene {
     this.cmd = estTactile() ? null : creerCommandes(this, this.reg);
     this.installerSouris();
     this.touchesCarte = this.input.keyboard.addKeys({ tab: K.TAB, m: K.M });
-    this.touchesArmes = this.input.keyboard.addKeys({ a1: K.ONE, a2: K.TWO, a3: K.THREE, a4: K.FOUR, a5: K.FIVE });
+    this.touchesArmes = this.input.keyboard.addKeys({ a1: K.ONE, a2: K.TWO, a3: K.THREE, a4: K.FOUR, a5: K.FIVE, a6: K.SIX });
     this.carte = false;
     this.decor.vus = new Uint8Array(this.plan[0].length * this.plan.length);   // murs déjà vus (la carte n'affiche qu'eux)
     this.decor.speciaux = this.indicesSecrets();

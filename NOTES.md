@@ -6,8 +6,9 @@
 - **Beufa** : TERMINÉ — infiltration façon Metal Gear (4 pièces) puis QUIZ dans son bureau (codec, Psycho Mantis,
   rideau, 60 questions, GAME OVER façon MGS, classement BIG BOSS → CHICKEN, médaille = badge du hub, meilleur rang
   sauvegardé). Audit final : `propositions/beufa_audit_final.md`.
-- **Julien** : EN COURS — niveau 1 « la manif » jouable ; niveau 2 « la salle de classe » (Julien lance des livres,
-  3 phases, badge) jouable en prototype (dessins provisoires). Voir « JULIEN » plus bas.
+- **Julien** : EN COURS — niveau 1 « la manif » jouable ; niveau 2 « la salle de classe » : COMBAT REFAIT (audit B :
+  fenêtre de punition de dos, 8 attaques, phases noir / bureau renversé + alarme, élèves, sarbacane). RESTE : le
+  mini-niveau « le lycée » (audit A) puis l'équilibrage avec Fabien. Voir « JULIEN » plus bas.
 - **Rémi** : pas commencé (« Bientôt » au hub).
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
@@ -1095,7 +1096,21 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   salle 12 ; B : vrai combat — Julien DE DOS au tableau = fenêtre de punition ×2, mur de copies avec un trou,
   « AU TABLEAU ! » (aimant), « CONFISQUÉ ! », craies, règle ; phases qui changent la salle : rétroprojecteur dans le
   noir, bureau renversé + alarme incendie ; élèves assis qui réagissent ; sarbacane ; salle moins profonde).
-  En attente du choix de Fabien (conseil : B puis A).
+  Choix : B puis A.
+- FAIT (B, le combat refait, `JulienClasse.js` ; réglages `RG.julien` / `RG.classe`) : salle 15 × 11 (moins profonde) ;
+  après chaque grosse attaque (éventail, mur, dico, aimant, rafale ; petites : chance `dosApresPetite`) Julien écrit au
+  tableau DE DOS (`dos` s) : dégâts ×2, sarbacane ×3, bulle « ×2 », élèves « VAS-Y ! ». Attaques annoncées en grand
+  (+ conseil la 1re fois) : livre, éventail, MUR DE COPIES (toute la largeur, 1 trou, passe au-dessus des tables),
+  DICO, « AU TABLEAU ! » (aimant 2 s, au contact : règle + repoussé), « CONFISQUÉ ! » (trop près : arme prise 8 s,
+  boîte de la même arme non ramassable pendant ce temps), CRAIES en rafale, RÈGLE au contact. Phase 2 : lumière
+  éteinte (`decor.sombre` + sols sombres à l'index +16), rétroprojecteur qui balaie : il ne te voit que dans sa
+  lumière ou à moins de 2,5 cases (sinon il vise où il t'a vu). Phase 3 : bureau renversé au centre (abri pour lui,
+  ses livres passent, pas tes œufs : contourner), alarme incendie (son toutes les 4 s, flash rouge, gouttes), sol qui
+  glisse (`RG.classe.glisse`). 4 élèves assis (plan : 'e') : contents / cachés, répliques `ELEVES` (niveau_classe.js).
+  SARBACANE (plan : 'b', arme n° 6 dans `armes.js`, touche 6) : infinie, 0,5 dégât. Vie de Julien 30 → 40.
+  Sons ajoutés (`generer_sons.py`, à la fin : la foule n'est pas changée) : craie, papier, alarme.
+  Testé (navigateur, sans bot de jeu complet) : toutes les attaques et les 3 phases sans erreur. À faire : faire
+  jouer Fabien, équilibrer, puis A (le lycée).
 - IMAGES DE JULIEN LIVRÉES (photo du vrai Julien → portrait → corps entier `julien_reference.jpg` → 2 planches de
   4 poses `julien_prof_1/2.jpg`). Découpe : `python3 outils/julien/decouper_prof.py` (zones EXCLURE : texte
   « ART CLASS 101 » et livres volants effacés) → `julien_julien_<pose>.png` (marche0/1, bras, lance, touche, dos,

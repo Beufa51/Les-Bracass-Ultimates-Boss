@@ -4,6 +4,7 @@
 //  3 TOMATES   : une tomate vaut 2 œufs et fait bien reculer
 //  4 PISTOLET À EAU : jet continu, petits dégâts, ÉTEINT les nuages de lacrymo
 //  5 FUMIGÈNES : nuage coloré ; les policiers dedans ne te voient plus et s'étouffent ; caché dedans, tu es invisible
+//  6 SARBACANE : (niveau 2) boulettes de papier, infinie, précise, petits dégâts ; ×3 dans le dos de Julien
 // Les projectiles partagent une seule liste (scene.tirs) : { genre, x, y, dx, dy, t, ... }.
 import { REGLAGES as RG } from './reglages.js';
 import { murEn } from './raycaster.js';
@@ -15,6 +16,7 @@ export const ARMES = [
   { id: 'tomates', nom: 'TOMATES', mun: 'tomates' },
   { id: 'eau', nom: 'PISTOLET À EAU', mun: 'eau' },
   { id: 'fumigenes', nom: 'FUMIGÈNES', mun: 'fumigenes' },
+  { id: 'sarbacane', nom: 'SARBACANE', mun: null },   // niveau 2 (la classe), touche 6
 ];
 export const armeDe = (id) => ARMES.find(a => a.id === id);
 
@@ -72,6 +74,10 @@ export function tirer(scene, dx, dy, appui, nouveau) {
     j.recharge = RG.tomates.cadence; j.lanceT = 0.25;
     ajout('tomate', vx, vy);
     jouerSon(scene, 'julien_lancer', { rate: 0.8 });
+  } else if (j.arme === 'sarbacane') {
+    j.recharge = RG.sarbacane.cadence; j.lanceT = 0.12;
+    ajout('boulette', vx, vy);
+    jouerSon(scene, 'julien_lancer', { rate: 1.6 });
   } else if (j.arme === 'eau') {
     j.recharge = RG.eau.cadence; j.lanceT = 0.1;
     const e = (Math.random() - 0.5) * 0.06, base = Math.atan2(vy, vx);
@@ -110,7 +116,7 @@ function frapper(scene, dx, dy) {
     scene.message('BONK ! Son bouclier tombe : vite, vise-le !', 1.5);
     return;
   }
-  scene.toucherEnnemi(cible, P.degats, { recul, tache: null });
+  scene.toucherEnnemi(cible, P.degats, { recul, tache: null, genre: 'pancarte' });
 }
 
 // Fait avancer les tirs (œufs, tomates, eau, fumigènes) et les fumées colorées
@@ -125,13 +131,13 @@ export function avancerTirs(scene, dt) {
       if (t >= 1) { o.fini = true; scene.fumees.push({ x: o.x, y: o.y, t: RG.fumigenes.duree }); jouerSon(scene, 'julien_fumigene'); }
       continue;
     }
-    const R = o.genre === 'oeuf' ? RG.oeufs : o.genre === 'tomate' ? RG.tomates : RG.eau;
+    const R = o.genre === 'oeuf' ? RG.oeufs : o.genre === 'tomate' ? RG.tomates : o.genre === 'boulette' ? RG.sarbacane : RG.eau;
     o.x += o.dx * R.vitesse * dt; o.y += o.dy * R.vitesse * dt;
-    const vie = o.genre === 'oeuf' ? 2 : R.duree;
+    const vie = o.genre === 'oeuf' ? 2 : R.duree, sec = o.genre === 'eau' || o.genre === 'boulette';   // sec : pas de tache
     if (o.genre === 'eau') for (const n of scene.nuages) if (Math.hypot(n.x - o.x, n.y - o.y) < RG.lacrymo.rayon) n.t -= R.eteint;   // l'eau éteint la lacrymo
     if (murEn(scene.plan, o.x, o.y) || o.t > vie) {
       o.fini = true;
-      if (o.genre !== 'eau') {
+      if (!sec) {
         scene.alerter(o.x, o.y, 2.5);
         scene.splats.push({ x: o.x - o.dx * 0.12, y: o.y - o.dy * 0.12, t: 1.5, rouge: o.genre === 'tomate' });
         jouerSon(scene, 'julien_splat', { rate: o.genre === 'tomate' ? 0.9 : 1.3 });
@@ -140,7 +146,7 @@ export function avancerTirs(scene, dt) {
     }
     for (const b of scene.objets) if (b.actif && b.solide && Math.hypot(b.x - o.x, b.y - o.y) < b.rayon) {
       o.fini = true;
-      if (o.genre !== 'eau') scene.splats.push({ x: o.x, y: o.y, t: 1.2, rouge: o.genre === 'tomate' });
+      if (!sec) scene.splats.push({ x: o.x, y: o.y, t: 1.2, rouge: o.genre === 'tomate' });
       if (b.type === 'farine' && o.genre !== 'eau') scene.exploserFarine(b);
       if (b.type === 'manifestant' && o.genre !== 'eau') scene.message('« Hé ! Pas sur nous ! »');
       break;
@@ -148,7 +154,7 @@ export function avancerTirs(scene, dt) {
     if (o.fini) continue;
     for (const e of scene.ennemis) if (e.actif && e.etat !== 'fuite' && Math.hypot(e.x - o.x, e.y - o.y) < 0.35) {
       o.fini = true;
-      scene.toucherEnnemi(e, R.degats, { recul: [o.dx * R.recul, o.dy * R.recul], silencieux: o.genre === 'eau', tache: o.genre === 'oeuf' ? 'oeuf' : o.genre === 'tomate' ? 'tomate' : null });
+      scene.toucherEnnemi(e, R.degats, { recul: [o.dx * R.recul, o.dy * R.recul], silencieux: o.genre === 'eau', genre: o.genre, tache: o.genre === 'oeuf' ? 'oeuf' : o.genre === 'tomate' ? 'tomate' : null });
       break;
     }
   }
