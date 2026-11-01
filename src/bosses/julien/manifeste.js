@@ -22,5 +22,8 @@ export const MANIFESTE = {
     julien_ramasse: son('ramasse'),   // objet ramassé
     julien_portail: son('portail'),   // le portail du lycée s'ouvre
     julien_secret: son('secret'),     // un passage secret s'ouvre
+    julien_pancarte: son('pancarte'), // coup de pancarte
+    julien_eau: son('eau'),           // pistolet à eau
+    julien_fumigene: son('fumigene'), // un fumigène s'allume
   },
 };

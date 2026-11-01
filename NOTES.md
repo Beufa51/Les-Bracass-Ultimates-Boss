@@ -1003,7 +1003,15 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
 - CARTE façon Doom (TAB ou M ; bouton CARTE en haut à droite sur téléphone) : filigrane, nord en haut, seulement les
   murs déjà vus (le raycaster les note dans `decor.vus`), portail en jaune, flèche blanche = toi.
 - AUDIT FUN (joueur) : `propositions/julien_audit_fun.md` (armes pancarte/tomates/pistolet à eau/fumigène/sono, bonus,
-  BAC / drone / canon à eau / commissaire, événements, jus, difficultés, rang de fin). En attente du choix de Fabien.
+  BAC / drone / canon à eau / commissaire, événements, jus, difficultés, rang de fin).
+- FAIT (audit fun, étape 1) : ARMES (`armes.js`, réglages dans `reglages.js`) — touches 1 à 5, bouton ARME (téléphone,
+  sous CARTE), bouton de tir renommé LANCER. 1 pancarte (corps à corps infini ; un CRS frappé baisse son bouclier
+  1,4 s), 2 œufs, 3 tomates (3 en éventail, recul), 4 pistolet à eau (jet continu, petits dégâts, ÉTEINT les
+  lacrymos), 5 fumigènes (nuage rose 6 s : les policiers dedans ne voient plus et s'étouffent ; caché dedans, tu es
+  invisible). Ramassables `t` (ruelle, place, parvis), `w` (passage, place, rue), `f` (place ×2) : le 1er donne l'arme.
+  Dessins provisoires ; prompts : section 9 de `propositions/julien_prompts_images.md`. Sons pancarte / eau / fumigène.
+- RESTE de l'audit fun : jus (recul visible, jaune, tremblement, combo), bonus (écharpe, café, K-Way), BAC + canon
+  à eau, difficultés + rang de fin, sono (BFG).
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,

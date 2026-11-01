@@ -246,6 +246,26 @@ export function texturesSprites() {
     R(g, '#f0e6c8', 10, 24, 20, 30); ecrire(g, 'CINÉ', 20, 32, 6, '#a22'); R(g, '#ffd84a', 10, 58, 20, 36); ecrire(g, 'MANIF', 20, 70, 5, '#222');
     ovale(g, '#2f5a3a', 20, 14, 16, 6); ovale(g, '#264a30', 20, 6, 8, 6); R(g, '#264a30', 19, 0, 2, 4);
   });
+  // ARMES : projectiles, fumées, objets à ramasser
+  S.tomate = toile(12, 12, (g) => { ovale(g, '#d8281e', 6, 7, 5, 5); R(g, '#3f9a3a', 4, 1, 4, 3); R(g, '#ff8a7a', 3, 4, 2, 2); });
+  S.splat_rouge = toile(22, 14, (g) => { ovale(g, '#c8241a', 11, 8, 10, 5); ovale(g, '#ff5a48', 12, 7, 4, 2); ovale(g, '#c8241a', 3, 4, 2, 2); ovale(g, '#e8d070', 16, 9, 1, 1); });
+  S.eau = toile(8, 8, (g) => { ovale(g, 'rgba(140,200,255,0.85)', 4, 4, 3, 3); R(g, '#fff', 3, 2, 1, 1); });
+  S.fumi = toile(10, 14, (g) => { R(g, '#d02a8a', 2, 4, 6, 10); R(g, '#222', 2, 4, 6, 2); ovale(g, 'rgba(240,140,200,0.8)', 5, 2, 4, 3); });
+  S.fumee = toile(64, 56, (g) => {
+    const b = [[20, 36, 15], [38, 32, 17], [50, 40, 12], [28, 20, 13], [44, 18, 11], [12, 44, 9], [56, 46, 8], [32, 8, 9]];
+    for (const [x, y, r] of b) ovale(g, 'rgba(235,120,190,0.6)', x, y, r, r * 0.85);
+    for (const [x, y, r] of b) ovale(g, 'rgba(160,230,140,0.3)', x + 3, y + 2, r * 0.5, r * 0.4);
+  });
+  S.tomates = toile(40, 24, (g) => {   // cagette de tomates
+    for (let i = 0; i < 4; i++) ovale(g, '#d8281e', 8 + i * 8, 8, 4, 4);
+    R(g, '#c8a060', 2, 10, 36, 13); for (let x = 4; x < 38; x += 6) R(g, '#a07a40', x, 12, 2, 9); R(g, '#8a6430', 2, 10, 36, 2);
+  });
+  S.eau_pistolet = toile(40, 24, (g) => {   // pistolet à eau au sol
+    R(g, '#ff8c1a', 4, 8, 28, 8); R(g, '#2a9cff', 10, 2, 12, 7); R(g, '#ff8c1a', 22, 14, 6, 9); R(g, '#ffd84a', 32, 10, 6, 4);
+  });
+  S.fumigenes = toile(30, 26, (g) => {   // 3 fumigènes
+    for (let i = 0; i < 3; i++) { R(g, ['#d02a8a', '#2ac05a', '#e0c020'][i], 4 + i * 9, 6, 6, 18); R(g, '#222', 4 + i * 9, 6, 6, 3); }
+  });
   S.oeuf = toile(10, 12, (g) => { ovale(g, '#fffaf0', 5, 6, 4, 5.5); R(g, '#fff', 3, 3, 1, 2); });
   S.splat = toile(22, 14, (g) => { ovale(g, '#fff6d8', 11, 8, 10, 5); ovale(g, '#ffc928', 12, 8, 4, 3); ovale(g, '#fff6d8', 3, 4, 2, 2); ovale(g, '#fff6d8', 19, 3, 2, 2); });
   S.grenade = toile(12, 12, (g) => { R(g, '#3b4038', 3, 2, 6, 9); R(g, '#c8b030', 3, 2, 6, 2); ovale(g, 'rgba(220,220,210,0.7)', 6, 1, 3, 2); });
@@ -270,7 +290,20 @@ export function texturesMain() {
       R(g, PEAU, 42, 38, 8, 10); R(g, PEAU_O, 44, 44, 24, 2);
     }
   });
-  return { tient: main(false), lance: main(true) };
+  // autres armes (dessins provisoires 105 × 120, comme la vraie image de la main à l'œuf)
+  const bras = (g, x, y, l = 30) => { R(g, '#1f2c52', x, y, l, 120 - y); R(g, '#2a3a66', x + 4, y, 6, 120 - y); };
+  const arme = (dessin) => toile(105, 120, (g) => { g.imageSmoothingEnabled = false; dessin(g); });
+  return {
+    tient: main(false), lance: main(true),
+    pancarte: arme((g) => { R(g, '#7a5530', 50, 20, 6, 80); R(g, '#e8dcb8', 14, 6, 80, 40); g.strokeStyle = '#5a4a30'; g.strokeRect(14.5, 6.5, 79, 39); ecrire(g, 'NON !', 54, 26, 16, '#c22'); bras(g, 40, 88); ovale(g, PEAU, 54, 86, 13, 10); }),
+    pancarte_tir: arme((g) => { g.save(); g.translate(40, 60); g.rotate(-0.9); R(g, '#7a5530', -3, -40, 6, 80); R(g, '#e8dcb8', -40, -70, 80, 40); ecrire(g, 'NON !', 0, -50, 16, '#c22'); g.restore(); bras(g, 30, 90); ovale(g, PEAU, 42, 86, 13, 10); }),
+    tomates: arme((g) => { bras(g, 46, 70); ovale(g, PEAU, 60, 64, 16, 13); ovale(g, '#d8281e', 56, 48, 14, 13); R(g, '#3f9a3a', 52, 34, 8, 5); ovale(g, '#ff8a7a', 50, 44, 3, 3); }),
+    tomates_tir: arme((g) => { bras(g, 40, 50); ovale(g, PEAU, 52, 46, 15, 11); }),
+    eau: arme((g) => { bras(g, 52, 78); R(g, '#ff8c1a', 30, 52, 56, 18); R(g, '#2a9cff', 46, 34, 26, 18); R(g, '#ffd84a', 22, 56, 10, 8); R(g, '#ff8c1a', 62, 70, 12, 20); ovale(g, PEAU, 68, 80, 12, 10); }),
+    eau_tir: arme((g) => { bras(g, 52, 78); R(g, '#ff8c1a', 30, 54, 56, 18); R(g, '#2a9cff', 46, 36, 26, 18); R(g, '#ffd84a', 22, 58, 10, 8); ovale(g, 'rgba(160,215,255,0.8)', 14, 58, 8, 5); R(g, '#ff8c1a', 62, 72, 12, 20); ovale(g, PEAU, 68, 82, 12, 10); }),
+    fumigenes: arme((g) => { bras(g, 46, 72); ovale(g, PEAU, 60, 66, 15, 12); R(g, '#d02a8a', 52, 26, 14, 40); R(g, '#222', 52, 26, 14, 6); ovale(g, 'rgba(240,140,200,0.7)', 58, 18, 10, 8); }),
+    fumigenes_tir: arme((g) => { bras(g, 40, 50); ovale(g, PEAU, 52, 46, 15, 11); }),
+  };
 }
 
 // ---------------------------------------------------------------- vraies images (assets/sprites/julien/)
@@ -289,7 +322,8 @@ const MAINS = { tient: 'main_tient', lance: 'main_lance' };
 const HAUTEURS_IMAGES = { lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barriere: 0.45, poubelle: 0.5, oeufs: 0.2,
   sandwich: 0.1, oeuf: 0.08, splat: 0.12, grenade: 0.16, nuage: 1.0, statue: 2.0, camion: 1.05, colonne: 1.5 };
 export const HAUTEURS_PROVISOIRES = { lanceur: 0.82, bouclier: 0.86, manifestant: 1.0, barriere: 0.42, poubelle: 0.5, oeufs: 0.18,
-  sandwich: 0.14, oeuf: 0.08, splat: 0.1, grenade: 0.1, nuage: 0.9, statue: 1.7, camion: 0.95, colonne: 1.35 };
+  sandwich: 0.14, oeuf: 0.08, splat: 0.1, grenade: 0.1, nuage: 0.9, statue: 1.7, camion: 0.95, colonne: 1.35,
+  tomates: 0.22, eau: 0.2, fumigenes: 0.22 };
 
 // murs qui ont aussi une version AVEC panneau (posée sur 1 case sur 6 : voir raycaster.js)
 const PANNEAUX = ['mur_briques', 'mur_immeuble', 'mur_tag', 'mur_lycee'];

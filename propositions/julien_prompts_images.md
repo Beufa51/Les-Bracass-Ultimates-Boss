@@ -99,3 +99,28 @@ Object: …
 - `julien_statue.jpg` : `Object: the bronze statue of Marianne from Place de la République in Paris, green patina, standing on a tall grey stone pedestal with the letters "RF", one arm raising an olive branch. Tall and narrow.`
 - `julien_camion.jpg` : `Object: a French riot police van (white and blue CRS van, "POLICE" written on it), seen strictly from the front, metal grille protecting the windscreen, blue lights on the roof. Wide image.`
 - `julien_colonne.jpg` : `Object: a dark green Parisian Morris advertising column, round, with a small dome roof, covered with colorful posters (cinema, theater, a protest poster). Tall and narrow.`
+
+## 9. Armes (ajoutées après l'audit « fun »)
+### 9a. Mains du héros, vue à la 1re personne (une image par arme, 2 poses chacune) — mêmes règles que la main à l'œuf
+```
+Pixel art sprite sheet in the style of the weapon view of DOOM (1993): digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading.
+First-person view, seen from the player's own eyes: the player's right hand and forearm in a navy blue hoodie sleeve, coming up from the bottom edge of the image.
+2 poses side by side, each in its own equal-size cell, same scale:
+POSES
+Plain solid pure white background (#FFFFFF), no text except on the sign, no frame, no grid lines.
+IMPORTANT: the two poses are clearly SEPARATED by a wide empty white gap; neither may touch the other.
+```
+Remplacer POSES par :
+- `julien_main_pancarte.jpg` : `1) the hand holding a wooden stick with a cardboard protest sign "NON !" held up, ready; 2) the sign swung forward and to the left, hitting (motion blur lines).`
+- `julien_main_tomates.jpg` : `1) the hand holding a big ripe red tomato, ready to throw; 2) the arm extended forward, hand open, the tomato just thrown (no tomato visible).`
+- `julien_main_eau.jpg` : `1) the hand holding a big colorful plastic water gun (orange and blue Super Soaker style); 2) the same water gun firing a jet of water forward.`
+- `julien_main_fumigenes.jpg` : `1) the hand holding a lit pink smoke flare (protest smoke torch) with pink smoke rising; 2) the arm extended forward, hand open, the flare just thrown (no flare visible).`
+
+### 9b. Objets (une planche) — `julien_objets_armes.jpg`
+```
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. French street-protest theme.
+6 separate objects in one row, each in its own equal-size cell, seen from the FRONT, same pixel scale, resting on the same bottom line:
+1) a wooden market crate full of red tomatoes; 2) a big orange and blue plastic water gun lying on the ground; 3) three protest smoke flares (pink, green, yellow) tied together; 4) a single red tomato; 5) a squashed tomato splat (red); 6) a puffy cloud of bright pink smoke.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every object is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no object, smoke or splat may touch or overlap another object or the cell border.
+```

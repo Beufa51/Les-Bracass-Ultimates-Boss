@@ -88,6 +88,22 @@ ecrire('julien_portail', grince * 0.6 + clang, 0.7)
 d = 0.8; x = t(d)
 ecrire('julien_secret', passe_bas(bruit(d), 300) * np.sin(np.pi * x / d) + 0.3 * passe_bas(glisse(d, 60, 45, scie), 400) * np.sin(np.pi * x / d), 0.8)
 
+# coup de pancarte : « vouf » + choc de carton
+d = 0.3; x = t(d)
+choc = coller(silence(0.15), passe_bas(bruit(0.15), 800) * env(0.15, 0.001, 0.03) + 0.6 * glisse(0.15, 140, 80) * env(0.15, 0.001, 0.04))
+choc = np.pad(choc, (0, max(0, len(x) - len(choc))))[:len(x)]
+ecrire('julien_pancarte', bande(bruit(d), 400, 2500) * np.sin(np.pi * np.clip(x / 0.18, 0, 1)) ** 2 * (x < 0.18) + choc, 0.8)
+
+# pistolet à eau : petit « pschit » mouillé (joué pendant le jet)
+d = 0.12
+ecrire('julien_eau', bande(bruit(d), 2500, 8000) * env(d, 0.005, 0.04), 0.35)
+
+# fumigène qui s'allume : « pop » + chuintement
+d = 0.9; x = t(d)
+f = bande(bruit(d), 900, 5000) * np.clip(x / 0.08, 0, 1) * np.exp(-x / 0.5)
+f[:int(SR * 0.03)] += 0.9 * passe_bas(bruit(0.03), 1200)
+ecrire('julien_fumigene', f, 0.5)
+
 # ambiance de manif en boucle (8 s) : brouhaha de foule et tambour (sans sifflets)
 d = 8.0; x = t(d)
 foule = np.zeros_like(x)

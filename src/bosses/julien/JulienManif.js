@@ -16,6 +16,7 @@ import { PLAN_MANIF, OBJETS, SECRETS, ZONES, PARVIS, PAR } from './niveau_manif.
 import { rendre, murEn, vueLibre } from './raycaster.js';
 import { texturesMurs, texturesSprites, texturesMain, chargerImages, appliquerImages } from './textures.js';
 import { construireDecor } from './decor.js';
+import { ARMES, armeDe, RECHARGES, choisirArme, armeSuivante, tirer, avancerTirs, dansFumee } from './armes.js';
 import { toileVisage, niveauVisage } from './visage.js';
 
 const L = 480, H = 270, VUE_H = 222;   // toile basse résolution ; la vue 3D au-dessus, la barre du bas en dessous
@@ -53,7 +54,7 @@ export class JulienManif extends BossScene {
     const yb = VUE_H * 2;
     texte(this, 92, yb + 20, 'VIE', 14, '#c9b48a');
     this.txtVie = texte(this, 92, yb + 58, '', 40, '#ff5a3c');
-    texte(this, 300, yb + 20, 'ŒUFS', 14, '#c9b48a');
+    this.txtArme = texte(this, 300, yb + 20, '', 14, '#c9b48a');
     this.txtOeufs = texte(this, 300, yb + 58, '', 40, '#fff2c8');
     texte(this, 660, yb + 20, 'POLICIERS REPOUSSÉS', 14, '#c9b48a');
     this.txtFlics = texte(this, 660, yb + 58, '', 32, '#9fd0ff');
@@ -69,6 +70,7 @@ export class JulienManif extends BossScene {
     this.cotes = this.input.keyboard.addKeys({ alt: K.ALT, ctrl: K.CTRL, maj: K.SHIFT, virgule: K.COMMA, point: K.PERIOD,
       q: K.Q, d: K.D });
     this.touchesCarte = this.input.keyboard.addKeys({ tab: K.TAB, m: K.M });
+    this.touchesArmes = this.input.keyboard.addKeys({ a1: K.ONE, a2: K.TWO, a3: K.THREE, a4: K.FOUR, a5: K.FIVE });
     this.carte = false;
     T.decor.vus = new Uint8Array(this.plan[0].length * this.plan.length);   // murs déjà vus (la carte n'affiche qu'eux)
     this.installerBoutonCarte();
@@ -82,20 +84,21 @@ export class JulienManif extends BossScene {
       'Rejoins le portail du LYCÉE à travers la manif !',
       tact ? '▲ ▼ : avancer / reculer      ◀ ▶ : pas de côté' : '↑ ↓ : avancer / reculer      ← → : tourner',
       tact ? '↺ ↻ : tourner' : 'ALT + ← → (ou , et .) : pas de côté',
-      tact ? 'ŒUF : lancer un œuf' : 'CTRL : lancer un œuf      MAJ : courir',
+      tact ? 'LANCER : tirer      ARME (en haut à droite) : changer d\'arme' : 'CTRL : tirer   1 à 5 : armes   MAJ : courir',
       tact ? 'CARTE (en haut à droite) : la carte, comme dans Doom' : 'TAB ou M : la carte, comme dans Doom',
       'Les lacrymos piquent : sors vite du nuage.',
       'Le bouclier arrête les œufs, SAUF quand le CRS',
       'est essoufflé après sa charge : esquive de côté puis vise !',
-    ], () => { etiquettesTactiles({ x: 'ŒUF', z: '↺', espace: '↻' }); this.enJeu = true; });
+    ], () => { etiquettesTactiles({ x: 'LANCER', z: '↺', espace: '↻' }); this.enJeu = true; });
   }
 
   // ------------------------------------------------------------------ niveau
   lireNiveau() {
     const j = RG.joueur;
-    this.j = { x: 2.5, y: 2.5, a: -Math.PI / 2, vie: j.vie, oeufs: RG.oeufs.depart, recharge: 0, lanceT: 0, bob: 0,
+    this.j = { x: 2.5, y: 2.5, a: -Math.PI / 2, vie: j.vie, recharge: 0,
+      mun: { oeufs: RG.oeufs.depart, tomates: 0, eau: 0, fumigenes: 0 }, armes: new Set(['pancarte', 'oeufs']), arme: 'oeufs', lanceT: 0, bob: 0,
       regard: 0, regardT: 1.2, expr: 'normal', exprT: 0, rouge: 0, gaz: 0 };
-    this.ennemis = []; this.objets = []; this.oeufs = []; this.grenades = []; this.nuages = []; this.splats = [];
+    this.ennemis = []; this.objets = []; this.tirs = []; this.fumees = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.sortie = null;
     this.secrets = new Map(); this.secretsTrouves = 0;
     let nm = 0;
@@ -114,7 +117,7 @@ export class JulienManif extends BossScene {
           ronde: !(x >= PARVIS.x0 && x <= PARVIS.x1 && y >= PARVIS.y0 && y <= PARVIS.y1) && !(x >= 15 && x <= 17 && y >= 9 && y <= 17),
           rdx: (y >= 28 && y <= 35) ? 0 : (x % 2 ? 1 : -1), rdy: (y >= 28 && y <= 35) ? 1 : 0, rondeT: 2.5 });
       } else {
-        const solide = type !== 'oeufs' && type !== 'sandwich';
+        const solide = !RECHARGES[type] && type !== 'sandwich';
         const rayon = { barriere: 0.45, statue: 0.75, camion: 1.05, colonne: 0.4 }[type] || 0.3;
         const o = { type, x: px, y: py, solide, rayon, actif: true, n: nm };
         if (type === 'manifestant') nm++;
@@ -141,8 +144,10 @@ export class JulienManif extends BossScene {
       border: '2px solid rgba(255,255,255,0.55)', borderRadius: '10px', background: 'rgba(20,20,30,0.45)', color: '#fff',
       font: 'bold 14px monospace', touchAction: 'none' });
     b.addEventListener('pointerdown', (e) => { e.preventDefault(); if (this.enJeu) this.carte = !this.carte; });
-    document.body.appendChild(b);
-    this.events.once('shutdown', () => b.remove());
+    const arme = b.cloneNode(); arme.textContent = 'ARME'; arme.style.top = '46px';   // passe à l'arme suivante
+    arme.addEventListener('pointerdown', (e) => { e.preventDefault(); if (this.enJeu) armeSuivante(this); });
+    document.body.append(b, arme);
+    this.events.once('shutdown', () => { b.remove(); arme.remove(); });
   }
 
   message(t, duree = 2.8) { this.txtMsg.setText(t); this.msgT = duree; }
@@ -184,6 +189,7 @@ export class JulienManif extends BossScene {
     const dt = Math.min(delta / 1000, 0.05);
     if (this.enJeu && !this.termine) {
       if (vientDAppuyer(this.touchesCarte.tab) || vientDAppuyer(this.touchesCarte.m)) this.carte = !this.carte;
+      ['a1', 'a2', 'a3', 'a4', 'a5'].forEach((t, i) => { if (vientDAppuyer(this.touchesArmes[t])) choisirArme(this, ARMES[i].id); });
       this.bougerJoueur(dt);
       this.ennemis.forEach(e => this.ia(e, dt));
       this.projectiles(dt);
@@ -237,14 +243,9 @@ export class JulienManif extends BossScene {
     }
 
     j.recharge -= dt; j.lanceT -= dt;
-    if ((this.tactile ? k.x.isDown : (k.z.isDown || c.ctrl.isDown)) && j.recharge <= 0) {
-      if (j.oeufs > 0) {
-        j.oeufs--; j.recharge = RG.oeufs.cadence; j.lanceT = 0.18;
-        const [vx, vy] = this.viser(dx, dy);
-        this.oeufs.push({ x: j.x + vx * 0.3, y: j.y + vy * 0.3, dx: vx, dy: vy, t: 0 });
-        jouerSon(this, 'julien_lancer');
-      } else if ((this.tactile ? vientDAppuyer(k.x) : (vientDAppuyer(k.z) || vientDAppuyer(c.ctrl)))) { this.message('Plus d\'œufs ! Cherche une boîte.'); j.recharge = 0.5; }
-    }
+    const appui = this.tactile ? k.x.isDown : (k.z.isDown || c.ctrl.isDown);
+    const nouveau = this.tactile ? vientDAppuyer(k.x) : (vientDAppuyer(k.z) || vientDAppuyer(c.ctrl));
+    tirer(this, dx, dy, appui, nouveau);
   }
 
   // Aide à la visée : un œuf lancé presque vers un policier (écart < aide) part droit sur lui
@@ -293,7 +294,7 @@ export class JulienManif extends BossScene {
     if (!e.actif) return;
     const j = this.j, R = RG[e.type];
     const ox = j.x - e.x, oy = j.y - e.y, d = Math.hypot(ox, oy);
-    const voit = j.vie > 0 && d < R.vue && vueLibre(this.plan, e.x, e.y, j.x, j.y);
+    const voit = j.vie > 0 && d < R.vue && vueLibre(this.plan, e.x, e.y, j.x, j.y) && !dansFumee(this, e.x, e.y) && !dansFumee(this, j.x, j.y);
     if (voit) { e.vuX = j.x; e.vuY = j.y; if (!e.alerte) { e.alerte = true; e.t = 0.6 + Math.random() * 0.6; this.alerter(e.x, e.y, 6); } }
     e.t -= dt; e.bouge = false;
     const marcher = (vx, vy, vitesse) => {
@@ -354,10 +355,12 @@ export class JulienManif extends BossScene {
     if (e.etat === 'essouffle' && e.t <= 0) { e.etat = 'approche'; e.t = 0.8; }
   }
 
-  toucherEnnemi(e) {
-    if (e.type === 'bouclier' && e.etat !== 'essouffle') { jouerSon(this, 'julien_plonk'); return; }
-    e.vie--;
-    jouerSon(this, 'julien_splat');
+  // degats : 1 = un œuf ; options : recul [dx, dy], perceBouclier (fumée), silencieux (eau, fumée : pas de son ni de sursaut)
+  toucherEnnemi(e, degats = 1, { recul = null, perceBouclier = false, silencieux = false } = {}) {
+    if (recul) this.deplacer(e, recul[0], recul[1], 0.28);
+    if (e.type === 'bouclier' && e.etat !== 'essouffle' && !perceBouclier) { if (!silencieux) jouerSon(this, 'julien_plonk'); return; }
+    e.vie -= degats;
+    if (!silencieux) jouerSon(this, 'julien_splat');
     if (e.vie <= 0) {
       e.etat = 'fuite'; e.t = 1.8; this.repousses++;
       jouerSon(this, 'julien_fuite');
@@ -366,30 +369,14 @@ export class JulienManif extends BossScene {
       return;
     }
     if (!e.alerte) { e.alerte = true; e.vuX = this.j.x; e.vuY = this.j.y; e.etat = e.type === 'lanceur' ? 'chasse' : 'approche'; }
+    if (silencieux || e.etat === 'touche') return;
     if (e.type === 'lanceur' && e.etat === 'prepare') return;   // le lancer part quand même
     e.apres = e.etat; e.tApres = e.t; e.etat = 'touche'; e.t = 0.22;
   }
 
   projectiles(dt) {
     const j = this.j;
-    // œufs
-    for (const o of this.oeufs) {
-      if (o.fini) continue;
-      o.t += dt;
-      const pas = RG.oeufs.vitesse * dt;
-      o.x += o.dx * pas; o.y += o.dy * pas;
-      if (murEn(this.plan, o.x, o.y) || o.t > 2) { o.fini = true; this.alerter(o.x, o.y, 2.5); this.splats.push({ x: o.x - o.dx * 0.12, y: o.y - o.dy * 0.12, t: 1.5 }); jouerSon(this, 'julien_splat', { rate: 1.3 }); continue; }
-      for (const b of this.objets) if (b.actif && b.solide && Math.hypot(b.x - o.x, b.y - o.y) < b.rayon) {
-        o.fini = true; this.splats.push({ x: o.x, y: o.y, t: 1.2 });
-        if (b.type === 'manifestant') this.message('« Hé ! Pas sur nous ! »');
-        break;
-      }
-      if (o.fini) continue;
-      for (const e of this.ennemis) if (e.actif && e.etat !== 'fuite' && Math.hypot(e.x - o.x, e.y - o.y) < 0.35) {
-        o.fini = true; this.toucherEnnemi(e); break;
-      }
-    }
-    this.oeufs = this.oeufs.filter(o => !o.fini);
+    avancerTirs(this, dt);   // œufs, tomates, eau, fumigènes (armes.js)
     // grenades lacrymogènes : vol en cloche, puis nuage
     for (const g of this.grenades) {
       g.t += dt / RG.lacrymo.vol;
@@ -418,10 +405,11 @@ export class JulienManif extends BossScene {
     const j = this.j;
     for (const o of this.objets) {
       if (!o.actif || o.solide || Math.hypot(o.x - j.x, o.y - j.y) > 0.5) continue;
-      if (o.type === 'oeufs') {
-        if (j.oeufs >= RG.oeufs.maxi) continue;
-        j.oeufs = Math.min(RG.oeufs.maxi, j.oeufs + RG.oeufs.boite);
-        this.message(`Une boîte d'œufs ! (+${RG.oeufs.boite})`);
+      if (RECHARGES[o.type]) {
+        const r = RECHARGES[o.type](), nouvelle = !j.armes.has(o.type);
+        if (!nouvelle && j.mun[o.type] >= r.maxi) continue;
+        j.mun[o.type] = Math.min(r.maxi, j.mun[o.type] + r.n);
+        if (nouvelle) { j.armes.add(o.type); j.arme = o.type; this.message(r.trouve, 4); } else this.message(r.txt);
       } else if (o.type === 'sandwich') {
         if (j.vie >= RG.joueur.vie) continue;
         j.vie = Math.min(RG.joueur.vie, j.vie + RG.sandwich);
@@ -493,37 +481,47 @@ export class JulienManif extends BossScene {
     const cam = { x: j.x, y: j.y, dx, dy, px: -dy * FOV, py: dx * FOV };
     const liste = [];
     for (const o of this.objets) if (o.actif) {
-      const t = o.type === 'manifestant' ? s['manifestant_' + (o.n % T.nbManif)] : s[o.type];
+      const t = o.type === 'manifestant' ? s['manifestant_' + (o.n % T.nbManif)] : o.type === 'eau' ? s.eau_pistolet : s[o.type];
       const haut = T.hauteurs[o.type];
       liste.push({ x: o.x, y: o.y, toile: t, haut, z: o.type === 'manifestant' ? Math.abs(Math.sin(this.time.now / 300 + o.n)) * 0.03 : 0 });
     }
     for (const e of this.ennemis) if (e.actif) liste.push({ x: e.x, y: e.y, toile: this.imageEnnemi(e), haut: T.hauteurs[e.type], z: 0 });
-    for (const o of this.oeufs) liste.push({ x: o.x, y: o.y, toile: s.oeuf, haut: T.hauteurs.oeuf, z: 0.42 });
+    for (const o of this.tirs) {
+      if (o.genre === 'fumi') liste.push({ x: o.x, y: o.y, toile: s.fumi, haut: 0.14, z: o.z });
+      else liste.push({ x: o.x, y: o.y, toile: s[o.genre], haut: o.genre === 'eau' ? 0.05 : T.hauteurs.oeuf, z: o.genre === 'eau' ? 0.4 : 0.42 });
+    }
+    for (const f of this.fumees) liste.push({ x: f.x, y: f.y, toile: s.fumee, haut: 1.3 + 0.1 * Math.sin(f.t * 2), z: 0 });
     for (const gr of this.grenades) liste.push({ x: gr.x, y: gr.y, toile: s.grenade, haut: T.hauteurs.grenade, z: gr.z });
-    for (const sp of this.splats) liste.push({ x: sp.x, y: sp.y, toile: s.splat, haut: T.hauteurs.splat, z: 0.38 });
+    for (const sp of this.splats) liste.push({ x: sp.x, y: sp.y, toile: sp.rouge ? s.splat_rouge : s.splat, haut: T.hauteurs.splat, z: 0.38 });
     for (const n of this.nuages) liste.push({ x: n.x, y: n.y, toile: s.nuage, haut: T.hauteurs.nuage + 0.1 * Math.sin(n.t * 3), z: 0 });
 
     rendre(g, L, VUE_H, this.plan, cam, T.decor, liste);
 
-    // main qui tient l'œuf
+    // la main et l'arme en bas de l'écran
     const bx = Math.sin(j.bob) * 5, by = Math.abs(Math.cos(j.bob)) * 4;
-    if (T.main.image) {   // vraies images (210×240) : le bras sort du bas de l'écran
+    if (j.arme === 'oeufs' && T.main.image) {   // vraies images (210×240) : le bras sort du bas de l'écran
       if (j.lanceT > 0) g.drawImage(T.main.lance, L / 2 + 30, VUE_H - 128, 112, 128);
-      else if (j.oeufs > 0) g.drawImage(T.main.tient, L / 2 + 60 + bx, VUE_H - 110 + by, 105, 120);
-    } else if (j.lanceT > 0) g.drawImage(T.main.lance, L / 2 + 50, VUE_H - 82, 90, 80);
-    else if (j.oeufs > 0) g.drawImage(T.main.tient, L / 2 + 70 + bx, VUE_H - 70 + by, 90, 80);
+      else if (j.mun.oeufs > 0) g.drawImage(T.main.tient, L / 2 + 60 + bx, VUE_H - 110 + by, 105, 120);
+    } else {
+      const m = T.main[j.arme] || T.main.tient, frappe = j.lanceT > 0;
+      const img = frappe && T.main[j.arme + '_tir'] ? T.main[j.arme + '_tir'] : m;
+      g.drawImage(img, L / 2 + (frappe ? 30 : 60) + bx, VUE_H - (frappe ? 125 : 110) + by, 105, 120);
+    }
     // petit viseur au centre
     g.fillStyle = 'rgba(0,0,0,0.6)'; g.fillRect(L / 2 - 4, VUE_H / 2 - 1, 9, 3); g.fillRect(L / 2 - 1, VUE_H / 2 - 4, 3, 9);
     g.fillStyle = 'rgba(255,255,255,0.85)'; g.fillRect(L / 2 - 3, VUE_H / 2, 7, 1); g.fillRect(L / 2, VUE_H / 2 - 3, 1, 7);
     // voile de gaz et flash rouge
     if (j.gaz > 0) { g.fillStyle = `rgba(190,205,160,${0.5 * j.gaz})`; g.fillRect(0, 0, L, VUE_H); }
+    if (j.rose > 0) { g.fillStyle = `rgba(230,120,190,${0.35 * j.rose})`; g.fillRect(0, 0, L, VUE_H); }
     if (j.rouge > 0) { g.fillStyle = `rgba(200,0,0,${j.rouge * 0.6})`; g.fillRect(0, 0, L, VUE_H); }
 
     if (this.carte) this.dessinerCarte(g);
     this.dessinerBarre(g, cam);
     this.toile.refresh();
     this.txtVie.setText(`${Math.ceil(j.vie)}%`);
-    this.txtOeufs.setText(`${j.oeufs}`);
+    const a = armeDe(j.arme);
+    this.txtArme.setText(`${ARMES.indexOf(a) + 1} · ${a.nom}`);
+    this.txtOeufs.setText(a.mun ? `${Math.ceil(j.mun[a.mun])}` : '∞');
     this.txtFlics.setText(`${this.repousses} / ${this.total}`);
   }
 

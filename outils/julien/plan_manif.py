@@ -50,6 +50,8 @@ objets = {
     # avenue bloquée : camions de CRS + barrières + manifestants face à eux
     (15, 30): 'C', (17, 30): 'C', (14, 32): 'b', (15, 32): 'b', (16, 32): 'b', (17, 32): 'b', (18, 32): 'b',
     (15, 34): 'm', (17, 34): 'm',
+    # armes : tomates (t) dans la ruelle, pistolet à eau (w) dans le passage, fumigènes (f) sur la place, + recharges
+    (8, 32): 't', (24, 31): 'w', (16, 24): 'f', (26, 26): 't', (9, 26): 'w', (12, 20): 'f', (12, 7): 't', (15, 15): 'w',
     # boulevard : départ au milieu de la foule
     (16, 39): 'J', (12, 37): 'm', (14, 40): 'm', (18, 38): 'm', (20, 40): 'm', (10, 39): 'm', (22, 37): 'm',
     (13, 38): 'm', (19, 37): 'm', (8, 40): 'm', (25, 39): 'm', (4, 38): 'm', (28, 37): 'm', (30, 40): 'm',
