@@ -1,17 +1,21 @@
 // Boss Beufa : infiltration de nuit dans sa base militaire (vue du dessus, façon Metal Gear),
-// puis (à venir) le QUIZ. Une pièce à l'écran à la fois : gardes à cônes de vision,
+// puis le QUIZ dans son bureau (BeufaQuiz). Une pièce à l'écran à la fois : gardes à cônes de vision,
 // conteneurs qui coupent la vue, projecteurs au bord dont le halo rejoint le milieu.
 // pret: false => la porte du hub affiche « Bientôt » (à remettre si on ne veut pas que les joueurs entrent).
 import { IDENTITE, REGLAGES as R } from './reglages.js';
 import { BeufaInfiltration } from './BeufaInfiltration.js';
+import { BeufaQuiz } from './BeufaQuiz.js';
 import { MANIFESTE } from './manifeste.js';
 
 export default {
   ...IDENTITE,
   pret: true,
-  phases: [{ id: 'infiltration', nom: 'Infiltration de la base (squelette)', scene: 'BeufaInfiltration' }],
+  phases: [
+    { id: 'infiltration', nom: 'Infiltration de la base', scene: 'BeufaInfiltration' },
+    { id: 'quiz', nom: 'Le quiz dans son bureau', scene: 'BeufaQuiz' },   // V82
+  ],
   manifeste: MANIFESTE,   // ses visuels et sons (rien de partagé avec les autres boss)
-  scenes: [BeufaInfiltration],
+  scenes: [BeufaInfiltration, BeufaQuiz],
   // réglages développeur (écran caché du hub : 5 appuis sur « Badges ») ; voir src/core/reglagesDev.js
   reglagesDev: [
     { groupe: 'INFILTRATION', nom: 'Vitesse de marche (px/s)', objet: R.joueur, champ: 'vitesse', pas: 10, min: 80, max: 300 },

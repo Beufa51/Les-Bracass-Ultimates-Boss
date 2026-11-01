@@ -925,7 +925,9 @@ export class BeufaInfiltration extends BossScene {
     const cam = this.cameras.main;
     cam.stopFollow(); cam.setZoom(1); cam.centerOn(LARGEUR / 2, HAUTEUR / 2);
     jouerSon(this, 'beufa_reussi');
-    this.victoire('La base de BEUFA est infiltrée en ' + formatTemps(this.temps) + ' ! Alertes déclenchées : ' + this.alertes + '. QUATRE pièces traversées — le QUIZ arrive !');
+    // V82 : pas encore de badge : la porte de Beufa mène à SON BUREAU → la phase QUIZ
+    this.messageCentre('INFILTRATION RÉUSSIE ! (' + formatTemps(this.temps) + ', alertes : ' + this.alertes + ')\nLa porte de Beufa s\'ouvre…', '#7fff7f', 2.4);
+    this.time.delayedCall(2600, () => this.scene.start('BeufaQuiz', { temps: this.temps, alertes: this.alertes }));
   }
 
   // LA POUSSIÈRE DES PAS : elle monte, s'étale et s'efface — le sol de la base vit.

@@ -43,6 +43,12 @@ export const REGLAGES = {
     verification: 4,   // V32 (3 avant) : s à fouiller avant de retourner à sa ronde
     rattrape: 24,      // px : il te touche → RENVOYÉ à l'entrée de la pièce (jamais de mort)
   },
+  quiz: {             // V82 : LA PHASE QUIZ (textes : data/beufa_quiz.js)
+    questions: 10,     // nombre de questions tirées au hasard dans la liste
+    erreursMax: 3,     // 3 croix = GAME OVER
+    temps: 60,         // secondes par question
+    lettresParSeconde: 45,   // vitesse d'écriture du codec
+  },
   vue: {
     nuit: 0.3,   // V29 : opacité du voile de nuit (0 = plein jour, 0.55 = l'ancienne nuit, trop sombre sur téléphone)
     zoom: 1.15,   // la caméra RAPPROCHÉE : elle suit le héros — 1 = pièce entière, 2 = très proche

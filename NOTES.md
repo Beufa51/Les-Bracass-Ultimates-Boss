@@ -860,3 +860,20 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   derrière la porte est du QG. `portesInterieures` existe si besoin. Questions à mettre dans `data/`.
 - À demander à Fabien avant de coder : les questions (qui les écrit, sur quoi), le format (QCM ? temps limité ?
   vies ?), ce qui se passe en cas d'erreur / de victoire, et le rôle de Beufa pendant le quiz.
+
+## BEUFA — V82 : LA PHASE QUIZ (BeufaQuiz)
+- Enchaînement : la sortie du QG (infiltration réussie) → message 2,6 s → `BeufaQuiz` (plus de badge à
+  l'infiltration ; le BADGE se gagne au quiz). Phase `quiz` aussi lançable depuis le menu de test.
+- TEXTES (questions, lecture des pensées, moqueries, bravos, fins) : `data/beufa_quiz.js` — modifiables sans code.
+  30 questions de culture jeu vidéo, 10 tirées au hasard, 4 choix mélangés (la 1re de chaque liste = la bonne).
+- Réglages `R.quiz` : 10 questions, 3 erreurs max, 60 s/question, 45 lettres/s pour le codec.
+- Déroulé : écran des commandes → Beufa MASQUÉ (façon Psycho Mantis : portrait qui tremble, flash violet) lit
+  dans tes pensées (4 phrases au hasard) → « il fait trop chaud dans ce masque » → flash, il l'enlève → quiz.
+  Erreur = croix rouge en haut à droite + Beufa se moque (+ bonne réponse) ; 10 s restantes = chrono rouge + tic ;
+  temps écoulé = erreur. 3 croix = GAME OVER (« CONTINUE ? » relance le quiz SANS l'intro masquée).
+  Commandes : 1-4, ou flèches + ESPACE, ou toucher/cliquer ; ESPACE / toucher le codec = suite du dialogue.
+- Images : `assets_inbox/beufa_face.jpg` (Beufa de face, livré par Fabien) → `outils/beufa_quiz_images.py`
+  fabrique beufa_portrait(_masque) (tête pixélisée) et beufa_buste(_masque) (debout derrière le bureau) ; le masque
+  à gaz est DESSINÉ par l'outil. Bureau dessiné par le code ; bannières et plantes = images existantes.
+- `BeufaQuiz` appelle `BeufaInfiltration.prototype.preparerImages` (fond blanc retiré, taille du jeu).
+- Testé (Playwright) : 10 bonnes réponses → victoire + badge ; 3 erreurs → GAME OVER. Sons = bips provisoires.

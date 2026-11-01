@@ -71,6 +71,11 @@ export const MANIFESTE = {
     beufa_casiers:        { fichier: 'sprites/beufa/beufa_casiers.jpg', fond: 'blanc', largeur: 140, hauteur: 102, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
     beufa_tableau:        { fichier: 'sprites/beufa/beufa_tableau.jpg', fond: 'blanc', largeur: 120, hauteur: 105, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
     beufa_banniere:       { fichier: 'sprites/beufa/beufa_banniere.jpg', fond: 'blanc', largeur: 40, hauteur: 121, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#701c1c', pixel: 2 } },
+    // V82 : LE QUIZ — tirés de assets_inbox/beufa_face.jpg par outils/beufa_quiz_images.py (masque dessiné par l'outil)
+    beufa_portrait:        { fichier: 'sprites/beufa/beufa_portrait.jpg', fond: 'blanc', largeur: 120, hauteur: 120, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#8c704c', pixel: 2 } },
+    beufa_portrait_masque: { fichier: 'sprites/beufa/beufa_portrait_masque.jpg', fond: 'blanc', largeur: 120, hauteur: 120, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#383838', pixel: 2 } },
+    beufa_buste:           { fichier: 'sprites/beufa/beufa_buste.jpg', fond: 'blanc', largeur: 172, hauteur: 198, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#a8c4e0', pixel: 2 } },
+    beufa_buste_masque:    { fichier: 'sprites/beufa/beufa_buste_masque.jpg', fond: 'blanc', largeur: 172, hauteur: 198, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#a8c4e0', pixel: 2 } },
     beufa_porte:  { fichier: 'sprites/beufa/beufa_porte.jpg', fond: 'blanc', largeur: 72, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'porte_nes', couleur: '#545454', ouverte: true, pixel: 2 } },
     beufa_porte_verrouillee: { fichier: 'sprites/beufa/beufa_porte_verrouillee.jpg', fond: 'blanc', largeur: 64, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'porte_nes', couleur: '#545454', ouverte: false, pixel: 2 } },
     beufa_garde_face: { fichier: 'sprites/beufa/beufa_garde_face.jpg', fond: 'blanc', echelleCommune: true, trousBlancs: 8, seuilBlanc: 200, liseré: 3, largeur: 52, hauteur: 58, images: 8, vitesse: 7, provisoire: { forme: 'garde_nes', couleur: '#385438', pixel: 2 } },   // V75 : garde DEBOUT en 3/4 (face)
@@ -95,6 +100,12 @@ export const MANIFESTE = {
     beufa_pierre:  { fichier: null, provisoire: { frequence: 320, duree: 0.09 } },
     beufa_verrou:  { fichier: null, provisoire: { frequence: 210, duree: 0.25 } },
     beufa_flaque:  { fichier: null, provisoire: { frequence: 980, duree: 0.06 } },   // V68 : « plic » dans une flaque
+    beufa_codec:   { fichier: null, provisoire: { frequence: 1400, duree: 0.02 } },   // V82 : la machine à écrire du codec
+    beufa_psy:     { fichier: null, provisoire: { frequence: 180, duree: 0.35 } },    // V82 : « je lis dans tes pensées »
+    beufa_masque:  { fichier: null, provisoire: { frequence: 520, duree: 0.2 } },     // V82 : il enlève son masque
+    beufa_bon:     { fichier: null, provisoire: { frequence: 880, duree: 0.15 } },
+    beufa_faux:    { fichier: null, provisoire: { frequence: 120, duree: 0.45 } },
+    beufa_tic:     { fichier: null, provisoire: { frequence: 1000, duree: 0.04 } },
     beufa_reussi:  { fichier: null, provisoire: { frequence: 740, duree: 0.3 } },
   },
 };
