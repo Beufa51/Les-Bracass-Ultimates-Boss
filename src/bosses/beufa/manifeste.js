@@ -6,10 +6,10 @@
 // (sprites/beufa/…), on remplace fichier: null par le chemin et TOUT le reste tient déjà.
 // fond: 'blanc' => le PNG arrive sur un FOND BLANC (le générateur ne fait pas la
 // transparence) : la scène retire CE blanc au chargement, sans toucher au dessin.
-import { DALLE_NES, MUR_NES, MUR_NES_V, ROUTE_NES, CONTENEUR_NES, CAISSE_NES, SACS_NES, TABLE_NES, PROJECTEUR_NES, PORTE_NES, GARDE_NES, HEROS_NES, BEUFA_NES, PIERRE_NES, CAMION_NES, JEEP_NES, HELICO_NES, RESERVOIR_NES, MIRADOR_NES, TENTE_NES, RATELIER_NES, BARIL_NES } from './dessins.js';
+import { DALLE_NES, MUR_NES, MUR_NES_V, ROUTE_NES, CONTENEUR_NES, CAISSE_NES, SACS_NES, TABLE_NES, PROJECTEUR_NES, CAMERA_NES, PORTE_NES, GARDE_NES, HEROS_NES, BEUFA_NES, PIERRE_NES, CAMION_NES, JEEP_NES, HELICO_NES, RESERVOIR_NES, MIRADOR_NES, TENTE_NES, RATELIER_NES, BARIL_NES } from './dessins.js';
 
 export const MANIFESTE = {
-  formes: { dalle_nes: DALLE_NES, mur_nes: MUR_NES, mur_nes_v: MUR_NES_V, route_nes: ROUTE_NES, conteneur_nes: CONTENEUR_NES, caisse_nes: CAISSE_NES, sacs_nes: SACS_NES, table_nes: TABLE_NES, projecteur_nes: PROJECTEUR_NES, porte_nes: PORTE_NES, garde_nes: GARDE_NES, heros_nes: HEROS_NES, beufa_nes: BEUFA_NES, pierre_nes: PIERRE_NES, camion_nes: CAMION_NES, jeep_nes: JEEP_NES, helico_nes: HELICO_NES, reservoir_nes: RESERVOIR_NES, mirador_nes: MIRADOR_NES, tente_nes: TENTE_NES, ratelier_nes: RATELIER_NES, baril_nes: BARIL_NES },
+  formes: { dalle_nes: DALLE_NES, mur_nes: MUR_NES, mur_nes_v: MUR_NES_V, route_nes: ROUTE_NES, conteneur_nes: CONTENEUR_NES, caisse_nes: CAISSE_NES, sacs_nes: SACS_NES, table_nes: TABLE_NES, projecteur_nes: PROJECTEUR_NES, camera_nes: CAMERA_NES, porte_nes: PORTE_NES, garde_nes: GARDE_NES, heros_nes: HEROS_NES, beufa_nes: BEUFA_NES, pierre_nes: PIERRE_NES, camion_nes: CAMION_NES, jeep_nes: JEEP_NES, helico_nes: HELICO_NES, reservoir_nes: RESERVOIR_NES, mirador_nes: MIRADOR_NES, tente_nes: TENTE_NES, ratelier_nes: RATELIER_NES, baril_nes: BARIL_NES },
   images: {
     beufa_sol:    { fichier: 'sprites/beufa/beufa_sol.jpg', fond: 'bord', largeur: 128, hauteur: 128, images: 1, vitesse: 1, provisoire: { forme: 'dalle_nes', couleur: '#1c1c38', pixel: 2 } },
     beufa_mur:    { fichier: 'sprites/beufa/beufa_mur.jpg', fond: 'bord', largeur: 64, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'mur_nes', couleur: '#545470', pixel: 2 } },
@@ -59,6 +59,8 @@ export const MANIFESTE = {
     beufa_sacs:   { fichier: 'sprites/beufa/beufa_sacs.jpg', fond: 'blanc', largeur: 64, hauteur: 44, images: 1, vitesse: 1, provisoire: { forme: 'sacs_nes', couleur: '#8c7038', pixel: 2 } },
     beufa_table:   { fichier: 'sprites/beufa/beufa_table.jpg', fond: 'blanc', largeur: 140, hauteur: 90, images: 1, vitesse: 1, provisoire: { forme: 'table_nes', couleur: '#a88c54', pixel: 2 } },
     beufa_projecteur: { fichier: 'sprites/beufa/beufa_projecteur.jpg', fond: 'blanc', largeur: 42, hauteur: 30, images: 1, vitesse: 1, provisoire: { forme: 'projecteur_nes', couleur: '#383854', pixel: 2 } },
+    // V67 : caméra de surveillance (QG). Dessin provisoire par le code — prompt n°14 : remplacer fichier: null à la livraison
+    beufa_camera: { fichier: null, largeur: 42, hauteur: 30, images: 1, vitesse: 1, provisoire: { forme: 'camera_nes', couleur: '#8c8ca8', pixel: 1 } },
     beufa_porte:  { fichier: 'sprites/beufa/beufa_porte.jpg', fond: 'blanc', largeur: 72, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'porte_nes', couleur: '#545454', ouverte: true, pixel: 2 } },
     beufa_porte_verrouillee: { fichier: 'sprites/beufa/beufa_porte_verrouillee.jpg', fond: 'blanc', largeur: 64, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'porte_nes', couleur: '#545454', ouverte: false, pixel: 2 } },
     beufa_garde:  { fichier: 'sprites/beufa/beufa_garde.jpg', fond: 'blanc', largeur: 48, hauteur: 48, images: 6, vitesse: 6, provisoire: { forme: 'garde_nes', couleur: '#385438', pixel: 2 } },

@@ -214,7 +214,7 @@ export const PIECES = [
     caisses: [],
     tables: [ [760, 270] ],                           // LA TABLE DES CARTES : le stratège en fait le tour
     projecteurs: [
-      { tour: [300, 14], depart: [300, 60], arrivee: [300, 480], phase: 3 },   // LE PORTIQUE de l'antichambre (on le connaît)
+      { tour: [300, 14], depart: [300, 60], arrivee: [300, 480], phase: 3, camera: true },   // LE PORTIQUE de l'antichambre — V67 : une CAMÉRA (dedans, pas de projecteur), même balayage
     ],
     gardes: [
       { chemin: [[560, 175], [960, 175], [960, 380], [560, 380]] },   // LE STRATÈGE : le tour de la table, en boucle (sens des aiguilles d'une montre)

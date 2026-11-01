@@ -740,3 +740,10 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   (postes d'opérateurs) ; `marquagesSol: [[x,y,l,h]]` = cadre jaune peint, autour des missiles de l'arsenal.
 - Prompt n°14 (caméra) : à la livraison, le portique du QG devient une CAMÉRA (même balayage ; dehors = projecteurs).
 - À décider par Fabien : projecteur sur le mirador ; lampadaires = vraie lumière qui repère Snake.
+
+## BEUFA — V67 : CAMÉRA AU QG + RECHERCHE « COMMENT METAL GEAR AGENCE SES NIVEAUX »
+- Le portique de l'antichambre du QG devient une CAMÉRA de surveillance (`camera: true` sur un projecteur → sprite
+  `beufa_camera`, dessin provisoire `CAMERA_NES` par le code ; prompt n°14 à livrer). Même balayage, même repérage.
+- `propositions/beufa_recherche_metal_gear.md` : 9 principes de Metal Gear + 5 propositions de gameplay (A flaques
+  bruyantes, B conduit d'aération, C objet dans le danger, D gardes qui se couvrent dans la cour, E angle mort sous
+  la caméra) → À VALIDER par Fabien.

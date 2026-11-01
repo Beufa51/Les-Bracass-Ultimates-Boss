@@ -472,7 +472,7 @@ export class BeufaInfiltration extends BossScene {
     // de « depart » à « arrivee » (jusqu'au milieu de la pièce) puis revient.
     for (const pr of (P.projecteurs || [])) {
       const face = Math.atan2(pr.arrivee[1] - pr.tour[1], pr.arrivee[0] - pr.tour[0]);
-      const sprite = this.add.image(pr.tour[0], pr.tour[1], 'beufa_projecteur').setDepth(22).setRotation(face);
+      const sprite = this.add.image(pr.tour[0], pr.tour[1], pr.camera ? 'beufa_camera' : 'beufa_projecteur').setDepth(22).setRotation(face);   // V67 : à l'intérieur, une CAMÉRA
       const alerte = this.add.text(pr.tour[0], pr.tour[1] - 26, '', styleAlerte).setOrigin(0.5).setDepth(940);
       this.decor.push(sprite, alerte);
       this.projecteurs.push({ tour: pr.tour, depart: pr.depart, arrivee: pr.arrivee, phase: pr.phase || 0, t: 0, hx: pr.depart[0], hy: pr.depart[1], jauge: 0, alerte });

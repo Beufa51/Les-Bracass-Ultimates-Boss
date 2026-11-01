@@ -236,6 +236,22 @@ export function PROJECTEUR_NES(ctx, w, h, p) {
   ctx.fillStyle = '#fcfcfc'; ctx.fillRect(w - 10, h / 2 - 4, 5, 8);   // le cœur, blanc chaud
 }
 
+// V67 : LA CAMÉRA DE SURVEILLANCE (intérieur du QG — dehors, ce sont des projecteurs) : vue de dessus,
+// elle VISE À DROITE (le jeu la fait tourner) : platine sur le mur à gauche, bras, boîtier gris, objectif, LED rouge.
+export function CAMERA_NES(ctx, w, h, p) {
+  ctx.fillStyle = '#00001c'; ctx.fillRect(0, h / 2 - 8, 6, 16);                     // la platine vissée au mur
+  ctx.fillStyle = '#70708c'; ctx.fillRect(1, h / 2 - 7, 4, 14);
+  ctx.fillStyle = '#383854'; ctx.fillRect(6, h / 2 - 2, 8, 4);                      // le bras
+  ctx.fillStyle = '#00001c'; ctx.fillRect(13, h / 2 - 8, w - 17, 16);               // le contour du boîtier
+  ctx.fillStyle = p.couleur; ctx.fillRect(14, h / 2 - 7, w - 19, 14);               // le boîtier
+  ctx.fillStyle = teinte(p.couleur, 0.35); ctx.fillRect(14, h / 2 - 7, w - 19, 4);  // son dessus éclairé
+  trame(ctx, 14, h / 2 - 3, w - 19, 2, teinte(p.couleur, 0.15));
+  ctx.fillStyle = '#1c1c1c'; ctx.fillRect(w - 6, h / 2 - 6, 5, 12);                 // la visière
+  ctx.fillStyle = '#1c3870'; ctx.fillRect(w - 5, h / 2 - 4, 3, 8);                  // l'objectif
+  ctx.fillStyle = '#70a8fc'; ctx.fillRect(w - 5, h / 2 - 3, 1, 2);                  // son reflet
+  ctx.fillStyle = '#fc3838'; ctx.fillRect(18, h / 2 - 6, 3, 3);                     // la LED rouge : elle filme
+}
+
 // UNE PORTE BLINDÉE : ouverte (bande de chantier jaune/noire + LED verte = la
 // sortie) ou verrouillée (LED rouge). SNES : bande biseautée, LED à halo en
 // trame. Le contour reste teinté, pas noir pur.
