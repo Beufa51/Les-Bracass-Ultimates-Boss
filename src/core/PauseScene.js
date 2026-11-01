@@ -24,6 +24,7 @@ export class PauseScene extends Phaser.Scene {
       { libelle: () => `Musique : ${this.jauge('musique')}`, reglage: 'musique' },
       { libelle: () => `Bruitages : ${this.jauge('sons')}`, reglage: 'sons' },
       { libelle: () => `Voix : ${this.jauge('voix')}`, reglage: 'voix' },
+      ...(this.sceneCommandes() ? [{ libelle: () => 'Commandes du clavier', action: () => this.commandes() }] : []),
       { libelle: () => 'Abandonner (retour au hub)', action: () => this.quitter() },
     ];
     this.lignes = this.choix.map((c, i) => texte(this, LARGEUR / 2, 170 + i * 55, '', 24, '#ffffff'));
@@ -59,6 +60,20 @@ export class PauseScene extends Phaser.Scene {
       this.majAffichage();
     }
     if (vientDAppuyer(t.espace) && c.action) c.action();
+  }
+
+  // jeu en pause qui sait afficher son écran de commandes (Julien, sur PC) : méthode ouvrirCommandes(retour)
+  sceneCommandes() {
+    if (estTactile()) return null;
+    return this.enPause.map(k => this.scene.get(k)).find(s => s && typeof s.ouvrirCommandes === 'function'
+      && (!s.commandesDisponibles || s.commandesDisponibles())) || null;
+  }
+
+  // ferme la pause, montre l'écran de commandes du jeu, puis rouvre la pause en sortant
+  commandes() {
+    const s = this.sceneCommandes(), jeu = this.game;
+    this.reprendre();
+    s.ouvrirCommandes(() => basculerPause(jeu));
   }
 
   reprendre() {

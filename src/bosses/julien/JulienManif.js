@@ -214,6 +214,14 @@ export class JulienManif extends BossScene {
     this.input.keyboard.on('keydown', touche);
   }
 
+  // Depuis le menu pause (PC) : jeu figé pendant l'écran des commandes, puis 'retour' (qui rouvre la pause)
+  commandesDisponibles() { return this.enJeu && !this.termine; }   // pas pendant les menus / l'intro / la fin
+  ouvrirCommandes(retour) {
+    const avant = this.enJeu;
+    this.enJeu = false; this.libererSouris();
+    this.ecranCommandes(() => { this.enJeu = avant; retour(); });
+  }
+
   // Menu des difficultés façon Doom (▲ ▼ puis ESPACE / OK) ; le choix est retenu
   choisirDifficulte(suite) {
     const noms = Object.keys(DIFFICULTES);

@@ -1068,6 +1068,8 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   courir OUI/NON ; chaque action se change (ENTRÉE puis la touche) → « PERSONNALISÉ ». Touche « inverser » (Alt)
   maintenue : pas de côté ↔ tourner. Gardé dans le navigateur (localStorage `bracass_julien_commandes_v1`).
   Fixes : 1-5 armes, Tab / M carte. L'intro affiche les touches choisies.
+  Aussi dans le MENU PAUSE (PC, en cours de partie) : ligne « Commandes du clavier » → même écran, jeu figé, C rouvre
+  la pause (PauseScene cherche une scène en pause qui a `ouvrirCommandes(retour)` / `commandesDisponibles()`).
 - À FAIRE (audit Doom) : point 3 : BAC en civil, tireur de LBD, policiers en hauteur, sono (BFG). Point 4 : clé + porte + boucle.
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
