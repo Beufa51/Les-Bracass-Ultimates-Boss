@@ -1,6 +1,6 @@
 // LE QUIZ DE BEUFA — tout le texte est ici : modifie-le librement (sans toucher au code).
 // QUESTIONS : la 1re réponse de chaque liste est la BONNE (le jeu mélange l'ordre à l'affichage).
-// Le jeu en tire 10 au hasard à chaque partie.
+// Le jeu en tire 10 au hasard à chaque partie (60 questions depuis la V92).
 export const QUESTIONS = [
   { q: 'Dans Donkey Kong (1981), comment s\'appelait Mario ?', r: ['Jumpman', 'Mister Video', 'Plumber Man', 'Super Guy'] },
   { q: 'Quelle entreprise a créé Sonic ?', r: ['Sega', 'Nintendo', 'Capcom', 'Atari'] },
@@ -32,6 +32,37 @@ export const QUESTIONS = [
   { q: 'Comment s\'appelle le frère de Mario ?', r: ['Luigi', 'Wario', 'Toad', 'Yoshi'] },
   { q: 'En quelle année la Game Boy est-elle sortie au Japon ?', r: ['1989', '1985', '1993', '1996'] },
   { q: 'Dans Metal Gear, où Snake aime-t-il se cacher ?', r: ['Dans un carton', 'Dans un tonneau', 'Dans une poubelle', 'Dans un frigo'] },
+  // V92 : 30 questions de plus (60 au total : on retombe moins vite sur les mêmes)
+  { q: 'Comment s\'appelle le dinosaure vert, ami de Mario ?', r: ['Yoshi', 'Birdo', 'Rex', 'Dino'] },
+  { q: 'Dans quel jeu incarne-t-on Cloud Strife ?', r: ['Final Fantasy VII', 'Chrono Trigger', 'Dragon Quest VIII', 'Xenogears'] },
+  { q: 'Avec quelle console Wii Sports était-il vendu ?', r: ['Wii', 'Wii U', 'GameCube', 'Switch'] },
+  { q: 'Quel héros de Capcom combat les robots du Dr. Wily ?', r: ['Mega Man', 'Strider', 'Arthur', 'Viewtiful Joe'] },
+  { q: 'Dans quel jeu visite-t-on Rapture, une ville sous la mer ?', r: ['BioShock', 'Subnautica', 'Dead Space', 'SOMA'] },
+  { q: 'Qui est le héros de Half-Life ?', r: ['Gordon Freeman', 'Isaac Clarke', 'Duke Nukem', 'Sam Fisher'] },
+  { q: 'Quelle console portable avait deux écrans, dont un tactile ?', r: ['Nintendo DS', 'Game Boy Advance', 'PSP', 'Game Gear'] },
+  { q: 'Dans quelle région se passe Pokémon Rouge et Bleu ?', r: ['Kanto', 'Johto', 'Hoenn', 'Sinnoh'] },
+  { q: 'Qui est l\'ennemi juré de Sonic ?', r: ['Le Dr. Eggman (Robotnik)', 'Le Dr. Wily', 'Bowser', 'Knuckles'] },
+  { q: 'Quel jeu de Blizzard se déroule en Azeroth ?', r: ['World of Warcraft', 'Diablo', 'StarCraft', 'Overwatch'] },
+  { q: 'Dans quelle saga cherche-t-on la Triforce ?', r: ['Zelda', 'Metroid', 'Fire Emblem', 'Kirby'] },
+  { q: 'Qui est l\'héroïne de Metroid ?', r: ['Samus Aran', 'Lara Croft', 'Jill Valentine', 'Bayonetta'] },
+  { q: 'Que mange Pac-Man pour pouvoir manger les fantômes ?', r: ['Une super pac-gomme', 'Une cerise', 'Une étoile', 'Un champignon'] },
+  { q: 'Sur quelle console est sorti Super Mario Bros. (1985) ?', r: ['NES', 'Master System', 'Atari 2600', 'Super Nintendo'] },
+  { q: 'Où commence Resident Evil (1996) ?', r: ['Dans un manoir', 'Dans un commissariat', 'Dans un village', 'Sur un paquebot'] },
+  { q: 'Quelle mascotte de PlayStation est un bandicoot ?', r: ['Crash', 'Spyro', 'Ratchet', 'Sly'] },
+  { q: 'Dans Mario Kart, quel objet fonce sur le PREMIER ?', r: ['La carapace bleue', 'La carapace rouge', 'La carapace verte', 'La banane'] },
+  { q: 'Quel est le vrai prénom de Solid Snake ?', r: ['David', 'Jack', 'John', 'Adam'] },
+  { q: 'Qui a créé Mario ?', r: ['Shigeru Miyamoto', 'Hideo Kojima', 'Yu Suzuki', 'Satoru Iwata'] },
+  { q: 'Dans quel jeu affronte-t-on 16 colosses géants ?', r: ['Shadow of the Colossus', 'Ico', 'Monster Hunter', 'Dark Souls'] },
+  { q: 'Quelle a été la DERNIÈRE console de salon de Sega ?', r: ['Dreamcast', 'Saturn', 'Mega Drive', 'Master System'] },
+  { q: 'Dans Street Fighter II, de quel pays vient Chun-Li ?', r: ['La Chine', 'Le Japon', 'La Corée', 'La Thaïlande'] },
+  { q: 'Quel jeu d\'id Software (1993) a lancé la mode des FPS ?', r: ['Doom', 'Quake', 'Duke Nukem 3D', 'Half-Life'] },
+  { q: 'Quelle princesse Mario doit-il sauver de Bowser ?', r: ['Peach', 'Zelda', 'Daisy', 'Harmonie'] },
+  { q: 'Dans Tetris, combien de carrés forment chaque pièce ?', r: ['4', '3', '5', '6'] },
+  { q: 'De quelle couleur est la tunique de Link ?', r: ['Verte', 'Bleue', 'Rouge', 'Violette'] },
+  { q: 'Dans quel jeu les personnages parlent-ils le « simlish » ?', r: ['Les Sims', 'SimCity', 'Animal Crossing', 'Second Life'] },
+  { q: 'Comment s\'appelle l\'intelligence artificielle de Portal ?', r: ['GLaDOS', 'HAL 9000', 'SHODAN', 'Cortana'] },
+  { q: 'Dans quelle saga de Capcom chasse-t-on des monstres géants ?', r: ['Monster Hunter', 'Dino Crisis', 'Lost Planet', 'Onimusha'] },
+  { q: 'Comment s\'appelle le renard à deux queues, ami de Sonic ?', r: ['Tails', 'Knuckles', 'Shadow', 'Amy'] },
 ];
 
 // L'INTRO : Beufa, masqué, « lit dans tes pensées » (on en tire 4 au hasard, après la 1re phrase)

@@ -7,6 +7,10 @@ Jeu web Phaser 3 (boss par boss). L'état du projet est dans `NOTES.md` : lis se
 Le propriétaire avance aussi avec une autre IA. Avant chaque modification : `git fetch origin main` puis
 `git merge --ff-only FETCH_HEAD`. Ne travaille jamais sur un boss qu'il est en train de modifier ailleurs (demande si tu as un doute).
 
+## Rappel au propriétaire
+Quand les 6 boss sont finalisés : lui rappeler la passe de FINITION où l'on personnalise les textes de chaque jeu
+(voir « À RAPPELER À FABIEN » en tête de `NOTES.md`).
+
 ## Beufa
 Après tout changement de `src/bosses/beufa/reglages.js` : `node outils/beufa_verif.mjs` doit finir à 0 erreur, 0 avertissement.
 

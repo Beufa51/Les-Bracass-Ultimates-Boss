@@ -31,7 +31,7 @@ export const MANIFESTE = {
     // ---------- BADGES (interface) ----------
     badge_vide:   { fichier: null, largeur: 48, hauteur: 48, images: 1, vitesse: 1,
       provisoire: { forme: 'cercle', couleur: '#3a3a3a' } },
-    badge_beufa:  { fichier: null, largeur: 48, hauteur: 48, images: 1, vitesse: 1,
+    badge_beufa:  { fichier: 'sprites/hub/badge_beufa.png', largeur: 48, hauteur: 48, images: 1, vitesse: 1,
       provisoire: { forme: 'badge', couleur: '#e8b923', lettre: 'B' } },
     badge_kedric: { fichier: null, largeur: 48, hauteur: 48, images: 1, vitesse: 1,
       provisoire: { forme: 'badge', couleur: '#3cb44b', lettre: 'K', icone: 'football' } },   // médaille verte au ballon de football américain

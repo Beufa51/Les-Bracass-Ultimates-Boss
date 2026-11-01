@@ -9,6 +9,7 @@ import { texte } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique, arreterMusique } from '../../core/musique.js';
+import { Sauvegarde } from '../../core/sauvegarde.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, REGLAGES as R } from './reglages.js';
 import { QUESTIONS, LECTURE_DEBUT, LECTURES, MASQUE_CHAUD, DEBUT_QUIZ, MOQUERIES, TROP_TARD, BRAVOS, VICTOIRE, GAME_OVER, RANGS, RANG_PARFAIT } from '../../../data/beufa_quiz.js';
@@ -356,7 +357,7 @@ export class BeufaQuiz extends BossScene {
 
   gagne() {
     this.hudNumero.setText('');
-    jouerSon(this, 'beufa_reussi');
+    jouerSon(this, 'beufa_bon');   // V92 : le son de réussite est gardé pour l'apparition du rang (il jouait 2 fois)
     this.visage('choque');
     this.dire([VICTOIRE], () => {
       this.etape = 'fin';
@@ -366,8 +367,9 @@ export class BeufaQuiz extends BossScene {
 
   // ---------- V91 : l'écran de RÉSULTATS façon MGS (classement + médaille) ----------
   calculerRang() {
+    // V92 : infiltration pas jouée (quiz lancé seul) = 0 point d'infiltration (avant : 50 « gratuits »)
     const d = this.donnees, alertes = d.alertes ?? 0, continues = d.continues || 0;
-    const points = this.bons * 10 + Math.max(0, 50 - alertes * 10) - continues * 15;
+    const points = this.bons * 10 + (d.alertes === undefined ? 0 : Math.max(0, 50 - alertes * 10)) - continues * 15;
     if (alertes === 0 && this.bons === this.questions.length && continues === 0 && d.alertes !== undefined) return { ...RANG_PARFAIT, points, parfait: true };
     return { ...RANGS.find((r) => points >= r.min), points };
   }
@@ -375,6 +377,11 @@ export class BeufaQuiz extends BossScene {
   ecranVictoire() {
     arreterMusique('beufa_duel');
     const P = 1000, d = this.donnees, rang = this.calculerRang();
+    // V92 : le MEILLEUR RANG est gardé (affiché au hub sous la porte) — seulement si l'infiltration a été jouée
+    const ordre = [RANG_PARFAIT.nom, ...RANGS.map((r) => r.nom)];
+    const avant = Sauvegarde.record('beufa');
+    const record = d.alertes !== undefined ? Sauvegarde.proposerRecord('beufa', rang.nom, d.temps ?? 5999, ordre) : avant;
+    const nouveau = d.alertes !== undefined && (!avant || avant.rang !== record.rang || avant.temps !== record.temps);
     const minutes = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
     this.add.rectangle(0, 0, LARGEUR, HAUTEUR, 0x000000).setOrigin(0).setDepth(P);
     // les lignes de balayage du codec
@@ -409,6 +416,10 @@ export class BeufaQuiz extends BossScene {
       this.tweens.add({ targets: titre, alpha: 1, duration: 200 });
       this.tweens.add({ targets: nom, alpha: 1, scale: 1, duration: 450, ease: 'Back.Out' });
       this.tweens.add({ targets: phrase, alpha: 1, delay: 400, duration: 300 });
+      const txtRecord = nouveau ? '★ NOUVEAU RECORD ★' : record ? `MEILLEUR RANG : ${record.rang}` : '(joue l\'infiltration avant pour être classé)';
+      const tr = this.add.text(62, 486, txtRecord, st(18, nouveau ? '#ffd84a' : '#4fbf80')).setDepth(P + 2).setAlpha(0);
+      this.tweens.add({ targets: tr, alpha: 1, delay: 800, duration: 300 });
+      if (nouveau) this.tweens.add({ targets: tr, alpha: 0.4, delay: 1100, duration: 500, yoyo: true, repeat: -1 });
     });
     // la MÉDAILLE de la mission (dessinée), qui se balance
     const medaille = this.dessinerMedaille(P + 3, rang.parfait);

@@ -1,18 +1,17 @@
 # NOTES : état du projet "Les Bracass'"
 
-## Où on en est
-**Étape 0 terminée : squelette jouable.**
-**Étape 1 terminée : boss Greg TERMINÉ** (illustrations, sons, équilibrage testé par bots, écran de victoire avec trophée).
-Copie de référence de la version finale : branche `greg-termine` (`version-1-greg` = état un peu plus ancien).
-**Étape 2 terminée : boss Lionel VALIDÉ par le propriétaire** (match de frisbee façon Windjammers, illustrations manga
-mains vides, entraînement, joystick, jauges du public, 3 supers, surprises, difficulté PERSO). En ligne sur `main`.
-**Étape 3 : boss Kédric — v6 : 3 courses d'une traite puis le battle de danse sur scène** (à réessayer). Choix du propriétaire : tu portes le ballon
-et tu traverses le terrain en esquivant les défenseurs qui reçoivent les ordres du coach Kédric, VUE DE DOS, esquives ◀ ▶ ▲ ▼,
-plus tu esquives plus tu accélères jusqu'au DEVIL BAT GHOST, référence graphique **Eyeshield 21**, Kédric = **showman frimeur**.
-ILLUSTRATIONS INTÉGRÉES (personnages) : 24 images Gemini du propriétaire, renommées `assets_inbox/kedric_*.jpg`, détourées par
-`outils/kedric/preparer_images.py` dans `assets/sprites/kedric/`. Musique intégrée. Manquent encore : le décor (stade + pelouse illustrés), le trophée.
-Rappel : Kédric a son propre dossier (`src/bosses/kedric/`), ne touche ni Greg ni Lionel.
-Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
+## Où on en est (mis à jour V92)
+- **Greg** : TERMINÉ (branche de référence `greg-termine`). **Lionel** : VALIDÉ. **Kédric** : jouable (courses + battle
+  de danse), manquent le décor illustré (stade, pelouse) et le trophée.
+- **Beufa** : TERMINÉ — infiltration façon Metal Gear (4 pièces) puis QUIZ dans son bureau (codec, Psycho Mantis,
+  rideau, 60 questions, GAME OVER façon MGS, classement BIG BOSS → CHICKEN, médaille = badge du hub, meilleur rang
+  sauvegardé). Audit final : `propositions/beufa_audit_final.md`.
+- **Julien, Rémi** : pas commencés (« Bientôt » au hub).
+- Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
+
+## ⚠️ À RAPPELER À FABIEN quand les 6 boss seront finalisés (phase de FINITION)
+- Repasser sur CHAQUE jeu pour PERSONNALISER LES TEXTES (répliques, intros, moqueries, victoires, questions…) avec lui.
+  Pour Beufa, tout est dans `data/beufa_quiz.js` (quiz) et en tête de `BeufaInfiltration.js` (conseils, messages).
 
 ## Décisions
 - Moteur : **Phaser 3.90** (gratuit, licence MIT), copié dans `lib/`. Aucune installation pour jouer.
@@ -935,3 +934,12 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   ≥130, HOUND ≥120, EAGLE ≥110, PUMA ≥100, CROCODILE ≥90, sinon CHICKEN.
 - CONTINUE (GAME OVER) relance le quiz en GARDANT temps/alertes de l'infiltration, et compte les continues.
 - Testé : 0 alerte + 10/10 → BIG BOSS (150) ; 3 alertes, 1 continue, 8/10 → CHICKEN (85).
+
+## BEUFA — V92 : LES 4 CONSEILS DE L'AUDIT
+- Meilleur rang sauvegardé (`Sauvegarde.proposerRecord('beufa', rang, temps d'infiltration, ordre des rangs)`),
+  affiché au hub sous la porte (« Record BIG BOSS 5'12 ») et sur l'écran de résultats (« ★ NOUVEAU RECORD ★ » ou
+  « MEILLEUR RANG »). Pas de record si le quiz est lancé seul ; dans ce cas, 0 point d'infiltration (avant : 50 offerts).
+- Badge du hub = la médaille (`assets/sprites/hub/badge_beufa.png`, 48×48, dessinée par script Python).
+- Le son de réussite ne joue plus 2 fois à la victoire (« bon » au dialogue, « réussi » au rang).
+- 60 questions (30 ajoutées en V92).
+- `beufa_musique.mp3` : 5 premières minutes en boucle, mono 56 kb/s (11 → 2,1 Mo ; original dans l'historique git).
