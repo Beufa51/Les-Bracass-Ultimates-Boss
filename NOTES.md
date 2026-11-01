@@ -887,3 +887,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   provisoire créerait la clé et remplacerait le vrai portrait) : ajouter les entrées seulement quand les images arrivent.
 - Prompts Gemini des 5 portraits codec (style MGS PS1, vert) : `propositions/beufa_prompts_codec.md`.
 - Reste : recevoir les 6 images (`assets_inbox/beufa_codec_*.jpg`), les préparer (carré, ~120 px) et les brancher.
+
+## BEUFA — V84 : PORTRAITS CODEC BRANCHÉS
+- Livrés par Fabien (style cartoon pixel art vert) : `beufa_codec_masque / souriant / surpris / choque`
+  (`assets_inbox/` → réduits en 256×256 dans `assets/sprites/beufa/`, entrées ajoutées au manifeste).
+- Pas d'image « calme » (choix de Fabien) : le sourire la remplace. « machiavelique » pas encore livrée →
+  le sourire en attendant (une humeur sans image retombe sur le sourire).

@@ -99,8 +99,10 @@ export class BeufaQuiz extends BossScene {
   // V83 : les EXPRESSIONS du codec (images de Fabien : beufa_codec_masque / _calme / _choque / _surpris /
   // _machiavelique / _souriant). Tant qu'une image manque, on garde le portrait actuel.
   visage(humeur) {
-    const cle = this.masque ? 'beufa_codec_masque' : `beufa_codec_${humeur}`;
-    const t = this.textures.exists(cle) ? cle : (this.masque ? 'beufa_portrait_masque' : 'beufa_portrait');
+    // V84 : pas d'image « calme » (le sourire suffit, choix de Fabien) ; une humeur sans image → le sourire
+    const cle = this.masque ? 'beufa_codec_masque' : `beufa_codec_${humeur === 'calme' ? 'souriant' : humeur}`;
+    const repli = this.masque ? 'beufa_portrait_masque' : (this.textures.exists('beufa_codec_souriant') ? 'beufa_codec_souriant' : 'beufa_portrait');
+    const t = this.textures.exists(cle) ? cle : repli;
     if (this.portrait.texture.key === t) return;
     this.portrait.setTexture(t); this.portrait.setScale(136 / this.portrait.height);
   }
