@@ -964,7 +964,7 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   `textures.js` (murs/persos/objets dessinés par le code), `visage.js`, `reglages.js`, `manifeste.js` (bips provisoires).
   Rendu : toile 480×270 agrandie ×2 (vue 480×222 + barre 48).
 - Commandes EXACTEMENT comme Doom 93 (demande de Fabien) : ↑↓ avancer, ←→ tourner, Alt+←→ (ou , .) pas de côté,
-  Ctrl ou clic tirer, Maj courir, souris pour tourner (un clic la capture, Échap la libère) ; Z et Q/D en plus.
+  Ctrl tirer, Maj courir, PAS DE SOURIS (Fabien : tout au clavier comme en 93) ; Z et Q/D en plus.
   Tactile : croix, « Côté » maintenu (= Alt), « Œuf », « Courir » maintenu.
 - À FAIRE : vrais sons et images (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
