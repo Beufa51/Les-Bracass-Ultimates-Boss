@@ -781,3 +781,12 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Gardes : vus de dessus et TOURNÉS (effet « carton qui pivote » à côté de Snake debout). Prompt 3 vues ajouté dans
   `propositions/beufa_prompts_marche.md` (« GARDE — LES 3 DIRECTIONS ») ; à la livraison : découper en 3 rangées et
   choisir la rangée selon la direction, sans rotation (comme `afficher()` pour Snake).
+
+## BEUFA — V72 : SNAKE À L'ÉCHELLE DES DÉCORS + PROMPTS « VUS DE DOS »
+- Snake 70 → 58 px de haut (planches 46×58 au lieu de 56×70) : il était presque aussi haut qu'un conteneur et
+  écrasait établi/caisses. Centre du sprite à y-4 → pieds toujours à y+25 (tri par Y inchangé). Collision inchangée.
+- RÈGLE vue 3/4 : on voit la face SUD de tout objet → contre le MUR DU BAS, seulement des objets vus de dos ou
+  sans face avant (caisses, barils, pneus, palettes). Prompts n°15-17 (étagère, casiers, pompe vus de dos) dans
+  `propositions/beufa_prompts_base_militaire.md`. À la livraison : QG rangée sud (640/880/1200,494) → étagère_dos,
+  casiers (150,494) → casiers_dos, pompe (parc 1150,506) → pompe_dos.
+- Gardes : 48×48 vus de dessus en attendant la planche 3 vues (viser ~58 px de haut comme Snake).
