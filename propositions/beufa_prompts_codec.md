@@ -82,13 +82,17 @@ Image ENTIÈRE du haut de l'écran : le jeu la met en fond plein écran (16:9) e
 Donc Beufa et le bureau doivent tenir dans les 2 tiers du haut. Faire d'abord SANS masque (photo jointe), puis le
 masque dans la même conversation (même cadrage exact). Noms : `beufa_bureau_scene.jpg`, `beufa_bureau_scene_masque.jpg`.
 
-## A. Bureau, sans masque (en premier, photo jointe)
-Using the attached photo as the reference, keep EXACTLY the same head as in the photo (stylized as a cartoon, but
-still clearly him): same face, same hair length and haircut, same beard length and shape, same shirt as in the photo.
+## A. Bureau, sans masque (en premier) — dans une NOUVELLE conversation, joindre 2 images :
+## la photo ET le portrait codec souriant (`assets_inbox/beufa_codec_souriant.jpg`)
+Two images are attached: a photo of the man, and a green codec portrait of him SMILING. Keep EXACTLY the same head
+(stylized as a cartoon, but still clearly him): same face, same hair length and haircut, same beard length and shape,
+same shirt as in the photo. His expression must be EXACTLY the one of the smiling codec portrait: a warm, genuine,
+friendly smile, relaxed eyebrows, eyes slightly squinted by the smile. NOT a smirk, NOT a villain face, NOT narrowed
+eyes, NOT eyebrows angled down. Ignore any previous expression.
 Wide 16:9 game scene in FULL COLOR, friendly CARTOON 16-bit pixel art (clean outlines, simple flat shading, soft
 lighting, likable comic look like a Nintendo / Advance Wars character, nothing realistic or scary), front view.
 The secret office of a villain boss inside a military base: he sits behind a big wooden desk facing the camera,
-hands joined on the desk, confident smile. On the desk: an old military radio with a small red light, a stack of
+hands joined on the desk, warm friendly smile. On the desk: an old military radio with a small red light, a stack of
 files, a desk lamp. Behind him: a dark steel wall with a red banner with a gold star on each side, a big world map,
 a small potted plant in each corner. COMPOSITION: the whole character and the top of the desk must be in the UPPER
 TWO THIRDS of the image; the bottom third only shows the front of the desk and the floor (it will be hidden by the
