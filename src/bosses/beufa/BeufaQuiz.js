@@ -38,7 +38,7 @@ export class BeufaQuiz extends BossScene {
     this.input.keyboard.on('keydown', (ev) => this.touche(ev.key));
     this.input.on('pointerdown', (p) => { if (p.y > 352 && this.etape === 'dialogue') this.avancer(); });
 
-    const lancer = () => (this.masque ? this.introMasque() : this.dire(DEBUT_QUIZ, () => this.questionSuivante()));
+    const lancer = () => (this.masque ? this.introMasque() : (this.visage('machiavelique'), this.dire(DEBUT_QUIZ, () => this.questionSuivante())));
     if (this.donnees.reprise) lancer();
     else this.afficherIntro('BEUFA — LE QUIZ', [
       'Beufa t\'attend dans son bureau…',
@@ -83,6 +83,7 @@ export class BeufaQuiz extends BossScene {
     g.lineStyle(2, VERT, 0.9).strokeRect(18, 374, 142, 142);               // le cadre du portrait
     this.portrait = this.add.image(89, 445, this.masque ? 'beufa_portrait_masque' : 'beufa_portrait').setDepth(51);
     this.portrait.setScale(136 / this.portrait.height);
+    this.visage('calme');
     // les lignes de balayage de l'écran codec
     const sc = this.add.graphics().setDepth(52);
     sc.fillStyle(0x000000, 0.28);
@@ -93,6 +94,15 @@ export class BeufaQuiz extends BossScene {
     this.suite = texte(this, LARGEUR - 34, HAUTEUR - 26, '▼', 18, VERT_TXT).setDepth(53).setVisible(false);
     this.tweens.add({ targets: this.suite, alpha: 0.2, duration: 400, yoyo: true, repeat: -1 });
     this.boutons = [];
+  }
+
+  // V83 : les EXPRESSIONS du codec (images de Fabien : beufa_codec_masque / _calme / _choque / _surpris /
+  // _machiavelique). Tant qu'une image manque, on garde le portrait actuel.
+  visage(humeur) {
+    const cle = this.masque ? 'beufa_codec_masque' : `beufa_codec_${humeur}`;
+    const t = this.textures.exists(cle) ? cle : (this.masque ? 'beufa_portrait_masque' : 'beufa_portrait');
+    if (this.portrait.texture.key === t) return;
+    this.portrait.setTexture(t); this.portrait.setScale(136 / this.portrait.height);
   }
 
   // ---------- en haut : question, croix, chrono ----------
@@ -136,7 +146,8 @@ export class BeufaQuiz extends BossScene {
     this.psy = true;   // le portrait et le buste tremblent, l'écran pulse en violet
     const lignes = [LECTURE_DEBUT];
     for (const l of melange(LECTURES).slice(0, 4)) lignes.push(() => { this.flashPsy(); this.ligneSuivante(); }, l);
-    lignes.push(() => { this.psy = false; this.ligneSuivante(); }, MASQUE_CHAUD, () => this.enleverMasque());
+    lignes.push(() => { this.psy = false; this.ligneSuivante(); }, MASQUE_CHAUD, () => this.enleverMasque(),
+      () => { this.visage('machiavelique'); this.ligneSuivante(); });
     this.dire(lignes, () => this.dire(DEBUT_QUIZ, () => this.questionSuivante()));
   }
 
@@ -150,14 +161,31 @@ export class BeufaQuiz extends BossScene {
   enleverMasque() {
     this.etape = 'animation';
     this.tweens.add({ targets: this.buste, y: this.busteY - 10, duration: 120, yoyo: true, repeat: 2 });
-    this.time.delayedCall(800, () => {
-      this.cameras.main.flash(300, 255, 255, 255);
-      jouerSon(this, 'beufa_masque');
-      this.masque = false;
-      this.buste.setTexture('beufa_buste'); this.buste.setScale(215 / this.buste.height);
-      this.portrait.setTexture('beufa_portrait'); this.portrait.setScale(136 / this.portrait.height);
+    // V83 : un RIDEAU se ferme, on change Beufa derrière, puis il se rouvre sur Beufa sans masque à son bureau
+    const moitie = LARGEUR / 2;
+    const rideaux = [0, 1].map((i) => {
+      const r = this.add.rectangle(i ? LARGEUR : 0, 0, moitie + 2, HAUTEUR, 0x050805).setOrigin(i ? 0 : 1, 0).setDepth(800);
+      r.setStrokeStyle(3, VERT, 0.9);
+      return r;
     });
-    this.time.delayedCall(1500, () => { this.etape = 'dialogue'; this.ligneSuivante(); });
+    this.texteCodec.setText('');
+    this.time.delayedCall(700, () => {
+      this.tweens.add({ targets: rideaux[0], x: moitie, duration: 450, ease: 'Quad.In' });
+      this.tweens.add({ targets: rideaux[1], x: moitie, duration: 450, ease: 'Quad.In', onComplete: () => {
+        jouerSon(this, 'beufa_masque');
+        this.cameras.main.shake(150, 0.004);
+        this.masque = false;
+        this.buste.setTexture('beufa_buste'); this.buste.setScale(215 / this.buste.height);
+        this.visage('calme');
+        this.time.delayedCall(700, () => {
+          this.tweens.add({ targets: rideaux[0], x: 0, duration: 550, ease: 'Quad.Out' });
+          this.tweens.add({ targets: rideaux[1], x: LARGEUR, duration: 550, ease: 'Quad.Out', onComplete: () => {
+            rideaux.forEach((r) => r.destroy());
+            this.etape = 'dialogue'; this.ligneSuivante();
+          } });
+        });
+      } });
+    });
   }
 
   // ---------- les questions ----------
@@ -169,6 +197,7 @@ export class BeufaQuiz extends BossScene {
     this.choix = melange(q.r);
     this.selection = 0;
     this.etape = 'question';
+    this.visage('calme');
     this.reste = R.quiz.temps; this.dernierTic = 99;
     this.hudNumero.setText(`QUESTION ${this.numero}/${this.questions.length}`);
     this.chronoFond.setVisible(true); this.chronoBarre.setVisible(true);
@@ -207,10 +236,14 @@ export class BeufaQuiz extends BossScene {
       if (bon) {
         this.bons++;
         jouerSon(this, 'beufa_bon');
+        this.serie = (this.serie || 0) + 1;
+        this.visage(this.serie >= 3 ? 'choque' : 'surpris');   // 3 bonnes d'affilée : il n'en revient pas
         this.dire([hasard(BRAVOS)], () => this.questionSuivante());
       } else {
         this.erreurs++;
         jouerSon(this, 'beufa_faux');
+        this.serie = 0;
+        this.visage('machiavelique');
         const c = this.croix[this.erreurs - 1];
         c.setVisible(true).setScale(3);
         this.tweens.add({ targets: c, scale: 1, duration: 300, ease: 'Back.Out' });
@@ -231,6 +264,7 @@ export class BeufaQuiz extends BossScene {
   gameOver() {
     this.etape = 'fin';
     jouerSon(this, 'ui_defaite');
+    this.visage('machiavelique');
     this.dire([GAME_OVER], () => {
       this.etape = 'fin';
       voile(this, 0.9).setDepth(900);
@@ -247,6 +281,7 @@ export class BeufaQuiz extends BossScene {
   gagne() {
     this.hudNumero.setText('');
     jouerSon(this, 'beufa_reussi');
+    this.visage('choque');
     this.dire([VICTOIRE], () => {
       this.etape = 'fin';
       this.victoire(`Quiz de BEUFA réussi : ${this.bons}/${this.questions.length} bonnes réponses, ${this.erreurs} erreur(s). Sa base est à toi !`);
@@ -290,6 +325,7 @@ export class BeufaQuiz extends BossScene {
       this.chronoBarre.width = 400 * k;
       this.chronoBarre.setFillStyle(this.reste < 10 ? 0xff3838 : VERT);
       this.chronoTexte.setText(Math.ceil(Math.max(0, this.reste)) + ' s');
+      if (this.reste < 10 && this.dernierTic === 99) this.visage('machiavelique');   // il savoure ton stress
       if (this.reste < 10 && Math.ceil(this.reste) !== this.dernierTic) { this.dernierTic = Math.ceil(this.reste); jouerSon(this, 'beufa_tic'); }
       if (this.reste <= 0) this.repondre(-1);
     }
