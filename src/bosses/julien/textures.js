@@ -1,0 +1,251 @@
+// Dessins PROVISOIRES du niveau manif (faits par le code, aucun fichier image) : murs 64×64, personnages et objets.
+// Chaque dessin est une petite toile (canvas) ; le moteur 3D (raycaster.js) les découpe en colonnes.
+// Pour mettre de vraies images plus tard : remplacer la toile par l'image (même taille conseillée).
+
+function toile(l, h, dessin) {
+  const c = document.createElement('canvas');
+  c.width = l; c.height = h;
+  const g = c.getContext('2d');
+  g.imageSmoothingEnabled = false;
+  dessin(g, l, h);
+  return c;
+}
+const R = (g, c, x, y, l, h) => { g.fillStyle = c; g.fillRect(x, y, l, h); };
+function ovale(g, c, x, y, rx, ry) { g.fillStyle = c; g.beginPath(); g.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); g.fill(); }
+function ecrire(g, txt, x, y, taille, c, police = 'bold') {
+  g.font = `${police} ${taille}px monospace`; g.fillStyle = c; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(txt, x, y);
+}
+// petit bruit pour que les surfaces ne soient pas toutes lisses
+function grain(g, l, h, force, graine = 1) {
+  let s = graine;
+  for (let i = 0; i < l * h / 6; i++) {
+    s = (s * 9301 + 49297) % 233280; const x = s % l;
+    s = (s * 9301 + 49297) % 233280; const y = s % h;
+    g.fillStyle = (i % 2) ? `rgba(0,0,0,${force})` : `rgba(255,255,255,${force * 0.7})`;
+    g.fillRect(x, y, 1, 1);
+  }
+}
+function fenetre(g, x, y, l, h) {
+  R(g, '#e8e2d0', x - 2, y - 2, l + 4, h + 4);
+  R(g, '#25364a', x, y, l, h);
+  R(g, '#3d5878', x + 1, y + 1, l / 2 - 2, h / 2 - 2);
+  R(g, '#e8e2d0', x + l / 2 - 1, y, 2, h);
+  R(g, '#e8e2d0', x, y + h / 2 - 1, l, 2);
+}
+
+// ---------------------------------------------------------------- murs
+export function texturesMurs() {
+  const T = {};
+  T[1] = toile(64, 64, (g) => {   // briques + une fenêtre
+    R(g, '#5a3324', 0, 0, 64, 64);
+    for (let y = 0; y < 64; y += 8) for (let x = -8; x < 64; x += 16) {
+      const dx = (y / 8) % 2 ? 8 : 0;
+      R(g, ((x + y) / 8) % 3 ? '#8a4b35' : '#7c4230', x + dx + 1, y + 1, 14, 6);
+    }
+    fenetre(g, 20, 14, 24, 28);
+    grain(g, 64, 64, 0.12, 3);
+  });
+  T[2] = toile(64, 64, (g) => {   // immeuble crème, 2 fenêtres, balcon
+    R(g, '#d9cba8', 0, 0, 64, 64);
+    for (let y = 0; y < 64; y += 16) R(g, '#c4b48f', 0, y, 64, 1);
+    fenetre(g, 8, 10, 16, 26); fenetre(g, 40, 10, 16, 26);
+    R(g, '#333', 4, 38, 56, 2);
+    for (let x = 5; x < 60; x += 4) R(g, '#333', x, 39, 1, 8);
+    R(g, '#333', 4, 46, 56, 1);
+    grain(g, 64, 64, 0.08, 5);
+  });
+  T[3] = toile(64, 64, (g) => {   // boutique : enseigne + vitrine
+    R(g, '#6d6d6d', 0, 0, 64, 64);
+    R(g, '#b0262c', 0, 6, 64, 14);
+    ecrire(g, 'TABAC', 32, 13, 10, '#ffe9a8');
+    R(g, '#2a2a2a', 4, 24, 56, 40);
+    const v = g.createLinearGradient(0, 24, 0, 64); v.addColorStop(0, '#6f97b0'); v.addColorStop(1, '#2d4656');
+    g.fillStyle = v; g.fillRect(6, 26, 52, 38);
+    g.strokeStyle = 'rgba(255,255,255,0.35)'; g.beginPath(); g.moveTo(12, 60); g.lineTo(28, 30); g.moveTo(20, 62); g.lineTo(36, 30); g.stroke();
+    R(g, '#2a2a2a', 31, 26, 2, 38);
+    grain(g, 64, 64, 0.06, 7);
+  });
+  T[4] = toile(64, 64, (g) => {   // mur de béton tagué
+    R(g, '#8e8e88', 0, 0, 64, 64);
+    for (let x = 0; x < 64; x += 16) R(g, '#7a7a74', x, 0, 1, 64);
+    grain(g, 64, 64, 0.18, 9);
+    g.save(); g.translate(32, 24); g.rotate(-0.12);
+    ecrire(g, 'GRÈVE', 0, 0, 15, '#e84aa0'); g.restore();
+    ecrire(g, 'NON!', 20, 46, 11, '#3fd06a');
+    ecrire(g, '✊', 48, 48, 12, '#ffd84a', 'normal');
+  });
+  T[5] = toile(64, 64, (g) => {   // palissade de chantier + affiches
+    for (let x = 0; x < 64; x += 8) R(g, (x / 8) % 2 ? '#556b4e' : '#4b5f45', x, 0, 8, 64);
+    for (let x = 0; x < 64; x += 8) R(g, '#3a4935', x, 0, 1, 64);
+    R(g, '#f2efe0', 8, 14, 20, 28); ecrire(g, 'BAC', 18, 22, 7, '#c22'); ecrire(g, '2026', 18, 32, 7, '#222');
+    R(g, '#ffd84a', 38, 22, 18, 24); ecrire(g, 'ON', 47, 30, 8, '#222'); ecrire(g, 'LÂCHE', 47, 39, 5, '#222');
+    R(g, '#d0d0d0', 0, 60, 64, 4);
+  });
+  T[6] = toile(64, 64, (g) => {   // mur du lycée : pierre claire
+    R(g, '#cdbf9a', 0, 0, 64, 64);
+    for (let y = 0; y < 64; y += 12) { R(g, '#b5a780', 0, y, 64, 1); for (let x = (y / 12) % 2 * 16; x < 64; x += 32) R(g, '#b5a780', x, y, 1, 12); }
+    fenetre(g, 22, 18, 20, 20);
+    grain(g, 64, 64, 0.08, 11);
+  });
+  T[7] = toile(64, 64, (g) => {   // portail du lycée : grille verte, plaque « LYCÉE »
+    const f = g.createLinearGradient(0, 0, 0, 64); f.addColorStop(0, '#9fc3dd'); f.addColorStop(0.6, '#d7d0bf'); f.addColorStop(1, '#a89f8c');
+    g.fillStyle = f; g.fillRect(0, 0, 64, 64);
+    R(g, '#c9b98f', 0, 34, 64, 20);
+    for (let x = 2; x < 64; x += 6) { R(g, '#1f5a3a', x, 10, 2, 54); R(g, '#2f7a52', x, 8, 2, 3); }
+    R(g, '#1f5a3a', 0, 20, 64, 3); R(g, '#1f5a3a', 0, 54, 64, 3);
+    R(g, '#1c3f8f', 12, 0, 40, 11); R(g, '#fff', 13, 1, 38, 1);
+    ecrire(g, 'LYCÉE', 32, 6, 8, '#ffffff');
+  });
+  return T;
+}
+
+// ---------------------------------------------------------------- personnages
+const PEAU = '#e5b48c', PEAU_O = '#c48d68';
+function eclabousser(g, l, h, n, graine) {   // traces d'œuf
+  let s = graine;
+  for (let i = 0; i < n; i++) {
+    s = (s * 9301 + 49297) % 233280; const x = 8 + s % (l - 16);
+    s = (s * 9301 + 49297) % 233280; const y = 14 + s % (h - 30);
+    ovale(g, '#fff6d8', x, y, 5, 3); ovale(g, '#ffc928', x + 1, y, 2, 2);
+  }
+}
+
+// Policier lanceur de lacrymos (48×80). poses : marche0, marche1, bras, lance, touche, fuite
+function policier(pose) {
+  return toile(48, 80, (g) => {
+    const dos = pose === 'fuite';
+    const pas = pose === 'marche1' ? 3 : pose === 'marche0' ? -3 : 0;
+    // jambes
+    R(g, '#16213f', 16 + pas, 52, 7, 26); R(g, '#16213f', 25 - pas, 52, 7, 26);
+    R(g, '#111', 15 + pas, 76, 9, 4); R(g, '#111', 24 - pas, 76, 9, 4);
+    // corps
+    R(g, '#22356b', 13, 26, 22, 28); R(g, '#111', 13, 50, 22, 3);
+    if (!dos) { R(g, '#d9d9d9', 16, 30, 6, 3); R(g, '#c9a227', 27, 30, 4, 4); }
+    // bras + lanceur
+    if (pose === 'bras') {
+      R(g, '#22356b', 34, 6, 6, 22); ovale(g, '#3a3a3a', 37, 5, 4, 5); R(g, '#9aa', 35, 1, 4, 2);
+      R(g, '#22356b', 7, 28, 6, 18);
+    } else if (pose === 'lance') {
+      R(g, '#22356b', 34, 22, 12, 6); R(g, PEAU, 44, 22, 4, 6);
+      R(g, '#22356b', 7, 28, 6, 18);
+    } else if (!dos) {
+      R(g, '#22356b', 7, 28, 6, 18); R(g, '#22356b', 35, 28, 6, 18);
+      R(g, '#555', 30, 38, 18, 5); R(g, '#333', 44, 37, 4, 7);   // lanceur
+    } else {
+      R(g, '#22356b', 6, 20, 6, 14); R(g, '#22356b', 36, 20, 6, 14);   // bras en l'air en fuyant
+    }
+    // tête + casque
+    R(g, PEAU, 18, 14, 12, 12);
+    ovale(g, '#1a2a55', 24, 13, 9, 8); R(g, '#1a2a55', 15, 13, 18, 4);
+    if (!dos) { R(g, 'rgba(140,190,230,0.75)', 17, 16, 14, 6); R(g, '#222', 21, 23, 6, 1); }
+    else R(g, '#1a2a55', 16, 14, 16, 10);
+    if (pose === 'touche' || dos) eclabousser(g, 48, 80, dos ? 5 : 3, 17);
+    if (pose === 'touche') { g.fillStyle = 'rgba(255,255,255,0.45)'; g.fillRect(10, 4, 30, 76); }
+  });
+}
+
+// CRS au bouclier (56×80). poses : marche0, marche1, cri, charge, essouffle, touche, fuite
+function crs(pose) {
+  return toile(56, 80, (g) => {
+    const dos = pose === 'fuite', bas = pose === 'essouffle';
+    const pas = pose === 'marche1' || pose === 'charge' ? 3 : pose === 'marche0' ? -3 : 0;
+    R(g, '#141414', 19 + pas, 52, 8, 26); R(g, '#141414', 29 - pas, 52, 8, 26);
+    R(g, '#000', 18 + pas, 76, 10, 4); R(g, '#000', 28 - pas, 76, 10, 4);
+    const yb = bas ? 32 : 24;
+    R(g, '#262a30', 16, yb, 24, 30); R(g, '#3a3f48', 16, yb, 24, 6);
+    // tête casquée
+    const yt = bas ? 20 : 10;
+    R(g, PEAU, 22, yt + 4, 12, 11);
+    ovale(g, '#1b1d22', 28, yt + 3, 10, 9);
+    if (!dos) {
+      R(g, 'rgba(150,200,235,0.6)', 20, yt + 6, 16, 7);
+      if (pose === 'cri') { R(g, '#4a1010', 25, yt + 13, 6, 3); }
+      if (bas) { R(g, '#fff', 36, yt - 2, 4, 2); R(g, '#fff', 40, yt - 6, 3, 2); }   // il souffle
+    }
+    if (dos) { R(g, '#262a30', 8, 18, 6, 16); R(g, '#262a30', 42, 18, 6, 16); eclabousser(g, 56, 80, 5, 23); return; }
+    // bouclier
+    if (bas) {
+      g.save(); g.translate(8, 46); g.rotate(-0.5);
+      R(g, 'rgba(170,200,220,0.55)', 0, 0, 14, 30); R(g, '#9ab', 0, 0, 14, 2); g.restore();
+    } else {
+      const grand = pose === 'charge';
+      const x = grand ? 4 : 8, y = grand ? 16 : 22, l = grand ? 48 : 40, h = grand ? 60 : 52;
+      R(g, 'rgba(165,195,215,0.62)', x, y, l, h);
+      g.strokeStyle = '#d8e4ec'; g.lineWidth = 2; g.strokeRect(x + 1, y + 1, l - 2, h - 2);
+      ecrire(g, 'POLICE', x + l / 2, y + 12, grand ? 9 : 8, '#ffffff');
+      R(g, 'rgba(255,255,255,0.25)', x + 4, y + 18, 3, h - 24);
+    }
+    if (pose === 'touche') { eclabousser(g, 56, 80, 3, 31); g.fillStyle = 'rgba(255,255,255,0.4)'; g.fillRect(6, 4, 44, 76); }
+  });
+}
+
+// Manifestant (décor), 48×100 avec sa pancarte
+const PANCARTES = [['NON !', '#e83a3a'], ['GRÈVE', '#2a7de1'], ['BAC POUR', 'TOUS'], ['ON', 'LÂCHE RIEN']];
+const HABITS = ['#d9472b', '#3f8f4a', '#7a3fa0', '#e0a030'];
+function manifestant(n) {
+  return toile(48, 100, (g) => {
+    const [l1, l2] = PANCARTES[n % 4];
+    R(g, '#6b4a2a', 23, 14, 2, 30);
+    R(g, '#f5f0dc', 4, 2, 40, 22); g.strokeStyle = '#333'; g.strokeRect(4.5, 2.5, 39, 21);
+    if (l2.startsWith('#')) ecrire(g, l1, 24, 13, 10, l2);
+    else { ecrire(g, l1, 24, 9, 8, '#222'); ecrire(g, l2, 24, 18, 7, '#c22'); }
+    R(g, '#2b3550', 16, 72, 7, 26); R(g, '#2b3550', 25, 72, 7, 26);
+    R(g, HABITS[n % 4], 13, 46, 22, 28);
+    R(g, HABITS[n % 4], 22, 30, 6, 18);   // bras qui tient la pancarte
+    R(g, PEAU, 18, 32, 12, 13);
+    R(g, ['#3a2416', '#111', '#a0662a', '#5a3a1a'][n % 4], 17, 30, 14, 5);
+    R(g, '#222', 21, 37, 2, 2); R(g, '#222', 26, 37, 2, 2); R(g, '#7a2a2a', 22, 41, 4, 2);
+  });
+}
+
+export function texturesSprites() {
+  const S = {};
+  for (const p of ['marche0', 'marche1', 'bras', 'lance', 'touche', 'fuite']) S['lanceur_' + p] = policier(p);
+  for (const p of ['marche0', 'marche1', 'cri', 'charge', 'essouffle', 'touche', 'fuite']) S['bouclier_' + p] = crs(p);
+  for (let i = 0; i < 4; i++) S['manifestant_' + i] = manifestant(i);
+  S.barriere = toile(64, 40, (g) => {
+    R(g, '#9aa0a6', 2, 4, 60, 3); R(g, '#9aa0a6', 2, 30, 60, 3);
+    for (let x = 4; x < 62; x += 5) R(g, '#b8bec4', x, 6, 2, 25);
+    R(g, '#7a8086', 2, 4, 3, 36); R(g, '#7a8086', 59, 4, 3, 36);
+    R(g, '#55595d', 0, 37, 10, 3); R(g, '#55595d', 54, 37, 10, 3);
+  });
+  S.poubelle = toile(36, 46, (g) => {
+    R(g, '#2f6b3a', 4, 10, 28, 34); R(g, '#24552e', 2, 6, 32, 6); R(g, '#1c4424', 4, 12, 28, 2);
+    ovale(g, '#111', 8, 44, 3, 3); ovale(g, '#111', 28, 44, 3, 3);
+    R(g, '#d8d8d8', 12, 2, 8, 5); R(g, '#c8a060', 22, 3, 6, 4);   // ça déborde
+  });
+  S.oeufs = toile(32, 20, (g) => {
+    R(g, '#b88a52', 2, 6, 28, 13); R(g, '#9c7240', 2, 6, 28, 2);
+    for (let i = 0; i < 3; i++) ovale(g, '#fff8e8', 9 + i * 7, 7, 3, 4);
+    ecrire(g, 'ŒUFS', 16, 14, 6, '#4a2f12');
+  });
+  S.sandwich = toile(36, 18, (g) => {
+    ovale(g, '#d39a4a', 18, 9, 16, 6); R(g, '#5fb04a', 4, 9, 28, 2); R(g, '#e2a8a0', 5, 10, 26, 2);
+    for (let x = 8; x < 30; x += 6) R(g, '#b07a30', x, 5, 3, 1);
+  });
+  S.oeuf = toile(10, 12, (g) => { ovale(g, '#fffaf0', 5, 6, 4, 5.5); R(g, '#fff', 3, 3, 1, 2); });
+  S.splat = toile(22, 14, (g) => { ovale(g, '#fff6d8', 11, 8, 10, 5); ovale(g, '#ffc928', 12, 8, 4, 3); ovale(g, '#fff6d8', 3, 4, 2, 2); ovale(g, '#fff6d8', 19, 3, 2, 2); });
+  S.grenade = toile(12, 12, (g) => { R(g, '#3b4038', 3, 2, 6, 9); R(g, '#c8b030', 3, 2, 6, 2); ovale(g, 'rgba(220,220,210,0.7)', 6, 1, 3, 2); });
+  S.nuage = toile(64, 48, (g) => {
+    const b = [[20, 30, 14], [36, 26, 16], [48, 32, 12], [28, 18, 12], [42, 16, 10], [12, 36, 9], [54, 38, 9]];
+    for (const [x, y, r] of b) ovale(g, 'rgba(205,215,190,0.55)', x, y, r, r * 0.85);
+    for (const [x, y, r] of b) ovale(g, 'rgba(235,240,225,0.35)', x - 2, y - 3, r * 0.5, r * 0.4);
+  });
+  return S;
+}
+
+// Main du héros qui tient l'œuf (bas de l'écran). pose : 'tient' ou 'lance'
+export function texturesMain() {
+  const main = (lance) => toile(90, 80, (g) => {
+    if (lance) {
+      R(g, '#3a4a6a', 40, 30, 22, 50);    // manche du sweat, bras tendu vers l'avant
+      ovale(g, PEAU, 50, 28, 12, 10); R(g, PEAU_O, 42, 30, 16, 3);
+    } else {
+      R(g, '#3a4a6a', 46, 48, 30, 32);
+      ovale(g, PEAU, 56, 44, 15, 12);
+      ovale(g, '#fffaf0', 52, 30, 9, 12); R(g, '#fff', 47, 24, 2, 5);
+      R(g, PEAU, 42, 38, 8, 10); R(g, PEAU_O, 44, 44, 24, 2);
+    }
+  });
+  return { tient: main(false), lance: main(true) };
+}

@@ -6,7 +6,9 @@
 - **Beufa** : TERMINÉ — infiltration façon Metal Gear (4 pièces) puis QUIZ dans son bureau (codec, Psycho Mantis,
   rideau, 60 questions, GAME OVER façon MGS, classement BIG BOSS → CHICKEN, médaille = badge du hub, meilleur rang
   sauvegardé). Audit final : `propositions/beufa_audit_final.md`.
-- **Julien, Rémi** : pas commencés (« Bientôt » au hub).
+- **Julien** : EN COURS — niveau 1 « la manif » jouable (FPS façon Wolfenstein, dessins provisoires) ; niveau 2 (salle de
+  classe, Julien lance des livres) pas commencé. Voir « JULIEN » plus bas.
+- **Rémi** : pas commencé (« Bientôt » au hub).
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
 ## ⚠️ À RAPPELER À FABIEN quand les 6 boss seront finalisés (phase de FINITION)
@@ -944,10 +946,25 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - 60 questions (30 ajoutées en V92).
 - `beufa_musique.mp3` : 5 premières minutes en boucle, mono 56 kb/s (11 → 2,1 Mo ; original dans l'historique git).
 
-## JULIEN — PROCHAINE ÉTAPE (rien de commencé : `src/bosses/julien/index.js` vide, aucune image)
-Questions à poser à Fabien avant de coder (comme pour les autres boss) :
-1. Le jeu : quel genre / quel jeu de référence (ex. Greg = Punch-Out, Lionel = Windjammers, Beufa = Metal Gear) ?
-2. Julien : sa personnalité, ce qu'il aime, ses expressions / répliques typiques (blagues entre amis).
-3. Comment on gagne / on perd, et en combien de temps environ (2, 5, 10 min ?).
-4. Les images : as-tu une photo ou un pixel art de Julien ? Style voulu (manga, pixel art, cartoon…) ?
-5. Musique de référence ? Couleur et icône du badge ?
+## JULIEN — FPS FAÇON WOLFENSTEIN (décidé avec Fabien)
+Histoire : tu es un étudiant en pleine manif, tu dois rejoindre le lycée (niveau 1), puis affronter Julien, prof, qui
+lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : collisions en grille (simples) et peu d'images
+(ennemis toujours de face). Pas de visée en hauteur, un seul niveau par phase, pas de côté pour esquiver.
+- **Niveau 1 : LA MANIF** (`JulienManif.js`) — FAIT (prototype jouable). Boulevard → ruelle ou rue gardée → place →
+  rue du lycée → parvis → portail (case `S`). On lance des ŒUFS (pas d'armes). Policier lanceur : lève le bras
+  (préavis) puis lacrymo en cloche → nuage qui fait perdre de la vie + voile vert. CRS au bouclier : crie
+  « DISPERSEZ-VOUS ! », charge en ligne droite (direction fixée à la fin du cri → un pas de côté l'esquive), puis
+  ESSOUFFLÉ (bouclier baissé) : seul moment où les œufs le touchent. Policier vaincu = s'enfuit dégoulinant.
+  Ramassables : boîte d'œufs, sandwich (vie). Décor : barrières, poubelles, manifestants à pancartes (bloquent).
+  Barre du bas façon Doom : VIE, ŒUFS, tête du héros, policiers repoussés, boussole vers le lycée.
+  Tête (`visage.js`) : regard gauche/droite au hasard, tourne vers le coup reçu, grimace, tousse dans le gaz,
+  sourit en ramassant, 5 niveaux d'amochage, KO.
+  Fin : écran « TU AS ATTEINT LE LYCÉE » sans badge (le badge viendra après Julien).
+- Fichiers : `src/bosses/julien/` : `raycaster.js` (moteur 3D), `niveau_manif.js` (plan en texte, légende en tête),
+  `textures.js` (murs/persos/objets dessinés par le code), `visage.js`, `reglages.js`, `manifeste.js` (bips provisoires).
+  Rendu : toile 480×270 agrandie ×2 (vue 480×222 + barre 48).
+- Commandes : ↑↓ avancer, ←→ tourner, Q/D ou X+←→ pas de côté, Z/Espace œuf. Tactile : croix, « Côté » maintenu, « Œuf ».
+- À FAIRE : vrais sons et images (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
+  policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
+  équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,
+  dictionnaire qui rebondit ; copies d'interro sous 50 % ; on riposte avec boulettes/craies) et le badge.
