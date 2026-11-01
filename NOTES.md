@@ -891,5 +891,5 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 ## BEUFA — V84 : PORTRAITS CODEC BRANCHÉS
 - Livrés par Fabien (style cartoon pixel art vert) : `beufa_codec_masque / souriant / surpris / choque`
   (`assets_inbox/` → réduits en 256×256 dans `assets/sprites/beufa/`, entrées ajoutées au manifeste).
-- Pas d'image « calme » (choix de Fabien) : le sourire la remplace. « machiavelique » pas encore livrée →
-  le sourire en attendant (une humeur sans image retombe sur le sourire).
+- Pas d'image « calme » (choix de Fabien) : le sourire la remplace. « machiavelique » livrée ensuite (V85).
+  Une humeur sans image retombe sur le sourire.

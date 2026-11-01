@@ -79,6 +79,7 @@ export const MANIFESTE = {
     beufa_codec_souriant: { fichier: 'sprites/beufa/beufa_codec_souriant.jpg', fond: 'bord', largeur: 256, hauteur: 256, images: 1, vitesse: 1 },   // V84 : portraits codec de Fabien
     beufa_codec_surpris: { fichier: 'sprites/beufa/beufa_codec_surpris.jpg', fond: 'bord', largeur: 256, hauteur: 256, images: 1, vitesse: 1 },   // V84 : portraits codec de Fabien
     beufa_codec_choque: { fichier: 'sprites/beufa/beufa_codec_choque.jpg', fond: 'bord', largeur: 256, hauteur: 256, images: 1, vitesse: 1 },   // V84 : portraits codec de Fabien
+    beufa_codec_machiavelique: { fichier: 'sprites/beufa/beufa_codec_machiavelique.jpg', fond: 'bord', largeur: 256, hauteur: 256, images: 1, vitesse: 1 },
     beufa_buste_masque:    { fichier: 'sprites/beufa/beufa_buste_masque.jpg', fond: 'blanc', largeur: 172, hauteur: 198, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#a8c4e0', pixel: 2 } },
     beufa_porte:  { fichier: 'sprites/beufa/beufa_porte.jpg', fond: 'blanc', largeur: 72, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'porte_nes', couleur: '#545454', ouverte: true, pixel: 2 } },
     beufa_porte_verrouillee: { fichier: 'sprites/beufa/beufa_porte_verrouillee.jpg', fond: 'blanc', largeur: 64, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'porte_nes', couleur: '#545454', ouverte: false, pixel: 2 } },
