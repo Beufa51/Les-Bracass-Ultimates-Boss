@@ -91,6 +91,16 @@ export const REGLAGES = {
     degats: 7,           // vie perdue par seconde dans le nuage (Fabien : trop dur → 14 → 10 → 7)
     degatsPolice: 0.5,   // les policiers pris dans leur propre lacrymo toussent aussi (par seconde)
   },
+  // MINI-NIVEAU « LE LYCÉE » (JulienLycee.js) : entre la manif et la classe
+  surveillant: {         // le pion : comme un CRS SANS bouclier (il siffle, puis il fonce ; pas de côté !)
+    vie: 2, vitesse: 1.5, vue: 8, porteeCharge: 5, preavis: 0.7, vitesseCharge: 5.8, dureeCharge: 1.1,
+    degats: 10, essouffle: 1.6, cri: '« TWEEET ! Hé toi ! Tu vas où comme ça ?! »',
+  },
+  cantiniere: {          // dame de cantine : comme un lanceur, mais de la PURÉE (flaque où l'on avance au ralenti)
+    vie: 3, vitesse: 1.0, vue: 9, distance: 4, cadence: 2.8, preavis: 0.7,
+    degats: 8, rayon: 0.9, flaque: 6, ralenti: 0.45, replique: '« Reprends donc de la purée ! »',
+  },
+  lycee: { oeufs: 30, canette: 15, fayotCri: 3.5, fayotAlerte: 10, fayotVue: 8 },   // canette : vie rendue ; fayot : s entre 2 cris, rayon d'alerte, vue
   // NIVEAU 2 : JULIEN, le prof (JulienClasse.js). 3 phases : > 50 % de vie, 50-20 %, < 20 % (il pète un câble)
   julien: {
     vie: 40,             // 1 œuf = 1, 1 tomate = 2, 1 coup de pancarte = 1 ; DE DOS : ×2 (sarbacane ×3)

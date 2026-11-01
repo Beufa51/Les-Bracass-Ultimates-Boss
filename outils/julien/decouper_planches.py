@@ -33,6 +33,15 @@ GROUPES = {
     'main_fumigenes': ('julien_main_fumigenes.jpg', 240, [('main_fumigenes', (360, 330)), ('main_fumigenes_tir', (1060, 500))]),
     # niveau 2 : centres À AJUSTER quand l'image sera livrée
     'main_sarbacane': ('julien_main_sarbacane.jpg', 240, [('main_sarbacane', (340, 400)), ('main_sarbacane_tir', (1100, 400))]),
+    # MINI-NIVEAU « LE LYCÉE » : surveillant (le pion), dame de cantine, fayot
+    'surveillant': ('julien_surveillant.jpg', 200, [
+        ('surveillant_marche0', (135, 400)), ('surveillant_marche1', (380, 400)), ('surveillant_cri', (610, 400)),
+        ('surveillant_charge', (820, 420)), ('surveillant_touche', (1045, 400)), ('surveillant_fuite', (1265, 400))]),
+    'cantiniere': ('julien_cantiniere.jpg', 190, [
+        ('cantiniere_marche0', (135, 420)), ('cantiniere_marche1', (385, 420)), ('cantiniere_bras', (620, 400)),
+        ('cantiniere_lance', (870, 420)), ('cantiniere_touche', (1065, 440)), ('cantiniere_fuite', (1280, 410))]),
+    'fayot': ('julien_fayot.jpg', 200, [
+        ('fayot_bras', (178, 394)), ('fayot_crie', (541, 400)), ('fayot_saute', (881, 360)), ('fayot_fuite', (1234, 394))]),
     # élèves assis (rangée du haut ; celle du bas est un doublon) : A content, A caché, B…, D caché
     'eleves': ('julien_eleves.jpg', 180, [(f'eleve_{k // 2}_{"content" if k % 2 == 0 else "cache"}', (x, 200))
         for k, x in enumerate([115, 300, 465, 630, 815, 990, 1165, 1325])]),
@@ -66,7 +75,10 @@ OBJETS_CLASSE = ('julien_objets_classe.jpg', [
 
 # traits de grille que le nettoyage automatique rate (cases de largeurs différentes selon la rangée) :
 # planche → [(x0, y0, x1, y1), ...] effacés en blanc
-TRAITS = {'julien_objets_classe.jpg': [(x - 3, 0, x + 4, 386) for x in (292, 703, 938, 1173)]
+TRAITS = {
+    'julien_surveillant.jpg': [(255, 0, 262, 768), (930, 0, 937, 768)],   # poses qui se touchent
+    'julien_cantiniere.jpg': [(940, 150, 1110, 290)],                    # la louche en vol (le projectile, dessiné à part)
+    'julien_objets_classe.jpg': [(x - 3, 0, x + 4, 386) for x in (292, 703, 938, 1173)]
           + [(x - 3, 380, x + 4, 768) for x in (234, 469, 703, 938, 1173)] + [(0, 380, 1408, 388)]}
 
 # murs de la CLASSE (niveau 2) : 2 de large pour 3 de haut, réduits à 128 × 192 ; le tableau est coupé en 3
@@ -187,7 +199,12 @@ def main():
     os.makedirs(SORTIE, exist_ok=True)
     morceaux = {}
     for groupe, (fichier, hauteur, liste) in GROUPES.items():
-        img = charger(fichier)
+        if not os.path.exists(ENTREE + fichier):
+            print('  (absente :', fichier + ')')
+            continue
+        img = charger(fichier).copy()
+        for x0, y0, x1, y1 in TRAITS.get(fichier, []):
+            img[y0:y1, x0:x1] = 255
         masques, _ = poses(img, [c for _, c in liste])
         noms, ims = [], []
         for (nom, _), m in zip(liste, masques):
@@ -250,7 +267,8 @@ def main():
         print('  ', nom, i.size)
 
     # murs : carré réduit à 128 × 128
-    for nom in ['mur_briques', 'mur_immeuble', 'mur_boutique', 'mur_tag', 'mur_palissade', 'mur_lycee', 'portail_lycee', 'mur_boutique2', 'mur_rideau']:
+    for nom in ['mur_briques', 'mur_immeuble', 'mur_boutique', 'mur_tag', 'mur_palissade', 'mur_lycee', 'portail_lycee', 'mur_boutique2', 'mur_rideau',
+                'mur_casiers', 'mur_couloir', 'mur_cantine']:   # (les 3 derniers : le lycée, niveau 2)
         if os.path.exists(ENTREE + f'julien_{nom}.jpg'):
             mur = Image.open(ENTREE + f'julien_{nom}.jpg').convert('RGB')
             if nom in SANS_PANNEAU:

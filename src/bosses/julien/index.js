@@ -1,16 +1,18 @@
 // Boss Julien : fiche d'identité lue par le hub et le menu de test.
-// Niveau 1 : LA MANIF (FPS façon Wolfenstein, rejoindre le lycée). Niveau 2 : la salle de classe, Julien lance des livres (badge).
+// Niveau 1 : LA MANIF (FPS façon Wolfenstein, rejoindre le lycée). Puis LE LYCÉE (trouver son carnet, salle 12).
+// Niveau 2 : la salle de classe, Julien lance des livres (badge).
 import { IDENTITE, REGLAGES as R } from './reglages.js';
 import { JulienManif } from './JulienManif.js';
+import { JulienLycee } from './JulienLycee.js';
 import { JulienClasse } from './JulienClasse.js';
 import { MANIFESTE } from './manifeste.js';
 
 export default {
   ...IDENTITE,
   pret: true,
-  phases: [{ id: 'manif', nom: 'Niveau 1 : la manif', scene: 'JulienManif' }, { id: 'classe', nom: 'Niveau 2 : la classe (Julien)', scene: 'JulienClasse' }],
+  phases: [{ id: 'manif', nom: 'Niveau 1 : la manif', scene: 'JulienManif' }, { id: 'lycee', nom: 'Le lycée (avant la classe)', scene: 'JulienLycee' }, { id: 'classe', nom: 'Niveau 2 : la classe (Julien)', scene: 'JulienClasse' }],
   manifeste: MANIFESTE,
-  scenes: [JulienManif, JulienClasse],
+  scenes: [JulienManif, JulienLycee, JulienClasse],
   // réglages développeur (écran caché du hub : 5 appuis sur « Badges ») ; voir src/core/reglagesDev.js
   reglagesDev: [
     { groupe: 'JOUEUR', nom: 'Vie au départ', objet: R.joueur, champ: 'vie', pas: 10, min: 30, max: 300 },

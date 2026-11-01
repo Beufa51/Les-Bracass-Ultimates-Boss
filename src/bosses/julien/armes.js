@@ -147,7 +147,8 @@ export function avancerTirs(scene, dt) {
     for (const b of scene.objets) if (b.actif && b.solide && Math.hypot(b.x - o.x, b.y - o.y) < b.rayon) {
       o.fini = true;
       if (!sec) scene.splats.push({ x: o.x, y: o.y, t: 1.2, rouge: o.genre === 'tomate' });
-      if (b.type === 'farine' && o.genre !== 'eau') scene.exploserFarine(b);
+      if ((b.type === 'farine' || b.type === 'extincteur') && o.genre !== 'eau') scene.exploserFarine(b);   // extincteur : le lycée
+      if (b.replique && !sec) scene.message(b.replique, 1.6);   // (les fayots du lycée)
       if (b.type === 'manifestant' && o.genre !== 'eau') scene.message('« Hé ! Pas sur nous ! »');
       break;
     }

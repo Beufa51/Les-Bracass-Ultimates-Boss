@@ -86,10 +86,41 @@ function solsClasse() {
   });
   // versions sombres (lumière éteinte, phase 2 : decor.sombre) : même place + 16
   const sombre = (tx) => tx.map(p => (p & 0xff000000) | ((((p >> 16) & 255) * 0.35) << 16) | ((((p >> 8) & 255) * 0.35) << 8) | ((p & 255) * 0.4));
-  const sols = [lino, parquet];
-  sols[16] = sombre(lino); sols[17] = sombre(parquet);
+  const carrelage = texture32((g) => {   // cantine : carrelage blanc et joints gris
+    g.fillStyle = '#d8d6cc'; g.fillRect(0, 0, 32, 32); g.fillStyle = '#c4c2b8'; g.fillRect(0, 0, 16, 16); g.fillRect(16, 16, 16, 16);
+    g.fillStyle = '#9a988f'; g.fillRect(0, 0, 32, 1); g.fillRect(0, 0, 1, 32); g.fillRect(0, 16, 32, 1); g.fillRect(16, 0, 1, 32);
+  });
+  const sols = [lino, parquet, carrelage];
+  sols[16] = sombre(lino); sols[17] = sombre(parquet); sols[18] = sombre(carrelage);
   return sols;
 }
+
+// Décor du LYCÉE (mini-niveau) : murs d'un étage (vraies images branchées par JulienLycee), sol lino, cantine carrelée
+export function construireDecorLycee(ctx, l, hVue, plan, estCantine) {
+  const W = plan[0].length, H = plan.length, mi = hVue / 2;
+  const genres = new Uint8Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) genres[y * W + x] = estCantine(x, y) ? 2 : 0;
+  const image = ctx.createImageData(l, hVue - mi);
+  const brume = ctx.createLinearGradient(0, mi, 0, hVue);
+  brume.addColorStop(0, 'rgba(40,38,34,0.55)'); brume.addColorStop(0.4, 'rgba(40,38,34,0.15)'); brume.addColorStop(1, 'rgba(40,38,34,0)');
+  const uni = (c1, c2) => toile(64, 64, (g) => { R(g, c1, 0, 0, 64, 64); R(g, c2, 0, 52, 64, 12); grain(g, 64, 64, 0.06, 5); });
+  return {
+    murs: { 1: uni('#3a5a9a', '#2a3a6a'), 2: uni('#e8e0c8', '#6a7a5a'), 3: uni('#e8e8e8', '#9a9a9a'), 4: uni('#8a5a2a', '#5a3a1a'), 5: uni('#b9c9a8', '#6d7f60') },
+    etages: {}, hauteurs: { 1: 1, 2: 1, 3: 1, 4: 1, 5: 1 },
+    ciel: plafond(mi), sombre: new Uint8Array(W * H), neons: new Set(), neonEteint: 0,
+    sol: { genres, largeur: W, textures: solsClasse(), image, buf: new Uint32Array(image.data.buffer), brume },
+  };
+}
+// dessins provisoires du lycée (le reste a de vraies images)
+export function spritesLycee() {
+  const S = {};
+  S.carnet = toile(20, 26, (g) => { R(g, '#a8322c', 0, 0, 20, 26); R(g, '#7a2420', 0, 0, 3, 26); R(g, '#f2ead2', 5, 6, 12, 6); ecrire(g, 'CARNET', 11, 9, 3, '#a8322c'); });
+  S.puree = toile(16, 12, (g) => { ovale(g, '#f2e6a8', 8, 6, 7.5, 5.5); ovale(g, '#fff6cc', 6, 4, 3, 2); });
+  S.flaque = toile(48, 10, (g) => { ovale(g, '#e8d890', 24, 5, 23, 4.5); ovale(g, '#f6eab0', 18, 4, 9, 2); });
+  return S;
+}
+export const HAUTEURS_LYCEE = { surveillant: 1.0, cantiniere: 0.95, fayot_bras: 1.0, fayot_crie: 1.0, fayot_saute: 1.05, fayot_fuite: 1.0,
+  canette: 0.16, extincteur: 0.5, carnet: 0.14, comptoir: 0.62, table: 0.72, puree: 0.1, flaque: 0.06 };
 
 export function construireDecorClasse(ctx, l, hVue) {
   const W = PLAN_CLASSE[0].length, H = PLAN_CLASSE.length, mi = hVue / 2;

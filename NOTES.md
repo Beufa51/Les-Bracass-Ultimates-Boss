@@ -8,7 +8,7 @@
   sauvegardé). Audit final : `propositions/beufa_audit_final.md`.
 - **Julien** : EN COURS — niveau 1 « la manif » jouable ; niveau 2 « la salle de classe » : COMBAT REFAIT (audit B :
   fenêtre de punition de dos, 8 attaques, phases noir / bureau renversé + alarme, élèves, sarbacane). RESTE : le
-  mini-niveau « le lycée » (audit A) puis l'équilibrage avec Fabien. Voir « JULIEN » plus bas.
+  MINI-NIVEAU « LE LYCÉE » (audit A) FAIT. Reste : faire jouer Fabien, équilibrer. Voir « JULIEN » plus bas.
 - **Rémi** : pas commencé (« Bientôt » au hub).
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
@@ -1078,6 +1078,16 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   faisait « plonk » (surtout avec le café) → `bouclierBaisse(e)` ; le lanceur caché derrière un mur visait ta position
   ACTUELLE à travers les murs → il vise là où il t'a vu (`vuX`, `vuY`). Aucune erreur dans la console. Plaisir : rien de
   bloquant, le niveau 1 est jugé prêt (restent en option : BAC, LBD, policiers en hauteur, sono, clé + porte).
+- FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
+  vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».
+  Hall → couloir des casiers (porte de la salle 12 en haut, FERMÉE sans le carnet) → cantine (CARNET DE
+  CORRESPONDANCE sur le comptoir ; 2 chemins). SURVEILLANT = IA du CRS sans bouclier (`RG.surveillant`, il siffle
+  puis fonce) ; DAME DE CANTINE = IA du lanceur avec de la PURÉE (`RG.cantiniere` : flaque 6 s, on y avance ×0,45) ;
+  FAYOTS invincibles (objets) : ils crient et alertent tout le monde à 10 cases, s'enfuient si on s'approche ;
+  EXTINCTEUR = sac de farine (mousse) ; CANETTES +15 ; casier ouvert 'X' = placard secret (tomates, K-Way, œufs).
+  Boussole : le carnet, puis la porte ; « CARNET OUI/NON » sous la boussole. Images découpées (surveillant 6 poses,
+  cantinière 6, fayot 4, murs casiers / couloir / cantine). Provisoires : carnet, purée, flaque ; comptoir = image du
+  bureau. Testé (navigateur) : tout le parcours jusqu'à l'entrée en classe, sans erreur.
 - SARBACANE EN MAIN (Fabien : « moche ») : dessin provisoire refait en gros pixels (`mainSarbacane` dans
   JulienClasse.js : poing, tube de Bic transparent, manche ; pose de tir avec la boulette). Vraie image à faire :
   prompt `julien_main_sarbacane.jpg` (section 9a de `julien_prompts_images.md`), découpe déjà prévue dans

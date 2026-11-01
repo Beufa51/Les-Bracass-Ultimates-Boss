@@ -491,7 +491,7 @@ export class JulienManif extends BossScene {
     j.a += tourne * (this.tactile ? R.tactile.rotation : R.rotation) * dt + this.sourisX * R.souris;   // + la souris
     this.sourisX = 0;
     const dx = Math.cos(j.a), dy = Math.sin(j.a);
-    const v = j.cafe > 0 ? RG.bonus.cafeVitesse : 1;   // café serré : plus rapide
+    const v = (j.cafe > 0 ? RG.bonus.cafeVitesse : 1) * (j.lent ? RG.cantiniere.ralenti : 1);   // café serré : plus rapide ; purée : au ralenti
     const mx = (dx * avance * R.vitesse + -dy * cote * R.vitesseCote) * dt * v;
     const my = (dy * avance * R.vitesse + dx * cote * R.vitesseCote) * dt * v;
     this.deplacer(j, mx, my, R.rayon);
@@ -611,6 +611,7 @@ export class JulienManif extends BossScene {
     const F = RG.farine, j = this.j;
     this.farines.push({ x: sac.x, y: sac.y, t: 1.6 });
     jouerSon(this, 'julien_farine');
+    if (sac.type === 'extincteur') this.message('PSCHHHT ! De la mousse partout : ils glissent et n\'y voient plus rien !', 2.5);
     if (Math.hypot(j.x - sac.x, j.y - sac.y) < 6) this.cameras.main.shake(180, 0.007);
     if (Math.hypot(j.x - sac.x, j.y - sac.y) < F.rayon) j.blanc = 0.9;
     for (const e of this.ennemis) if (e.actif && e.etat !== 'fuite' && Math.hypot(e.x - sac.x, e.y - sac.y) < F.rayon) {
@@ -658,7 +659,7 @@ export class JulienManif extends BossScene {
     }
     if (e.etat === 'touche') { if (e.t <= 0) { e.etat = e.apres; e.t = e.tApres; } return; }
 
-    if (e.type === 'lanceur') {
+    if (e.type === 'lanceur' || e.type === 'cantiniere') {   // (la dame de cantine du lycée : même IA, elle lance de la purée)
       if (e.etat === 'attente') { if (e.alerte) e.etat = 'chasse'; else if (e.ronde) this.ronde(e, marcher, dt); return; }
       if (e.etat === 'chasse') {
         if (voit) {
@@ -670,8 +671,9 @@ export class JulienManif extends BossScene {
       }
       if (e.etat === 'prepare' && e.t <= 0) {
         const [cx, cy] = voit ? [j.x, j.y] : [e.vuX, e.vuY];   // caché derrière un mur : il vise là où il t'a vu
-        this.grenades.push({ x0: e.x, y0: e.y, x1: cx, y1: cy, t: 0, x: e.x, y: e.y, z: 0.6 });
-        jouerSon(this, 'julien_tir');
+        this.grenades.push({ x0: e.x, y0: e.y, x1: cx, y1: cy, t: 0, x: e.x, y: e.y, z: 0.6, puree: e.type === 'cantiniere' });
+        jouerSon(this, e.type === 'cantiniere' ? 'julien_lancer' : 'julien_tir', e.type === 'cantiniere' ? { rate: 0.6 } : undefined);
+        if (R.replique && Math.random() < 0.35) this.message(R.replique, 2);
         e.etat = 'lance'; e.t = 0.35;
         return;
       }
@@ -684,7 +686,7 @@ export class JulienManif extends BossScene {
     if (e.etat === 'approche') {
       if (voit) {
         if (d > 1) marcher(ox, oy, R.vitesse);
-        if (d < R.porteeCharge && e.t <= 0) { e.etat = 'cri'; e.t = R.preavis; jouerSon(this, 'julien_cri'); this.message('« DISPERSEZ-VOUS ! »'); }
+        if (d < R.porteeCharge && e.t <= 0) { e.etat = 'cri'; e.t = R.preavis; jouerSon(this, 'julien_cri'); this.message(R.cri || '« DISPERSEZ-VOUS ! »'); }
       } else if (Math.hypot(e.vuX - e.x, e.vuY - e.y) > 0.3) marcher(e.vuX - e.x, e.vuY - e.y, R.vitesse);
       return;
     }
@@ -765,7 +767,11 @@ export class JulienManif extends BossScene {
       const t = Math.min(1, g.t);
       g.x = g.x0 + (g.x1 - g.x0) * t; g.y = g.y0 + (g.y1 - g.y0) * t;
       g.z = 0.6 * (1 - t) + 1.4 * t * (1 - t);
-      if (t >= 1) {
+      if (t >= 1 && g.puree) {   // purée de la cantine : une flaque (on y avance au ralenti) et une éclaboussure
+        g.fini = true; this.flaques = this.flaques || []; this.flaques.push({ x: g.x, y: g.y, t: RG.cantiniere.flaque });
+        jouerSon(this, 'julien_splat', { rate: 0.6 });
+        if (Math.hypot(g.x - j.x, g.y - j.y) < RG.cantiniere.rayon) this.degats(RG.cantiniere.degats, g.x, g.y);
+      } else if (t >= 1) {
         g.fini = true; this.nuages.push({ x: g.x, y: g.y, t: RG.lacrymo.duree }); jouerSon(this, 'julien_gaz');
         if (Math.hypot(g.x - j.x, g.y - j.y) < 2.5) this.cameras.main.shake(150, 0.006);
       }
@@ -853,9 +859,9 @@ export class JulienManif extends BossScene {
       jouerSon(this, 'julien_portail');
     });
     this.time.delayedCall(1000 + lignes.length * 450, () => {
-      texte(this, LARGEUR / 2, 452, 'Mais Julien t\'attend en classe…', 18, '#9fd0ff').setDepth(1001);
-      texte(this, LARGEUR / 2, HAUTEUR - 28, `${estTactile() ? 'OK' : 'ESPACE'} : entrer en classe (niveau 2)`, 20, '#aaaaaa').setDepth(1001);
-      this.time.delayedCall(300, () => this.input.keyboard.once('keydown-SPACE', () => this.scene.start('JulienClasse', { depuisManif: true })));
+      texte(this, LARGEUR / 2, 452, 'Mais Julien t\'attend en classe… salle 12, au fond du lycée.', 18, '#9fd0ff').setDepth(1001);
+      texte(this, LARGEUR / 2, HAUTEUR - 28, `${estTactile() ? 'OK' : 'ESPACE'} : entrer dans le lycée`, 20, '#aaaaaa').setDepth(1001);
+      this.time.delayedCall(300, () => this.input.keyboard.once('keydown-SPACE', () => this.scene.start('JulienLycee', { depuisManif: true })));
     });
   }
 
@@ -876,7 +882,7 @@ export class JulienManif extends BossScene {
     const v = e.dernier === 'tomate' ? '_rouge' : e.dernier === 'propre' ? '_propre' : '';   // les images ont du jaune d'œuf
     if (e.etat === 'fuite') return s[p + 'fuite' + v] || s[p + 'fuite'];
     if (e.etat === 'touche') return s[p + 'touche' + v] || s[p + 'touche'];
-    if (e.type === 'lanceur') {
+    if (e.type === 'lanceur' || e.type === 'cantiniere') {
       if (e.etat === 'prepare') return s[p + 'bras'];
       if (e.etat === 'lance') return s[p + 'lance'];
     } else {
@@ -910,7 +916,7 @@ export class JulienManif extends BossScene {
     }
     for (const f of this.farines) liste.push({ x: f.x, y: f.y, toile: s.nuage_farine, haut: 1.0 + (1.6 - f.t) * 0.5, z: 0 });
     for (const f of this.fumees) liste.push({ x: f.x, y: f.y, toile: s.fumee, haut: 1.3 + 0.1 * Math.sin(f.t * 2), z: 0 });
-    for (const gr of this.grenades) liste.push({ x: gr.x, y: gr.y, toile: s.grenade, haut: T.hauteurs.grenade, z: gr.z });
+    for (const gr of this.grenades) liste.push({ x: gr.x, y: gr.y, toile: gr.puree ? s.puree : s.grenade, haut: gr.puree ? T.hauteurs.puree : T.hauteurs.grenade, z: gr.z });
     for (const sp of this.splats) liste.push({ x: sp.x, y: sp.y, toile: sp.rouge ? s.splat_rouge : s.splat, haut: T.hauteurs.splat, z: 0.38 });
     for (const n of this.nuages) liste.push({ x: n.x, y: n.y, toile: s.nuage, haut: T.hauteurs.nuage + 0.1 * Math.sin(n.t * 3), z: 0 });
 
