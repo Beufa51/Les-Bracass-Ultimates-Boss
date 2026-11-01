@@ -15,6 +15,8 @@ export default {
     { groupe: 'JOUEUR', nom: 'Vie au départ', objet: R.joueur, champ: 'vie', pas: 10, min: 30, max: 300 },
     { groupe: 'JOUEUR', nom: 'Vitesse', objet: R.joueur, champ: 'vitesse', pas: 0.2, min: 1.5, max: 6 },
     { groupe: 'JOUEUR', nom: 'Vitesse de rotation', objet: R.joueur, champ: 'rotation', pas: 0.2, min: 1, max: 5 },
+    { groupe: 'TÉLÉPHONE', nom: 'Joystick à gauche (non = la croix)', objet: R.joueur.tactile, champ: 'joystick' },
+    { groupe: 'TÉLÉPHONE', nom: 'Vitesse de rotation (↺ ↻)', objet: R.joueur.tactile, champ: 'rotation', pas: 0.2, min: 1, max: 4 },
     { groupe: 'ŒUFS', nom: 'Œufs au départ', objet: R.oeufs, champ: 'depart', pas: 5, min: 0, max: 99 },
     { groupe: 'ŒUFS', nom: 'Œufs par boîte', objet: R.oeufs, champ: 'boite', pas: 1, min: 1, max: 40 },
     { groupe: 'ŒUFS', nom: 'Aide à la visée clavier (radians)', objet: R.oeufs, champ: 'aide', pas: 0.02, min: 0, max: 0.4 },

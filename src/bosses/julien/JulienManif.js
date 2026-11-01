@@ -17,6 +17,7 @@ import { PLAN_MANIF, OBJETS, SECRETS, ZONES, PARVIS, PAR, ABSENTS_FACILE, RENFOR
 import { rendre, murEn, vueLibre } from './raycaster.js';
 import { texturesMurs, texturesSprites, texturesMain, chargerImages, appliquerImages, variantesTaches } from './textures.js';
 import { construireDecor } from './decor.js';
+import { installerJoystick } from './joystick.js';
 import { ARMES, armeDe, RECHARGES, choisirArme, armeSuivante, tirer, avancerTirs, dansFumee } from './armes.js';
 import { toileVisage, niveauVisage } from './visage.js';
 
@@ -87,6 +88,7 @@ export class JulienManif extends BossScene {
     T.decor.speciaux = this.indicesSecrets();
     this.installerBoutonCarte();
     this.agrandirCroix();
+    this.joy = RG.joueur.tactile.joystick ? installerJoystick(this) : null;   // téléphone : joystick à gauche (sinon la croix)
     this.tactile = estTactile();   // téléphone : croix = avancer / reculer / pas de côté, ↺ ↻ = tourner, ŒUF en haut
     this.enJeu = false;
     jouerMusique(this, 'julien_musique');   // « At Doom's Gate », en boucle
@@ -101,9 +103,9 @@ export class JulienManif extends BossScene {
     const tact = estTactile();
     this.afficherIntro('LA MANIF', [
       'Rejoins le portail du LYCÉE à travers la manif !',
-      tact ? '▲ ▼ : avancer / reculer      ◀ ▶ : pas de côté' : '↑ ↓ : avancer / reculer      ← → : tourner',
+      tact ? (this.joy ? 'Joystick (pouce gauche) : avancer, reculer, pas de côté' : '▲ ▼ : avancer / reculer      ◀ ▶ : pas de côté') : '↑ ↓ : avancer / reculer      ← → : tourner',
       tact ? '↺ ↻ : tourner' : 'ALT + ← → (ou , et .) : pas de côté',
-      tact ? 'LANCER : tirer      ARME (en haut à droite) : changer d\'arme' : 'CTRL : tirer   1 à 5 : armes   MAJ : courir',
+      tact ? 'LANCER : tirer      ARME (au-dessus) : changer d\'arme' : 'CTRL : tirer   1 à 5 : armes   MAJ : courir',
       tact ? 'CARTE (en haut à droite) : la carte, comme dans Doom' : 'TAB ou M : la carte, comme dans Doom',
       'Les lacrymos piquent : sors vite du nuage.',
       'Le bouclier arrête les œufs, SAUF quand le CRS',
@@ -111,7 +113,7 @@ export class JulienManif extends BossScene {
     ], () => this.demarrer());
   }
 
-  demarrer() { etiquettesTactiles({ x: 'LANCER', z: '↺', espace: '↻' }); this.enJeu = true; }
+  demarrer() { etiquettesTactiles({ x: 'LANCER', z: '↺', espace: '↻' }); if (this.joy) this.joy.activer(true); this.enJeu = true; }
 
   // Difficulté : œufs de départ + nombre de policiers (absents en facile, renforts en Anarchiste)
   appliquerDifficulte() {
@@ -127,6 +129,7 @@ export class JulienManif extends BossScene {
   perdu() {
     if (this.termine) return;
     this.termine = true;
+    if (this.joy) this.joy.activer(false);
     jouerSon(this, 'ui_defaite');
     etiquettesTactiles({ espace: 'REJOUER', x: 'HUB', z: null, haut: null, bas: null, gauche: null, droite: null });
     voile(this, 0.75).setDepth(1000);
@@ -190,7 +193,7 @@ export class JulienManif extends BossScene {
         this.ajouterEnnemi(type, x, y);
       } else {
         const solide = !RECHARGES[type] && !BONUS[type] && type !== 'sandwich';
-        const rayon = { barriere: 0.45, statue: 0.75, camion: 1.05, colonne: 0.4 }[type] || 0.3;
+        const rayon = { barriere: 0.45, statue: 0.75, camion: 0.6, colonne: 0.4 }[type] || 0.3;
         const o = { type, x: px, y: py, solide, rayon, actif: true, n: nm };
         if (type === 'manifestant') nm++;
         this.objets.push(o);
@@ -241,7 +244,8 @@ export class JulienManif extends BossScene {
       border: '2px solid rgba(255,255,255,0.55)', borderRadius: '10px', background: 'rgba(20,20,30,0.45)', color: '#fff',
       font: 'bold 14px monospace', touchAction: 'none' });
     b.addEventListener('pointerdown', (e) => { e.preventDefault(); if (this.enJeu) this.carte = !this.carte; });
-    const arme = b.cloneNode(); arme.textContent = 'ARME'; arme.style.top = '46px';   // passe à l'arme suivante
+    const arme = b.cloneNode(); arme.textContent = 'ARME';   // passe à l'arme suivante : juste au-dessus de LANCER, sous le pouce droit
+    Object.assign(arme.style, { top: 'auto', bottom: '172px', right: '12px', width: '200px', height: '46px', fontSize: '18px' });
     arme.addEventListener('pointerdown', (e) => { e.preventDefault(); if (this.enJeu) armeSuivante(this); });
     document.body.append(b, arme);
     this.events.once('shutdown', () => { b.remove(); arme.remove(); });
@@ -330,6 +334,7 @@ export class JulienManif extends BossScene {
     if (k.haut.isDown) avance += course;
     if (k.bas.isDown) avance -= course;
     cote = Math.sign(cote) * course;
+    if (this.joy) { const jv = this.joy.valeur(); avance += jv.y; cote += jv.x; }   // joystick : en douceur
     j.a += tourne * (this.tactile ? R.tactile.rotation : R.rotation) * dt;
     const dx = Math.cos(j.a), dy = Math.sin(j.a);
     const v = j.cafe > 0 ? RG.bonus.cafeVitesse : 1;   // café serré : plus rapide
@@ -419,7 +424,7 @@ export class JulienManif extends BossScene {
     const j = this.j, [cx, cy] = FOURGON.camion;
     if (this.fourgonT > 0 || Math.hypot(j.x - cx, j.y - cy) < 2.2) return;   // jamais sur le joueur
     this.fourgonFait = true;
-    this.objets.push({ type: 'camion', x: cx, y: cy, solide: true, rayon: 1.05, actif: true, n: 0 });
+    this.objets.push({ type: 'camion', x: cx, y: cy, solide: true, rayon: 0.6, actif: true, n: 0 });   // rayon = largeur de l'image
     const renforts = [...FOURGON.renforts, ...(this.diff === DIFFICULTES.anarchiste ? [FOURGON.renfortAnarchiste] : [])];
     for (const [type, x, y] of renforts) {
       this.ajouterEnnemi(type, Math.floor(x), Math.floor(y));
@@ -624,7 +629,7 @@ export class JulienManif extends BossScene {
   }
 
   finNiveau() {
-    this.enJeu = false; this.termine = true;
+    this.enJeu = false; this.termine = true; if (this.joy) this.joy.activer(false);
     jouerSon(this, 'julien_ramasse');
     etiquettesTactiles({ espace: 'OK', z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
     this.txtMsg.setText(''); this.msgT = 0; this.txtBonus.setVisible(false);

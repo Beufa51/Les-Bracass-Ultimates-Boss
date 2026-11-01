@@ -1049,6 +1049,10 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
 - Retours Fabien : bouts blancs sur les manifestants → `detourer(nettoyer=True)` (trous blancs enfermés > 20 px
   rendus transparents + liseré clair retiré ; manifestants et policier, PAS le CRS à cause des reflets du bouclier) ;
   trop rapide sur téléphone → `RG.joueur.tactile` (pas de course, rotation 2,0).
+- Retours Fabien : fourgon/camions qui bloquaient plus large que leur image → rayon 1,05 → 0,6 ; bouton ARME déplacé
+  juste au-dessus de LANCER (bas droite, 200 px de large) ; TÉLÉPHONE : joystick au pouce gauche (`joystick.js`,
+  analogique : avancer / reculer / pas de côté), ↺ ↻ et LANCER à droite, croix cachée en jeu ; réglage
+  `RG.joueur.tactile.joystick` (false = la croix), aussi dans l'écran caché des réglages (groupe TÉLÉPHONE).
 - À FAIRE (audit Doom) : point 3 : BAC en civil, tireur de LBD, policiers en hauteur, sono (BFG). Point 4 : clé + porte + boucle.
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;

@@ -28,7 +28,7 @@ export const REGLAGES = {
     rotation: 3.0,       // radians par seconde (≈ 170° / s)
     course: 1.6,         // vitesse ×1,6 en courant
     toujoursCourir: true,   // comme les joueurs de Doom (« always run ») : Maj fait alors MARCHER
-    tactile: { courir: false, rotation: 2.0 },   // sur téléphone (Fabien : un peu trop rapide) : pas de course, rotation plus douce
+    tactile: { courir: false, rotation: 2.0, joystick: true },   // téléphone : pas de course, rotation douce ; joystick à gauche (false = la croix)
     rayon: 0.25,         // taille du joueur pour les collisions
   },
   oeufs: {
