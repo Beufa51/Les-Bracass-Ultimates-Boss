@@ -130,17 +130,44 @@ IMPORTANT: every object is clearly SEPARATED from the others by a wide empty whi
 Mêmes règles qu'au-dessus (un prompt = une image, poses bien séparées, fond blanc). Livraison : `assets_inbox/julien/`.
 Les sections 13 et 14 ne servent QUE si on fait le mini-niveau « le lycée » (voir `julien_audit_classe.md`).
 
-## 10. Julien, le prof (le boss) — `julien_prof.png`
-⚠️ JOINDRE LA PHOTO du vrai Julien dans Gemini avec ce prompt (la ressemblance vient de la photo).
+## 10. Julien, le prof (le boss) — EN 3 ÉTAPES (une seule étape ne ressemblait pas assez)
+Gemini perd la ressemblance quand il doit dessiner en même temps 8 poses en pixel art à partir d'une photo.
+On sépare donc : d'abord le VISAGE (une image qu'on refait jusqu'à ce qu'il ressemble), puis le corps entier
+à partir de CE visage, puis les poses, 4 par 4.
+Astuce : remplir la ligne « Distinctive features » avec 3 à 5 détails qui font qu'on le reconnaît (Claude peut
+les écrire si la photo est déposée dans `assets_inbox/julien/julien_photo.jpg`).
+
+### 10a. Portrait de référence — `julien_portrait.png` (joindre la PHOTO ; recommencer jusqu'à ce qu'il ressemble)
 ```
-Use the attached photo as the reference for this character: keep his face, hairstyle, facial hair, glasses (if any), skin tone and build so that he is clearly RECOGNIZABLE, slightly caricatured in a funny way (bigger head, expressive face). Do not copy the photo's background or pose.
-Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. Humorous, cartoonish French high-school theme, no blood, no gore.
-Character: the man from the photo as a French high-school teacher, brown corduroy jacket with elbow patches over a light blue shirt and a red tie, beige trousers, brown shoes. Full body, seen strictly from the FRONT, facing the viewer, no perspective tilt.
-8 poses in one row, each in its own equal-size cell, same scale, feet aligned on the same bottom line:
-1) walking, left foot forward, a blue textbook under his arm; 2) walking, right foot forward; 3) holding a thick book high above his head with both hands, about to throw it, angry eyebrows; 4) arm thrown forward, just released the book; 5) hit in the face by an egg, flinching, egg yolk on his glasses and jacket; 6) seen from the BACK, writing on an invisible blackboard with a piece of chalk, arm raised; 7) furious, red face, both fists raised, shouting, tie askew; 8) defeated, sitting on the floor, dizzy, glasses crooked, egg yolk all over.
+Turn the person in the attached photo into a pixel art portrait in the style of the DOOM (1993) status-bar face: digitized, 90s look, limited color palette, visible chunky pixels, strong shading.
+LIKENESS IS THE TOP PRIORITY: copy exactly his face shape, eyes, eyebrows, nose, mouth, ears, hairline and hairstyle, facial hair, glasses (or none), skin tone and apparent age from the photo. Do not beautify, do not make him younger, do not change his proportions, no caricature.
+Distinctive features: …
+Head and shoulders only, seen strictly from the front, neutral expression, looking at the viewer.
+Plain solid pure white background (#FFFFFF), no text, no frame.
+```
+Si ça ne ressemble pas : répondre dans la même conversation « Closer to the photo: [ce qui ne va pas : nez plus
+large, cheveux plus courts…] », plutôt que de tout relancer.
+
+### 10b. Corps entier de référence — `julien_reference.png` (joindre le PORTRAIT 10a validé, pas la photo)
+```
+Use the attached pixel art portrait as the exact face of this character: same face, hair, facial hair, glasses and skin tone, unchanged.
+Pixel art in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading.
+Character: a French high-school teacher, brown corduroy jacket with elbow patches over a light blue shirt and a red tie, beige trousers, brown shoes, a blue textbook under his arm. Full body, standing, seen strictly from the FRONT, facing the viewer, no perspective tilt. Head a bit large for the body (game sprite proportions) so the face stays readable.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame.
+```
+
+### 10c. Les poses, 4 par 4 — `julien_prof_1.png` puis `julien_prof_2.png` (joindre l'image 10b)
+```
+Use the attached image as the exact character: same face, hair, glasses, clothes, colors and pixel art style. Do not redesign him.
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D. Humorous, cartoonish, no blood, no gore. Full body, seen strictly from the FRONT, no perspective tilt.
+4 poses in one row, each in its own equal-size cell, same scale as the attached image, feet aligned on the same bottom line:
+POSES
 Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
-IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no arm, book or chalk may touch or overlap another pose or the cell border.
+IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no arm, book or chalk may touch another pose or the cell border.
 ```
+Remplacer POSES par :
+- `julien_prof_1.png` : `1) walking, left foot forward; 2) walking, right foot forward; 3) holding a thick book high above his head with both hands, about to throw it, angry eyebrows; 4) arm thrown forward, just released the book.`
+- `julien_prof_2.png` : `1) hit in the face by an egg, flinching, egg yolk on his face and jacket; 2) seen from the BACK, writing on an invisible blackboard with a piece of chalk, arm raised; 3) furious, red face, both fists raised, shouting, tie askew; 4) defeated, sitting on the floor, dizzy, egg yolk all over.`
 
 ## 11. Objets de la classe — `julien_objets_classe.png`
 ```
