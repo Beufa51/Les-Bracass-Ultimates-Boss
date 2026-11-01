@@ -344,7 +344,16 @@ export class BeufaInfiltration extends BossScene {
             // V44 : 'hauteur' → chaque image ramenée à LA MÊME HAUTEUR (le générateur dessine certaines rangées plus grandes)
             const k = e.echelleCommune === 'hauteur' ? Math.min((e.echelle || 1) * fH / h, fL / w) : kCommun;
             const dL = Math.min(fL, Math.round(w * k * (e.etirementL || 1))), dH = Math.round(h * k);   // V46 : etirementL élargit (profil trop fin)
-            c2.drawImage(cv, seg[0], seg[4], w, h, i * fL + Math.round((fL - dL) / 2), fH - dH, dL, dH);
+            // V80 : ancre 'buste' : on aligne le BUSTE (pas la largeur du dessin, que les jambes écartées font varier)
+            // au centre de la case — sinon le corps saute d'avant en arrière à chaque pas
+            let gx = i * fL + Math.round((fL - dL) / 2);
+            if (e.ancre === 'buste') {
+              let somme = 0, nb = 0;
+              for (let y = seg[4] + Math.round(h * 0.25); y < seg[4] + Math.round(h * 0.45); y++)
+                for (let x = seg[0]; x <= seg[1]; x++) if (d[(y * L + x) * 4 + 3] > 8) { somme += x; nb++; }
+              if (nb) gx = Math.round(i * fL + fL / 2 - (somme / nb - seg[0]) * (dL / w));
+            }
+            c2.drawImage(cv, seg[0], seg[4], w, h, gx, fH - dH, dL, dH);
           } else if (w / h >= 0.7 && w / h <= 1.43) {   // aspect proche de la case : il la REMPLIT (taille stable d'une frame à l'autre)
             c2.drawImage(cv, seg[0], seg[4], w, h, i * fL, 0, fL, fH);
           } else {   // trop étiré : on le fait juste RENTRER, centré
@@ -973,9 +982,10 @@ export class BeufaInfiltration extends BossScene {
     const faceDos = this.heroBouge && (cle === 'beufa_heros' || cle === 'beufa_heros_dos');
     const appui = faceDos ? Math.sin((this.joueur.distPas || 0) / R.joueur.pas * 2 * Math.PI) : 0;
     this.sprJoueur.setFrame(imageH).setFlipX(miroir)
+      // V80 : de profil, PAS de rebond ajouté : les poses ont leur propre descente (genou plié), il la contrariait
       // V72 : Snake 58 px (70 avant, trop grand face aux décors) : centre à y-4 → pieds toujours à y+25
       // V49 : debout, il MONTE un peu à chaque pas (au passage des jambes) — le rebond que la planche n'a pas
-      .setPosition(this.joueur.x + appui * R.joueur.balancement, this.joueur.y - 4 - (this.heroBouge ? R.joueur.rebond * Math.abs(Math.sin((this.joueur.distPas || 0) / R.joueur.pas * 2 * Math.PI)) : 0))
+      .setPosition(this.joueur.x + appui * R.joueur.balancement, this.joueur.y - 4 - (this.heroBouge && cle !== 'beufa_heros_profil' ? R.joueur.rebond * Math.abs(Math.sin((this.joueur.distPas || 0) / R.joueur.pas * 2 * Math.PI)) : 0))
       .setRotation(appui * R.joueur.penche)
       .setDepth(profondeurY(this.joueur.y + 25))   // V56 : tri par les pieds (vue 3/4)
       .setScale(1, 1 + (this.heroBouge ? 0 : Math.sin(this.temps * 2.2) * 0.015));

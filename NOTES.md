@@ -842,3 +842,10 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   `assets/sprites/beufa/beufa_heros_profil.jpg` (et remettre `echelleCommune: true`) pour revenir en arrière.
 - La course de profil reste l'ancienne planche.
 - V79b : pose 4 (genou trop haut) RETIRÉE → cycle contact, bas, passage × 2 (6 images, `pas` 60 inchangé).
+
+## BEUFA — V80 : PROFIL DE SNAKE SANS À-COUPS
+- Le buste sautait de ~1,5 px à chaque pas (le chargeur centrait la LARGEUR du dessin, que les jambes écartées
+  font varier) → option de manifeste `ancre: 'buste'` : chaque image est alignée sur le centre de son buste
+  (lignes 25-45 %). Mesuré : buste stable à 0,4 px près.
+- `echelleCommune: 'hauteur'` (V79) grossissait de 7 % la pose genou plié → retour à l'échelle commune, pieds au
+  sol : Snake s'abaisse naturellement de 4 px. Le rebond ajouté par le code est coupé de profil (il le contrariait).
