@@ -965,8 +965,8 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   Rendu : toile 480×270 agrandie ×2 (vue 480×222 + barre 48).
 - Commandes EXACTEMENT comme Doom 93 (demande de Fabien) : ↑↓ avancer, ←→ tourner, Alt+←→ (ou , .) pas de côté,
   Ctrl tirer, Maj courir, PAS DE SOURIS (Fabien : tout au clavier comme en 93) ; Z et Q/D en plus.
-  TÉLÉPHONE (`tactileFps.js`, demande « intuitif ») : joystick pouce gauche (avancer/reculer/pas de côté, à fond =
-  courir), glisser à droite = tourner (réglage `glisser`), tape à droite ou gros bouton ŒUF = lancer ; croix cachée en jeu.
+  TÉLÉPHONE (choix de Fabien, les 2 joysticks ne lui plaisaient pas → supprimés) : croix du moteur commun,
+  ▲▼ avancer/reculer, ◀▶ PAS DE CÔTÉ ; bouton « TOURNER » (touche X) maintenu + ◀▶ = tourner ; bouton « ŒUF » (Z).
 - PROMPTS DES IMAGES : `propositions/julien_prompts_images.md` (style Doom 93, livraison dans `assets_inbox/julien/`).
 - IMAGES LIVRÉES (V1) : policier, CRS, 8 manifestants (2 planches), objets, main, tête (2 planches), mur en briques.
   Découpe : `python3 outils/julien/decouper_planches.py` (centres des poses en tête du script ; grilles de Gemini
