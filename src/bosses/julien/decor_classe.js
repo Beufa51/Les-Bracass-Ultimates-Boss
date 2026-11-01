@@ -4,7 +4,7 @@
 import { PLAN_CLASSE } from './niveau_classe.js';
 
 const HAUT_MUR = 1.5;   // la classe est un peu plus haute que la vue (plafond au-dessus)
-export const HAUTEURS_CLASSE = { table: 0.5, bureau: 0.58, julien: 1.0, livre: 0.11, dico: 0.15, copie: 0.13 };
+export const HAUTEURS_CLASSE = { table: 0.5, bureau: 0.58, julien: 1.1, livre: 0.11, dico: 0.15, copie: 0.13 };
 
 function toile(l, h, dessin) {
   const c = document.createElement('canvas'); c.width = l; c.height = h;

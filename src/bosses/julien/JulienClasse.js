@@ -21,16 +21,24 @@ import { construireDecorClasse, spritesClasse, HAUTEURS_CLASSE } from './decor_c
 
 const L = 480, VUE_H = 222;   // comme JulienManif
 const hasard = (liste) => liste[(Math.random() * liste.length) | 0];
+const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'dos', 'rage', 'vaincu'];
 const RANGEES = [1.6, 2.5, 3.4, 4.5, 5.5, 7.5, 9.5, 11.5];   // allées où Julien peut marcher en phase 3
 
 export class JulienClasse extends JulienManif {
   constructor() { super('JulienClasse'); }
+
+  // vraies images de Julien (outils/julien/decouper_prof.py) ; image absente = dessin provisoire
+  preload() {
+    for (const p of POSES_PROF) if (!this.textures.exists('julien_julien_' + p)) this.load.image('julien_julien_' + p, `assets/sprites/julien/julien_julien_${p}.png`);
+    super.preload();
+  }
 
   // ------------------------------------------------------------------ points d'entrée (voir JulienManif)
   creerDecor() {
     const T = this.T;
     if (!T.classe) {
       Object.assign(T.spr, spritesClasse());
+      for (const p of POSES_PROF) if (this.textures.exists('julien_julien_' + p)) T.spr['julien_' + p] = this.textures.get('julien_julien_' + p).getSourceImage();
       Object.assign(T.hauteurs, HAUTEURS_CLASSE);
       T.classe = construireDecorClasse(this.ctx, L, VUE_H);
     }

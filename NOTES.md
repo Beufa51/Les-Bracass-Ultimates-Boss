@@ -1096,6 +1096,12 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   « AU TABLEAU ! » (aimant), « CONFISQUÉ ! », craies, règle ; phases qui changent la salle : rétroprojecteur dans le
   noir, bureau renversé + alarme incendie ; élèves assis qui réagissent ; sarbacane ; salle moins profonde).
   En attente du choix de Fabien (conseil : B puis A).
+- IMAGES DE JULIEN LIVRÉES (photo du vrai Julien → portrait → corps entier `julien_reference.jpg` → 2 planches de
+  4 poses `julien_prof_1/2.jpg`). Découpe : `python3 outils/julien/decouper_prof.py` (zones EXCLURE : texte
+  « ART CLASS 101 » et livres volants effacés) → `julien_julien_<pose>.png` (marche0/1, bras, lance, touche, dos,
+  rage, vaincu ; 240 px). Branchées dans `JulienClasse` (`POSES_PROF`). La pose « dos » (au tableau) attend le
+  combat refait (B). La photo du vrai Julien n'est PAS dans le dépôt (public). Tenue : veste verte, t-shirt geek
+  (Silent Hill) ; il aime les t-shirts de jeux d'horreur (Silent Hill, Resident Evil).
 - PROMPTS des images du niveau 2 + images manquantes de la manif : `propositions/julien_prompts_images.md`, sections
   10 à 16 (Julien 8 poses, objets de la classe, élèves assis, ennemis du lycée, murs, bonus de la manif, rideau de fer).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
