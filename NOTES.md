@@ -1071,6 +1071,11 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   Aussi dans le MENU PAUSE (PC, en cours de partie) : ligne « Commandes du clavier » → même écran, jeu figé, C rouvre
   la pause (PauseScene cherche une scène en pause qui a `ouvrirCommandes(retour)` / `commandesDisponibles()`).
 - À FAIRE (audit Doom) : point 3 : BAC en civil, tireur de LBD, policiers en hauteur, sono (BFG). Point 4 : clé + porte + boucle.
+- AUDIT BUGS + PLAISIR (niveau 1, avant le niveau 2) : 3 bugs corrigés — après « REJOUER » la souris ne marchait plus
+  (`sourisInstallee` gardé d'une partie à l'autre) ; un CRS essoufflé qui sursaute (0,22 s) redevenait blindé → le 2e œuf
+  faisait « plonk » (surtout avec le café) → `bouclierBaisse(e)` ; le lanceur caché derrière un mur visait ta position
+  ACTUELLE à travers les murs → il vise là où il t'a vu (`vuX`, `vuY`). Aucune erreur dans la console. Plaisir : rien de
+  bloquant, le niveau 1 est jugé prêt (restent en option : BAC, LBD, policiers en hauteur, sono, clé + porte).
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,

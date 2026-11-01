@@ -102,7 +102,7 @@ function frapper(scene, dx, dy) {
   if (!cible) return;
   const d = Math.hypot(cible.x - j.x, cible.y - j.y);
   const recul = [(cible.x - j.x) / d * P.recul, (cible.y - j.y) / d * P.recul];
-  if (cible.type === 'bouclier' && cible.etat !== 'essouffle') {
+  if (cible.type === 'bouclier' && !scene.bouclierBaisse(cible)) {
     // le bouclier encaisse, mais le CRS est sonné : bouclier baissé quelques instants
     scene.deplacer(cible, recul[0], recul[1], 0.28);
     cible.etat = 'essouffle'; cible.t = P.etourdit * scene.diff.essouffle; cible.alerte = true;

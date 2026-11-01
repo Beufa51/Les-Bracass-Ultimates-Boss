@@ -78,6 +78,7 @@ export class JulienManif extends BossScene {
     this.msgT = 0;
 
     this.touches = creerTouches(this);
+    this.sourisInstallee = false; this.okRelache = false;   // « REJOUER » relance la même scène : on repart de zéro (sinon la souris ne marche plus)
     const K = Phaser.Input.Keyboard.KeyCodes;
     // PC : commandes personnalisables (commandes.js : préréglages Moderne, Doom 93, ZQSD, WASD + touches au choix)
     this.reg = lireCommandes();
@@ -644,7 +645,8 @@ export class JulienManif extends BossScene {
         return;
       }
       if (e.etat === 'prepare' && e.t <= 0) {
-        this.grenades.push({ x0: e.x, y0: e.y, x1: j.x, y1: j.y, t: 0, x: e.x, y: e.y, z: 0.6 });
+        const [cx, cy] = voit ? [j.x, j.y] : [e.vuX, e.vuY];   // caché derrière un mur : il vise là où il t'a vu
+        this.grenades.push({ x0: e.x, y0: e.y, x1: cx, y1: cy, t: 0, x: e.x, y: e.y, z: 0.6 });
         jouerSon(this, 'julien_tir');
         e.etat = 'lance'; e.t = 0.35;
         return;
@@ -683,7 +685,7 @@ export class JulienManif extends BossScene {
   // tache : 'oeuf' (jaune), 'tomate' (rouge) ou null (pancarte, eau, fumée : pas de trace)
   toucherEnnemi(e, degats = 1, { recul = null, perceBouclier = false, silencieux = false, tache = null } = {}) {
     if (recul) this.deplacer(e, recul[0], recul[1], 0.28);
-    if (e.type === 'bouclier' && e.etat !== 'essouffle' && !perceBouclier) { if (!silencieux) jouerSon(this, 'julien_plonk'); return; }
+    if (e.type === 'bouclier' && !this.bouclierBaisse(e) && !perceBouclier) { if (!silencieux) jouerSon(this, 'julien_plonk'); return; }
     e.vie -= degats;
     e.dernier = tache || 'propre';   // pour l'image « touché » / « fuite » : jaune, rouge ou sans trace
     // il garde la trace : jaune d'œuf ou tomate sur l'uniforme (4 au plus)
@@ -702,6 +704,9 @@ export class JulienManif extends BossScene {
     if (e.type === 'lanceur' && e.etat === 'prepare') return;   // le lancer part quand même
     e.apres = e.etat; e.tApres = e.t; e.etat = 'touche'; e.t = 0.22;
   }
+
+  // CRS vulnérable : essoufflé, ou en train de sursauter pendant son essoufflement (sinon le 2e œuf fait « plonk »)
+  bouclierBaisse(e) { return e.etat === 'essouffle' || (e.etat === 'touche' && e.apres === 'essouffle'); }
 
   projectiles(dt) {
     const j = this.j;
