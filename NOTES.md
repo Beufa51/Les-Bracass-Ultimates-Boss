@@ -39,7 +39,8 @@
 - Menu de test caché (F1) : lancer n'importe quel boss / phase, remettre la sauvegarde à zéro.
 - **Smartphone / tablette** : boutons tactiles à l'écran (`src/core/tactile.js`), qui "appuient" sur
   les touches du clavier. Chaque scène choisit le texte de ses boutons (`etiquettesTactiles`).
-  Le menu de test (F1) n'existe que sur ordinateur.
+  Menu de test sur TÉLÉPHONE : bouton II (pause, aussi dans le hub) → « Menu de test (aller à un combat) » ; au doigt :
+  toucher une ligne la choisit, la retoucher la lance (▲ ▼ OK marchent aussi). Les lignes de la pause se touchent aussi.
 - PAUSE (Échap / P, bouton II sur mobile ; pendant Greg et Lionel, le bouton II est rangé en haut à droite) : reprendre, volumes musique / bruitages / voix (enregistrés),
   abandonner. `src/core/PauseScene.js`. Volumes et records dans `src/core/sauvegarde.js`.
 - Le hub affiche le record (rang + temps) sous la porte de chaque boss gagné.

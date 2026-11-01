@@ -1,9 +1,10 @@
-// Menu de test caché (touche F1) : lance n'importe quel boss / phase,
-// ou remet la sauvegarde à zéro.
+// Menu de test caché (touche F1 ; sur téléphone : bouton II puis « Menu de test ») : lance n'importe quel boss / phase,
+// ou remet la sauvegarde à zéro. Au doigt : toucher une ligne la choisit, la toucher encore la lance.
 import { LARGEUR, HAUTEUR } from './reglages.js';
 import { texte, voile } from './ui.js';
 import { creerTouches, vientDAppuyer } from './clavier.js';
 import { Sauvegarde } from './sauvegarde.js';
+import { estTactile, etiquettesTactiles, etiquettesActuelles } from './tactile.js';
 import { BOSS, MODELE } from '../bosses/liste.js';
 
 export class MenuTestScene extends Phaser.Scene {
@@ -11,6 +12,7 @@ export class MenuTestScene extends Phaser.Scene {
 
   init(donnees) {
     this.enPause = donnees.enPause || [];
+    this.etiquettesAvant = donnees.etiquettes || etiquettesActuelles();
     this.confirmation = false;
   }
 
@@ -28,14 +30,22 @@ export class MenuTestScene extends Phaser.Scene {
     this.choix.push({ libelle: 'Retour au hub', action: () => this.lancer('Hub', {}) });
     this.choix.push({ libelle: 'Réglages développeur (vitesses, jauges...)', action: () => this.scene.start('ReglagesDev', { enPause: this.enPause }) });
     this.choix.push({ libelle: 'Remettre la sauvegarde à zéro', action: () => this.reset() });
-    this.choix.push({ libelle: 'Fermer le menu (F1)', action: () => this.fermer() });
+    this.tactile = estTactile();
+    this.choix.push({ libelle: this.tactile ? 'Fermer le menu' : 'Fermer le menu (F1)', action: () => this.fermer() });
 
     voile(this, 0.9);
-    texte(this, LARGEUR / 2, 34, 'MENU DE TEST', 30, '#ffd84a');
-    texte(this, LARGEUR / 2, HAUTEUR - 22, 'Haut/Bas : choisir   Espace : valider   F1 : fermer', 16, '#aaaaaa');
+    texte(this, this.tactile ? LARGEUR / 2 + 220 : LARGEUR / 2, 34, 'MENU DE TEST', 30, '#ffd84a');   // téléphone : à côté du bouton II
+    texte(this, LARGEUR / 2, HAUTEUR - 22, this.tactile ? 'Touche une ligne pour la choisir, encore une fois pour la lancer   (▲ ▼ OK aussi)' : 'Haut/Bas : choisir   Espace : valider   F1 : fermer', 16, '#aaaaaa');
 
-    this.lignes = this.choix.map((c, i) =>
-      texte(this, LARGEUR / 2, 0, c.libelle, 20, '#ffffff'));
+    this.lignes = this.choix.map((c, i) => {
+      const l = texte(this, LARGEUR / 2, 0, c.libelle, this.tactile ? 24 : 20, '#ffffff');
+      l.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+        if (this.index !== i) { this.index = i; this.confirmation = false; this.majAffichage(); return; }
+        this.choix[i].action();
+      });
+      return l;
+    });
+    if (this.tactile) etiquettesTactiles({ z: null, x: null, espace: 'OK' });
     this.index = 0;
     this.touches = creerTouches(this);
     this.majAffichage();
@@ -43,12 +53,12 @@ export class MenuTestScene extends Phaser.Scene {
 
   majAffichage() {
     // le menu défile si la liste est trop longue pour l'écran
-    const visibles = 18, hauteurLigne = 25;
+    const visibles = this.tactile ? 10 : 18, hauteurLigne = this.tactile ? 44 : 25;   // téléphone : lignes plus hautes pour le doigt
     const debut = Phaser.Math.Clamp(this.index - Math.floor(visibles / 2), 0, Math.max(0, this.choix.length - visibles));
     this.lignes.forEach((l, i) => {
       const pos = i - debut;
       l.setVisible(pos >= 0 && pos < visibles);
-      l.y = 80 + pos * hauteurLigne;
+      l.y = (this.tactile ? 104 : 80) + pos * hauteurLigne;
       const actif = i === this.index;
       let libelle = this.choix[i].libelle;
       if (actif && this.confirmation) libelle = 'Sûr ? Espace pour CONFIRMER';
@@ -71,11 +81,13 @@ export class MenuTestScene extends Phaser.Scene {
   }
 
   lancer(cle, donnees) {
+    etiquettesTactiles(this.etiquettesAvant);
     this.enPause.forEach(k => this.scene.stop(k));
     this.scene.start(cle, donnees);
   }
 
   fermer() {
+    etiquettesTactiles(this.etiquettesAvant);
     this.enPause.forEach(k => this.scene.resume(k));
     this.scene.stop();
   }

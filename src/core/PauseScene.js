@@ -1,4 +1,5 @@
-// Pause (touche Échap ou P, ou bouton II sur mobile) : reprendre, régler les volumes, quitter.
+// Pause (touche Échap ou P, ou bouton II sur mobile) : reprendre, régler les volumes, quitter,
+// ou ouvrir le MENU DE TEST (comme F1 : seul moyen d'y aller sur téléphone).
 import { LARGEUR, HAUTEUR } from './reglages.js';
 import { texte, voile } from './ui.js';
 import { creerTouches, vientDAppuyer } from './clavier.js';
@@ -26,8 +27,16 @@ export class PauseScene extends Phaser.Scene {
       { libelle: () => `Voix : ${this.jauge('voix')}`, reglage: 'voix' },
       ...(this.sceneCommandes() ? [{ libelle: () => 'Commandes du clavier', action: () => this.commandes() }] : []),
       { libelle: () => 'Abandonner (retour au hub)', action: () => this.quitter() },
+      { libelle: () => 'Menu de test (aller à un combat)', action: () => this.menuTest() },
     ];
-    this.lignes = this.choix.map((c, i) => texte(this, LARGEUR / 2, 170 + i * 55, '', 24, '#ffffff'));
+    const pas = this.choix.length > 6 ? 48 : 55;
+    this.lignes = this.choix.map((c, i) => texte(this, LARGEUR / 2, 160 + i * pas, '', 24, '#ffffff'));
+    // au doigt : toucher une ligne la choisit, la toucher encore la valide
+    this.lignes.forEach((l, i) => l.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+      const c = this.choix[i];
+      if (this.index !== i) { this.index = i; this.majAffichage(); if (!c.action) return; }
+      if (c.action) c.action();
+    }));
     texte(this, LARGEUR / 2, HAUTEUR - 40,
       estTactile() ? '▲ ▼ : choisir   ◀ ▶ : volume   OK : valider' : 'Haut/Bas : choisir   Gauche/Droite : volume   Espace : valider   Échap : reprendre',
       15, '#aaaaaa');
@@ -80,6 +89,13 @@ export class PauseScene extends Phaser.Scene {
     etiquettesTactiles(this.etiquettesAvant);
     this.enPause.forEach(k => this.scene.resume(k));
     this.scene.stop();
+  }
+
+  // ferme la pause et ouvre le menu de test à sa place (le jeu reste en pause derrière)
+  menuTest() {
+    this.scene.stop();
+    this.scene.start('MenuTest', { enPause: this.enPause, etiquettes: this.etiquettesAvant });
+    this.scene.bringToTop('MenuTest');
   }
 
   quitter() {
