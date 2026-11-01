@@ -294,6 +294,15 @@ export class BeufaInfiltration extends BossScene {
           if (occupee && b0 < 0) b0 = y;
           else if (!occupee && b0 >= 0) { bandes.push([b0, y - 1]); b0 = -1; }
         }
+        // V76 : une bande s'arrêtait à la dernière ligne au trait LONG — les bottes (deux petits blocs séparés)
+        // tombaient dehors : les gardes de face perdaient le bas des pieds. On prolonge chaque bande tant qu'une
+        // ligne garde un peu d'encre (≥ 3 px d'affilée), sans empiéter sur la bande voisine.
+        const encre = (y) => { let run = 0; for (let x = x0; x <= x1; x++) { if (d[(y * L + x) * 4 + 3] > 8) { if (++run >= 3) return true; } else run = 0; } return false; };
+        bandes.forEach((bd, i) => {
+          const bas = i + 1 < bandes.length ? bandes[i + 1][0] - 1 : y1, haut = i > 0 ? bandes[i - 1][1] + 1 : y0;
+          while (bd[1] < bas && encre(bd[1] + 1)) bd[1]++;
+          while (bd[0] > haut && encre(bd[0] - 1)) bd[0]--;
+        });
         const vus = [];
         for (const bd of bandes) {
           let s = -1;
@@ -952,7 +961,7 @@ export class BeufaInfiltration extends BossScene {
     const nH = Math.max(1, Object.keys(this.textures.get(cle).frames).length - 1);
     const pasH = cle === 'beufa_heros_course_profil' ? R.joueur.pasCourse : (cle === 'beufa_heros_profil' ? R.joueur.pas : R.joueur.pasFace);   // V51 : course plus longue — V71 : face/dos = 4 cycles par planche
     const imageH = this.heroBouge ? Math.floor((this.joueur.distPas || 0) / pasH * nH) % nH
-      : (cle === 'beufa_heros' ? this.poseArretHeros : 0);
+      : (cle === 'beufa_heros' || cle === 'beufa_heros_dos' ? 1 : 0);   // V76 : à l'arrêt, face/dos = la pose « debout » (image 1)
     if (this.sprJoueur.texture.key !== cle) this.sprJoueur.setTexture(cle);
     // V74 : de FACE et de DOS, la planche bouge à peine les jambes → on ajoute le TRANSFERT DE POIDS d'un pied sur
     // l'autre : le corps se décale et penche légèrement du côté du pied posé, une fois à chaque pas (30 px)

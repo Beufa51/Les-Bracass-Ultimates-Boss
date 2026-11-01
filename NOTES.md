@@ -812,3 +812,12 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - `afficher()` : planche choisie selon `g.angle` (profil si horizontal, miroir à gauche ; dos si vers le haut ;
   face sinon), plus de rotation ; pose d'arrêt face/dos image 2, profil image 3 ; pieds à y+25 (tri Y comme Snake).
   L'ancienne planche vue de dessus `beufa_garde` reste en secours si les 3 vues manquent.
+
+## BEUFA — V76 : NOUVELLE PLANCHE SNAKE (face/dos) + BOTTES DES GARDES
+- `assets_inbox/beufa_heros_planche_complete.jpg` (4 rangées × 10). Mesures : face et dos bougent nettement plus
+  que l'ancienne → GARDÉS, montés en 4 poses [gauche levé, debout, droit levé, debout] : face = images 8,4,6,4 ;
+  dos = 3,0,1,0 (`beufa_heros.jpg` / `_dos.jpg`, images: 4, `pasFace: 60`, arrêt = image 1).
+  Profil marche (jamais de jambes croisées → glisserait) et course (images 5-6 collées) : REFUSÉS, on garde les anciens.
+- Chargeur : les bandes de personnages s'arrêtaient au dernier trait LONG → les bottes (2 petits blocs) étaient
+  coupées (gardes de face). Bandes prolongées tant qu'une ligne a ≥ 3 px d'encre d'affilée.
+- Astuce outil : ne JAMAIS enchaîner `pkill -f "http.server 8765"` avec d'autres commandes (il tue son propre shell).
