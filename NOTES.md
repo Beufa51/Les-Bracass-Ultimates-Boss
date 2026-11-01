@@ -821,3 +821,10 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Chargeur : les bandes de personnages s'arrêtaient au dernier trait LONG → les bottes (2 petits blocs) étaient
   coupées (gardes de face). Bandes prolongées tant qu'une ligne a ≥ 3 px d'encre d'affilée.
 - Astuce outil : ne JAMAIS enchaîner `pkill -f "http.server 8765"` avec d'autres commandes (il tue son propre shell).
+
+## BEUFA — V77 : MARCHE FACE/DOS FLUIDE (toutes les images de la nouvelle planche)
+- Retour de Fabien : « il manque des images, le genou ». La V76 n'utilisait que 3 poses. On reprend TOUTES les
+  images des rangées face/dos de `beufa_heros_planche_complete.jpg`, classées par hauteur des pieds pour que le
+  genou monte puis redescende : face = 8,0,9,4,2,1,6,7,4,3,5 (11 images), dos = 3,2,7,4,0,5,6,1,6,0,9,8 (12).
+  Un cycle = 2 pas (`pasFace: 60`) → une image tous les ~5 px. Arrêt : face image 3, dos image 4 (pieds à plat).
+- Vérifié dans le jeu : 11 images chargées, image changée à chaque 6 px.

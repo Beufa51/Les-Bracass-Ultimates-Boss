@@ -961,7 +961,7 @@ export class BeufaInfiltration extends BossScene {
     const nH = Math.max(1, Object.keys(this.textures.get(cle).frames).length - 1);
     const pasH = cle === 'beufa_heros_course_profil' ? R.joueur.pasCourse : (cle === 'beufa_heros_profil' ? R.joueur.pas : R.joueur.pasFace);   // V51 : course plus longue — V71 : face/dos = 4 cycles par planche
     const imageH = this.heroBouge ? Math.floor((this.joueur.distPas || 0) / pasH * nH) % nH
-      : (cle === 'beufa_heros' || cle === 'beufa_heros_dos' ? 1 : 0);   // V76 : à l'arrêt, face/dos = la pose « debout » (image 1)
+      : (cle === 'beufa_heros' ? 3 : cle === 'beufa_heros_dos' ? 4 : 0);   // V77 : à l'arrêt = la pose « debout » (pieds à plat) du cycle
     if (this.sprJoueur.texture.key !== cle) this.sprJoueur.setTexture(cle);
     // V74 : de FACE et de DOS, la planche bouge à peine les jambes → on ajoute le TRANSFERT DE POIDS d'un pied sur
     // l'autre : le corps se décale et penche légèrement du côté du pied posé, une fois à chaque pas (30 px)
