@@ -1028,6 +1028,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   tomate / eau / pancarte / fumée (`variantesTaches` : le jaune des images touché/fuite devient rouge ou disparaît ;
   `e.dernier`) ; téléphone : croix 96 px et symboles plus gros dans la manif.
 - RESTE de l'audit fun : BAC en civil + canon à eau, sono (BFG) ; images des bonus.
+- AUDIT « DOOM » (dev id Software + joueur de doom-like) : `propositions/julien_audit_doom.md` (recommencer tout de
+  suite, toujours courir, bruit qui alerte, infighting, sacs de farine = barils, embuscades, lumière, ennemis
+  rapides / en hauteur, boss commissaire, clé et porte). En attente du choix de Fabien.
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
