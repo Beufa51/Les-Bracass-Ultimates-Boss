@@ -52,6 +52,8 @@ objets = {
     (15, 34): 'm', (17, 34): 'm',
     # armes : tomates (t) dans la ruelle, pistolet à eau (w) dans le passage, fumigènes (f) sur la place, + recharges
     (8, 32): 't', (24, 31): 'w', (16, 24): 'f', (26, 26): 't', (9, 26): 'w', (12, 20): 'f', (12, 7): 't', (15, 15): 'w',
+    # bonus : écharpe mouillée (e), café serré (c), K-Way (K)
+    (25, 34): 'e', (7, 26): 'e', (30, 38): 'c', (21, 7): 'c', (3, 32): 'K', (17, 16): 'K',
     # boulevard : départ au milieu de la foule
     (16, 39): 'J', (12, 37): 'm', (14, 40): 'm', (18, 38): 'm', (20, 40): 'm', (10, 39): 'm', (22, 37): 'm',
     (13, 38): 'm', (19, 37): 'm', (8, 40): 'm', (25, 39): 'm', (4, 38): 'm', (28, 37): 'm', (30, 40): 'm',

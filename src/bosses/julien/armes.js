@@ -87,6 +87,7 @@ export function tirer(scene, dx, dy, appui, nouveau) {
     ajout('fumi', dx, dy, { x0: j.x, y0: j.y, x1: j.x + dx * d, y1: j.y + dy * d, z: 0.5 });
     jouerSon(scene, 'julien_lancer', { rate: 0.6 });
   }
+  if (j.cafe > 0) j.recharge *= RG.bonus.cafeCadence;   // café serré : on tire plus vite
 }
 
 // coup de pancarte : le policier le plus proche devant toi
@@ -104,7 +105,7 @@ function frapper(scene, dx, dy) {
   if (cible.type === 'bouclier' && cible.etat !== 'essouffle') {
     // le bouclier encaisse, mais le CRS est sonné : bouclier baissé quelques instants
     scene.deplacer(cible, recul[0], recul[1], 0.28);
-    cible.etat = 'essouffle'; cible.t = P.etourdit; cible.alerte = true;
+    cible.etat = 'essouffle'; cible.t = P.etourdit * scene.diff.essouffle; cible.alerte = true;
     jouerSon(scene, 'julien_plonk', { rate: 0.6 });
     scene.message('BONK ! Son bouclier tombe : vite, vise-le !', 1.5);
     return;
@@ -146,7 +147,7 @@ export function avancerTirs(scene, dt) {
     if (o.fini) continue;
     for (const e of scene.ennemis) if (e.actif && e.etat !== 'fuite' && Math.hypot(e.x - o.x, e.y - o.y) < 0.35) {
       o.fini = true;
-      scene.toucherEnnemi(e, R.degats, { recul: [o.dx * R.recul, o.dy * R.recul], silencieux: o.genre === 'eau' });
+      scene.toucherEnnemi(e, R.degats, { recul: [o.dx * R.recul, o.dy * R.recul], silencieux: o.genre === 'eau', rouge: o.genre === 'tomate' });
       break;
     }
   }

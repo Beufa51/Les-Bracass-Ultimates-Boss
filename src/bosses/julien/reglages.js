@@ -3,6 +3,23 @@
 // Distances en CASES du plan (1 case = la largeur d'un mur), temps en secondes, vitesses en cases par seconde.
 export const IDENTITE = { id: 'julien', nom: 'Julien' };
 
+// Niveaux de difficulté façon Doom (choisis avant la manif, retenus pour la fois suivante)
+//  degats : × dégâts reçus ; munitions : × œufs au départ et dans ce qu'on ramasse ;
+//  cadence : × temps entre 2 lacrymos (plus petit = plus souvent) ; essouffle : × temps où le CRS baisse son bouclier
+export const DIFFICULTES = {
+  sage:       { nom: 'LYCÉEN SAGE',       couleur: '#7fff7f', degats: 0.5,  munitions: 1.5, cadence: 1.3, essouffle: 1.3, texte: 'Pour découvrir la manif tranquille.' },
+  delegue:    { nom: 'DÉLÉGUÉ DE CLASSE', couleur: '#9fd0ff', degats: 0.75, munitions: 1.2, cadence: 1.1, essouffle: 1.15, texte: 'Un peu d\'aide, mais ça pique quand même.' },
+  bloqueur:   { nom: 'BLOQUEUR',          couleur: '#ffd84a', degats: 1,    munitions: 1,   cadence: 1,   essouffle: 1,   texte: 'La vraie manif, comme prévue.' },
+  anarchiste: { nom: 'ANARCHISTE',        couleur: '#ff5a6e', degats: 1.5,  munitions: 0.7, cadence: 0.7, essouffle: 0.7, texte: 'Lacrymos en rafale, CRS teigneux. Pour les vrais.' },
+};
+// Rang de fin (score sur 100 : policiers 50, secrets 20, objets 10, temps 20) ; court = affiché au hub
+export const RANGS = [
+  { mini: 85, nom: 'CHE GUEVARA DU LYCÉE', court: 'CHE' },
+  { mini: 65, nom: 'LEADER ÉTUDIANT', court: 'LEADER' },
+  { mini: 40, nom: 'DÉLÉGUÉ DE CLASSE', court: 'DÉLÉGUÉ' },
+  { mini: 0, nom: 'FAYOT', court: 'FAYOT' },
+];
+
 export const REGLAGES = {
   joueur: {
     vie: 100,            // vie au départ (et maximum)
@@ -17,6 +34,7 @@ export const REGLAGES = {
     maxi: 99,
     cadence: 0.35,       // secondes entre 2 lancers
     vitesse: 9,          // vitesse de l'œuf
+    degats: 1, recul: 0.15,   // un œuf = 1 de vie en moins, et le policier recule un peu
     boite: 15,           // œufs dans une boîte ramassée
     aide: 0.10,          // aide à la visée (clavier) : un œuf lancé à moins de 0,10 radian (≈ 6°) d'un policier part sur lui
     aideTactile: 0.17,   // aide à la visée au doigt (≈ 10°)
@@ -27,6 +45,14 @@ export const REGLAGES = {
   eau: { bouteille: 120, maxi: 300, cadence: 0.07, vitesse: 11, duree: 0.45, degats: 0.2, recul: 0.06, eteint: 0.3 },   // eteint : s de lacrymo en moins par goutte
   fumigenes: { boite: 3, maxi: 9, cadence: 1.0, distance: 5, vol: 0.8, duree: 6, rayon: 1.6, degats: 1 },   // degats : par seconde dans la fumée
   sandwich: 25,          // vie rendue par un sandwich
+  // BONUS façon Doom : écharpe mouillée (= combinaison anti-radiations), café serré (= Berserk), K-Way (= armure)
+  bonus: {
+    echarpe: 20,         // s sans souffrir des lacrymos
+    cafe: 15,            // s plus rapide (×vitesse) et tir plus rapide (×cadence)
+    cafeVitesse: 1.4, cafeCadence: 0.5,
+    kway: 50,            // armure gagnée (maxi kwayMaxi) ; elle absorbe une part des dégâts (absorbe)
+    kwayMaxi: 100, absorbe: 0.5,
+  },
   lanceur: {             // policier qui lance des lacrymos
     vie: 2,              // œufs pour le faire fuir
     vitesse: 1.3,

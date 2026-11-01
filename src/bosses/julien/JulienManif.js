@@ -11,7 +11,8 @@ import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
-import { IDENTITE, REGLAGES as RG } from './reglages.js';
+import { IDENTITE, REGLAGES as RG, DIFFICULTES, RANGS } from './reglages.js';
+import { Sauvegarde } from '../../core/sauvegarde.js';
 import { PLAN_MANIF, OBJETS, SECRETS, ZONES, PARVIS, PAR } from './niveau_manif.js';
 import { rendre, murEn, vueLibre } from './raycaster.js';
 import { texturesMurs, texturesSprites, texturesMain, chargerImages, appliquerImages } from './textures.js';
@@ -19,6 +20,12 @@ import { construireDecor } from './decor.js';
 import { ARMES, armeDe, RECHARGES, choisirArme, armeSuivante, tirer, avancerTirs, dansFumee } from './armes.js';
 import { toileVisage, niveauVisage } from './visage.js';
 
+// Bonus : temps (s) ou armure gagnée, et message
+const BONUS = {
+  echarpe: () => `Écharpe mouillée : ${RG.bonus.echarpe} s sans souffrir des lacrymos !`,
+  cafe: () => `Café serré ! ${RG.bonus.cafe} s plus rapide !`,
+  kway: () => `Un K-Way ! (+${RG.bonus.kway} d'armure)`,
+};
 const L = 480, H = 270, VUE_H = 222;   // toile basse résolution ; la vue 3D au-dessus, la barre du bas en dessous
 const FOV = 0.66;                      // largeur du champ de vision (≈ 66°)
 let T = null;                          // dessins (faits une seule fois)
@@ -53,7 +60,9 @@ export class JulienManif extends BossScene {
     // barre du bas : chiffres en haute résolution par-dessus la toile
     const yb = VUE_H * 2;
     texte(this, 92, yb + 20, 'VIE', 14, '#c9b48a');
-    this.txtVie = texte(this, 92, yb + 58, '', 40, '#ff5a3c');
+    this.txtVie = texte(this, 92, yb + 52, '', 40, '#ff5a3c');
+    this.txtArmure = texte(this, 92, yb + 84, '', 14, '#f0c818');   // K-Way
+    this.txtBonus = texte(this, 16, 44, '', 16, '#9fd8ff').setOrigin(0, 0).setStroke('#000', 4);   // bonus en cours
     this.txtArme = texte(this, 300, yb + 20, '', 14, '#c9b48a');
     this.txtOeufs = texte(this, 300, yb + 58, '', 40, '#fff2c8');
     texte(this, 660, yb + 20, 'POLICIERS REPOUSSÉS', 14, '#c9b48a');
@@ -79,6 +88,11 @@ export class JulienManif extends BossScene {
     jouerMusique(this, 'julien_musique');   // « At Doom's Gate », en boucle
     jouerMusique(this, 'julien_foule');     // ambiance de manif par-dessus
     this.dessiner(0);
+    this.diff = DIFFICULTES.bloqueur;
+    this.choisirDifficulte(() => this.time.delayedCall(120, () => this.intro()));
+  }
+
+  intro() {
     const tact = estTactile();
     this.afficherIntro('LA MANIF', [
       'Rejoins le portail du LYCÉE à travers la manif !',
@@ -92,11 +106,38 @@ export class JulienManif extends BossScene {
     ], () => { etiquettesTactiles({ x: 'LANCER', z: '↺', espace: '↻' }); this.enJeu = true; });
   }
 
+  // Menu des difficultés façon Doom (▲ ▼ puis ESPACE / OK) ; le choix est retenu
+  choisirDifficulte(suite) {
+    const noms = Object.keys(DIFFICULTES);
+    let i = Math.max(0, noms.indexOf(Sauvegarde.difficulte(IDENTITE.id)));
+    if (i === 0 && !DIFFICULTES[Sauvegarde.difficulte(IDENTITE.id)]) i = 2;
+    const el = [voile(this, 0.85).setDepth(1000), texte(this, LARGEUR / 2, 90, 'CHOISIS TA DIFFICULTÉ', 36, '#ffd84a').setDepth(1001)];
+    const lignes = noms.map((n, k) => texte(this, LARGEUR / 2, 180 + k * 56, DIFFICULTES[n].nom, 28, DIFFICULTES[n].couleur).setDepth(1001));
+    const aide = texte(this, LARGEUR / 2, 420, '', 18, '#ffffff').setDepth(1001);
+    const bas = texte(this, LARGEUR / 2, HAUTEUR - 40, `▲ ▼ : choisir      ${estTactile() ? 'OK' : 'ESPACE'} : valider`, 18, '#aaaaaa').setDepth(1001);
+    const maj = () => { lignes.forEach((l, k) => l.setAlpha(k === i ? 1 : 0.35).setScale(k === i ? 1.1 : 1)); aide.setText(DIFFICULTES[noms[i]].texte); };
+    maj();
+    const touche = (ev) => {
+      if (ev.key === 'ArrowUp') { i = (i + noms.length - 1) % noms.length; maj(); jouerSon(this, 'julien_lancer'); }
+      else if (ev.key === 'ArrowDown') { i = (i + 1) % noms.length; maj(); jouerSon(this, 'julien_lancer'); }
+      else if (ev.key === ' ') {
+        this.input.keyboard.off('keydown', touche);
+        [...el, ...lignes, aide, bas].forEach(o => o.destroy());
+        Sauvegarde.reglerDifficulte(IDENTITE.id, noms[i]);
+        this.diff = DIFFICULTES[noms[i]];
+        this.j.mun.oeufs = Math.round(RG.oeufs.depart * this.diff.munitions);
+        jouerSon(this, 'julien_ramasse');
+        suite();
+      }
+    };
+    this.input.keyboard.on('keydown', touche);
+  }
+
   // ------------------------------------------------------------------ niveau
   lireNiveau() {
     const j = RG.joueur;
     this.j = { x: 2.5, y: 2.5, a: -Math.PI / 2, vie: j.vie, recharge: 0,
-      mun: { oeufs: RG.oeufs.depart, tomates: 0, eau: 0, fumigenes: 0 }, armes: new Set(['pancarte', 'oeufs']), arme: 'oeufs', lanceT: 0, bob: 0,
+      mun: { oeufs: RG.oeufs.depart, tomates: 0, eau: 0, fumigenes: 0 }, armes: new Set(['pancarte', 'oeufs']), arme: 'oeufs', armure: 0, echarpe: 0, cafe: 0, lanceT: 0, bob: 0,
       regard: 0, regardT: 1.2, expr: 'normal', exprT: 0, rouge: 0, gaz: 0 };
     this.ennemis = []; this.objets = []; this.tirs = []; this.fumees = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.sortie = null;
@@ -117,7 +158,7 @@ export class JulienManif extends BossScene {
           ronde: !(x >= PARVIS.x0 && x <= PARVIS.x1 && y >= PARVIS.y0 && y <= PARVIS.y1) && !(x >= 15 && x <= 17 && y >= 9 && y <= 17),
           rdx: (y >= 28 && y <= 35) ? 0 : (x % 2 ? 1 : -1), rdy: (y >= 28 && y <= 35) ? 1 : 0, rondeT: 2.5 });
       } else {
-        const solide = !RECHARGES[type] && type !== 'sandwich';
+        const solide = !RECHARGES[type] && !BONUS[type] && type !== 'sandwich';
         const rayon = { barriere: 0.45, statue: 0.75, camion: 1.05, colonne: 0.4 }[type] || 0.3;
         const o = { type, x: px, y: py, solide, rayon, actif: true, n: nm };
         if (type === 'manifestant') nm++;
@@ -169,6 +210,8 @@ export class JulienManif extends BossScene {
   degats(n, sx, sy) {
     const j = this.j;
     if (j.vie <= 0) return;
+    n *= this.diff.degats;   // difficulté
+    if (j.armure > 0) { const a = Math.min(j.armure, n * RG.bonus.absorbe); j.armure -= a; n -= a; }   // le K-Way encaisse une part
     j.vie = Math.max(0, j.vie - n);
     if (sx !== undefined) {
       const dx = Math.cos(j.a), dy = Math.sin(j.a);
@@ -195,6 +238,7 @@ export class JulienManif extends BossScene {
       this.projectiles(dt);
       this.ramasser();
       this.temps += dt;
+      this.j.echarpe = Math.max(0, this.j.echarpe - dt); this.j.cafe = Math.max(0, this.j.cafe - dt);
       const j = this.j;
       ZONES.forEach((z, i) => {   // message à la première entrée dans une zone
         if (!this.zonesVues.has(i) && j.x >= z.x0 && j.x < z.x1 + 1 && j.y >= z.y0 && j.y < z.y1 + 1) { this.zonesVues.add(i); this.message(this.portailOuvert && z.ouvert ? z.ouvert : z.texte, 4.5); }
@@ -227,8 +271,9 @@ export class JulienManif extends BossScene {
     cote = Math.sign(cote) * course;
     j.a += tourne * R.rotation * (course > 1 ? 1.4 : 1) * dt;
     const dx = Math.cos(j.a), dy = Math.sin(j.a);
-    const mx = (dx * avance * R.vitesse + -dy * cote * R.vitesseCote) * dt;
-    const my = (dy * avance * R.vitesse + dx * cote * R.vitesseCote) * dt;
+    const v = j.cafe > 0 ? RG.bonus.cafeVitesse : 1;   // café serré : plus rapide
+    const mx = (dx * avance * R.vitesse + -dy * cote * R.vitesseCote) * dt * v;
+    const my = (dy * avance * R.vitesse + dx * cote * R.vitesseCote) * dt * v;
     this.deplacer(j, mx, my, R.rayon);
     if (mx || my) j.bob += dt * 9;
     // mur secret : il s'ouvre quand on pousse dedans en avançant
@@ -246,6 +291,18 @@ export class JulienManif extends BossScene {
     const appui = this.tactile ? k.x.isDown : (k.z.isDown || c.ctrl.isDown);
     const nouveau = this.tactile ? vientDAppuyer(k.x) : (vientDAppuyer(k.z) || vientDAppuyer(c.ctrl));
     tirer(this, dx, dy, appui, nouveau);
+  }
+
+  // plusieurs policiers mis en fuite en moins de 3 s : « OMELETTE ×N ! »
+  combo() {
+    const t = this.time.now;
+    this.comboN = t - (this.comboT || -1e9) < 3000 ? (this.comboN || 1) + 1 : 1;
+    this.comboT = t;
+    if (this.comboN < 2) return;
+    const txt = texte(this, LARGEUR / 2, 150, `OMELETTE ×${this.comboN} !`, 44, '#ffd84a').setDepth(50).setScale(0.4);
+    this.tweens.add({ targets: txt, scale: 1, duration: 180, ease: 'Back.out' });
+    this.tweens.add({ targets: txt, alpha: 0, y: 120, delay: 900, duration: 500, onComplete: () => txt.destroy() });
+    jouerSon(this, 'julien_ramasse', { rate: 1.2 });
   }
 
   // Aide à la visée : un œuf lancé presque vers un policier (écart < aide) part droit sur lui
@@ -326,7 +383,7 @@ export class JulienManif extends BossScene {
         e.etat = 'lance'; e.t = 0.35;
         return;
       }
-      if (e.etat === 'lance' && e.t <= 0) { e.etat = 'chasse'; e.t = R.cadence * (0.8 + Math.random() * 0.4); }
+      if (e.etat === 'lance' && e.t <= 0) { e.etat = 'chasse'; e.t = R.cadence * this.diff.cadence * (0.8 + Math.random() * 0.4); }
       return;
     }
 
@@ -347,23 +404,27 @@ export class JulienManif extends BossScene {
       const bloque = marcher(e.cdx, e.cdy, R.vitesseCharge);
       if (d < 0.7) {
         this.degats(R.degats, e.x, e.y);
+        this.cameras.main.shake(260, 0.012);
         this.deplacer(j, e.cdx * 0.9, e.cdy * 0.9, RG.joueur.rayon);
-        e.etat = 'essouffle'; e.t = R.essouffle;
-      } else if (bloque || e.t <= 0) { e.etat = 'essouffle'; e.t = R.essouffle; }
+        e.etat = 'essouffle'; e.t = R.essouffle * this.diff.essouffle;
+      } else if (bloque || e.t <= 0) { e.etat = 'essouffle'; e.t = R.essouffle * this.diff.essouffle; }
       return;
     }
     if (e.etat === 'essouffle' && e.t <= 0) { e.etat = 'approche'; e.t = 0.8; }
   }
 
   // degats : 1 = un œuf ; options : recul [dx, dy], perceBouclier (fumée), silencieux (eau, fumée : pas de son ni de sursaut)
-  toucherEnnemi(e, degats = 1, { recul = null, perceBouclier = false, silencieux = false } = {}) {
+  toucherEnnemi(e, degats = 1, { recul = null, perceBouclier = false, silencieux = false, rouge = false } = {}) {
     if (recul) this.deplacer(e, recul[0], recul[1], 0.28);
     if (e.type === 'bouclier' && e.etat !== 'essouffle' && !perceBouclier) { if (!silencieux) jouerSon(this, 'julien_plonk'); return; }
     e.vie -= degats;
+    // il garde la trace : jaune d'œuf ou tomate sur l'uniforme (4 au plus)
+    if (!silencieux && (e.taches || (e.taches = [])).length < 4) e.taches.push({ o: Math.random() * 1.6 - 0.8, h: 0.3 + Math.random() * 0.35, rouge });
     if (!silencieux) jouerSon(this, 'julien_splat');
     if (e.vie <= 0) {
       e.etat = 'fuite'; e.t = 1.8; this.repousses++;
       jouerSon(this, 'julien_fuite');
+      this.combo();
       this.message(['Il s\'enfuit tout dégoulinant !', 'Omelette !', 'Un de moins !', 'Retour au commissariat !'][this.repousses % 4]);
       this.j.expr = 'content'; this.j.exprT = 0.9;
       return;
@@ -383,13 +444,16 @@ export class JulienManif extends BossScene {
       const t = Math.min(1, g.t);
       g.x = g.x0 + (g.x1 - g.x0) * t; g.y = g.y0 + (g.y1 - g.y0) * t;
       g.z = 0.6 * (1 - t) + 1.4 * t * (1 - t);
-      if (t >= 1) { g.fini = true; this.nuages.push({ x: g.x, y: g.y, t: RG.lacrymo.duree }); jouerSon(this, 'julien_gaz'); }
+      if (t >= 1) {
+        g.fini = true; this.nuages.push({ x: g.x, y: g.y, t: RG.lacrymo.duree }); jouerSon(this, 'julien_gaz');
+        if (Math.hypot(g.x - j.x, g.y - j.y) < 2.5) this.cameras.main.shake(150, 0.006);
+      }
     }
     this.grenades = this.grenades.filter(g => !g.fini);
     j.gaz = Math.max(0, j.gaz - dt * 1.5);
     for (const n of this.nuages) {
       n.t -= dt;
-      if (j.vie > 0 && Math.hypot(n.x - j.x, n.y - j.y) < RG.lacrymo.rayon) {
+      if (j.vie > 0 && j.echarpe <= 0 && Math.hypot(n.x - j.x, n.y - j.y) < RG.lacrymo.rayon) {   // l'écharpe mouillée protège
         this.degats(RG.lacrymo.degats * dt);
         j.gaz = Math.min(1, j.gaz + dt * 3);
         if (this.time.now > (this.touxT || 0)) { jouerSon(this, 'julien_toux'); this.touxT = this.time.now + 1300; }
@@ -408,8 +472,12 @@ export class JulienManif extends BossScene {
       if (RECHARGES[o.type]) {
         const r = RECHARGES[o.type](), nouvelle = !j.armes.has(o.type);
         if (!nouvelle && j.mun[o.type] >= r.maxi) continue;
-        j.mun[o.type] = Math.min(r.maxi, j.mun[o.type] + r.n);
+        j.mun[o.type] = Math.min(r.maxi, j.mun[o.type] + Math.round(r.n * this.diff.munitions));
         if (nouvelle) { j.armes.add(o.type); j.arme = o.type; this.message(r.trouve, 4); } else this.message(r.txt);
+      } else if (BONUS[o.type]) {
+        if (o.type === 'kway') { if (j.armure >= RG.bonus.kwayMaxi) continue; j.armure = Math.min(RG.bonus.kwayMaxi, j.armure + RG.bonus.kway); }
+        else j[o.type] = RG.bonus[o.type];
+        this.message(BONUS[o.type](), 3);
       } else if (o.type === 'sandwich') {
         if (j.vie >= RG.joueur.vie) continue;
         j.vie = Math.min(RG.joueur.vie, j.vie + RG.sandwich);
@@ -425,7 +493,7 @@ export class JulienManif extends BossScene {
     this.enJeu = false; this.termine = true;
     jouerSon(this, 'julien_ramasse');
     etiquettesTactiles({ espace: 'OK', z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
-    this.txtMsg.setText(''); this.msgT = 0;
+    this.txtMsg.setText(''); this.msgT = 0; this.txtBonus.setVisible(false);
     voile(this, 0.85).setDepth(1000);
     const pc = (a, b) => b ? `${Math.round(100 * a / b)}%` : '—';
     const mmss = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
@@ -436,14 +504,25 @@ export class JulienManif extends BossScene {
     ];
     lignes.forEach(([nom, val], n) => {   // les lignes apparaissent une par une, comme dans Doom
       this.time.delayedCall(400 + n * 450, () => {
-        texte(this, LARGEUR / 2 - 40, 150 + n * 52, nom, 30, '#ff5a3c').setOrigin(1, 0.5).setDepth(1001);
-        texte(this, LARGEUR / 2 + 40, 150 + n * 52, val, 30, '#ffffff').setOrigin(0, 0.5).setDepth(1001);
+        texte(this, LARGEUR / 2 - 40, 130 + n * 48, nom, 30, '#ff5a3c').setOrigin(1, 0.5).setDepth(1001);
+        texte(this, LARGEUR / 2 + 40, 130 + n * 48, val, 30, '#ffffff').setOrigin(0, 0.5).setDepth(1001);
         jouerSon(this, 'julien_lancer');
       });
     });
+    // rang : policiers 50, secrets 20, objets 10, temps 20 (plein si sous le PAR)
+    const f = (a, b) => b ? a / b : 1;
+    const score = 50 * f(this.repousses, this.total) + 20 * f(this.secretsTrouves, this.secrets.size) + 10 * f(this.ramasses, this.totalObjets)
+      + 20 * Math.min(1, PAR / Math.max(1, this.temps));
+    const rang = RANGS.find(r => score >= r.mini);
+    const record = Sauvegarde.proposerRecord(IDENTITE.id, rang.court, this.temps, RANGS.map(r => r.court));
     this.time.delayedCall(400 + lignes.length * 450, () => {
-      texte(this, LARGEUR / 2, 430, 'Mais Julien t\'attend en classe… (niveau 2 bientôt)', 22, '#9fd0ff').setDepth(1001);
-      texte(this, LARGEUR / 2, HAUTEUR - 50, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, 20, '#aaaaaa').setDepth(1001);
+      texte(this, LARGEUR / 2, 382, `RANG : ${rang.nom}`, 30, '#ffd84a').setDepth(1001);
+      texte(this, LARGEUR / 2, 416, `${this.diff.nom}${record.rang === rang.court && Math.abs(record.temps - this.temps) < 0.01 ? '   ★ NOUVEAU RECORD ★' : ''}`, 16, this.diff.couleur).setDepth(1001);
+      jouerSon(this, 'julien_portail');
+    });
+    this.time.delayedCall(1000 + lignes.length * 450, () => {
+      texte(this, LARGEUR / 2, 452, 'Mais Julien t\'attend en classe… (niveau 2 bientôt)', 18, '#9fd0ff').setDepth(1001);
+      texte(this, LARGEUR / 2, HAUTEUR - 28, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, 20, '#aaaaaa').setDepth(1001);
       this.attendreRetour(300);
     });
   }
@@ -485,7 +564,13 @@ export class JulienManif extends BossScene {
       const haut = T.hauteurs[o.type];
       liste.push({ x: o.x, y: o.y, toile: t, haut, z: o.type === 'manifestant' ? Math.abs(Math.sin(this.time.now / 300 + o.n)) * 0.03 : 0 });
     }
-    for (const e of this.ennemis) if (e.actif) liste.push({ x: e.x, y: e.y, toile: this.imageEnnemi(e), haut: T.hauteurs[e.type], z: 0 });
+    const nP = Math.hypot(cam.px, cam.py), qx = cam.px / nP, qy = cam.py / nP;
+    for (const e of this.ennemis) if (e.actif) {
+      liste.push({ x: e.x, y: e.y, toile: this.imageEnnemi(e), haut: T.hauteurs[e.type], z: 0 });
+      if (e.etat !== 'fuite') for (const t of e.taches || []) {   // traces d'œuf / de tomate, un peu devant lui
+        liste.push({ x: e.x + qx * t.o * 0.18 - dx * 0.06, y: e.y + qy * t.o * 0.18 - dy * 0.06, toile: t.rouge ? s.splat_rouge : s.splat, haut: 0.09, z: t.h });
+      }
+    }
     for (const o of this.tirs) {
       if (o.genre === 'fumi') liste.push({ x: o.x, y: o.y, toile: s.fumi, haut: 0.14, z: o.z });
       else liste.push({ x: o.x, y: o.y, toile: s[o.genre], haut: o.genre === 'eau' ? 0.05 : T.hauteurs.oeuf, z: o.genre === 'eau' ? 0.4 : 0.42 });
@@ -520,6 +605,8 @@ export class JulienManif extends BossScene {
     this.dessinerBarre(g, cam);
     this.toile.refresh();
     this.txtVie.setText(`${Math.ceil(j.vie)}%`);
+    this.txtArmure.setText(j.armure > 0 ? `K-WAY ${Math.ceil(j.armure)}` : '');
+    this.txtBonus.setText([j.echarpe > 0 ? `ÉCHARPE ${Math.ceil(j.echarpe)}` : '', j.cafe > 0 ? `CAFÉ ${Math.ceil(j.cafe)}` : ''].filter(Boolean).join('   '));
     const a = armeDe(j.arme);
     this.txtArme.setText(`${ARMES.indexOf(a) + 1} · ${a.nom}`);
     this.txtOeufs.setText(a.mun ? `${Math.ceil(j.mun[a.mun])}` : '∞');

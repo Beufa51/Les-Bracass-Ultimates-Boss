@@ -266,6 +266,18 @@ export function texturesSprites() {
   S.fumigenes = toile(30, 26, (g) => {   // 3 fumigènes
     for (let i = 0; i < 3; i++) { R(g, ['#d02a8a', '#2ac05a', '#e0c020'][i], 4 + i * 9, 6, 6, 18); R(g, '#222', 4 + i * 9, 6, 6, 3); }
   });
+  // BONUS
+  S.echarpe = toile(32, 26, (g) => {   // écharpe mouillée (gouttes)
+    R(g, '#2a6fd0', 4, 8, 24, 7); R(g, '#e0e0e0', 4, 10, 24, 2); R(g, '#2a6fd0', 20, 14, 7, 11); R(g, '#e0e0e0', 20, 18, 7, 2);
+    for (const [x, y] of [[8, 4], [16, 2], [26, 5]]) ovale(g, '#9fd8ff', x, y, 2, 3);
+  });
+  S.cafe = toile(22, 28, (g) => {   // gobelet de café serré
+    R(g, '#f2efe0', 4, 8, 14, 18); R(g, '#7a4a2a', 4, 14, 14, 5); R(g, '#3a2414', 3, 6, 16, 3);
+    g.strokeStyle = 'rgba(230,230,230,0.8)'; g.beginPath(); g.moveTo(9, 5); g.quadraticCurveTo(6, 2, 9, 0); g.moveTo(14, 5); g.quadraticCurveTo(17, 2, 14, 0); g.stroke();
+  });
+  S.kway = toile(30, 26, (g) => {   // K-Way jaune plié
+    R(g, '#f0c818', 3, 6, 24, 18); R(g, '#c89a10', 3, 6, 24, 3); R(g, '#c89a10', 14, 9, 2, 15); R(g, '#e83a3a', 6, 12, 6, 3);
+  });
   S.oeuf = toile(10, 12, (g) => { ovale(g, '#fffaf0', 5, 6, 4, 5.5); R(g, '#fff', 3, 3, 1, 2); });
   S.splat = toile(22, 14, (g) => { ovale(g, '#fff6d8', 11, 8, 10, 5); ovale(g, '#ffc928', 12, 8, 4, 3); ovale(g, '#fff6d8', 3, 4, 2, 2); ovale(g, '#fff6d8', 19, 3, 2, 2); });
   S.grenade = toile(12, 12, (g) => { R(g, '#3b4038', 3, 2, 6, 9); R(g, '#c8b030', 3, 2, 6, 2); ovale(g, 'rgba(220,220,210,0.7)', 6, 1, 3, 2); });
@@ -326,7 +338,7 @@ const HAUTEURS_IMAGES = { lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barrie
   tomates: 0.26, eau: 0.2, fumigenes: 0.28 };
 export const HAUTEURS_PROVISOIRES = { lanceur: 0.82, bouclier: 0.86, manifestant: 1.0, barriere: 0.42, poubelle: 0.5, oeufs: 0.18,
   sandwich: 0.14, oeuf: 0.08, splat: 0.1, grenade: 0.1, nuage: 0.9, statue: 1.7, camion: 0.95, colonne: 1.35,
-  tomates: 0.22, eau: 0.2, fumigenes: 0.22 };
+  tomates: 0.22, eau: 0.2, fumigenes: 0.22, echarpe: 0.2, cafe: 0.22, kway: 0.22 };
 
 // murs qui ont aussi une version AVEC panneau (posée sur 1 case sur 6 : voir raycaster.js)
 const PANNEAUX = ['mur_briques', 'mur_immeuble', 'mur_tag', 'mur_lycee'];

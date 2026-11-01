@@ -1011,8 +1011,19 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   invisible). Ramassables `t` (ruelle, place, parvis), `w` (passage, place, rue), `f` (place ×2) : le 1er donne l'arme.
   Images livrées (4 mains × 2 poses, planche objets_armes) ; seule la goutte d'eau reste dessinée par le code.
   Pistolet à eau tenu à 2 mains : dessiné au centre. Sons pancarte / eau / fumigène.
-- RESTE de l'audit fun : jus (recul visible, jaune, tremblement, combo), bonus (écharpe, café, K-Way), BAC + canon
-  à eau, difficultés + rang de fin, sono (BFG).
+- BUG CORRIGÉ : depuis les armes, les œufs n'enlevaient plus de vie (RG.oeufs sans `degats` / `recul`).
+- FAIT (audit fun, suite) :
+  JUS : traces d'œuf / de tomate qui restent sur les policiers (4 maxi), recul à chaque coup, écran qui tremble
+  (charge du CRS, lacrymo tout près), combo « OMELETTE ×N ! » (fuites à moins de 3 s d'écart).
+  BONUS (`RG.bonus`) : `e` écharpe mouillée (20 s sans souffrir des lacrymos), `c` café serré (15 s : vitesse ×1,4,
+  tir 2× plus rapide), `K` K-Way (+50 d'armure, absorbe la moitié des dégâts ; affiché sous la VIE). Dessins
+  provisoires (pas d'image : Gemini au maximum ce jour-là).
+  DIFFICULTÉS (`DIFFICULTES` dans reglages.js, menu avant l'intro, retenue dans la sauvegarde) : Lycéen sage,
+  Délégué de classe, Bloqueur (normal), Anarchiste.
+  RANG de fin (`RANGS`) : score policiers 50 / secrets 20 / objets 10 / temps 20 → Fayot, Délégué de classe,
+  Leader étudiant, Che Guevara du lycée ; record (rang court + temps) affiché au hub sous la porte.
+- RESTE de l'audit fun : BAC en civil + canon à eau, sono (BFG) ; images des bonus et de la goutte d'eau ;
+  pistolet à eau pose 2 à refaire (prompt v3 donné à Fabien).
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
