@@ -245,7 +245,7 @@ export class JulienManif extends BossScene {
       font: 'bold 14px monospace', touchAction: 'none' });
     b.addEventListener('pointerdown', (e) => { e.preventDefault(); if (this.enJeu) this.carte = !this.carte; });
     const arme = b.cloneNode(); arme.textContent = 'ARME';   // passe à l'arme suivante : juste au-dessus de LANCER, sous le pouce droit
-    Object.assign(arme.style, { top: 'auto', bottom: '172px', right: '12px', width: '200px', height: '46px', fontSize: '18px' });
+    Object.assign(arme.style, { top: 'auto', bottom: '250px', right: '12px', width: '140px', height: '50px', fontSize: '18px' });   // bien au-dessus de LANCER
     arme.addEventListener('pointerdown', (e) => { e.preventDefault(); if (this.enJeu) armeSuivante(this); });
     document.body.append(b, arme);
     this.events.once('shutdown', () => { b.remove(); arme.remove(); });

@@ -212,6 +212,10 @@ def main():
         lab, n = nd.label(dessin, structure=np.ones((3, 3)))
         aires = nd.sum(np.ones_like(lab), lab, range(1, n + 1))
         m = np.isin(lab, [i + 1 for i, a in enumerate(aires) if a >= 200])
+        # trait de « sol » dessiné sous l'objet (le camion) : il enfermait du blanc entre les roues → on l'enlève
+        ys, xs = np.where(m); larg = xs.max() - xs.min() + 1
+        for y in range(ys.max(), max(ys.min(), ys.max() - 40), -1):
+            if m[y].sum() > 0.6 * larg: m[y] = False
         i = detourer(img, m)
         i = i.resize((max(1, round(i.width * h / i.height)), h), Image.LANCZOS)
         i.save(SORTIE + f'julien_{nom}.png')

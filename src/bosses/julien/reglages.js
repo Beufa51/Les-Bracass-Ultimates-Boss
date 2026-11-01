@@ -62,7 +62,7 @@ export const REGLAGES = {
     vitesse: 1.3,
     vue: 9,              // distance à laquelle il te repère
     distance: 4.5,       // il essaie de rester à cette distance
-    cadence: 2.6,        // secondes entre 2 lacrymos
+    cadence: 3.0,        // secondes entre 2 lacrymos (2,6 → 3,0)
     preavis: 0.6,        // il lève le bras ce temps-là AVANT de lancer (pour que tu le voies venir)
   },
   bouclier: {            // CRS au bouclier : les œufs s'écrasent sur le bouclier, SAUF quand il est essoufflé après une charge
@@ -73,14 +73,14 @@ export const REGLAGES = {
     preavis: 0.7,        // il crie « DISPERSEZ-VOUS ! » ce temps-là avant de charger
     vitesseCharge: 5.5,
     dureeCharge: 1.3,
-    degats: 18,
+    degats: 14,          // charge du CRS (18 → 14)
     essouffle: 2.2,      // bouclier baissé ce temps-là après la charge : c'est le moment de lui lancer des œufs
   },
   lacrymo: {
     vol: 1.0,            // temps de vol de la grenade
     duree: 4.5,          // durée du nuage
     rayon: 1.15,
-    degats: 14,          // vie perdue par seconde dans le nuage
+    degats: 10,          // vie perdue par seconde dans le nuage (Fabien : un peu dur en Bloqueur → 14 → 10)
     degatsPolice: 0.5,   // les policiers pris dans leur propre lacrymo toussent aussi (par seconde)
   },
 };
