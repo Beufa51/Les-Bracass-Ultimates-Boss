@@ -37,6 +37,9 @@ OBJETS = ('julien_objets.jpg', [
     ('barriere', (245, 245), 110), ('poubelle', (600, 245), 130), ('oeufs', (885, 250), 90), ('sandwich', (1215, 265), 60),
     ('oeuf', (220, 620), 40), ('splat', (570, 640), 50), ('grenade', (890, 560), 70), ('nuage', (1215, 540), 160)])
 
+# gros objets du décor, une image chacun : nom → hauteur finale
+SEULS = {'statue': 240, 'camion': 140, 'colonne': 220}
+
 # Tête du héros : 5 niveaux d'amochage × regard (gauche, face, droite), puis les expressions.
 # ('rLcC', miroir ?) : la planche des regards ne suit pas exactement la demande → regards manquants = miroir d'un autre.
 TETES = [
@@ -171,6 +174,20 @@ def main():
     img = charger(fichier)
     masques, _ = poses(img, [c for _, c, _ in liste])
     for (nom, _, h), m in zip(liste, masques):
+        i = detourer(img, m)
+        i = i.resize((max(1, round(i.width * h / i.height)), h), Image.LANCZOS)
+        i.save(SORTIE + f'julien_{nom}.png')
+        print('  ', nom, i.size)
+
+    # gros objets : UN objet par image (toutes les taches dessinées)
+    for nom, h in SEULS.items():
+        if not os.path.exists(ENTREE + f'julien_{nom}.jpg'):
+            continue
+        img = charger(f'julien_{nom}.jpg')
+        dessin = masque_dessin(img)
+        lab, n = nd.label(dessin, structure=np.ones((3, 3)))
+        aires = nd.sum(np.ones_like(lab), lab, range(1, n + 1))
+        m = np.isin(lab, [i + 1 for i, a in enumerate(aires) if a >= 200])
         i = detourer(img, m)
         i = i.resize((max(1, round(i.width * h / i.height)), h), Image.LANCZOS)
         i.save(SORTIE + f'julien_{nom}.png')

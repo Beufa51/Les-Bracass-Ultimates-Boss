@@ -994,7 +994,8 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   `SANS_PANNEAU`) + version avec panneau sur 1 case sur 6. Dessin d'une image : ~7 ms.
 - Œufs : 40 au départ, maxi 99, boîtes de 15 (Fabien : les munitions ne doivent pas être un problème).
 - Rondes : les policiers non alertés font des allers-retours (sauf parvis et cordon).
-- RESTE de l'audit : images F (statue, camions, colonne Morris, sol/ciel dessinés à la main si voulu), sons.
+- Statue, camion de CRS, colonne Morris : vraies images (`SEULS` dans le script de découpe : un objet par image).
+- RESTE : sons (bips provisoires), puis NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,
