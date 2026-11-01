@@ -765,3 +765,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   casiers (QG, 150,494, à la place de l'étagère de l'entrée = vestiaire) ; tableau de briefing (QG, 880,84, à la
   place d'une console, face à la table). Bannière : en réserve pour la pièce du QUIZ.
 - Vérif : 0 erreur, 0 avertissement. Manquent encore : réservoir 3/4 (n°12), jerricans (n°7).
+
+## BEUFA — V70 : RÉSERVOIR 3/4 + JERRICANS (toutes les images de décor sont livrées)
+- Réservoir 96×159 (cour et parc, emprise 96×96 inchangée). Jerricans 40×37 (parc, 1108,503, emprise 36×32 :
+  au bout du cul-de-sac derrière le camion sud-est, à côté de la pompe — devant la pompe ils étaient cachés).
+- Station-service du parc complète : camion, jerricans, pompe, réservoir. Vérif : 0 erreur, 0 avertissement.
+- Reste éventuel : bannière (pièce du quiz), vrais sons (« plic » des flaques = bip provisoire).

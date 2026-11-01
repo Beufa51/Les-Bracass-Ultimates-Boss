@@ -29,7 +29,7 @@ export const MANIFESTE = {
     beufa_plot:       { fichier: 'sprites/beufa/beufa_plot.jpg', fond: 'blanc', largeur: 20, hauteur: 20, images: 1, vitesse: 1, provisoire: { forme: 'baril_nes', couleur: '#d8701c', pixel: 2 } },
     beufa_jeep:       { fichier: 'sprites/beufa/beufa_jeep.jpg', fond: 'blanc', largeur: 120, hauteur: 81, images: 1, vitesse: 1, provisoire: { forme: 'jeep_nes', couleur: '#38543c', pixel: 2 } },
     beufa_helico:     { fichier: 'sprites/beufa/beufa_helico.jpg', fond: 'blanc', largeur: 184, hauteur: 100, images: 1, vitesse: 1, provisoire: { forme: 'helico_nes', couleur: '#1c3854', pixel: 2 } },
-    beufa_reservoir:  { fichier: 'sprites/beufa/beufa_reservoir.jpg', fond: 'blanc', largeur: 96, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'reservoir_nes', couleur: '#385454', pixel: 2 } },
+    beufa_reservoir:  { fichier: 'sprites/beufa/beufa_reservoir.jpg', fond: 'blanc', largeur: 96, hauteur: 159, images: 1, vitesse: 1, provisoire: { forme: 'reservoir_nes', couleur: '#385454', pixel: 2 } },
     beufa_mirador:    { fichier: 'sprites/beufa/beufa_mirador.jpg', fond: 'blanc', largeur: 84, hauteur: 110, images: 1, vitesse: 1, provisoire: { forme: 'mirador_nes', couleur: '#545038', pixel: 2 } },
     beufa_tente:      { fichier: 'sprites/beufa/beufa_tente.jpg', fond: 'blanc', largeur: 148, hauteur: 96, images: 1, vitesse: 1, provisoire: { forme: 'tente_nes', couleur: '#545438', pixel: 2 } },
     beufa_ratelier:   { fichier: 'sprites/beufa/beufa_ratelier.jpg', fond: 'blanc', largeur: 140, hauteur: 52, images: 1, vitesse: 1, provisoire: { forme: 'ratelier_nes', couleur: '#545038', pixel: 2 } },
@@ -64,6 +64,7 @@ export const MANIFESTE = {
     // V69 : livrés par Fabien — station-service (pompe), arsenal (panneau danger), QG (casiers, tableau) ; bannière = pièce du QUIZ (pas encore placée)
     beufa_pompe:          { fichier: 'sprites/beufa/beufa_pompe.jpg', fond: 'blanc', largeur: 40, hauteur: 77, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#385438', pixel: 2 } },
     beufa_panneau_danger: { fichier: 'sprites/beufa/beufa_panneau_danger.jpg', fond: 'blanc', largeur: 30, hauteur: 69, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#d8b81c', pixel: 2 } },
+    beufa_jerricans:      { fichier: 'sprites/beufa/beufa_jerricans.jpg', fond: 'blanc', largeur: 40, hauteur: 37, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#385438', pixel: 2 } },
     beufa_casiers:        { fichier: 'sprites/beufa/beufa_casiers.jpg', fond: 'blanc', largeur: 140, hauteur: 102, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
     beufa_tableau:        { fichier: 'sprites/beufa/beufa_tableau.jpg', fond: 'blanc', largeur: 120, hauteur: 105, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#545438', pixel: 2 } },
     beufa_banniere:       { fichier: 'sprites/beufa/beufa_banniere.jpg', fond: 'blanc', largeur: 40, hauteur: 121, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#701c1c', pixel: 2 } },

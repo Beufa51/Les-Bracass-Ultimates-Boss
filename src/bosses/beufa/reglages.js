@@ -117,6 +117,7 @@ export const PIECES = [
       [560, 450, 176, 72, 'beufa_camion'], [800, 450, 176, 72, 'beufa_camion'], [1040, 450, 176, 72, 'beufa_camion'],   // V65 : y 455 → 450, le passage derrière fait 34 px (avant : 29, piège)
       [1220, 480, 96, 96, 'beufa_reservoir'],        // la station : cache la dernière niche du gardien de la porte
       [1150, 506, 36, 24, 'beufa_pompe'],             // V69 : LA POMPE de la station-service, à côté du réservoir
+      [1108, 503, 36, 32, 'beufa_jerricans'],         // V70 : les jerricans à côté de la pompe (au bout du cul-de-sac derrière le camion)
       [1355, 53, 120, 66, 'beufa_jeep'],             // décor de l'angle nord-est — V61 : garée contre le mur (au-dessus du demi-tour du gardien, y 110)
       [368, 410, 16, 16, 'beufa_plot'], [384, 410, 16, 16, 'beufa_plot'], [1142, 320, 16, 16, 'beufa_plot'], [1158, 320, 16, 16, 'beufa_plot'],   // V65 : plots collés par paires   // V55 : plots au bord de la route (hors des chemins des gardes)
       [250, 318, 14, 12, 'beufa_lampadaire'], [1340, 318, 14, 12, 'beufa_lampadaire'],   // V60 : lampadaires au bord NORD de la route (au sud, le poteau montait par-dessus l'asphalte)
