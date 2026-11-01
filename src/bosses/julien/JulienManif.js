@@ -74,7 +74,7 @@ export class JulienManif extends BossScene {
     // commandes de Doom (1993), tout au clavier : Alt + ← → pas de côté (ou , et .), Ctrl tirer, Maj courir
     this.cotes = this.input.keyboard.addKeys({ alt: K.ALT, ctrl: K.CTRL, maj: K.SHIFT, virgule: K.COMMA, point: K.PERIOD,
       q: K.Q, d: K.D });
-    this.tactile = estTactile();   // téléphone : croix = avancer / reculer / pas de côté, « Tourner » maintenu + ◀ ▶ = tourner
+    this.tactile = estTactile();   // téléphone : croix = avancer / reculer / pas de côté, ↺ ↻ = tourner, ŒUF en haut
     this.enJeu = false;
     jouerMusique(this, 'julien_musique');   // « At Doom's Gate », en boucle
     this.dessiner(0);
@@ -82,12 +82,12 @@ export class JulienManif extends BossScene {
     this.afficherIntro('LA MANIF', [
       'Rejoins le portail du LYCÉE à travers la manif !',
       tact ? '▲ ▼ : avancer / reculer      ◀ ▶ : pas de côté' : '↑ ↓ : avancer / reculer      ← → : tourner',
-      tact ? 'TOURNER (maintenu) + ◀ ▶ : tourner' : 'ALT + ← → (ou , et .) : pas de côté',
+      tact ? '↺ ↻ : tourner' : 'ALT + ← → (ou , et .) : pas de côté',
       tact ? 'ŒUF : lancer un œuf' : 'CTRL : lancer un œuf      MAJ : courir',
       'Les lacrymos piquent : sors vite du nuage.',
       'Le bouclier arrête les œufs, SAUF quand le CRS',
       'est essoufflé après sa charge : esquive de côté puis vise !',
-    ], () => { etiquettesTactiles({ z: 'ŒUF', x: 'TOURNER', espace: null }); this.enJeu = true; });
+    ], () => { etiquettesTactiles({ x: 'ŒUF', z: '↺', espace: '↻' }); this.enJeu = true; });
   }
 
   // ------------------------------------------------------------------ niveau
@@ -186,14 +186,19 @@ export class JulienManif extends BossScene {
   bougerJoueur(dt) {
     const j = this.j, k = this.touches, c = this.cotes, R = RG.joueur;
     // Clavier (Doom 93) : ← → tournent, Alt + ← → = pas de côté.
-    // Téléphone (demande de Fabien) : ◀ ▶ = pas de côté, bouton « TOURNER » (touche X) maintenu + ◀ ▶ = tourner.
-    const modeCote = this.tactile ? !k.x.isDown : (c.alt.isDown || k.x.isDown);
-    const course = c.maj.isDown || k.espace.isDown ? R.course : 1;
+    // Téléphone (demande de Fabien) : ◀ ▶ = pas de côté ; boutons ↺ (touche Z) et ↻ (Espace) = tourner ; ŒUF (touche X).
+    const modeCote = this.tactile || c.alt.isDown || k.x.isDown;
+    const course = !this.tactile && (c.maj.isDown || k.espace.isDown) ? R.course : 1;
     let tourne = 0, avance = 0, cote = 0;
     if (k.gauche.isDown) { if (modeCote) cote -= 1; else tourne -= 1; }
     if (k.droite.isDown) { if (modeCote) cote += 1; else tourne += 1; }
     if (c.virgule.isDown || c.q.isDown) cote -= 1;
     if (c.point.isDown || c.d.isDown) cote += 1;
+    if (this.tactile) {
+      if (!k.espace.isDown) this.okRelache = true;   // le OK du départ (même bouton que ↻) ne fait pas tourner
+      if (k.z.isDown) tourne -= 1;
+      if (k.espace.isDown && this.okRelache) tourne += 1;
+    }
     if (k.haut.isDown) avance += course;
     if (k.bas.isDown) avance -= course;
     cote = Math.sign(cote) * course;
@@ -215,13 +220,13 @@ export class JulienManif extends BossScene {
     }
 
     j.recharge -= dt; j.lanceT -= dt;
-    if ((k.z.isDown || c.ctrl.isDown) && j.recharge <= 0) {
+    if ((this.tactile ? k.x.isDown : (k.z.isDown || c.ctrl.isDown)) && j.recharge <= 0) {
       if (j.oeufs > 0) {
         j.oeufs--; j.recharge = RG.oeufs.cadence; j.lanceT = 0.18;
         const [vx, vy] = this.viser(dx, dy);
         this.oeufs.push({ x: j.x + vx * 0.3, y: j.y + vy * 0.3, dx: vx, dy: vy, t: 0 });
         jouerSon(this, 'julien_lancer');
-      } else if (vientDAppuyer(k.z) || vientDAppuyer(c.ctrl)) { this.message('Plus d\'œufs ! Cherche une boîte.'); j.recharge = 0.5; }
+      } else if ((this.tactile ? vientDAppuyer(k.x) : (vientDAppuyer(k.z) || vientDAppuyer(c.ctrl)))) { this.message('Plus d\'œufs ! Cherche une boîte.'); j.recharge = 0.5; }
     }
   }
 
