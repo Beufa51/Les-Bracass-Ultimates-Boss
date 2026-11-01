@@ -5,7 +5,8 @@ const son = (nom) => ({ fichier: `audio/julien/julien_${nom}.wav`, provisoire: {
 export const MANIFESTE = {
   images: {},
   sons: {
-    // MUSIQUE DE FOND (src/core/musique.js, en boucle) : DOOM « At Doom's Gate » (E1M1), déposée par Fabien, mono 64 kb/s
+    // MUSIQUE DE FOND (src/core/musique.js, en boucle) : DOOM « At Doom's Gate » (E1M1), déposée par Fabien, mono 64 kb/s,
+    // silences du début (1,1 s) et de la fin (5,4 s) coupés pour qu'elle reparte tout de suite
     julien_musique: { fichier: 'audio/julien/julien_musique.mp3', musique: true, volume: 0.4 },
     // AMBIANCE de manif en boucle (foule, tambour), jouée en même temps que la musique
     julien_foule: { fichier: 'audio/julien/julien_foule.mp3', musique: true, volume: 0.3 },
