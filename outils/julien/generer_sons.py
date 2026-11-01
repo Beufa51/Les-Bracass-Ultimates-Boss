@@ -104,6 +104,10 @@ f = bande(bruit(d), 900, 5000) * np.clip(x / 0.08, 0, 1) * np.exp(-x / 0.5)
 f[:int(SR * 0.03)] += 0.9 * passe_bas(bruit(0.03), 1200)
 ecrire('julien_fumigene', f, 0.5)
 
+# policier qui te repère : « HÉ ! » bref et grave (deux syllabes grésillantes)
+def syllabe(d, f0, f1): return np.tanh(3 * bande(glisse(d, f0, f1, scie), 400, 1800)) * env(d, 0.01, d / 2.5)
+ecrire('julien_halte', coller(syllabe(0.12, 180, 170), silence(0.04), syllabe(0.2, 210, 150)), 0.45)
+
 # ambiance de manif en boucle (8 s) : brouhaha de foule et tambour (sans sifflets)
 d = 8.0; x = t(d)
 foule = np.zeros_like(x)

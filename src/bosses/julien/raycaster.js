@@ -99,7 +99,7 @@ export function rendre(ctx, l, h, plan, cam, decor, sprites) {
       const hl = h / perp;
       let mx = cote === 0 ? cam.y + perp * ry : cam.x + perp * rx;
       mx -= Math.floor(mx);
-      let tex = decor.murs[code] || decor.murs[1];
+      let tex = (decor.speciaux && decor.speciaux.get(ty * decor.sol.largeur + tx)) || decor.murs[code] || decor.murs[1];   // ex. mur secret avec indice
       if (Array.isArray(tex)) tex = tex[(tx * 31 + ty * 17) % 6 === 0 ? 1 : 0];
       let col = (mx * tex.width) | 0;
       if ((cote === 0 && rx < 0) || (cote === 1 && ry > 0)) col = tex.width - col - 1;

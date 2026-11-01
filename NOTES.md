@@ -1030,7 +1030,17 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
 - RESTE de l'audit fun : BAC en civil + canon à eau, sono (BFG) ; images des bonus.
 - AUDIT « DOOM » (dev id Software + joueur de doom-like) : `propositions/julien_audit_doom.md` (recommencer tout de
   suite, toujours courir, bruit qui alerte, infighting, sacs de farine = barils, embuscades, lumière, ennemis
-  rapides / en hauteur, boss commissaire, clé et porte). En attente du choix de Fabien.
+  rapides / en hauteur, boss commissaire, clé et porte). Fabien : OK pour tout SAUF le boss commissaire (Julien est
+  LE boss, au niveau 2) → à la place, une dernière vague plus intense sur le parvis (fourgon qui dépose des CRS).
+- FAIT (audit Doom, point 1) : PERDU → « REJOUER » (ESPACE / OK : `scene.restart({ rejouer: true })`, sans menu ni
+  intro) ou HUB (X) ; toujours courir (`toujoursCourir`, Maj fait marcher), rotation 3,0 ; chaque tir alerte les
+  policiers à 8 cases (`bruitTir`) ; cri « HÉ ! » quand un policier te repère (`julien_halte`) ; la lacrymo fait aussi
+  tousser les policiers (`degatsPolice`) ; flash doré au ramassage ; flash bleu des gyrophares près des camions ;
+  indice « ↘? » jaune sur les murs secrets (`decor.speciaux`) ; compteur « PARVIS : n policiers » ; difficulté =
+  nombre de policiers (`ABSENTS_FACILE` : 8 en Sage/Délégué ; `RENFORTS_ANARCHISTE` : 15 en Anarchiste ; 11 en Bloqueur).
+- À FAIRE (audit Doom, point 2) : sacs de farine explosifs en chaîne, embuscades (rideau de fer au pistolet à eau,
+  fourgon sur le parvis), lumière (ruelle sombre, néon qui clignote), changement d'arme animé, tableau des munitions.
+  Point 3 : BAC en civil, tireur de LBD, policiers en hauteur, sono (BFG). Point 4 : clé + porte + boucle.
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,

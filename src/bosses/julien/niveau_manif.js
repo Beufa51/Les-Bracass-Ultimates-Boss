@@ -80,4 +80,9 @@ export const ZONES = [
 ];
 // Les policiers placés sur le parvis : quand ils ont tous fui, le portail (murs 7) s'ouvre
 export const PARVIS = { x0: 10, y0: 4, x1: 23, y1: 8 };
+// Difficulté = nombre de policiers (comme Doom) : absents en Lycéen sage / Délégué, renforts en Anarchiste
+export const ABSENTS_FACILE = [[26, 19], [16, 10], [22, 4]];
+export const RENFORTS_ANARCHISTE = [
+  { type: 'bouclier', x: 22, y: 23 }, { type: 'bouclier', x: 19, y: 8 }, { type: 'lanceur', x: 20, y: 25 }, { type: 'lanceur', x: 8, y: 34 },
+];
 export const PAR = 210;   // temps de référence (s), comme le « PAR » de Doom

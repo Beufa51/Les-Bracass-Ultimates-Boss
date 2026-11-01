@@ -25,8 +25,9 @@ export const REGLAGES = {
     vie: 100,            // vie au départ (et maximum)
     vitesse: 3.2,        // avancer / reculer
     vitesseCote: 2.8,    // pas de côté
-    rotation: 2.4,       // radians par seconde (≈ 140° / s)
-    course: 1.6,         // vitesse ×1,6 en courant (Maj)
+    rotation: 3.0,       // radians par seconde (≈ 170° / s)
+    course: 1.6,         // vitesse ×1,6 en courant
+    toujoursCourir: true,   // comme les joueurs de Doom (« always run ») : Maj fait alors MARCHER
     rayon: 0.25,         // taille du joueur pour les collisions
   },
   oeufs: {
@@ -53,6 +54,7 @@ export const REGLAGES = {
     kway: 50,            // armure gagnée (maxi kwayMaxi) ; elle absorbe une part des dégâts (absorbe)
     kwayMaxi: 100, absorbe: 0.5,
   },
+  bruitTir: 8,           // un tir alerte les policiers à moins de 8 cases (comme dans Doom)
   lanceur: {             // policier qui lance des lacrymos
     vie: 2,              // œufs pour le faire fuir
     vitesse: 1.3,
@@ -77,5 +79,6 @@ export const REGLAGES = {
     duree: 4.5,          // durée du nuage
     rayon: 1.15,
     degats: 14,          // vie perdue par seconde dans le nuage
+    degatsPolice: 0.5,   // les policiers pris dans leur propre lacrymo toussent aussi (par seconde)
   },
 };

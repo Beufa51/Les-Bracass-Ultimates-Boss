@@ -87,6 +87,7 @@ export function tirer(scene, dx, dy, appui, nouveau) {
     jouerSon(scene, 'julien_lancer', { rate: 0.6 });
   }
   if (j.cafe > 0) j.recharge *= RG.bonus.cafeCadence;   // café serré : on tire plus vite
+  scene.alerter(j.x, j.y, RG.bruitTir);   // le bruit alerte les policiers proches
 }
 
 // coup de pancarte : le policier le plus proche devant toi
