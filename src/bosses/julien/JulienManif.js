@@ -505,7 +505,8 @@ export class JulienManif extends BossScene {
     } else {
       const m = T.main[j.arme] || T.main.tient, frappe = j.lanceT > 0;
       const img = frappe && T.main[j.arme + '_tir'] ? T.main[j.arme + '_tir'] : m;
-      g.drawImage(img, L / 2 + (frappe ? 30 : 60) + bx, VUE_H - (frappe ? 125 : 110) + by, 105, 120);
+      if (j.arme === 'eau') g.drawImage(img, L / 2 - 52 + bx * 0.5, VUE_H - 118 + by + (frappe ? 4 : 0), 112, 120);   // tenu à deux mains, au centre
+      else g.drawImage(img, L / 2 + (frappe ? 30 : 60) + bx, VUE_H - (frappe ? 125 : 110) + by, 105, 120);
     }
     // petit viseur au centre
     g.fillStyle = 'rgba(0,0,0,0.6)'; g.fillRect(L / 2 - 4, VUE_H / 2 - 1, 9, 3); g.fillRect(L / 2 - 1, VUE_H / 2 - 4, 3, 9);

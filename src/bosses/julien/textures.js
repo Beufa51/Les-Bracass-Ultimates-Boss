@@ -314,13 +314,16 @@ const SPRITES = [
   ...['marche0', 'marche1', 'cri', 'charge', 'essouffle', 'touche', 'fuite'].map(p => 'bouclier_' + p),
   ...[0, 1, 2, 3, 4, 5, 6, 7].map(n => 'manifestant_' + n),
   'barriere', 'poubelle', 'oeufs', 'sandwich', 'oeuf', 'splat', 'grenade', 'nuage', 'statue', 'camion', 'colonne',
+  'tomates', 'eau_pistolet', 'fumigenes', 'tomate', 'splat_rouge', 'fumee',
 ];
 const MURS = { 1: 'mur_briques', 2: 'mur_immeuble', 3: 'mur_boutique', 4: 'mur_tag', 5: 'mur_palissade', 6: 'mur_lycee',
   7: 'portail_lycee', 8: 'mur_boutique2' };   // 8 : 2e tabac (façade en pierre), pas de dessin provisoire (repli : briques)
-const MAINS = { tient: 'main_tient', lance: 'main_lance' };
+const MAINS = { tient: 'main_tient', lance: 'main_lance',
+  ...Object.fromEntries(['pancarte', 'tomates', 'eau', 'fumigenes'].flatMap(a => [[a, 'main_' + a], [a + '_tir', 'main_' + a + '_tir']])) };
 // hauteur dans le monde (1 = un mur) avec les vraies images : leur cadre inclut bras levés, pancartes, fumée…
 const HAUTEURS_IMAGES = { lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barriere: 0.45, poubelle: 0.5, oeufs: 0.2,
-  sandwich: 0.1, oeuf: 0.08, splat: 0.12, grenade: 0.16, nuage: 1.0, statue: 2.0, camion: 1.05, colonne: 1.5 };
+  sandwich: 0.1, oeuf: 0.08, splat: 0.12, grenade: 0.16, nuage: 1.0, statue: 2.0, camion: 1.05, colonne: 1.5,
+  tomates: 0.26, eau: 0.2, fumigenes: 0.28 };
 export const HAUTEURS_PROVISOIRES = { lanceur: 0.82, bouclier: 0.86, manifestant: 1.0, barriere: 0.42, poubelle: 0.5, oeufs: 0.18,
   sandwich: 0.14, oeuf: 0.08, splat: 0.1, grenade: 0.1, nuage: 0.9, statue: 1.7, camion: 0.95, colonne: 1.35,
   tomates: 0.22, eau: 0.2, fumigenes: 0.22 };

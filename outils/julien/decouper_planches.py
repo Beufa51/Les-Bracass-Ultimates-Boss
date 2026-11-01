@@ -27,6 +27,10 @@ GROUPES = {
     'manif2': ('julien_manifestants_2.jpg', 240, [
         ('manifestant_4', (190, 400)), ('manifestant_5', (540, 400)), ('manifestant_6', (920, 400)), ('manifestant_7', (1250, 400))]),
     'main': ('julien_main.jpg', 240, [('main_tient', (345, 460)), ('main_lance', (1020, 440))]),
+    'main_pancarte': ('julien_main_pancarte.jpg', 240, [('main_pancarte', (330, 350)), ('main_pancarte_tir', (1150, 380))]),
+    'main_tomates': ('julien_main_tomates.jpg', 240, [('main_tomates', (330, 330)), ('main_tomates_tir', (1060, 370))]),
+    'main_eau': ('julien_main_eau.jpg', 240, [('main_eau', (340, 460)), ('main_eau_tir', (1130, 420))]),
+    'main_fumigenes': ('julien_main_fumigenes.jpg', 240, [('main_fumigenes', (360, 330)), ('main_fumigenes_tir', (1060, 500))]),
     'tete_regards': ('julien_tete_regards.jpg', 96, [
         (f'r{r}c{c}', (140 + c * 281, 140 + r * 255)) for r in range(3) for c in range(5)]),
     'tete_expr': ('julien_tete_expressions.jpg', 96, [
@@ -39,6 +43,10 @@ OBJETS = ('julien_objets.jpg', [
 
 # gros objets du décor, une image chacun : nom → hauteur finale
 SEULS = {'statue': 240, 'camion': 140, 'colonne': 220}
+
+OBJETS_ARMES = ('julien_objets_armes.jpg', [
+    ('tomates', (245, 215), 90), ('eau_pistolet', (760, 240), 70), ('fumigenes', (1215, 215), 90),
+    ('tomate', (240, 585), 40), ('splat_rouge', (760, 580), 50), ('fumee', (1210, 570), 160)])
 
 # Tête du héros : 5 niveaux d'amochage × regard (gauche, face, droite), puis les expressions.
 # ('rLcC', miroir ?) : la planche des regards ne suit pas exactement la demande → regards manquants = miroir d'un autre.
@@ -170,14 +178,16 @@ def main():
     planche.save(SORTIE + 'julien_tetes.png')
     print('   tetes', L, 'x 96 ×', len(cases))
 
-    fichier, liste = OBJETS
-    img = charger(fichier)
-    masques, _ = poses(img, [c for _, c, _ in liste])
-    for (nom, _, h), m in zip(liste, masques):
-        i = detourer(img, m)
-        i = i.resize((max(1, round(i.width * h / i.height)), h), Image.LANCZOS)
-        i.save(SORTIE + f'julien_{nom}.png')
-        print('  ', nom, i.size)
+    for fichier, liste in (OBJETS, OBJETS_ARMES):
+        if not os.path.exists(ENTREE + fichier):
+            continue
+        img = charger(fichier)
+        masques, _ = poses(img, [c for _, c, _ in liste])
+        for (nom, _, h), m in zip(liste, masques):
+            i = detourer(img, m)
+            i = i.resize((max(1, round(i.width * h / i.height)), h), Image.LANCZOS)
+            i.save(SORTIE + f'julien_{nom}.png')
+            print('  ', nom, i.size)
 
     # gros objets : UN objet par image (toutes les taches dessinées)
     for nom, h in SEULS.items():

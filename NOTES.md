@@ -1009,7 +1009,8 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   1,4 s), 2 œufs, 3 tomates (3 en éventail, recul), 4 pistolet à eau (jet continu, petits dégâts, ÉTEINT les
   lacrymos), 5 fumigènes (nuage rose 6 s : les policiers dedans ne voient plus et s'étouffent ; caché dedans, tu es
   invisible). Ramassables `t` (ruelle, place, parvis), `w` (passage, place, rue), `f` (place ×2) : le 1er donne l'arme.
-  Dessins provisoires ; prompts : section 9 de `propositions/julien_prompts_images.md`. Sons pancarte / eau / fumigène.
+  Images livrées (4 mains × 2 poses, planche objets_armes) ; seule la goutte d'eau reste dessinée par le code.
+  Pistolet à eau tenu à 2 mains : dessiné au centre. Sons pancarte / eau / fumigène.
 - RESTE de l'audit fun : jus (recul visible, jaune, tremblement, combo), bonus (écharpe, café, K-Way), BAC + canon
   à eau, difficultés + rang de fin, sono (BFG).
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
