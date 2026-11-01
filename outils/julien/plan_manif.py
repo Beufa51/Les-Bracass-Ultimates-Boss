@@ -32,6 +32,8 @@ for y in range(28, 36):
 # secrets (mur qui s'ouvre quand on pousse dedans) + leurs recoins
 sol(3, 30, 4, 32); put(5, 31, 'X')       # derrière le mur tagué de la ruelle
 sol(28, 31, 29, 33); put(27, 32, 'Z')    # derrière une vitrine du passage
+# EMBUSCADE du passage : 2 boutiques fermées par un rideau de fer (R), un policier caché derrière chacun
+sol(22, 30, 22, 30); put(23, 30, 'R'); sol(22, 32, 22, 32); put(23, 32, 'R')
 objets = {
     # parvis (vague finale)
     (11, 4): 'P', (22, 4): 'P', (16, 6): 'B', (12, 5): 'b', (21, 5): 'b', (13, 8): 'b', (22, 8): 'b',
@@ -52,6 +54,10 @@ objets = {
     (15, 34): 'm', (17, 34): 'm',
     # armes : tomates (t) dans la ruelle, pistolet à eau (w) dans le passage, fumigènes (f) sur la place, + recharges
     (8, 32): 't', (24, 31): 'w', (16, 24): 'f', (26, 26): 't', (9, 26): 'w', (12, 20): 'f', (12, 7): 't', (15, 15): 'w',
+    # embuscade : policiers derrière les rideaux de fer (ils sortent quand on ramasse le pistolet à eau)
+    (22, 30): 'P', (22, 32): 'B',
+    # SACS DE FARINE (a) : un œuf dessus → nuage blanc qui fait fuir les policiers autour (en chaîne)
+    (8, 18): 'a', (25, 18): 'a', (14, 4): 'a', (19, 5): 'a', (16, 13): 'a', (26, 30): 'a', (12, 24): 'a', (21, 22): 'a',
     # bonus : écharpe mouillée (e), café serré (c), K-Way (K)
     (25, 34): 'e', (7, 26): 'e', (30, 38): 'c', (21, 7): 'c', (3, 32): 'K', (17, 16): 'K',
     # boulevard : départ au milieu de la foule
@@ -64,7 +70,7 @@ for (x, y), c in objets.items():
 for l in g: print("  '" + ''.join(l) + "',")
 # vérif : chemin du départ à S (en traversant les ennemis, sans les objets bloquants, secrets fermés)
 from collections import deque
-bloque = set('123456789XZbpTCmk')
+bloque = set('123456789XZbpTCmkRa')
 dep = next((x, y) for y in range(H) for x in range(W) if g[y][x] == 'J')
 vu = {dep}; f = deque([dep])
 while f:

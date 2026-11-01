@@ -54,7 +54,7 @@ function sol(ctx, l, h, mi, cam, decor) {
     let fx = cam.x + dist * r0x, fy = cam.y + dist * r0y;
     for (let x = 0; x < l; x++, i++) {
       const cx = fx | 0, cy = fy | 0;   // (le joueur et ce qu'il voit sont toujours dans le plan : coordonnées positives)
-      const g = cx >= 0 && cy >= 0 && cx < W && cy < Hp ? S.genres[cy * W + cx] : 0;
+      const n = cy * W + cx, g = cx >= 0 && cy >= 0 && cx < W && cy < Hp ? S.genres[n] + (decor.sombre[n] ? 16 : 0) : 0;
       buf[i] = S.textures[g][(((fy - cy) * 32) & 31) * 32 + (((fx - cx) * 32) & 31)];
       fx += pasX; fy += pasY;
     }
@@ -111,7 +111,8 @@ export function rendre(ctx, l, h, plan, cam, decor, sprites) {
         const c = Math.min(t.width - 1, (col * t.width / tex.width) | 0);
         ctx.drawImage(t, c, 0, 1, t.height, x, bas - hl * (e + 1), 1, hl);
       }
-      const ombre = Math.min(0.8, cote * 0.22 + perp * 0.045);
+      const n = ty * decor.sol.largeur + tx;
+      const ombre = Math.min(0.8, cote * 0.22 + perp * 0.045 + (decor.sombre[n] ? 0.4 : 0) + (decor.neons.has(n) ? decor.neonEteint : 0));
       if (ombre > 0.02) { ctx.fillStyle = OMBRES[Math.round(ombre * 50)]; ctx.fillRect(x, bas - hl * hm, 1, hl * hm); }
     }
   }

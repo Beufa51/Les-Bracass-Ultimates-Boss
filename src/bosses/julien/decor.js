@@ -1,11 +1,11 @@
 // Décor du niveau manif, pour le moteur 3D (raycaster.js) : hauteur des immeubles, étages, sol texturé, ciel panoramique.
 // Tout est fait par le code (aucune image à fournir) ; les murs viennent de textures.js.
-import { PLAN_MANIF, SECRETS, PARVIS } from './niveau_manif.js';
+import { PLAN_MANIF, SECRETS, PARVIS, SOMBRE, NEONS } from './niveau_manif.js';
 
 // Hauteur de chaque mur (en étages) : immeubles de 3 niveaux, ruelle et lycée 2, palissade 1, portail un peu plus haut
-export const HAUTEURS = { 1: 3, 2: 3, 3: 3, 8: 3, 4: 2, 5: 1, 6: 2, 7: 1.4 };
+export const HAUTEURS = { 1: 3, 2: 3, 3: 3, 8: 3, 4: 2, 5: 1, 6: 2, 7: 1.4, 9: 3 };
 // Texture des étages (au-dessus du rez-de-chaussée) : un tabac a des appartements au-dessus, la ruelle aussi
-const ETAGES = { 1: 1, 2: 2, 3: 1, 8: 2, 4: 1, 6: 6 };
+const ETAGES = { 1: 1, 2: 2, 3: 1, 8: 2, 4: 1, 6: 6, 9: 2 };
 
 // Genres de sol
 const CHAUSSEE = 0, TROTTOIR = 1, PAVES = 2, DALLES = 3, PASSAGE_Y = 4, EGOUT = 5, TRACTS = 6, PASSAGE_X = 7;
@@ -116,8 +116,18 @@ export function construireDecor(ctx, murs, l, hVue) {
   const image = ctx.createImageData(l, hVue - mi);
   const brume = ctx.createLinearGradient(0, mi, 0, hVue);
   brume.addColorStop(0, 'rgba(28,30,38,0.8)'); brume.addColorStop(0.35, 'rgba(28,30,38,0.3)'); brume.addColorStop(1, 'rgba(28,30,38,0)');
+  const sol = genresSol(), W = sol.largeur;
+  // lumière : cases sombres (murs et sol plus foncés) et néons qui clignotent
+  const sombre = new Uint8Array(sol.genres.length), neons = new Set();
+  for (const [x0, y0, x1, y1] of SOMBRE) for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) sombre[y * W + x] = 1;
+  for (const [x0, y0, x1, y1] of NEONS) for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) neons.add(y * W + x);
+  const textures = texturesSol();
+  // textures du sol assombries (même rang + 16)
+  textures.forEach((t, i) => { const s = new Uint32Array(t.length);
+    for (let k = 0; k < t.length; k++) { const v = t[k]; s[k] = (v & 0xff000000) | (((v >> 16 & 255) * 0.45) << 16) | (((v >> 8 & 255) * 0.45) << 8) | ((v & 255) * 0.5); }
+    textures[i + 16] = s; });
   return {
-    murs, etages, hauteurs: HAUTEURS, ciel: panorama(mi),
-    sol: { ...genresSol(), textures: texturesSol(), image, buf: new Uint32Array(image.data.buffer), brume },
+    murs, etages, hauteurs: HAUTEURS, ciel: panorama(mi), sombre, neons, neonEteint: 0,
+    sol: { ...sol, textures, image, buf: new Uint32Array(image.data.buffer), brume },
   };
 }

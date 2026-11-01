@@ -24,6 +24,9 @@ export const MANIFESTE = {
     julien_secret: son('secret'),     // un passage secret s'ouvre
     julien_pancarte: son('pancarte'), // coup de pancarte
     julien_halte: son('halte'),       // un policier te repère
+    julien_farine: son('farine'),     // sac de farine qui éclate
+    julien_fourgon: son('fourgon'),   // le fourgon de CRS arrive
+    julien_rideau: son('rideau'),     // rideau de fer qui se lève (embuscade)
     julien_eau: son('eau'),           // pistolet à eau
     julien_fumigene: son('fumigene'), // un fumigène s'allume
   },

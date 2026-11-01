@@ -96,6 +96,14 @@ export function texturesMurs() {
     R(g, '#1c3f8f', 12, 0, 40, 11); R(g, '#fff', 13, 1, 38, 1);
     ecrire(g, 'LYCÉE', 32, 6, 8, '#ffffff');
   });
+  T[9] = toile(64, 64, (g) => {   // rideau de fer baissé (boutique fermée)
+    R(g, '#3a3a3a', 0, 0, 64, 64);
+    for (let y = 4; y < 60; y += 4) { R(g, '#8a8e92', 3, y, 58, 3); R(g, '#5c6064', 3, y + 2, 58, 1); }
+    R(g, '#2a2a2a', 0, 0, 3, 64); R(g, '#2a2a2a', 61, 0, 3, 64); R(g, '#6a2a2a', 0, 0, 64, 4);
+    R(g, '#222', 28, 56, 8, 4);   // serrure
+    g.save(); g.translate(32, 30); g.rotate(-0.15); ecrire(g, 'FERMÉ', 0, 0, 11, '#e84aa0'); g.restore();
+    grain(g, 64, 64, 0.1, 13);
+  });
   return T;
 }
 
@@ -266,6 +274,16 @@ export function texturesSprites() {
   S.fumigenes = toile(30, 26, (g) => {   // 3 fumigènes
     for (let i = 0; i < 3; i++) { R(g, ['#d02a8a', '#2ac05a', '#e0c020'][i], 4 + i * 9, 6, 6, 18); R(g, '#222', 4 + i * 9, 6, 6, 3); }
   });
+  // SAC DE FARINE (comme les barils de Doom) et son nuage blanc
+  S.farine = toile(30, 34, (g) => {
+    ovale(g, '#e9dfc4', 15, 20, 13, 13); R(g, '#e9dfc4', 4, 10, 22, 14); R(g, '#c9bc98', 10, 4, 10, 7); R(g, '#9a8a60', 9, 9, 12, 2);
+    ecrire(g, 'FARINE', 15, 21, 6, '#7a5a2a'); R(g, '#b07a3a', 6, 26, 18, 2);
+  });
+  S.nuage_farine = toile(64, 56, (g) => {
+    const b = [[20, 36, 16], [40, 32, 18], [52, 40, 11], [28, 18, 14], [46, 16, 12], [10, 44, 9], [32, 46, 12]];
+    for (const [x, y, r] of b) ovale(g, 'rgba(250,248,240,0.75)', x, y, r, r * 0.85);
+    for (const [x, y, r] of b) ovale(g, 'rgba(255,255,255,0.6)', x - 2, y - 3, r * 0.5, r * 0.4);
+  });
   // BONUS
   S.echarpe = toile(32, 26, (g) => {   // écharpe mouillée (gouttes)
     R(g, '#2a6fd0', 4, 8, 24, 7); R(g, '#e0e0e0', 4, 10, 24, 2); R(g, '#2a6fd0', 20, 14, 7, 11); R(g, '#e0e0e0', 20, 18, 7, 2);
@@ -338,7 +356,7 @@ const HAUTEURS_IMAGES = { lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barrie
   tomates: 0.26, eau: 0.2, fumigenes: 0.28 };
 export const HAUTEURS_PROVISOIRES = { lanceur: 0.82, bouclier: 0.86, manifestant: 1.0, barriere: 0.42, poubelle: 0.5, oeufs: 0.18,
   sandwich: 0.14, oeuf: 0.08, splat: 0.1, grenade: 0.1, nuage: 0.9, statue: 1.7, camion: 0.95, colonne: 1.35,
-  tomates: 0.22, eau: 0.2, fumigenes: 0.22, echarpe: 0.2, cafe: 0.22, kway: 0.22 };
+  tomates: 0.22, eau: 0.2, fumigenes: 0.22, echarpe: 0.2, cafe: 0.22, kway: 0.22, farine: 0.42 };
 
 // murs qui ont aussi une version AVEC panneau (posée sur 1 case sur 6 : voir raycaster.js)
 const PANNEAUX = ['mur_briques', 'mur_immeuble', 'mur_tag', 'mur_lycee'];

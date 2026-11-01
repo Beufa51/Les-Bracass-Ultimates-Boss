@@ -108,6 +108,21 @@ ecrire('julien_fumigene', f, 0.5)
 def syllabe(d, f0, f1): return np.tanh(3 * bande(glisse(d, f0, f1, scie), 400, 1800)) * env(d, 0.01, d / 2.5)
 ecrire('julien_halte', coller(syllabe(0.12, 180, 170), silence(0.04), syllabe(0.2, 210, 150)), 0.45)
 
+# sac de farine qui éclate : « pouf » sourd + souffle
+d = 0.7; x = t(d)
+ecrire('julien_farine', passe_bas(bruit(d), 1500) * np.exp(-x / 0.18) + 0.8 * glisse(d, 90, 40) * np.exp(-x / 0.1), 0.85)
+
+# fourgon qui arrive : grondement de moteur + coup de frein
+d = 1.6; x = t(d)
+moteur = passe_bas(glisse(d, 55, 75, scie), 500) * np.clip(x / 0.3, 0, 1) * (x < 1.25)
+frein = bande(bruit(d), 2500, 6000) * np.clip((x - 1.1) / 0.05, 0, 1) * np.exp(-np.maximum(0, x - 1.1) / 0.15) * (x > 1.1)
+ecrire('julien_fourgon', moteur + 0.5 * frein, 0.8)
+
+# rideau de fer qui se lève : cliquetis métallique qui monte
+d = 1.0; x = t(d)
+clic = (np.sin(2 * np.pi * 34 * x) > 0.6) * bande(bruit(d), 1500, 5000)
+ecrire('julien_rideau', clic * np.clip(x / 0.05, 0, 1) * (x < 0.9) + 0.3 * glisse(d, 200, 320, scie) * (x < 0.9), 0.6)
+
 # ambiance de manif en boucle (8 s) : brouhaha de foule et tambour (sans sifflets)
 d = 8.0; x = t(d)
 foule = np.zeros_like(x)

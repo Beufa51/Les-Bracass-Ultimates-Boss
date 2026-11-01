@@ -1038,9 +1038,15 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   tousser les policiers (`degatsPolice`) ; flash doré au ramassage ; flash bleu des gyrophares près des camions ;
   indice « ↘? » jaune sur les murs secrets (`decor.speciaux`) ; compteur « PARVIS : n policiers » ; difficulté =
   nombre de policiers (`ABSENTS_FACILE` : 8 en Sage/Délégué ; `RENFORTS_ANARCHISTE` : 15 en Anarchiste ; 11 en Bloqueur).
-- À FAIRE (audit Doom, point 2) : sacs de farine explosifs en chaîne, embuscades (rideau de fer au pistolet à eau,
-  fourgon sur le parvis), lumière (ruelle sombre, néon qui clignote), changement d'arme animé, tableau des munitions.
-  Point 3 : BAC en civil, tireur de LBD, policiers en hauteur, sono (BFG). Point 4 : clé + porte + boucle.
+- FAIT (audit Doom, point 2) : SACS DE FARINE `a` (8 ; un œuf / une tomate dessus → nuage blanc, 3 de dégâts qui
+  percent le bouclier, policiers aveuglés 3 s, en chaîne ; `RG.farine`, `exploserFarine`) ; EMBUSCADE : 2 rideaux de
+  fer `R` (mur n°9) dans le passage, un policier caché derrière chacun, levés 1,5 s après le 1er pistolet à eau
+  (`ouvrirRideaux`) ; DERNIÈRE VAGUE : 3 s après l'arrivée sur le parvis, un fourgon bloque la rue du lycée et
+  dépose 2 CRS (+1 lanceur en Anarchiste) comptés dans le parvis — le portail attend qu'ils fuient (`FOURGON`,
+  `majFourgon`) ; LUMIÈRE : ruelle sombre (`SOMBRE`, murs + sol assombris), néons des vitrines de la rue du lycée
+  qui grésillent (`NEONS`) ; changement d'arme animé (0,3 s, pas de tir pendant) ; tableau des munitions sous
+  « policiers repoussés ». Sons farine / fourgon / rideau.
+- À FAIRE (audit Doom) : point 3 : BAC en civil, tireur de LBD, policiers en hauteur, sono (BFG). Point 4 : clé + porte + boucle.
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,

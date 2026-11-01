@@ -54,6 +54,7 @@ export const REGLAGES = {
     kway: 50,            // armure gagnée (maxi kwayMaxi) ; elle absorbe une part des dégâts (absorbe)
     kwayMaxi: 100, absorbe: 0.5,
   },
+  farine: { rayon: 1.9, degats: 3, aveugle: 3, chaine: 0.15 },   // sac de farine : dégâts (perce le bouclier), s aveuglés, délai de la chaîne
   bruitTir: 8,           // un tir alerte les policiers à moins de 8 cases (comme dans Doom)
   lanceur: {             // policier qui lance des lacrymos
     vie: 2,              // œufs pour le faire fuir

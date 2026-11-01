@@ -35,7 +35,7 @@ export function choisirArme(scene, id) {
   if (!j.armes.has(id)) return false;
   const a = armeDe(id);
   if (a.mun && j.mun[a.mun] <= 0) { scene.message(`Plus de ${a.nom.toLowerCase()} !`); return false; }
-  if (j.arme !== id) { j.arme = id; j.lanceT = 0; scene.message(a.nom, 1.2); }
+  if (j.arme !== id) { j.arme = id; j.lanceT = 0; j.changeT = 0.3; scene.message(a.nom, 1.2); }   // l'arme descend puis remonte
   return true;
 }
 export function armeSuivante(scene) {
@@ -55,7 +55,7 @@ function armeDeSecours(scene) {
 // Tir de l'arme en main. appui : le bouton est enfoncé ; nouveau : il vient d'être enfoncé
 export function tirer(scene, dx, dy, appui, nouveau) {
   const j = scene.j, a = armeDe(j.arme);
-  if (!appui || j.recharge > 0) return;
+  if (!appui || j.recharge > 0 || j.changeT > 0) return;
   if (a.mun && j.mun[a.mun] <= 0) { if (nouveau) armeDeSecours(scene); return; }
   if (a.mun) j.mun[a.mun]--;
   const [vx, vy] = scene.viser(dx, dy);
@@ -141,6 +141,7 @@ export function avancerTirs(scene, dt) {
     for (const b of scene.objets) if (b.actif && b.solide && Math.hypot(b.x - o.x, b.y - o.y) < b.rayon) {
       o.fini = true;
       if (o.genre !== 'eau') scene.splats.push({ x: o.x, y: o.y, t: 1.2, rouge: o.genre === 'tomate' });
+      if (b.type === 'farine' && o.genre !== 'eau') scene.exploserFarine(b);
       if (b.type === 'manifestant' && o.genre !== 'eau') scene.message('« Hé ! Pas sur nous ! »');
       break;
     }
