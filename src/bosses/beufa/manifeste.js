@@ -101,6 +101,10 @@ export const MANIFESTE = {
     // MUSIQUE DE FOND (jouée par src/core/musique.js, en boucle) : Metal Gear Solid « Intruder 2 »,
     // déposée par Fabien, réencodée en 96 kb/s (22 → 11 Mo) par outils/beufa_alleger.py.
     beufa_musique:  { fichier: 'audio/beufa/beufa_musique.mp3', musique: true, volume: 0.45 },
+    // V90 : musiques du QUIZ (déposées par Fabien, réencodées en 96 kb/s) : « Psycho Mantis Hymn » pendant la phase
+    // masquée, puis « Duel » (boss battle) après le rideau
+    beufa_mantis:   { fichier: 'audio/beufa/beufa_mantis.mp3', musique: true, volume: 0.45 },
+    beufa_duel:     { fichier: 'audio/beufa/beufa_duel.mp3', musique: true, volume: 0.4 },
     beufa_soupcon: { fichier: null, provisoire: { frequence: 620, duree: 0.12 } },
     beufa_alerte:  { fichier: null, provisoire: { frequence: 880, duree: 0.3 } },
     beufa_attrape: { fichier: null, provisoire: { frequence: 150, duree: 0.4 } },

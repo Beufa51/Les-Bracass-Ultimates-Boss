@@ -920,3 +920,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   [écartées, mi-serrées, SERRÉES, mi-serrées] × 2 pas. Réglages : `R.garde.pasProfil` 56 (px pour 2 pas),
   `profilHanche` 0.58, `profilSerrage` 0.36, `rebond` 1.5 (il monte au passage). Arrêt = jambes serrées.
   Le prompt 4 poses (V88) reste utile si on veut mieux un jour, mais n'est plus nécessaire.
+
+## BEUFA — V90 : MUSIQUES DU QUIZ
+- `beufa_mantis.mp3` (Psycho Mantis Hymn) pendant la phase masquée ; coupée quand le rideau est fermé,
+  `beufa_duel.mp3` (Duel, boss battle) démarre à la réouverture (et directement après un CONTINUE).
+  Coupée avant le GAME OVER (son MGS). Fichiers de Fabien réencodés en 96 kb/s (2,1 et 1,7 Mo).

@@ -8,6 +8,7 @@ import { BeufaInfiltration } from './BeufaInfiltration.js';
 import { texte } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
+import { jouerMusique, arreterMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, REGLAGES as R } from './reglages.js';
 import { QUESTIONS, LECTURE_DEBUT, LECTURES, MASQUE_CHAUD, DEBUT_QUIZ, MOQUERIES, TROP_TARD, BRAVOS, VICTOIRE, GAME_OVER } from '../../../data/beufa_quiz.js';
@@ -38,7 +39,11 @@ export class BeufaQuiz extends BossScene {
     this.input.keyboard.on('keydown', (ev) => this.touche(ev.key));
     this.input.on('pointerdown', (p) => { if (p.y > 352 && this.etape === 'dialogue') this.avancer(); });
 
-    const lancer = () => (this.masque ? this.introMasque() : (this.visage('machiavelique'), this.dire(DEBUT_QUIZ, () => this.questionSuivante())));
+    // V90 : musique de Psycho Mantis pendant la phase masquée, « Duel » ensuite (directement si on reprend)
+    const lancer = () => {
+      if (this.masque) { jouerMusique(this, 'beufa_mantis'); this.introMasque(); }
+      else { jouerMusique(this, 'beufa_duel'); this.visage('machiavelique'); this.dire(DEBUT_QUIZ, () => this.questionSuivante()); }
+    };
     if (this.donnees.reprise) lancer();
     else this.afficherIntro('BEUFA — LE QUIZ', [
       'Beufa t\'attend dans son bureau…',
@@ -184,12 +189,14 @@ export class BeufaQuiz extends BossScene {
       this.tweens.add({ targets: rideaux[0], x: moitie, duration: 450, ease: 'Quad.In' });
       this.tweens.add({ targets: rideaux[1], x: moitie, duration: 450, ease: 'Quad.In', onComplete: () => {
         jouerSon(this, 'beufa_masque');
+        arreterMusique('beufa_mantis');   // V90 : rideau fermé, la musique change
         this.cameras.main.shake(150, 0.004);
         this.masque = false;
         if (this.scene_) this.buste.setTexture('beufa_bureau_scene');
         else { this.buste.setTexture('beufa_buste'); this.buste.setScale(215 / this.buste.height); }
         this.visage('calme');
         this.time.delayedCall(700, () => {
+          jouerMusique(this, 'beufa_duel');
           this.tweens.add({ targets: rideaux[0], x: 0, duration: 550, ease: 'Quad.Out' });
           this.tweens.add({ targets: rideaux[1], x: LARGEUR, duration: 550, ease: 'Quad.Out', onComplete: () => {
             rideaux.forEach((r) => r.destroy());
@@ -277,7 +284,7 @@ export class BeufaQuiz extends BossScene {
     this.etape = 'fin';
     jouerSon(this, 'ui_defaite');
     this.visage('machiavelique');
-    this.dire([GAME_OVER], () => this.ecranGameOver());
+    this.dire([GAME_OVER], () => { arreterMusique('beufa_duel'); this.ecranGameOver(); });
   }
 
   // V88 : l'écran GAME OVER façon Metal Gear Solid (vidéo de Fabien) : écran noir, « GAME OVER » en CONTOUR cyan
