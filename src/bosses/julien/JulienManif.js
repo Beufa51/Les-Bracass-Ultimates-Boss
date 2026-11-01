@@ -33,7 +33,7 @@ export class JulienManif extends BossScene {
   create() {
     if (!T) T = { murs: texturesMurs(), spr: texturesSprites(), main: texturesMain(),
       ciel: degrade(VUE_H / 2, '#7f8fa3', '#c9cdd0'), sol: degrade(VUE_H / 2, '#4a4a4e', '#2a2a2c') };
-    etiquettesTactiles({ z: 'Œuf', x: 'Côté', espace: null });
+    etiquettesTactiles({ espace: 'OK', z: null, x: null });   // intro : seulement OK (les boutons du jeu arrivent au départ)
     this.cameras.main.setBackgroundColor('#000000');
 
     if (this.textures.exists('julien_vue')) this.textures.remove('julien_vue');
@@ -72,7 +72,7 @@ export class JulienManif extends BossScene {
       'Les lacrymos piquent : sors vite du nuage.',
       'Le bouclier arrête les œufs, SAUF quand le CRS',
       'est essoufflé après sa charge : esquive de côté puis vise !',
-    ], () => { this.enJeu = true; this.message('Direction le lycée ! Le portail est au nord.'); });
+    ], () => { etiquettesTactiles({ z: 'Œuf', x: 'Côté', espace: null }); this.enJeu = true; this.message('Direction le lycée ! Le portail est au nord.'); });
   }
 
   // ------------------------------------------------------------------ niveau
