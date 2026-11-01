@@ -124,3 +124,67 @@ Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized
 Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
 IMPORTANT: every object is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no object, smoke or splat may touch or overlap another object or the cell border.
 ```
+
+---
+# NIVEAU 2 (le lycée + la salle de classe) et images MANQUANTES de la manif
+Mêmes règles qu'au-dessus (un prompt = une image, poses bien séparées, fond blanc). Livraison : `assets_inbox/julien/`.
+Les sections 13 et 14 ne servent QUE si on fait le mini-niveau « le lycée » (voir `julien_audit_classe.md`).
+
+## 10. Julien, le prof (le boss) — `julien_prof.png`
+⚠️ Adapter la ligne « Character » au VRAI Julien (cheveux, barbe, lunettes, tenue…) : c'est la ligne qui compte.
+```
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. Humorous, cartoonish French high-school theme, no blood, no gore.
+Character: a French high-school teacher in his forties, glasses, short hair, light stubble, brown corduroy jacket with elbow patches over a light blue shirt and a red tie, beige trousers, brown shoes. Full body, seen strictly from the FRONT, facing the viewer, no perspective tilt.
+8 poses in one row, each in its own equal-size cell, same scale, feet aligned on the same bottom line:
+1) walking, left foot forward, a blue textbook under his arm; 2) walking, right foot forward; 3) holding a thick book high above his head with both hands, about to throw it, angry eyebrows; 4) arm thrown forward, just released the book; 5) hit in the face by an egg, flinching, egg yolk on his glasses and jacket; 6) seen from the BACK, writing on an invisible blackboard with a piece of chalk, arm raised; 7) furious, red face, both fists raised, shouting, tie askew; 8) defeated, sitting on the floor, dizzy, glasses crooked, egg yolk all over.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no arm, book or chalk may touch or overlap another pose or the cell border.
+```
+
+## 11. Objets de la classe — `julien_objets_classe.png`
+```
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. French high-school classroom theme.
+10 separate objects in one row, each in its own equal-size cell, seen strictly from the FRONT, same pixel scale, resting on the same bottom line:
+1) a student desk: light wooden top, grey metal legs, a notebook and a pencil case on it; 2) the teacher's desk: big dark wooden desk, closed in front, a pile of exam papers and a red apple on top; 3) a blue school textbook flying, slightly open; 4) a huge thick red dictionary; 5) a single sheet of lined exam paper with a big red "0/20"; 6) a white chalk stick; 7) a blowpipe made from an empty ballpoint pen with a small paper spitball; 8) a red fire extinguisher; 9) a school bag (backpack) on the floor; 10) a can of soda.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text except "0/20" on the paper, no frame, no grid lines.
+IMPORTANT: every object is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no object may touch or overlap another object or the cell border.
+```
+
+## 12. Élèves assis (décor de la classe) — `julien_eleves.png`
+```
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. Humorous, cartoonish French high-school theme.
+Characters: four different French teenage students (two girls, two boys, casual clothes: hoodie, denim jacket, sweater), each sitting on a chair, seen strictly from the FRONT, facing the viewer, no perspective tilt, no desk.
+8 cells in one row, same scale, chairs aligned on the same bottom line: for each student, 1) cheering with arms up, mouth open; 2) hiding, crouched and covering the head with both hands.
+Order: student A cheering, student A hiding, student B cheering, student B hiding, student C cheering, student C hiding, student D cheering, student D hiding.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no part may touch another pose or the cell border.
+```
+
+## 13. Ennemis du lycée (mini-niveau) — une planche par personnage
+Prompt commun : celui de la section 1 (policier) en remplaçant les lignes « Character » et « poses » :
+- `julien_surveillant.png` : `Character: a young French school supervisor ("pion"), 20 years old, red hoodie, jeans, sneakers, a whistle around his neck, a lanyard badge.` — poses : `6 poses: 1) running, left foot forward; 2) running, right foot forward; 3) blowing his whistle, arm pointing at the viewer; 4) diving forward with arms out to grab the viewer; 5) hit by an egg, flinching, egg yolk on his hoodie; 6) seen from the BACK, running away, arms in the air.`
+- `julien_cantiniere.png` : `Character: a stout French school canteen lady, white apron, blue hairnet, yellow rubber gloves, holding a big metal ladle and a pot of mashed potatoes.` — poses : `6 poses: 1) walking, left foot forward; 2) walking, right foot forward; 3) ladle raised high full of mashed potatoes, about to throw; 4) ladle thrown forward, just released; 5) hit by an egg, flinching; 6) seen from the BACK, running away, ladle in the air.`
+- `julien_fayot.png` : `Character: a skinny French teenage "teacher's pet", round glasses, neatly combed hair, sweater vest, holding a notebook.` — poses : `4 poses: 1) standing, arms crossed, smug; 2) pointing at the viewer and shouting; 3) jumping up and down, waving to call the teacher; 4) seen from the BACK, running away.`
+
+## 14. Murs du lycée et de la classe (texture qui se répète)
+Prompt commun : celui de la section 7 (murs), en remplaçant « Parisian street theme » par « French high-school interior theme » et la ligne « Wall: … ». Pour la CLASSE, demander une image 2 fois plus HAUTE que large (« tall image, 1:1.5 ratio ») : le plafond est plus haut.
+- `julien_mur_classe.png` : `Wall: classroom wall painted pale green on top, darker green lower part, a wooden skirting board at the bottom. Nothing on it.`
+- `julien_mur_classe_affiche.png` : `Wall: the same pale green classroom wall with a school poster pinned on it (map of France).`
+- `julien_tableau.png` (image 3 fois plus LARGE que haute, coupée en 3 par Claude) : `Wall: a long green classroom blackboard in a wooden frame on a pale green wall, chalk writing "INTERRO SURPRISE" and a math formula, a chalk ledge with chalk sticks and an eraser.`
+- `julien_fenetres_classe.png` : `Wall: two tall classroom windows with white frames and orange curtains, the school courtyard and trees visible outside.`
+- `julien_porte_classe.png` : `Wall: a wooden classroom door with a small window and a plate "SALLE 12", on a pale green wall.`
+- `julien_mur_casiers.png` : `Wall: a row of blue metal school lockers, some dented, stickers on them.`
+- `julien_mur_couloir.png` : `Wall: school corridor wall, cream paint, a cork notice board with timetables and leaflets.`
+- `julien_mur_cantine.png` : `Wall: school canteen wall with white tiles, a serving counter with steel trays and pots of food.`
+
+## 15. Objets MANQUANTS de la manif — `julien_objets_bonus.png`
+```
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. French street-protest theme.
+7 separate objects in one row, each in its own equal-size cell, seen strictly from the FRONT, same pixel scale, resting on the same bottom line:
+1) a wet knitted scarf (dripping water drops), folded; 2) a small paper cup of strong espresso coffee, steaming; 3) a folded bright yellow K-Way rain jacket (windbreaker); 4) a big white sack of flour, tied at the top, the word "FARINE" on it; 5) a big puffy cloud of white flour powder; 6) a single blue water droplet; 7) a lit protest smoke flare flying, trailing pink smoke.
+Plain solid pure white background (#FFFFFF) — EXCEPT the flour cloud, which must be light grey-white with a dark grey outline so it stays visible —, no ground shadow, no text except "FARINE", no frame, no grid lines.
+IMPORTANT: every object is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no object may touch or overlap another object or the cell border.
+```
+
+## 16. Rideau de fer (mur de la manif, embuscade du passage) — `julien_mur_rideau.png`
+Prompt de la section 7 (murs, thème « Parisian street »), ligne : `Wall: a closed corrugated metal shop shutter (rolling steel shutter), grey, with a few graffiti tags and a padlock at the bottom.`

@@ -1090,7 +1090,14 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   Perdu : « COLLÉ ! » → REJOUER (repart en classe). Victoire = BADGE de Julien. Répliques dans `REPLIQUES`
   (niveau_classe.js) à personnaliser à la finition. Dessins provisoires : `decor_classe.js` (murs 64×96, plafond à néons,
   lino + estrade en parquet, Julien 7 poses, table, bureau, livre, dico, copie).
-- À FAIRE niveau 2 : images de Julien (prompts à écrire), équilibrage avec Fabien, sons propres (livre, dico).
+- Retour Fabien sur le niveau 2 : « pas ultra fun ». AVIS DEV + JOUEURS : `propositions/julien_audit_classe.md`
+  (A : mini-niveau « le lycée » avant la classe — surveillant, fayots, cantinière, extincteur, carnet = clé de la
+  salle 12 ; B : vrai combat — Julien DE DOS au tableau = fenêtre de punition ×2, mur de copies avec un trou,
+  « AU TABLEAU ! » (aimant), « CONFISQUÉ ! », craies, règle ; phases qui changent la salle : rétroprojecteur dans le
+  noir, bureau renversé + alarme incendie ; élèves assis qui réagissent ; sarbacane ; salle moins profonde).
+  En attente du choix de Fabien (conseil : B puis A).
+- PROMPTS des images du niveau 2 + images manquantes de la manif : `propositions/julien_prompts_images.md`, sections
+  10 à 16 (Julien 8 poses, objets de la classe, élèves assis, ennemis du lycée, murs, bonus de la manif, rideau de fer).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,
