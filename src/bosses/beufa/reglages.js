@@ -12,6 +12,8 @@ export const REGLAGES = {
     pasFace: 240,      // V71 : les planches de FACE et de DOS contiennent 4 cycles (les pieds alternent à chaque image) :
                        //       240 px pour les 8 images = UN pas tous les 30 px, comme de profil (avec 60, Snake « vibrait »)
     pasCourse: 100,    // V51 : px pour un cycle de COURSE complet (sprint de profil) — plus petit = jambes plus rapides
+    balancement: 1.5,  // V74 : px dont le corps se décale vers le pied posé (marche de face/dos)
+    penche: 0.04,      // V74 : rad dont il penche vers le pied posé (≈ 2°)
     rebond: 1.5,       // V49 : px dont il monte à chaque pas (0 = aucun)
     rayon: 10,      // V25 : on frôle les caisses SANS être bloqué — les couloirs redeviennent passables
     bruitFlaque: 150,  // V68 : rayon (px) dans lequel un garde entend Snake marcher dans une flaque

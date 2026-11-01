@@ -796,3 +796,11 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   `beufa_pompe_dos` 40×85 (parc 1150,506). Emprises inchangées. Vérif : 0 erreur, 0 avertissement.
 - Les versions « de face » (beufa_etagere, beufa_casiers, beufa_pompe) restent au manifeste pour les murs du haut.
 - Reste : planche des gardes en 3 vues.
+
+## BEUFA — V74 : GARDES À L'ÉCHELLE + TRANSFERT DE POIDS DE FACE/DOS
+- Gardes 48 → 40 px (même réduction que Snake en V72). Collision inchangée.
+- Marche de face/dos : la planche bouge à peine les jambes → le corps se décale (`balancement` 1,5 px) et penche
+  (`penche` 0,04 rad) vers le pied posé, alterné à chaque pas de 30 px. Vérifié dans le jeu (rotation ±0,038).
+- Vraie solution : nouvelle planche face/dos en 4 poses très marquées (prompt « SNAKE — FACE ET DOS EN 4 POSES »
+  dans `propositions/beufa_prompts_marche.md`). À la livraison : découper 2 rangées × 4 → beufa_heros / _dos,
+  `pasFace` 240 → 60 (4 images = 2 pas), garder balancement/penche si ça aide.
