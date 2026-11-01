@@ -967,6 +967,7 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   Ctrl tirer, Maj courir, PAS DE SOURIS (Fabien : tout au clavier comme en 93) ; Z et Q/D en plus.
   TÉLÉPHONE (`tactileFps.js`, demande « intuitif ») : joystick pouce gauche (avancer/reculer/pas de côté, à fond =
   courir), glisser à droite = tourner (réglage `glisser`), tape à droite ou gros bouton ŒUF = lancer ; croix cachée en jeu.
+- PROMPTS DES IMAGES : `propositions/julien_prompts_images.md` (style Doom 93, livraison dans `assets_inbox/julien/`).
 - À FAIRE : vrais sons et images (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,
