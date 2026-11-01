@@ -649,9 +649,11 @@ export class JulienManif extends BossScene {
       return this.deplacer(e, vx / n * vitesse * dt, vy / n * vitesse * dt, 0.28);
     };
 
-    if (e.etat === 'fuite') {
-      marcher(-ox, -oy, 2.6);
-      if (e.t <= 0) e.actif = false;
+    if (e.etat === 'fuite') {   // il s'enfuit par un chemin libre, et ne disparaît que quand tu ne le vois plus
+      e.fuiteT = (e.fuiteT || 0) + dt;
+      if (!e.fdx || e.t <= 0) this.directionFuite(e, -ox / (d || 1), -oy / (d || 1));
+      if (marcher(e.fdx, e.fdy, RG.fuite.vitesse)) e.t = 0;   // bloqué : il cherche un autre chemin
+      if (e.fuiteT > RG.fuite.mini && !this.visible(e)) e.actif = false;
       return;
     }
     if (e.etat === 'touche') { if (e.t <= 0) { e.etat = e.apres; e.t = e.tApres; } return; }
@@ -703,6 +705,26 @@ export class JulienManif extends BossScene {
     if (e.etat === 'essouffle' && e.t <= 0) { e.etat = 'approche'; e.t = 0.8; }
   }
 
+  // fuite : la direction la plus dégagée qui l'éloigne de toi (jamais droit dans un mur)
+  directionFuite(e, ax, ay) {
+    let mieux = -1e9;
+    for (let k = 0; k < 16; k++) {
+      const a = k / 16 * Math.PI * 2, dx = Math.cos(a), dy = Math.sin(a);
+      let libre = 0;
+      while (libre < 3 && this.libre(e.x + dx * (libre + 0.3), e.y + dy * (libre + 0.3), 0.28, e)) libre += 0.3;
+      const score = (dx * ax + dy * ay) * 2 + libre;
+      if (score > mieux) { mieux = score; e.fdx = dx; e.fdy = dy; }
+    }
+    e.t = 0.8;
+  }
+  // vrai si tu vois ce personnage à l'écran (devant toi, pas caché par un mur)
+  visible(e) {
+    const j = this.j, ox = e.x - j.x, oy = e.y - j.y, d = Math.hypot(ox, oy);
+    if (d > 16) return false;
+    const ecart = Math.abs(Math.atan2(Math.cos(j.a) * oy - Math.sin(j.a) * ox, Math.cos(j.a) * ox + Math.sin(j.a) * oy));
+    return ecart < Math.atan(FOV) + 0.25 && vueLibre(this.plan, j.x, j.y, e.x, e.y);
+  }
+
   // degats : 1 = un œuf ; options : recul [dx, dy], perceBouclier (fumée), silencieux (eau, fumée : pas de son ni de sursaut)
   // tache : 'oeuf' (jaune), 'tomate' (rouge) ou null (pancarte, eau, fumée : pas de trace)
   toucherEnnemi(e, degats = 1, { recul = null, perceBouclier = false, silencieux = false, tache = null } = {}) {
@@ -714,8 +736,12 @@ export class JulienManif extends BossScene {
     if (tache && (e.taches || (e.taches = [])).length < 4) e.taches.push({ o: Math.random() * 1.6 - 0.8, h: 0.3 + Math.random() * 0.35, rouge: tache === 'tomate' });
     if (!silencieux) jouerSon(this, 'julien_splat');
     if (e.vie <= 0) {
-      e.etat = 'fuite'; e.t = 1.8; this.repousses++;
+      e.etat = 'fuite'; e.t = 0; e.fdx = 0; e.fuiteT = 0; this.repousses++;
       jouerSon(this, 'julien_fuite');
+      if (Math.random() < RG.soins.casseCroute) {   // dans sa fuite, il lâche son casse-croûte
+        this.objets.push({ type: 'sandwich', x: e.x, y: e.y, solide: false, rayon: 0.3, actif: true, n: 0, lache: true });
+        this.time.delayedCall(900, () => this.message('Il a lâché son casse-croûte !', 2));
+      }
       this.combo();
       this.message(['Il s\'enfuit tout dégoulinant !', 'Omelette !', 'Un de moins !', 'Retour au commissariat !'][this.repousses % 4]);
       this.j.expr = 'content'; this.j.exprT = 0.9;
@@ -765,6 +791,13 @@ export class JulienManif extends BossScene {
 
   ramasser() {
     const j = this.j;
+    // un manifestant (une fois chacun) te soigne quand tu passes à côté : gourde, pansement…
+    if (j.vie < RG.joueur.vie) for (const o of this.objets) if (o.type === 'manifestant' && !o.soigne && Math.hypot(o.x - j.x, o.y - j.y) < 1.1) {
+      o.soigne = true; j.vie = Math.min(RG.joueur.vie, j.vie + RG.soins.manifestant);
+      this.message(['« Tiens, bois un coup ! »', '« Attends, je te mets un pansement ! »', '« Du sérum phy pour tes yeux ! »', '« Courage, camarade ! »'][(o.n || 0) % 4] + ` (+${RG.soins.manifestant})`, 2.5);
+      jouerSon(this, 'julien_ramasse', { rate: 0.8 }); j.expr = 'content'; j.exprT = 0.9; j.or = 0.5;
+      break;
+    }
     for (const o of this.objets) {
       if (!o.actif || o.solide || Math.hypot(o.x - j.x, o.y - j.y) > 0.5) continue;
       if (RECHARGES[o.type]) {
@@ -781,7 +814,7 @@ export class JulienManif extends BossScene {
         j.vie = Math.min(RG.joueur.vie, j.vie + RG.sandwich);
         this.message(`Un sandwich, ça requinque ! (+${RG.sandwich})`);
       } else continue;
-      o.actif = false; this.ramasses++;
+      o.actif = false; if (!o.lache) this.ramasses++;   // un casse-croûte lâché ne compte pas dans les objets du niveau
       jouerSon(this, 'julien_ramasse');
       j.expr = 'content'; j.exprT = 0.9; j.or = 0.6;   // petit flash doré, comme Doom
     }

@@ -49,7 +49,12 @@ export const REGLAGES = {
   sarbacane: { cadence: 0.22, vitesse: 12, duree: 1.2, degats: 0.5, recul: 0 },   // niveau 2 : infinie, précise, petits dégâts (×3 DE DOS)
   eau: { bouteille: 120, maxi: 300, cadence: 0.07, vitesse: 11, duree: 0.45, degats: 0.2, recul: 0.06, eteint: 0.3 },   // eteint : s de lacrymo en moins par goutte
   fumigenes: { boite: 3, maxi: 9, cadence: 1.0, distance: 5, vol: 0.8, duree: 6, rayon: 1.6, degats: 1 },   // degats : par seconde dans la fumée
-  sandwich: 25,          // vie rendue par un sandwich
+  sandwich: 35,          // vie rendue par un sandwich (Fabien : trop dur → 25 → 35)
+  soins: {
+    casseCroute: 0.45,   // chance qu'un policier mis en fuite lâche son casse-croûte (= un sandwich)
+    manifestant: 15,     // vie rendue par un manifestant quand tu passes à côté (une fois chacun)
+  },
+  fuite: { vitesse: 2.6, mini: 0.6 },   // policier en fuite : vitesse ; il disparaît après « mini » s, dès que tu ne le vois plus
   // BONUS façon Doom : écharpe mouillée (= combinaison anti-radiations), café serré (= Berserk), K-Way (= armure)
   bonus: {
     echarpe: 20,         // s sans souffrir des lacrymos
@@ -76,14 +81,14 @@ export const REGLAGES = {
     preavis: 0.7,        // il crie « DISPERSEZ-VOUS ! » ce temps-là avant de charger
     vitesseCharge: 5.5,
     dureeCharge: 1.3,
-    degats: 14,          // charge du CRS (18 → 14)
+    degats: 10,          // charge du CRS (18 → 14 → 10 : Fabien, trop dur)
     essouffle: 2.2,      // bouclier baissé ce temps-là après la charge : c'est le moment de lui lancer des œufs
   },
   lacrymo: {
     vol: 1.0,            // temps de vol de la grenade
     duree: 4.5,          // durée du nuage
     rayon: 1.15,
-    degats: 10,          // vie perdue par seconde dans le nuage (Fabien : un peu dur en Bloqueur → 14 → 10)
+    degats: 7,           // vie perdue par seconde dans le nuage (Fabien : trop dur → 14 → 10 → 7)
     degatsPolice: 0.5,   // les policiers pris dans leur propre lacrymo toussent aussi (par seconde)
   },
   // NIVEAU 2 : JULIEN, le prof (JulienClasse.js). 3 phases : > 50 % de vie, 50-20 %, < 20 % (il pète un câble)

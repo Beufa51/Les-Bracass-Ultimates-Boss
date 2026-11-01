@@ -1078,6 +1078,12 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   faisait « plonk » (surtout avec le café) → `bouclierBaisse(e)` ; le lanceur caché derrière un mur visait ta position
   ACTUELLE à travers les murs → il vise là où il t'a vu (`vuX`, `vuY`). Aucune erreur dans la console. Plaisir : rien de
   bloquant, le niveau 1 est jugé prêt (restent en option : BAC, LBD, policiers en hauteur, sono, clé + porte).
+- RETOUR FABIEN (manif) « les CRS disparaissent n'importe où, trop dur, pas assez de soins » → CORRIGÉ :
+  fuite : le policier prend la direction la plus dégagée qui l'éloigne de toi (`directionFuite`, 16 directions) et ne
+  disparaît que quand tu ne le vois plus (`visible` : dans le champ de vision et pas derrière un mur) — `RG.fuite`.
+  Soins : sandwich 25 → 35 ; un policier en fuite lâche son CASSE-CROÛTE 45 % du temps (`RG.soins.casseCroute`, ne
+  compte pas dans les objets du rang) ; chaque MANIFESTANT te soigne une fois (+15) quand tu passes à côté
+  (`RG.soins.manifestant`). Dégâts : charge du CRS 14 → 10, lacrymo 10 → 7 par seconde.
 - **NIVEAU 2 : LA SALLE DE CLASSE** (`JulienClasse.js`, hérite de `JulienManif` ; choix de Fabien : même FPS, 3 phases)
   — FAIT (prototype jouable, dessins provisoires). Fin de la manif → ESPACE = entrer en classe (difficulté gardée).
   Manif déjà finie (`Sauvegarde.fait('julien_manif')`) : touche 2 (▶ sur téléphone) dans le menu des difficultés = direct
