@@ -5,7 +5,7 @@
 // 3 croix = GAME OVER (façon MGS). Tout le texte est dans data/beufa_quiz.js.
 import { BossScene } from '../../core/BossScene.js';
 import { BeufaInfiltration } from './BeufaInfiltration.js';
-import { texte, voile } from '../../core/ui.js';
+import { texte } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
@@ -277,17 +277,73 @@ export class BeufaQuiz extends BossScene {
     this.etape = 'fin';
     jouerSon(this, 'ui_defaite');
     this.visage('machiavelique');
-    this.dire([GAME_OVER], () => {
-      this.etape = 'fin';
-      voile(this, 0.9).setDepth(900);
-      texte(this, LARGEUR / 2, 200, 'GAME OVER', 72, '#ff3838').setDepth(901);
-      texte(this, LARGEUR / 2, 290, `${this.bons} bonne(s) réponse(s) sur ${this.numero}`, 22, '#ffffff').setDepth(901);
-      const rejouer = texte(this, LARGEUR / 2, 380, `${estTactile() ? 'OK' : 'ESPACE'} : CONTINUE ?`, 28, '#ffd84a').setDepth(901).setInteractive();
-      const hub = texte(this, LARGEUR / 2, 440, 'Retour au hub', 20, '#aaaaaa').setDepth(901).setInteractive();
-      rejouer.on('pointerdown', () => this.scene.restart({ reprise: true }));
-      hub.on('pointerdown', () => this.retourHub());
-      this.time.delayedCall(500, () => { this.etape = 'gameover'; });
+    this.dire([GAME_OVER], () => this.ecranGameOver());
+  }
+
+  // V88 : l'écran GAME OVER façon Metal Gear Solid (vidéo de Fabien) : écran noir, « GAME OVER » en CONTOUR cyan
+  // tracé de gauche à droite par un ÉCLAT bleu (traînées horizontales), puis CONTINUE / EXIT dessous.
+  ecranGameOver() {
+    this.etape = 'fin';
+    const CYAN = 0x38d8ff, Y = 225;
+    this.add.rectangle(0, 0, LARGEUR, HAUTEUR, 0x000000).setOrigin(0).setDepth(900).setInteractive();
+    const style = { fontFamily: '"Arial Black", Impact, sans-serif', fontStyle: 'italic', fontSize: '104px', color: 'rgba(0,0,0,0)', stroke: '#38d8ff', strokeThickness: 3 };
+    const titre = this.add.text(LARGEUR / 2, Y, 'GAME  OVER', style).setOrigin(0.5).setDepth(902);
+    const halo = this.add.text(LARGEUR / 2, Y, 'GAME  OVER', { ...style, stroke: '#1e78ff', strokeThickness: 9 }).setOrigin(0.5).setDepth(901).setAlpha(0.25);
+    const ligne = this.add.rectangle(titre.x - titre.width / 2 + 20, Y + 50, titre.width - 40, 2, CYAN).setOrigin(0, 0.5).setDepth(902);
+    // le DÉVOILEMENT : un masque qui s'élargit de gauche à droite, l'éclat suit son bord
+    const x0 = titre.x - titre.width / 2 - 10, largeurT = titre.width + 20;
+    const formeMasque = this.make.graphics({ add: false });
+    const masque = formeMasque.createGeometryMask();
+    [titre, halo, ligne].forEach((o) => o.setMask(masque));
+    const eclat = this.add.ellipse(x0, Y, 90, 26, 0x2a7cff, 0.9).setDepth(903).setBlendMode(Phaser.BlendModes.ADD);
+    const rayon = this.add.rectangle(x0, Y, 6, 200, 0x6ab4ff, 0.8).setDepth(903).setBlendMode(Phaser.BlendModes.ADD);
+    const prog = { k: 0 };
+    jouerSon(this, 'beufa_psy');
+    this.tweens.add({ targets: prog, k: 1, duration: 1700, ease: 'Sine.InOut',
+      onUpdate: () => {
+        const bx = x0 + largeurT * prog.k;
+        formeMasque.clear().fillStyle(0xffffff).fillRect(x0, Y - 80, largeurT * prog.k, 160);
+        eclat.setPosition(bx, Y + Phaser.Math.Between(-30, 30)).setScale(0.8 + Math.random() * 0.6, 1);
+        rayon.setPosition(bx, Y).setAlpha(0.4 + Math.random() * 0.5);
+        if (Math.random() < 0.35) {   // les traînées fines, comme dans le jeu
+          const t = this.add.rectangle(bx - Phaser.Math.Between(20, 200), Y + Phaser.Math.Between(-90, 90), Phaser.Math.Between(40, 160), 1, CYAN, 0.8).setDepth(903);
+          this.tweens.add({ targets: t, alpha: 0, x: t.x - 60, duration: 350, onComplete: () => t.destroy() });
+        }
+      },
+      onComplete: () => {
+        this.tweens.add({ targets: [eclat, rayon], alpha: 0, duration: 250 });
+        this.tweens.add({ targets: halo, alpha: 0.5, duration: 400, yoyo: true, repeat: -1 });
+        this.afficherChoixGameOver(Y + 72);
+      } });
+  }
+
+  afficherChoixGameOver(y) {
+    this.choixGO = 0;
+    const style = { fontFamily: '"Arial Black", Impact, sans-serif', fontStyle: 'italic', fontSize: '22px', color: '#38d8ff' };
+    this.optionsGO = [['CONTINUE', LARGEUR / 2 - 140], ['E X I T', LARGEUR / 2 + 160]].map(([mot, x], i) => {
+      const t = this.add.text(x, y, mot, style).setOrigin(0.5).setDepth(902).setInteractive({ useHandCursor: true });
+      t.on('pointerover', () => { this.choixGO = i; this.majChoixGO(); });
+      t.on('pointerdown', () => { this.choixGO = i; this.validerGameOver(); });
+      return t;
     });
+    texte(this, LARGEUR / 2, HAUTEUR - 40, `${this.bons} bonne(s) réponse(s) sur ${this.numero}`, 16, '#2a6a80').setDepth(902);
+    this.majChoixGO();
+    this.time.delayedCall(400, () => { this.etape = 'gameover'; });
+  }
+
+  majChoixGO() {
+    this.optionsGO.forEach((t, i) => {
+      t.setColor(i === this.choixGO ? '#bff4ff' : '#1c6a80').setStroke(i === this.choixGO ? '#38d8ff' : '#000000', i === this.choixGO ? 2 : 0);
+      t.setScale(i === this.choixGO ? 1.15 : 1);
+    });
+  }
+
+  validerGameOver() {
+    if (this.etape !== 'gameover') return;
+    this.etape = 'fin';
+    jouerSon(this, 'ui_valider');
+    if (this.choixGO === 0) this.scene.restart({ reprise: true });
+    else this.retourHub();
   }
 
   gagne() {
@@ -303,8 +359,11 @@ export class BeufaQuiz extends BossScene {
   // ---------- le clavier ----------
   touche(k) {
     if (this.etape === 'dialogue' && (k === ' ' || k === 'Enter')) this.avancer();
-    else if (this.etape === 'gameover' && (k === ' ' || k === 'Enter')) this.scene.restart({ reprise: true });
-    else if (this.etape === 'gameover' && k === 'Escape') this.retourHub();
+    else if (this.etape === 'gameover') {
+      if (k === 'ArrowLeft' || k === 'ArrowRight') { this.choixGO ^= 1; this.majChoixGO(); jouerSon(this, 'beufa_codec'); }
+      else if (k === ' ' || k === 'Enter') this.validerGameOver();
+      else if (k === 'Escape') { this.choixGO = 1; this.validerGameOver(); }
+    }
     else if (this.etape === 'question') {
       if (['1', '2', '3', '4'].includes(k)) { this.selection = Number(k) - 1; this.repondre(this.selection); }
       else if (k === 'ArrowLeft' || k === 'ArrowRight') { this.selection ^= 1; this.majSelection(); }

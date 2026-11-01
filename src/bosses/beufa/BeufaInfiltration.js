@@ -1024,8 +1024,11 @@ export class BeufaInfiltration extends BossScene {
         if (Math.abs(cg) > Math.abs(sg) + 0.01) { cleG = 'beufa_garde_profil'; arret = 3; }
         else if (sg < 0) cleG = 'beufa_garde_dos';
         if (g.sprite.texture.key !== cleG) g.sprite.setTexture(cleG);
-        const imageG = this.cyclePas(g, R.garde.pasVue, 8);
-        g.sprite.setPosition(g.x, g.y - 4).setDepth(profondeurY(g.y + 25))
+        // V88 : de profil, pas plus court + petit rebond (la planche n'a pas de pose « jambes serrées » : il glissait)
+        const profil = cleG === 'beufa_garde_profil';
+        const imageG = this.cyclePas(g, profil ? R.garde.pasProfil : R.garde.pasVue, 8);
+        const rebondG = profil && g.bouge ? R.garde.rebond * Math.abs(Math.sin((g.distPas || 0) / (R.garde.pasProfil / 4) * Math.PI)) : 0;
+        g.sprite.setPosition(g.x, g.y - 4 - rebondG).setDepth(profondeurY(g.y + 25))
           .setRotation(0).setFlipX(cleG === 'beufa_garde_profil' && cg < 0)
           .setFrame(g.bouge ? imageG : arret);
         g.alerte.setPosition(g.x, g.y - 40).setScale(1 + Math.sin(this.temps * 18) * 0.12);

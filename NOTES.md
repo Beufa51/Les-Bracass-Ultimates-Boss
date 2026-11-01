@@ -902,3 +902,12 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 ## BEUFA — V87 : NOUVELLE SCÈNE SANS MASQUE (choix de Fabien)
 - `beufa_bureau_scene.jpg` remplacée ; scène remontée de 30 px (mains visibles au-dessus du codec) ;
   chrono déplacé en haut à gauche, 300 px de large (au centre il passait sur le visage).
+
+## BEUFA — V88 : GAME OVER FAÇON MGS + GARDES DE PROFIL
+- Quiz : 3 croix → écran noir, « GAME OVER » en contour cyan dévoilé de gauche à droite par un éclat bleu
+  (traînées), puis CONTINUE / EXIT (◀ ▶ + ESPACE, souris, ÉCHAP = EXIT). CONTINUE = relance sans l'intro masquée.
+  Référence : vidéo MGS1 de Fabien (le son de la vidéo n'est PAS repris : son « psy » provisoire).
+- Gardes de profil : la planche n'a aucune pose « jambes serrées » (pieds toujours écartés de 90-118 px source)
+  → glisse. Palliatif : `R.garde.pasProfil` 100 (au lieu de 120) + `R.garde.rebond` 1.5 px. Vraie solution :
+  prompt « GARDE — PROFIL : UN SEUL PAS EN 4 POSES » dans `propositions/beufa_prompts_marche.md`
+  (une fois livrée : 4 images, jouées 2 fois, comme Snake V79).
