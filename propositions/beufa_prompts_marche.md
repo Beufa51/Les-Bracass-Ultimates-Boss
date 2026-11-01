@@ -153,3 +153,9 @@ Run cycle in each row, every frame clearly different:
 Arms swing opposite to the legs. Every frame the same height scale; large white space between frames, frames
 must NOT touch or overlap, bandana tails included. Pure white background, no ground shadow, no motion lines,
 no dust, no text, no grid, no extra characters.
+
+## GARDE — LES 3 DIRECTIONS SUR UNE SEULE PLANCHE (V71 : debout en 3/4 comme Snake, plus de rotation)
+À livrer : `assets_inbox/beufa_garde_3vues.jpg`. Le jeu choisira la rangée selon la direction (comme Snake).
+```
+Pixel art sprite sheet, detailed 16-bit SNES style, slightly high camera angle, ONE character drawn 24 times with EXACTLY the same proportions, the same height and the same scale in every frame. Character: an enemy soldier guard of a military base: realistic adult proportions (head about 1/7 of the body height); olive green field uniform with rolled sleeves; olive green steel helmet; brown leather belt and webbing straps; black combat boots; an assault rifle with a brown wooden stock carried diagonally across the chest with both hands, muzzle pointing down. Upright, calm patrol walking posture. 3 ROWS of 8 frames each, a complete smooth WALK CYCLE in every row: Row 1: seen from the FRONT, walking toward the camera (bottom of the image); Row 2: seen from the BACK, walking away from the camera (top of the image), face not visible; Row 3: STRICT SIDE VIEW at 90 degrees, walking toward the RIGHT, only one eye visible. Walk cycle in each row: 1. contact (one leg forward), 2. down, 3. passing (legs crossing), 4. up, 5. contact (other leg forward), 6. down, 7. passing, 8. up. The legs clearly change from frame to frame, the body rises slightly on frames 4 and 8. The head is at the same height in all frames of all rows. Large white space between frames: frames must NOT touch or overlap. Pure white background, no ground shadow, no text, no grid, no extra characters.
+```

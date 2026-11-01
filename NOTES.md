@@ -771,3 +771,13 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   au bout du cul-de-sac derrière le camion sud-est, à côté de la pompe — devant la pompe ils étaient cachés).
 - Station-service du parc complète : camion, jerricans, pompe, réservoir. Vérif : 0 erreur, 0 avertissement.
 - Reste éventuel : bannière (pièce du quiz), vrais sons (« plic » des flaques = bip provisoire).
+
+## BEUFA — V71 : MARCHE DE FACE/DOS QUI NE VIBRE PLUS + PROMPT GARDES EN 3/4
+- Diagnostic (mesures image par image) : les planches de FACE et de DOS contiennent 4 cycles (pieds alternés à
+  chaque image) mais étaient jouées comme 1 cycle sur 60 px → pieds alternés tous les 7,5 px = Snake « vibrait ».
+  `R.joueur.pasFace: 240` → un pas tous les 30 px (comme le profil). Vérifié dans le jeu : image changée à 230/260/290.
+- Profil marche et course : ordre des images CORRECT (écart max → moyen → croisé → moyen…), cadence cohérente avec
+  la foulée. Le reste du défaut vient du dessin (raideur, bandeau qui saute) → seulement en refaisant la planche.
+- Gardes : vus de dessus et TOURNÉS (effet « carton qui pivote » à côté de Snake debout). Prompt 3 vues ajouté dans
+  `propositions/beufa_prompts_marche.md` (« GARDE — LES 3 DIRECTIONS ») ; à la livraison : découper en 3 rangées et
+  choisir la rangée selon la direction, sans rotation (comme `afficher()` pour Snake).

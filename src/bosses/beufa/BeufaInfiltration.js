@@ -950,7 +950,7 @@ export class BeufaInfiltration extends BossScene {
       if (this.heroSprint && this.heroBouge && this.textures.exists('beufa_heros_course_profil')) cle = 'beufa_heros_course_profil';   // V51 : il COURT
     } else if (sa < 0 && this.textures.exists('beufa_heros_dos')) cle = 'beufa_heros_dos';
     const nH = Math.max(1, Object.keys(this.textures.get(cle).frames).length - 1);
-    const pasH = cle === 'beufa_heros_course_profil' ? R.joueur.pasCourse : R.joueur.pas;   // V51 : foulée de course plus longue
+    const pasH = cle === 'beufa_heros_course_profil' ? R.joueur.pasCourse : (cle === 'beufa_heros_profil' ? R.joueur.pas : R.joueur.pasFace);   // V51 : course plus longue — V71 : face/dos = 4 cycles par planche
     const imageH = this.heroBouge ? Math.floor((this.joueur.distPas || 0) / pasH * nH) % nH
       : (cle === 'beufa_heros' ? this.poseArretHeros : 0);
     if (this.sprJoueur.texture.key !== cle) this.sprJoueur.setTexture(cle);
