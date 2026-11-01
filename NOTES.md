@@ -6,8 +6,8 @@
 - **Beufa** : TERMINÉ — infiltration façon Metal Gear (4 pièces) puis QUIZ dans son bureau (codec, Psycho Mantis,
   rideau, 60 questions, GAME OVER façon MGS, classement BIG BOSS → CHICKEN, médaille = badge du hub, meilleur rang
   sauvegardé). Audit final : `propositions/beufa_audit_final.md`.
-- **Julien** : EN COURS — niveau 1 « la manif » jouable (FPS façon Wolfenstein, dessins provisoires) ; niveau 2 (salle de
-  classe, Julien lance des livres) pas commencé. Voir « JULIEN » plus bas.
+- **Julien** : EN COURS — niveau 1 « la manif » jouable ; niveau 2 « la salle de classe » (Julien lance des livres,
+  3 phases, badge) jouable en prototype (dessins provisoires). Voir « JULIEN » plus bas.
 - **Rémi** : pas commencé (« Bientôt » au hub).
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
@@ -1076,7 +1076,21 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   faisait « plonk » (surtout avec le café) → `bouclierBaisse(e)` ; le lanceur caché derrière un mur visait ta position
   ACTUELLE à travers les murs → il vise là où il t'a vu (`vuX`, `vuY`). Aucune erreur dans la console. Plaisir : rien de
   bloquant, le niveau 1 est jugé prêt (restent en option : BAC, LBD, policiers en hauteur, sono, clé + porte).
-- RESTE : NIVEAU 2 (salle de classe contre Julien).
+- **NIVEAU 2 : LA SALLE DE CLASSE** (`JulienClasse.js`, hérite de `JulienManif` ; choix de Fabien : même FPS, 3 phases)
+  — FAIT (prototype jouable, dessins provisoires). Fin de la manif → ESPACE = entrer en classe (difficulté gardée).
+  Manif déjà finie (`Sauvegarde.fait('julien_manif')`) : touche 2 (▶ sur téléphone) dans le menu des difficultés = direct
+  en classe. Menu F1 : « Niveau 2 : la classe ». Plan 15 × 14 (`niveau_classe.js`) : tableau au nord, Julien sur
+  l'estrade, tables en îlots décalés (abris : elles arrêtent ses livres ET tes œufs), bureau du prof, porte au sud.
+  Julien (`RG.julien`, vie 30) fait les cent pas, s'arrête un instant au bout (`arret` : le moment de viser), lève le
+  livre (préavis) puis lance. Phase 1 (> 50 %) : livre / éventail de 3. Phase 2 (« INTERRO SURPRISE ») : copies d'interro
+  en vague (elles volettent), DICTIONNAIRE qui rebondit 3 fois sur les murs. Phase 3 (< 20 %, « RETENUE ! ») : rafales,
+  plus rapide, il descend dans les allées. Changement de phase : pause de 1,6 s où il est intouchable. Aide à la visée
+  qui anticipe sa marche. Tu gardes pancarte, œufs (30), tomates (6) ; moins de 8 œufs → un camarade fait passer une
+  boîte (`secours`). Barre de vie de Julien en haut (repères 50 % / 20 %), PHASE n / 3 dans la barre du bas.
+  Perdu : « COLLÉ ! » → REJOUER (repart en classe). Victoire = BADGE de Julien. Répliques dans `REPLIQUES`
+  (niveau_classe.js) à personnaliser à la finition. Dessins provisoires : `decor_classe.js` (murs 64×96, plafond à néons,
+  lino + estrade en parquet, Julien 7 poses, table, bureau, livre, dico, copie).
+- À FAIRE niveau 2 : images de Julien (prompts à écrire), équilibrage avec Fabien, sons propres (livre, dico).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,

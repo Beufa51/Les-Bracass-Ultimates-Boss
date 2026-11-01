@@ -85,4 +85,24 @@ export const REGLAGES = {
     degats: 10,          // vie perdue par seconde dans le nuage (Fabien : un peu dur en Bloqueur → 14 → 10)
     degatsPolice: 0.5,   // les policiers pris dans leur propre lacrymo toussent aussi (par seconde)
   },
+  // NIVEAU 2 : JULIEN, le prof (JulienClasse.js). 3 phases : > 50 % de vie, 50-20 %, < 20 % (il pète un câble)
+  julien: {
+    vie: 30,             // 1 œuf = 1, 1 tomate = 2, 1 coup de pancarte = 1
+    vitesse: 1.1,        // il fait les cent pas devant le tableau (phase 3 : vitesseRage, il descend dans les allées)
+    vitesseRage: 1.7,
+    cadence: [2.4, 2.0, 1.2],    // secondes entre 2 lancers, par phase (× la difficulté)
+    preavis: [0.75, 0.65, 0.45], // il lève le livre ce temps-là AVANT de lancer
+    arret: [1.1, 0.8, 0.4],      // il s'arrête ce temps-là (environ) à chaque bout de sa marche : le moment de viser
+    pause: 1.6,          // changement de phase : il s'arrête, crie, et ne prend pas de coups
+    livre: { vitesse: 5.5, degats: 12 },
+    eventail: 0.28,      // écart (radians) entre les 3 livres de l'éventail
+    dico: { vitesse: 4.5, degats: 22, rebonds: 3 },   // le dictionnaire rebondit sur les murs (pas sur les tables)
+    copies: { nombre: 5, vitesse: 3, degats: 7, ecart: 0.22 },   // copies d'interro : lentes, en vague
+    rafale: { nombre: 3, intervalle: 0.28 },   // phase 3 : 3 livres coup sur coup
+  },
+  classe: {
+    oeufs: 30, tomates: 6,   // munitions en entrant en classe (× la difficulté)
+    secours: 8,              // moins d'œufs que ça : un camarade te fait passer une boîte (toutes les 'secoursT' s)
+    secoursT: 6,
+  },
 };

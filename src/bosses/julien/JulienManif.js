@@ -33,7 +33,7 @@ const FOV = 0.66;                      // largeur du champ de vision (≈ 66°)
 let T = null;                          // dessins (faits une seule fois)
 
 export class JulienManif extends BossScene {
-  constructor() { super('JulienManif', IDENTITE); }
+  constructor(cle = 'JulienManif') { super(cle, IDENTITE); }   // JulienClasse (niveau 2) hérite de cette scène
 
   preload() {
     chargerImages(this);   // vraies images (assets/sprites/julien/), avant la barre de chargement commune
@@ -54,10 +54,11 @@ export class JulienManif extends BossScene {
     this.toile.setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.ctx = this.toile.getContext();
     this.ctx.imageSmoothingEnabled = false;
-    if (!T.decor) T.decor = construireDecor(this.ctx, T.murs, L, VUE_H);   // immeubles hauts, sol, ciel (decor.js)
+    this.T = T;
+    this.decor = this.creerDecor();
     this.add.image(0, 0, 'julien_vue').setOrigin(0).setScale(LARGEUR / L, HAUTEUR / H);
 
-    this.plan = PLAN_MANIF;
+    this.plan = this.planDepart();
     this.lireNiveau();
 
     // barre du bas : chiffres en haute résolution par-dessus la toile
@@ -69,9 +70,9 @@ export class JulienManif extends BossScene {
     this.txtBonus = texte(this, 16, 44, '', 16, '#9fd8ff').setOrigin(0, 0).setStroke('#000', 4);   // bonus en cours
     this.txtArme = texte(this, 300, yb + 20, '', 14, '#c9b48a');
     this.txtOeufs = texte(this, 300, yb + 58, '', 40, '#fff2c8');
-    texte(this, 660, yb + 20, 'POLICIERS REPOUSSÉS', 14, '#c9b48a');
+    this.lblFlics = texte(this, 660, yb + 20, 'POLICIERS REPOUSSÉS', 14, '#c9b48a');
     this.txtFlics = texte(this, 660, yb + 58, '', 32, '#9fd0ff');
-    texte(this, 868, yb + 20, 'LYCÉE', 14, '#c9b48a');
+    this.lblLycee = texte(this, 868, yb + 20, 'LYCÉE', 14, '#c9b48a');
     // tête du héros (vraie image, en haute résolution par-dessus la barre)
     this.tete = T.tetes ? this.add.image(LARGEUR / 2, yb + 50, 'julien_tetes', 0).setDisplaySize(82, 84) : null;
     this.txtMsg = texte(this, 16, 14, '', 18, '#ffffff').setOrigin(0, 0).setStroke('#000', 4);
@@ -87,21 +88,31 @@ export class JulienManif extends BossScene {
     this.touchesCarte = this.input.keyboard.addKeys({ tab: K.TAB, m: K.M });
     this.touchesArmes = this.input.keyboard.addKeys({ a1: K.ONE, a2: K.TWO, a3: K.THREE, a4: K.FOUR, a5: K.FIVE });
     this.carte = false;
-    T.decor.vus = new Uint8Array(this.plan[0].length * this.plan.length);   // murs déjà vus (la carte n'affiche qu'eux)
-    T.decor.speciaux = this.indicesSecrets();
+    this.decor.vus = new Uint8Array(this.plan[0].length * this.plan.length);   // murs déjà vus (la carte n'affiche qu'eux)
+    this.decor.speciaux = this.indicesSecrets();
     this.installerBoutonCarte();
     this.bloquerRaccourcisNavigateur();
     this.agrandirCroix();
     this.joy = RG.joueur.tactile.joystick ? installerJoystick(this) : null;   // téléphone : joystick à gauche (sinon la croix)
     this.tactile = estTactile();   // téléphone : croix = avancer / reculer / pas de côté, ↺ ↻ = tourner, ŒUF en haut
     this.enJeu = false;
-    jouerMusique(this, 'julien_musique');   // « At Doom's Gate », en boucle
-    jouerMusique(this, 'julien_foule');     // ambiance de manif par-dessus
+    this.lancerMusique();
     this.dessiner(0);
     this.diff = DIFFICULTES[Sauvegarde.difficulte(IDENTITE.id)] || DIFFICULTES.bloqueur;
     if (this.donnees.rejouer) { this.appliquerDifficulte(); this.time.delayedCall(60, () => this.demarrer()); }   // « recommencer » : direct
+    else if (this.donnees.depuisManif) { this.appliquerDifficulte(); this.time.delayedCall(120, () => this.intro()); }   // niveau 2 : difficulté déjà choisie
     else this.choisirDifficulte(() => this.time.delayedCall(120, () => this.intro()));
   }
+
+  // --- points d'entrée que le niveau 2 (JulienClasse) remplace
+  creerDecor() { return T.decor || (T.decor = construireDecor(this.ctx, T.murs, L, VUE_H)); }   // immeubles hauts, sol, ciel (decor.js)
+  planDepart() { return PLAN_MANIF; }
+  lancerMusique() {
+    jouerMusique(this, 'julien_musique');   // « At Doom's Gate », en boucle
+    jouerMusique(this, 'julien_foule');     // ambiance de manif par-dessus
+  }
+  spritesEnPlus() {}        // (liste) : sprites du niveau en plus
+  dessinerEnPlus() {}       // (g) : par-dessus la vue, avant la barre du bas
 
   intro() {
     const tact = estTactile();
@@ -141,7 +152,7 @@ export class JulienManif extends BossScene {
   }
 
   // Perdu : comme Doom, on recommence tout de suite (ESPACE / OK) ; X = retour au hub
-  perdu() {
+  perdu(titre = 'GAZÉ !', sous = 'Les CRS t\'ont renvoyé chez toi. Le lycée attendra…') {
     if (this.termine) return;
     this.termine = true;
     if (this.joy) this.joy.activer(false);
@@ -149,8 +160,8 @@ export class JulienManif extends BossScene {
     jouerSon(this, 'ui_defaite');
     etiquettesTactiles({ espace: 'REJOUER', x: 'HUB', z: null, haut: null, bas: null, gauche: null, droite: null });
     voile(this, 0.75).setDepth(1000);
-    texte(this, LARGEUR / 2, 170, 'GAZÉ !', 56, '#ff6b6b').setDepth(1001);
-    texte(this, LARGEUR / 2, 250, 'Les CRS t\'ont renvoyé chez toi. Le lycée attendra…', 22, '#ffffff').setDepth(1001);
+    texte(this, LARGEUR / 2, 170, titre, 56, '#ff6b6b').setDepth(1001);
+    texte(this, LARGEUR / 2, 250, sous, 22, '#ffffff').setDepth(1001);
     texte(this, LARGEUR / 2, 360, `${estTactile() ? 'REJOUER' : 'ESPACE'} : recommencer tout de suite`, 24, '#7fff7f').setDepth(1001);
     texte(this, LARGEUR / 2, 400, `${estTactile() ? 'HUB' : 'X'} : retour au hub`, 18, '#aaaaaa').setDepth(1001);
     this.time.delayedCall(600, () => {
@@ -232,6 +243,7 @@ export class JulienManif extends BossScene {
     const lignes = noms.map((n, k) => texte(this, LARGEUR / 2, 180 + k * 56, DIFFICULTES[n].nom, 28, DIFFICULTES[n].couleur).setDepth(1001));
     const aide = texte(this, LARGEUR / 2, 420, '', 18, '#ffffff').setDepth(1001);
     const bas = texte(this, LARGEUR / 2, HAUTEUR - 40, `▲ ▼ : choisir      ${estTactile() ? 'OK' : 'ESPACE'} : valider${estTactile() ? '' : '      C : COMMANDES DU CLAVIER'}`, 18, '#aaaaaa').setDepth(1001);
+    if (this.raccourciClasse()) el.push(texte(this, LARGEUR / 2, HAUTEUR - 72, `Manif déjà finie : ${estTactile() ? '▶' : '2'} = aller direct en CLASSE (niveau 2)`, 18, '#9fd0ff').setDepth(1001));
     const maj = () => { lignes.forEach((l, k) => l.setAlpha(k === i ? 1 : 0.35).setScale(k === i ? 1.1 : 1)); aide.setText(DIFFICULTES[noms[i]].texte); };
     maj();
     const touche = (ev) => {
@@ -241,6 +253,11 @@ export class JulienManif extends BossScene {
         this.input.keyboard.off('keydown', touche);
         [...el, ...lignes, aide, bas].forEach(o => o.destroy());
         this.ecranCommandes(() => this.choisirDifficulte(suite));
+      }
+      else if ((ev.key === '2' || (ev.key === 'ArrowRight' && estTactile())) && this.raccourciClasse()) {   // manif déjà finie : direct en classe
+        this.input.keyboard.off('keydown', touche);
+        Sauvegarde.reglerDifficulte(IDENTITE.id, noms[i]);
+        this.scene.start('JulienClasse', { depuisManif: true });
       }
       else if (ev.key === ' ') {
         this.input.keyboard.off('keydown', touche);
@@ -255,12 +272,17 @@ export class JulienManif extends BossScene {
     this.input.keyboard.on('keydown', touche);
   }
 
+  raccourciClasse() { return this.scene.key === 'JulienManif' && Sauvegarde.fait('julien_manif'); }
+
   // ------------------------------------------------------------------ niveau
-  lireNiveau() {
-    const j = RG.joueur;
-    this.j = { x: 2.5, y: 2.5, a: -Math.PI / 2, vie: j.vie, recharge: 0,
+  nouveauJoueur() {
+    return { x: 2.5, y: 2.5, a: -Math.PI / 2, vie: RG.joueur.vie, recharge: 0,
       mun: { oeufs: RG.oeufs.depart, tomates: 0, eau: 0, fumigenes: 0 }, armes: new Set(['pancarte', 'oeufs']), arme: 'oeufs', armure: 0, echarpe: 0, cafe: 0, lanceT: 0, bob: 0,
       regard: 0, regardT: 1.2, expr: 'normal', exprT: 0, rouge: 0, gaz: 0 };
+  }
+
+  lireNiveau() {
+    this.j = this.nouveauJoueur();
     this.ennemis = []; this.objets = []; this.tirs = []; this.fumees = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.sortie = null;
     this.secrets = new Map(); this.secretsTrouves = 0;
@@ -790,6 +812,7 @@ export class JulienManif extends BossScene {
     const score = 50 * f(this.repousses, this.total) + 20 * f(this.secretsTrouves, this.secrets.size) + 10 * f(this.ramasses, this.totalObjets)
       + 20 * Math.min(1, PAR / Math.max(1, this.temps));
     const rang = RANGS.find(r => score >= r.mini);
+    Sauvegarde.marquerFait('julien_manif');   // la porte du hub propose ensuite d'aller directement en classe
     const record = Sauvegarde.proposerRecord(IDENTITE.id, rang.court, this.temps, RANGS.map(r => r.court));
     this.time.delayedCall(400 + lignes.length * 450, () => {
       texte(this, LARGEUR / 2, 382, `RANG : ${rang.nom}`, 30, '#ffd84a').setDepth(1001);
@@ -797,9 +820,9 @@ export class JulienManif extends BossScene {
       jouerSon(this, 'julien_portail');
     });
     this.time.delayedCall(1000 + lignes.length * 450, () => {
-      texte(this, LARGEUR / 2, 452, 'Mais Julien t\'attend en classe… (niveau 2 bientôt)', 18, '#9fd0ff').setDepth(1001);
-      texte(this, LARGEUR / 2, HAUTEUR - 28, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, 20, '#aaaaaa').setDepth(1001);
-      this.attendreRetour(300);
+      texte(this, LARGEUR / 2, 452, 'Mais Julien t\'attend en classe…', 18, '#9fd0ff').setDepth(1001);
+      texte(this, LARGEUR / 2, HAUTEUR - 28, `${estTactile() ? 'OK' : 'ESPACE'} : entrer en classe (niveau 2)`, 20, '#aaaaaa').setDepth(1001);
+      this.time.delayedCall(300, () => this.input.keyboard.once('keydown-SPACE', () => this.scene.start('JulienClasse', { depuisManif: true })));
     });
   }
 
@@ -859,8 +882,9 @@ export class JulienManif extends BossScene {
     for (const n of this.nuages) liste.push({ x: n.x, y: n.y, toile: s.nuage, haut: T.hauteurs.nuage + 0.1 * Math.sin(n.t * 3), z: 0 });
 
     const tps = this.time.now / 1000;   // néons des vitrines : ils grésillent
-    T.decor.neonEteint = Math.sin(tps * 23) + Math.sin(tps * 3.1) > 1.3 ? 0.35 : 0;
-    rendre(g, L, VUE_H, this.plan, cam, T.decor, liste);
+    this.decor.neonEteint = Math.sin(tps * 23) + Math.sin(tps * 3.1) > 1.3 ? 0.35 : 0;
+    this.spritesEnPlus(liste);
+    rendre(g, L, VUE_H, this.plan, cam, this.decor, liste);
 
     // la main et l'arme en bas de l'écran
     const bx = Math.sin(j.bob) * 5, by = Math.abs(Math.cos(j.bob)) * 4 + (j.changeT > 0 ? Math.sin(Math.PI * j.changeT / 0.3) * 90 : 0);   // changement d'arme : elle descend puis remonte
@@ -886,6 +910,7 @@ export class JulienManif extends BossScene {
     for (const o of this.objets) if (o.type === 'camion') gyro = Math.min(gyro, Math.hypot(o.x - j.x, o.y - j.y));
     if (gyro < 6 && Math.sin(this.time.now / 110) > 0.2) { g.fillStyle = `rgba(60,110,255,${0.16 * (1 - gyro / 6)})`; g.fillRect(0, 0, L, VUE_H); }
 
+    this.dessinerEnPlus(g);
     if (this.carte) this.dessinerCarte(g);
     this.dessinerBarre(g, cam);
     this.toile.refresh();
@@ -903,7 +928,7 @@ export class JulienManif extends BossScene {
 
   // Carte en filigrane façon Doom : murs déjà vus (rouge), portail (jaune), toi (flèche blanche) ; le nord en haut
   dessinerCarte(g) {
-    const E = 7, j = this.j, p = this.plan, vus = T.decor.vus, W = p[0].length, H = p.length;
+    const E = 7, j = this.j, p = this.plan, vus = this.decor.vus, W = p[0].length, H = p.length;
     const ox = Math.round(L / 2 - j.x * E), oy = Math.round(VUE_H / 2 - j.y * E);
     g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillRect(0, 0, L, VUE_H);
     const mur = (x, y) => murEn(p, x, y) !== 0;
