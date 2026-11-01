@@ -259,7 +259,8 @@ const SPRITES = [
   ...[0, 1, 2, 3, 4, 5, 6, 7].map(n => 'manifestant_' + n),
   'barriere', 'poubelle', 'oeufs', 'sandwich', 'oeuf', 'splat', 'grenade', 'nuage',
 ];
-const MURS = { 1: 'mur_briques' };   // à compléter quand les autres murs arrivent (2 immeuble, 3 boutique, 4 tag, 5 palissade, 6 lycée, 7 portail)
+const MURS = { 1: 'mur_briques', 2: 'mur_immeuble', 3: 'mur_boutique', 4: 'mur_tag', 5: 'mur_palissade', 6: 'mur_lycee',
+  7: 'portail_lycee', 8: 'mur_boutique2' };   // 8 : 2e tabac (façade en pierre), pas de dessin provisoire (repli : briques)
 const MAINS = { tient: 'main_tient', lance: 'main_lance' };
 // hauteur dans le monde (1 = un mur) avec les vraies images : leur cadre inclut bras levés, pancartes, fumée…
 const HAUTEURS_IMAGES = { lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barriere: 0.45, poubelle: 0.5, oeufs: 0.2,

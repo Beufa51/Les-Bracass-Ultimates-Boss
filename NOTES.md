@@ -973,9 +973,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   effacées ; poses d'un même perso au même cadre). Branchement : `textures.js` (listes SPRITES / MURS / MAINS,
   HAUTEURS_IMAGES) ; image absente = dessin provisoire. Tête : `julien_tetes.png` = 20 cases (5 niveaux × g/face/d,
   puis aïe g, aïe d, tousse, content, KO) ; regards manquants de la planche Gemini = miroir (liste TETES du script).
-  CRS : 10 poses livrées, 7 utilisées. MANQUENT : les 6 autres murs (immeuble, boutique, tag, palissade, lycée, portail).
+  CRS : 10 poses livrées, 7 utilisées. MURS : les 7 livrés + un 2e tabac en pierre (mur n°8 du plan).
 - MUSIQUE : « At Doom's Gate » (DOOM E1M1, déposée par Fabien) → `assets/audio/julien/julien_musique.mp3` (mono 64 kb/s, 1 Mo), en boucle dès l'arrivée dans le niveau.
-- À FAIRE : vrais sons, les 6 murs manquants (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
+- À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,
   dictionnaire qui rebondit ; copies d'interro sous 50 % ; on riposte avec boulettes/craies) et le badge.

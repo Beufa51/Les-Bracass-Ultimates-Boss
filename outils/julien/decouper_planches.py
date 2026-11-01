@@ -166,7 +166,7 @@ def main():
         print('  ', nom, i.size)
 
     # murs : carré réduit à 128 × 128
-    for nom in ['mur_briques', 'mur_immeuble', 'mur_boutique', 'mur_tag', 'mur_palissade', 'mur_lycee', 'portail_lycee']:
+    for nom in ['mur_briques', 'mur_immeuble', 'mur_boutique', 'mur_tag', 'mur_palissade', 'mur_lycee', 'portail_lycee', 'mur_boutique2']:
         if os.path.exists(ENTREE + f'julien_{nom}.jpg'):
             Image.open(ENTREE + f'julien_{nom}.jpg').convert('RGB').resize((128, 128), Image.LANCZOS).save(SORTIE + f'julien_{nom}.png')
             print('  ', nom, '128 x 128')
