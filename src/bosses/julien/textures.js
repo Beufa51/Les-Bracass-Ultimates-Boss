@@ -291,7 +291,9 @@ const HAUTEURS_IMAGES = { lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barrie
 export const HAUTEURS_PROVISOIRES = { lanceur: 0.82, bouclier: 0.86, manifestant: 1.0, barriere: 0.42, poubelle: 0.5, oeufs: 0.18,
   sandwich: 0.14, oeuf: 0.08, splat: 0.1, grenade: 0.1, nuage: 0.9, statue: 1.7, camion: 0.95, colonne: 1.35 };
 
-const tous = () => [...SPRITES, ...Object.values(MURS), ...Object.values(MAINS), 'tetes'];
+// murs qui ont aussi une version AVEC panneau (posée sur 1 case sur 6 : voir raycaster.js)
+const PANNEAUX = ['mur_briques', 'mur_immeuble', 'mur_tag', 'mur_lycee'];
+const tous = () => [...SPRITES, ...Object.values(MURS), ...PANNEAUX.map(n => n + '_panneau'), ...Object.values(MAINS), 'tetes'];
 
 // dans preload() : demande le chargement des images (une seule fois)
 export function chargerImages(scene) {
@@ -311,7 +313,10 @@ export function appliquerImages(scene, T) {
     if (HAUTEURS_IMAGES[type]) T.hauteurs[type] = HAUTEURS_IMAGES[type];
     if (type === 'manifestant') manif = Math.max(manif, +n.split('_')[1] + 1);
   }
-  for (const [code, n] of Object.entries(MURS)) { const i = img(n); if (i) T.murs[code] = i; }
+  for (const [code, n] of Object.entries(MURS)) {
+    const i = img(n), p = img(n + '_panneau');
+    if (i) T.murs[code] = p ? [i, p] : i;
+  }
   for (const [pose, n] of Object.entries(MAINS)) { const i = img(n); if (i) T.main[pose] = i; }
   T.main.image = !!img('main_tient');
   T.nbManif = manif;

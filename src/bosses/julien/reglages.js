@@ -13,11 +13,11 @@ export const REGLAGES = {
     rayon: 0.25,         // taille du joueur pour les collisions
   },
   oeufs: {
-    depart: 15,          // œufs au départ
-    maxi: 30,
+    depart: 40,          // œufs au départ (Fabien : les munitions ne doivent pas être un problème)
+    maxi: 99,
     cadence: 0.35,       // secondes entre 2 lancers
     vitesse: 9,          // vitesse de l'œuf
-    boite: 8,            // œufs dans une boîte ramassée
+    boite: 15,           // œufs dans une boîte ramassée
     aide: 0.10,          // aide à la visée (clavier) : un œuf lancé à moins de 0,10 radian (≈ 6°) d'un policier part sur lui
     aideTactile: 0.17,   // aide à la visée au doigt (≈ 10°)
   },

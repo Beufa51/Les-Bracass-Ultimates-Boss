@@ -986,7 +986,15 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   Doom (POLICIERS / OBJETS / SECRETS / TEMPS / PAR 3:30), aide à la visée (`aide`, `aideTactile`), petit viseur,
   alerte entre policiers (6 cases) et au bruit d'un œuf écrasé, œufs : 15 au départ, boîtes de 8 (7 boîtes).
   Statue, camion de CRS, colonne Morris : dessins provisoires (images à demander).
-- RESTE de l'audit : étape 2 (murs hauts, sol texturé, ciel panoramique, murs sans panneau), images F, rondes des policiers.
+- FAIT (étape 2 de l'audit, décors, `decor.js` + `raycaster.js`) : immeubles de 3 étages (ruelle et lycée 2,
+  palissade 1, portail 1,4 ; `HAUTEURS` / `ETAGES`), un mur bas laisse voir le grand mur derrière ; sol texturé par
+  pixel (chaussée, trottoirs le long des murs, pavés sur la place, dalles au parvis, passages piétons, bouches
+  d'égout, tracts sur le boulevard ; `ZONES_SOL`) ; ciel panoramique qui tourne (toits de Paris, tour Eiffel,
+  Sacré-Cœur, fumées de lacrymo) ; murs SANS panneau (le script de découpe recouvre plaques et « Lycée Jules Ferry »,
+  `SANS_PANNEAU`) + version avec panneau sur 1 case sur 6. Dessin d'une image : ~7 ms.
+- Œufs : 40 au départ, maxi 99, boîtes de 15 (Fabien : les munitions ne doivent pas être un problème).
+- Rondes : les policiers non alertés font des allers-retours (sauf parvis et cordon).
+- RESTE de l'audit : images F (statue, camions, colonne Morris, sol/ciel dessinés à la main si voulu), sons.
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,

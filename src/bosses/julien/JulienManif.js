@@ -15,18 +15,12 @@ import { IDENTITE, REGLAGES as RG } from './reglages.js';
 import { PLAN_MANIF, OBJETS, SECRETS, ZONES, PARVIS, PAR } from './niveau_manif.js';
 import { rendre, murEn, vueLibre } from './raycaster.js';
 import { texturesMurs, texturesSprites, texturesMain, chargerImages, appliquerImages } from './textures.js';
+import { construireDecor } from './decor.js';
 import { toileVisage, niveauVisage } from './visage.js';
 
 const L = 480, H = 270, VUE_H = 222;   // toile basse résolution ; la vue 3D au-dessus, la barre du bas en dessous
 const FOV = 0.66;                      // largeur du champ de vision (≈ 66°)
 let T = null;                          // dessins (faits une seule fois)
-
-function degrade(h, haut, bas) {
-  const c = document.createElement('canvas'); c.width = 4; c.height = h;
-  const g = c.getContext('2d'); const d = g.createLinearGradient(0, 0, 0, h);
-  d.addColorStop(0, haut); d.addColorStop(1, bas); g.fillStyle = d; g.fillRect(0, 0, 4, h);
-  return c;
-}
 
 export class JulienManif extends BossScene {
   constructor() { super('JulienManif', IDENTITE); }
@@ -38,8 +32,7 @@ export class JulienManif extends BossScene {
 
   create() {
     if (!T) {
-      T = { murs: texturesMurs(), spr: texturesSprites(), main: texturesMain(),
-        ciel: degrade(VUE_H / 2, '#7f8fa3', '#c9cdd0'), sol: degrade(VUE_H / 2, '#4a4a4e', '#2a2a2c') };
+      T = { murs: texturesMurs(), spr: texturesSprites(), main: texturesMain() };
       appliquerImages(this, T);
     }
     etiquettesTactiles({ espace: 'OK', z: null, x: null });   // intro : seulement OK (les boutons du jeu arrivent au départ)
@@ -50,6 +43,7 @@ export class JulienManif extends BossScene {
     this.toile.setFilter(Phaser.Textures.FilterMode.NEAREST);
     this.ctx = this.toile.getContext();
     this.ctx.imageSmoothingEnabled = false;
+    if (!T.decor) T.decor = construireDecor(this.ctx, T.murs, L, VUE_H);   // immeubles hauts, sol, ciel (decor.js)
     this.add.image(0, 0, 'julien_vue').setOrigin(0).setScale(LARGEUR / L, HAUTEUR / H);
 
     this.plan = PLAN_MANIF;
@@ -109,7 +103,10 @@ export class JulienManif extends BossScene {
       if (type === 'lanceur' || type === 'bouclier') {
         this.ennemis.push({ type, x: px, y: py, vie: RG[type].vie, etat: 'attente', t: 1 + Math.random(), anim: 0, bouge: false,
           vuX: px, vuY: py, alerte: false, cdx: 0, cdy: 0, actif: true,
-          parvis: x >= PARVIS.x0 && x <= PARVIS.x1 && y >= PARVIS.y0 && y <= PARVIS.y1 });
+          parvis: x >= PARVIS.x0 && x <= PARVIS.x1 && y >= PARVIS.y0 && y <= PARVIS.y1,
+          // rondes : tous sauf le parvis et le cordon (rue du lycée) ; horizontales sauf dans les rues étroites
+          ronde: !(x >= PARVIS.x0 && x <= PARVIS.x1 && y >= PARVIS.y0 && y <= PARVIS.y1) && !(x >= 15 && x <= 17 && y >= 9 && y <= 17),
+          rdx: (y >= 28 && y <= 35) ? 0 : (x % 2 ? 1 : -1), rdy: (y >= 28 && y <= 35) ? 1 : 0, rondeT: 2.5 });
       } else {
         const solide = type !== 'oeufs' && type !== 'sandwich';
         const rayon = { barriere: 0.45, statue: 0.75, camion: 1.05, colonne: 0.4 }[type] || 0.3;
@@ -266,6 +263,12 @@ export class JulienManif extends BossScene {
     this.message('Le parvis est libre : le CPE ouvre le portail ! Entre vite !', 4);
   }
 
+  // ronde : un policier pas encore alerté fait des allers-retours (on peut le surprendre de dos… ou de face)
+  ronde(e, marcher, dt) {
+    e.rondeT -= dt;
+    if (marcher(e.rdx, e.rdy, 0.7) || e.rondeT <= 0) { e.rdx = -e.rdx; e.rdy = -e.rdy; e.rondeT = 2.2 + Math.random(); }
+  }
+
   ia(e, dt) {
     if (!e.actif) return;
     const j = this.j, R = RG[e.type];
@@ -287,7 +290,7 @@ export class JulienManif extends BossScene {
     if (e.etat === 'touche') { if (e.t <= 0) { e.etat = e.apres; e.t = e.tApres; } return; }
 
     if (e.type === 'lanceur') {
-      if (e.etat === 'attente') { if (e.alerte) e.etat = 'chasse'; return; }
+      if (e.etat === 'attente') { if (e.alerte) e.etat = 'chasse'; else if (e.ronde) this.ronde(e, marcher, dt); return; }
       if (e.etat === 'chasse') {
         if (voit) {
           if (d > R.distance + 0.6) marcher(ox, oy, R.vitesse);
@@ -307,7 +310,7 @@ export class JulienManif extends BossScene {
     }
 
     // CRS au bouclier
-    if (e.etat === 'attente') { if (e.alerte) e.etat = 'approche'; return; }
+    if (e.etat === 'attente') { if (e.alerte) e.etat = 'approche'; else if (e.ronde) this.ronde(e, marcher, dt); return; }
     if (e.etat === 'approche') {
       if (voit) {
         if (d > 1) marcher(ox, oy, R.vitesse);
@@ -479,7 +482,7 @@ export class JulienManif extends BossScene {
     for (const sp of this.splats) liste.push({ x: sp.x, y: sp.y, toile: s.splat, haut: T.hauteurs.splat, z: 0.38 });
     for (const n of this.nuages) liste.push({ x: n.x, y: n.y, toile: s.nuage, haut: T.hauteurs.nuage + 0.1 * Math.sin(n.t * 3), z: 0 });
 
-    rendre(g, L, VUE_H, this.plan, cam, T.murs, liste, T.ciel, T.sol);
+    rendre(g, L, VUE_H, this.plan, cam, T.decor, liste);
 
     // main qui tient l'œuf
     const bx = Math.sin(j.bob) * 5, by = Math.abs(Math.cos(j.bob)) * 4;

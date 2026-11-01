@@ -49,6 +49,17 @@ TETES = [
 ]
 
 
+# Murs dont un PANNEAU unique (plaque de rue, nom du lycée…) se verrait répété sur chaque case : on le recouvre avec
+# un morceau du même mur pris ailleurs. (x0, y0, x1, y1) = zone à recouvrir, (sx, sy) = coin du morceau copié
+# (sur l'image 1024 × 1024 ; décalages multiples de la hauteur d'une rangée pour garder l'alignement).
+SANS_PANNEAU = {
+    'mur_briques': [((636, 376, 836, 504), (636, 504))],
+    'mur_immeuble': [((800, 30, 1000, 150), (400, 30))],
+    'mur_tag': [((670, 20, 1000, 225), (40, 20))],
+    'mur_lycee': [((236, 170, 796, 318), (236, 810)), ((332, 704, 692, 776), (332, 896))],
+}
+
+
 def charger(fichier):
     return np.asarray(Image.open(ENTREE + fichier).convert('RGB')).astype(np.int16)
 
@@ -168,8 +179,16 @@ def main():
     # murs : carré réduit à 128 × 128
     for nom in ['mur_briques', 'mur_immeuble', 'mur_boutique', 'mur_tag', 'mur_palissade', 'mur_lycee', 'portail_lycee', 'mur_boutique2']:
         if os.path.exists(ENTREE + f'julien_{nom}.jpg'):
-            Image.open(ENTREE + f'julien_{nom}.jpg').convert('RGB').resize((128, 128), Image.LANCZOS).save(SORTIE + f'julien_{nom}.png')
-            print('  ', nom, '128 x 128')
+            mur = Image.open(ENTREE + f'julien_{nom}.jpg').convert('RGB')
+            if nom in SANS_PANNEAU:
+                # version AVEC panneau gardée à part (le jeu la pose sur quelques cases seulement)
+                mur.resize((128, 128), Image.LANCZOS).save(SORTIE + f'julien_{nom}_panneau.png')
+                propre = mur.copy()
+                for (x0, y0, x1, y1), (sx, sy) in SANS_PANNEAU[nom]:
+                    propre.paste(mur.crop((sx, sy, sx + x1 - x0, sy + y1 - y0)), (x0, y0))
+                mur = propre
+            mur.resize((128, 128), Image.LANCZOS).save(SORTIE + f'julien_{nom}.png')
+            print('  ', nom, '128 x 128', '(+ version avec panneau)' if nom in SANS_PANNEAU else '')
 
 
 if __name__ == '__main__':
