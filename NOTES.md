@@ -854,3 +854,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - `pas` (profil) et `pasFace` (face/dos) 60 → 70 : un pas tous les 35 px au lieu de 30 (−15 % de cadence),
   vitesse de déplacement inchangée. Balancement et rebond de face/dos calés sur `pasFace`. Réglage à affiner en jouant
   (plus grand = jambes plus lentes ; au-delà de ~80 les pieds glissent).
+
+## BEUFA — PROCHAINE ÉTAPE : LA PHASE QUIZ (validé par Fabien : l'infiltration est terminée)
+- Décor prévu : le BUREAU DE BEUFA (image `beufa_bureau`, bannière `beufa_banniere`, tapis `beufa_tapis`, plantes),
+  derrière la porte est du QG. `portesInterieures` existe si besoin. Questions à mettre dans `data/`.
+- À demander à Fabien avant de coder : les questions (qui les écrit, sur quoi), le format (QCM ? temps limité ?
+  vies ?), ce qui se passe en cas d'erreur / de victoire, et le rôle de Beufa pendant le quiz.
