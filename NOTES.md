@@ -790,3 +790,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   `propositions/beufa_prompts_base_militaire.md`. À la livraison : QG rangée sud (640/880/1200,494) → étagère_dos,
   casiers (150,494) → casiers_dos, pompe (parc 1150,506) → pompe_dos.
 - Gardes : 48×48 vus de dessus en attendant la planche 3 vues (viser ~58 px de haut comme Snake).
+
+## BEUFA — V73 : MEUBLES DU MUR DU BAS VUS DE DOS
+- Livrés et branchés : `beufa_etagere_dos` 140×94 (QG 640/880/1200,494), `beufa_casiers_dos` 140×97 (QG 150,494),
+  `beufa_pompe_dos` 40×85 (parc 1150,506). Emprises inchangées. Vérif : 0 erreur, 0 avertissement.
+- Les versions « de face » (beufa_etagere, beufa_casiers, beufa_pompe) restent au manifeste pour les murs du haut.
+- Reste : planche des gardes en 3 vues.

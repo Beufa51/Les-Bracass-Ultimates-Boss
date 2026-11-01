@@ -118,7 +118,7 @@ export const PIECES = [
       // LA RANGÉE SUD : trois camions le long de la route — les niches entre eux sont à L'OMBRE du halo
       [560, 450, 176, 72, 'beufa_camion'], [800, 450, 176, 72, 'beufa_camion'], [1040, 450, 176, 72, 'beufa_camion'],   // V65 : y 455 → 450, le passage derrière fait 34 px (avant : 29, piège)
       [1220, 480, 96, 96, 'beufa_reservoir'],        // la station : cache la dernière niche du gardien de la porte
-      [1150, 506, 36, 24, 'beufa_pompe'],             // V69 : LA POMPE de la station-service, à côté du réservoir
+      [1150, 506, 36, 24, 'beufa_pompe_dos'],             // V69 : LA POMPE de la station-service, à côté du réservoir
       [1108, 503, 36, 32, 'beufa_jerricans'],         // V70 : les jerricans à côté de la pompe (au bout du cul-de-sac derrière le camion)
       [1355, 53, 120, 66, 'beufa_jeep'],             // décor de l'angle nord-est — V61 : garée contre le mur (au-dessus du demi-tour du gardien, y 110)
       [368, 410, 16, 16, 'beufa_plot'], [384, 410, 16, 16, 'beufa_plot'], [1142, 320, 16, 16, 'beufa_plot'], [1158, 320, 16, 16, 'beufa_plot'],   // V65 : plots collés par paires   // V55 : plots au bord de la route (hors des chemins des gardes)
@@ -208,11 +208,11 @@ export const PIECES = [
     portes: [ [10, 365, Math.PI / 2], [1430, 365, Math.PI / 2] ],
     routes: [],
     conteneurs: [
-      [150, 150, 132, 44, 'beufa_console'], [150, 494, 140, 52, 'beufa_casiers'],   // V54 : consoles radar au nord       // l'antichambre : la poche sûre
+      [150, 150, 132, 44, 'beufa_console'], [150, 494, 140, 52, 'beufa_casiers_dos'],   // V54 : consoles radar au nord       // l'antichambre : la poche sûre
       [420, 130, 52, 140, 'beufa_etagere'], [420, 450, 52, 140, 'beufa_etagere'],       // les rayonnages de part et d'autre du portique de lumière
-      [640, 494, 140, 52, 'beufa_etagere'], [880, 494, 140, 52, 'beufa_etagere'],       // la rangée sud : l'abri contre le stratège — V61 : collée au mur (avant : faux passage de 24 px derrière)
+      [640, 494, 140, 52, 'beufa_etagere_dos'], [880, 494, 140, 52, 'beufa_etagere_dos'],       // la rangée sud : l'abri contre le stratège — V61 : collée au mur (avant : faux passage de 24 px derrière)
       [640, 84, 140, 52, 'beufa_console'], [880, 84, 140, 52, 'beufa_tableau'],   // V69 : le TABLEAU DE BRIEFING face à la table des cartes —       // V66 : postes d'opérateurs face à la table des cartes — la rangée nord — DERRIÈRE elle, contre le mur, un PASSAGE SECRET (la variante)
-      [1200, 494, 140, 52, 'beufa_etagere'],                           // les archives du sas
+      [1200, 494, 140, 52, 'beufa_etagere_dos'],                           // les archives du sas
       [1200, 42, 132, 44, 'beufa_console'],          // V62 : LE POSTE DE SÉCURITÉ (écrans) contre le mur — le bureau de Beufa ira dans la pièce du QUIZ
     ],
     decorsSol: [ [1340, 365, 'beufa_tapis'] ],   // V62 : le tapis à l'emblème de Beufa mène à SA porte (la sortie, vers le quiz)
