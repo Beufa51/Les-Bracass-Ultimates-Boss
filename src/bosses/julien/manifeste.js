@@ -5,6 +5,8 @@ const bip = (frequence, duree) => ({ fichier: null, provisoire: { frequence, dur
 export const MANIFESTE = {
   images: {},
   sons: {
+    // MUSIQUE DE FOND (src/core/musique.js, en boucle) : DOOM « At Doom's Gate » (E1M1), déposée par Fabien, mono 64 kb/s
+    julien_musique: { fichier: 'audio/julien/julien_musique.mp3', musique: true, volume: 0.4 },
     julien_lancer: bip(520, 0.05),    // tu lances un œuf
     julien_splat: bip(180, 0.07),     // un œuf s'écrase
     julien_plonk: bip(900, 0.04),     // l'œuf rebondit sur le bouclier

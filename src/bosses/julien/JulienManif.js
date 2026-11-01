@@ -9,6 +9,7 @@ import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { texte, voile } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
+import { jouerMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, REGLAGES as RG } from './reglages.js';
 import { PLAN_MANIF, OBJETS } from './niveau_manif.js';
@@ -76,6 +77,7 @@ export class JulienManif extends BossScene {
       q: K.Q, d: K.D });
     this.tactile = installerTactileFps(this);   // téléphone : joystick + glisser pour tourner (null sur ordinateur)
     this.enJeu = false;
+    jouerMusique(this, 'julien_musique');   // « At Doom's Gate », en boucle
     this.dessiner(0);
     const tact = estTactile();
     this.afficherIntro('LA MANIF', [
