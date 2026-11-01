@@ -11,7 +11,7 @@ import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique, arreterMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, REGLAGES as R } from './reglages.js';
-import { QUESTIONS, LECTURE_DEBUT, LECTURES, MASQUE_CHAUD, DEBUT_QUIZ, MOQUERIES, TROP_TARD, BRAVOS, VICTOIRE, GAME_OVER } from '../../../data/beufa_quiz.js';
+import { QUESTIONS, LECTURE_DEBUT, LECTURES, MASQUE_CHAUD, DEBUT_QUIZ, MOQUERIES, TROP_TARD, BRAVOS, VICTOIRE, GAME_OVER, RANGS, RANG_PARFAIT } from '../../../data/beufa_quiz.js';
 
 const VERT = 0x38fc8c, VERT_TXT = '#7dffb0';
 const hasard = (liste) => liste[Math.floor(Math.random() * liste.length)];
@@ -349,7 +349,8 @@ export class BeufaQuiz extends BossScene {
     if (this.etape !== 'gameover') return;
     this.etape = 'fin';
     jouerSon(this, 'ui_valider');
-    if (this.choixGO === 0) this.scene.restart({ reprise: true });
+    // V91 : CONTINUE garde les scores de l'infiltration et compte les continues (pour le classement)
+    if (this.choixGO === 0) this.scene.restart({ ...this.donnees, reprise: true, continues: (this.donnees.continues || 0) + 1 });
     else this.retourHub();
   }
 
@@ -361,6 +362,83 @@ export class BeufaQuiz extends BossScene {
       this.etape = 'fin';
       this.victoire(`Quiz de BEUFA réussi : ${this.bons}/${this.questions.length} bonnes réponses, ${this.erreurs} erreur(s). Sa base est à toi !`);
     });
+  }
+
+  // ---------- V91 : l'écran de RÉSULTATS façon MGS (classement + médaille) ----------
+  calculerRang() {
+    const d = this.donnees, alertes = d.alertes ?? 0, continues = d.continues || 0;
+    const points = this.bons * 10 + Math.max(0, 50 - alertes * 10) - continues * 15;
+    if (alertes === 0 && this.bons === this.questions.length && continues === 0 && d.alertes !== undefined) return { ...RANG_PARFAIT, points, parfait: true };
+    return { ...RANGS.find((r) => points >= r.min), points };
+  }
+
+  ecranVictoire() {
+    arreterMusique('beufa_duel');
+    const P = 1000, d = this.donnees, rang = this.calculerRang();
+    const minutes = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+    this.add.rectangle(0, 0, LARGEUR, HAUTEUR, 0x000000).setOrigin(0).setDepth(P);
+    // les lignes de balayage du codec
+    const sc = this.add.graphics().setDepth(P + 1);
+    sc.fillStyle(VERT, 0.05); for (let y = 0; y < HAUTEUR; y += 4) sc.fillRect(0, y, LARGEUR, 1);
+    const st = (taille, couleur = VERT_TXT) => ({ fontFamily: 'monospace', fontSize: taille + 'px', color: couleur });
+    this.add.text(60, 40, 'RÉSULTATS DE LA MISSION', st(26)).setDepth(P + 2);
+    this.add.rectangle(60, 80, 520, 2, VERT).setOrigin(0).setDepth(P + 2);
+    const lignes = [
+      ['TEMPS D\'INFILTRATION', d.temps !== undefined ? minutes(d.temps) : '—'],
+      ['ALERTES', d.alertes !== undefined ? String(d.alertes) : '— (non jouée)'],
+      ['BONNES RÉPONSES', `${this.bons} / ${this.questions.length}`],
+      ['ERREURS', String(this.erreurs)],
+      ['CONTINUES', String(d.continues || 0)],
+      ['POINTS', String(rang.points)],
+    ];
+    lignes.forEach(([a, b], i) => {
+      const y = 104 + i * 36;
+      const ta = this.add.text(70, y, a, st(20, '#4fbf80')).setDepth(P + 2).setAlpha(0);
+      const tb = this.add.text(570, y, b, st(20, '#e8fff0')).setOrigin(1, 0).setDepth(P + 2).setAlpha(0);
+      this.tweens.add({ targets: [ta, tb], alpha: 1, delay: 300 + i * 250, duration: 150 });
+      this.time.delayedCall(300 + i * 250, () => jouerSon(this, 'beufa_codec'));
+    });
+    // le RANG (« CODE NAME ») tombe en dernier
+    const tDebut = 300 + lignes.length * 250 + 400;
+    const titre = this.add.text(60, 340, 'CODE NAME', st(20)).setDepth(P + 2).setAlpha(0);
+    const nom = this.add.text(60, 368, rang.nom, { fontFamily: '"Arial Black", Impact, sans-serif', fontStyle: 'italic', fontSize: '64px', color: rang.parfait ? '#ffd84a' : '#bff4ff', stroke: rang.parfait ? '#b37a00' : '#1c8c5a', strokeThickness: 4 }).setDepth(P + 2).setAlpha(0).setScale(2);
+    const phrase = this.add.text(62, 450, rang.phrase, st(18, '#e8fff0')).setDepth(P + 2).setAlpha(0);
+    this.time.delayedCall(tDebut, () => {
+      jouerSon(this, 'beufa_reussi');
+      this.cameras.main.flash(250, 120, 255, 170);
+      this.tweens.add({ targets: titre, alpha: 1, duration: 200 });
+      this.tweens.add({ targets: nom, alpha: 1, scale: 1, duration: 450, ease: 'Back.Out' });
+      this.tweens.add({ targets: phrase, alpha: 1, delay: 400, duration: 300 });
+    });
+    // la MÉDAILLE de la mission (dessinée), qui se balance
+    const medaille = this.dessinerMedaille(P + 3, rang.parfait);
+    medaille.setPosition(770, -260);
+    this.tweens.add({ targets: medaille, y: 40, delay: 500, duration: 900, ease: 'Bounce.Out' });
+    this.tweens.add({ targets: medaille, angle: { from: -4, to: 4 }, delay: 1400, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
+    this.add.text(LARGEUR - 30, HAUTEUR - 30, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, st(16, '#4fbf80')).setOrigin(1, 1).setDepth(P + 2);
+  }
+
+  // La médaille : ruban rayé (vert / rouge / or), disque doré, étoile, « B » de Beufa. Or plus vif si BIG BOSS.
+  dessinerMedaille(prof, parfait) {
+    const c = this.add.container(0, 0).setDepth(prof);
+    const g = this.add.graphics();
+    const rayures = [0x2e6b3a, 0xc8a040, 0xb3202c, 0xc8a040, 0x2e6b3a];
+    rayures.forEach((col, i) => g.fillStyle(col).fillRect(-50 + i * 20, 0, 20, 150));
+    g.fillStyle(0x000000, 0.25).fillTriangle(-50, 150, 50, 150, 0, 175);
+    g.lineStyle(3, 0x1a1a1a).strokeRect(-50, 0, 100, 150);
+    const orC = parfait ? 0xffd84a : 0xd8b050, orF = parfait ? 0xb37a00 : 0x8c6a20;
+    g.fillStyle(orF).fillCircle(0, 230, 78);
+    g.fillStyle(orC).fillCircle(0, 230, 70);
+    g.lineStyle(3, orF).strokeCircle(0, 230, 56);
+    for (let k = 0; k < 24; k++) {   // les crans du bord
+      const a = (k / 24) * Math.PI * 2;
+      g.fillStyle(orF).fillCircle(Math.cos(a) * 74, 230 + Math.sin(a) * 74, 3);
+    }
+    const etoile = this.add.star(0, 230, 5, 20, 46, parfait ? 0xfff3a8 : 0xf0d890).setStrokeStyle(3, orF);
+    const lettre = this.add.text(0, 232, 'B', { fontFamily: '"Arial Black", Impact, sans-serif', fontSize: '34px', color: '#8c6a20' }).setOrigin(0.5);
+    const titre = this.add.text(0, 320, parfait ? 'BIG BOSS' : 'MÉDAILLE DE BEUFA', { fontFamily: 'monospace', fontSize: '15px', color: '#ffd84a' }).setOrigin(0.5);
+    c.add([g, etoile, lettre, titre]);
+    return c;
   }
 
   // ---------- le clavier ----------

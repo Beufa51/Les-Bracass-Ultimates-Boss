@@ -925,3 +925,13 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - `beufa_mantis.mp3` (Psycho Mantis Hymn) pendant la phase masquée ; coupée quand le rideau est fermé,
   `beufa_duel.mp3` (Duel, boss battle) démarre à la réouverture (et directement après un CONTINUE).
   Coupée avant le GAME OVER (son MGS). Fichiers de Fabien réencodés en 96 kb/s (2,1 et 1,7 Mo).
+
+## BEUFA — V91 : CLASSEMENT FAÇON MGS + MÉDAILLE
+- Victoire au quiz → `ecranVictoire()` (BeufaQuiz) : écran « RÉSULTATS DE LA MISSION » vert (temps, alertes,
+  bonnes réponses, erreurs, continues, points) puis CODE NAME + phrase, et une MÉDAILLE dessinée (ruban, disque
+  doré, étoile, « B » ; or plus vif pour BIG BOSS) qui tombe et se balance. Le badge est toujours donné.
+- Rangs et phrases : `data/beufa_quiz.js` (`RANGS`, `RANG_PARFAIT`). Points = 10/bonne réponse + (50 − 10/alerte,
+  min 0) − 15/continue. BIG BOSS = 0 alerte + 10/10 + 0 continue (infiltration jouée). Puis FOX ≥140, DOBERMAN
+  ≥130, HOUND ≥120, EAGLE ≥110, PUMA ≥100, CROCODILE ≥90, sinon CHICKEN.
+- CONTINUE (GAME OVER) relance le quiz en GARDANT temps/alertes de l'infiltration, et compte les continues.
+- Testé : 0 alerte + 10/10 → BIG BOSS (150) ; 3 alertes, 1 continue, 8/10 → CHICKEN (85).

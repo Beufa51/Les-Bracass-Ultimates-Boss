@@ -73,3 +73,18 @@ export const BRAVOS = [
 ];
 export const VICTOIRE = 'Impossible… Tu connais tes classiques. Le QG est à toi.';
 export const GAME_OVER = 'GAME OVER, soldat. Retourne réviser tes classiques.';
+
+// V91 : le CLASSEMENT façon Metal Gear Solid (écran de résultats après la victoire au quiz).
+// Points = 10 par bonne réponse (max 100) + infiltration : 50 − 10 par alerte (min 0) − 15 par CONTINUE.
+// BIG BOSS seulement si TOUT est parfait : 0 alerte, 10/10, aucun CONTINUE. Sinon, le 1er rang dont le
+// minimum est atteint (du meilleur au moins bon).
+export const RANG_PARFAIT = { nom: 'BIG BOSS', phrase: 'La légende absolue. Même Beufa te salue.' };
+export const RANGS = [
+  { min: 140, nom: 'FOX', phrase: 'Un agent d\'élite. Presque parfait.' },
+  { min: 130, nom: 'DOBERMAN', phrase: 'Rapide, précis, redoutable.' },
+  { min: 120, nom: 'HOUND', phrase: 'Un bon limier. Encore un effort.' },
+  { min: 110, nom: 'EAGLE', phrase: 'Tu vois loin, mais tu te fais voir.' },
+  { min: 100, nom: 'PUMA', phrase: 'Du talent, mais trop de bruit.' },
+  { min: 90, nom: 'CROCODILE', phrase: 'Tu avances… à ta façon.' },
+  { min: -999, nom: 'CHICKEN', phrase: 'Tu as eu chaud, soldat. Très chaud.' },
+];
