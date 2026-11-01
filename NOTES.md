@@ -1058,6 +1058,10 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   (`SEULS`) ; bouton ARME trop près de LANCER → monté à 250 px du bas, 140 px de large.
 - Alt + ← faisait « page précédente » dans le navigateur (sortie du jeu) → `bloquerRaccourcisNavigateur` (preventDefault
   sur Alt + flèches et Alt seul, + garde d'historique pendant la manif).
+- COMMANDES PC REFAITES (Fabien : « strafe de base comme sur mobile ») : ↑↓ avancer, ← → PAS DE CÔTÉ, Q / A / D ou
+  Alt (X) + ← → = tourner, Ctrl / Z / clic = tirer, Maj = marcher, 1-5 armes, Tab / M carte. SOURIS facultative :
+  un clic dans le jeu la capture (tourner la vue, clic = tirer), Échap la libère (`sourisActive`, `souris` ; réglages
+  cachés, groupe PC). NB tests : lancer la scène depuis la scène active (sinon le hub reste ouvert et capte D).
 - À FAIRE (audit Doom) : point 3 : BAC en civil, tireur de LBD, policiers en hauteur, sono (BFG). Point 4 : clé + porte + boucle.
 - RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;

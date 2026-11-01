@@ -80,7 +80,8 @@ export class JulienManif extends BossScene {
     const K = Phaser.Input.Keyboard.KeyCodes;
     // commandes de Doom (1993), tout au clavier : Alt + ← → pas de côté (ou , et .), Ctrl tirer, Maj courir
     this.cotes = this.input.keyboard.addKeys({ alt: K.ALT, ctrl: K.CTRL, maj: K.SHIFT, virgule: K.COMMA, point: K.PERIOD,
-      q: K.Q, d: K.D });
+      q: K.Q, a: K.A, d: K.D });
+    this.installerSouris();
     this.touchesCarte = this.input.keyboard.addKeys({ tab: K.TAB, m: K.M });
     this.touchesArmes = this.input.keyboard.addKeys({ a1: K.ONE, a2: K.TWO, a3: K.THREE, a4: K.FOUR, a5: K.FIVE });
     this.carte = false;
@@ -104,9 +105,9 @@ export class JulienManif extends BossScene {
     const tact = estTactile();
     this.afficherIntro('LA MANIF', [
       'Rejoins le portail du LYCÉE à travers la manif !',
-      tact ? (this.joy ? 'Joystick (pouce gauche) : avancer, reculer, pas de côté' : '▲ ▼ : avancer / reculer      ◀ ▶ : pas de côté') : '↑ ↓ : avancer / reculer      ← → : tourner',
-      tact ? '↺ ↻ : tourner' : 'ALT + ← → (ou , et .) : pas de côté',
-      tact ? 'LANCER : tirer      ARME (au-dessus) : changer d\'arme' : 'CTRL : tirer   1 à 5 : armes   MAJ : courir',
+      tact ? (this.joy ? 'Joystick (pouce gauche) : avancer, reculer, pas de côté' : '▲ ▼ : avancer / reculer      ◀ ▶ : pas de côté') : '↑ ↓ : avancer / reculer      ← → : pas de côté',
+      tact ? '↺ ↻ : tourner' : 'Q / D (ou ALT + ← →) : tourner      SOURIS : clic pour l\'utiliser',
+      tact ? 'LANCER : tirer      ARME (au-dessus) : changer d\'arme' : 'CTRL ou clic : tirer   1 à 5 : armes   MAJ : marcher',
       tact ? 'CARTE (en haut à droite) : la carte, comme dans Doom' : 'TAB ou M : la carte, comme dans Doom',
       'Les lacrymos piquent : sors vite du nuage.',
       'Le bouclier arrête les œufs, SAUF quand le CRS',
@@ -131,6 +132,7 @@ export class JulienManif extends BossScene {
     if (this.termine) return;
     this.termine = true;
     if (this.joy) this.joy.activer(false);
+    this.libererSouris();
     jouerSon(this, 'ui_defaite');
     etiquettesTactiles({ espace: 'REJOUER', x: 'HUB', z: null, haut: null, bas: null, gauche: null, droite: null });
     voile(this, 0.75).setDepth(1000);
@@ -224,6 +226,22 @@ export class JulienManif extends BossScene {
     this.totalObjets = this.objets.filter(o => !o.solide).length; this.ramasses = 0;
     this.zonesVues = new Set(); this.portailOuvert = false; this.temps = 0;
   }
+
+  // Souris (PC, facultative) : un clic la capture ; la bouger tourne la vue, cliquer tire ; Échap la libère
+  installerSouris() {
+    this.sourisX = 0; this.clic = false; this.clicNouveau = false;
+    if (estTactile() || !RG.joueur.sourisActive) return;
+    const souris = this.input.mouse;
+    this.input.on('pointerdown', () => {
+      if (!this.enJeu) return;
+      if (!souris.locked) { souris.requestPointerLock(); return; }
+      this.clic = true; this.clicNouveau = true;
+    });
+    this.input.on('pointerup', () => { this.clic = false; });
+    this.input.on('pointermove', (p) => { if (souris.locked && this.enJeu) this.sourisX += p.movementX; });
+    this.events.once('shutdown', () => { if (souris.locked) souris.releasePointerLock(); });
+  }
+  libererSouris() { if (this.input.mouse && this.input.mouse.locked) this.input.mouse.releasePointerLock(); this.clic = false; }
 
   // Alt + ← / → (pas de côté, comme Doom) = « page précédente / suivante » pour le navigateur : on l'en empêche
   // pendant la manif ; et si le navigateur revient quand même en arrière, on reste sur le jeu.
@@ -339,14 +357,17 @@ export class JulienManif extends BossScene {
     const j = this.j, k = this.touches, c = this.cotes, R = RG.joueur;
     // Clavier (Doom 93) : ← → tournent, Alt + ← → = pas de côté.
     // Téléphone (demande de Fabien) : ◀ ▶ = pas de côté ; boutons ↺ (touche Z) et ↻ (Espace) = tourner ; ŒUF (touche X).
-    const modeCote = this.tactile || c.alt.isDown || k.x.isDown;
+    // PC (demande de Fabien, comme sur téléphone) : ← → = pas de côté ; Alt (ou X) + ← → = tourner ; Q / A / D = tourner ; souris
+    const modeCote = this.tactile || !(c.alt.isDown || k.x.isDown);
     const maj = !this.tactile && (c.maj.isDown || k.espace.isDown);
     const course = this.tactile ? (R.tactile.courir ? R.course : 1) : ((R.toujoursCourir ? !maj : maj) ? R.course : 1);   // toujours courir : Maj fait marcher
     let tourne = 0, avance = 0, cote = 0;
     if (k.gauche.isDown) { if (modeCote) cote -= 1; else tourne -= 1; }
     if (k.droite.isDown) { if (modeCote) cote += 1; else tourne += 1; }
-    if (c.virgule.isDown || c.q.isDown) cote -= 1;
-    if (c.point.isDown || c.d.isDown) cote += 1;
+    if (c.virgule.isDown) cote -= 1;
+    if (c.point.isDown) cote += 1;
+    if (c.q.isDown || c.a.isDown) tourne -= 1;
+    if (c.d.isDown) tourne += 1;
     if (this.tactile) {
       if (!k.espace.isDown) this.okRelache = true;   // le OK du départ (même bouton que ↻) ne fait pas tourner
       if (k.z.isDown) tourne -= 1;
@@ -356,7 +377,8 @@ export class JulienManif extends BossScene {
     if (k.bas.isDown) avance -= course;
     cote = Math.sign(cote) * course;
     if (this.joy) { const jv = this.joy.valeur(); avance += jv.y; cote += jv.x; }   // joystick : en douceur
-    j.a += tourne * (this.tactile ? R.tactile.rotation : R.rotation) * dt;
+    j.a += tourne * (this.tactile ? R.tactile.rotation : R.rotation) * dt + this.sourisX * R.souris;   // + la souris
+    this.sourisX = 0;
     const dx = Math.cos(j.a), dy = Math.sin(j.a);
     const v = j.cafe > 0 ? RG.bonus.cafeVitesse : 1;   // café serré : plus rapide
     const mx = (dx * avance * R.vitesse + -dy * cote * R.vitesseCote) * dt * v;
@@ -375,8 +397,9 @@ export class JulienManif extends BossScene {
     }
 
     j.recharge -= dt; j.lanceT -= dt;
-    const appui = this.tactile ? k.x.isDown : (k.z.isDown || c.ctrl.isDown);
-    const nouveau = this.tactile ? vientDAppuyer(k.x) : (vientDAppuyer(k.z) || vientDAppuyer(c.ctrl));
+    const appui = this.tactile ? k.x.isDown : (k.z.isDown || c.ctrl.isDown || this.clic);
+    const nouveau = this.tactile ? vientDAppuyer(k.x) : (vientDAppuyer(k.z) || vientDAppuyer(c.ctrl) || this.clicNouveau);
+    this.clicNouveau = false;
     tirer(this, dx, dy, appui, nouveau);
   }
 
@@ -650,7 +673,7 @@ export class JulienManif extends BossScene {
   }
 
   finNiveau() {
-    this.enJeu = false; this.termine = true; if (this.joy) this.joy.activer(false);
+    this.enJeu = false; this.termine = true; if (this.joy) this.joy.activer(false); this.libererSouris();
     jouerSon(this, 'julien_ramasse');
     etiquettesTactiles({ espace: 'OK', z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
     this.txtMsg.setText(''); this.msgT = 0; this.txtBonus.setVisible(false);

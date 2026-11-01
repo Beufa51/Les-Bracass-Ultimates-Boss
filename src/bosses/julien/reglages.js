@@ -29,6 +29,8 @@ export const REGLAGES = {
     course: 1.6,         // vitesse ×1,6 en courant
     toujoursCourir: true,   // comme les joueurs de Doom (« always run ») : Maj fait alors MARCHER
     tactile: { courir: false, rotation: 2.0, joystick: true },   // téléphone : pas de course, rotation douce ; joystick à gauche (false = la croix)
+    sourisActive: true,  // PC : un clic dans le jeu capture la souris pour tourner la vue (Échap la libère)
+    souris: 0.0035,      // rotation par pixel de souris
     rayon: 0.25,         // taille du joueur pour les collisions
   },
   oeufs: {
