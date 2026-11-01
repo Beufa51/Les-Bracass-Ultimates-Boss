@@ -21,17 +21,19 @@ Quand elles s'affichent dans le jeu :
 ## Bloc de style (commun, déjà inclus dans chaque prompt)
 Metal Gear Solid (PS1, 1998) CODEC portrait screen. Square close-up portrait, head and top of the shoulders,
 facing the camera, centered. Monochrome phosphor GREEN palette only (dark green-black background, mid greens,
-bright mint-green highlights), like the original MGS codec faces: semi-realistic anime illustration by Yoji Shinkawa
-style, hard cel shading, strong shadows, visible horizontal CRT scanlines, slight screen glow. No text, no frame,
+bright mint-green highlights), like a retro game codec screen: NOT realistic, a fun friendly CARTOON caricature in clean 16-bit
+pixel art (big readable shapes, simple flat shading, soft lighting, no dark shadows on the eyes, nothing scary,
+likable comic look like a Nintendo / Advance Wars character portrait), visible horizontal CRT scanlines, slight screen glow. No text, no frame,
 no UI, no logo. 1:1 square image.
 
 ## 1. SOURIANT (à faire en premier)
-Using the attached photo as the reference, keep EXACTLY the same head as in the photo: same face shape and
+Using the attached photo as the reference, keep EXACTLY the same head as in the photo (stylized as a cartoon, but still clearly him): same face shape and
 features, same hair length and haircut, same beard length and shape, same glasses if any. Do not make him younger,
 thinner or more muscular, do not change his hair or beard. Draw this man as a Metal Gear Solid (PS1, 1998) CODEC portrait. Square close-up portrait, head and top of the
 shoulders, facing the camera, centered. Monochrome phosphor GREEN palette only (dark green-black background, mid
-greens, bright mint-green highlights), like the original MGS codec faces: semi-realistic anime illustration in
-Yoji Shinkawa style, hard cel shading, strong shadows, visible horizontal CRT scanlines, slight screen glow.
+greens, bright mint-green highlights), like a retro game codec screen: NOT realistic, a fun friendly CARTOON caricature in clean 16-bit
+pixel art (big readable shapes, simple flat shading, soft lighting, no dark shadows on the eyes, nothing scary,
+likable comic look like a Nintendo / Advance Wars character portrait), visible horizontal CRT scanlines, slight screen glow.
 Expression: SMILING — a warm, genuine friendly smile showing a little of the teeth, relaxed eyebrows, eyes slightly
 squinted by the smile, small smile lines at the corners of the eyes, like a boss who is amused and pleased. He wears the SAME SHIRT as in the photo (same type of shirt and collar), no jacket, no uniform. No text, no frame, no UI, no logo. 1:1 square image.
 
@@ -44,7 +46,7 @@ neutral mouth, slightly lowered eyelids, the cold look of a boss who controls ev
 ## 3. MACHIAVÉLIQUE
 Same character, same framing, same green codec style and scanlines as the previous image. Keep exactly the same head (same hair length, same beard length), same shirt as in
 the photo. Only the expression changes: MACHIAVELLIAN — a wide sly smirk on one side of the mouth, eyebrows angled down toward the nose, eyes
-narrowed, head tilted slightly down so the shadows darken his eyes, like a villain who just set a trap.
+narrowed, like a cartoon villain who just set a funny trap, playful not scary.
 No text, no frame. 1:1 square image.
 
 ## 4. SURPRIS
@@ -56,14 +58,14 @@ still in control, not afraid. No text, no frame. 1:1 square image.
 ## 5. CHOQUÉ
 Same character, same framing, same green codec style and scanlines. Keep exactly the same head (same hair length, same beard length), same shirt as in
 the photo. Only the expression changes: SHOCKED —
-eyes very wide with small pupils, eyebrows up and pinched, jaw dropped, a drop of sweat on the temple, sharp
-dramatic shadows, like a boss who cannot believe he is losing. No text, no frame. 1:1 square image.
+eyes very wide with small pupils, eyebrows up and pinched, jaw dropped, a big cartoon drop of sweat on the temple,
+comic and exaggerated, like a boss who cannot believe he is losing. No text, no frame. 1:1 square image.
 
 ## 6. MASQUÉ (façon Psycho Mantis)
 Same character, same framing, same green codec style and scanlines. Now his whole face is hidden behind a
 PSYCHO MANTIS style gas mask: a smooth leather-like face mask fitting the skull, two big round dark glass eye
 lenses, a corrugated breathing hose hanging from the mouth area down to the chest, a high collar. His hair stays
-visible on top, exactly the same hair length as in the photo, and he still wears the same shirt as in the photo. Head slightly tilted to the side, mysterious and creepy, faint psychic glow around the head.
+visible on top, exactly the same hair length as in the photo, and he still wears the same shirt as in the photo. Head slightly tilted to the side, mysterious but cartoon and fun, not scary, faint psychic glow around the head.
 Still monochrome phosphor green only. No text, no frame. 1:1 square image.
 
 ## (Option) Beufa à son bureau, sans masque
