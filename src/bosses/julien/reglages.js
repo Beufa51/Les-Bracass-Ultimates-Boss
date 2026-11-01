@@ -9,6 +9,8 @@ export const REGLAGES = {
     vitesse: 3.2,        // avancer / reculer
     vitesseCote: 2.8,    // pas de côté
     rotation: 2.4,       // radians par seconde (≈ 140° / s)
+    course: 1.6,         // vitesse ×1,6 en courant (Maj, ou « Courir » sur téléphone)
+    souris: 0.004,       // rotation par pixel de souris
     rayon: 0.25,         // taille du joueur pour les collisions
   },
   oeufs: {

@@ -963,7 +963,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
 - Fichiers : `src/bosses/julien/` : `raycaster.js` (moteur 3D), `niveau_manif.js` (plan en texte, légende en tête),
   `textures.js` (murs/persos/objets dessinés par le code), `visage.js`, `reglages.js`, `manifeste.js` (bips provisoires).
   Rendu : toile 480×270 agrandie ×2 (vue 480×222 + barre 48).
-- Commandes : ↑↓ avancer, ←→ tourner, Q/D ou X+←→ pas de côté, Z/Espace œuf. Tactile : croix, « Côté » maintenu, « Œuf ».
+- Commandes EXACTEMENT comme Doom 93 (demande de Fabien) : ↑↓ avancer, ←→ tourner, Alt+←→ (ou , .) pas de côté,
+  Ctrl ou clic tirer, Maj courir, souris pour tourner (un clic la capture, Échap la libère) ; Z et Q/D en plus.
+  Tactile : croix, « Côté » maintenu (= Alt), « Œuf », « Courir » maintenu.
 - À FAIRE : vrais sons et images (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,

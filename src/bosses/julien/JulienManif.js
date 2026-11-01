@@ -60,19 +60,22 @@ export class JulienManif extends BossScene {
 
     this.touches = creerTouches(this);
     const K = Phaser.Input.Keyboard.KeyCodes;
-    this.cotes = this.input.keyboard.addKeys({ q: K.Q, a: K.A, d: K.D, e: K.E });
+    // commandes de Doom (1993) : Alt + ← → pas de côté (ou , et .), Ctrl tirer, Maj courir, souris pour tourner
+    this.cotes = this.input.keyboard.addKeys({ alt: K.ALT, ctrl: K.CTRL, maj: K.SHIFT, virgule: K.COMMA, point: K.PERIOD,
+      q: K.Q, d: K.D });
+    this.installerSouris();
     this.enJeu = false;
     this.dessiner(0);
     const tact = estTactile();
     this.afficherIntro('LA MANIF', [
       'Rejoins le portail du LYCÉE à travers la manif !',
-      tact ? '▲ ▼ : avancer / reculer      ◀ ▶ : tourner' : '↑ ↓ : avancer / reculer      ← → : tourner',
-      tact ? 'Côté (maintenu) + ◀ ▶ : pas de côté' : 'Q / D (ou X + ← →) : pas de côté',
-      tact ? 'Œuf : lancer un œuf' : 'Z ou ESPACE : lancer un œuf',
+      tact ? '▲ ▼ : avancer / reculer      ◀ ▶ : tourner' : '↑ ↓ : avancer / reculer      ← → ou souris : tourner',
+      tact ? 'Côté (maintenu) + ◀ ▶ : pas de côté' : 'ALT + ← → (ou , et .) : pas de côté',
+      tact ? 'Œuf : lancer      Courir (maintenu) : courir' : 'CTRL ou clic : lancer un œuf      MAJ : courir',
       'Les lacrymos piquent : sors vite du nuage.',
       'Le bouclier arrête les œufs, SAUF quand le CRS',
       'est essoufflé après sa charge : esquive de côté puis vise !',
-    ], () => { etiquettesTactiles({ z: 'Œuf', x: 'Côté', espace: null }); this.enJeu = true; this.message('Direction le lycée ! Le portail est au nord.'); });
+    ], () => { etiquettesTactiles({ z: 'Œuf', x: 'Côté', espace: 'Courir' }); this.enJeu = true; this.message('Direction le lycée ! Le portail est au nord.'); });
   }
 
   // ------------------------------------------------------------------ niveau
@@ -106,6 +109,21 @@ export class JulienManif extends BossScene {
     this.repousses = 0;
   }
 
+  // Souris (ordinateur) : un clic capture la souris ; ensuite la bouger fait tourner et cliquer lance un œuf (Échap la libère)
+  installerSouris() {
+    this.sourisX = 0; this.clic = false; this.clicNouveau = false;
+    if (estTactile()) return;
+    const souris = this.input.mouse;
+    this.input.on('pointerdown', () => {
+      if (!this.enJeu) return;
+      if (!souris.locked) { souris.requestPointerLock(); return; }
+      this.clic = true; this.clicNouveau = true;
+    });
+    this.input.on('pointerup', () => { this.clic = false; });
+    this.input.on('pointermove', (p) => { if (souris.locked && this.enJeu) this.sourisX += p.movementX; });
+    this.events.once('shutdown', () => { if (souris.locked) souris.releasePointerLock(); });
+  }
+
   message(t) { this.txtMsg.setText(t); this.msgT = 2.8; }
 
   // collision : murs + objets solides (cercle). ignore : l'entité qui bouge (pour ne pas se bloquer elle-même)
@@ -135,7 +153,7 @@ export class JulienManif extends BossScene {
     }
     if (j.vie <= 0) {
       j.expr = 'ko'; j.exprT = 99;
-      this.enJeu = false;
+      this.enJeu = false; this.libererSouris();
       this.time.delayedCall(1200, () => this.defaite('Gazé ! Les CRS t\'ont renvoyé chez toi. Le lycée attendra…'));
     }
   }
@@ -145,6 +163,7 @@ export class JulienManif extends BossScene {
     const dt = Math.min(delta / 1000, 0.05);
     if (this.enJeu && !this.termine) {
       this.bougerJoueur(dt);
+      this.clicNouveau = false;
       this.ennemis.forEach(e => this.ia(e, dt));
       this.projectiles(dt);
       this.ramasser();
@@ -157,15 +176,18 @@ export class JulienManif extends BossScene {
 
   bougerJoueur(dt) {
     const j = this.j, k = this.touches, c = this.cotes, R = RG.joueur;
-    const modeCote = k.x.isDown;
+    const modeCote = c.alt.isDown || k.x.isDown;   // Alt (bouton « Côté » sur téléphone) : les flèches font des pas de côté
+    const course = c.maj.isDown || k.espace.isDown ? R.course : 1;
     let tourne = 0, avance = 0, cote = 0;
     if (k.gauche.isDown) { if (modeCote) cote -= 1; else tourne -= 1; }
     if (k.droite.isDown) { if (modeCote) cote += 1; else tourne += 1; }
-    if (c.q.isDown || c.a.isDown) cote -= 1;
-    if (c.d.isDown || c.e.isDown) cote += 1;
-    if (k.haut.isDown) avance += 1;
-    if (k.bas.isDown) avance -= 1;
-    j.a += tourne * R.rotation * dt;
+    if (c.virgule.isDown || c.q.isDown) cote -= 1;
+    if (c.point.isDown || c.d.isDown) cote += 1;
+    if (k.haut.isDown) avance += course;
+    if (k.bas.isDown) avance -= course;
+    cote = Math.sign(cote) * course;
+    j.a += tourne * R.rotation * (course > 1 ? 1.4 : 1) * dt + this.sourisX * R.souris;
+    this.sourisX = 0;
     const dx = Math.cos(j.a), dy = Math.sin(j.a);
     const mx = (dx * avance * R.vitesse + -dy * cote * R.vitesseCote) * dt;
     const my = (dy * avance * R.vitesse + dx * cote * R.vitesseCote) * dt;
@@ -178,12 +200,12 @@ export class JulienManif extends BossScene {
     }
 
     j.recharge -= dt; j.lanceT -= dt;
-    if ((k.z.isDown || k.espace.isDown) && j.recharge <= 0) {
+    if ((k.z.isDown || c.ctrl.isDown || this.clic) && j.recharge <= 0) {
       if (j.oeufs > 0) {
         j.oeufs--; j.recharge = RG.oeufs.cadence; j.lanceT = 0.18;
         this.oeufs.push({ x: j.x + dx * 0.3, y: j.y + dy * 0.3, dx, dy, t: 0 });
         jouerSon(this, 'julien_lancer');
-      } else if (vientDAppuyer(k.z) || vientDAppuyer(k.espace)) { this.message('Plus d\'œufs ! Cherche une boîte.'); j.recharge = 0.5; }
+      } else if (vientDAppuyer(k.z) || vientDAppuyer(c.ctrl) || this.clicNouveau) { this.message('Plus d\'œufs ! Cherche une boîte.'); j.recharge = 0.5; }
     }
   }
 
@@ -330,8 +352,10 @@ export class JulienManif extends BossScene {
     }
   }
 
+  libererSouris() { if (this.input.mouse && this.input.mouse.locked) this.input.mouse.releasePointerLock(); }
+
   finNiveau() {
-    this.enJeu = false; this.termine = true;
+    this.enJeu = false; this.termine = true; this.libererSouris();
     jouerSon(this, 'julien_ramasse');
     etiquettesTactiles({ espace: 'OK', z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
     voile(this, 0.8).setDepth(1000);
