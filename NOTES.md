@@ -995,7 +995,10 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
 - Œufs : 40 au départ, maxi 99, boîtes de 15 (Fabien : les munitions ne doivent pas être un problème).
 - Rondes : les policiers non alertés font des allers-retours (sauf parvis et cordon).
 - Statue, camion de CRS, colonne Morris : vraies images (`SEULS` dans le script de découpe : un objet par image).
-- RESTE : sons (bips provisoires), puis NIVEAU 2 (salle de classe contre Julien).
+- SONS : 12 bruitages rétro fabriqués par `outils/julien/generer_sons.py` (WAV) + ambiance de manif en boucle
+  `julien_foule.mp3` (foule, tambours, sifflets) jouée avec la musique ; toux dans le gaz (1 fois / 1,3 s).
+  Voix à enregistrer par Fabien (facultatif) : « Dispersez-vous ! », « Aïe ! », toux, « Beurk ! ».
+- RESTE : NIVEAU 2 (salle de classe contre Julien).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,

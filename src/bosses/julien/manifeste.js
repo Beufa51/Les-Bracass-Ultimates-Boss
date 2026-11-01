@@ -1,20 +1,26 @@
 // Manifeste de Julien : ses visuels et sons (rien de partagé avec les autres boss).
-// Niveau 1 (la manif) : les murs, policiers et la tête du héros sont dessinés par le code (textures.js, visage.js).
-// Sons : bips provisoires pour l'instant (fichier: null) ; plus tard des fichiers dans assets/audio/julien/.
-const bip = (frequence, duree) => ({ fichier: null, provisoire: { frequence, duree } });
+// Images : assets/sprites/julien/ (textures.js) ; bruitages : outils/julien/generer_sons.py → assets/audio/julien/.
+// Sons : fichiers WAV de assets/audio/julien/ (bip provisoire si le fichier manque).
+const son = (nom) => ({ fichier: `audio/julien/julien_${nom}.wav`, provisoire: { frequence: 440, duree: 0.08 } });
 export const MANIFESTE = {
   images: {},
   sons: {
     // MUSIQUE DE FOND (src/core/musique.js, en boucle) : DOOM « At Doom's Gate » (E1M1), déposée par Fabien, mono 64 kb/s
     julien_musique: { fichier: 'audio/julien/julien_musique.mp3', musique: true, volume: 0.4 },
-    julien_lancer: bip(520, 0.05),    // tu lances un œuf
-    julien_splat: bip(180, 0.07),     // un œuf s'écrase
-    julien_plonk: bip(900, 0.04),     // l'œuf rebondit sur le bouclier
-    julien_fuite: bip(760, 0.18),     // un policier s'enfuit
-    julien_aie: bip(140, 0.15),       // tu es touché
-    julien_tir: bip(300, 0.06),       // un policier tire une lacrymo
-    julien_gaz: bip(90, 0.3),         // la lacrymo éclate
-    julien_cri: bip(220, 0.25),       // « DISPERSEZ-VOUS ! »
-    julien_ramasse: bip(880, 0.12),   // objet ramassé
+    // AMBIANCE de manif en boucle (foule, tambours, sifflets), jouée en même temps que la musique
+    julien_foule: { fichier: 'audio/julien/julien_foule.mp3', musique: true, volume: 0.3 },
+    // BRUITAGES fabriqués par outils/julien/generer_sons.py
+    julien_lancer: son('lancer'),     // tu lances un œuf
+    julien_splat: son('splat'),       // un œuf s'écrase
+    julien_plonk: son('plonk'),       // l'œuf rebondit sur le bouclier
+    julien_fuite: son('fuite'),       // un policier s'enfuit (sifflet à coulisse)
+    julien_aie: son('aie'),           // tu es touché
+    julien_toux: son('toux'),         // tu tousses dans le gaz
+    julien_tir: son('tir'),           // un policier tire une lacrymo
+    julien_gaz: son('gaz'),           // la lacrymo éclate
+    julien_cri: son('cri'),           // le CRS siffle avant de charger
+    julien_ramasse: son('ramasse'),   // objet ramassé
+    julien_portail: son('portail'),   // le portail du lycée s'ouvre
+    julien_secret: son('secret'),     // un passage secret s'ouvre
   },
 };

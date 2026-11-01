@@ -71,6 +71,7 @@ export class JulienManif extends BossScene {
     this.tactile = estTactile();   // téléphone : croix = avancer / reculer / pas de côté, ↺ ↻ = tourner, ŒUF en haut
     this.enJeu = false;
     jouerMusique(this, 'julien_musique');   // « At Doom's Gate », en boucle
+    jouerMusique(this, 'julien_foule');     // ambiance de manif par-dessus
     this.dessiner(0);
     const tact = estTactile();
     this.afficherIntro('LA MANIF', [
@@ -252,14 +253,14 @@ export class JulienManif extends BossScene {
     const [x, y] = k.split(',').map(Number);
     this.plan[y] = this.plan[y].slice(0, x) + '.' + this.plan[y].slice(x + 1);
     this.secretsTrouves++;
-    jouerSon(this, 'julien_ramasse', { rate: 0.7 });
+    jouerSon(this, 'julien_secret');
     this.message('PASSAGE SECRET !');
   }
 
   ouvrirPortail() {
     this.portailOuvert = true;
     this.plan = this.plan.map(l => l.replace(/7/g, '.'));
-    jouerSon(this, 'julien_fuite', { rate: 0.6 });
+    jouerSon(this, 'julien_portail');
     this.message('Le parvis est libre : le CPE ouvre le portail ! Entre vite !', 4);
   }
 
@@ -385,6 +386,7 @@ export class JulienManif extends BossScene {
       if (j.vie > 0 && Math.hypot(n.x - j.x, n.y - j.y) < RG.lacrymo.rayon) {
         this.degats(RG.lacrymo.degats * dt);
         j.gaz = Math.min(1, j.gaz + dt * 3);
+        if (this.time.now > (this.touxT || 0)) { jouerSon(this, 'julien_toux'); this.touxT = this.time.now + 1300; }
         if (j.expr !== 'aie') { j.expr = 'tousse'; j.exprT = 0.4; }
       }
     }
