@@ -833,3 +833,11 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Chargeur : aux genoux (face) et au cou (dos), aucune ligne n'a de trait d'encre long → la rangée était coupée en
   2 BANDES (comme 2 rangées de persos) et on perdait la tête ou les pieds. Les bandes reliées par des lignes d'encre
   sont maintenant FUSIONNÉES. Vérifié sur les textures du jeu : face, dos et gardes entiers.
+
+## BEUFA — V79 : PROFIL DE SNAKE EN 4 POSES (ESSAI)
+- `assets_inbox/beufa_heros_profil_4poses.jpg` (contact, bas, PASSAGE genou plié, haut) : style un peu différent
+  (pas de barbe, bandeau plus large) mais invisible à 58 px. Planche du jeu = les 4 poses × 2 (un pas joué 2 fois),
+  `echelleCommune: 'hauteur'` (l'image 2 est dessinée plus petite). Pose 4 : genou très haut (à surveiller).
+- Ancienne planche gardée : `assets_inbox/beufa_heros_profil_V48_sauvegarde.jpg` → la recopier dans
+  `assets/sprites/beufa/beufa_heros_profil.jpg` (et remettre `echelleCommune: true`) pour revenir en arrière.
+- La course de profil reste l'ancienne planche.
