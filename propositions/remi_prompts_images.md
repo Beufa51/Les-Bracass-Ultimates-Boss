@@ -68,3 +68,28 @@ Décor de jeu style manga/anime : couloir des toilettes d'un bar, vu de côté, 
 ## 9. La porte vue DE DOS (audit V3, amélioration C1) ✅ REÇUES ET INTÉGRÉES
 Prompts dans `propositions/remi_audit.md`, section 5 : `remi_porte_dos_planche.jpg` (Rémi de dos) et
 `remi_toi_dos_planche.jpg` (toi de dos).
+
+## 10. L'intérieur du bar (fond du beer pong, derrière Rémi) — `remi_bar_interieur.jpg`
+À joindre : la façade du bar (`remi_bar_facade.jpg`) pour garder le style.
+```
+Même style que l'image jointe (manga/anime, contours nets, couleurs chaudes). Intérieur d'un bar de quartier la nuit, vu DE FACE,
+cadré à hauteur de poitrine : le comptoir en bois au fond avec des étagères pleines de bouteilles éclairées, des tireuses à bière,
+un néon rose « BAR » et un néon bleu « BEER PONG » au mur, guirlandes lumineuses, quelques silhouettes floues de clients sur
+les côtés. Le CENTRE de l'image reste dégagé (un personnage s'y tiendra). Aucun texte lisible à part les néons. Image 16:9.
+```
+
+## 11. Les quais de nuit (2e quartier du vélo) — `remi_rue2.jpg`
+À joindre : la rue de nuit (`remi_rue.jpg`) pour garder le style.
+```
+Même style et même cadrage que l'image jointe (décor de jeu en défilement horizontal, vue STRICTEMENT DE PROFIL, la nuit) :
+les quais d'une rivière en ville, parapet en pierre, réverbères, péniches amarrées, la rivière et des reflets de lumières,
+des immeubles sur l'autre rive au loin, ciel nuit avec lune. Le bas de l'image s'arrête au niveau du quai (pas de route).
+Image très large (format 3:1), bords gauche et droit raccordables. Aucun personnage, aucun texte.
+```
+
+## 12. Le centre-ville animé (3e quartier du vélo) — `remi_rue3.jpg`
+```
+Même style et même cadrage que l'image jointe (défilement horizontal, vue de profil, la nuit) : une rue piétonne animée du
+centre-ville, terrasses de bars éclairées, guirlandes lumineuses au-dessus de la rue, enseignes néon (sans texte lisible),
+façades colorées. Le bas de l'image s'arrête au pied des façades. Image très large (3:1), bords raccordables, aucun personnage.
+```

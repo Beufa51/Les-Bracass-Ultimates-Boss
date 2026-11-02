@@ -82,7 +82,23 @@
 - V5b (retour : « toute la planche de gens au lieu d'un » ; boutons trop petits) : 3 images avaient changé de 1 px au
   re-détourage (porte 344, bourrés 559 de haut, façade 762) → Phaser ne découpait plus les cases. Manifeste corrigé +
   NOUVEL OUTIL `node outils/remi_verif.mjs` (taille des fichiers = manifeste). Vélo : 2 GROS boutons dessinés en bas
-  (DRING à gauche avec sa recharge en arc, SAUTE à droite), qui s'allument ; toute la moitié d'écran reste active. : `python3 outils/remi/preparer_images.py`.
+  (DRING à gauche avec sa recharge en arc, SAUTE à droite), qui s'allument ; toute la moitié d'écran reste active.
+- V6 (retours : pong trop facile + boire sans effet ; porte pas très fun ; vélo plus grand, routes, tremplins ; sons ;
+  image du bar derrière Rémi) :
+  - SONS : vrais bruitages générés par `python3 outils/remi/generer_sons.py assets/audio/remi` (sonnette, chute, plouf,
+    boit, hips, foule, bois...). Manifeste : `son(nom, ...)` (bip de secours si le fichier manque).
+  - PONG : imprécision plus forte (`erreur` 0,045 / 0,07 / 0,085, uniforme), `dedans` 0,7, `tirage` 150 ; courbe d'aide
+    PARTIELLE (`apercu` 1 / 0,65 / 0,45). ALCOOL : chaque verre bu efface la fin de la courbe (`courbeBue`), visée qui tangue
+    plus vite et plus fort, imprécision +15 %/verre, VISION DOUBLE (verres et Rémi en double), écran qui penche, HOQUETS
+    dès 2 verres (`hoquet`), glouglou. Bot parfait : gagne encore souvent (la pyramide est une grosse cible) — à juger en main.
+    Fond : `remi_bar_interieur` utilisé s'il est ajouté au manifeste (prompt n°10).
+  - PORTE : ÉLAN en alternance GAUCHE / DROITE (2 gros boutons, celui attendu clignote ; même côté 2 fois = raté),
+    `elan` 3 s, `parTape` 0,09 ; COUP DE GRÂCE (élan > 90 % + pile dessus) ; annonce MANCHE DÉCISIVE.
+  - VÉLO x1,3 (sprites, chocs, sauts, vitesses, `longueur` 19500) ; vélo à x 260 (plus caché par le bouton DRING) ;
+    TREMPLINS + 2 VOITURES garées tous les `voitures` obstacles (on roule sur les toits, pintes au-dessus, rentrer dans le
+    côté = chute ; `solSous`, `voituresPas`) ; 3 QUARTIERS (`QUARTIERS` : rue des bars, quais, centre-ville : images
+    `remi_rue2` / `remi_rue3` si ajoutées au manifeste, sinon la rue teintée) avec fondu et annonce.
+    Bots NORMAL (15 % d'erreurs) / CHAMPION (10 %) : arrivés de justesse avant réglage ; temps finaux 58 / 46 / 38 s. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

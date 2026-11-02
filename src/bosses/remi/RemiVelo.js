@@ -20,16 +20,23 @@ import { bulle, annonce, jeuSuivant, ecranPerdu, hasard, choisir } from './commu
 import { choisirDifficulte } from './difficulte.js';
 
 const SOL = 440;                     // hauteur de la route à l'écran
-const X_VELO = 230;                  // le vélo reste à cet endroit de l'écran (c'est la rue qui défile)
-const DEMI_VELO = 50;                // demi-longueur du vélo pour les chocs (un peu plus petite que l'image : indulgent)
-const HAUT_PINTE = 200;              // hauteur des pintes au-dessus de la route (on ne les attrape qu'en sautant)
+const X_VELO = 260;                  // le vélo reste à cet endroit de l'écran (c'est la rue qui défile)
+const DEMI_VELO = 65;                // demi-longueur du vélo pour les chocs (un peu plus petite que l'image : indulgent)
+const HAUT_PINTE = 260;              // hauteur des pintes au-dessus de la route (on ne les attrape qu'en sautant)
 const BOUTON_G = { x: 88, y: 448, r: 74 }, BOUTON_D = { x: LARGEUR - 88, y: 448, r: 74 };   // les 2 gros boutons
+// LES QUARTIERS traversés (« routes ») : à partir de cette part du trajet ; image remi_rue2 / remi_rue3 si elle existe,
+// sinon la rue de base teintée
+const QUARTIERS = [
+  { a: 0, nom: 'LA RUE DES BARS', image: 'remi_rue', teinte: 0xffffff },
+  { a: 0.34, nom: 'LES QUAIS', image: 'remi_rue2', teinte: 0x9fb8ff },
+  { a: 0.67, nom: 'LE CENTRE-VILLE', image: 'remi_rue3', teinte: 0xffc8a0 },
+];
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 // hauteur et demi-largeur de chaque obstacle (chocs) ; debout et traverse sont plus hauts que le plus grand saut
-const TAILLE = { allonge: [40, 45], verre: [10, 28], debout: [160, 18], traverse: [160, 20], vomi: [4, 42] };
+const TAILLE = { allonge: [52, 58], verre: [13, 36], debout: [210, 23], traverse: [210, 26], vomi: [5, 55] };
 const SONNER = { debout: true, traverse: true };    // les obstacles qui demandent la sonnette (les autres : sauter)
 // illustration des bourrés (remi_bourres.png : debout, sursaute, allongé, traverse de face) et sa taille à l'écran
-const BOURRE = 0.25, IMAGE_BOURRE = { debout: 0, ecarte: 1, allonge: 2, marche: 3 };
+const BOURRE = 0.33, IMAGE_BOURRE = { debout: 0, ecarte: 1, allonge: 2, marche: 3 };
 const TEINTES = [0xffffff, 0xffe2d8, 0xdfe6ff, 0xe4ffd9, 0xfff3c0];
 
 export class RemiVelo extends BossScene {
@@ -42,14 +49,14 @@ export class RemiVelo extends BossScene {
     this.chute = 0; this.ralenti = 0; this.glisse = 0; this.recharge = 0; this.dring = 0; this.invincible = 0; this.horloge = 0;
     this.prochainTexto = 9; this.chutes = 0; this.score = 0; this.serie = 0; this.pintesPrises = 0;
     this.obstacles = []; this.pintes = [];
-    this.sautDoigt = false;
+    this.sautDoigt = false; this.voitures = []; this.tremplins = []; this.auSol = true;
 
     this.creerDecor();
     this.decor = this.add.graphics().setDepth(2);
     this.gPintes = this.add.graphics().setDepth(9);
     this.gVelo = this.add.graphics().setDepth(11);
     // l'illustration du vélo (8 poses) ; sans fichier, c'est le dessin du code
-    this.sprVelo = this.textures.exists('remi_velo') ? this.add.sprite(0, 0, 'remi_velo', 0).setOrigin(0.5, 1).setDepth(10).setScale(0.6) : null;
+    this.sprVelo = this.textures.exists('remi_velo') ? this.add.sprite(0, 0, 'remi_velo', 0).setOrigin(0.5, 1).setDepth(10).setScale(0.78) : null;
     this.gRemi = this.add.graphics().setDepth(6);
     this.facade = this.textures.exists('remi_bar_facade') ? this.add.image(0, 0, 'remi_bar_facade').setOrigin(0.5, 1).setScale(340 / 917).setDepth(3).setVisible(false) : null;
     this.sprRemi = this.textures.exists('remi_porte') ? this.add.sprite(0, 0, 'remi_porte', 0).setFlipX(true).setOrigin(0.7, 1).setScale(0.42).setDepth(6).setVisible(false) : null;
@@ -88,9 +95,10 @@ export class RemiVelo extends BossScene {
   // (re)démarrage du trajet (aussi appelé directement par les tests)
   demarrer() {
     this.genererParcours();
-    this.bx = 0; this.v = V.vitesseDepart; this.y = 0; this.vy = 0; this.invincible = 0;
+    this.bx = 0; this.v = V.vitesseDepart; this.y = 0; this.vy = 0; this.invincible = 0; this.auSol = true; this.surTremplin = null;
     this.score = 0; this.serie = 0; this.pintesPrises = 0; this.chutes = 0;
     this.tempsRestant = this.diff.temps;
+    this.quartier = undefined; this.changerQuartier(0);
     this.etat = 'jeu';
     etiquettesTactiles(VIDES);   // sur téléphone : pas de boutons, deux grandes moitiés d'écran
     annonce(this, 'C\'EST PARTI !', '#7fff7f', 0.8);
@@ -110,20 +118,32 @@ export class RemiVelo extends BossScene {
 
   genererParcours() {
     for (const o of this.obstacles) { o.g.destroy(); if (o.spr) o.spr.destroy(); }
-    this.obstacles = []; this.pintes = [];
+    this.obstacles = []; this.pintes = []; this.voitures = []; this.tremplins = [];
     const poids = Object.entries(V.types), total = poids.reduce((s, [, p]) => s + p, 0);
     const tirer = () => { let r = Math.random() * total; for (const [n, p] of poids) { r -= p; if (r <= 0) return n; } return 'debout'; };
     // les 3 premiers obstacles apprennent les gestes : allongé (saut), debout (sonnette), traverse (sonnette)
     const debut = ['allonge', 'debout', 'traverse'];
     let x = 1100, k = 0;
     while (x < V.longueur - 800) {
+      // tous les « voitures » obstacles : un TREMPLIN puis 2 VOITURES garées (on roule sur le toit, pintes au-dessus)
+      if (k > 3 && k % V.voitures === 0) {
+        const L = V.longueurVoiture, H = V.hauteurVoiture;
+        this.tremplins.push({ x0: x, l: 150, h: 70 });
+        const v1 = x + 150 + 130;
+        for (const xv of [v1, v1 + L + 40]) {
+          this.voitures.push({ x0: xv, l: L, h: H, couleur: choisir([0xb03a3a, 0x3a6ab0, 0xd8c060, 0x5a8a4a, 0x8a4ab0]), touche: false });
+          this.pintes.push({ x: xv + L * 0.5, h: H + 140, prise: false, t: Math.random() * 6 });
+        }
+        x = v1 + 2 * L + 40 + 520; k++;
+        continue;
+      }
       const type = k < debut.length ? debut[k] : tirer();
       k++;
       this.ajouter(type, x);
       // l'écart se compte en TEMPS, à la vitesse prévue à cet endroit : jamais deux obstacles collés
       const vit = V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * x / V.longueur;
       const ecart = vit * hasard(V.ecart[0], V.ecart[1]) / this.diff.densite + (type === 'traverse' ? 120 : 0);
-      if (k > 2 && Math.random() < V.pintes) this.pintes.push({ x: x + ecart / 2, prise: false, t: Math.random() * 6 });
+      if (k > 2 && Math.random() < V.pintes) this.pintes.push({ x: x + ecart / 2, h: HAUT_PINTE, prise: false, t: Math.random() * 6 });
       x += ecart;
     }
   }
@@ -211,27 +231,88 @@ export class RemiVelo extends BossScene {
     const tenu = T.haut.isDown || T.espace.isDown || this.sautDoigt;
     if (this.chute > 0) {
       this.chute -= dt; this.v = 0;
-      if (this.chute <= 0) { this.y = 0; this.vy = 0; this.invincible = V.invincible; }
+      if (this.chute <= 0) { this.y = 0; this.vy = 0; this.auSol = true; this.invincible = V.invincible; }
     } else {
       // vitesse : de plus en plus vite vers le bar ; ralentie après une crevaison ou une glissade
       const cible = (V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, this.bx / V.longueur)) * (this.ralenti > 0 ? 0.55 : 1);
       this.v += Math.sign(cible - this.v) * Math.min(Math.abs(cible - this.v), 500 * dt);
-      if (this.y === 0 && this.vy === 0 && this.tampon > 0) { this.vy = V.saut; this.tenu = 0; this.tampon = 0; jouerSon(this, 'remi_saut'); }
+      if (this.auSol && this.tampon > 0) { this.vy = V.saut; this.tenu = 0; this.tampon = 0; this.auSol = false; jouerSon(this, 'remi_saut'); }
+    }
+    // le SOL sous le vélo : la route (0), un tremplin (pente), le toit d'une voiture
+    const avant = this.surTremplin;
+    const sol = this.solSous(this.y);
+    if (this.auSol && avant && !this.surTremplin && this.bx > avant.x0 + avant.l) {
+      // bout du tremplin : ENVOL !
+      this.vy = V.tremplin; this.auSol = false; this.surTremplin = null; this.tenu = 0;
+      jouerSon(this, 'remi_saut', { rate: 0.8 }); bulle(this, 'ENVOL !', '#9fe0ff', 0.6, 140); this.score += 15;
+    } else if (this.auSol && this.vy <= 0) {
+      if (sol < this.y - 2) this.auSol = false;   // on quitte le toit (ou la fin du tremplin) : on tombe
+      else this.y = sol;
     }
     // saut : tant qu'on garde appuyé (au début), la gravité est plus faible = saut plus haut et plus long
-    if (this.y > 0 || this.vy > 0) {
+    if (!this.auSol) {
       this.tenu += dt;
       const leger = tenu && this.vy > 0 && this.tenu < V.sautTenu;
+      const yAvant = this.y;
       this.y += this.vy * dt; this.vy -= (leger ? V.graviteTenue : V.gravite) * dt;
-      if (this.y <= 0) { this.y = 0; this.vy = 0; jouerSon(this, 'remi_atterrit'); }
+      const sol2 = this.solSous(Math.max(this.y, yAvant));   // (vu d'où on était : on ne traverse pas un toit en tombant vite)
+      if (this.vy <= 0 && this.y <= sol2) { this.y = sol2; this.vy = 0; this.auSol = true; jouerSon(this, 'remi_atterrit'); }
     }
+    this.voituresPas();
     this.bx += this.v * dt;
     this.a += this.v * dt / 14;
     this.obstaclesPas(dt);
     this.pintesPas();
+    // changement de QUARTIER
+    const q = QUARTIERS.filter(z => this.bx >= z.a * V.longueur).length - 1;
+    if (q !== this.quartier) this.changerQuartier(q);
     this.prochainTexto -= dt;
     if (this.prochainTexto <= 0) { this.prochainTexto = hasard(10, 15); bulle(this, '📱 ' + choisir(REPLIQUES.textos), '#9fe0ff', 2.4, 76); jouerSon(this, 'remi_texto'); }
     if (this.bx >= V.longueur) this.arriver();
+  }
+
+  changerQuartier(q) {
+    const premier = this.quartier === undefined || this.quartier < 0;
+    this.quartier = q;
+    if (!this.rue) return;
+    const z = QUARTIERS[q], appliquer = () => {
+      this.rue.setTexture(this.textures.exists(z.image) ? z.image : 'remi_rue');
+      this.rue.setTint(this.textures.exists(z.image) ? 0xffffff : z.teinte);
+    };
+    if (premier) { appliquer(); return; }
+    // petit fondu au noir pendant qu'on change de quartier
+    const voileQ = this.add.rectangle(0, 0, LARGEUR, SOL - 14, 0x000000, 0).setOrigin(0, 0).setDepth(1.5);
+    this.tweens.add({ targets: voileQ, fillAlpha: 0.85, duration: 300, yoyo: true, onYoyo: appliquer, onComplete: () => voileQ.destroy() });
+    annonce(this, z.nom, '#9fe0ff', 1);
+  }
+
+  // hauteur du sol sous le vélo, vu depuis la hauteur y : on ne « monte » sur un toit que par au-dessus (marche de 30 px)
+  solSous(y) {
+    let h = 0;
+    this.surTremplin = null;
+    for (const t of this.tremplins) {
+      if (this.bx >= t.x0 && this.bx <= t.x0 + t.l) {
+        const ht = t.h * (this.bx - t.x0) / t.l;
+        if (ht <= y + 30) { h = Math.max(h, ht); this.surTremplin = t; }
+      }
+    }
+    for (const v of this.voitures) {
+      if (this.bx + DEMI_VELO * 0.7 >= v.x0 && this.bx - DEMI_VELO * 0.7 <= v.x0 + v.l && v.h <= y + 30) h = Math.max(h, v.h);
+    }
+    return h;
+  }
+
+  // rentrer dans une voiture par le côté = chute
+  voituresPas() {
+    if (this.chute > 0 || this.invincible > 0) return;
+    for (const v of this.voitures) {
+      if (v.touche) continue;
+      if (this.bx + DEMI_VELO * 0.8 >= v.x0 && this.bx - DEMI_VELO * 0.8 <= v.x0 + v.l && this.y < v.h - 30) {
+        v.touche = true; this.serie = 0;
+        this.tomber({ type: 'voiture', etat: '', p: 0 });
+        this.bx = v.x0 - DEMI_VELO - 10;   // on recule devant la voiture
+      }
+    }
   }
 
   sonner() {
@@ -290,7 +371,7 @@ export class RemiVelo extends BossScene {
     for (const p of this.pintes) {
       if (p.prise) continue;
       const d = p.x - this.bx;
-      if (Math.abs(d) < 45 && this.y + 165 >= HAUT_PINTE - 10) {
+      if (Math.abs(d) < 55 && this.y + 215 >= p.h - 12) {
         p.prise = true; this.pintesPrises++;
         this.tempsRestant += V.bonusPinte; this.score += 25;
         bulle(this, `🍺 +${V.bonusPinte} s`, '#ffd84a', 0.7, 140);
@@ -302,7 +383,7 @@ export class RemiVelo extends BossScene {
   tomber(o) {
     this.chute = V.chute; this.chutes++;
     this.y = 0; this.vy = 0;
-    if (o.type === 'traverse') o.etat = 'recule'; else { o.etat = 'ecarte'; o.p = 1; }
+    if (o.type === 'traverse') o.etat = 'recule'; else if (o.type !== 'voiture') { o.etat = 'ecarte'; o.p = 1; }
     this.cameras.main.shake(250, 0.012);
     jouerSon(this, 'remi_chute');
     bulle(this, choisir(['Aïe !', 'Il m\'a pas vu !', 'Oh le boulet...', 'Ma roue !']), '#ff9a9a', 1.2, 140);
@@ -350,12 +431,13 @@ export class RemiVelo extends BossScene {
       g.lineStyle(2, pret ? 0xffe680 : 0x888888, pret ? 0.7 : 0.3).lineBetween(x1, SOL - 14, x1, SOL + 8);
     }
     this.dessinerObstacles(g, cam);
+    this.dessinerVoitures(cam);
     // pintes à attraper en sautant
     const gp = this.gPintes.clear();
     for (const p of this.pintes) {
       const sx = p.x - cam;
       if (p.prise || sx < -50 || sx > LARGEUR + 50) continue;
-      const y = SOL - HAUT_PINTE + Math.sin(this.horloge * 4 + p.t) * 6;
+      const y = SOL - p.h + Math.sin(this.horloge * 4 + p.t) * 6;
       gp.fillStyle(0xffd84a, 0.25).fillCircle(sx, y, 26);
       gp.fillStyle(0xe8a52a, 1).fillRect(sx - 11, y - 14, 22, 28);
       gp.fillStyle(0xffffff, 1).fillRect(sx - 12, y - 19, 24, 7);
@@ -387,6 +469,33 @@ export class RemiVelo extends BossScene {
     }
   }
 
+  dessinerVoitures(cam) {
+    if (!this.gVoit) this.gVoit = this.add.graphics().setDepth(7);
+    const g = this.gVoit.clear();
+    for (const t of this.tremplins) {
+      const x = t.x0 - cam;
+      if (x > LARGEUR + 50 || x + t.l < -50) continue;
+      // tremplin : une planche posée sur des caisses de bière
+      g.fillStyle(0x5a3a1a, 1).fillRect(x + t.l - 60, SOL - t.h + 8, 60, t.h - 8);
+      g.fillStyle(0xd8a040, 1).fillRect(x + t.l - 56, SOL - t.h + 14, 52, 20).fillRect(x + t.l - 56, SOL - t.h + 40, 52, 20);
+      g.lineStyle(10, 0x2a1a0a, 1).lineBetween(x, SOL, x + t.l, SOL - t.h);
+      g.lineStyle(6, 0xc89050, 1).lineBetween(x, SOL - 1, x + t.l, SOL - t.h - 1);
+    }
+    for (const v of this.voitures) {
+      const x = v.x0 - cam;
+      if (x > LARGEUR + 50 || x + v.l < -50) continue;
+      const L = v.l, H = v.h;
+      g.fillStyle(0x000000, 0.3).fillEllipse(x + L / 2, SOL + 2, L, 14);
+      g.fillStyle(v.couleur, 1).fillRoundedRect(x, SOL - H * 0.62, L, H * 0.5, 14);           // caisse
+      g.fillRoundedRect(x + L * 0.2, SOL - H, L * 0.58, H * 0.44, { tl: 26, tr: 22, bl: 0, br: 0 });   // habitacle (le toit = H)
+      g.fillStyle(0x9fd8e8, 0.85).fillRect(x + L * 0.25, SOL - H + 10, L * 0.22, H * 0.28).fillRect(x + L * 0.52, SOL - H + 10, L * 0.22, H * 0.28);
+      g.fillStyle(0x111111, 1).fillCircle(x + L * 0.2, SOL - 18, 22).fillCircle(x + L * 0.8, SOL - 18, 22);
+      g.fillStyle(0x888888, 1).fillCircle(x + L * 0.2, SOL - 18, 9).fillCircle(x + L * 0.8, SOL - 18, 9);
+      g.fillStyle(0xffe680, 1).fillRect(x + L - 10, SOL - H * 0.5, 10, 12);
+      g.lineStyle(3, 0x111111, 0.8).strokeRoundedRect(x, SOL - H * 0.62, L, H * 0.5, 14);
+    }
+  }
+
   dessinerObstacles(g, cam) {
     const icones = this.nomDiff !== 'champion' && this.etat === 'jeu';
     for (const o of this.obstacles) {
@@ -397,7 +506,7 @@ export class RemiVelo extends BossScene {
       // icône : quoi faire (▲ = saute, 🔔 = sonne), tant qu'on ne l'a pas encore passé
       if (icones && !o.touche && o.x > this.bx && sx < LARGEUR - 20 && o.etat !== 'ecarte' && o.etat !== 'recule') {
         const d = o.x - this.bx, son = SONNER[o.type], dedans = son && d > 60 && d < this.diff.sonnette;
-        const y = SOL - (son ? 190 : 80) + Math.sin(this.horloge * 6) * 3;
+        const y = SOL - (son ? 250 : 100) + Math.sin(this.horloge * 6) * 3;
         g.fillStyle(son ? (dedans ? 0xffe680 : 0x6a6040) : 0x9fe0ff, 0.95).fillCircle(sx, y, 15);
         if (son) { g.fillStyle(0x222222, 1).fillTriangle(sx - 8, y + 5, sx + 8, y + 5, sx, y - 9).fillCircle(sx, y + 7, 2.5); }
         else g.fillStyle(0x10304a, 1).fillTriangle(sx - 9, y + 6, sx + 9, y + 6, sx, y - 8);
@@ -434,16 +543,16 @@ export class RemiVelo extends BossScene {
     const zig = this.glisse > 0 ? Math.sin(this.horloge * 30) * 0.12 : 0;
     const bond = this.chute > 0 ? 0 : -this.y;
     gv.setPosition(X_VELO, SOL + bond).setRotation(0);
-    const rot = this.chute > 0 ? 0 : (this.vy > 0 ? -0.12 : this.y > 0 ? 0.08 : 0) + zig;
+    const rot = this.chute > 0 ? 0 : (this.auSol && this.surTremplin ? -Math.atan2(this.surTremplin.h, this.surTremplin.l) : this.vy > 0 ? -0.12 : !this.auSol ? 0.08 : 0) + zig;
     if (this.sprVelo) {
-      const f = this.chute > 0 ? 7 : this.y > 0 ? 6 : Math.floor(this.a / (Math.PI * 2) * 6) % 6;
+      const f = this.chute > 0 ? 7 : !this.auSol ? 6 : Math.floor(this.a / (Math.PI * 2) * 6) % 6;
       this.sprVelo.setFrame(f).setPosition(X_VELO, SOL + bond + 6).setRotation(rot)
         .setAlpha(this.invincible > 0 && Math.floor(this.horloge * 12) % 2 ? 0.35 : 1);   // clignote après une chute
     } else {
       if (this.chute > 0) gv.setRotation(-1.3).setPosition(X_VELO + 20, SOL - 30); else gv.setRotation(rot);
       cycliste(gv, this.a, { sonnette: this.dring > 0 });
     }
-    if (this.dring > 0) gv.lineStyle(3, 0xffe680, 1).strokeCircle(60, -150, 8).strokeCircle(60, -150, 16);
+    if (this.dring > 0) gv.lineStyle(3, 0xffe680, 1).strokeCircle(78, -195, 10).strokeCircle(78, -195, 20);
   }
 
   dessinerHud() {

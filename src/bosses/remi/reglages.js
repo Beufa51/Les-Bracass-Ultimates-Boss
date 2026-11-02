@@ -13,27 +13,28 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 //  PORTE : remiMin / remiMax = scores de Rémi ; zone = largeur de la zone parfaite de la visée (0 à 1) ; visee = vitesse du curseur (x)
 export const DIFFICULTES = {
   facile: { nom: 'FACILE', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
-    temps: 62, densite: 0.8, traverse: 0.8, sonnette: 560,
+    temps: 58, densite: 0.8, traverse: 0.8, sonnette: 730,
     erreur: 0.045, apercu: 1, distrait: 0, remi: 0.32, aide: true,
     remiMin: 560, remiMax: 760, zone: 0.22, visee: 0.8 },
   normal: { nom: 'NORMAL', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
-    temps: 50, densite: 1, traverse: 1, sonnette: 500,
+    temps: 46, densite: 1, traverse: 1, sonnette: 650,
     erreur: 0.07, apercu: 0.65, distrait: 0.35, remi: 0.42, aide: false,
     remiMin: 650, remiMax: 850, zone: 0.15, visee: 1 },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
-    temps: 43, densite: 1.2, traverse: 1.25, sonnette: 440,
+    temps: 38, densite: 1.2, traverse: 1.25, sonnette: 570,
     erreur: 0.085, apercu: 0.45, distrait: 0.55, remi: 0.52, aide: false,
     remiMin: 760, remiMax: 930, zone: 0.1, visee: 1.3 },
 };
 
 export const VELO = {
-  longueur: 15000,        // longueur du trajet jusqu'au bar (px)
-  vitesseDepart: 300,     // le vélo roule TOUT SEUL ; il accélère doucement jusqu'au bar (px/s)
-  vitesseFin: 430,
-  saut: 480,              // vitesse de départ du saut (px/s)
+  // V6 : tout est 1,3 fois plus GRAND qu'en V5 (vélo, bourrés, sauts, vitesses), la durée du trajet ne change pas
+  longueur: 19500,        // longueur du trajet jusqu'au bar (px)
+  vitesseDepart: 390,     // le vélo roule TOUT SEUL ; il accélère doucement jusqu'au bar (px/s)
+  vitesseFin: 560,
+  saut: 624,              // vitesse de départ du saut (px/s)
   sautTenu: 0.28,         // saut maintenu jusqu'à ce temps (s) = saut plus haut et plus long
-  graviteTenue: 600,      // gravité tant que le saut est maintenu (au début du saut)
-  gravite: 1600,          // px/s²
+  graviteTenue: 780,      // gravité tant que le saut est maintenu (au début du saut)
+  gravite: 2080,          // px/s²
   tampon: 0.15,           // saut demandé un peu AVANT d'atterrir : il part quand même (s)
   sonnette: 0.6,          // recharge de la sonnette (s)
   chute: 1.2,             // secondes au sol après une chute
@@ -44,6 +45,12 @@ export const VELO = {
   pintes: 0.45,           // chance d'une PINTE à attraper en sautant entre deux obstacles
   bonusPinte: 1,          // secondes gagnées par pinte
   serie: 5,               // tous les 5 obstacles passés proprement à la suite : +2 s
+  // TREMPLINS + VOITURES GARÉES : tous les « voitures » obstacles, un tremplin suivi de 2 voitures (on roule sur le toit,
+  // pintes au-dessus). Rentrer dans une voiture par le côté = chute.
+  voitures: 5,            // une séquence tremplin + voitures tous les 5 obstacles environ
+  tremplin: 760,          // élan vers le haut en quittant le tremplin (px/s)
+  hauteurVoiture: 130,    // hauteur du toit (px)
+  longueurVoiture: 330,
 };
 
 export const PONG = {
