@@ -32,10 +32,14 @@ const OBJETS_IMAGES = ['table', 'bureau', 'livre', 'dico', 'copie', 'craie'];
 const HAUTEURS_IMAGES_CLASSE = { table: 0.72, bureau: 0.62, livre: 0.15, dico: 0.17, copie: 0.15, craie: 0.06 };
 const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'dos', 'rage', 'vaincu'];
 // vue du dessus (section 18 des prompts) ; image absente = dessin fait par le code
+// tables d'élèves sur les bords de la vue du dessus : x, y (le bas de l'image), élève ('a' / 'b') ou table seule
+const TABLES_DESSUS = [[34, 100, 'a'], [34, 160, 'cahier'], [34, 218, 'vide'], [446, 100, 'b'], [446, 160, 'sac'], [446, 218, 'a']];
 const DESSUS_IMAGES = ['dessus_salle', 'dessus_julien_marche0', 'dessus_julien_marche1', 'dessus_julien_lance', 'dessus_julien_touche',
   'dessus_heros', 'dessus_heros_cote', 'dessus_heros_touche', 'dessus_copie_0', 'dessus_copie_1', 'dessus_copie_2', 'dessus_boulette',
   'dessus_julien_marche2', 'dessus_julien_marche3', 'dessus_julien_rage', 'dessus_julien_pointe',   // (18e) animations en plus
   'dessus_heros_marche0', 'dessus_heros_marche1', 'dessus_heros_souffle', 'dessus_heros_victoire',
+  'dessus_table_a_content', 'dessus_table_a_cache', 'dessus_table_b_content', 'dessus_table_b_cache',   // (18d) tables
+  'dessus_table_vide', 'dessus_table_cahier', 'dessus_table_sac',
   'dessus_explosion', 'dessus_etoile', 'dessus_poussiere', 'dessus_feuilles', 'dessus_note0', 'dessus_note20'];   // (18f) effets
 const ELEVES_IMAGES = [0, 1, 2, 3].flatMap(k => [`eleve_${k}_content`, `eleve_${k}_cache`]);
 const GROSSES = new Set(['eventail', 'mur', 'murs', 'deluge', 'dico', 'aimant', 'rafale']);   // après elles : il se retourne (fenêtre de punition)
@@ -539,7 +543,7 @@ export class JulienClasse extends JulienManif {
 
   majDessus(dt) {
     const M = this.dessus, D = RG.julien.dessus, J = RG.julien, e = this.julien, j = this.j;
-    const X0 = 12, X1 = L - 12;
+    const X0 = this.T.spr.dessus_table_vide ? 56 : 12, X1 = L - X0;   // (avec les tables sur les bords : zone plus étroite)
     M.entree -= dt; M.rouge = Math.max(0, M.rouge - dt * 2);
     for (const p of M.parts) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.94; p.vy *= 0.94; p.rot += p.vr * dt; }
     M.parts = M.parts.filter(p => p.t < p.vie);
@@ -645,6 +649,21 @@ export class JulienClasse extends JulienManif {
     ombre(M.prof, 50, 13, 4);
     if (pj) { const h = 46, w = h * pj.width / pj.height; g.drawImage(pj, M.prof - w / 2, 6 - (M.lanceT > 0 ? 2 : 0), w, h); }
     if (M.flash > 0) { g.fillStyle = `rgba(255,255,255,${M.flash * 3})`; g.beginPath(); g.arc(M.prof, 26, 18 + (0.15 - M.flash) * 60, 0, Math.PI * 2); g.fill(); }
+    // les tables d'élèves sur les bords : l'élève se CACHE quand un mur de copies passe à sa hauteur,
+    // et lève les bras quand Julien est touché (ou au 20/20)
+    if (s.dessus_table_vide) for (const [x, y, q] of TABLES_DESSUS) {
+      let n = 'dessus_table_' + q;
+      if (q === 'a' || q === 'b') {
+        const peur = M.murs.some(w => Math.abs(w.y - (y - 18)) < 30);
+        const joie = M.rageT > 0 || (M.fin != null && M.touches === 0);
+        n += peur || !joie ? '_cache' : '_content';
+        if (!peur && !joie && ((t * 0.7 + x) | 0) % 3 === 0) n = 'dessus_table_' + q + '_content';   // de temps en temps, ils osent regarder
+      }
+      const i = s[n]; if (!i) continue;
+      const h = 44, w = h * i.width / i.height;
+      ombre(x, y - 2, w * 0.4, 3, 0.2);
+      g.drawImage(i, x - w / 2, y - h, w, h);
+    }
     // les murs de copies : ombres d'abord, puis les copies ; le mur se déploie depuis les mains de Julien
     for (const w of M.murs) {
       const portee = w.ouv * L;

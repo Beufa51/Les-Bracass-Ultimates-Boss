@@ -1116,7 +1116,8 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   LIVRÉES et branchées : 18e (Julien marche ×2, RAGE après un coup et en phase 3, POINTE 1 mur sur 2 ; héros marche
   ×2, SOUFFLE quand il tire, VICTOIRE ; la 3e marche du héros est ignorée) et 18f (explosion + étoile à l'impact,
   poussière, feuilles quand tu es touché, NOTE tamponnée à la fin de la rafale : 20/20 sans être touché, sinon 0/20,
-  `RG.julien.dessus.note` s). 18d (tables d'élèves vues du dessus) : pas encore livrée.
+  `RG.julien.dessus.note` s). 18d LIVRÉE : 6 tables d'élèves sur les bords (`TABLES_DESSUS`), l'élève se cache quand un
+  mur passe à sa hauteur, lève les bras quand Julien est touché ou au 20/20 ; zone de jeu réduite (x 56 à 424).
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».

@@ -55,6 +55,11 @@ GROUPES = {
     'dessus_heros2': ('julien_dessus_anim.jpg', 100, [
         ('dessus_heros_marche0', (131, 955)), ('dessus_heros_marche1', (375, 955)), (None, (250, 1271)),
         ('dessus_heros_souffle', (280, 1611)), ('dessus_heros_victoire', (253, 1957))]),
+    # VUE DU DESSUS, tables d'élèves (section 18d) : même échelle pour toutes (pieds alignés)
+    'dessus_tables': ('julien_dessus_tables.jpg', 90, [
+        ('dessus_table_a_content', (210, 211)), ('dessus_table_a_cache', (552, 246)), ('dessus_table_b_content', (890, 222)),
+        ('dessus_table_b_cache', (1211, 246)), ('dessus_table_vide', (230, 548)), ('dessus_table_cahier', (708, 554)),
+        ('dessus_table_sac', (1172, 547))]),
     # élèves assis (rangée du haut ; celle du bas est un doublon) : A content, A caché, B…, D caché
     'eleves': ('julien_eleves.jpg', 180, [(f'eleve_{k // 2}_{"content" if k % 2 == 0 else "cache"}', (x, 200))
         for k, x in enumerate([115, 300, 465, 630, 815, 990, 1165, 1325])]),
