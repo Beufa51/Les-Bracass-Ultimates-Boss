@@ -1,7 +1,8 @@
 // =====================================================================
 // RÉMI — JEU 3 : LA PORTE (qui tape le plus fort ?)
 // Façon borne « boxeur » de bar : en 3 manches, Rémi frappe, puis toi.
-//   1) ÉLAN : TAPOTE le plus vite possible (ESPACE, ou le doigt n'importe où) pour remplir la jauge.
+//   1) ÉLAN : tape GAUCHE / DROITE en ALTERNANCE le plus vite possible (◀ ▶, ou les 2 moitiés d'écran) ;
+//      deux fois le même côté = ça ne compte pas. (Sans alternance possible, ESPACE marche à moitié.)
 //   2) VISÉE : le curseur va et vient ; ESPACE (ou un toucher) quand il est dans la zone verte = FRAPPE.
 // Score = élan + précision (sur 999). La plus grosse frappe gagne la manche ; 2 manches = la victoire (et le badge).
 // =====================================================================
@@ -69,7 +70,7 @@ export class RemiPorte extends BossScene {
     const t = estTactile();
     this.afficherIntro('RÉMI - La porte', [
       REPLIQUES.porteIntro,
-      `1) ÉLAN : TAPOTE ${t ? 'l\'écran' : 'ESPACE'} le plus vite possible`,
+      `1) ÉLAN : tape ${t ? 'GAUCHE / DROITE de l\'écran' : '◀ ▶'} EN ALTERNANCE, le plus vite possible`,
       `2) VISÉE : ${t ? 'touche' : 'ESPACE'} quand le curseur est dans la zone VERTE`,
       `${R.manches} manches : la plus grosse frappe gagne la manche.`,
     ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.mancheSuivante(); }));
@@ -113,7 +114,9 @@ export class RemiPorte extends BossScene {
   mancheSuivante() {
     this.manche++;
     this.scores = { toi: 0, remi: 0 };
-    annonce(this, `MANCHE ${this.manche}`, '#ffd84a', 1);
+    const decisive = this.points.toi === this.points.remi && this.points.toi === Math.ceil(R.manches / 2) - 1 && this.manche > 1;
+    annonce(this, decisive ? 'MANCHE DÉCISIVE !' : `MANCHE ${this.manche}`, decisive ? '#ff5a5a' : '#ffd84a', 1.2);
+    if (decisive) jouerSon(this, 'remi_foule');
     this.majHud();
     this.time.delayedCall(1300, () => this.tourRemi());
   }
@@ -149,8 +152,9 @@ export class RemiPorte extends BossScene {
     this.frappeur = 'toi'; this.poseRemi = 'garde';
     this.etat = 'elan'; this.jauge = 0; this.chrono = R.elan; this.tapes = 0; this.toucher = false;
     this.poseToi = 'elan';
-    etiquettesTactiles({ ...VIDES, espace: 'TAPE !' });
-    annonce(this, 'TAPE ! TAPE !', '#7fff7f', 0.7);
+    etiquettesTactiles(VIDES);
+    this.dernierCote = null;
+    annonce(this, 'GAUCHE ! DROITE !', '#7fff7f', 0.7);
   }
 
   update(temps, delta) {
@@ -176,10 +180,19 @@ export class RemiPorte extends BossScene {
       return;
     }
     if (this.etat === 'elan') {
-      if (appui) { this.jauge += R.parTape; this.tapes++; jouerSon(this, 'remi_tape', { rate: 0.8 + this.jauge * 0.8 }); }
+      // ÉLAN façon « Track & Field » : il faut ALTERNER gauche et droite
+      let cote = null;
+      if (vientDAppuyer(T.gauche) || (toucheX !== null && toucheX < LARGEUR / 2)) cote = 'g';
+      if (vientDAppuyer(T.droite) || (toucheX !== null && toucheX >= LARGEUR / 2)) cote = 'd';
+      if (cote) {
+        if (cote !== this.dernierCote) { this.jauge += R.parTape; this.tapes++; jouerSon(this, 'remi_tape', { rate: 0.8 + this.jauge * 0.8 }); }
+        else { this.jauge -= 0.02; this.rate = 0.25; }   // même côté deux fois : raté
+        this.dernierCote = cote; this.flashCote = { c: cote, t: 0.12 };
+      } else if (vientDAppuyer(T.espace)) { this.jauge += R.parTape * 0.5; jouerSon(this, 'remi_tape'); }
+      this.rate = Math.max(0, (this.rate || 0) - dt);
       this.jauge = Phaser.Math.Clamp(this.jauge - R.baisse * dt, 0, 1);
       this.chrono -= dt;
-      this.consigne.setVisible(true).setText(`ÉLAN : TAPOTE ${estTactile() ? 'L\'ÉCRAN' : 'ESPACE'} !   ${Math.max(0, this.chrono).toFixed(1)} s`);
+      this.consigne.setVisible(true).setText(this.rate > 0 ? 'ALTERNE ! gauche, droite, gauche...' : `ÉLAN : GAUCHE / DROITE en alternance !   ${Math.max(0, this.chrono).toFixed(1)} s`);
       if (this.chrono <= 0) {
         this.etat = 'visee'; this.chrono = 0; this.elanFinal = this.jauge;
         etiquettesTactiles({ ...VIDES, espace: 'FRAPPE !' });
@@ -214,7 +227,8 @@ export class RemiPorte extends BossScene {
     const s = Math.min(999, Math.round(999 * (R.poidsElan * this.elanFinal + (1 - R.poidsElan) * precision)) + this.bonusPari);
     this.etat = 'frappe';
     etiquettesTactiles(VIDES);
-    if (precision === 1) bulle(this, 'PILE AU CENTRE !', '#7fff7f', 1, 120);
+    if (precision === 1 && this.elanFinal > 0.9) { bulle(this, 'COUP DE GRÂCE !', '#ffd84a', 1.2, 120); jouerSon(this, 'remi_foule'); }
+    else if (precision === 1) bulle(this, 'PILE DESSUS !', '#7fff7f', 1, 120);
     this.frapper('toi', s);
     this.time.delayedCall(1700, () => this.finManche());
   }
@@ -386,6 +400,20 @@ export class RemiPorte extends BossScene {
       for (let k = 0; k < 10; k++) {
         const allume = v * 10 > k, yk = 446 - (k + 1) * 29.6;
         j.fillStyle(COUL[k], allume ? 1 : 0.18).fillRect(42, yk + 3, 36, 24);
+      }
+    }
+    // pendant l'élan : 2 gros boutons G / D, celui à taper ensuite clignote
+    if (this.etat === 'elan') {
+      const fl = this.flashCote && this.flashCote.t > 0 ? this.flashCote.c : null;
+      if (this.flashCote) this.flashCote.t -= dt;
+      const suivant = this.dernierCote === 'g' ? 'd' : this.dernierCote === 'd' ? 'g' : null;
+      for (const [c, x] of [['g', 210], ['d', LARGEUR - 110]]) {
+        const allume = fl === c, attendu = suivant === c && Math.floor(this.horloge * 8) % 2 === 0;
+        j.fillStyle(0x000000, 0.4).fillCircle(x, 400, 70);
+        j.fillStyle(allume ? 0xffffff : attendu ? 0x7fff7f : 0xffd84a, allume ? 0.8 : attendu ? 0.5 : 0.18).fillCircle(x, 400, 64);
+        j.lineStyle(4, 0xffd84a, 0.9).strokeCircle(x, 400, 70);
+        j.fillStyle(0xffffff, 1);
+        if (c === 'g') j.fillTriangle(x + 18, 375, x + 18, 425, x - 22, 400); else j.fillTriangle(x - 18, 375, x - 18, 425, x + 22, 400);
       }
     }
     if (this.etat === 'visee' && !this.vueDos) {

@@ -56,6 +56,7 @@ export class RemiPong extends BossScene {
     this.decor();
     this.gRemi = this.add.graphics().setDepth(3);
     this.g = this.add.graphics().setDepth(5);
+    this.gDouble = this.add.graphics().setDepth(5.5).setAlpha(0.35);
     this.gVisee = this.add.graphics().setDepth(6);
     this.hud = texte(this, LARGEUR / 2, 24, '', 20, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
     this.hudTour = texte(this, 16, 516, '', 18, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 8, y: 3 }, align: 'left' }).setOrigin(0, 0.5).setDepth(900);
@@ -160,15 +161,30 @@ export class RemiPong extends BossScene {
 
   // tangage de l'ivresse (+ Rémi qui agite les bras)
   tangage() {
-    const a = this.ivresse * P.ivresse + (this.distrait > 0 ? 0.05 : 0);
-    return { x: a * Math.sin(this.horloge * 1.7), z: a * 1.6 * Math.cos(this.horloge * 1.13) };
+    const a = this.ivresse * P.ivresse + (this.distrait > 0 ? 0.05 : 0), v = 1 + this.ivresse * 0.25;
+    // HOQUET : une secousse brève et forte
+    const h = this.hoquet > 0 ? Math.sin(this.hoquet * 30) * 0.09 * this.hoquet / 0.4 : 0;
+    return { x: a * Math.sin(this.horloge * 1.7 * v) + h, z: a * 1.6 * Math.cos(this.horloge * 1.13 * v) + h * 0.8 };
   }
+
+  // part de la courbe d'aide encore visible (l'alcool efface la retombée)
+  partCourbe() { return this.feu ? 1 : Math.max(0.25, Math.min(this.diff.apercu, 1 - this.ivresse * P.courbeBue)); }
 
   update(temps, delta) {
     const dt = Math.min(delta, 50) / 1000;
     this.horloge += dt;
     this.distrait = Math.max(0, this.distrait - dt);
     this.flashBiere = Math.max(0, this.flashBiere - dt);
+    // hoquets quand on a trop bu (pendant ta visée)
+    this.hoquet = Math.max(0, (this.hoquet || 0) - dt);
+    if (this.etat === 'vise' && this.ivresse >= P.hoquet) {
+      this.prochainHoquet = (this.prochainHoquet ?? 3) - dt;
+      if (this.prochainHoquet <= 0) {
+        this.prochainHoquet = hasard(3, 7) / (1 + (this.ivresse - P.hoquet) * 0.3);
+        this.hoquet = 0.4; jouerSon(this, 'remi_hips');
+        bulle(this, 'HIPS !', '#ffb070', 0.6, 300);
+      }
+    }
     if (this.etat === 'vise') this.viseClavier(dt);
     if (this.balle) this.balleVol(dt);
     this.gouttesPas(dt);
@@ -188,7 +204,8 @@ export class RemiPong extends BossScene {
 
   lancerToi(tx, tz) {
     const s = this.tangage(), e = this.diff.erreur * (this.feu ? 0.5 : 1);
-    const ex = (hasard(-1, 1) + hasard(-1, 1)) / 2 * e, ez = (hasard(-1, 1) + hasard(-1, 1)) / 2 * e;
+    // imprécision du bras (augmente avec l'alcool)
+    const e2 = e * (1 + this.ivresse * 0.15), ex = hasard(-1, 1) * e2, ez = hasard(-1, 1) * e2 * 1.2;
     this.balles--;
     this.etat = 'vol'; this.distrait = 0;
     this.lancer(DEPART, tx + s.x + ex, tz + s.z + ez, this.verresRemi, 'toi');
@@ -286,10 +303,13 @@ export class RemiPong extends BossScene {
       this.ivresseRemi++; this.serie++;
       if (this.serie >= P.serieFeu && !this.feu) { this.feu = true; this.time.delayedCall(500, () => annonce(this, 'EN FEU !', '#ff8a2a', 1.2)); }
       annonce(this, choisir(['BOIS, RÉMI !', 'PLOUF !', 'DEDANS !']), '#7fff7f', 0.7);
+      jouerSon(this, 'remi_foule');
       this.time.delayedCall(450, () => this.poseTemp('boit', 1.6));
       if (Math.random() < 0.6) this.time.delayedCall(900, () => bulle(this, `Rémi : « ${choisir(REPLIQUES.pongToucheToi)} »`, '#ffd84a', 1.6, 250));
     } else {
-      this.ivresse++; this.flashBiere = 0.6;
+      this.ivresse++; this.flashBiere = 0.8;
+      this.time.delayedCall(250, () => jouerSon(this, 'remi_boit'));
+      if (this.ivresse === P.hoquet) this.time.delayedCall(1500, () => bulle(this, 'Tu commences à être pompette : la fin de la courbe s\'efface et tu as le hoquet !', '#ffb070', 2.4, 300));
       annonce(this, 'TU BOIS !', '#ffb070', 0.9);
       this.time.delayedCall(300, () => this.poseTemp('nargue', 1.6));
       this.time.delayedCall(700, () => bulle(this, `Rémi : « ${choisir(REPLIQUES.pongToucheRemi)} »`, '#ffd84a', 1.6, 250));
@@ -353,6 +373,9 @@ export class RemiPong extends BossScene {
       if (!this.imgRemi) this.imgRemi = this.add.sprite(CX, 0, 'remi_pong', 0).setOrigin(0.5, 1).setDepth(3).setScale(0.34);
       this.imgRemi.setFrame({ face: 0, lance: 1, boit: 2, nargue: 3 }[this.pose] ?? 0);
       this.imgRemi.setPosition(CX + bal, yBord + 26).setRotation(bal * 0.004);
+      if (!this.imgDouble) this.imgDouble = this.add.sprite(CX, 0, 'remi_pong', 0).setOrigin(0.5, 1).setDepth(3.5).setScale(0.34).setAlpha(0.3).setVisible(false);
+      const dec = Math.sin(this.horloge * 1.3) * (4 + this.ivresse * 4);
+      this.imgDouble.setFrame(this.imgRemi.frame.name).setPosition(CX + bal + dec * 1.5, yBord + 26).setRotation(this.imgRemi.rotation);
     } else {
       gr.setPosition(CX + bal, yBord + 6).setRotation(bal * 0.004);
       remi(gr, this.pose, this.horloge);
@@ -370,6 +393,10 @@ export class RemiPong extends BossScene {
     const b = this.balle;
     if (b) objets.push({ z: b.etat === 'dedans' ? b.z + 0.001 : b.z - 0.02, f: () => this.dessinerBalle(g, b) });
     objets.sort((a, c) => c.z - a.z).forEach(o => o.f());
+    // VISION DOUBLE quand tu as bu : les verres de Rémi en double, décalés (et Rémi aussi)
+    const gd = this.gDouble.clear(), dec = this.ivresse > 0 ? Math.sin(this.horloge * 1.3) * (4 + this.ivresse * 4) : 0;
+    if (dec) { gd.setPosition(dec, 0); for (const v of this.verresRemi) if (v.plein) this.verre(gd, v); }
+    if (this.imgDouble) this.imgDouble.setVisible(!!dec);
     for (const v of [...this.verresRemi, ...this.verresToi]) { if (!v.plein && v.bu > 0) v.bu = Math.max(0, v.bu - 0.025); v.flash = Math.max(0, v.flash - 0.02); }
     for (const d of this.gouttes) g.fillStyle(0xe8a52a, Math.min(1, d.vie * 2)).fillCircle(d.x, d.y, 4);
     if (this.flashBiere > 0) g.fillStyle(0xe8a52a, this.flashBiere * 0.5).fillRect(0, 0, LARGEUR, HAUTEUR);
@@ -388,16 +415,16 @@ export class RemiPong extends BossScene {
       if (c) {
         const vol = this.parametresVol(DEPART, c.x + s.x, c.z + s.z);
         // TOUTE la courbe jusqu'à la retombée ; en CHAMPION, des pointillés plus espacés et pas de point d'arrivée
-        const part = this.feu ? 1 : this.diff.apercu, pas = part >= 0.5 ? 1 : 2;
-        for (let k = 1; k <= 24; k += pas) {
+        const part = this.feu ? 1 : this.diff.apercu, pas = 1, fin = Math.round(24 * this.partCourbe());
+        for (let k = 1; k <= fin; k += pas) {
           const t = (k / 24) * vol.T;
           const q = proj(DEPART.x + vol.vx * t, DEPART.y + vol.vy * t - G * t * t / 2, DEPART.z + vol.vz * t);
           const rr = Math.max(2.5, q.k * 0.009);
           gv.fillStyle(0x000000, 0.6).fillCircle(q.x, q.y, rr + 1.5);   // contour sombre : lisible même devant Rémi
           gv.fillStyle(this.feu ? 0xff8a2a : 0xffffff, 0.95).fillCircle(q.x, q.y, rr);
         }
-        this.vueCote(gv, vol, c, s, pas);
-        if (part >= 0.5 || this.feu) { const q = proj(c.x + s.x, H_VERRE, c.z + s.z); gv.lineStyle(2, 0x7fff7f, 0.9).strokeEllipse(q.x, q.y, q.k * 0.07, q.k * 0.03); }
+        this.vueCote(gv, vol, c, s, pas, fin);
+        if ((part >= 0.5 && fin >= 24) || this.feu) { const q = proj(c.x + s.x, H_VERRE, c.z + s.z); gv.lineStyle(2, 0x7fff7f, 0.9).strokeEllipse(q.x, q.y, q.k * 0.07, q.k * 0.03); }
         if (!this.tir) {   // jauge de force (clavier)
           gv.fillStyle(0x000000, 0.5).fillRect(LARGEUR - 60, 280, 22, 150);
           gv.fillStyle(0xffd84a, 1).fillRect(LARGEUR - 57, 427 - 144 * c.f, 16, 144 * c.f);
@@ -414,11 +441,11 @@ export class RemiPong extends BossScene {
       : (this.etat === 'remi' || (this.balle && this.balle.qui === 'remi')) ? 'RÉMI LANCE...' : '';
     this.hudTour.setText(tour).setVisible(!!tour);
     // l'ivresse fait un peu tanguer l'écran
-    this.cameras.main.setRotation(Math.sin(this.horloge * 0.9) * this.ivresse * 0.004);
+    this.cameras.main.setRotation(Math.sin(this.horloge * 0.9) * this.ivresse * 0.008);
   }
 
   // VUE DE CÔTÉ (encart en haut à droite) : la table de profil, les verres de Rémi, et la courbe qui monte puis RETOMBE
-  vueCote(g, vol, c, s, pas) {
+  vueCote(g, vol, c, s, pas, fin = 24) {
     const x0 = LARGEUR - 250, y0 = 120, L = 230, H = 80, zMin = DEPART.z - 0.1;
     const X = (z) => x0 + (z - zMin) / (D + 0.1 - zMin) * L, Y = (y) => y0 - y * 95;
     g.fillStyle(0x000000, 0.6).fillRoundedRect(x0 - 10, y0 - H, L + 20, H + 22, 8);
@@ -427,11 +454,11 @@ export class RemiPong extends BossScene {
     const rangs = new Map();
     for (const v of this.verresRemi) if (v.plein) rangs.set(v.rang, v.z);
     for (const z of rangs.values()) g.fillStyle(0xc81e2a, 1).fillRect(X(z) - 4, Y(H_VERRE), 8, Y(0) - Y(H_VERRE));
-    for (let k = 0; k <= 24; k += pas) {
+    for (let k = 0; k <= fin; k += pas) {
       const t = (k / 24) * vol.T;
       g.fillStyle(this.feu ? 0xff8a2a : 0xffffff, 1).fillCircle(X(DEPART.z + vol.vz * t), Y(DEPART.y + vol.vy * t - G * t * t / 2), 2);
     }
-    g.fillStyle(0x7fff7f, 1).fillCircle(X(c.z + s.z), Y(H_VERRE), 3.5);
+    if (fin >= 24) g.fillStyle(0x7fff7f, 1).fillCircle(X(c.z + s.z), Y(H_VERRE), 3.5);
   }
 
   verre(g, v) {
