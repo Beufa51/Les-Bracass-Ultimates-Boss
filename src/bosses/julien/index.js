@@ -38,6 +38,5 @@ export default {
     { groupe: 'JULIEN (niveau 2)', nom: 'Dégâts d\'un livre', objet: R.julien.livre, champ: 'degats', pas: 2, min: 0, max: 50 },
     { groupe: 'JULIEN (niveau 2)', nom: 'Vitesse des livres', objet: R.julien.livre, champ: 'vitesse', pas: 0.5, min: 2, max: 12 },
     { groupe: 'JULIEN (niveau 2)', nom: 'Dégâts du dictionnaire', objet: R.julien.dico, champ: 'degats', pas: 2, min: 0, max: 60 },
-    { groupe: 'JULIEN (niveau 2)', nom: 'Œufs en entrant en classe', objet: R.classe, champ: 'oeufs', pas: 5, min: 0, max: 99 },
   ],
 };

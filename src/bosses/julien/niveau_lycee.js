@@ -5,18 +5,18 @@
 // Python ; on peut le retoucher à la main.
 //
 // Murs (chiffres) : 1 casiers, 2 couloir (panneau d'affichage), 3 cantine (carrelage), 4 PORTE DE LA SALLE 12, 5 mur nu.
-// Secret : 'X' = casier ouvert (aspect casiers) : on pousse dedans → placard secret (tomates, K-Way, œufs).
+// Secret : 'X' = casier ouvert (aspect casiers) : on pousse dedans → placard secret (sandwich, K-Way, canette).
 // Sol : '.' vide, 'J' départ (regarde vers le haut).
 // Ennemis : 'V' surveillant (le pion : il siffle puis te fonce dessus ; pas de bouclier),
 //           'Q' dame de cantine (lance de la purée : flaque où tu avances au ralenti).
 // 'F' FAYOT : on ne peut pas le blesser ; quand il te voit il crie « M'SIEUR ! IL EST LÀ ! » et alerte tout le monde.
 // Objets : 'x' extincteur (un œuf dessus → nuage de mousse : les ennemis autour glissent et sont aveuglés),
 //          'n' canette (petit soin), 'k' CARNET (la clé), 'd' table de cantine (abri), 'q' comptoir,
-//          'o' œufs, 't' tomates, 's' sandwich, 'K' K-Way.
+//          's' sandwich, 'K' K-Way. (Pas d'œufs ni de tomates : les armes de la manif sont interdites au lycée.)
 export const PLAN_LYCEE = [
   '555555555555555555555555',
   '511411533333333333333335',
-  '51...153.......qqqq..o35',
+  '51...153.......qqqq...35',
   '51...111...Q....k.....35',
   '51.V..............d...35',
   '51........d.d.d.......35',
@@ -25,14 +25,14 @@ export const PLAN_LYCEE = [
   '51...153........x...V.35',
   '51.x.153.s............35',
   '51...1.K33333...33333335',
-  '51...Xt.55552...25555555',
-  '51F..1.o55552.F.25555555',
+  '51...Xs.55552...25555555',
+  '51F..1.n55552.F.25555555',
   '51...15555552...25555555',
-  '51..o15555552n..25555555',
+  '51...15555552n..25555555',
   '51...12222222...25555555',
   '51s.............25555555',
   '52......V.......25555555',
-  '52............o.25555555',
+  '52..............25555555',
   '52.n.......n....25555555',
   '52.......J......25555555',
   '522222222222222225555555',
@@ -40,7 +40,7 @@ export const PLAN_LYCEE = [
 
 export const OBJETS_LYCEE = {
   V: 'surveillant', Q: 'cantiniere', F: 'fayot', x: 'extincteur', n: 'canette', k: 'carnet', d: 'table', q: 'comptoir',
-  o: 'oeufs', t: 'tomates', s: 'sandwich', K: 'kway',
+  s: 'sandwich', K: 'kway',
 };
 export const SECRETS_LYCEE = { X: '1' };
 export const PORTE_SALLE_12 = { x: 3, y: 1 };

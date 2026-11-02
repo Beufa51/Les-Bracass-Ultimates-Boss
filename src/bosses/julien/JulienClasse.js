@@ -4,12 +4,12 @@
 //   dégâts ×2 (sarbacane ×3), les élèves chuchotent « VAS-Y ! ». Esquiver → foncer → punir.
 // - Chaque attaque a SON préavis et SA réponse : livre / éventail (pas de côté), MUR DE COPIES avec un trou (s'y
 //   placer), DICO qui rebondit (s'éloigner des murs), « AU TABLEAU ! » qui t'attire (courir vers le fond, se coller
-//   à une table), « CONFISQUÉ ! » si tu es trop près (il prend ton arme 8 s), CRAIES en rafale (derrière une table),
-//   RÈGLE au contact (reculer).
-// - Les phases changent la salle : 1 cours normal ; 2 « INTERRO SURPRISE » dans le NOIR (il ne te voit que dans la
-//   lumière du rétroprojecteur qui balaie la salle) ; 3 « RETENUE ! » : bureau RENVERSÉ (son abri : contourne-le),
-//   alarme incendie et sprinklers (le sol glisse), il se retourne plus souvent.
-// - Élèves assis qui réagissent ; SARBACANE trouvée sous une table (touche 6). Œufs et tomates gardés.
+//   à une table), « CONFISQUÉ ! » si tu es trop près (il prend ta sarbacane 8 s), CRAIES en rafale (derrière une
+//   table), RÈGLE au contact (reculer).
+// - Phases : 1 cours normal ; 2 « INTERRO SURPRISE » (mur de copies, dico, « au tableau ») ; 3 « RETENUE ! » : bureau
+//   RENVERSÉ (son abri : contourne-le), alarme incendie et sprinklers (le sol glisse), il se retourne plus souvent.
+//   (Le noir + rétroprojecteur de la phase 2 a été retiré : demande de Fabien.)
+// - Élèves assis qui réagissent. Dans le lycée, les armes de la manif sont INTERDITES : seulement la SARBACANE.
 import { JulienManif } from './JulienManif.js';
 import { texte } from '../../core/ui.js';
 import { LARGEUR } from '../../core/reglages.js';
@@ -18,9 +18,9 @@ import { jouerMusique } from '../../core/musique.js';
 import { estTactile } from '../../core/tactile.js';
 import { vientDAppuyer } from '../../core/clavier.js';
 import { REGLAGES as RG } from './reglages.js';
-import { ARMES, armeDe, armeSuivante, choisirArme } from './armes.js';
+import { ARMES, armeDe, choisirArme } from './armes.js';
 import { murEn, vueLibre } from './raycaster.js';
-import { PLAN_CLASSE, OBJETS_CLASSE, RAYONS_CLASSE, ESTRADE, BUREAU_RENVERSE, CASES_SECOURS, REPLIQUES, ELEVES } from './niveau_classe.js';
+import { PLAN_CLASSE, OBJETS_CLASSE, RAYONS_CLASSE, ESTRADE, BUREAU_RENVERSE, REPLIQUES, ELEVES } from './niveau_classe.js';
 import { construireDecorClasse, spritesClasse, HAUTEURS_CLASSE } from './decor_classe.js';
 
 const L = 480, VUE_H = 222;   // comme JulienManif
@@ -28,8 +28,8 @@ const hasard = (liste) => liste[(Math.random() * liste.length) | 0];
 // vraies images des murs de la classe (outils/julien/decouper_planches.py) : code du plan → image
 const MURS_IMAGES = { 1: 'mur_classe', 3: 'fenetres_classe', 4: 'porte_classe', 5: 'tableau_0', 6: 'tableau_1', 7: 'tableau_2', a: 'mur_classe_affiche' };
 // vraies images des objets (table avec sa chaise, bureau, projectiles) et leur hauteur dans le monde
-const OBJETS_IMAGES = ['table', 'bureau', 'livre', 'dico', 'copie', 'craie', 'sarbacane'];
-const HAUTEURS_IMAGES_CLASSE = { table: 0.72, bureau: 0.62, livre: 0.15, dico: 0.17, copie: 0.15, craie: 0.06, sarbacane: 0.3 };
+const OBJETS_IMAGES = ['table', 'bureau', 'livre', 'dico', 'copie', 'craie'];
+const HAUTEURS_IMAGES_CLASSE = { table: 0.72, bureau: 0.62, livre: 0.15, dico: 0.17, copie: 0.15, craie: 0.06 };
 const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'dos', 'rage', 'vaincu'];
 const ELEVES_IMAGES = [0, 1, 2, 3].flatMap(k => [`eleve_${k}_content`, `eleve_${k}_cache`]);
 const GROSSES = new Set(['eventail', 'mur', 'dico', 'aimant', 'rafale']);   // après elles : il se retourne (fenêtre de punition)
@@ -45,7 +45,7 @@ const ANNONCES = {
 
 // Dessin provisoire de la main qui tient la sarbacane (stylo Bic vidé), en gros pixels comme les vraies mains :
 // dessiné en 35 × 40 puis agrandi ×3 (105 × 120). souffle : la boulette part (joues… non : un petit nuage de souffle).
-function mainSarbacane(souffle) {
+export function mainSarbacane(souffle) {
   const p = document.createElement('canvas'); p.width = 35; p.height = 40;
   const g = p.getContext('2d');
   const R = (c, x, y, l = 1, h = 1) => { g.fillStyle = c; g.fillRect(x, y, l, h); };
@@ -119,7 +119,7 @@ export class JulienClasse extends JulienManif {
     return T.classe;
   }
   planDepart() { return PLAN_CLASSE; }
-  lancerMusique() { jouerMusique(this, 'julien_musique'); }
+  lancerMusique() { jouerMusique(this, 'julien_boss_musique'); }   // « One-Winged Angel » (Sephiroth)
 
   create() {
     super.create();
@@ -142,7 +142,7 @@ export class JulienClasse extends JulienManif {
       'Julien, le prof, te bombarde : livres, craies, copies, dictionnaire…',
       'Chaque attaque s\'annonce : lis l\'écran et réagis (pas de côté, table, trou dans les copies…).',
       'Après une grosse attaque, il écrit au tableau DE DOS : FONCE, dégâts ×2 !',
-      'Les TABLES arrêtent les livres. Une SARBACANE traîne sous une table (×3 dans le dos).',
+      'Les TABLES arrêtent les livres. Ta SARBACANE fait ×3 dans le dos ! (trop près : il la confisque)',
       ...(tact ? [this.joy ? 'Joystick : avancer, reculer, pas de côté     ↺ ↻ : tourner' : '▲ ▼ avancer / reculer   ◀ ▶ pas de côté   ↺ ↻ tourner',
         'LANCER : tirer      ARME : changer d\'arme'] : this.lignesCommandes()),
     ], () => this.demarrer());
@@ -155,8 +155,7 @@ export class JulienClasse extends JulienManif {
   }
 
   appliquerDifficulte() {
-    const C = RG.classe, m = this.diff.munitions;
-    this.j.mun.oeufs = Math.round(C.oeufs * m); this.j.mun.tomates = Math.round(C.tomates * m);
+    this.j.mun.oeufs = 0; this.j.mun.tomates = 0;   // seulement la sarbacane (infinie)
     this.total = 1;
   }
 
@@ -165,12 +164,12 @@ export class JulienClasse extends JulienManif {
   // ------------------------------------------------------------------ niveau
   lireNiveau() {
     this.j = this.nouveauJoueur();
-    this.j.armes = new Set(['pancarte', 'oeufs', 'tomates']);
+    this.j.armes = new Set(['sarbacane']); this.j.arme = 'sarbacane';   // armes de la manif interdites au lycée
     this.ennemis = []; this.objets = []; this.tirs = []; this.fumees = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.farines = []; this.rideaux = []; this.secrets = new Map(); this.secretsTrouves = 0; this.fourgonFait = true;
-    this.livres = []; this.secoursT = RG.classe.secoursT; this.finDemandee = false;
-    this.eleves = []; this.noir = false; this.alarme = false; this.alarmeT = 0; this.confisque = null;
-    this.vus = new Set(); this.spotT = 0; this.spot = { x: 7.5, y: 7 }; this.bureau = null;
+    this.livres = []; this.finDemandee = false;
+    this.eleves = []; this.alarme = false; this.alarmeT = 0; this.confisque = null;
+    this.vus = new Set(); this.bureau = null;
     this.plan = this.plan.map((ligne, y) => [...ligne].map((c, x) => {
       const px = x + 0.5, py = y + 0.5;
       if (c === 'J') { this.j.x = px; this.j.y = py; return '.'; }
@@ -195,20 +194,6 @@ export class JulienClasse extends JulienManif {
   }
 
 
-  // la sarbacane (une arme, pas une recharge) ; une arme confisquée ne se ramasse pas en attendant
-  ramasser() {
-    const j = this.j, caches = [];
-    for (const o of this.objets) {
-      if (!o.actif || Math.hypot(o.x - j.x, o.y - j.y) > 0.5) continue;
-      if (o.type === 'sarbacane') {
-        o.actif = false; j.armes.add('sarbacane'); choisirArme(this, 'sarbacane');
-        jouerSon(this, 'julien_ramasse'); j.expr = 'content'; j.exprT = 0.9; j.or = 0.6;
-        this.message('Une SARBACANE ! (touche 6 / ARME) : infinie, et ×3 dans le DOS de Julien !', 4.5);
-      } else if (this.confisque && o.type === this.confisque.id) { o.actif = false; caches.push(o); }
-    }
-    super.ramasser();
-    for (const o of caches) o.actif = true;
-  }
 
   // ------------------------------------------------------------------ boucle
   update(temps, delta) {
@@ -224,25 +209,11 @@ export class JulienClasse extends JulienManif {
       this.projectiles(dt);   // tes tirs (armes.js) et les taches
       this.avancerLivres(dt);
       this.ramasser();
-      this.secours(dt);
       this.temps += dt;
       this.j.changeT = Math.max(0, (this.j.changeT || 0) - dt);
     }
     this.majVisage(dt);
     this.dessiner(dt);
-  }
-
-  // un camarade te fait passer une boîte d'œufs quand tu n'en as presque plus (jamais bloqué, comme dans Doom)
-  secours(dt) {
-    const j = this.j;
-    if (j.mun.oeufs >= RG.classe.secours || this.objets.some(o => o.actif && o.type === 'oeufs')) return;
-    this.secoursT -= dt;
-    if (this.secoursT > 0) return;
-    const libres = CASES_SECOURS.filter(([x, y]) => Math.hypot(x + 0.5 - j.x, y + 0.5 - j.y) > 1.5);
-    const [x, y] = hasard(libres.length ? libres : CASES_SECOURS);
-    this.objets.push({ type: 'oeufs', x: x + 0.5, y: y + 0.5, solide: false, rayon: 0.3, actif: true, n: 0 });
-    this.secoursT = RG.classe.secoursT;
-    this.message('Un camarade te fait passer une boîte d\'œufs sous la table !', 3);
   }
 
   // ------------------------------------------------------------------ Julien
@@ -270,7 +241,6 @@ export class JulienClasse extends JulienManif {
     const J = RG.julien, j = this.j, ph = e.phase - 1;
     const d = Math.hypot(j.x - e.x, j.y - e.y);
     let voit = j.vie > 0 && vueLibre(this.plan, e.x, e.y, j.x, j.y);
-    if (voit && this.noir) voit = d < RG.classe.projecteur.vue || Math.hypot(j.x - this.spot.x, j.y - this.spot.y) < RG.classe.projecteur.rayon;   // dans le noir
     if (voit) { e.vuX = j.x; e.vuY = j.y; }
     e.t -= dt; e.bouge = false; e.flash = Math.max(0, e.flash - dt);
     const marcher = (vx, vy, v) => {
@@ -299,7 +269,7 @@ export class JulienClasse extends JulienManif {
         if (bloque) e.cible = null;
         // au contact : la règle, tout de suite
         if (voit && d < J.regle.portee && e.t < J.cadence[ph] * 0.6) e.t = 0;
-        if (e.t <= 0 && (voit || this.noir)) this.preparer(e, d);
+        if (e.t <= 0 && voit) this.preparer(e, d);
         return;
       }
       case 'prepare':
@@ -397,8 +367,7 @@ export class JulienClasse extends JulienManif {
   confisquer(id) {
     const j = this.j;
     this.confisque = { id, t: RG.julien.confisque.duree };
-    j.armes.delete(id); j.arme = 'pancarte'; armeSuivante(this);
-    this.txtAnnonce.setText('CONFISQUÉ !'); this.annonceT = 1.6; this.txtConseil.setText(`Tes ${armeDe(id).nom.toLowerCase()} : rendus dans ${RG.julien.confisque.duree} s`);
+    this.txtAnnonce.setText('CONFISQUÉ !'); this.annonceT = 1.6; this.txtConseil.setText(`Ta ${armeDe(id).nom.toLowerCase()} : rendue dans ${RG.julien.confisque.duree} s. Esquive en attendant !`);
     this.message(REPLIQUES.confisqueOk, 2);
     jouerSon(this, 'julien_plonk', { rate: 0.5 });
   }
@@ -413,7 +382,7 @@ export class JulienClasse extends JulienManif {
     return [px / n, py / n];
   }
 
-  angleVers(e, voit) {   // caché (ou dans le noir) : il vise là où il t'a vu
+  angleVers(e, voit) {   // caché : il vise là où il t'a vu
     const [x, y] = voit ? [this.j.x, this.j.y] : [e.vuX, e.vuY];
     return Math.atan2(y - e.y, x - e.x);
   }
@@ -486,24 +455,14 @@ export class JulienClasse extends JulienManif {
     this.annonceT -= dt; if (this.annonceT <= 0) { this.txtAnnonce.setText(''); this.txtConseil.setText(''); }
     this.elevesT -= dt; if (this.elevesT <= 0) this.txtEleves.setText('');
     // les élèves (dessinés AVEC leur table) : contents (bras en l'air) quand ça bouge pour toi, cachés quand ça chauffe
-    const chaud = this.noir || this.alarme || this.julien.etat === 'aimant';
+    const chaud = this.julien.phase > 1 || this.alarme || this.julien.etat === 'aimant';
     for (const el of this.eleves) {
       el.t -= dt;
       el.table.type = `te_${el.k}_${el.t > 0 || (!chaud && this.julien.phase === 1) ? 'content' : 'cache'}`;
     }
     if (this.confisque && (this.confisque.t -= dt) <= 0) {   // il te rend ton arme
       const id = this.confisque.id; this.confisque = null;
-      this.j.armes.add(id); this.message(`Julien te rend tes ${armeDe(id).nom.toLowerCase()}. « Et que je ne vous y reprenne pas ! »`, 2.5);
-    }
-    if (this.noir) {   // phase 2 : le rétroprojecteur balaie la salle ; seules les cases dans sa lumière sont éclairées
-      this.spotT += dt * C.projecteur.vitesse;
-      this.spot.x = 7.5 + 5.3 * Math.sin(this.spotT * 2.1);
-      this.spot.y = 6.8 + 2.2 * Math.sin(this.spotT * 3.3 + 1);
-      const W = this.plan[0].length, S = this.decor.sombre, e = this.julien;
-      for (let n = 0; n < S.length; n++) {
-        const x = n % W + 0.5, y = ((n / W) | 0) + 0.5;
-        S[n] = Math.hypot(x - this.spot.x, y - this.spot.y) < C.projecteur.rayon || Math.hypot(x - e.x, y - e.y) < 1.2 ? 0 : 1;
-      }
+      this.message(`Julien te rend ta ${armeDe(id).nom.toLowerCase()}. « Et que je ne vous y reprenne pas ! »`, 2.5);
     }
     if (this.alarme && (this.alarmeT -= dt) <= 0) { jouerSon(this, 'julien_alarme', { volume: 0.35 }); this.alarmeT = 4; }
   }
@@ -520,13 +479,11 @@ export class JulienClasse extends JulienManif {
 
   changerPhase(ph) {
     const e = this.julien;
-    if (ph === 2) {   // INTERRO SURPRISE : on éteint la lumière
-      this.noir = true; this.spotT = 0;
+    if (ph === 2) {   // INTERRO SURPRISE : copies, dictionnaire, « au tableau ! »
       this.txtAnnonce.setText('INTERRO SURPRISE !'); this.annonceT = 3;
-      this.txtConseil.setText('Dans le NOIR, il ne te voit que dans la LUMIÈRE du rétroprojecteur. Reste dans l\'ombre !');
-      this.parlerEleves('noir');
-    } else {          // RETENUE : la lumière revient, il renverse son bureau, l'alarme incendie sonne
-      this.noir = false; this.decor.sombre.fill(0);
+      this.txtConseil.setText('Murs de copies, dictionnaire, « AU TABLEAU ! » : lis bien les annonces !');
+      this.parlerEleves('interro');
+    } else {          // RETENUE : il renverse son bureau, l'alarme incendie sonne
       const b = this.bureau;
       if (b) { b.type = 'bureau_renverse'; b.x = BUREAU_RENVERSE.x; b.y = BUREAU_RENVERSE.y; b.rayon = BUREAU_RENVERSE.rayon; }
       if (e.y > BUREAU_RENVERSE.y - BUREAU_RENVERSE.rayon - 0.3) e.y = 1.7;
@@ -558,7 +515,7 @@ export class JulienClasse extends JulienManif {
     if (!silencieux) jouerSon(this, 'julien_splat');
     if (e.vie <= 0) {
       e.etat = 'fuite'; e.t = 3.4; this.repousses = 1; this.livres = [];
-      this.alarme = false; this.noir = false; this.decor.sombre.fill(0);
+      this.alarme = false;
       this.txtAnnonce.setText(''); this.txtConseil.setText('');
       for (const el of this.eleves) el.t = 99;
       this.parlerEleves('fin', 3.4);
@@ -618,7 +575,6 @@ export class JulienClasse extends JulienManif {
   // barre de vie de Julien en haut de la vue (repères des phases à 50 % et 20 %)
   dessinerEnPlus(g) {
     const t = this.time.now / 1000;
-    if (this.noir) { g.fillStyle = 'rgba(5,8,25,0.38)'; g.fillRect(0, 0, L, VUE_H); }   // lumière éteinte
     if (this.alarme) {   // alarme incendie (flash rouge) et sprinklers (gouttes)
       if (Math.sin(t * 9) > 0.6) { g.fillStyle = 'rgba(255,40,30,0.12)'; g.fillRect(0, 0, L, VUE_H); }
       g.fillStyle = 'rgba(190,220,255,0.45)';
@@ -643,6 +599,6 @@ export class JulienClasse extends JulienManif {
     this.txtFlics.setText(`${Math.ceil(100 * e.vie / RG.julien.vie)}%`);
     this.txtPhase.setText(`${e.phase} / 3`);
     if (this.confisque) this.txtBonus.setText(`CONFISQUÉ : ${armeDe(this.confisque.id).nom} ${Math.ceil(this.confisque.t)} s`);
-    this.txtMunitions.setText(`ŒUFS ${this.j.mun.oeufs}  TOMATES ${this.j.mun.tomates}${this.j.armes.has('sarbacane') ? '  SARBACANE ∞' : ''}`);
+    this.txtMunitions.setText(this.confisque ? 'SARBACANE CONFISQUÉE' : 'SARBACANE ∞');
   }
 }

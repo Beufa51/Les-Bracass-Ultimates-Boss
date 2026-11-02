@@ -13,7 +13,7 @@
 // Objets : 'o' boîte d'œufs, 's' sandwich, 'b' barrière, 'p' poubelle, 'm' manifestant, 'T' statue,
 //          'C' camion de CRS, 'k' colonne Morris (tous bloquent sauf œufs et sandwich).
 // Armes (la 1re trouvée donne l'arme, les suivantes des munitions) : 't' cagette de tomates, 'w' pistolet à eau,
-//          'f' fumigènes.
+//          'f' fumigènes (retirés du niveau : demande de Fabien).
 // Bonus : 'e' écharpe mouillée (pas de toux dans les lacrymos), 'c' café serré (plus rapide), 'K' K-Way (armure).
 // 'a' SAC DE FARINE (bloque) : un œuf ou une tomate dessus → nuage blanc, les policiers autour fuient (en chaîne).
 // 'R' RIDEAU DE FER (mur n°9) : se lève quand on ramasse le 1er pistolet à eau → embuscade (policiers cachés derrière).
@@ -38,11 +38,11 @@ export const PLAN_MANIF = [
   '222111222111223...8221112221112221',
   '222111..a................a..112221',
   '222111.P..................P.112221',
-  '111222...b..f...........b...221112',
+  '111222...b..............b...221112',
   '111222..o...................221112',
   '111222..........T....a......221112',
   '111222.....B................221112',
-  '222111......a...f........s..112221',
+  '222111......a...............112221',
   '222111..p...............p...112221',
   '222111.e.w..k........k....t.112221',
   '222111......................112221',

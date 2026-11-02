@@ -46,12 +46,12 @@ export const REGLAGES = {
   // AUTRES ARMES (touches 1 à 5 ; bouton ARME sur téléphone). La 1re cagette / pistolet / fumigène trouvé donne l'arme.
   pancarte: { cadence: 0.45, portee: 1.4, degats: 1, recul: 0.7, etourdit: 1.4 },   // un CRS frappé baisse son bouclier (etourdit s)
   tomates: { cagette: 10, maxi: 40, cadence: 0.6, vitesse: 8, duree: 0.9, degats: 2, recul: 0.5 },   // une tomate = 2 œufs, fait bien reculer
-  sarbacane: { cadence: 0.22, vitesse: 12, duree: 1.2, degats: 0.5, recul: 0 },   // niveau 2 : infinie, précise, petits dégâts (×3 DE DOS)
+  sarbacane: { cadence: 0.3, vitesse: 12, duree: 1.2, degats: 1, recul: 0 },   // lycée et classe : SEULE arme (celles de la manif sont interdites), infinie ; ×3 DE DOS
   eau: { bouteille: 120, maxi: 300, cadence: 0.07, vitesse: 11, duree: 0.45, degats: 0.2, recul: 0.06, eteint: 0.3 },   // eteint : s de lacrymo en moins par goutte
   fumigenes: { boite: 3, maxi: 9, cadence: 1.0, distance: 5, vol: 0.8, duree: 6, rayon: 1.6, degats: 1 },   // degats : par seconde dans la fumée
   sandwich: 35,          // vie rendue par un sandwich (Fabien : trop dur → 25 → 35)
   soins: {
-    casseCroute: 0.45,   // chance qu'un policier mis en fuite lâche son casse-croûte (= un sandwich)
+    casseCroute: 0.25,   // (Fabien : un peu moins de nourriture, 0,45 → 0,25) chance qu'un policier mis en fuite lâche son casse-croûte (= un sandwich)
     manifestant: 15,     // vie rendue par un manifestant quand tu passes à côté (une fois chacun)
   },
   fuite: { vitesse: 2.6, mini: 0.6 },   // policier en fuite : vitesse ; il disparaît après « mini » s, dès que tu ne le vois plus
@@ -100,7 +100,7 @@ export const REGLAGES = {
     vie: 3, vitesse: 1.0, vue: 9, distance: 4, cadence: 2.8, preavis: 0.7,
     degats: 8, rayon: 0.9, flaque: 6, ralenti: 0.45, replique: '« Reprends donc de la purée ! »',
   },
-  lycee: { oeufs: 30, canette: 15, fayotCri: 3.5, fayotAlerte: 10, fayotVue: 8 },   // canette : vie rendue ; fayot : s entre 2 cris, rayon d'alerte, vue
+  lycee: { canette: 15, fayotCri: 3.5, fayotAlerte: 10, fayotVue: 8 },   // canette : vie rendue ; fayot : s entre 2 cris, rayon d'alerte, vue
   // NIVEAU 2 : JULIEN, le prof (JulienClasse.js). 3 phases : > 50 % de vie, 50-20 %, < 20 % (il pète un câble)
   julien: {
     vie: 40,             // 1 œuf = 1, 1 tomate = 2, 1 coup de pancarte = 1 ; DE DOS : ×2 (sarbacane ×3)
@@ -125,10 +125,6 @@ export const REGLAGES = {
     rafale: { nombre: 3, intervalle: 0.28 },   // phase 3 : 3 livres coup sur coup
   },
   classe: {
-    oeufs: 30, tomates: 6,   // munitions en entrant en classe (× la difficulté)
-    projecteur: { rayon: 1.6, vitesse: 0.35, vue: 2.5 },   // phase 2 : dans le noir, il ne te voit que dans la lumière (ou à moins de « vue » cases)
     glisse: 0.45,            // phase 3 (sprinklers) : tu glisses encore ce temps-là (s) après avoir lâché (petit = moins de glissade)
-    secours: 8,              // moins d'œufs que ça : un camarade te fait passer une boîte (toutes les 'secoursT' s)
-    secoursT: 6,
   },
 };

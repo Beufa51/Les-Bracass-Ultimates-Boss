@@ -58,6 +58,7 @@ function armeDeSecours(scene) {
 export function tirer(scene, dx, dy, appui, nouveau) {
   const j = scene.j, a = armeDe(j.arme);
   if (!appui || j.recharge > 0 || j.changeT > 0) return;
+  if (scene.confisque && scene.confisque.id === j.arme) return;   // (la classe) Julien l'a confisquée
   if (a.mun && j.mun[a.mun] <= 0) { if (nouveau) armeDeSecours(scene); return; }
   if (a.mun) j.mun[a.mun]--;
   const [vx, vy] = scene.viser(dx, dy);
@@ -148,7 +149,7 @@ export function avancerTirs(scene, dt) {
       o.fini = true;
       if (!sec) scene.splats.push({ x: o.x, y: o.y, t: 1.2, rouge: o.genre === 'tomate' });
       if ((b.type === 'farine' || b.type === 'extincteur') && o.genre !== 'eau') scene.exploserFarine(b);   // extincteur : le lycée
-      if (b.replique && !sec) scene.message(b.replique, 1.6);   // (les fayots du lycée)
+      if (b.replique && o.genre !== 'eau') scene.message(b.replique, 1.6);   // (les fayots du lycée)
       if (b.type === 'manifestant' && o.genre !== 'eau') scene.message('« Hé ! Pas sur nous ! »');
       break;
     }

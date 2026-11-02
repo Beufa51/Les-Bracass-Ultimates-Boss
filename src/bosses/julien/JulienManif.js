@@ -927,7 +927,8 @@ export class JulienManif extends BossScene {
 
     // la main et l'arme en bas de l'écran
     const bx = Math.sin(j.bob) * 5, by = Math.abs(Math.cos(j.bob)) * 4 + (j.changeT > 0 ? Math.sin(Math.PI * j.changeT / 0.3) * 90 : 0);   // changement d'arme : elle descend puis remonte
-    if (j.arme === 'oeufs' && T.main.image) {   // vraies images (210×240) : le bras sort du bas de l'écran
+    if (this.confisque && this.confisque.id === j.arme) { /* arme confisquée (la classe) : pas de main */ }
+    else if (j.arme === 'oeufs' && T.main.image) {   // vraies images (210×240) : le bras sort du bas de l'écran
       if (j.lanceT > 0) g.drawImage(T.main.lance, L / 2 + 30, VUE_H - 128, 112, 128);
       else if (j.mun.oeufs > 0) g.drawImage(T.main.tient, L / 2 + 60 + bx, VUE_H - 110 + by, 105, 120);
     } else {
@@ -954,7 +955,7 @@ export class JulienManif extends BossScene {
     this.dessinerBarre(g, cam);
     this.toile.refresh();
     this.txtVie.setText(`${Math.ceil(j.vie)}%`);
-    this.txtMunitions.setText(`ŒUFS ${j.mun.oeufs}  TOMATES ${j.mun.tomates}  EAU ${Math.ceil(j.mun.eau)}  FUMI ${j.mun.fumigenes}`);
+    this.txtMunitions.setText(`ŒUFS ${j.mun.oeufs}  TOMATES ${j.mun.tomates}  EAU ${Math.ceil(j.mun.eau)}`);
     this.txtArmure.setText(j.armure > 0 ? `K-WAY ${Math.ceil(j.armure)}` : '');
     const restants = this.ennemis.filter(e => e.parvis && e.actif && e.etat !== 'fuite').length;
     const parvis = this.zonesVues.has(ZONES.length - 1) && !this.portailOuvert ? `PARVIS : ${restants} policier${restants > 1 ? 's' : ''}` : '';

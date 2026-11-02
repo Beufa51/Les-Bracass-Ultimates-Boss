@@ -202,6 +202,26 @@ def meme_taille(images, hauteur):
     return sorties
 
 
+# Julien est prof de FRANÇAIS (pas de maths) : la formule du tableau est remplacée par une dictée à la craie,
+# écrite petit puis agrandie ×3 (gros pixels, comme le titre « INTERRO SURPRISE » qu'on garde)
+TABLEAU_TEXTE = ['Dictée : « Je ne manifeste', 'plus pendant les cours. »']
+def corriger_tableau(t):
+    from PIL import ImageDraw, ImageFont
+    a = np.asarray(t).astype(np.int16).copy()
+    rng = np.random.default_rng(3)
+    zone = a[280:445, 300:1150]
+    zone[:] = np.array([36, 57, 31]) + rng.integers(-2, 3, zone.shape)   # le vert du tableau (effacé)
+    t = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
+    police = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 17)
+    for k, ligne in enumerate(TABLEAU_TEXTE):
+        petit = Image.new('L', (290, 26), 0)
+        ImageDraw.Draw(petit).text((145, 13), ligne, font=police, fill=255, anchor='mm')
+        masque = petit.point(lambda v: 255 if v > 110 else 0).resize((870, 78), Image.NEAREST)
+        craie = Image.new('RGB', masque.size, (226, 232, 222))
+        t.paste(craie, (290, 284 + k * 80), masque)
+    return t
+
+
 def main():
     os.makedirs(SORTIE, exist_ok=True)
     morceaux = {}
@@ -293,7 +313,7 @@ def main():
             Image.open(ENTREE + f'julien_{nom}.jpg').convert('RGB').resize((128, 192), Image.LANCZOS).save(SORTIE + f'julien_{nom}.png')
             print('  ', nom, '128 x 192')
     if os.path.exists(ENTREE + 'julien_tableau.jpg'):
-        t = Image.open(ENTREE + 'julien_tableau.jpg').convert('RGB')
+        t = corriger_tableau(Image.open(ENTREE + 'julien_tableau.jpg').convert('RGB'))
         for k in range(3):
             t.crop((k * t.width // 3, 0, (k + 1) * t.width // 3, t.height)).resize((128, 192), Image.LANCZOS).save(SORTIE + f'julien_tableau_{k}.png')
         print('   tableau 3 x 128 x 192')

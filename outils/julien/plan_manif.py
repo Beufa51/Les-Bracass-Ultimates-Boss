@@ -42,7 +42,7 @@ objets = {
     (16, 10): 'P', (15, 12): 'B', (16, 12): 'b', (17, 12): 'B',   # cordon : 2 CRS + une barrière (16, 16): 'o',
     # place : statue au centre
     (16, 22): 'T', (7, 19): 'P', (26, 19): 'P', (11, 23): 'B',
-    (9, 20): 'b', (24, 20): 'b', (8, 21): 'o', (25, 24): 's', (8, 25): 'p', (24, 25): 'p', (12, 26): 'k', (21, 26): 'k',
+    (9, 20): 'b', (24, 20): 'b', (8, 21): 'o', (8, 25): 'p', (24, 25): 'p', (12, 26): 'k', (21, 26): 'k',
     # ruelle : un CRS seul
     (7, 30): 'B', (7, 34): 'o', (6, 28): 'p',
     # passage : un lanceur seul
@@ -53,7 +53,7 @@ objets = {
     (15, 30): 'C', (17, 30): 'C', (14, 32): 'b', (15, 32): 'b', (16, 32): 'b', (17, 32): 'b', (18, 32): 'b',
     (15, 34): 'm', (17, 34): 'm',
     # armes : tomates (t) dans la ruelle, pistolet à eau (w) dans le passage, fumigènes (f) sur la place, + recharges
-    (8, 32): 't', (24, 31): 'w', (16, 24): 'f', (26, 26): 't', (9, 26): 'w', (12, 20): 'f', (12, 7): 't', (15, 15): 'w',
+    (8, 32): 't', (24, 31): 'w', (26, 26): 't', (9, 26): 'w', (12, 7): 't', (15, 15): 'w',
     # embuscade : policiers derrière les rideaux de fer (ils sortent quand on ramasse le pistolet à eau)
     (22, 30): 'P', (22, 32): 'B',
     # SACS DE FARINE (a) : un œuf dessus → nuage blanc qui fait fuir les policiers autour (en chaîne)

@@ -4,7 +4,8 @@
 //  - SURVEILLANT (le pion) : IA du CRS sans bouclier (il siffle, puis il fonce : pas de côté, puis bombarde-le).
 //  - DAME DE CANTINE : IA du lanceur, mais de la PURÉE : flaque où l'on avance au ralenti.
 //  - FAYOTS : invincibles ; quand ils te voient ils crient et ALERTENT tout le monde ; de près, ils s'enfuient.
-//  - EXTINCTEUR (le baril de Doom) : un œuf dessus → nuage de mousse (même effet que le sac de farine de la manif).
+//  - Armes de la manif INTERDITES : seulement la SARBACANE.
+//  - EXTINCTEUR (le baril de Doom) : une boulette dessus → nuage de mousse (même effet que le sac de farine de la manif).
 //  - CANETTES : petits soins. Un casier ouvert cache un placard secret.
 // Plan et textes : niveau_lycee.js ; réglages : RG.surveillant, RG.cantiniere, RG.lycee.
 import { JulienManif } from './JulienManif.js';
@@ -18,7 +19,8 @@ import { REGLAGES as RG } from './reglages.js';
 import { ARMES, choisirArme } from './armes.js';
 import { vueLibre } from './raycaster.js';
 import { PLAN_LYCEE, OBJETS_LYCEE, SECRETS_LYCEE, PORTE_SALLE_12, ZONES_LYCEE, REPLIQUES_LYCEE as TXT } from './niveau_lycee.js';
-import { construireDecorLycee, spritesLycee, HAUTEURS_LYCEE } from './decor_classe.js';
+import { construireDecorLycee, spritesLycee, spritesClasse, HAUTEURS_LYCEE } from './decor_classe.js';
+import { mainSarbacane } from './JulienClasse.js';
 
 const L = 480, VUE_H = 222;   // comme JulienManif
 const hasard = (liste) => liste[(Math.random() * liste.length) | 0];
@@ -30,7 +32,7 @@ const POSES = {
 // vraies images des murs (outils/julien/decouper_planches.py) : code du plan → image
 const MURS_IMAGES = { 1: 'mur_casiers', 2: 'mur_couloir', 3: 'mur_cantine', 4: 'porte_classe', 5: 'mur_classe' };
 const IMAGES = [...Object.entries(POSES).flatMap(([t, ps]) => ps.map(p => `${t}_${p}`)), ...Object.values(MURS_IMAGES),
-  'table', 'bureau', 'canette', 'extincteur', 'carnet', 'puree', 'flaque', 'comptoir', 'mousse'];   // (5 derniers : section 17 des prompts)
+  'table', 'bureau', 'canette', 'extincteur', 'carnet', 'puree', 'flaque', 'comptoir', 'mousse', 'main_sarbacane', 'main_sarbacane_tir'];   // (5 derniers : section 17 des prompts)
 const RAYONS = { table: 0.48, comptoir: 0.55, extincteur: 0.3, fayot: 0.3 };
 const estCantine = (x, y) => x >= 8 && x <= 21 && y >= 2 && y <= 9;
 
@@ -47,6 +49,10 @@ export class JulienLycee extends JulienManif {
     const T = this.T;
     if (!T.lycee) {
       const img = (n) => this.textures.exists('julien_' + n) ? this.textures.get('julien_' + n).getSourceImage() : null;
+      T.spr.boulette = T.spr.boulette || spritesClasse().boulette;   // la boulette de la sarbacane
+      // la sarbacane en main (vraie image si livrée, sinon le dessin en pixel art de la classe)
+      const ms = img('main_sarbacane');
+      T.main.sarbacane = ms || mainSarbacane(false); T.main.sarbacane_tir = img('main_sarbacane_tir') || ms || mainSarbacane(true);
       Object.assign(T.spr, spritesLycee());
       Object.assign(T.hauteurs, HAUTEURS_LYCEE);
       for (const [t, ps] of Object.entries(POSES)) for (const p of ps) { const i = img(`${t}_${p}`); if (i) T.spr[`${t}_${p}`] = i; }
@@ -59,7 +65,7 @@ export class JulienLycee extends JulienManif {
     return T.lycee;
   }
   planDepart() { return PLAN_LYCEE; }
-  lancerMusique() { jouerMusique(this, 'julien_musique'); }
+  lancerMusique() { jouerMusique(this, 'julien_lycee_musique'); }   // thème de Duke Nukem 3D
 
   create() {
     super.create();
@@ -73,17 +79,18 @@ export class JulienLycee extends JulienManif {
     const tact = estTactile();
     this.afficherIntro('LE LYCÉE', [
       'Tu es dans le lycée… et en RETARD ! Julien t\'attend en SALLE 12.',
+      'Œufs et tomates sont INTERDITS ici : tu n\'as plus que ta SARBACANE (munitions infinies).',
       'La porte est fermée : récupère d\'abord ton CARNET DE CORRESPONDANCE à la CANTINE.',
       'SURVEILLANT : il siffle puis il fonce → pas de côté.   DAME DE CANTINE : évite la purée.',
       'Les FAYOTS te dénoncent : on ne peut pas les toucher, contourne-les.',
-      'Un œuf sur un EXTINCTEUR : mousse partout !   Les CANETTES soignent.',
+      'Une boulette sur un EXTINCTEUR : mousse partout !   Les CANETTES soignent.',
       ...(tact ? [this.joy ? 'Joystick : avancer, reculer, pas de côté     ↺ ↻ : tourner' : '▲ ▼ avancer / reculer   ◀ ▶ pas de côté   ↺ ↻ tourner',
         'LANCER : tirer      ARME : changer d\'arme'] : this.lignesCommandes()),
     ], () => this.demarrer());
   }
 
   appliquerDifficulte() {
-    this.j.mun.oeufs = Math.round(RG.lycee.oeufs * this.diff.munitions);
+    this.j.mun.oeufs = 0; this.j.mun.tomates = 0;   // armes de la manif interdites : seulement la sarbacane
     this.total = this.ennemis.filter(e => e.actif).length;
   }
 
@@ -92,6 +99,7 @@ export class JulienLycee extends JulienManif {
   // ------------------------------------------------------------------ niveau
   lireNiveau() {
     this.j = this.nouveauJoueur();
+    this.j.armes = new Set(['sarbacane']); this.j.arme = 'sarbacane';   // les armes de la manif sont INTERDITES au lycée
     this.ennemis = []; this.objets = []; this.tirs = []; this.fumees = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.farines = []; this.rideaux = []; this.flaques = []; this.fourgonFait = true;
     this.secrets = new Map(); this.secretsTrouves = 0;
@@ -129,7 +137,7 @@ export class JulienLycee extends JulienManif {
     if (this.enJeu && !this.termine) {
       const j = this.j;
       if (vientDAppuyer(this.touchesCarte.tab) || vientDAppuyer(this.touchesCarte.m)) this.carte = !this.carte;
-      ['a1', 'a2', 'a3', 'a4', 'a5'].forEach((t, i) => { if (vientDAppuyer(this.touchesArmes[t])) choisirArme(this, ARMES[i].id); });
+      ['a1', 'a2', 'a3', 'a4', 'a5', 'a6'].forEach((t, i) => { if (vientDAppuyer(this.touchesArmes[t])) choisirArme(this, ARMES[i].id); });
       for (const f of this.flaques) f.t -= dt;
       this.flaques = this.flaques.filter(f => f.t > 0);
       j.lent = this.flaques.some(f => Math.hypot(f.x - j.x, f.y - j.y) < 0.8);
@@ -226,5 +234,6 @@ export class JulienLycee extends JulienManif {
     super.dessiner(dt);
     if (!this.txtLycee) return;
     this.txtLycee.setText(this.carnet ? 'OUI' : 'NON');
+    this.txtMunitions.setText('SARBACANE ∞');
   }
 }

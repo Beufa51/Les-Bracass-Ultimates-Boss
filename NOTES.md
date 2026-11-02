@@ -1078,6 +1078,16 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   faisait « plonk » (surtout avec le café) → `bouclierBaisse(e)` ; le lanceur caché derrière un mur visait ta position
   ACTUELLE à travers les murs → il vise là où il t'a vu (`vuX`, `vuY`). Aucune erreur dans la console. Plaisir : rien de
   bloquant, le niveau 1 est jugé prêt (restent en option : BAC, LBD, policiers en hauteur, sono, clé + porte).
+- DEMANDES FABIEN (après le lycée) — FAIT :
+  · phase 2 de la classe : le NOIR + rétroprojecteur est SUPPRIMÉ (phase 2 = « interro surprise » : copies, dico, aimant).
+  · Julien est prof de FRANÇAIS : la formule de maths du tableau est remplacée par une dictée à la craie
+    (`corriger_tableau` / `TABLEAU_TEXTE` dans `decouper_planches.py`, l'image source n'est pas modifiée).
+  · manif : FUMIGÈNES retirés du niveau (plan + `plan_manif.py`), 1 sandwich sur 3 retiré, casse-croûte 45 % → 25 %.
+  · lycée ET classe : armes de la manif INTERDITES → seulement la SARBACANE, équipée d'office (dégâts 1, cadence 0,3,
+    ×3 de dos). Plus d'œufs / tomates à ramasser (remplacés par canettes / sandwichs), plus de « camarade qui fait
+    passer des œufs ». « CONFISQUÉ ! » : la sarbacane est prise 8 s (on ne peut plus tirer, la main disparaît).
+  · MUSIQUES : lycée = thème de Duke Nukem 3D (`julien_lycee_musique.mp3`), boss = « One-Winged Angel » de Sephiroth
+    (`julien_boss_musique.mp3`) ; la manif garde Doom. Chargées seulement quand elles jouent.
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».
   Hall → couloir des casiers (porte de la salle 12 en haut, FERMÉE sans le carnet) → cantine (CARNET DE
