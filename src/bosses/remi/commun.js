@@ -61,3 +61,17 @@ export function ecranPerdu(scene, titre, message, nomDiff) {
 
 export const hasard = (a, b) => a + Math.random() * (b - a);
 export const choisir = (liste) => liste[Math.floor(Math.random() * liste.length)];
+
+// Sur téléphone, les blocs de boutons (en bas à gauche et à droite) restent posés sur l'écran même quand leurs boutons
+// sont cachés : ils « mangeaient » les touchers du jeu (bug V6 : « je dois appuyer à côté »). Pendant les jeux de Rémi,
+// les blocs laissent passer les touchers ; seuls les boutons VISIBLES restent touchables. Remis comme avant en partant.
+export function laisserPasserTactile(scene) {
+  const blocs = [...document.querySelectorAll('.tactile')];
+  for (const b of blocs) {
+    b.style.pointerEvents = 'none';
+    for (const bouton of b.querySelectorAll('button')) bouton.style.pointerEvents = 'auto';
+  }
+  scene.events.once('shutdown', () => {
+    for (const b of blocs) { b.style.pointerEvents = ''; for (const bouton of b.querySelectorAll('button')) bouton.style.pointerEvents = ''; }
+  });
+}

@@ -15,7 +15,7 @@ import { jouerMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, PORTE as R, REPLIQUES } from './reglages.js';
 import { remi, toi } from './dessins.js';
-import { bulle, annonce, ecranPerdu, difficulteOuChoix, hasard, choisir } from './commun.js';
+import { bulle, annonce, ecranPerdu, difficulteOuChoix, hasard, choisir , laisserPasserTactile } from './commun.js';
 
 const SOL = 470, X_FRAPPE = 500, X_ATTENTE = 170;
 // la porte du décor illustré (remi_porte_decor.jpg, 960 x 536) : son battant, pour le faire trembler / tomber
@@ -62,6 +62,7 @@ export class RemiPorte extends BossScene {
     this.hud = texte(this, 200, 28, '', 22, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
     this.consigne = texte(this, LARGEUR / 2, 505, '', 30, '#ffd84a', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 4 } }).setDepth(900).setVisible(false);
     this.touches = creerTouches(this);
+    laisserPasserTactile(this);   // les blocs de boutons cachés ne mangent plus les touchers
     jouerMusique(this, 'remi_musique_bar');   // la musique du bar (dès l'écran des commandes)
     this.input.on('pointerdown', (p) => { this.toucher = true; this.toucheX = p.x; });
     this.gel = 0; this.bonusPari = 0; this.cible = { x: 0, y: 0 };

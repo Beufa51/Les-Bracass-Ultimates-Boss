@@ -93,3 +93,24 @@ Même style et même cadrage que l'image jointe (défilement horizontal, vue de 
 centre-ville, terrasses de bars éclairées, guirlandes lumineuses au-dessus de la rue, enseignes néon (sans texte lisible),
 façades colorées. Le bas de l'image s'arrête au pied des façades. Image très large (3:1), bords raccordables, aucun personnage.
 ```
+
+## 13. Rémi qui t'attend devant le bar (fin du vélo) — `remi_accueil.png` (détendu, PAS en garde)
+À joindre : l'image de présentation de Rémi.
+```
+Même personnage que l'image jointe (casquette noire à l'envers, barbe, veste en jean, tee-shirt orange, jean, baskets), même style
+manga/anime, contours noirs nets, fond BLANC uni, aucun texte. Vu de 3/4 face, EN PIED (des chaussures à la casquette),
+détendu et souriant : il lève une pinte de bière d'une main et fait un grand signe « viens ! » de l'autre. Une seule pose, centrée.
+```
+
+## 14. Les voitures garées du vélo — `remi_voitures_planche.jpg`
+```
+Planche de sprites style manga/anime, contours noirs nets, fond BLANC uni, aucun texte. 3 petites voitures de ville garées,
+vues STRICTEMENT DE PROFIL, toutes tournées vers la DROITE, même échelle et même hauteur, alignées sur une ligne et bien espacées :
+une citadine rouge, une berline bleue, une petite camionnette jaune. Toit plat bien visible (on roule dessus à vélo). Pas d'ombre au sol.
+```
+
+## 15. Le tremplin du vélo — `remi_tremplin.png`
+```
+Style manga/anime, contours noirs nets, fond BLANC uni, aucun texte. Vu STRICTEMENT DE PROFIL : un tremplin de fortune fait d'une
+planche de bois posée en pente (montant vers la DROITE) sur une pile de caisses de bière en plastique jaune. Une seule image, centrée.
+```

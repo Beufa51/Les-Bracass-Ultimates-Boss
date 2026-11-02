@@ -18,7 +18,7 @@ import { jouerMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, PONG as P, REPLIQUES } from './reglages.js';
 import { remi } from './dessins.js';
-import { bulle, annonce, jeuSuivant, ecranPerdu, difficulteOuChoix, hasard, choisir } from './commun.js';
+import { bulle, annonce, jeuSuivant, ecranPerdu, difficulteOuChoix, hasard, choisir , laisserPasserTactile } from './commun.js';
 
 // ---------- projection : caméra en retrait et en hauteur : toute la table tient dans l'écran (bord de Rémi y≈190, le tien y≈520) ----------
 const CAM_Z = -2, CAM_H = 1.416, F = 984, HORIZON = -177, CX = LARGEUR / 2;
@@ -61,6 +61,7 @@ export class RemiPong extends BossScene {
     this.hud = texte(this, LARGEUR / 2, 24, '', 20, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
     this.hudTour = texte(this, 16, 516, '', 18, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 8, y: 3 }, align: 'left' }).setOrigin(0, 0.5).setDepth(900);
     this.touches = creerTouches(this);
+    laisserPasserTactile(this);   // les blocs de boutons cachés ne mangent plus les touchers
     jouerMusique(this, 'remi_musique_bar');   // la musique du bar (dès l'écran des commandes)
     this.installerTir();
     this.pose = 'face'; this.poseFin = 0;

@@ -98,7 +98,12 @@
     TREMPLINS + 2 VOITURES garées tous les `voitures` obstacles (on roule sur les toits, pintes au-dessus, rentrer dans le
     côté = chute ; `solSous`, `voituresPas`) ; 3 QUARTIERS (`QUARTIERS` : rue des bars, quais, centre-ville : images
     `remi_rue2` / `remi_rue3` si ajoutées au manifeste, sinon la rue teintée) avec fondu et annonce.
-    Bots NORMAL (15 % d'erreurs) / CHAMPION (10 %) : arrivés de justesse avant réglage ; temps finaux 58 / 46 / 38 s. : `python3 outils/remi/preparer_images.py`.
+    Bots NORMAL (15 % d'erreurs) / CHAMPION (10 %) : arrivés de justesse avant réglage ; temps finaux 58 / 46 / 38 s.
+- V6b (retours : touches du vélo qui ne marchent qu'à côté ; pong un peu dur ; Rémi « en bagarre » et trop grand devant le bar) :
+  BUG TACTILE : les blocs de boutons HTML (même vides) restaient posés sur l'écran et mangeaient les touchers →
+  `laisserPasserTactile(scene)` (commun.js) dans les 3 jeux (vérifié en émulation téléphone : le toucher arrive au jeu).
+  Pong : `erreur` 0,035 / 0,05 / 0,065, `apercu` 1 / 0,8 / 0,55. Rémi devant le bar : pose « attend » du pong, plus petit,
+  derrière une table haute dessinée ; `remi_accueil` (en pied) utilisé s'il est ajouté au manifeste. Prompts 10 à 15 donnés. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

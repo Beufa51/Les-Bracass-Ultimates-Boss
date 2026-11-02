@@ -14,15 +14,15 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 export const DIFFICULTES = {
   facile: { nom: 'FACILE', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
     temps: 58, densite: 0.8, traverse: 0.8, sonnette: 730,
-    erreur: 0.045, apercu: 1, distrait: 0, remi: 0.32, aide: true,
+    erreur: 0.035, apercu: 1, distrait: 0, remi: 0.32, aide: true,
     remiMin: 560, remiMax: 760, zone: 0.22, visee: 0.8 },
   normal: { nom: 'NORMAL', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 46, densite: 1, traverse: 1, sonnette: 650,
-    erreur: 0.07, apercu: 0.65, distrait: 0.35, remi: 0.42, aide: false,
+    erreur: 0.05, apercu: 0.8, distrait: 0.35, remi: 0.42, aide: false,
     remiMin: 650, remiMax: 850, zone: 0.15, visee: 1 },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 38, densite: 1.2, traverse: 1.25, sonnette: 570,
-    erreur: 0.085, apercu: 0.45, distrait: 0.55, remi: 0.52, aide: false,
+    erreur: 0.065, apercu: 0.55, distrait: 0.55, remi: 0.52, aide: false,
     remiMin: 760, remiMax: 930, zone: 0.1, visee: 1.3 },
 };
 

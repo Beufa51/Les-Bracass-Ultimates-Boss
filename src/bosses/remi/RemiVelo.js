@@ -16,7 +16,7 @@ import { jouerSon } from '../../core/ressources.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, DIFFICULTES, VELO as V, REPLIQUES } from './reglages.js';
 import { cycliste, bourre, verreCasse, flaque, remi, COULEURS } from './dessins.js';
-import { bulle, annonce, jeuSuivant, ecranPerdu, hasard, choisir } from './commun.js';
+import { bulle, annonce, jeuSuivant, ecranPerdu, hasard, choisir , laisserPasserTactile } from './commun.js';
 import { choisirDifficulte } from './difficulte.js';
 
 const SOL = 440;                     // hauteur de la route à l'écran
@@ -59,12 +59,19 @@ export class RemiVelo extends BossScene {
     this.sprVelo = this.textures.exists('remi_velo') ? this.add.sprite(0, 0, 'remi_velo', 0).setOrigin(0.5, 1).setDepth(10).setScale(0.78) : null;
     this.gRemi = this.add.graphics().setDepth(6);
     this.facade = this.textures.exists('remi_bar_facade') ? this.add.image(0, 0, 'remi_bar_facade').setOrigin(0.5, 1).setScale(340 / 917).setDepth(3).setVisible(false) : null;
-    this.sprRemi = this.textures.exists('remi_porte') ? this.add.sprite(0, 0, 'remi_porte', 0).setFlipX(true).setOrigin(0.7, 1).setScale(0.42).setDepth(6).setVisible(false) : null;
+    // Rémi t'attend devant le bar, détendu : son illustration « remi_accueil » (en pied) si elle existe, sinon la pose
+    // « attend » du beer pong (coupée à la taille), derrière une table haute de terrasse dessinée qui cache le bas
+    this.remiAccueil = this.textures.exists('remi_accueil');
+    this.sprRemi = this.remiAccueil ? this.add.image(0, 0, 'remi_accueil').setOrigin(0.5, 1).setDepth(6).setVisible(false)
+      : this.textures.exists('remi_pong') ? this.add.sprite(0, 0, 'remi_pong', 0).setOrigin(0.5, 1).setScale(0.3).setDepth(6).setVisible(false) : null;
+    if (this.sprRemi && this.remiAccueil) this.sprRemi.setScale(230 / this.sprRemi.height);
+    this.gTable = this.add.graphics().setDepth(6.5);
     this.enseigne = texte(this, 0, 0, 'BAR', 54, '#ff4fd8', { fontStyle: 'bold', stroke: '#5a0a4a', strokeThickness: 6 }).setDepth(4).setVisible(false);
     this.creerHud();
 
     this.touches = creerTouches(this);
     this.installerZones();
+    laisserPasserTactile(this);   // les blocs de boutons cachés ne mangent plus les touchers
     this.dessiner();
 
     etiquettesTactiles({ ...VIDES, espace: 'OK' });
@@ -460,12 +467,21 @@ export class RemiVelo extends BossScene {
         this.enseigne.setVisible(true).setPosition(xBar + 60, SOL - 240).setAlpha(0.75 + 0.25 * Math.sin(this.horloge * 9));
       }
       const gr = this.gRemi.clear().setPosition(xBar - 20, SOL);
-      if (this.sprRemi) this.sprRemi.setVisible(true).setPosition(xBar - 110, SOL + 4);   // Rémi t'attend devant le bar
+      const gt = this.gTable.clear();
+      if (this.sprRemi && this.remiAccueil) this.sprRemi.setVisible(true).setPosition(xBar - 130, SOL + 4);
+      else if (this.sprRemi) {
+        this.sprRemi.setVisible(true).setPosition(xBar - 130, SOL - 70);
+        // table haute de terrasse (cache le bas de l'image) avec une pinte
+        gt.fillStyle(0x2a1a10, 1).fillRect(xBar - 200, SOL - 92, 140, 12).fillRect(xBar - 136, SOL - 82, 10, 82).fillRect(xBar - 160, SOL - 4, 60, 6);
+        gt.fillStyle(0xe8a52a, 1).fillRect(xBar - 90, SOL - 118, 18, 26);
+        gt.fillStyle(0xffffff, 1).fillRect(xBar - 91, SOL - 122, 20, 6);
+      }
       else remi(gr, 'garde', this.horloge);
     } else {
       this.enseigne.setVisible(false); this.gRemi.clear();
       if (this.facade) this.facade.setVisible(false);
       if (this.sprRemi) this.sprRemi.setVisible(false);
+      this.gTable.clear();
     }
   }
 
