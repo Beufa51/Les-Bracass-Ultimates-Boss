@@ -16,6 +16,7 @@ import { remi, toi } from './dessins.js';
 import { bulle, annonce, ecranPerdu, difficulteOuChoix, hasard, choisir } from './commun.js';
 
 const SOL = 470, X_FRAPPE = 500, X_ATTENTE = 170, PORTE_X = 640;
+const ECHELLE = 0.45, POING = 342;   // POING : où est le poing (px) dans la case de l'impact (largeur de la pose)
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 
 export class RemiPorte extends BossScene {
@@ -31,6 +32,11 @@ export class RemiPorte extends BossScene {
     this.gPorte = this.add.graphics().setDepth(3);
     this.gRemi = this.add.graphics().setDepth(5);
     this.gToi = this.add.graphics().setDepth(6);
+    // illustrations de profil (6 cases : Rémi garde / coup / impact, toi garde / coup / impact) ; sinon les dessins du code
+    if (this.textures.exists('remi_porte')) {
+      this.sprRemi = this.add.sprite(0, 0, 'remi_porte', 0).setOrigin(0, 1).setScale(ECHELLE).setDepth(5);
+      this.sprToi = this.add.sprite(0, 0, 'remi_porte', 3).setOrigin(0, 1).setScale(ECHELLE).setDepth(6);
+    }
     this.gJauges = this.add.graphics().setDepth(900);
     this.ecran = texte(this, PORTE_X + 70, 60, '000', 54, '#ff3030', { fontStyle: 'bold', stroke: '#300000', strokeThickness: 6, backgroundColor: '#100000' }).setDepth(4);
     this.hud = texte(this, 200, 28, '', 22, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
@@ -133,7 +139,9 @@ export class RemiPorte extends BossScene {
   // la frappe : pose, tremblement, fissures, compteur de la borne
   frapper(qui, score) {
     this.scores[qui] = score;
-    if (qui === 'remi') this.poseRemi = 'frappe'; else this.poseToi = 'frappe';
+    // « coup » (bras qui part) puis « frappe » (impact, traits de vitesse)
+    if (qui === 'remi') this.poseRemi = 'coup'; else this.poseToi = 'coup';
+    this.time.delayedCall(90, () => { if (qui === 'remi') this.poseRemi = 'frappe'; else this.poseToi = 'frappe'; });
     this.time.delayedCall(450, () => { if (qui === 'remi') this.poseRemi = 'garde'; else this.poseToi = 'garde'; });
     this.tremble = score / 999;
     this.cameras.main.shake(180 + score / 4, 0.004 + score / 999 * 0.014);
@@ -146,7 +154,7 @@ export class RemiPorte extends BossScene {
   }
 
   fissure() {
-    const pts = [[PORTE_X + hasard(30, 110), hasard(220, 330)]];
+    const pts = [[PORTE_X + hasard(4, 60), hasard(250, 300)]];   // autour de l'impact du poing
     for (let k = 0; k < 4; k++) { const [x, y] = pts[pts.length - 1]; pts.push([x + hasard(-26, 26), y + hasard(-30, 30)]); }
     return pts;
   }
@@ -194,6 +202,15 @@ export class RemiPorte extends BossScene {
     this.ecran.setText(String(Math.round(this.compteur)).padStart(3, '0'));
     // les deux joueurs : le frappeur devant la porte, l'autre attend à gauche
     const placer = (gr, qui, dessin, pose) => {
+      const spr = qui === 'remi' ? this.sprRemi : this.sprToi;
+      if (spr) {
+        // illustrations (cases alignées à gauche = le pied arrière) : le poing de l'impact touche la porte
+        const p = this.frappeur === qui ? pose : 'garde', base = qui === 'remi' ? 0 : 3;
+        const x = this.frappeur === qui ? PORTE_X + 6 - POING * ECHELLE : (qui === 'remi' ? 40 : 230);
+        spr.setFrame(base + ({ coup: 1, frappe: 2 }[p] ?? 0));
+        spr.setPosition(x - (p === 'elan' ? 22 : 0), SOL + 4).setRotation(p === 'elan' ? -0.1 : 0);
+        return;
+      }
       const x = this.frappeur === qui ? X_FRAPPE : X_ATTENTE + (qui === 'remi' ? 0 : 90);
       gr.clear().setPosition(x, SOL).setScale(1.5);
       dessin(gr, this.frappeur === qui ? pose : 'garde', this.horloge);

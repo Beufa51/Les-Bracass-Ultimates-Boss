@@ -97,6 +97,44 @@ def planche_pong():
     bande.save(DST + 'remi_pong.png')
     print('remi_pong.png', W, H)
 
+def planche_porte():
+    # 2 rangées de 3 poses de profil (Rémi en haut, toi en bas) : garde, coup, impact (traits de vitesse)
+    # -> remi_porte.png : 6 cases ALIGNÉES À GAUCHE (le pied arrière reste au même endroit), posées en bas
+    im = detourer(Image.open(SRC + 'remi_porte_planche.jpg'))
+    al = np.asarray(im)[:, :, 3] > 40
+    lab, n = ndimage.label(ndimage.binary_dilation(al, iterations=2))
+    boites = ndimage.find_objects(lab)
+    tailles = ndimage.sum(np.ones_like(lab), lab, range(1, n + 1))
+    grands = [i for i in range(n) if tailles[i] > 20000]
+    groupes = {i: list(boites[i]) for i in grands}
+    membres = {i: [i + 1] for i in grands}   # étiquettes de chaque pose (pour ne garder QUE ses pixels)
+    for i in range(n):
+        if i in groupes or tailles[i] < 150: continue
+        b = boites[i]; cy, cx = (b[0].start + b[0].stop) / 2, (b[1].start + b[1].stop) / 2
+        # un trait de vitesse rejoint le corps dont la boîte est la plus proche (souvent le poing juste à droite)
+        def dist(g):
+            gg = groupes[g]
+            dx = max(gg[1].start - cx, 0, cx - gg[1].stop); dy = max(gg[0].start - cy, 0, cy - gg[0].stop)
+            # à égalité (dans les deux boîtes) : le corps dont le centre est le plus proche en hauteur
+            return (dx + dy, abs((gg[0].start + gg[0].stop) / 2 - cy) + abs(gg[1].stop - cx) * 0.2)
+        j = min(grands, key=dist); g = groupes[j]; membres[j].append(i + 1)
+        groupes[j] = [slice(min(g[0].start, b[0].start), max(g[0].stop, b[0].stop)), slice(min(g[1].start, b[1].start), max(g[1].stop, b[1].stop))]
+    ordre = sorted(groupes, key=lambda j: (groupes[j][0].start > al.shape[0] / 2, groupes[j][1].start))
+    rgba = np.asarray(im).copy()
+    poses = []
+    for j in ordre:
+        b = groupes[j]
+        m = np.isin(lab, membres[j])
+        r = rgba.copy(); r[:, :, 3] = np.where(m, r[:, :, 3], 0)
+        poses.append(Image.fromarray(r, 'RGBA').crop((b[1].start, b[0].start, b[1].stop, b[0].stop)))
+    print('porte : poses', [p.size for p in poses])
+    W = max(p.size[0] for p in poses); H = max(p.size[1] for p in poses)
+    bande = Image.new('RGBA', (W * len(poses), H), (0, 0, 0, 0))
+    for k, p in enumerate(poses): bande.paste(p, (k * W, H - p.size[1]))
+    bande.save(DST + 'remi_porte.png')
+    print('remi_porte.png', W, H, len(poses))
+
 planche_velo()
 presentation()
 planche_pong()
+planche_porte()

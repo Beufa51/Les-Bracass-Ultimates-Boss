@@ -51,7 +51,7 @@ Même personnage que l'image jointe, style manga/anime, contours noirs nets, fon
 (bras levé), 3 : il boit un gobelet rouge (il a perdu un verre), 4 : il nargue (index pointé, grand sourire). Aucun texte.
 ```
 
-## 7. La porte : Rémi et toi de profil — `remi_porte_planche.jpg`
+## 7. La porte : Rémi et toi de profil — `remi_porte_planche.jpg` ✅ REÇUE ET INTÉGRÉE
 À joindre : les photos de Rémi.
 ```
 Style manga/anime, contours noirs nets, fond blanc uni. Deux personnages entiers vus DE PROFIL tournés vers la DROITE, même échelle.
