@@ -324,3 +324,14 @@ Pixel art sprite in the style of DOOM (1993) and Wolfenstein 3D: digitized, slig
 The SAME teacher as in the attached image (dark hair, glasses askew, green jacket, geeky horror video game t-shirt, jeans), full body, seen from the FRONT: defeated, sitting on the floor, dazed, little stars and crumpled white paper balls around his head, a few sheets of paper on him, NO egg, NO yolk.
 One single pose. Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
 ```
+
+### 20. Julien pour l'ÉCRAN DE PRÉSENTATION, moins caricatural — `julien_presentation.jpg`
+Joindre `julien_reference.jpg` (pour le visage et les habits) et `beufa_buste.jpg` (pour le style de l'affiche).
+À déposer dans `assets_inbox/julien/` ; Claude le détoure et remplace `assets/sprites/julien/julien_presentation.png`.
+```
+Semi-realistic digital illustration, clean and detailed, in the SAME style as the second attached image (the man in the light blue shirt): smooth shading, crisp outlines, NOT pixel art, NOT a caricature.
+The SAME man as in the first attached image: messy dark hair, salt-and-pepper beard, warm slightly mischievous smile, green track jacket with white stripes worn open over a black t-shirt with a grey horror video game print, holding a blue book under his arm.
+REALISTIC PROPORTIONS: normal-size head (NOT a big head, NOT a bobblehead), natural adult body.
+Framing: from the top of the head down to the hips, facing the viewer, slightly turned three-quarter, confident pose.
+Plain solid pure white background (#FFFFFF), no shadow, no text, no frame.
+```
