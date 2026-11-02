@@ -165,6 +165,10 @@
   milieu ESQUIVE, droite SAUTE) ; un appui = `VELO.esquive` 0,9 s en bas (`esquiveBas` 58 px), garder appuyé = rester en
   bas ; seulement sur la route (pas en l'air, pas sur un toit), pas de saut tant qu'on est en bas. Icône ▼ orange et
   « EN BAS ! » au bon moment. Le saut reste pour pintes, tremplins, verre, flaque, poubelle. Bot : 6 allongés, 0 touché.
+- V17 VÉLO, BOUTONS REVUS (retour : « extrêmement mal disposés ») : plus de bouton au milieu (hors de portée des pouces).
+  Pouce GAUCHE = DRING dans le coin (ne cache plus le vélo) ; pouce DROIT = SAUTE en haut (y 318) et EN BAS juste dessous
+  (y 462), empilés comme une croix. Zones : moitié gauche = DRING ; moitié droite au-dessus de `LIGNE_BAS` = SAUTE, en
+  dessous = EN BAS. Boutons plus petits (r 62) et presque transparents au repos (on voit les obstacles à travers).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

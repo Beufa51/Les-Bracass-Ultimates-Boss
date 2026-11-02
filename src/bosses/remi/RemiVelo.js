@@ -1,9 +1,9 @@
 // =====================================================================
 // RÉMI — JEU 1 : LE VÉLO (V5, vue de PROFIL, la ville défile vers la gauche)
 // Le vélo roule TOUT SEUL (de plus en plus vite). Deux gestes seulement :
-//   SAUTER : tiers DROIT de l'écran (ou ▲ / ESPACE) — garder appuyé = saut plus haut et plus long
+//   SAUTER : bouton en HAUT à droite (moitié droite, partie haute) (ou ▲ / ESPACE) — garder appuyé = saut plus haut et plus long
 //            → verre cassé, flaque, poubelle, tremplins ; et les PINTES en l'air (+1 s chacune)
-//   ESQUIVE (V17) : bouton du MILIEU (ou ▼) — le vélo descend vers le bas de l'écran et passe DEVANT
+//   ESQUIVE (V17) : bouton en BAS à droite, sous SAUTE (ou ▼) — le vélo descend vers le bas de l'écran et passe DEVANT
 //            → le bourré ALLONGÉ (on ne peut plus le sauter)
 //   DRING  : moitié GAUCHE de l'écran (ou Z / ◀) — la sonnette, dans la zone jaune devant toi
 //            → un bourré DEBOUT s'écarte, un bourré qui TRAVERSE s'arrête et recule
@@ -26,8 +26,12 @@ const SOL = 440;                     // hauteur de la route à l'écran
 const X_VELO = 260;                  // le vélo reste à cet endroit de l'écran (c'est la rue qui défile)
 const DEMI_VELO = 65;                // demi-longueur du vélo pour les chocs (un peu plus petite que l'image : indulgent)
 const HAUT_PINTE = 260;              // hauteur des pintes au-dessus de la route (on ne les attrape qu'en sautant)
-const BOUTON_G = { x: 88, y: 448, r: 74 }, BOUTON_D = { x: LARGEUR - 88, y: 448, r: 74 };   // les gros boutons
-const BOUTON_B = { x: LARGEUR / 2, y: 470, r: 60 };   // V17 : ESQUIVE (vers le bas), au milieu
+// BOUTONS (V17, revus pour les pouces, téléphone à l'horizontale) : pouce GAUCHE = DRING, dans le coin (ne cache plus le
+// vélo) ; pouce DROIT = SAUTE en haut et EN BAS juste en dessous, empilés comme une croix (haut = saute, bas = esquive).
+// Les zones tactiles sont bien plus grandes que les boutons : moitié gauche = DRING ; moitié droite : au-dessus de
+// LIGNE_BAS = SAUTE, en dessous = EN BAS.
+const BOUTON_G = { x: 74, y: 462, r: 62 }, BOUTON_D = { x: LARGEUR - 74, y: 318, r: 62 }, BOUTON_B = { x: LARGEUR - 74, y: 462, r: 62 };
+const LIGNE_BAS = (318 + 462) / 2;
 // LES ROUTES (V8) : le trajet = 3 tronçons. Au bout des 2 premiers, un CARREFOUR : on choisit la suite (gauche / droite).
 //  longueur : part de la longueur d'un tronçon (raccourci = plus court mais plus chargé) ; densite / pintes / voitures : x
 const DEPART_ROUTE = { nom: 'LA RUE DES BARS', image: 'remi_rue', teinte: 0xffffff, longueur: 1, densite: 1, pintes: 1, voitures: 1 };
@@ -95,9 +99,9 @@ export class RemiVelo extends BossScene {
     const t = estTactile();
     this.afficherIntro('RÉMI - Direction le bar', [
       'Rémi t\'attend au bar... et le bar ferme bientôt ! Le vélo roule tout seul.',
-      `SAUTE : ${t ? 'touche à DROITE de l\'écran' : '▲ ou ESPACE'} (garde appuyé = plus haut)`,
+      `SAUTE : ${t ? 'touche à DROITE, en HAUT' : '▲ ou ESPACE'} (garde appuyé = plus haut)`,
       '   → verre cassé, flaque, poubelle, tremplins... et attrape les PINTES (+1 s)',
-      `EN BAS : ${t ? 'touche au MILIEU' : '▼'} → tu passes DEVANT le bourré ALLONGÉ (garde appuyé = tu restes en bas)`,
+      `EN BAS : ${t ? 'touche à DROITE, en BAS' : '▼'} → tu passes DEVANT le bourré ALLONGÉ (garde appuyé = tu restes en bas)`,
       `DRING : ${t ? 'touche à GAUCHE' : 'Z ou ◀'} quand le bourré est dans la zone jaune`,
       '   → le bourré DEBOUT s\'écarte, celui qui TRAVERSE s\'arrête',
       'L\'icône au-dessus de chaque obstacle te dit quoi faire. Série de 5 = +2 s.',
@@ -134,9 +138,9 @@ export class RemiVelo extends BossScene {
     this.input.on('pointerdown', (p) => {
       if (this.etat !== 'jeu') return;
       if (this.carrefourOuvert && !this.choix) { this.toucheChoix = p.x < LARGEUR / 2 ? 0 : 1; return; }
-      // V17 : 3 zones : gauche = DRING, milieu = ESQUIVE (vers le bas), droite = SAUTE
-      if (p.x < LARGEUR * 0.34) this.demanderDring();
-      else if (p.x < LARGEUR * 0.66) { this.esqDoigt = true; this.doigtEsq = p.id; this.demanderEsquive(); }
+      // V17 : moitié gauche = DRING ; moitié droite : en haut = SAUTE, en bas = ESQUIVE
+      if (p.x < LARGEUR / 2) this.demanderDring();
+      else if (p.y >= LIGNE_BAS) { this.esqDoigt = true; this.doigtEsq = p.id; this.demanderEsquive(); }
       else { this.sautDoigt = true; this.doigtSaut = p.id; this.tampon = V.tampon; this.appuiD = 0.15; }
     });
     this.input.on('pointerup', (p) => { if (p.id === this.doigtSaut) this.sautDoigt = false; if (p.id === this.doigtEsq) this.esqDoigt = false; });
@@ -250,9 +254,9 @@ export class RemiVelo extends BossScene {
     // DEUX GROS BOUTONS dessinés en bas (toute la moitié d'écran marche, mais on voit où appuyer)
     const t = estTactile();
     this.gBoutons = this.add.graphics().setDepth(899);
-    this.zoneG = texte(this, BOUTON_G.x, BOUTON_G.y + 22, t ? 'DRING' : 'DRING (Z)', 22, '#ffe680', { fontStyle: 'bold' }).setDepth(900).setVisible(false);
-    this.zoneD = texte(this, BOUTON_D.x, BOUTON_D.y + 22, t ? 'SAUTE' : 'SAUTE (▲)', 22, '#9fe0ff', { fontStyle: 'bold' }).setDepth(900).setVisible(false);
-    this.zoneB = texte(this, BOUTON_B.x, BOUTON_B.y + 20, t ? 'EN BAS' : 'EN BAS (▼)', 20, '#ffb060', { fontStyle: 'bold' }).setDepth(900).setVisible(false);
+    this.zoneG = texte(this, BOUTON_G.x, BOUTON_G.y + 20, t ? 'DRING' : 'DRING (Z)', 18, '#ffe680', { fontStyle: 'bold' }).setDepth(900).setVisible(false);
+    this.zoneD = texte(this, BOUTON_D.x, BOUTON_D.y + 20, t ? 'SAUTE' : 'SAUTE (▲)', 18, '#9fe0ff', { fontStyle: 'bold' }).setDepth(900).setVisible(false);
+    this.zoneB = texte(this, BOUTON_B.x, BOUTON_B.y + 20, t ? 'EN BAS' : 'EN BAS (▼)', 18, '#ffb060', { fontStyle: 'bold' }).setDepth(900).setVisible(false);
     this.appuiG = 0; this.appuiD = 0; this.appuiB = 0;
   }
 
@@ -819,15 +823,15 @@ export class RemiVelo extends BossScene {
       const a = this.nomDiff !== 'champion' && this.action && this.action.maintenant ? this.action.geste : null;
       const clign = Math.floor(this.horloge * 10) % 2 === 0;
       for (const [b, c, actif, appel] of [[BOUTON_G, 0xffe680, this.appuiG > 0, a === 'dring'], [BOUTON_D, 0x9fe0ff, this.appuiD > 0 || tenu, a === 'saute'], [BOUTON_B, 0xffb060, this.appuiB > 0 || this.esq > 0, a === 'esquive']]) {
-        gb.fillStyle(0x000000, actif ? 0.55 : 0.35).fillCircle(b.x, b.y, b.r);
-        gb.fillStyle(c, actif ? 0.45 : appel && clign ? 0.6 : 0.15).fillCircle(b.x, b.y, b.r - 6);
+        gb.fillStyle(0x000000, actif ? 0.45 : 0.12).fillCircle(b.x, b.y, b.r);
+        gb.fillStyle(c, actif ? 0.4 : appel && clign ? 0.45 : 0.06).fillCircle(b.x, b.y, b.r - 6);
         gb.lineStyle(appel ? 8 : 4, c, 0.9).strokeCircle(b.x, b.y, b.r + (appel ? 6 : 0));   // le bouton à presser MAINTENANT clignote
       }
       // icône cloche / flèche
       const g0 = BOUTON_G, d0 = BOUTON_D;
-      gb.fillStyle(0xffe680, 1).fillTriangle(g0.x - 18, g0.y - 2, g0.x + 18, g0.y - 2, g0.x, g0.y - 38).fillCircle(g0.x, g0.y - 26, 12).fillCircle(g0.x, g0.y + 2, 5);
-      gb.fillStyle(0x9fe0ff, 1).fillTriangle(d0.x - 22, d0.y - 6, d0.x + 22, d0.y - 6, d0.x, d0.y - 40);
-      gb.fillStyle(0xffb060, 1).fillTriangle(BOUTON_B.x - 20, BOUTON_B.y - 36, BOUTON_B.x + 20, BOUTON_B.y - 36, BOUTON_B.x, BOUTON_B.y - 4);
+      gb.fillStyle(0xffe680, 1).fillTriangle(g0.x - 15, g0.y - 4, g0.x + 15, g0.y - 4, g0.x, g0.y - 34).fillCircle(g0.x, g0.y - 24, 10).fillCircle(g0.x, g0.y, 4);
+      gb.fillStyle(0x9fe0ff, 1).fillTriangle(d0.x - 18, d0.y - 6, d0.x + 18, d0.y - 6, d0.x, d0.y - 36);
+      gb.fillStyle(0xffb060, 1).fillTriangle(BOUTON_B.x - 18, BOUTON_B.y - 36, BOUTON_B.x + 18, BOUTON_B.y - 36, BOUTON_B.x, BOUTON_B.y - 6);
       // recharge de la sonnette : un arc autour du bouton DRING
       if (this.recharge > 0) gb.lineStyle(8, 0x555555, 0.9).beginPath().arc(g0.x, g0.y, g0.r - 4, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (this.recharge / V.sonnette), false).strokePath();
     }
