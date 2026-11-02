@@ -10,7 +10,7 @@ export const MANIFESTE = {
     julien_musique: { fichier: 'audio/julien/julien_musique.mp3', musique: true, volume: 0.4 },
     // LE LYCÉE : thème de Duke Nukem 3D (déposé par Fabien), mono 64 kb/s, silence de la fin coupé
     julien_lycee_musique: { fichier: 'audio/julien/julien_lycee_musique.mp3', musique: true, volume: 0.4 },
-    // LE BOSS (la classe) : « One-Winged Angel », thème de Sephiroth (déposé par Fabien), mono 56 kb/s, silences coupés
+    // LE BOSS (la classe) : Streets of Rage 2, thème du niveau 1 (déposé par Fabien ; remplace Sephiroth), mono 64 kb/s, fin coupée
     julien_boss_musique: { fichier: 'audio/julien/julien_boss_musique.mp3', musique: true, volume: 0.4 },
     // AMBIANCE de manif en boucle (foule, tambour), jouée en même temps que la musique
     julien_foule: { fichier: 'audio/julien/julien_foule.mp3', musique: true, volume: 0.3 },

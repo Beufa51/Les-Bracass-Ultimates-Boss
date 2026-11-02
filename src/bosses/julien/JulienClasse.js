@@ -121,7 +121,7 @@ export class JulienClasse extends JulienManif {
     return T.classe;
   }
   planDepart() { return PLAN_CLASSE; }
-  lancerMusique() { jouerMusique(this, 'julien_boss_musique'); }   // « One-Winged Angel » (Sephiroth)
+  lancerMusique() { jouerMusique(this, 'julien_boss_musique'); }   // Streets of Rage 2, niveau 1
 
   create() {
     super.create();

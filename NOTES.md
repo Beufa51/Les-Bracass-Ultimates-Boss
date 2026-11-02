@@ -1086,8 +1086,8 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   · lycée ET classe : armes de la manif INTERDITES → seulement la SARBACANE, équipée d'office (dégâts 1, cadence 0,3,
     ×3 de dos). Plus d'œufs / tomates à ramasser (remplacés par canettes / sandwichs), plus de « camarade qui fait
     passer des œufs ». « CONFISQUÉ ! » : la sarbacane est prise 8 s (on ne peut plus tirer, la main disparaît).
-  · MUSIQUES : lycée = thème de Duke Nukem 3D (`julien_lycee_musique.mp3`), boss = « One-Winged Angel » de Sephiroth
-    (`julien_boss_musique.mp3`) ; la manif garde Doom. Chargées seulement quand elles jouent.
+  · MUSIQUES : lycée = thème de Duke Nukem 3D (`julien_lycee_musique.mp3`), boss = Streets of Rage 2, thème du niveau 1
+    (`julien_boss_musique.mp3`, a remplacé Sephiroth) ; la manif garde Doom. Chargées seulement quand elles jouent.
 - RETOUR FABIEN (2) — FAIT : surveillants qui « n'enlèvent pas de vie » → au contact ils t'ATTRAPENT
   (`RG.surveillant.attrape` : 8 toutes les 0,9 s + bousculade ; géré dans l'IA du CRS de JulienManif), plus rapides,
   charge 15. Julien trop simple → vie 55, cadences / préavis / fenêtre de dos plus courts, livre 14 ; nouvelles
