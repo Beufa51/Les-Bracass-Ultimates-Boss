@@ -33,6 +33,9 @@ export const MANIFESTE = {
     remi_bar_interieur: { fichier: 'sprites/remi/remi_bar_interieur.jpg', largeur: 960, hauteur: 536, images: 1, vitesse: 1 },
     // le videur de la porte : distrait, furieux (coupé à la taille)
     remi_videur: { fichier: 'sprites/remi/remi_videur.png', largeur: 672, hauteur: 743, images: 2, vitesse: 1 },
+    // les 2 autres intrus de la porte : le gars qui vient pisser, la mamie (distrait / furieux, coupés à la taille)
+    remi_pisseur: { fichier: 'sprites/remi/remi_pisseur.png', largeur: 548, hauteur: 756, images: 2, vitesse: 1 },
+    remi_mamie: { fichier: 'sprites/remi/remi_mamie.png', largeur: 709, hauteur: 750, images: 2, vitesse: 1 },
     remi_presentation: { fichier: 'sprites/remi/remi_presentation.png', largeur: 832, hauteur: 1202, images: 1, vitesse: 1 },
   },
   sons: {

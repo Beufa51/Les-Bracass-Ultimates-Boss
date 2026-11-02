@@ -129,7 +129,7 @@ Style manga/anime coloré, contours noirs nets, fond BLANC uni, aucun texte. Un 
 coupés à la taille, serrés les uns contre les autres, qui crient et lèvent leurs verres (encouragements), une seule image large.
 ```
 
-## 18. Le gars qui vient pisser (porte) — `remi_pisseur_planche.jpg`
+## 18. Le gars qui vient pisser (porte) — `remi_pisseur_planche.jpg` ✅ REÇUE ET INTÉGRÉE
 À joindre : la planche du videur (pour le même style et le même cadrage).
 ```
 Même style et même cadrage que l'image jointe (manga/anime, contours noirs nets, fond BLANC uni, aucun texte, coupé à la taille,
@@ -138,7 +138,7 @@ il se tient l'entrejambe (il a très envie). 2 poses côte à côte, même éche
 se dandinant ; 2 : il te voit et sursaute, scandalisé, il pointe du doigt.
 ```
 
-## 19. La mamie (porte) — `remi_mamie_planche.jpg`
+## 19. La mamie (porte) — `remi_mamie_planche.jpg` ✅ REÇUE ET INTÉGRÉE
 À joindre : la planche du videur.
 ```
 Même style et même cadrage que l'image jointe (manga/anime, contours noirs nets, fond BLANC uni, aucun texte, coupée à la taille,

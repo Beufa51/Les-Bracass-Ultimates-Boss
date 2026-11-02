@@ -152,7 +152,7 @@
   du vélo) et la MAMIE (canne « toc », lente, regarde longtemps, revient TOUJOURS jeter un 2e coup d'œil ; dessinée au code
   en attendant son image). Répliques propres à chacun. Rémi réagit en 0,25-0,7 s et charge plus lentement → il se fait
   prendre de temps en temps (`remiPrudent` NORMAL 0,35). Images à venir : `remi_pisseur` / `remi_mamie` (prompts 18-19 ;
-  2 poses comme le videur → à ajouter au manifeste). VÉLO : pédalage = 3 poses de la 1re rangée en 0-1-2-1, cases calées
+  2 poses comme le videur) → REÇUES ET INTÉGRÉES : `remi_pisseur.png`, `remi_mamie.png` (`videur()` dans preparer_images.py). VÉLO : pédalage = 3 poses de la 1re rangée en 0-1-2-1, cases calées
   à droite (plus de vélo qui saute) ; 0,85 s mini entre 2 obstacles (+0,5 s après une poubelle) ; pintes : « +1 s » qui
   file vers l'horloge (qui clignote en vert), explication à la 1re pinte, compteur 🍺 en haut à droite. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
