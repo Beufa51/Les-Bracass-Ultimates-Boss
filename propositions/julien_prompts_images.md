@@ -316,3 +316,11 @@ IMPORTANT: every object is clearly SEPARATED from the others by a wide empty whi
 Prompt de la section 7 (murs), en remplaçant « Parisian street theme » par « French high-school interior theme » et la
 ligne « Wall: … » par :
 `Wall: school library wall covered with built-in wooden bookshelves full of colorful books, a small "CDI" sign near the top.`
+
+### 19d. Julien VAINCU sans œuf — `julien_vaincu_papier.jpg` (joindre `julien_reference.jpg`)
+L'image actuelle de Julien vaincu (assis, sonné) a du jaune d'œuf ; en classe on le bat à la sarbacane.
+```
+Pixel art sprite in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. Humorous, cartoonish, no blood, no gore.
+The SAME teacher as in the attached image (dark hair, glasses askew, green jacket, geeky horror video game t-shirt, jeans), full body, seen from the FRONT: defeated, sitting on the floor, dazed, little stars and crumpled white paper balls around his head, a few sheets of paper on him, NO egg, NO yolk.
+One single pose. Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+```

@@ -1145,6 +1145,7 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   LIVRÉES et branchées : mur du CDI (mur n° 6), étagère haute 'E' / basse 'B', table de lecture 'L', ordinateur 'O'
   (abris du CDI, plan regénéré) ; poses « touché par une boulette » : surveillant et cantinière (servent de
   `<type>_touche_propre`, choisi quand le coup ne fait pas de tache), Julien (`julien_touche_papier` en classe).
+  Poses de DOS vérifiées : propres (pas d'œuf). Reste : Julien VAINCU a du jaune d'œuf → prompt 19d (`julien_vaincu_papier.jpg`).
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».
