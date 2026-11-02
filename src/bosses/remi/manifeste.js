@@ -1,9 +1,8 @@
 // =====================================================================
 // MANIFESTE DE RÉMI : ses visuels et sons (et seulement les siens).
-// Pour l'instant tout est dessiné par le code (dessins.js) et les sons sont des bips provisoires.
 // Fichiers à venir dans assets/sprites/remi/ et assets/audio/remi/ (voir propositions/remi_prompts_images.md).
 // =====================================================================
-const bip = (frequence, duree) => ({ fichier: null, provisoire: { frequence, duree } });
+const son = (nom, frequence, duree) => ({ fichier: `audio/remi/remi_${nom}.wav`, provisoire: { frequence, duree } });
 
 export const MANIFESTE = {
   images: {
@@ -30,22 +29,24 @@ export const MANIFESTE = {
   sons: {
     // musique du bar (Star Wars, « Cantina Band », donnée par le propriétaire) : beer pong et porte
     remi_musique_bar: { fichier: 'audio/remi/remi_musique_bar.mp3', musique: true, volume: 0.4 },
-    // vélo
-    remi_sonnette:   bip(1760, 0.18),
-    remi_saut:       bip(520, 0.06),
-    remi_atterrit:   bip(180, 0.05),
-    remi_chute:      bip(90, 0.3),
-    remi_crevaison:  bip(140, 0.25),
-    remi_glisse:     bip(300, 0.2),
-    remi_texto:      bip(1320, 0.07),
-    remi_arrivee:    bip(880, 0.35),
-    // beer pong
-    remi_lance:      bip(700, 0.04),
-    remi_rebond:     bip(1100, 0.03),
-    remi_plouf:      bip(260, 0.15),
-    // porte
-    remi_tape:       bip(400, 0.03),
-    remi_porte:      bip(120, 0.18),
-    remi_porte_fort: bip(70, 0.4),
+    // bruitages générés au code : python3 outils/remi/generer_sons.py assets/audio/remi (bip de secours si le fichier manque)
+    remi_sonnette: son('sonnette', 1760, 0.18),
+    remi_saut: son('saut', 520, 0.06),
+    remi_atterrit: son('atterrit', 180, 0.05),
+    remi_chute: son('chute', 90, 0.3),
+    remi_crevaison: son('crevaison', 140, 0.25),
+    remi_glisse: son('glisse', 300, 0.2),
+    remi_texto: son('texto', 1320, 0.07),
+    remi_pinte: son('pinte', 990, 0.08),
+    remi_arrivee: son('arrivee', 880, 0.35),
+    remi_lance: son('lance', 700, 0.04),
+    remi_rebond: son('rebond', 1100, 0.03),
+    remi_plouf: son('plouf', 260, 0.15),
+    remi_hips: son('hips', 500, 0.08),
+    remi_boit: son('boit', 200, 0.3),
+    remi_foule: son('foule', 300, 0.4),
+    remi_tape: son('tape', 400, 0.03),
+    remi_porte: son('porte', 120, 0.18),
+    remi_porte_fort: son('porte_fort', 70, 0.4),
   },
 };

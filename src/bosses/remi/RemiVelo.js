@@ -294,7 +294,7 @@ export class RemiVelo extends BossScene {
         p.prise = true; this.pintesPrises++;
         this.tempsRestant += V.bonusPinte; this.score += 25;
         bulle(this, `🍺 +${V.bonusPinte} s`, '#ffd84a', 0.7, 140);
-        jouerSon(this, 'remi_texto', { rate: 1.6 });
+        jouerSon(this, 'remi_pinte');
       }
     }
   }
