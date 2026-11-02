@@ -131,7 +131,14 @@
   obstacles de la route 50 %) ; pas de tremplin / voitures juste avant un carrefour. PONG : OMBRE des pointillés sur la table.
   AUDIT PORTE `propositions/remi_audit_porte.md` (4,3/10 joueur) : refonte proposée « LA PORTE ET LE VIDEUR »
   (maintenir pour charger, lâcher avant que le videur regarde ; une seule règle : la solidité) — EN ATTENTE de l'accord de
-  Fabien ; prompts 16 (videur) et 17 (foule). : `python3 outils/remi/preparer_images.py`.
+  Fabien ; prompts 16 (videur) et 17 (foule).
+- V11 : PORTE REFAITE « LA PORTE ET LE VIDEUR » (image du videur reçue → `remi_videur.png`, 2 poses) : chacun son tour,
+  MAINTENIR (doigt / ESPACE) = charge qui accélère (`charge`, `accel`), LÂCHER = coup (dégâts = puissance x précision de la
+  cible sur la porte). VIDEUR : attente (`videurAttente`), annonce 1,1 s x `videur` de la difficulté (pas, ombre au sol, « ! »
+  rouge), regard 1-1,5 s : qui charge (ou vient de frapper) est ATTRAPÉ = coup perdu + porte rafistolée (`scotch` +300).
+  Rémi joue pareil (`remiCharge`, `remiPrudent` : il peut se faire attraper). Une seule règle : SOLIDITÉ 4500, celui qui la
+  fait céder gagne. La porte se bombe à chaque coup. Plus de manches ni de pari. Bots : prudent gagne (3 coups contre 3),
+  gourmand attrapé 4 fois et perd. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

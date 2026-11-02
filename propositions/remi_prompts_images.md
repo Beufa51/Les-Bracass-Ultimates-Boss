@@ -115,7 +115,7 @@ Style manga/anime, contours noirs nets, fond BLANC uni, aucun texte. Vu STRICTEM
 planche de bois posée en pente (montant vers la DROITE) sur une pile de caisses de bière en plastique jaune. Une seule image, centrée.
 ```
 
-## 16. Le videur (refonte de la porte) — `remi_videur_planche.jpg`
+## 16. Le videur (refonte de la porte) — `remi_videur_planche.jpg` ✅ REÇUE ET INTÉGRÉE
 ```
 Style manga/anime coloré, contours noirs nets, fond BLANC uni, aucun texte, aucun cadre. Un videur de bar costaud, crâne rasé,
 tee-shirt noir moulant avec « SECURITY » illisible, oreillette, bras énormes. 2 poses côte à côte, même échelle, bien espacées,

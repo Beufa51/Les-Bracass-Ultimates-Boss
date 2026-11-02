@@ -22,7 +22,7 @@ elle passe sur le poing ; score /999 ; une barre de SOLIDITÉ commune ; pendant 
 Le jeu demande de **faire vite** mais jamais de **choisir**. Une bonne « épreuve de force » de bar est un jeu de
 **prise de risque** : plus on charge, plus c'est fort… et plus on risque de tout perdre. Ici rien ne peut mal tourner.
 
-## Proposition : « LA PORTE ET LE VIDEUR » (refonte, même décor)
+## Proposition : « LA PORTE ET LE VIDEUR » (refonte, même décor) — FAITE en V11
 L'histoire : Rémi parie que tu ne défonceras pas la porte des WC avant lui. Mais le **VIDEUR** fait sa ronde dans le
 couloir : s'il te voit taper, tu te fais sortir (tour perdu).
 

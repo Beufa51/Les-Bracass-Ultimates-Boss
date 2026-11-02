@@ -10,20 +10,21 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 //         0,65 = jusqu'un peu après le sommet ; l'alcool en efface encore : voir PONG.courbeBue) ;
 //         distrait = chance que Rémi agite les bras pendant ta visée (ça fait trembler ton lancer) ;
 //         remi = chance que Rémi mette un verre ; aide = (non utilisé au pong depuis le lance-pierre)
-//  PORTE : remiMin / remiMax = scores de Rémi ; zone = largeur de la zone parfaite de la visée (0 à 1) ; visee = vitesse du curseur (x)
+//  PORTE : remiCharge = jusqu'où Rémi charge (0 à 1) ; remiPrudent = chance qu'il lâche quand le videur arrive ;
+//          videur = temps d'annonce du videur (x, + petit = moins prévenu) ; zone = rayon de la cible parfaite ; visee = vitesse de la cible
 export const DIFFICULTES = {
   facile: { nom: 'FACILE', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
     temps: 88, densite: 0.8, traverse: 0.8, sonnette: 730,
     erreur: 0.025, apercu: 1, distrait: 0, remi: 0.32, aide: true,
-    remiMin: 560, remiMax: 760, zone: 0.22, visee: 0.8 },
+    remiCharge: 0.6, remiPrudent: 0.3, videur: 1.3, zone: 0.22, visee: 0.8 },
   normal: { nom: 'NORMAL', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 70, densite: 1, traverse: 1, sonnette: 650,
     erreur: 0.035, apercu: 0.85, distrait: 0.35, remi: 0.42, aide: false,
-    remiMin: 650, remiMax: 850, zone: 0.15, visee: 1 },
+    remiCharge: 0.72, remiPrudent: 0.5, videur: 1, zone: 0.15, visee: 1 },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
     erreur: 0.05, apercu: 0.6, distrait: 0.55, remi: 0.52, aide: false,
-    remiMin: 760, remiMax: 930, zone: 0.1, visee: 1.3 },
+    remiCharge: 0.84, remiPrudent: 0.85, videur: 0.75, zone: 0.1, visee: 1.3 },
 };
 
 export const VELO = {
@@ -69,14 +70,17 @@ export const PONG = {
 };
 
 export const PORTE = {
-  solidite: 4200,         // SOLIDITÉ de la porte (commune) : chaque coup en enlève son score ; celui qui la fait céder GAGNE TOUT
-  manches: 3,             // en 3 manches gagnantes (la meilleure frappe de la manche gagne)
-  elan: 3,                // secondes d'ÉLAN (taper gauche / droite en alternance)
-  parTape: 0.09,          // jauge gagnée par tape alternée
-  baisse: 0.3,            // jauge perdue par seconde
-  periodeVisee: 1.1,      // durée (s) d'un aller-retour du curseur de visée (à vitesse x1)
-  poidsElan: 0.55,        // part de l'élan dans le score (le reste = la visée)
-  casse: 900,             // une frappe à ce score ou plus fend la porte d'un coup
+  // V11 : « LA PORTE ET LE VIDEUR ». Chacun son tour : MAINTENIR pour charger, LÂCHER pour frapper. Le videur fait sa ronde :
+  // s'il regarde pendant que tu charges (ou juste au moment du coup) : ATTRAPÉ (coup perdu, la porte est rafistolée).
+  solidite: 4500,         // SOLIDITÉ de la porte : chaque coup en enlève ses dégâts ; celui qui la fait céder GAGNE
+  charge: 0.35,           // vitesse de charge au départ (puissance par seconde) ; elle accélère en chargeant
+  accel: 1.3,             // accélération de la charge
+  degatsMin: 0.25,        // part des dégâts même avec une charge nulle
+  scotch: 300,            // solidité rendue à la porte quand quelqu'un se fait attraper (le barman la rafistole)
+  periodeVisee: 1.1,      // vitesse de la cible sur la porte
+  casse: 850,             // un coup à ce score ou plus : gros craquement, éclats, flash
+  // le videur : attente avant de revenir (s), annonce (ses pas, son ombre : s), regard (s)
+  videurAttente: [1.4, 3.6], videurAnnonce: 1.1, videurRegard: [1.0, 1.5],
 };
 
 // Répliques de Rémi (provisoires : à personnaliser à la passe de FINITION)
@@ -89,7 +93,8 @@ export const REPLIQUES = {
   pongToucheToi: ['Coup de bol.', 'Ok... ok.', 'Il me reste de la place.'],
   pongGagne: 'Bon... t\'as gagné. Mais qui tape le plus fort dans la porte, hein ?',
   pongPerdu: 'Rémi : « Tournée pour toi ! Reviens quand tu sais viser. »',
-  porteIntro: 'La porte des toilettes. Le plus gros coup de poing gagne. Le videur ne regarde pas.',
+  porteIntro: 'Rémi parie que tu ne défonceras pas la porte des WC avant lui. Mais le videur fait sa ronde...',
+  porteAttrape: ['HÉ ! Toi là ! On se calme !', 'Encore un coup et c\'est dehors !', 'Je t\'ai vu !'],
   porteRemiFrappe: ['Prends ça !', 'Regarde et apprends.', 'Celle-là elle a fait mal à la porte.'],
   porteGagne: 'Rémi : « OK... t\'es le patron de la soirée. La prochaine tournée est pour moi ! »',
   portePerdu: 'Rémi : « Faut manger de la soupe, mon grand. »',

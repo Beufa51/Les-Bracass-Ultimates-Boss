@@ -1,462 +1,330 @@
 // =====================================================================
-// RÉMI — JEU 3 : LA PORTE (qui tape le plus fort ?)
-// Façon borne « boxeur » de bar : en 3 manches, Rémi frappe, puis toi.
-//   1) ÉLAN : tape GAUCHE / DROITE en ALTERNANCE le plus vite possible (◀ ▶, ou les 2 moitiés d'écran) ;
-//      deux fois le même côté = ça ne compte pas. (Sans alternance possible, ESPACE marche à moitié.)
-//   2) VISÉE : le curseur va et vient ; ESPACE (ou un toucher) quand il est dans la zone verte = FRAPPE.
-// Score = élan + précision (sur 999). La plus grosse frappe gagne la manche ; 2 manches = la victoire (et le badge).
+// RÉMI — JEU 3 : « LA PORTE ET LE VIDEUR » (V11, vue de dos, la porte des WC du bar)
+// Rémi parie que tu ne défonceras pas la porte avant lui. Chacun son tour :
+//   MAINTENIR (le doigt n'importe où, ou ESPACE) = tu armes ton poing, la puissance monte de plus en plus vite ;
+//   LÂCHER = le coup part. Dégâts = puissance x précision (la cible qui se promène sur la porte doit être sur ton poing +).
+// LE VIDEUR fait sa ronde : on entend ses pas, son ombre s'allonge dans le couloir, puis il passe la tête (à gauche).
+//   S'il te voit en train de charger (ou au moment du coup) : ATTRAPÉ — coup perdu, la porte est rafistolée.
+// Une seule règle : la porte a une SOLIDITÉ commune ; celui dont le coup la fait CÉDER gagne (et le badge).
 // =====================================================================
 import { BossScene } from '../../core/BossScene.js';
-import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
+import { creerTouches } from '../../core/clavier.js';
 import { texte } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, PORTE as R, REPLIQUES } from './reglages.js';
-import { remi, toi } from './dessins.js';
-import { bulle, annonce, ecranPerdu, difficulteOuChoix, hasard, choisir , laisserPasserTactile } from './commun.js';
+import { bulle, annonce, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile } from './commun.js';
 
-const SOL = 470, X_FRAPPE = 500, X_ATTENTE = 170;
-// la porte du décor illustré (remi_porte_decor.jpg, 960 x 536) : son battant, pour le faire trembler / tomber
+// la porte du décor illustré (remi_porte_decor.jpg, 960 x 536), zoomé x1,5 sur la porte (à droite)
 const BATTANT = { x: 774, y: 147, l: 140, h: 322 };
-const ECHELLE = 0.45, POING = 342;   // POING : où est le poing (px) dans la case de l'impact (largeur de la pose)
-// VUE DE DOS (audit C1) : le décor zoomé x1,5 sur sa porte (à droite), le frappeur DE DOS au premier plan qui frappe la porte.
 const ZOOM = 1.5, DECOR_X = -480, DECOR_Y = -183;
-const PORTE_DOS = { x: DECOR_X + BATTANT.x * ZOOM, y: DECOR_Y + BATTANT.y * ZOOM, l: BATTANT.l * ZOOM, h: BATTANT.h * ZOOM };
+const PORTE = { x: DECOR_X + BATTANT.x * ZOOM, y: DECOR_Y + BATTANT.y * ZOOM, l: BATTANT.l * ZOOM, h: BATTANT.h * ZOOM };
 const IMPACT = { x: 730, y: 272 };   // où le poing touche la porte (écran)
-// planches de dos (outils/remi/preparer_images.py) : cases alignées à gauche ; « poing » = où est le poing dans la case de l'impact
+// planches de dos : cases alignées à gauche ; « poing » = où est le poing dans la case de l'impact
 const DOS = {
-  remi: { tex: 'remi_dos', echelle: 0.75, haut: 150, cases: { garde: 0, elan: 0, coup: 1, frappe: 2 }, poing: 520 },
-  toi: { tex: 'remi_toi_dos', echelle: 1.1, haut: 128, cases: { garde: 0, elan: 1, coup: 2, frappe: 3 }, poing: 336 },
+  remi: { tex: 'remi_dos', echelle: 0.75, haut: 150, cases: { garde: 0, charge: 0, coup: 1, frappe: 2 }, poing: 520 },
+  toi: { tex: 'remi_toi_dos', echelle: 1.1, haut: 128, cases: { garde: 0, charge: 1, coup: 2, frappe: 3 }, poing: 336 },
 };
+const VIDEUR = { x: 120, echelle: 0.42 };   // le videur passe la tête au coin du couloir (à gauche)
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 
 export class RemiPorte extends BossScene {
   constructor() { super('RemiPorte', IDENTITE); }
 
   create() {
-    this.etat = 'intro';         // intro | remi | elan | visee | frappe | fin
-    this.horloge = 0; this.manche = 0; this.points = { toi: 0, remi: 0 };
-    this.jauge = 0; this.curseur = 0; this.chrono = 0; this.tapes = 0;
-    this.poseToi = 'garde'; this.poseRemi = 'garde'; this.frappeur = 'remi';
-    this.fissures = []; this.tremble = 0; this.compteur = 0; this.compteurCible = 0; this.porteTombee = false;
-    this.decorImage = this.textures.exists('remi_porte_decor');
-    this.vueDos = this.decorImage && this.textures.exists('remi_dos') && this.textures.exists('remi_toi_dos');
-    this.eclats = []; this.flash = 0; this.entree = 0; this.dernierFrappeur = null;
-    this.px = this.decorImage ? BATTANT.x : 640;   // bord gauche de la porte
+    this.etat = 'intro';         // intro | remi | toi | coup | pause | fin
+    this.horloge = 0; this.frappeur = 'remi'; this.pose = { remi: 'garde', toi: 'garde' };
+    this.solidite = R.solidite; this.puissance = 0; this.cible = { x: 0, y: 0 }; this.tCible = 0; this.tCoup = 0;
+    this.fissures = []; this.eclats = []; this.flash = 0; this.gel = 0; this.tremble = 0; this.entree = 1; this.dernierFrappeur = null;
+    this.compteur = 0; this.coups = { toi: 0, remi: 0 }; this.attrapes = { toi: 0, remi: 0 };
+    this.videur = { etat: 'absent', t: 2.5, x: -300, pose: 0 };
+    this.doigt = false; this.charge = false; this.remiAttend = 0;
+
     this.decor();
     this.gPorte = this.add.graphics().setDepth(3);
-    this.gRemi = this.add.graphics().setDepth(5);
-    this.gToi = this.add.graphics().setDepth(6);
-    // illustrations de profil (6 cases : Rémi garde / coup / impact, toi garde / coup / impact) ; sinon les dessins du code
-    if (this.vueDos) {
-      this.dos = { remi: this.add.sprite(0, 0, DOS.remi.tex, 0).setOrigin(0, 0).setScale(DOS.remi.echelle).setDepth(6),
-        toi: this.add.sprite(0, 0, DOS.toi.tex, 0).setOrigin(0, 0).setScale(DOS.toi.echelle).setDepth(6) };
-    } else if (this.textures.exists('remi_porte')) {
-      this.sprRemi = this.add.sprite(0, 0, 'remi_porte', 0).setOrigin(0, 1).setScale(ECHELLE).setDepth(5);
-      this.sprToi = this.add.sprite(0, 0, 'remi_porte', 3).setOrigin(0, 1).setScale(ECHELLE).setDepth(6);
-    }
+    this.gOmbre = this.add.graphics().setDepth(4);
+    this.dos = {
+      remi: this.add.sprite(0, 0, DOS.remi.tex, 0).setOrigin(0, 0).setScale(DOS.remi.echelle).setDepth(6).setVisible(false),
+      toi: this.add.sprite(0, 0, DOS.toi.tex, 0).setOrigin(0, 0).setScale(DOS.toi.echelle).setDepth(6).setVisible(false),
+    };
+    this.sprVideur = this.add.sprite(-300, HAUTEUR + 10, 'remi_videur', 0).setOrigin(0.5, 1).setScale(VIDEUR.echelle).setDepth(7);
     this.gJauges = this.add.graphics().setDepth(900);
-    this.ecran = texte(this, this.vueDos ? 130 : this.decorImage ? this.px - 170 : this.px + 70, this.vueDos ? 110 : this.decorImage ? 80 : 60, '000', 54, '#ff3030', { fontStyle: 'bold', stroke: '#300000', strokeThickness: 6, backgroundColor: '#100000' }).setDepth(4);
-    this.hud = texte(this, 200, 28, '', 22, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
-    this.consigne = texte(this, LARGEUR / 2, 505, '', 30, '#ffd84a', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 4 } }).setDepth(900).setVisible(false);
+    this.ecran = texte(this, 130, 110, '000', 54, '#ff3030', { fontStyle: 'bold', stroke: '#300000', strokeThickness: 6, backgroundColor: '#100000' }).setDepth(4);
+    this.hud = texte(this, 190, 28, '', 20, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
+    this.consigne = texte(this, LARGEUR / 2, 505, '', 24, '#ffd84a', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 4 } }).setDepth(900).setVisible(false);
     this.touches = creerTouches(this);
-    laisserPasserTactile(this);   // les blocs de boutons cachés ne mangent plus les touchers
-    jouerMusique(this, 'remi_musique_bar');   // la musique du bar (dès l'écran des commandes)
-    this.input.on('pointerdown', (p) => { this.toucher = true; this.toucheX = p.x; });
-    this.gel = 0; this.bonusPari = 0; this.solidite = R.solidite; this.cassePar = null; this.cible = { x: 0, y: 0 };
+    laisserPasserTactile(this);
+    jouerMusique(this, 'remi_musique_bar');
+    // MAINTENIR = le doigt posé n'importe où (ou ESPACE)
+    this.input.on('pointerdown', () => { this.doigt = true; });
+    this.input.on('pointerup', () => { this.doigt = false; });
 
     etiquettesTactiles({ ...VIDES, espace: 'OK' });
     const t = estTactile();
-    this.afficherIntro('RÉMI - La porte', [
+    this.afficherIntro('RÉMI - La porte et le videur', [
       REPLIQUES.porteIntro,
-      `1) ÉLAN : tape ${t ? 'GAUCHE / DROITE de l\'écran' : '◀ ▶'} EN ALTERNANCE, le plus vite possible`,
-      `2) VISÉE : ${t ? 'touche' : 'ESPACE'} quand la cible passe sur ton poing (+)`,
-      'Chaque coup abîme la porte (barre de SOLIDITÉ) : celui qui la fait CÉDER gagne tout !',
-      `Sinon, en ${R.manches} manches : la plus grosse frappe gagne la manche.`,
-    ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.mancheSuivante(); }));
+      `MAINTIENS ${t ? 'le doigt sur l\'écran' : 'ESPACE'} : tu armes ton poing (ça monte de plus en plus vite)`,
+      'LÂCHE : le coup part. Lâche quand la cible passe sur ton poing (+) = coup parfait.',
+      'LE VIDEUR : ses pas, son ombre, le « ! »... puis il regarde. S\'il te voit charger : ATTRAPÉ !',
+      'Celui dont le coup fait CÉDER la porte gagne.',
+    ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.tour('remi'); }));
   }
 
   decor() {
     this.cameras.main.setBackgroundColor('#141018');
-    if (this.vueDos) {
-      // décor zoomé sur la porte ; le battant (découpé du fond) tremble et s'ouvre, le trou noir derrière
-      const t = this.textures.get('remi_porte_decor');
-      if (!t.has('battant')) t.add('battant', 0, BATTANT.x, BATTANT.y, BATTANT.l, BATTANT.h);
-      this.add.image(DECOR_X, DECOR_Y, 'remi_porte_decor').setOrigin(0, 0).setScale(ZOOM).setDepth(1);
-      this.add.rectangle(PORTE_DOS.x, PORTE_DOS.y, PORTE_DOS.l, PORTE_DOS.h, 0x050308).setOrigin(0, 0).setDepth(2);
-      this.battant = this.add.image(PORTE_DOS.x, PORTE_DOS.y, 'remi_porte_decor', 'battant').setOrigin(0, 0).setScale(ZOOM).setDepth(2.5);
-      this.bat = PORTE_DOS;
-      return;
-    }
-    if (this.decorImage) {
-      // fond illustré ; le battant de la porte est découpé du fond (il tremble, il tombe), avec le trou noir derrière
-      const t = this.textures.get('remi_porte_decor');
-      if (!t.has('battant')) t.add('battant', 0, BATTANT.x, BATTANT.y, BATTANT.l, BATTANT.h);
-      this.add.image(0, 0, 'remi_porte_decor').setOrigin(0, 0).setDepth(1);
-      this.add.rectangle(BATTANT.x, BATTANT.y, BATTANT.l, BATTANT.h, 0x050308).setOrigin(0, 0).setDepth(2);
-      this.battant = this.add.image(BATTANT.x, BATTANT.y, 'remi_porte_decor', 'battant').setOrigin(0, 0).setDepth(2.5);
-      this.bat = BATTANT;
-      return;
-    }
-    const g = this.add.graphics().setDepth(1);
-    g.fillGradientStyle(0x2a2030, 0x2a2030, 0x18121c, 0x18121c, 1).fillRect(0, 0, LARGEUR, SOL);
-    // carrelage des toilettes du bar
-    g.lineStyle(1, 0x3a3044, 1);
-    for (let y = 40; y < SOL; y += 40) g.lineBetween(0, y, LARGEUR, y);
-    for (let x = 0; x < LARGEUR; x += 40) g.lineBetween(x, 0, x, SOL);
-    g.fillStyle(0x3a2a22, 1).fillRect(0, SOL, LARGEUR, HAUTEUR - SOL);
-    // cadre de la porte
-    g.fillStyle(0x2a1a10, 1).fillRect(this.px - 14, 110, 172, SOL - 110);
-    const s = texte(this, this.px + 70, 128, 'WC', 20, '#ffffff').setDepth(4);
-    s.setBackgroundColor('#2a6ad0');
+    const t = this.textures.get('remi_porte_decor');
+    if (!t.has('battant')) t.add('battant', 0, BATTANT.x, BATTANT.y, BATTANT.l, BATTANT.h);
+    this.add.image(DECOR_X, DECOR_Y, 'remi_porte_decor').setOrigin(0, 0).setScale(ZOOM).setDepth(1);
+    this.add.rectangle(PORTE.x, PORTE.y, PORTE.l, PORTE.h, 0x050308).setOrigin(0, 0).setDepth(2);
+    // le battant, centré (il se BOMBE à chaque coup)
+    this.battant = this.add.image(PORTE.x + PORTE.l / 2, PORTE.y + PORTE.h / 2, 'remi_porte_decor', 'battant').setScale(ZOOM).setDepth(2.5);
   }
 
-  mancheSuivante() {
-    this.manche++;
-    this.scores = { toi: 0, remi: 0 };
-    const decisive = this.points.toi === this.points.remi && this.points.toi === Math.ceil(R.manches / 2) - 1 && this.manche > 1;
-    annonce(this, decisive ? 'MANCHE DÉCISIVE !' : `MANCHE ${this.manche}`, decisive ? '#ff5a5a' : '#ffd84a', 1.2);
-    if (decisive) jouerSon(this, 'remi_foule');
-    this.majHud();
-    // chacun commence une manche sur deux (manche 1 : Rémi)
-    this.ordre = this.manche % 2 ? ['remi', 'toi'] : ['toi', 'remi']; this.etape = 0;
-    this.time.delayedCall(1300, () => this.suite());
-  }
-
-  tourRemi() {
-    if (this.termine) return;
-    this.etat = 'remi'; this.frappeur = 'remi';
+  // ---------- les tours ----------
+  tour(qui) {
+    if (this.termine || this.solidite <= 0) return;
+    this.frappeur = qui; this.puissance = 0; this.charge = false; this.tCible = Math.random() * 3;
+    this.pose[qui] = 'garde';
+    this.etat = qui;
     etiquettesTactiles(VIDES);
-    this.poseRemi = 'elan';
-    bulle(this, `Rémi : « ${choisir(REPLIQUES.porteRemiFrappe)} »`, '#ffd84a', 1.4, 80);
-    // PARI (audit C3) : pendant que Rémi prend son élan, devine s'il fera PLUS ou MOINS que le seuil
-    this.seuilPari = Math.round((this.diff.remiMin + this.diff.remiMax) / 20) * 10;
-    this.pari = null; this.bonusPari = 0; this.etat = 'pari'; this.chrono = 2.2;
-    etiquettesTactiles({ ...VIDES, gauche: 'MOINS', droite: 'PLUS' });
-  }
-
-  // fin du pari (ou pas de réponse) : Rémi frappe
-  coupRemi() {
-    this.etat = 'remi';
-    etiquettesTactiles(VIDES);
-    const s = Math.round(hasard(this.diff.remiMin, this.diff.remiMax));
-    this.frapper('remi', s);
-    if (this.pari) {
-      const bon = (this.pari === 'plus') === (s > this.seuilPari);
-      this.bonusPari = bon ? 60 : 0;
-      this.time.delayedCall(1000, () => bulle(this, bon ? 'PARI GAGNÉ : +60 à ta frappe !' : 'Pari perdu...', bon ? '#7fff7f' : '#ffb0b0', 1.2, 200));
+    if (qui === 'toi') {
+      this.doigt = false;
+      this.consigne.setVisible(true);
+      annonce(this, 'À TOI !', '#7fff7f', 0.6);
+    } else {
+      this.consigne.setVisible(false);
+      // jusqu'où Rémi va charger cette fois (un peu au hasard autour de sa « gourmandise »)
+      this.remiVise = Phaser.Math.Clamp(this.diff.remiCharge + hasard(-0.12, 0.12), 0.25, 1);
+      this.remiAttend = hasard(0.4, 0.9);   // il se met en place
+      this.remiPrudence = undefined;
+      bulle(this, `Rémi : « ${choisir(REPLIQUES.porteRemiFrappe)} »`, '#ffd84a', 1.2, 80);
     }
-    this.time.delayedCall(2100, () => this.suite());
-  }
-
-  tourToi() {
-    if (this.termine) return;
-    this.frappeur = 'toi'; this.poseRemi = 'garde';
-    this.etat = 'elan'; this.jauge = 0; this.chrono = R.elan; this.tapes = 0; this.toucher = false;
-    this.poseToi = 'elan';
-    etiquettesTactiles(VIDES);
-    this.dernierCote = null;
-    annonce(this, 'GAUCHE ! DROITE !', '#7fff7f', 0.7);
   }
 
   update(temps, delta) {
     const dt = Math.min(delta, 50) / 1000;
     this.horloge += dt;
-    const T = this.touches;
-    const appui = vientDAppuyer(T.espace) || this.toucher;
-    const toucheX = this.toucher ? this.toucheX : null;
-    this.toucher = false;
-    // GEL d'impact : le jeu s'arrête un instant au moment du coup
     if (this.gel > 0) { this.gel -= dt; this.dessiner(0); return; }
-    if (this.etat === 'pari') {
-      this.chrono -= dt;
-      if (!this.pari) {
-        if (vientDAppuyer(T.gauche) || (toucheX !== null && toucheX < LARGEUR / 2)) this.pari = 'moins';
-        if (vientDAppuyer(T.droite) || (toucheX !== null && toucheX >= LARGEUR / 2)) this.pari = 'plus';
-        if (this.pari) jouerSon(this, 'ui_valider');
-      }
-      this.consigne.setVisible(true).setText(this.pari ? `Pari : ${this.pari.toUpperCase()} de ${this.seuilPari}` :
-        `PARI : Rémi fera ◀ MOINS ou PLUS ▶ de ${this.seuilPari} ?`);
-      if (this.chrono <= 0) this.coupRemi();
-      this.dessiner(dt);
-      return;
-    }
-    if (this.etat === 'elan') {
-      // ÉLAN façon « Track & Field » : il faut ALTERNER gauche et droite
-      let cote = null;
-      if (vientDAppuyer(T.gauche) || (toucheX !== null && toucheX < LARGEUR / 2)) cote = 'g';
-      if (vientDAppuyer(T.droite) || (toucheX !== null && toucheX >= LARGEUR / 2)) cote = 'd';
-      if (cote) {
-        if (cote !== this.dernierCote) { this.jauge += R.parTape; this.tapes++; jouerSon(this, 'remi_tape', { rate: 0.8 + this.jauge * 0.8 }); }
-        else { this.jauge -= 0.02; this.rate = 0.25; }   // même côté deux fois : raté
-        this.dernierCote = cote; this.flashCote = { c: cote, t: 0.12 };
-      } else if (vientDAppuyer(T.espace)) { this.jauge += R.parTape * 0.5; jouerSon(this, 'remi_tape'); }
-      this.rate = Math.max(0, (this.rate || 0) - dt);
-      this.jauge = Phaser.Math.Clamp(this.jauge - R.baisse * dt, 0, 1);
-      this.chrono -= dt;
-      this.consigne.setVisible(true).setText(this.rate > 0 ? 'ALTERNE ! gauche, droite, gauche...' : `ÉLAN : GAUCHE / DROITE en alternance !   ${Math.max(0, this.chrono).toFixed(1)} s`);
-      if (this.chrono <= 0) {
-        this.etat = 'visee'; this.chrono = 0; this.elanFinal = this.jauge;
-        etiquettesTactiles({ ...VIDES, espace: 'FRAPPE !' });
-        jouerSon(this, 'ui_valider');
-      }
-    } else if (this.etat === 'visee') {
-      this.chrono += dt;
-      const ph = (this.chrono * this.diff.visee / R.periodeVisee) % 1;
-      this.curseur = ph < 0.5 ? ph * 2 : 2 - ph * 2;
-      if (this.vueDos) {
-        // VISÉE SUR LA PORTE : une cible se promène sur le battant ; frappe quand elle passe sur ton poing (+)
-        const t = this.chrono * this.diff.visee, b = this.bat;
-        this.cible.x = b.x + b.l / 2 + (b.l / 2 - 26) * Math.sin(t * 2.3);
-        this.cible.y = IMPACT.y + 110 * Math.sin(t * 3.1 + 0.8);
-      }
-      this.consigne.setVisible(true).setText(this.vueDos ? `${estTactile() ? 'TOUCHE' : 'ESPACE'} quand la cible passe sur le + !` : `${estTactile() ? 'TOUCHE' : 'ESPACE'} dans la zone VERTE !`);
-      // un petit délai pour ne pas frapper avec la dernière tape de l'élan ; au bout de 4 s, ça part tout seul
-      if ((appui && this.chrono > 0.25) || this.chrono > 4) this.frappeToi();
-    } else this.consigne.setVisible(false);
+    if (this.etat === 'toi' || this.etat === 'remi') {
+      this.tCible += dt;
+      this.bougerCible();
+      this.pasVideur(dt);
+      if (this.etat === 'toi') this.pasToi(dt); else if (this.etat === 'remi') this.pasRemi(dt);
+    } else if (this.etat === 'coup' || this.etat === 'pause') this.pasVideur(dt);
     this.dessiner(dt);
   }
 
-  frappeToi() {
-    let precision;
-    if (this.vueDos) {
-      const d = Math.hypot(this.cible.x - IMPACT.x, this.cible.y - IMPACT.y), zr = this.diff.zone * 200;
-      precision = d <= zr ? 1 : Math.max(0, 1 - (d - zr) / 130);
-    } else {
-      const ecart = Math.abs(this.curseur - 0.5), z = this.diff.zone / 2;
-      precision = ecart <= z ? 1 : Math.max(0, 1 - (ecart - z) / (0.5 - z));
-    }
-    const s = Math.min(999, Math.round(999 * (R.poidsElan * this.elanFinal + (1 - R.poidsElan) * precision)) + this.bonusPari);
-    this.etat = 'frappe';
-    etiquettesTactiles(VIDES);
-    if (precision === 1 && this.elanFinal > 0.9) { bulle(this, 'COUP DE GRÂCE !', '#ffd84a', 1.2, 120); jouerSon(this, 'remi_foule'); }
-    else if (precision === 1) bulle(this, 'PILE DESSUS !', '#7fff7f', 1, 120);
-    this.frapper('toi', s);
-    this.time.delayedCall(1700, () => this.suite());
+  bougerCible() {
+    const t = this.tCible * this.diff.visee / R.periodeVisee * 2.2, b = PORTE;
+    this.cible.x = b.x + b.l / 2 + (b.l / 2 - 26) * Math.sin(t * 1.05);
+    this.cible.y = IMPACT.y + 110 * Math.sin(t * 1.4 + 0.8);
   }
 
-  // la frappe : pose, tremblement, fissures, compteur de la borne
-  frapper(qui, score) {
-    this.scores[qui] = score;
-    // la SOLIDITÉ commune de la porte baisse ; celui qui la fait céder gagne tout
+  charger(dt) {
+    const avant = this.puissance;
+    this.puissance = Math.min(1, this.puissance + (R.charge + this.puissance * R.accel) * dt);
+    this.charge = true;
+    this.pose[this.frappeur] = 'charge';
+    if (Math.floor(this.puissance * 10) !== Math.floor(avant * 10)) jouerSon(this, 'remi_tape', { rate: 0.7 + this.puissance });
+  }
+
+  pasToi(dt) {
+    const tenu = this.doigt || this.touches.espace.isDown;
+    if (tenu) this.charger(dt);
+    else if (this.charge) { this.frapper('toi'); return; }
+    this.consigne.setText(this.charge ? `PUISSANCE ${Math.round(this.puissance * 100)} %  -  LÂCHE quand la cible est sur le + !`
+      : `${estTactile() ? 'MAINTIENS le doigt' : 'MAINTIENS ESPACE'} pour charger... gare au videur !`);
+  }
+
+  pasRemi(dt) {
+    if (this.remiAttend > 0) { this.remiAttend -= dt; return; }
+    // Rémi ne commence pas à charger quand le videur arrive ; s'il charge déjà, il lâche (selon sa prudence)... ou il insiste
+    if (this.videur.etat !== 'absent' && this.puissance === 0) return;
+    if (this.videur.etat === 'annonce' && this.remiPrudence === undefined) this.remiPrudence = Math.random() < this.diff.remiPrudent;
+    if (this.remiPrudence) { this.frapper('remi'); return; }
+    this.charger(dt);
+    // il lâche quand la cible passe près de son poing, une fois assez chargé
+    const d = Math.hypot(this.cible.x - IMPACT.x, this.cible.y - IMPACT.y);
+    if (this.puissance >= this.remiVise && (d < 40 || this.puissance >= 1)) this.frapper('remi');
+  }
+
+  // ---------- le videur ----------
+  pasVideur(dt) {
+    const v = this.videur;
+    v.t -= dt;
+    if (v.etat === 'absent' && v.t <= 0) {
+      v.etat = 'annonce'; v.t = R.videurAnnonce * this.diff.videur; v.pas = 0;
+    } else if (v.etat === 'annonce') {
+      v.pas -= dt;
+      if (v.pas <= 0) { v.pas = 0.3; jouerSon(this, 'remi_atterrit', { rate: 0.6 }); }   // ses pas
+      if (v.t <= 0) { v.etat = 'regarde'; v.t = hasard(R.videurRegard[0], R.videurRegard[1]); v.pose = 0; v.vu = false; }
+    } else if (v.etat === 'regarde') {
+      // il regarde : celui qui charge (ou qui vient juste de frapper) se fait ATTRAPER
+      const fautif = (this.etat === 'toi' || this.etat === 'remi') && this.charge ? this.frappeur
+        : this.etat === 'coup' && this.tCoup < 0.25 ? this.frappeur : null;
+      if (fautif && !v.vu) this.attraper(fautif);
+      if (v.t <= 0) { v.etat = 'absent'; v.t = hasard(R.videurAttente[0], R.videurAttente[1]) * this.diff.videur; v.pose = 0; }
+    }
+  }
+
+  attraper(qui) {
+    const v = this.videur;
+    v.vu = true; v.pose = 1; v.t = Math.max(v.t, 1.3);
+    this.attrapes[qui]++;
+    this.solidite = Math.min(R.solidite, this.solidite + R.scotch);   // le barman rafistole la porte
+    jouerSon(this, 'remi_porte', { rate: 0.6 });
+    this.cameras.main.shake(200, 0.006);
+    annonce(this, qui === 'toi' ? 'ATTRAPÉ !' : 'RÉMI ATTRAPÉ !', qui === 'toi' ? '#ff5a5a' : '#7fff7f', 1);
+    bulle(this, `Le videur : « ${choisir(REPLIQUES.porteAttrape)} »`, '#ffb070', 1.8, 150);
+    this.time.delayedCall(500, () => bulle(this, `Coup perdu, et le barman rafistole la porte (+${R.scotch})`, '#ffffff', 1.4, 330));
+    if (qui === 'remi') this.time.delayedCall(900, () => bulle(this, 'Rémi : « Mais... j\'ai rien fait ! »', '#ffd84a', 1.2, 80));
+    this.etat = 'pause'; this.puissance = 0; this.charge = false; this.pose[qui] = 'garde';
+    this.consigne.setVisible(false);
+    this.time.delayedCall(1800, () => this.tour(qui === 'toi' ? 'remi' : 'toi'));
+  }
+
+  // ---------- le coup ----------
+  frapper(qui) {
+    const d = Math.hypot(this.cible.x - IMPACT.x, this.cible.y - IMPACT.y), zr = this.diff.zone * 200;
+    const precision = qui === 'remi' ? hasard(0.65, 1) : d <= zr ? 1 : Math.max(0.2, 1 - (d - zr) / 130);
+    const score = Math.round(999 * (R.degatsMin + (1 - R.degatsMin) * this.puissance) * (0.55 + 0.45 * precision));
+    this.etat = 'coup'; this.tCoup = 0; this.charge = false; this.consigne.setVisible(false);
+    this.coups[qui]++;
+    if (qui === 'toi' && precision === 1 && this.puissance > 0.9) { bulle(this, 'COUP PARFAIT !', '#ffd84a', 1, 150); jouerSon(this, 'remi_foule'); }
+    else if (qui === 'toi' && precision === 1) bulle(this, 'PILE DESSUS !', '#7fff7f', 0.8, 150);
+    this.pose[qui] = 'coup';
+    this.time.delayedCall(90, () => { this.pose[qui] = 'frappe'; this.impact(qui, score); });
+    this.time.delayedCall(550, () => { this.pose[qui] = 'garde'; });
+  }
+
+  impact(qui, score) {
     this.solidite = Math.max(0, this.solidite - score);
-    if (this.solidite <= 0 && !this.cassePar) {
-      this.cassePar = qui;
-      this.time.delayedCall(1300, () => {
-        if (qui === 'toi') this.gagner();
-        else { this.porteTombee = true; if (this.battant) this.tweens.add({ targets: this.battant, x: this.bat.x + this.bat.l, scaleX: 0.08, duration: 260 });
-          this.time.delayedCall(900, () => ecranPerdu(this, 'RÉMI A DÉFONCÉ LA PORTE', REPLIQUES.portePerdu, this.nomDiff)); }
-      });
-    } else if (this.solidite < R.solidite * 0.3 && !this.alerteSolidite) {
-      this.alerteSolidite = true;
-      this.time.delayedCall(1100, () => bulle(this, 'La porte ne tient plus qu\'à un fil : le prochain gros coup la fait céder !', '#ff9a5a', 2, 200));
-    }
-    // « coup » (bras qui part) puis « frappe » (impact, traits de vitesse)
-    if (qui === 'remi') this.poseRemi = 'coup'; else this.poseToi = 'coup';
-    this.time.delayedCall(90, () => { if (qui === 'remi') this.poseRemi = 'frappe'; else this.poseToi = 'frappe'; });
-    this.time.delayedCall(450, () => { if (qui === 'remi') this.poseRemi = 'garde'; else this.poseToi = 'garde'; });
+    this.gel = 0.06 + score / 999 * 0.1;
     this.tremble = score / 999;
-    this.time.delayedCall(90, () => {
-      this.gel = 0.08 + score / 999 * 0.1;   // petit arrêt sur image, plus long pour un gros coup
-      this.cameras.main.shake(180 + score / 4, 0.004 + score / 999 * 0.014);
-      if (this.vueDos) {
-        const pop = texte(this, IMPACT.x, IMPACT.y - 40, String(score), 30 + score / 25, score >= R.casse ? '#ffd84a' : '#ffffff', { fontStyle: 'bold italic', strokeThickness: 8 }).setDepth(950);
-        this.tweens.add({ targets: pop, y: IMPACT.y - 120, alpha: 0, scale: 1.3, duration: 1100, delay: 200, onComplete: () => pop.destroy() });
-      }
-    });
+    this.cameras.main.shake(160 + score / 4, 0.004 + score / 999 * 0.014);
     jouerSon(this, score >= R.casse ? 'remi_porte_fort' : 'remi_porte');
-    if (this.vueDos) {
-      // IMPACT proportionnel à la force (C2) : fissures en étoile, éclats de bois et flash blanc pour les gros coups
-      this.time.delayedCall(90, () => {
-        const n = 2 + Math.floor(score / 140), L = 20 + score / 7;
-        for (let k = 0; k < n; k++) this.fissures.push(this.fissure(Math.random() * Math.PI * 2, L * hasard(0.5, 1)));
-        const e = Math.floor(score / 60);
-        for (let k = 0; k < e; k++) this.eclats.push({ x: IMPACT.x, y: IMPACT.y, vx: hasard(-260, 260), vy: hasard(-380, 80), r: hasard(-6, 6), a: 0, vie: hasard(0.5, 1) });
-        if (score >= R.casse) { this.flash = 1; jouerSon(this, 'remi_porte_fort'); }
-      });
-    } else {
-      const n = Math.floor(score / 300) + (score >= R.casse ? 3 : 0);
-      for (let k = 0; k < n; k++) this.fissures.push(this.fissure());
-    }
-    this.compteur = 0; this.compteurCible = score;
-    this.tweens.add({ targets: this, compteur: score, duration: 800, ease: 'Cubic.Out' });
-    this.time.delayedCall(900, () => bulle(this, `${qui === 'remi' ? 'RÉMI' : 'TOI'} : ${score}${score >= R.casse ? '  -  LA PORTE SE FEND !' : ''}`, qui === 'remi' ? '#ffb070' : '#9fe0ff', 1.2, 150));
+    // la porte se BOMBE puis revient
+    this.tweens.add({ targets: this.battant, scaleX: ZOOM * (1 - 0.06 * score / 999), scaleY: ZOOM * (1 + 0.03 * score / 999), duration: 70, yoyo: true });
+    const n = 2 + Math.floor(score / 140), L = 20 + score / 7;
+    for (let k = 0; k < n; k++) this.fissures.push(this.fissure(Math.random() * Math.PI * 2, L * hasard(0.5, 1)));
+    for (let k = 0; k < Math.floor(score / 60); k++) this.eclats.push({ x: IMPACT.x, y: IMPACT.y, vx: hasard(-260, 260), vy: hasard(-380, 80), r: hasard(-6, 6), a: 0, vie: hasard(0.5, 1) });
+    if (score >= R.casse) this.flash = 1;
+    this.compteur = 0; this.tweens.add({ targets: this, compteur: score, duration: 600, ease: 'Cubic.Out' });
+    const pop = texte(this, IMPACT.x, IMPACT.y - 40, String(score), 30 + score / 25, score >= R.casse ? '#ffd84a' : '#ffffff', { fontStyle: 'bold italic', strokeThickness: 8 }).setDepth(950);
+    this.tweens.add({ targets: pop, y: IMPACT.y - 120, alpha: 0, scale: 1.3, duration: 1000, delay: 200, onComplete: () => pop.destroy() });
+    if (this.solidite <= 0) { this.time.delayedCall(700, () => this.porteCede(qui)); return; }
+    if (this.solidite < R.solidite * 0.25 && !this.alerte) { this.alerte = true; this.time.delayedCall(800, () => bulle(this, 'La porte ne tient plus qu\'à un fil !', '#ff9a5a', 1.6, 200)); }
+    this.time.delayedCall(1300, () => { if (this.etat === 'coup') this.tour(qui === 'toi' ? 'remi' : 'toi'); });
   }
 
   fissure(angle, longueur) {
-    if (this.vueDos) {
-      // un rayon de fissure qui part de l'impact, en zigzag
-      const pts = [[IMPACT.x - this.bat.x, IMPACT.y]], n = 5;
-      for (let k = 1; k <= n; k++) {
-        const r = longueur * k / n, a = angle + hasard(-0.25, 0.25);
-        pts.push([IMPACT.x - this.bat.x + Math.cos(a) * r, IMPACT.y + Math.sin(a) * r]);
-      }
-      return pts.map(([x, y]) => [this.bat.x + Phaser.Math.Clamp(x, 6, this.bat.l - 6), Phaser.Math.Clamp(y, this.bat.y + 6, this.bat.y + this.bat.h - 6)]);
+    const pts = [[IMPACT.x, IMPACT.y]];
+    for (let k = 1; k <= 5; k++) {
+      const r = longueur * k / 5, a = angle + hasard(-0.25, 0.25);
+      pts.push([Phaser.Math.Clamp(IMPACT.x + Math.cos(a) * r, PORTE.x + 6, PORTE.x + PORTE.l - 6), Phaser.Math.Clamp(IMPACT.y + Math.sin(a) * r, PORTE.y + 6, PORTE.y + PORTE.h - 6)]);
     }
-    const pts = [[this.px + hasard(4, 60), hasard(250, 300)]];   // autour de l'impact du poing
-    for (let k = 0; k < 4; k++) { const [x, y] = pts[pts.length - 1]; pts.push([x + hasard(-26, 26), y + hasard(-30, 30)]); }
     return pts;
   }
 
-  // le coup suivant de la manche, ou la fin de la manche ; rien si la porte a déjà cédé
-  suite() {
-    if (this.cassePar || this.termine) return;
-    const qui = this.ordre[this.etape++];
-    if (qui === 'remi') this.tourRemi(); else if (qui === 'toi') this.tourToi(); else this.finManche();
-  }
-
-  finManche() {
-    const { toi: a, remi: b } = this.scores;
-    if (a > b) { this.points.toi++; annonce(this, 'MANCHE POUR TOI !', '#7fff7f', 1.1); }
-    else if (b > a) { this.points.remi++; annonce(this, 'MANCHE POUR RÉMI', '#ff9a5a', 1.1); }
-    else annonce(this, 'ÉGALITÉ !', '#ffffff', 1.1);
-    this.majHud();
-    const besoin = Math.ceil(R.manches / 2);
-    this.time.delayedCall(1500, () => {
-      if (this.points.toi >= besoin) this.gagner();
-      else if (this.points.remi >= besoin) ecranPerdu(this, 'RÉMI TAPE PLUS FORT', REPLIQUES.portePerdu, this.nomDiff);
-      else this.mancheSuivante();
-    });
-  }
-
-  gagner() {
+  porteCede(qui) {
     this.etat = 'fin';
-    this.porteTombee = true;
-    if (this.battant) this.tweens.add({ targets: this.battant, x: this.bat.x + this.bat.l, scaleX: 0.08, duration: 260, ease: 'Cubic.In' });
-    jouerSon(this, 'remi_porte_fort');
+    jouerSon(this, 'remi_porte_fort'); jouerSon(this, 'remi_foule');
     this.cameras.main.shake(500, 0.02);
-    annonce(this, 'LA PORTE CÈDE !', '#ffd84a', 1.4);
-    this.time.delayedCall(1800, () => this.victoire(REPLIQUES.porteGagne));
+    this.tweens.add({ targets: this.battant, x: PORTE.x + PORTE.l, scaleX: 0.1, duration: 260, ease: 'Cubic.In' });
+    this.fissures = [];
+    if (qui === 'toi') {
+      annonce(this, 'LA PORTE CÈDE !', '#ffd84a', 1.4);
+      this.time.delayedCall(1800, () => this.victoire(REPLIQUES.porteGagne));
+    } else {
+      annonce(this, 'RÉMI A DÉFONCÉ LA PORTE', '#ff5a5a', 1.4);
+      this.time.delayedCall(1800, () => ecranPerdu(this, 'RÉMI A DÉFONCÉ LA PORTE', REPLIQUES.portePerdu, this.nomDiff));
+    }
   }
 
-  majHud() { this.hud.setText(`MANCHE ${this.manche}   TOI ${this.points.toi} - ${this.points.remi} RÉMI`); }
-
-  // barre de SOLIDITÉ de la porte (en haut au milieu)
-  dessinerSolidite(j) {
-    const x0 = 420, L = 260, v = this.solidite / R.solidite;
-    j.fillStyle(0x000000, 0.6).fillRect(x0 - 6, 12, L + 12, 30);
-    j.fillStyle(0x3a2a1a, 1).fillRect(x0, 18, L, 18);
-    j.fillStyle(v < 0.3 ? (Math.floor(this.horloge * 6) % 2 ? 0xff3030 : 0xffd84a) : 0xc89050, 1).fillRect(x0, 18, L * v, 18);
-    if (!this.txtSolidite) this.txtSolidite = texte(this, x0 + L / 2, 52, 'SOLIDITÉ DE LA PORTE', 14, '#ffd84a').setDepth(901);
-  }
-
+  // ---------- dessin ----------
   dessiner(dt) {
+    if (this.etat === 'coup') this.tCoup += dt;
     this.tremble = Math.max(0, this.tremble - dt * 2.5);
-    // la porte (qui tombe à la fin)
     const g = this.gPorte.clear();
     const dx = Math.sin(this.horloge * 60) * this.tremble * 5;
-    g.setPosition(dx, 0);
-    if (this.porteTombee) { g.setRotation(0.25).setPosition(160, -60); }
-    if (this.battant) {
-      // à la fin, le battant s'ouvre d'un coup vers l'intérieur (il « pivote » sur ses gonds) et laisse le trou noir
-      if (this.porteTombee) g.setVisible(false);
-      else this.battant.setPosition(this.bat.x + g.x, this.bat.y);
-    } else {
-    g.fillStyle(0x8a5a2b, 1).fillRect(this.px, 124, 144, SOL - 124);
-    g.lineStyle(3, 0x5a3818, 1).strokeRect(this.px + 14, 150, 116, 120).strokeRect(this.px + 14, 300, 116, 140);
-    g.fillStyle(0xd8c060, 1).fillCircle(this.px + 20, 300, 6);
-    }
+    if (this.etat !== 'fin') this.battant.x = PORTE.x + PORTE.l / 2 + dx;
     for (const f of this.fissures) {
-      g.lineStyle(3, 0x1a0e06, 1).beginPath(); g.moveTo(f[0][0], f[0][1]);
-      for (const [x, y] of f.slice(1)) g.lineTo(x, y);
+      g.lineStyle(3, 0x1a0e06, 1).beginPath(); g.moveTo(f[0][0] + dx, f[0][1]);
+      for (const [x, y] of f.slice(1)) g.lineTo(x + dx, y);
       g.strokePath();
-    }
-    this.ecran.setText(String(Math.round(this.compteur)).padStart(3, '0'));
-    // les deux joueurs : le frappeur devant la porte, l'autre attend à gauche
-    if (this.vueDos) {
-      // seul le frappeur est à l'écran (il arrive par la gauche à chaque changement)
-      if (this.dernierFrappeur !== this.frappeur) { this.dernierFrappeur = this.frappeur; this.entree = 1; }
-      this.entree = Math.max(0, this.entree - dt * 3);
-      for (const qui of ['remi', 'toi']) {
-        const spr = this.dos[qui], c = DOS[qui], vis = this.frappeur === qui;
-        spr.setVisible(vis);
-        if (!vis) continue;
-        const pose = qui === 'remi' ? this.poseRemi : this.poseToi;
-        const x = IMPACT.x - c.poing * c.echelle - 400 * this.entree * this.entree;
-        // en garde il respire ; pendant l'élan il TREMBLE de plus en plus (jauge)
-        const bal = pose === 'garde' ? Math.sin(this.horloge * 4) * 4 : pose === 'elan' && qui === 'toi' ? Math.sin(this.horloge * 47) * 5 * this.jauge : 0;
-        spr.setFrame(c.cases[pose] ?? 0).setPosition(x - (pose === 'elan' && qui === 'remi' ? 30 : 0), c.haut + bal)
-          .setRotation(pose === 'elan' && qui === 'remi' ? -0.06 : 0);
-      }
-    }
-    // ÉLAN : les bords de l'écran rougissent à mesure que la jauge monte (la tension monte)
-    if (this.vueDos) {
-      const e = this.etat === 'elan' ? this.jauge : this.etat === 'visee' ? this.elanFinal : 0;
-      if (e > 0) {
-        for (let k = 0; k < 6; k++) {
-          const m = 14 + k * 14;
-          g.fillStyle(0xff2020, e * 0.07).fillRect(-g.x, 0, LARGEUR, m).fillRect(-g.x, HAUTEUR - m, LARGEUR, m).fillRect(-g.x, 0, m, HAUTEUR).fillRect(LARGEUR - m - g.x, 0, m, HAUTEUR);
-        }
-      }
-      if (this.etat === 'visee') {
-        const c = this.cible, zr = this.diff.zone * 200;
-        g.lineStyle(4, 0xff3030, 0.95).strokeCircle(c.x - g.x, c.y, zr + 10).strokeCircle(c.x - g.x, c.y, zr * 0.5 + 4);
-        g.fillStyle(0xff3030, 0.25).fillCircle(c.x - g.x, c.y, zr + 10);
-        g.lineStyle(4, 0xffffff, 1).lineBetween(IMPACT.x - 16 - g.x, IMPACT.y, IMPACT.x + 16 - g.x, IMPACT.y).lineBetween(IMPACT.x - g.x, IMPACT.y - 16, IMPACT.x - g.x, IMPACT.y + 16);
-      }
     }
     // éclats de bois et flash
     for (const e of this.eclats) { e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 900 * dt; e.a += e.r * dt; e.vie -= dt; }
     this.eclats = this.eclats.filter(e => e.vie > 0);
     for (const e of this.eclats) {
-      const c = Math.cos(e.a), s2 = Math.sin(e.a);
-      g.fillStyle(0x8a5a2b, Math.min(1, e.vie * 2)).fillPoints([{ x: e.x - c * 8, y: e.y - s2 * 8 }, { x: e.x + c * 8, y: e.y + s2 * 8 }, { x: e.x + c * 8 - s2 * 3, y: e.y + s2 * 8 + c * 3 }], true);
+      const c = Math.cos(e.a), s = Math.sin(e.a);
+      g.fillStyle(0x8a5a2b, Math.min(1, e.vie * 2)).fillPoints([{ x: e.x - c * 8, y: e.y - s * 8 }, { x: e.x + c * 8, y: e.y + s * 8 }, { x: e.x + c * 8 - s * 3, y: e.y + s * 8 + c * 3 }], true);
     }
     this.flash = Math.max(0, this.flash - dt * 4);
-    if (this.flash > 0) g.fillStyle(0xffffff, this.flash * 0.6).fillRect(-50, -50, LARGEUR + 100, HAUTEUR + 100);
-    const placer = (gr, qui, dessin, pose) => {
-      if (this.vueDos) return;
-      const spr = qui === 'remi' ? this.sprRemi : this.sprToi;
-      if (spr) {
-        // illustrations (cases alignées à gauche = le pied arrière) : le poing de l'impact touche la porte
-        const p = this.frappeur === qui ? pose : 'garde', base = qui === 'remi' ? 0 : 3;
-        const x = this.frappeur === qui ? this.px + 6 - POING * ECHELLE : (qui === 'remi' ? 40 : 230);
-        spr.setFrame(base + ({ coup: 1, frappe: 2 }[p] ?? 0));
-        spr.setPosition(x - (p === 'elan' ? 22 : 0), SOL + 4).setRotation(p === 'elan' ? -0.1 : 0);
-        return;
-      }
-      const x = this.frappeur === qui ? X_FRAPPE : X_ATTENTE + (qui === 'remi' ? 0 : 90);
-      gr.clear().setPosition(x, SOL).setScale(1.5);
-      dessin(gr, this.frappeur === qui ? pose : 'garde', this.horloge);
-    };
-    placer(this.gRemi, 'remi', remi, this.poseRemi);
-    placer(this.gToi, 'toi', toi, this.poseToi);
-    // jauges (ton tour)
+    if (this.flash > 0) g.fillStyle(0xffffff, this.flash * 0.6).fillRect(0, 0, LARGEUR, HAUTEUR);
+    // la cible sur la porte et le poing (+)
+    if (this.etat === 'toi' || (this.etat === 'remi' && this.remiAttend <= 0)) {
+      const c = this.cible, zr = this.diff.zone * 200;
+      g.lineStyle(4, 0xff3030, 0.95).strokeCircle(c.x, c.y, zr + 10).strokeCircle(c.x, c.y, zr * 0.5 + 4);
+      g.fillStyle(0xff3030, 0.2).fillCircle(c.x, c.y, zr + 10);
+      g.lineStyle(4, 0xffffff, 1).lineBetween(IMPACT.x - 16, IMPACT.y, IMPACT.x + 16, IMPACT.y).lineBetween(IMPACT.x, IMPACT.y - 16, IMPACT.x, IMPACT.y + 16);
+    }
+    this.ecran.setText(String(Math.round(this.compteur)).padStart(3, '0'));
+    this.dessinerFrappeur(dt);
+    this.dessinerVideur(dt);
+    this.dessinerJauges();
+  }
+
+  dessinerFrappeur(dt) {
+    if (this.dernierFrappeur !== this.frappeur) { this.dernierFrappeur = this.frappeur; this.entree = 1; }
+    this.entree = Math.max(0, this.entree - dt * 3);
+    for (const qui of ['remi', 'toi']) {
+      const spr = this.dos[qui], c = DOS[qui], vis = this.frappeur === qui && this.etat !== 'intro';
+      spr.setVisible(vis);
+      if (!vis) continue;
+      const pose = this.pose[qui];
+      // en garde il respire ; en charge il recule et TREMBLE de plus en plus
+      const ch = pose === 'charge' ? this.puissance : 0;
+      const bal = pose === 'garde' ? Math.sin(this.horloge * 4) * 4 : Math.sin(this.horloge * 47) * 6 * ch;
+      const x = IMPACT.x - c.poing * c.echelle - 400 * this.entree * this.entree - ch * 40;
+      spr.setFrame(c.cases[pose] ?? 0).setPosition(x + bal, c.haut + ch * 10).setRotation(-0.08 * ch);
+    }
+  }
+
+  dessinerVideur(dt) {
+    const v = this.videur, o = this.gOmbre.clear();
+    // son OMBRE s'allonge sur le sol du couloir pendant qu'il approche
+    if (v.etat === 'annonce' || v.etat === 'regarde') {
+      const k = v.etat === 'annonce' ? 1 - v.t / (R.videurAnnonce * this.diff.videur) : 1;
+      o.fillStyle(0x000000, 0.45 * k).fillEllipse(30 + 120 * k, HAUTEUR - 18, 120 + 260 * k, 34);
+    }
+    const cible = v.etat === 'regarde' ? VIDEUR.x : -260;
+    v.x += (cible - v.x) * Math.min(1, dt * 10);
+    this.sprVideur.setPosition(v.x, HAUTEUR + 10).setFrame(v.pose);
+  }
+
+  dessinerJauges() {
     const j = this.gJauges.clear();
-    if (this.etat !== 'intro') this.dessinerSolidite(j);
-    if (this.etat === 'elan' || this.etat === 'visee') {
-      const v = this.etat === 'elan' ? this.jauge : this.elanFinal;
-      // jauge en 10 PALIERS colorés, comme une borne de bar (C4)
-      j.fillStyle(0x000000, 0.65).fillRect(36, 146, 48, 308);
+    if (this.etat === 'intro') return;
+    // SOLIDITÉ de la porte (en haut)
+    const x0 = 400, L = 300, v = this.solidite / R.solidite;
+    j.fillStyle(0x000000, 0.6).fillRect(x0 - 6, 12, L + 12, 30);
+    j.fillStyle(0x3a2a1a, 1).fillRect(x0, 18, L, 18);
+    j.fillStyle(v < 0.25 ? (Math.floor(this.horloge * 6) % 2 ? 0xff3030 : 0xffd84a) : 0xc89050, 1).fillRect(x0, 18, L * v, 18);
+    if (!this.txtSolidite) this.txtSolidite = texte(this, x0 + L / 2, 52, 'SOLIDITÉ DE LA PORTE', 14, '#ffd84a').setDepth(901);
+    this.hud.setText(this.frappeur === 'toi' ? 'À TOI' : 'À RÉMI');
+    // PUISSANCE en 10 paliers (celui qui frappe)
+    if (this.etat === 'toi' || this.etat === 'remi' || this.etat === 'coup') {
       const COUL = [0x3ad03a, 0x5ad03a, 0x8ad03a, 0xb8d03a, 0xe0d03a, 0xffc03a, 0xff9a3a, 0xff6a3a, 0xff3a3a, 0xff2080];
-      for (let k = 0; k < 10; k++) {
-        const allume = v * 10 > k, yk = 446 - (k + 1) * 29.6;
-        j.fillStyle(COUL[k], allume ? 1 : 0.18).fillRect(42, yk + 3, 36, 24);
-      }
+      j.fillStyle(0x000000, 0.65).fillRect(36, 166, 48, 288);
+      for (let k = 0; k < 10; k++) j.fillStyle(COUL[k], this.puissance * 10 > k ? 1 : 0.18).fillRect(42, 446 - (k + 1) * 27.6 + 3, 36, 22);
     }
-    // pendant l'élan : 2 gros boutons G / D, celui à taper ensuite clignote
-    if (this.etat === 'elan') {
-      const fl = this.flashCote && this.flashCote.t > 0 ? this.flashCote.c : null;
-      if (this.flashCote) this.flashCote.t -= dt;
-      const suivant = this.dernierCote === 'g' ? 'd' : this.dernierCote === 'd' ? 'g' : null;
-      for (const [c, x] of [['g', 210], ['d', LARGEUR - 110]]) {
-        const allume = fl === c, attendu = suivant === c && Math.floor(this.horloge * 8) % 2 === 0;
-        j.fillStyle(0x000000, 0.4).fillCircle(x, 400, 70);
-        j.fillStyle(allume ? 0xffffff : attendu ? 0x7fff7f : 0xffd84a, allume ? 0.8 : attendu ? 0.5 : 0.18).fillCircle(x, 400, 64);
-        j.lineStyle(4, 0xffd84a, 0.9).strokeCircle(x, 400, 70);
-        j.fillStyle(0xffffff, 1);
-        if (c === 'g') j.fillTriangle(x + 18, 375, x + 18, 425, x - 22, 400); else j.fillTriangle(x - 18, 375, x - 18, 425, x + 22, 400);
-      }
-    }
-    if (this.etat === 'visee' && !this.vueDos) {
-      const x0 = 220, L = 520, y = 440, z = this.diff.zone;
-      j.fillStyle(0x000000, 0.7).fillRect(x0 - 6, y - 6, L + 12, 34);
-      j.fillStyle(0xb03a3a, 1).fillRect(x0, y, L, 22);
-      j.fillStyle(0xffd84a, 1).fillRect(x0 + L * (0.5 - z / 2 - 0.12), y, L * (z + 0.24), 22);
-      j.fillStyle(0x3ad03a, 1).fillRect(x0 + L * (0.5 - z / 2), y, L * z, 22);
-      j.fillStyle(0xffffff, 1).fillRect(x0 + L * this.curseur - 4, y - 10, 8, 42);
+    // le videur arrive : « ! » rouge qui clignote, à gauche
+    if (this.videur.etat === 'annonce' && Math.floor(this.horloge * 8) % 2) {
+      j.fillStyle(0xff3030, 1).fillTriangle(140, 320, 200, 320, 170, 250);
+      j.fillStyle(0xffffff, 1).fillRect(167, 270, 6, 30).fillRect(167, 305, 6, 7);
     }
   }
 }

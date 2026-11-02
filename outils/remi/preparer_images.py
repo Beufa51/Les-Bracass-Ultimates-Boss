@@ -242,6 +242,14 @@ def petites_images():
     im = im.resize((960, round(im.size[1] * 960 / im.size[0])), Image.LANCZOS); im.save(DST + 'remi_bar_interieur.jpg', quality=88)
     print('remi_bar_interieur.jpg', im.size)
 
+def videur():
+    # le videur (refonte de la porte) : 2 poses coupées à la taille (distrait, furieux) -> remi_videur.png, posées en bas
+    p = poses_planche('remi_videur_planche.jpg', grand=20000)
+    W = max(x.size[0] for x in p); H = max(x.size[1] for x in p)
+    bande = Image.new('RGBA', (W * len(p), H), (0, 0, 0, 0))
+    for k, x in enumerate(p): bande.paste(x, (k * W + (W - x.size[0]) // 2, H - x.size[1]))
+    bande.save(DST + 'remi_videur.png'); print('remi_videur.png', W, H, len(p))
+
 def facade():
     # façade du bar (arrivée du vélo) : fond blanc retiré (et entre les pieds des tabourets) -> remi_bar_facade.png
     im = detourer(Image.open(SRC + 'remi_bar_facade.jpg'), grand=300, seuil=225)
@@ -272,4 +280,5 @@ rue()
 facade()
 rues_quartiers()
 petites_images()
+videur()
 decor_porte()
