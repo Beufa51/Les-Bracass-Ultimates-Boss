@@ -23,6 +23,7 @@ const SOL = 440;                     // hauteur de la route à l'écran
 const X_VELO = 230;                  // le vélo reste à cet endroit de l'écran (c'est la rue qui défile)
 const DEMI_VELO = 50;                // demi-longueur du vélo pour les chocs (un peu plus petite que l'image : indulgent)
 const HAUT_PINTE = 200;              // hauteur des pintes au-dessus de la route (on ne les attrape qu'en sautant)
+const BOUTON_G = { x: 88, y: 448, r: 74 }, BOUTON_D = { x: LARGEUR - 88, y: 448, r: 74 };   // les 2 gros boutons
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 // hauteur et demi-largeur de chaque obstacle (chocs) ; debout et traverse sont plus hauts que le plus grand saut
 const TAILLE = { allonge: [40, 45], verre: [10, 28], debout: [160, 18], traverse: [160, 20], vomi: [4, 42] };
@@ -100,12 +101,12 @@ export class RemiVelo extends BossScene {
     this.input.on('pointerdown', (p) => {
       if (this.etat !== 'jeu') return;
       if (p.x < LARGEUR / 2) this.demanderDring();
-      else { this.sautDoigt = true; this.doigtSaut = p.id; this.tampon = V.tampon; }
+      else { this.sautDoigt = true; this.doigtSaut = p.id; this.tampon = V.tampon; this.appuiD = 0.15; }
     });
     this.input.on('pointerup', (p) => { if (p.id === this.doigtSaut) this.sautDoigt = false; });
   }
 
-  demanderDring() { if (this.recharge <= 0 && this.chute <= 0) this.sonner(); }
+  demanderDring() { this.appuiG = 0.15; if (this.recharge <= 0 && this.chute <= 0) this.sonner(); }
 
   genererParcours() {
     for (const o of this.obstacles) { o.g.destroy(); if (o.spr) o.spr.destroy(); }
@@ -174,10 +175,12 @@ export class RemiVelo extends BossScene {
     this.hudTemps = texte(this, 140, 26, '', 22, '#ffd84a', { fontStyle: 'bold' }).setDepth(900);
     this.hudBarre = this.add.graphics().setDepth(900);
     this.hudScore = texte(this, LARGEUR - 110, 26, '', 20, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
-    // les deux moitiés d'écran (rappel discret en bas)
+    // DEUX GROS BOUTONS dessinés en bas (toute la moitié d'écran marche, mais on voit où appuyer)
     const t = estTactile();
-    this.zoneG = texte(this, 120, 512, t ? '🔔 DRING  (touche ici)' : '🔔 DRING : Z / ◀', 18, '#ffe680', { fontStyle: 'bold' }).setDepth(900).setAlpha(0.8).setVisible(false);
-    this.zoneD = texte(this, LARGEUR - 120, 512, t ? '(touche ici)  SAUTE ▲' : 'SAUTE : ▲ / ESPACE', 18, '#9fe0ff', { fontStyle: 'bold' }).setDepth(900).setAlpha(0.8).setVisible(false);
+    this.gBoutons = this.add.graphics().setDepth(899);
+    this.zoneG = texte(this, BOUTON_G.x, BOUTON_G.y + 22, t ? 'DRING' : 'DRING (Z)', 22, '#ffe680', { fontStyle: 'bold' }).setDepth(900).setVisible(false);
+    this.zoneD = texte(this, BOUTON_D.x, BOUTON_D.y + 22, t ? 'SAUTE' : 'SAUTE (▲)', 22, '#9fe0ff', { fontStyle: 'bold' }).setDepth(900).setVisible(false);
+    this.appuiG = 0; this.appuiD = 0;
   }
 
   // ---------- boucle ----------
@@ -202,7 +205,7 @@ export class RemiVelo extends BossScene {
     this.invincible = Math.max(0, this.invincible - dt);
     this.ralenti = Math.max(0, this.ralenti - dt);
     this.glisse = Math.max(0, this.glisse - dt);
-    if (vientDAppuyer(T.haut) || vientDAppuyer(T.espace)) this.tampon = V.tampon;   // un saut demandé un peu trop tôt est gardé
+    if (vientDAppuyer(T.haut) || vientDAppuyer(T.espace)) { this.tampon = V.tampon; this.appuiD = 0.15; }   // un saut demandé un peu trop tôt est gardé
     this.tampon = Math.max(0, this.tampon - dt);
     if (vientDAppuyer(T.z) || vientDAppuyer(T.x) || vientDAppuyer(T.gauche)) this.demanderDring();
     const tenu = T.haut.isDown || T.espace.isDown || this.sautDoigt;
@@ -456,7 +459,22 @@ export class RemiVelo extends BossScene {
     hb.fillStyle(0xff4fd8, 1).fillRect(x1 - 6, 14, 12, 24);
     hb.fillStyle(0xffffff, 1).fillCircle(x0 + (x1 - x0) * pr, 26, 7);
     // sonnette : cercle qui se remplit pendant la recharge (à côté du rappel DRING)
-    hb.fillStyle(0x000000, 0.5).fillCircle(258, 512, 13);
-    hb.fillStyle(0xffe680, 1).slice(258, 512, 11, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - this.recharge / V.sonnette), false).fillPath();
+    // les 2 gros boutons : DRING (sa recharge fait le tour du bouton), SAUTE ; ils s'allument quand on appuie
+    const gb = this.gBoutons.clear();
+    if (this.etat === 'jeu') {
+      this.appuiG = Math.max(0, this.appuiG - 1 / 60); this.appuiD = Math.max(0, this.appuiD - 1 / 60);
+      const tenu = this.sautDoigt || this.touches.haut.isDown || this.touches.espace.isDown;
+      for (const [b, c, actif] of [[BOUTON_G, 0xffe680, this.appuiG > 0], [BOUTON_D, 0x9fe0ff, this.appuiD > 0 || tenu]]) {
+        gb.fillStyle(0x000000, actif ? 0.55 : 0.35).fillCircle(b.x, b.y, b.r);
+        gb.fillStyle(c, actif ? 0.45 : 0.15).fillCircle(b.x, b.y, b.r - 6);
+        gb.lineStyle(4, c, 0.9).strokeCircle(b.x, b.y, b.r);
+      }
+      // icône cloche / flèche
+      const g0 = BOUTON_G, d0 = BOUTON_D;
+      gb.fillStyle(0xffe680, 1).fillTriangle(g0.x - 18, g0.y - 2, g0.x + 18, g0.y - 2, g0.x, g0.y - 38).fillCircle(g0.x, g0.y - 26, 12).fillCircle(g0.x, g0.y + 2, 5);
+      gb.fillStyle(0x9fe0ff, 1).fillTriangle(d0.x - 22, d0.y - 6, d0.x + 22, d0.y - 6, d0.x, d0.y - 40);
+      // recharge de la sonnette : un arc autour du bouton DRING
+      if (this.recharge > 0) gb.lineStyle(8, 0x555555, 0.9).beginPath().arc(g0.x, g0.y, g0.r - 4, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (this.recharge / V.sonnette), false).strokePath();
+    }
   }
 }

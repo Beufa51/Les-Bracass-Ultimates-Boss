@@ -78,7 +78,11 @@
   d'écran (gauche DRING, droite SAUTE) ; roule tout seul en accélérant (`vitesseDepart` / `vitesseFin`) ; traverse = sonnette ;
   icônes ▲ / cloche au-dessus des obstacles (pas en CHAMPION) ; écarts en temps ; PINTES (+1 s) ; SÉRIE de 5 = +2 s ; score.
   PONG : caméra qui montre toute la table (tes verres en bas), courbe entière + encart « vue de côté » (`vueCote`).
-  PORTE : visée = cible qui se promène sur la porte, PARI pendant l'élan de Rémi (+60), arrêt sur image + score qui jaillit. : `python3 outils/remi/preparer_images.py`.
+  PORTE : visée = cible qui se promène sur la porte, PARI pendant l'élan de Rémi (+60), arrêt sur image + score qui jaillit.
+- V5b (retour : « toute la planche de gens au lieu d'un » ; boutons trop petits) : 3 images avaient changé de 1 px au
+  re-détourage (porte 344, bourrés 559 de haut, façade 762) → Phaser ne découpait plus les cases. Manifeste corrigé +
+  NOUVEL OUTIL `node outils/remi_verif.mjs` (taille des fichiers = manifeste). Vélo : 2 GROS boutons dessinés en bas
+  (DRING à gauche avec sa recharge en arc, SAUTE à droite), qui s'allument ; toute la moitié d'écran reste active. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

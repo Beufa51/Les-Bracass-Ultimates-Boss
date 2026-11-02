@@ -13,13 +13,13 @@ export const MANIFESTE = {
     // Rémi de face au beer pong : attend, lance, boit, nargue
     remi_pong: { fichier: 'sprites/remi/remi_pong.png', largeur: 403, hauteur: 577, images: 4, vitesse: 1 },
     // la porte, de profil : Rémi garde / coup / impact, toi garde / coup / impact (alignées sur le pied arrière)
-    remi_porte: { fichier: 'sprites/remi/remi_porte.png', largeur: 345, hauteur: 562, images: 6, vitesse: 1 },
+    remi_porte: { fichier: 'sprites/remi/remi_porte.png', largeur: 344, hauteur: 562, images: 6, vitesse: 1 },
     // les bourrés du vélo : debout (titube), sursaute (sonnette), allongé (bouteilles), traverse de face
-    remi_bourres: { fichier: 'sprites/remi/remi_bourres.png', largeur: 495, hauteur: 560, images: 4, vitesse: 1 },
+    remi_bourres: { fichier: 'sprites/remi/remi_bourres.png', largeur: 495, hauteur: 559, images: 4, vitesse: 1 },
     // le fond de rue de nuit (répétable), derrière le vélo
     remi_rue: { fichier: 'sprites/remi/remi_rue.jpg', largeur: 1702, hauteur: 575, images: 1, vitesse: 1 },
     // la façade du bar (arrivée du vélo)
-    remi_bar_facade: { fichier: 'sprites/remi/remi_bar_facade.png', largeur: 763, hauteur: 917, images: 1, vitesse: 1 },
+    remi_bar_facade: { fichier: 'sprites/remi/remi_bar_facade.png', largeur: 762, hauteur: 917, images: 1, vitesse: 1 },
     // fond du jeu de la porte (toilettes du bar) : sa porte est à x 774 - 914 (voir BATTANT dans RemiPorte.js)
     remi_porte_decor: { fichier: 'sprites/remi/remi_porte_decor.jpg', largeur: 960, hauteur: 536, images: 1, vitesse: 1 },
     // la porte VUE DE DOS : Rémi (garde, coup, impact) et toi (garde, élan, coup, impact), cases alignées à gauche
