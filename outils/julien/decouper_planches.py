@@ -78,7 +78,8 @@ OBJETS = ('julien_objets.jpg', [
     ('oeuf', (220, 620), 40), ('splat', (570, 640), 50), ('grenade', (890, 560), 70), ('nuage', (1215, 540), 160)])
 
 # gros objets du décor, une image chacun : nom → hauteur finale
-SEULS = {'statue': 240, 'camion': 140, 'colonne': 220}
+SEULS = {'statue': 240, 'camion': 140, 'colonne': 220,
+         'julien_vaincu_papier': 240}   # Julien vaincu SANS œuf (19d) : un seul dessin, étoiles et feuilles comprises
 
 OBJETS_ARMES = ('julien_objets_armes.jpg', [
     ('tomates', (245, 215), 90), ('eau_pistolet', (760, 240), 70), ('fumigenes', (1215, 215), 90),

@@ -30,7 +30,7 @@ const MURS_IMAGES = { 1: 'mur_classe', 3: 'fenetres_classe', 4: 'porte_classe', 
 // vraies images des objets (table avec sa chaise, bureau, projectiles) et leur hauteur dans le monde
 const OBJETS_IMAGES = ['table', 'bureau', 'livre', 'dico', 'copie', 'craie'];
 const HAUTEURS_IMAGES_CLASSE = { table: 0.72, bureau: 0.62, livre: 0.15, dico: 0.17, copie: 0.15, craie: 0.06 };
-const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'touche_papier', 'dos', 'rage', 'vaincu'];
+const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'touche_papier', 'dos', 'rage', 'vaincu', 'vaincu_papier'];
 const ELEVES_IMAGES = [0, 1, 2, 3].flatMap(k => [`eleve_${k}_content`, `eleve_${k}_cache`]);
 const GROSSES = new Set(['eventail', 'mur', 'murs', 'deluge', 'dico', 'aimant', 'rafale']);   // après elles : il se retourne (fenêtre de punition)
 // ce qu'on annonce en grand quand il prépare une attaque, et le conseil la 1re fois
@@ -575,7 +575,7 @@ export class JulienClasse extends JulienManif {
   imageEnnemi(e) {
     if (e.type !== 'julien') return super.imageEnnemi(e);
     const s = this.T.spr;
-    if (e.etat === 'fuite') return s.julien_vaincu;
+    if (e.etat === 'fuite') return s.julien_vaincu_papier || s.julien_vaincu;   // vaincu à la sarbacane : sans jaune d'œuf
     if (e.etat === 'touche' || e.flash > 0) return s.julien_touche_papier || s.julien_rage || s.julien_touche;   // touché par une BOULETTE (sans jaune d'œuf)
     if (e.etat === 'dos') return s.julien_dos || s.julien_marche0;
     if (e.etat === 'prepare' || e.etat === 'aimant') return s.julien_bras;
