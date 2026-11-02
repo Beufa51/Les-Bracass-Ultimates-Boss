@@ -65,15 +65,16 @@ export class RemiPorte extends BossScene {
     laisserPasserTactile(this);   // les blocs de boutons cachés ne mangent plus les touchers
     jouerMusique(this, 'remi_musique_bar');   // la musique du bar (dès l'écran des commandes)
     this.input.on('pointerdown', (p) => { this.toucher = true; this.toucheX = p.x; });
-    this.gel = 0; this.bonusPari = 0; this.cible = { x: 0, y: 0 };
+    this.gel = 0; this.bonusPari = 0; this.solidite = R.solidite; this.cassePar = null; this.cible = { x: 0, y: 0 };
 
     etiquettesTactiles({ ...VIDES, espace: 'OK' });
     const t = estTactile();
     this.afficherIntro('RÉMI - La porte', [
       REPLIQUES.porteIntro,
       `1) ÉLAN : tape ${t ? 'GAUCHE / DROITE de l\'écran' : '◀ ▶'} EN ALTERNANCE, le plus vite possible`,
-      `2) VISÉE : ${t ? 'touche' : 'ESPACE'} quand le curseur est dans la zone VERTE`,
-      `${R.manches} manches : la plus grosse frappe gagne la manche.`,
+      `2) VISÉE : ${t ? 'touche' : 'ESPACE'} quand la cible passe sur ton poing (+)`,
+      'Chaque coup abîme la porte (barre de SOLIDITÉ) : celui qui la fait CÉDER gagne tout !',
+      `Sinon, en ${R.manches} manches : la plus grosse frappe gagne la manche.`,
     ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.mancheSuivante(); }));
   }
 
@@ -119,7 +120,9 @@ export class RemiPorte extends BossScene {
     annonce(this, decisive ? 'MANCHE DÉCISIVE !' : `MANCHE ${this.manche}`, decisive ? '#ff5a5a' : '#ffd84a', 1.2);
     if (decisive) jouerSon(this, 'remi_foule');
     this.majHud();
-    this.time.delayedCall(1300, () => this.tourRemi());
+    // chacun commence une manche sur deux (manche 1 : Rémi)
+    this.ordre = this.manche % 2 ? ['remi', 'toi'] : ['toi', 'remi']; this.etape = 0;
+    this.time.delayedCall(1300, () => this.suite());
   }
 
   tourRemi() {
@@ -145,7 +148,7 @@ export class RemiPorte extends BossScene {
       this.bonusPari = bon ? 60 : 0;
       this.time.delayedCall(1000, () => bulle(this, bon ? 'PARI GAGNÉ : +60 à ta frappe !' : 'Pari perdu...', bon ? '#7fff7f' : '#ffb0b0', 1.2, 200));
     }
-    this.time.delayedCall(2100, () => this.tourToi());
+    this.time.delayedCall(2100, () => this.suite());
   }
 
   tourToi() {
@@ -231,12 +234,25 @@ export class RemiPorte extends BossScene {
     if (precision === 1 && this.elanFinal > 0.9) { bulle(this, 'COUP DE GRÂCE !', '#ffd84a', 1.2, 120); jouerSon(this, 'remi_foule'); }
     else if (precision === 1) bulle(this, 'PILE DESSUS !', '#7fff7f', 1, 120);
     this.frapper('toi', s);
-    this.time.delayedCall(1700, () => this.finManche());
+    this.time.delayedCall(1700, () => this.suite());
   }
 
   // la frappe : pose, tremblement, fissures, compteur de la borne
   frapper(qui, score) {
     this.scores[qui] = score;
+    // la SOLIDITÉ commune de la porte baisse ; celui qui la fait céder gagne tout
+    this.solidite = Math.max(0, this.solidite - score);
+    if (this.solidite <= 0 && !this.cassePar) {
+      this.cassePar = qui;
+      this.time.delayedCall(1300, () => {
+        if (qui === 'toi') this.gagner();
+        else { this.porteTombee = true; if (this.battant) this.tweens.add({ targets: this.battant, x: this.bat.x + this.bat.l, scaleX: 0.08, duration: 260 });
+          this.time.delayedCall(900, () => ecranPerdu(this, 'RÉMI A DÉFONCÉ LA PORTE', REPLIQUES.portePerdu, this.nomDiff)); }
+      });
+    } else if (this.solidite < R.solidite * 0.3 && !this.alerteSolidite) {
+      this.alerteSolidite = true;
+      this.time.delayedCall(1100, () => bulle(this, 'La porte ne tient plus qu\'à un fil : le prochain gros coup la fait céder !', '#ff9a5a', 2, 200));
+    }
     // « coup » (bras qui part) puis « frappe » (impact, traits de vitesse)
     if (qui === 'remi') this.poseRemi = 'coup'; else this.poseToi = 'coup';
     this.time.delayedCall(90, () => { if (qui === 'remi') this.poseRemi = 'frappe'; else this.poseToi = 'frappe'; });
@@ -284,6 +300,13 @@ export class RemiPorte extends BossScene {
     return pts;
   }
 
+  // le coup suivant de la manche, ou la fin de la manche ; rien si la porte a déjà cédé
+  suite() {
+    if (this.cassePar || this.termine) return;
+    const qui = this.ordre[this.etape++];
+    if (qui === 'remi') this.tourRemi(); else if (qui === 'toi') this.tourToi(); else this.finManche();
+  }
+
   finManche() {
     const { toi: a, remi: b } = this.scores;
     if (a > b) { this.points.toi++; annonce(this, 'MANCHE POUR TOI !', '#7fff7f', 1.1); }
@@ -309,6 +332,15 @@ export class RemiPorte extends BossScene {
   }
 
   majHud() { this.hud.setText(`MANCHE ${this.manche}   TOI ${this.points.toi} - ${this.points.remi} RÉMI`); }
+
+  // barre de SOLIDITÉ de la porte (en haut au milieu)
+  dessinerSolidite(j) {
+    const x0 = 420, L = 260, v = this.solidite / R.solidite;
+    j.fillStyle(0x000000, 0.6).fillRect(x0 - 6, 12, L + 12, 30);
+    j.fillStyle(0x3a2a1a, 1).fillRect(x0, 18, L, 18);
+    j.fillStyle(v < 0.3 ? (Math.floor(this.horloge * 6) % 2 ? 0xff3030 : 0xffd84a) : 0xc89050, 1).fillRect(x0, 18, L * v, 18);
+    if (!this.txtSolidite) this.txtSolidite = texte(this, x0 + L / 2, 52, 'SOLIDITÉ DE LA PORTE', 14, '#ffd84a').setDepth(901);
+  }
 
   dessiner(dt) {
     this.tremble = Math.max(0, this.tremble - dt * 2.5);
@@ -393,6 +425,7 @@ export class RemiPorte extends BossScene {
     placer(this.gToi, 'toi', toi, this.poseToi);
     // jauges (ton tour)
     const j = this.gJauges.clear();
+    if (this.etat !== 'intro') this.dessinerSolidite(j);
     if (this.etat === 'elan' || this.etat === 'visee') {
       const v = this.etat === 'elan' ? this.jauge : this.elanFinal;
       // jauge en 10 PALIERS colorés, comme une borne de bar (C4)

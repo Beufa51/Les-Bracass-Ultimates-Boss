@@ -69,6 +69,7 @@ export const PONG = {
 };
 
 export const PORTE = {
+  solidite: 4200,         // SOLIDITÉ de la porte (commune) : chaque coup en enlève son score ; celui qui la fait céder GAGNE TOUT
   manches: 3,             // en 3 manches gagnantes (la meilleure frappe de la manche gagne)
   elan: 3,                // secondes d'ÉLAN (taper gauche / droite en alternance)
   parTape: 0.09,          // jauge gagnée par tape alternée
