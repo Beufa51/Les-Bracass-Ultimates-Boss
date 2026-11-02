@@ -187,6 +187,14 @@ def facade():
     im.save(DST + 'remi_bar_facade.png')
     print('remi_bar_facade.png', im.size)
 
+def decor_porte():
+    # fond du jeu de la porte (toilettes du bar), mis à la largeur du jeu (960) -> remi_porte_decor.jpg
+    # (la porte de l'image est à x ≈ 774 - 914, sol à y ≈ 467 : voir RemiPorte.js)
+    im = Image.open(SRC + 'remi_porte_decor.jpg').convert('RGB')
+    im = im.resize((960, round(im.size[1] * 960 / im.size[0])), Image.LANCZOS)
+    im.save(DST + 'remi_porte_decor.jpg', quality=88)
+    print('remi_porte_decor.jpg', im.size)
+
 planche_velo()
 presentation()
 planche_pong()
@@ -194,3 +202,4 @@ planche_porte()
 planche_bourres()
 rue()
 facade()
+decor_porte()

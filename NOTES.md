@@ -46,7 +46,9 @@
   planche des bourrés → `remi_bourres.png` (debout, sursaute, allongé, traverse de face ; teinte au hasard pour varier ;
   `BOURRE` = taille en tête de RemiVelo.js ; allongé : collision 40 px de haut) ; rue de nuit → `remi_rue.jpg`
   (bande noire coupée, bords fondus sur 90 px = répétable ; défile à 0,8 x la route ; remplace ciel, immeubles et lampadaires dessinés) ; façade du bar → `remi_bar_facade.png` (arrivée ; Rémi l'attend
-  devant, en garde : case 0 de `remi_porte` retournée) : `python3 outils/remi/preparer_images.py`.
+  devant, en garde : case 0 de `remi_porte` retournée) ; décor des WC → `remi_porte_decor.jpg` (960 x 536 ; le battant de sa
+  porte est découpé du fond — `BATTANT` dans RemiPorte.js — : il tremble, se fissure et s'ouvre d'un coup à la victoire).
+  TOUTES LES IMAGES DE RÉMI SONT INTÉGRÉES. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

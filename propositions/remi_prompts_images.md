@@ -59,7 +59,7 @@ Ligne 1 : le personnage de la photo jointe (casquette noire, tee-shirt orange) :
 bras tendu (frappe, traits de vitesse). Ligne 2 : un jeune homme en tee-shirt bleu, mêmes 3 poses. Aucun texte, cases bien séparées.
 ```
 
-## 8. Les toilettes du bar (fond de la porte) — `remi_porte_decor.jpg`
+## 8. Les toilettes du bar (fond de la porte) — `remi_porte_decor.jpg` ✅ REÇUE ET INTÉGRÉE
 ```
 Décor de jeu style manga/anime : couloir des toilettes d'un bar, vu de côté, carrelage, néon blafard, une porte de WC en bois
 à DROITE de l'image (bien visible, de face, pictogramme WC), murs couverts d'autocollants. Aucun personnage, image horizontale 16:9.

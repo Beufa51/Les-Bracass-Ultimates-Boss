@@ -15,7 +15,9 @@ import { IDENTITE, PORTE as R, REPLIQUES } from './reglages.js';
 import { remi, toi } from './dessins.js';
 import { bulle, annonce, ecranPerdu, difficulteOuChoix, hasard, choisir } from './commun.js';
 
-const SOL = 470, X_FRAPPE = 500, X_ATTENTE = 170, PORTE_X = 640;
+const SOL = 470, X_FRAPPE = 500, X_ATTENTE = 170;
+// la porte du décor illustré (remi_porte_decor.jpg, 960 x 536) : son battant, pour le faire trembler / tomber
+const BATTANT = { x: 774, y: 147, l: 140, h: 322 };
 const ECHELLE = 0.45, POING = 342;   // POING : où est le poing (px) dans la case de l'impact (largeur de la pose)
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 
@@ -28,6 +30,8 @@ export class RemiPorte extends BossScene {
     this.jauge = 0; this.curseur = 0; this.chrono = 0; this.tapes = 0;
     this.poseToi = 'garde'; this.poseRemi = 'garde'; this.frappeur = 'remi';
     this.fissures = []; this.tremble = 0; this.compteur = 0; this.compteurCible = 0; this.porteTombee = false;
+    this.decorImage = this.textures.exists('remi_porte_decor');
+    this.px = this.decorImage ? BATTANT.x : 640;   // bord gauche de la porte
     this.decor();
     this.gPorte = this.add.graphics().setDepth(3);
     this.gRemi = this.add.graphics().setDepth(5);
@@ -38,7 +42,7 @@ export class RemiPorte extends BossScene {
       this.sprToi = this.add.sprite(0, 0, 'remi_porte', 3).setOrigin(0, 1).setScale(ECHELLE).setDepth(6);
     }
     this.gJauges = this.add.graphics().setDepth(900);
-    this.ecran = texte(this, PORTE_X + 70, 60, '000', 54, '#ff3030', { fontStyle: 'bold', stroke: '#300000', strokeThickness: 6, backgroundColor: '#100000' }).setDepth(4);
+    this.ecran = texte(this, this.decorImage ? this.px - 170 : this.px + 70, this.decorImage ? 80 : 60, '000', 54, '#ff3030', { fontStyle: 'bold', stroke: '#300000', strokeThickness: 6, backgroundColor: '#100000' }).setDepth(4);
     this.hud = texte(this, 200, 28, '', 22, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
     this.consigne = texte(this, LARGEUR / 2, 505, '', 30, '#ffd84a', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 4 } }).setDepth(900).setVisible(false);
     this.touches = creerTouches(this);
@@ -56,6 +60,15 @@ export class RemiPorte extends BossScene {
 
   decor() {
     this.cameras.main.setBackgroundColor('#141018');
+    if (this.decorImage) {
+      // fond illustré ; le battant de la porte est découpé du fond (il tremble, il tombe), avec le trou noir derrière
+      const t = this.textures.get('remi_porte_decor');
+      if (!t.has('battant')) t.add('battant', 0, BATTANT.x, BATTANT.y, BATTANT.l, BATTANT.h);
+      this.add.image(0, 0, 'remi_porte_decor').setOrigin(0, 0).setDepth(1);
+      this.add.rectangle(BATTANT.x, BATTANT.y, BATTANT.l, BATTANT.h, 0x050308).setOrigin(0, 0).setDepth(2);
+      this.battant = this.add.image(BATTANT.x, BATTANT.y, 'remi_porte_decor', 'battant').setOrigin(0, 0).setDepth(2.5);
+      return;
+    }
     const g = this.add.graphics().setDepth(1);
     g.fillGradientStyle(0x2a2030, 0x2a2030, 0x18121c, 0x18121c, 1).fillRect(0, 0, LARGEUR, SOL);
     // carrelage des toilettes du bar
@@ -64,8 +77,8 @@ export class RemiPorte extends BossScene {
     for (let x = 0; x < LARGEUR; x += 40) g.lineBetween(x, 0, x, SOL);
     g.fillStyle(0x3a2a22, 1).fillRect(0, SOL, LARGEUR, HAUTEUR - SOL);
     // cadre de la porte
-    g.fillStyle(0x2a1a10, 1).fillRect(PORTE_X - 14, 110, 172, SOL - 110);
-    const s = texte(this, PORTE_X + 70, 128, 'WC', 20, '#ffffff').setDepth(4);
+    g.fillStyle(0x2a1a10, 1).fillRect(this.px - 14, 110, 172, SOL - 110);
+    const s = texte(this, this.px + 70, 128, 'WC', 20, '#ffffff').setDepth(4);
     s.setBackgroundColor('#2a6ad0');
   }
 
@@ -154,7 +167,7 @@ export class RemiPorte extends BossScene {
   }
 
   fissure() {
-    const pts = [[PORTE_X + hasard(4, 60), hasard(250, 300)]];   // autour de l'impact du poing
+    const pts = [[this.px + hasard(4, 60), hasard(250, 300)]];   // autour de l'impact du poing
     for (let k = 0; k < 4; k++) { const [x, y] = pts[pts.length - 1]; pts.push([x + hasard(-26, 26), y + hasard(-30, 30)]); }
     return pts;
   }
@@ -176,6 +189,7 @@ export class RemiPorte extends BossScene {
   gagner() {
     this.etat = 'fin';
     this.porteTombee = true;
+    if (this.battant) this.tweens.add({ targets: this.battant, x: BATTANT.x + BATTANT.l, scaleX: 0.08, duration: 260, ease: 'Cubic.In' });
     jouerSon(this, 'remi_porte_fort');
     this.cameras.main.shake(500, 0.02);
     annonce(this, 'LA PORTE CÈDE !', '#ffd84a', 1.4);
@@ -191,9 +205,15 @@ export class RemiPorte extends BossScene {
     const dx = Math.sin(this.horloge * 60) * this.tremble * 5;
     g.setPosition(dx, 0);
     if (this.porteTombee) { g.setRotation(0.25).setPosition(160, -60); }
-    g.fillStyle(0x8a5a2b, 1).fillRect(PORTE_X, 124, 144, SOL - 124);
-    g.lineStyle(3, 0x5a3818, 1).strokeRect(PORTE_X + 14, 150, 116, 120).strokeRect(PORTE_X + 14, 300, 116, 140);
-    g.fillStyle(0xd8c060, 1).fillCircle(PORTE_X + 20, 300, 6);
+    if (this.battant) {
+      // à la fin, le battant s'ouvre d'un coup vers l'intérieur (il « pivote » sur ses gonds) et laisse le trou noir
+      if (this.porteTombee) g.setVisible(false);
+      else this.battant.setPosition(BATTANT.x + g.x, BATTANT.y);
+    } else {
+    g.fillStyle(0x8a5a2b, 1).fillRect(this.px, 124, 144, SOL - 124);
+    g.lineStyle(3, 0x5a3818, 1).strokeRect(this.px + 14, 150, 116, 120).strokeRect(this.px + 14, 300, 116, 140);
+    g.fillStyle(0xd8c060, 1).fillCircle(this.px + 20, 300, 6);
+    }
     for (const f of this.fissures) {
       g.lineStyle(3, 0x1a0e06, 1).beginPath(); g.moveTo(f[0][0], f[0][1]);
       for (const [x, y] of f.slice(1)) g.lineTo(x, y);
@@ -206,7 +226,7 @@ export class RemiPorte extends BossScene {
       if (spr) {
         // illustrations (cases alignées à gauche = le pied arrière) : le poing de l'impact touche la porte
         const p = this.frappeur === qui ? pose : 'garde', base = qui === 'remi' ? 0 : 3;
-        const x = this.frappeur === qui ? PORTE_X + 6 - POING * ECHELLE : (qui === 'remi' ? 40 : 230);
+        const x = this.frappeur === qui ? this.px + 6 - POING * ECHELLE : (qui === 'remi' ? 40 : 230);
         spr.setFrame(base + ({ coup: 1, frappe: 2 }[p] ?? 0));
         spr.setPosition(x - (p === 'elan' ? 22 : 0), SOL + 4).setRotation(p === 'elan' ? -0.1 : 0);
         return;

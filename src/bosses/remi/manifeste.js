@@ -20,6 +20,8 @@ export const MANIFESTE = {
     remi_rue: { fichier: 'sprites/remi/remi_rue.jpg', largeur: 1702, hauteur: 575, images: 1, vitesse: 1 },
     // la façade du bar (arrivée du vélo)
     remi_bar_facade: { fichier: 'sprites/remi/remi_bar_facade.png', largeur: 763, hauteur: 917, images: 1, vitesse: 1 },
+    // fond du jeu de la porte (toilettes du bar) : sa porte est à x 774 - 914 (voir BATTANT dans RemiPorte.js)
+    remi_porte_decor: { fichier: 'sprites/remi/remi_porte_decor.jpg', largeur: 960, hauteur: 536, images: 1, vitesse: 1 },
     remi_presentation: { fichier: 'sprites/remi/remi_presentation.png', largeur: 832, hauteur: 1202, images: 1, vitesse: 1 },
   },
   sons: {
