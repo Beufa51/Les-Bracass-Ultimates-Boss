@@ -25,6 +25,8 @@ export const MANIFESTE = {
     remi_presentation: { fichier: 'sprites/remi/remi_presentation.png', largeur: 832, hauteur: 1202, images: 1, vitesse: 1 },
   },
   sons: {
+    // musique du bar (Star Wars, « Cantina Band », donnée par le propriétaire) : beer pong et porte
+    remi_musique_bar: { fichier: 'audio/remi/remi_musique_bar.mp3', musique: true, volume: 0.4 },
     // vélo
     remi_sonnette:   bip(1760, 0.18),
     remi_saut:       bip(520, 0.06),

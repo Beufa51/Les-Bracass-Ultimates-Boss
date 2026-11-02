@@ -48,7 +48,9 @@
   (bande noire coupée, bords fondus sur 90 px = répétable ; défile à 0,8 x la route ; remplace ciel, immeubles et lampadaires dessinés) ; façade du bar → `remi_bar_facade.png` (arrivée ; Rémi l'attend
   devant, en garde : case 0 de `remi_porte` retournée) ; décor des WC → `remi_porte_decor.jpg` (960 x 536 ; le battant de sa
   porte est découpé du fond — `BATTANT` dans RemiPorte.js — : il tremble, se fissure et s'ouvre d'un coup à la victoire).
-  TOUTES LES IMAGES DE RÉMI SONT INTÉGRÉES. : `python3 outils/remi/preparer_images.py`.
+  TOUTES LES IMAGES DE RÉMI SONT INTÉGRÉES.
+- MUSIQUE : `assets/audio/remi/remi_musique_bar.mp3` (Star Wars « Cantina Band », donnée par le propriétaire), au beer pong
+  et à la porte (repart du début à chaque jeu). Le vélo n'a pas encore de musique. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

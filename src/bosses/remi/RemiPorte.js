@@ -10,6 +10,7 @@ import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { texte } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
+import { jouerMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, PORTE as R, REPLIQUES } from './reglages.js';
 import { remi, toi } from './dessins.js';
@@ -46,6 +47,7 @@ export class RemiPorte extends BossScene {
     this.hud = texte(this, 200, 28, '', 22, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
     this.consigne = texte(this, LARGEUR / 2, 505, '', 30, '#ffd84a', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 4 } }).setDepth(900).setVisible(false);
     this.touches = creerTouches(this);
+    jouerMusique(this, 'remi_musique_bar');   // la musique du bar (dès l'écran des commandes)
     this.input.on('pointerdown', () => { this.toucher = true; });
 
     etiquettesTactiles({ ...VIDES, espace: 'OK' });

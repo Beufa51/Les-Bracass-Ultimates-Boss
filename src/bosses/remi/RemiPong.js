@@ -11,6 +11,7 @@ import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { texte } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
+import { jouerMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, PONG as P, REPLIQUES } from './reglages.js';
 import { remi } from './dessins.js';
@@ -57,6 +58,7 @@ export class RemiPong extends BossScene {
     this.txtCourt = texte(this, 225, 463, 'court', 16, '#ffb0b0').setDepth(901).setVisible(false);
     this.txtLoin = texte(this, 735, 463, 'loin', 16, '#ffb0b0').setDepth(901).setVisible(false);
     this.touches = creerTouches(this);
+    jouerMusique(this, 'remi_musique_bar');   // la musique du bar (dès l'écran des commandes)
     this.installerVisee();
     this.pose = 'face'; this.poseFin = 0;
 
