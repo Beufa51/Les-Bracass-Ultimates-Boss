@@ -68,6 +68,7 @@ export class JulienLycee extends JulienManif {
   lancerMusique() { jouerMusique(this, 'julien_lycee_musique'); }   // thème de Duke Nukem 3D
 
   create() {
+    this.txtLycee = null;   // (la scène est réutilisée quand on rejoue : ne pas toucher au texte de la partie d'avant)
     super.create();
     this.lblFlics.setText('REPOUSSÉS');
     this.lblLycee.setText('CARNET');

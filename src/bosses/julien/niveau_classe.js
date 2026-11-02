@@ -38,8 +38,8 @@ export const ELEVES = {
 
 // Répliques de Julien (à PERSONNALISER avec Fabien lors de la passe de finition)
 export const REPLIQUES = {
-  debut: '« Tiens, un retardataire… et plein d\'œufs ! Vous êtes en RETARD ! »',
-  lancer: ['« Ouvrez vos livres page 42 ! »', '« Silence au fond ! »', '« On ne mange pas d\'œufs en classe ! »',
+  debut: '« Tiens, un retardataire… et avec une SARBACANE ! Vous êtes en RETARD ! »',
+  lancer: ['« Ouvrez vos livres page 42 ! »', '« Silence au fond ! »', '« On ne souffle pas dans les stylos en classe ! »',
     '« Tu copieras 100 fois : je ne manifeste pas ! »', '« Et ça se dit étudiant ! »'],
   dos: ['« Notez bien ! »', '« Je l\'écris au tableau… »', '« Page 42, exercice 3… »'],
   mur: '« SORTEZ UNE FEUILLE ! »',
@@ -50,6 +50,6 @@ export const REPLIQUES = {
   regle: '« Recule ! »',
   phase2: '« INTERRO SURPRISE ! On éteint la lumière ! »',
   phase3: '« ÇA SUFFIT ! Tout le monde en RETENUE ! »',   // il renverse son bureau, l'alarme incendie sonne
-  touche: ['« Mon costume ! »', '« Zéro de conduite ! »', '« Chez le proviseur ! »'],
+  touche: ['« Ma veste ! »', '« Zéro de conduite ! »', '« Chez le proviseur ! »'],
   vaincu: '« Bon… d\'accord… pas d\'interro pour cette fois. »',
 };

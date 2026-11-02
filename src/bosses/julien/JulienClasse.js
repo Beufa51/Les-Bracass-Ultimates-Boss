@@ -48,7 +48,7 @@ const ANNONCES = {
   mur: ['SORTEZ UNE FEUILLE !', 'Des MURS DE COPIES en rafale : suis le TROU, il se déplace à chaque mur !'],
   dico: ['LE DICTIONNAIRE !', 'Il rebondit sur les murs : reste loin des murs !'],
   aimant: ['AU TABLEAU !', 'Il t\'attire : COURS vers le fond ou colle-toi à une table !'],
-  confisque: ['DONNE-MOI ÇA !', 'Trop près : il va CONFISQUER ton arme. Recule !'],
+  confisque: ['DONNE-MOI ÇA !', 'Trop près : il va CONFISQUER ta sarbacane. Recule !'],
   regle: ['LA RÈGLE !', 'Au contact, il frappe : RECULE !'],
   craies: ['CRAIES !', 'Des craies en rafale : planque-toi derrière une TABLE !'],
   deluge: ['CONTRÔLE SURPRISE !', 'Une PLUIE de copies : planque-toi derrière une TABLE ou faufile-toi dans les trous !'],
@@ -135,6 +135,8 @@ export class JulienClasse extends JulienManif {
   lancerMusique() { jouerMusique(this, 'julien_boss_musique'); }   // Streets of Rage 2, niveau 1
 
   create() {
+    // (bug corrigé : la scène est RÉUTILISÉE quand on rejoue ; ces textes-là venaient de la partie d'avant, détruits → plantage)
+    this.txtPhase = null; this.dessus = null; this.confisque = null;
     super.create();
     // barre du bas : la vie de Julien à la place des policiers, la phase à la place de la boussole
     this.lblFlics.setText('JULIEN');
@@ -180,7 +182,7 @@ export class JulienClasse extends JulienManif {
     this.j.armes = new Set(['sarbacane']); this.j.arme = 'sarbacane';   // armes de la manif interdites au lycée
     this.ennemis = []; this.objets = []; this.tirs = []; this.fumees = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.farines = []; this.rideaux = []; this.secrets = new Map(); this.secretsTrouves = 0; this.fourgonFait = true;
-    this.livres = []; this.finDemandee = false;
+    this.livres = []; this.finDemandee = false; this.dessus = null;
     this.eleves = []; this.alarme = false; this.alarmeT = 0; this.confisque = null;
     this.vus = new Set(); this.bureau = null;
     this.plan = this.plan.map((ligne, y) => [...ligne].map((c, x) => {
