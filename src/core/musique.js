@@ -55,7 +55,7 @@ export function jouerMusique(scene, cle) {
 
 // À appeler quand on change le volume de la musique dans les réglages
 export function majVolumeMusique() {
-  for (const p of Object.values(pistes)) p.audio.volume = p.base * Sauvegarde.volume('musique');
+  for (const p of Object.values(pistes)) p.audio.volume = p.base * (p.facteur ?? 1) * Sauvegarde.volume('musique');
 }
 
 // ---------- Ajouts optionnels (utilisés par le battle de danse de Kédric) ----------
@@ -76,4 +76,13 @@ export function tempsMusique(cle) {
   const p = pistes[cle];
   if (!p || p.audio.paused || p.audio.seeking || p.audio.readyState < 3) return null;
   return p.audio.currentTime;
+}
+
+// ---------- Ajout optionnel (utilisé par la porte de Rémi) ----------
+// Baisse / coupe une musique SANS l'arrêter (f : 1 = normal, 0 = muette) ; le réglage de volume reste appliqué
+export function facteurMusique(cle, f) {
+  const p = pistes[cle];
+  if (!p) return;
+  p.facteur = Math.max(0, Math.min(1, f));
+  p.audio.volume = p.base * p.facteur * Sauvegarde.volume('musique');
 }

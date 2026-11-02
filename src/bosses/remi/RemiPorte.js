@@ -12,7 +12,7 @@ import { creerTouches } from '../../core/clavier.js';
 import { texte } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
-import { jouerMusique } from '../../core/musique.js';
+import { jouerMusique, facteurMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, PORTE as R, REPLIQUES } from './reglages.js';
 import { bulle, annonce, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile } from './commun.js';
@@ -56,7 +56,10 @@ export class RemiPorte extends BossScene {
     this.consigne = texte(this, LARGEUR / 2, 505, '', 24, '#ffd84a', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 4 } }).setDepth(900).setVisible(false);
     this.touches = creerTouches(this);
     laisserPasserTactile(this);
-    jouerMusique(this, 'remi_musique_bar');
+    // la musique (Street Fighter II, Ken) : on la BAISSE quand le videur approche, on la COUPE net quand il regarde
+    // (« on fait genre de rien »), elle repart quand il s'en va
+    jouerMusique(this, 'remi_musique_porte'); this.volMusique = 1;
+    this.events.once('shutdown', () => facteurMusique('remi_musique_porte', 1));
     // MAINTENIR = le doigt posé n'importe où (ou ESPACE)
     this.input.on('pointerdown', () => { this.doigt = true; });
     this.input.on('pointerup', () => { this.doigt = false; });
@@ -159,7 +162,7 @@ export class RemiPorte extends BossScene {
     } else if (v.etat === 'annonce') {
       v.pas -= dt;
       if (v.pas <= 0) { v.pas = 0.3; jouerSon(this, 'remi_atterrit', { rate: 0.6 }); }   // ses pas
-      if (v.t <= 0) { v.etat = 'regarde'; v.t = hasard(R.videurRegard[0], R.videurRegard[1]); v.pose = 0; v.vu = false; }
+      if (v.t <= 0) { v.etat = 'regarde'; v.t = hasard(R.videurRegard[0], R.videurRegard[1]); v.pose = 0; v.vu = false; jouerSon(this, 'remi_scratch'); }
     } else if (v.etat === 'regarde') {
       // il regarde : celui qui charge (ou qui vient juste de frapper) se fait ATTRAPER
       const fautif = (this.etat === 'toi' || this.etat === 'remi') && this.charge ? this.frappeur
@@ -295,6 +298,10 @@ export class RemiPorte extends BossScene {
 
   dessinerVideur(dt) {
     const v = this.videur, o = this.gOmbre.clear();
+    // volume de la musique selon le videur (baissée quand il approche, coupée quand il regarde)
+    const voulu = this.etat === 'fin' ? 1 : v.etat === 'regarde' ? 0 : v.etat === 'annonce' ? 0.35 : 1;
+    this.volMusique += (voulu - this.volMusique) * Math.min(1, dt * (voulu === 0 ? 30 : 4));
+    facteurMusique('remi_musique_porte', this.volMusique);
     // son OMBRE s'allonge sur le sol du couloir pendant qu'il approche
     if (v.etat === 'annonce' || v.etat === 'regarde') {
       const k = v.etat === 'annonce' ? 1 - v.t / (R.videurAnnonce * this.diff.videur) : 1;

@@ -138,7 +138,10 @@
   rouge), regard 1-1,5 s : qui charge (ou vient de frapper) est ATTRAPÉ = coup perdu + porte rafistolée (`scotch` +300).
   Rémi joue pareil (`remiCharge`, `remiPrudent` : il peut se faire attraper). Une seule règle : SOLIDITÉ 4500, celui qui la
   fait céder gagne. La porte se bombe à chaque coup. Plus de manches ni de pari. Bots : prudent gagne (3 coups contre 3),
-  gourmand attrapé 4 fois et perd. : `python3 outils/remi/preparer_images.py`.
+  gourmand attrapé 4 fois et perd.
+- MUSIQUE DE LA PORTE : `remi_musique_porte.mp3` (Street Fighter II, Ken, donnée par le propriétaire) à la place de la Cantina ;
+  baissée à 35 % quand le videur approche, COUPÉE net (+ « scratch » `remi_scratch`) quand il regarde, revient ensuite.
+  Ajout optionnel dans le moteur : `facteurMusique(cle, f)` (src/core/musique.js), sans effet sur les autres boss. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

@@ -39,6 +39,8 @@ export const MANIFESTE = {
     // musique du bar (Star Wars, « Cantina Band », donnée par le propriétaire) : beer pong et porte
     // musique du vélo (F-Zero, « Big Blue », donnée par le propriétaire)
     remi_musique_velo: { fichier: 'audio/remi/remi_musique_velo.mp3', musique: true, volume: 0.4 },
+    // musique de la porte (Street Fighter II, thème de Ken, donnée par le propriétaire) : se coupe quand le videur regarde
+    remi_musique_porte: { fichier: 'audio/remi/remi_musique_porte.mp3', musique: true, volume: 0.45 },
     remi_musique_bar: { fichier: 'audio/remi/remi_musique_bar.mp3', musique: true, volume: 0.4 },
     // bruitages générés au code : python3 outils/remi/generer_sons.py assets/audio/remi (bip de secours si le fichier manque)
     remi_sonnette: son('sonnette', 1760, 0.18),
@@ -59,5 +61,6 @@ export const MANIFESTE = {
     remi_tape: son('tape', 400, 0.03),
     remi_porte: son('porte', 120, 0.18),
     remi_porte_fort: son('porte_fort', 70, 0.4),
+    remi_scratch: son('scratch', 300, 0.2),
   },
 };

@@ -96,3 +96,9 @@ place(s, np.tanh(2.5 * sum(a * np.sin(2 * np.pi * f * t(0.6)) * np.exp(-t(0.6) /
 for k in range(6): place(s, (0.9 - 0.1 * k) * passe_haut(bruit(0.05), 1200) * env(0.05, 0.0003, 0.01), 0.03 + k * 0.035 + rng.uniform(0, 0.02))
 ecrire('remi_porte_fort', s, 0.9)
 print('sons de Rémi générés dans', out)
+
+# « scratch » de disque : la musique se coupe net quand le videur regarde
+d = 0.35; x = t(d)
+f = 900 * np.exp(-x / 0.08) + 120
+ecrire('remi_scratch', np.sin(2 * np.pi * np.cumsum(f) / SR) * env(d, 0.002, 0.12) + 0.6 * passe_haut(bruit(d), 2500) * env(d, 0.001, 0.08), 0.6)
+print('scratch ajouté')
