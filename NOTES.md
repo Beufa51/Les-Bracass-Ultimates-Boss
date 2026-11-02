@@ -50,7 +50,7 @@
   porte est découpé du fond — `BATTANT` dans RemiPorte.js — : il tremble, se fissure et s'ouvre d'un coup à la victoire).
   TOUTES LES IMAGES DE RÉMI SONT INTÉGRÉES.
 - MUSIQUE : `assets/audio/remi/remi_musique_bar.mp3` (Star Wars « Cantina Band », donnée par le propriétaire), au beer pong
-  et à la porte (repart du début à chaque jeu). Le vélo n'a pas encore de musique.
+  et à la porte (repart du début à chaque jeu). Vélo : `remi_musique_velo.mp3` (F-Zero « Big Blue », donnée par le propriétaire).
 - AUDIT V3 (retour : pong pas fun, porte pas crédible, vélo injouable + liseré blanc) : `propositions/remi_audit.md`
   (notes joueur 4/3/4 sur 10, améliorations A1-A7 vélo, B1-B6 pong, C1-C4 porte = vue de dos, prompts des planches de dos).
   Ordre validé par Fabien. FAIT (V4) :

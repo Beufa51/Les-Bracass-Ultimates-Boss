@@ -13,6 +13,7 @@ import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { texte } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
+import { jouerMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, DIFFICULTES, VELO as V, REPLIQUES } from './reglages.js';
 import { cycliste, bourre, verreCasse, flaque, remi, COULEURS } from './dessins.js';
@@ -79,7 +80,8 @@ export class RemiVelo extends BossScene {
 
     this.touches = creerTouches(this);
     this.installerZones();
-    laisserPasserTactile(this);   // les blocs de boutons cachés ne mangent plus les touchers
+    laisserPasserTactile(this);
+    jouerMusique(this, 'remi_musique_velo');   // la musique du vélo (dès l'écran des commandes)   // les blocs de boutons cachés ne mangent plus les touchers
     this.dessiner();
 
     etiquettesTactiles({ ...VIDES, espace: 'OK' });

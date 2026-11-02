@@ -35,6 +35,8 @@ export const MANIFESTE = {
   },
   sons: {
     // musique du bar (Star Wars, « Cantina Band », donnée par le propriétaire) : beer pong et porte
+    // musique du vélo (F-Zero, « Big Blue », donnée par le propriétaire)
+    remi_musique_velo: { fichier: 'audio/remi/remi_musique_velo.mp3', musique: true, volume: 0.4 },
     remi_musique_bar: { fichier: 'audio/remi/remi_musique_bar.mp3', musique: true, volume: 0.4 },
     // bruitages générés au code : python3 outils/remi/generer_sons.py assets/audio/remi (bip de secours si le fichier manque)
     remi_sonnette: son('sonnette', 1760, 0.18),
