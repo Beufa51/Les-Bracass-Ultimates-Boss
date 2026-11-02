@@ -37,6 +37,8 @@ export const VELO = {
   sautTenu: 0.28,         // saut maintenu jusqu'à ce temps (s) = saut plus haut et plus long
   graviteTenue: 780,      // gravité tant que le saut est maintenu (au début du saut)
   gravite: 2080,          // px/s²
+  esquive: 0.9,           // V17 : ESQUIVE vers le bas (bourré allongé) : durée d'un appui (s), plus longue si on garde appuyé
+  esquiveBas: 58,         // de combien le vélo descend vers le bas de l'écran (px)
   tampon: 0.15,           // saut demandé un peu AVANT d'atterrir : il part quand même (s)
   sonnette: 0.6,          // recharge de la sonnette (s)
   chute: 1.2,             // secondes au sol après une chute

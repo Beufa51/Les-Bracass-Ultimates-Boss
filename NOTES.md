@@ -160,6 +160,11 @@
   VIENT PISSER (38 %, ne t'attrape jamais = feinte, même annonce que le videur). PORTE : plus de fissures en étoile ni de
   creux ; un TROU déchiqueté AU MILIEU du battant (`formeTrou` / `dessinerTrou`), qui grandit avec les dégâts et rétrécit
   quand le barman rafistole ; le poing frappe désormais au centre (`IMPACT.x` = milieu de la porte).
+- V17 VÉLO (demande de Fabien) : le bourré ALLONGÉ ne se saute plus, on l'ESQUIVE en descendant vers le bas de l'écran
+  (le vélo passe DEVANT lui) : ▼ au clavier, bouton « EN BAS » orange au MILIEU sur téléphone (zones : gauche 34 % DRING,
+  milieu ESQUIVE, droite SAUTE) ; un appui = `VELO.esquive` 0,9 s en bas (`esquiveBas` 58 px), garder appuyé = rester en
+  bas ; seulement sur la route (pas en l'air, pas sur un toit), pas de saut tant qu'on est en bas. Icône ▼ orange et
+  « EN BAS ! » au bon moment. Le saut reste pour pintes, tremplins, verre, flaque, poubelle. Bot : 6 allongés, 0 touché.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
