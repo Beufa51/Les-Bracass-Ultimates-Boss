@@ -128,3 +128,21 @@ vu de face et coupé à la taille, comme s'il passait la tête et une épaule au
 Style manga/anime coloré, contours noirs nets, fond BLANC uni, aucun texte. Un petit groupe de 6 clients d'un bar, vus de face,
 coupés à la taille, serrés les uns contre les autres, qui crient et lèvent leurs verres (encouragements), une seule image large.
 ```
+
+## 18. Le gars qui vient pisser (porte) — `remi_pisseur_planche.jpg`
+À joindre : la planche du videur (pour le même style et le même cadrage).
+```
+Même style et même cadrage que l'image jointe (manga/anime, contours noirs nets, fond BLANC uni, aucun texte, coupé à la taille,
+comme s'il passait la tête et une épaule au coin d'un mur). Un jeune fêtard éméché, chemise à fleurs ouverte, joues rouges,
+il se tient l'entrejambe (il a très envie). 2 poses côte à côte, même échelle, bien espacées : 1 : il jette un œil vague en
+se dandinant ; 2 : il te voit et sursaute, scandalisé, il pointe du doigt.
+```
+
+## 19. La mamie (porte) — `remi_mamie_planche.jpg`
+À joindre : la planche du videur.
+```
+Même style et même cadrage que l'image jointe (manga/anime, contours noirs nets, fond BLANC uni, aucun texte, coupée à la taille,
+comme si elle passait la tête au coin d'un mur). Une petite mamie à chignon gris, grosses lunettes, gilet violet, sac à main,
+canne. 2 poses côte à côte, même échelle, bien espacées : 1 : elle regarde, curieuse, en plissant les yeux ;
+2 : elle te voit, furieuse, elle lève sa canne d'un air menaçant.
+```

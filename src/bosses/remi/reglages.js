@@ -21,7 +21,7 @@ export const DIFFICULTES = {
   normal: { nom: 'NORMAL', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 70, densite: 1, traverse: 1, sonnette: 650,
     erreur: 0.035, apercu: 0.85, distrait: 0.35, remi: 0.42, aide: false,
-    remiCharge: 0.72, remiPrudent: 0.5, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
+    remiCharge: 0.75, remiPrudent: 0.35, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
     erreur: 0.05, apercu: 0.6, distrait: 0.55, remi: 0.52, aide: false,
@@ -73,7 +73,7 @@ export const PONG = {
 export const PORTE = {
   // V11 : « LA PORTE ET LE VIDEUR ». Chacun son tour : MAINTENIR pour charger, LÂCHER pour frapper. Le videur fait sa ronde :
   // s'il regarde pendant que tu charges (ou juste au moment du coup) : ATTRAPÉ (coup perdu, la porte est rafistolée).
-  solidite: 4500,         // SOLIDITÉ de la porte : chaque coup en enlève ses dégâts ; celui qui la fait céder GAGNE
+  solidite: 7500,         // SOLIDITÉ de la porte : chaque coup en enlève ses dégâts ; celui qui la fait céder GAGNE
   charge: 0.35,           // vitesse de charge au départ (puissance par seconde) ; elle accélère en chargeant
   accel: 1.3,             // accélération de la charge
   degatsMin: 0.25,        // part des dégâts même avec une charge nulle
@@ -96,6 +96,8 @@ export const REPLIQUES = {
   pongPerdu: 'Rémi : « Tournée pour toi ! Reviens quand tu sais viser. »',
   porteIntro: 'Rémi parie que tu ne défonceras pas la porte des WC avant lui. Mais le videur fait sa ronde...',
   porteAttrape: ['HÉ ! Toi là ! On se calme !', 'Encore un coup et c\'est dehors !', 'Je t\'ai vu !'],
+  porteAttrapePisseur: ['Oh ! Vous faites quoi là ?! ... hips', 'Je vais le dire au videur... après avoir fait pipi.', 'Ça va les gars ? Vous bloquez les WC !'],
+  porteAttrapeMamie: ['Jeune homme ! Ça ne va pas, non ?!', 'De mon temps, on frappait AVANT d\'entrer !', 'Je préviens le patron !'],
   porteRemiFrappe: ['Prends ça !', 'Regarde et apprends.', 'Celle-là elle a fait mal à la porte.'],
   porteGagne: 'Rémi : « OK... t\'es le patron de la soirée. La prochaine tournée est pour moi ! »',
   portePerdu: 'Rémi : « Faut manger de la soupe, mon grand. »',

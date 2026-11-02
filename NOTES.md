@@ -146,7 +146,15 @@
   FAUSSE ALERTE (demi-tour, l'ombre recule), SURPRISE (0,3 s d'annonce), RETOUR (2e coup d'œil juste après).
 - BUG CORRIGÉ « Cannot read properties of null (reading 'drawImage') » à la 2e partie : Phaser RÉUTILISE l'objet scène,
   les objets créés « à la demande » (`if (!this.motAction) ...`) gardaient un texte DÉTRUIT. Chaque `create()` des 3 jeux
-  remet ces propriétés à zéro. RÈGLE pour la suite : tout objet créé à la demande doit être remis à null dans `create()`. : `python3 outils/remi/preparer_images.py`.
+  remet ces propriétés à zéro. RÈGLE pour la suite : tout objet créé à la demande doit être remis à null dans `create()`.
+- V13 : PORTE : plus longue (`solidite` 7500, ~5 coups chacun) ; 3 INTRUS (`INTRUS` en tête de RemiPorte.js) : le videur,
+  le GARS QUI VIENT PISSER (pas titubants irréguliers + hoquets, fait souvent demi-tour ; en attendant son image : le bourré
+  du vélo) et la MAMIE (canne « toc », lente, regarde longtemps, revient TOUJOURS jeter un 2e coup d'œil ; dessinée au code
+  en attendant son image). Répliques propres à chacun. Rémi réagit en 0,25-0,7 s et charge plus lentement → il se fait
+  prendre de temps en temps (`remiPrudent` NORMAL 0,35). Images à venir : `remi_pisseur` / `remi_mamie` (prompts 18-19 ;
+  2 poses comme le videur → à ajouter au manifeste). VÉLO : pédalage = 3 poses de la 1re rangée en 0-1-2-1, cases calées
+  à droite (plus de vélo qui saute) ; 0,85 s mini entre 2 obstacles (+0,5 s après une poubelle) ; pintes : « +1 s » qui
+  file vers l'horloge (qui clignote en vert), explication à la 1re pinte, compteur 🍺 en haut à droite. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
