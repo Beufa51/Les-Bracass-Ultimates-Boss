@@ -21,7 +21,7 @@
   depuis la droite, nom, surnom, 4 infos). Beufa : après l'intro des commandes, avant la cinématique (`beufa_presentation` =
   `beufa_buste.jpg` en pleine taille). Julien : au tout début (avant la difficulté), sauf « recommencer » et l'arrivée depuis la manif.
 - Avatar de Julien en HAUTE DÉFINITION : `assets/sprites/julien/julien_presentation.png` (détouré depuis
-  `assets_inbox/julien/julien_reference.jpg`, coupé sous la veste avec un fondu). Textes provisoires (passe de FINITION).
+  `assets_inbox/julien/julien_reference.jpg`, coupé aux hanches avec un fondu) ; V93b : nouvelle image NON caricaturale, sans veste (`assets_inbox/julien/julien_presentation.jpg`). Textes provisoires (passe de FINITION).
 
 ## Décisions
 - Moteur : **Phaser 3.90** (gratuit, licence MIT), copié dans `lib/`. Aucune installation pour jouer.

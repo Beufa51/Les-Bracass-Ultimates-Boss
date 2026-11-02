@@ -4,8 +4,8 @@
 const son = (nom) => ({ fichier: `audio/julien/julien_${nom}.wav`, provisoire: { frequence: 440, duree: 0.08 } });
 export const MANIFESTE = {
   images: {
-    // écran de PRÉSENTATION (avant la manif) : Julien en haute définition, détouré (tiré de assets_inbox/julien/julien_reference.jpg)
-    julien_presentation: { fichier: 'sprites/julien/julien_presentation.png', largeur: 360, hauteur: 999, images: 1, vitesse: 1 },
+    // écran de PRÉSENTATION (avant la manif) : Julien en haute définition, détouré (tiré de assets_inbox/julien/julien_presentation.jpg, version non caricaturale)
+    julien_presentation: { fichier: 'sprites/julien/julien_presentation.png', largeur: 341, hauteur: 999, images: 1, vitesse: 1 },
   },
   sons: {
     // MUSIQUE DE FOND (src/core/musique.js, en boucle) : DOOM « At Doom's Gate » (E1M1), déposée par Fabien, mono 64 kb/s,

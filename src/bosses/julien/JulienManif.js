@@ -106,7 +106,7 @@ export class JulienManif extends BossScene {
       infos: [
         'Terrain : la manif, le lycée, puis SA classe',
         'Arme secrète : « Sortez une feuille ! »',
-        'Signe distinctif : veste de survêt\' verte',
+        'Signe distinctif : barbe poivre et sel',
         'Tee-shirt : Pyramid Head (Silent Hill)',
       ],
       invite: 'à la manif !',

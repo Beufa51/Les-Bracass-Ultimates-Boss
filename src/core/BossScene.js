@@ -72,8 +72,8 @@ export class BossScene extends Phaser.Scene {
     for (let k = 0; k < 40; k++) { const y = Math.random() * HAUTEUR; g.lineBetween(0, y, 600, y + (Math.random() - 0.5) * 20); }
     el.push(g);
     if (this.textures.exists(o.image)) {
-      const p = this.add.image(LARGEUR + 250, HAUTEUR / 2 + 10, o.image).setDepth(1001);
-      const s = Math.min(560 / p.height, 380 / p.width);   // tient dans 380 × 560
+      const p = this.add.image(LARGEUR + 250, HAUTEUR / 2 + 18, o.image).setDepth(1001);
+      const s = Math.min(500 / p.height, 380 / p.width);   // tient dans 380 × 500 (marge en haut)
       p.setScale(s);
       this.tweens.add({ targets: p, x: LARGEUR - 40 - p.displayWidth / 2, duration: 350, ease: 'Cubic.Out' });
       el.push(p);
