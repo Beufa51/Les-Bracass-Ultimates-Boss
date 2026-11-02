@@ -33,7 +33,10 @@ const HAUTEURS_IMAGES_CLASSE = { table: 0.72, bureau: 0.62, livre: 0.15, dico: 0
 const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'dos', 'rage', 'vaincu'];
 // vue du dessus (section 18 des prompts) ; image absente = dessin fait par le code
 const DESSUS_IMAGES = ['dessus_salle', 'dessus_julien_marche0', 'dessus_julien_marche1', 'dessus_julien_lance', 'dessus_julien_touche',
-  'dessus_heros', 'dessus_heros_cote', 'dessus_heros_touche', 'dessus_copie_0', 'dessus_copie_1', 'dessus_copie_2', 'dessus_boulette'];
+  'dessus_heros', 'dessus_heros_cote', 'dessus_heros_touche', 'dessus_copie_0', 'dessus_copie_1', 'dessus_copie_2', 'dessus_boulette',
+  'dessus_julien_marche2', 'dessus_julien_marche3', 'dessus_julien_rage', 'dessus_julien_pointe',   // (18e) animations en plus
+  'dessus_heros_marche0', 'dessus_heros_marche1', 'dessus_heros_souffle', 'dessus_heros_victoire',
+  'dessus_explosion', 'dessus_etoile', 'dessus_poussiere', 'dessus_feuilles', 'dessus_note0', 'dessus_note20'];   // (18f) effets
 const ELEVES_IMAGES = [0, 1, 2, 3].flatMap(k => [`eleve_${k}_content`, `eleve_${k}_cache`]);
 const GROSSES = new Set(['eventail', 'mur', 'murs', 'deluge', 'dico', 'aimant', 'rafale']);   // après elles : il se retourne (fenêtre de punition)
 // ce qu'on annonce en grand quand il prépare une attaque, et le conseil la 1re fois
@@ -495,7 +498,7 @@ export class JulienClasse extends JulienManif {
     this.livres = [];
     this.dessus = { prochain: D.attente, restants: RG.julien.murs.nombre[e.phase - 1] + (e.motif === 'murs' ? 1 : 0),
       murs: [], tirs: [], px: L / 2, py: VUE_H - 26, prof: L / 2, profV: 1, invT: 0, trou: null, sens: Math.random() < 0.5 ? -1 : 1,
-      recharge: 0, lanceT: 0, flash: 0, parts: [], entree: 0.45, fin: null, rouge: 0, poussiere: 0 };
+      recharge: 0, lanceT: 0, flash: 0, parts: [], fx: [], entree: 0.45, fin: null, rouge: 0, poussiere: 0, touches: 0, souffleT: 0, rageT: 0, murN: 0 };
     e.etat = 'interro';
     this.txtAnnonce.setText('INTERRO : ESQUIVE LES COPIES !'); this.annonceT = 2.5;
     this.txtConseil.setText(!this.vus.has('dessus') ? 'Vue du dessus : passe dans les TROUS (gauche / droite) et tire vers le haut sur Julien !' : '');
@@ -531,17 +534,24 @@ export class JulienClasse extends JulienManif {
     }
   }
 
+  // un effet en image (explosion, étoile, feuilles…) qui grossit un peu puis s'efface
+  effet(M, nom, x, y, taille, vie = 0.35) { M.fx.push({ nom, x, y, taille, vie, t: 0 }); }
+
   majDessus(dt) {
     const M = this.dessus, D = RG.julien.dessus, J = RG.julien, e = this.julien, j = this.j;
     const X0 = 12, X1 = L - 12;
     M.entree -= dt; M.rouge = Math.max(0, M.rouge - dt * 2);
     for (const p of M.parts) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.94; p.vy *= 0.94; p.rot += p.vr * dt; }
     M.parts = M.parts.filter(p => p.t < p.vie);
-    if (M.fin != null) { M.fin -= dt; if (M.fin <= 0) this.sortirDessus(true); return; }   // flash de sortie
+    for (const f of M.fx) f.t += dt;
+    M.fx = M.fx.filter(f => f.t < f.vie);
+    M.souffleT -= dt; M.rageT -= dt;
+    if (M.fin != null) { M.fin -= dt; if (M.fin <= 0) this.sortirDessus(true); return; }   // la note, puis le flash de sortie
     const c = this.commandesDessus();
     const ax = M.px, ay = M.py;
     M.px = Math.max(X0 + 8, Math.min(X1 - 8, M.px + c.x * D.vitesse * dt)); M.dir = c.x;
     M.py = Math.max(VUE_H - 90, Math.min(VUE_H - 12, M.py + c.y * D.vitesse * dt));
+    M.bouge = Math.hypot(M.px - ax, M.py - ay) > 0.5;
     if (Math.hypot(M.px - ax, M.py - ay) > 1 && (M.poussiere -= dt) <= 0) { this.particules(M, M.px, M.py + 14, 1, 'poussiere', 15); M.poussiere = 0.08; }
     M.invT -= dt; M.lanceT -= dt; M.flash -= dt;
     // Julien fait des allers-retours en haut
@@ -560,7 +570,7 @@ export class JulienClasse extends JulienManif {
         if (Math.random() < 0.3) M.sens = -M.sens;
       }
       M.trou = Math.max(g0, Math.min(g1, M.trou));
-      M.murs.push({ y: 40, trou: M.trou, touche: false, x0: M.prof, ouv: 0 });   // il se déploie depuis les mains de Julien
+      M.murs.push({ y: 40, trou: M.trou, touche: false, x0: M.prof, ouv: 0 }); M.murN++;   // il se déploie depuis les mains de Julien
       M.restants--; M.prochain = J.murs.intervalle[e.phase - 1]; M.lanceT = 0.3;
       this.particules(M, M.prof, 40, 5, 'feuille', 70);
       jouerSon(this, 'julien_papier', { rate: 1.3, volume: 0.7 });
@@ -568,7 +578,8 @@ export class JulienClasse extends JulienManif {
     for (const w of M.murs) {
       w.y += D.vitesseMur * dt; w.ouv = Math.min(1, w.ouv + dt / 0.3);
       if (!w.touche && j.vie > 0 && M.invT <= 0 && Math.abs(w.y - M.py) < 11 && Math.abs(M.px - w.trou) > D.trou / 2 - 6) {
-        w.touche = true; M.invT = 0.6; M.rouge = 0.5;
+        w.touche = true; M.invT = 0.6; M.rouge = 0.5; M.touches++;
+        this.effet(M, 'dessus_feuilles', M.px, M.py - 6, 34, 0.5);
         this.degats(J.mur.degats, e.x, e.y);
         this.cameras.main.shake(140, 0.006);
         this.particules(M, M.px, M.py, 8, 'feuille', 90);
@@ -579,21 +590,26 @@ export class JulienClasse extends JulienManif {
     // tes boulettes, vers le haut (sauf sarbacane confisquée)
     M.recharge -= dt;
     if (c.tir && M.recharge <= 0 && !this.confisque) {
-      M.tirs.push({ x: M.px + 4, y: M.py - 16 }); M.recharge = RG.sarbacane.cadence;
+      M.tirs.push({ x: M.px + 4, y: M.py - 16 }); M.recharge = RG.sarbacane.cadence; M.souffleT = 0.14;
       this.particules(M, M.px + 4, M.py - 18, 2, 'poussiere', 25);
       jouerSon(this, 'julien_lancer', { rate: 1.6 });
     }
     for (const b of M.tirs) {
       b.y -= D.vitesseTir * dt;
       if (!b.fini && b.y < 50 && b.y > 8 && Math.abs(b.x - M.prof) < 17) {
-        b.fini = true; M.flash = 0.15;
+        b.fini = true; M.flash = 0.15; M.rageT = 0.7;
         this.particules(M, b.x, b.y, 7, 'bout', 80);
+        this.effet(M, 'dessus_explosion', b.x, b.y, 28, 0.3); this.effet(M, 'dessus_etoile', M.prof + 10, 14, 18, 0.35);
         this.toucherEnnemi(e, RG.sarbacane.degats, { genre: 'boulette' });
         if (e.etat !== 'interro') { this.sortirDessus(false); return; }   // changement de phase ou vaincu : on revient en 3D
       }
     }
     M.tirs = M.tirs.filter(b => !b.fini && b.y > 0);
-    if (M.restants === 0 && M.murs.length === 0) M.fin = 0.35;   // fini : petit flash, puis retour en 3D
+    if (M.restants === 0 && M.murs.length === 0) {   // fini : la NOTE (20/20 sans être touché, sinon 0/20), puis retour en 3D
+      M.fin = RG.julien.dessus.note + 0.35;
+      if (M.touches === 0) { jouerSon(this, 'julien_ramasse', { rate: 1.2 }); this.parlerEleves('touche'); }
+      else jouerSon(this, 'julien_plonk', { rate: 0.6 });
+    }
   }
 
   sortirDessus(punir) {
@@ -614,10 +630,18 @@ export class JulienClasse extends JulienManif {
       g.fillStyle = '#2f4a32'; g.fillRect(140, 0, 200, 7); g.fillStyle = '#4b3a2a'; g.fillRect(0, 0, 12, VUE_H); g.fillRect(L - 12, 0, 12, VUE_H);
     }
     // poussière au sol (sous tout le reste)
-    for (const p of M.parts) if (p.genre === 'poussiere') { g.fillStyle = `rgba(220,225,235,${0.5 * (1 - p.t / p.vie)})`; g.fillRect(p.x - 1.5, p.y - 1.5, 3, 3); }
+    for (const p of M.parts) if (p.genre === 'poussiere') {
+      const a = 0.6 * (1 - p.t / p.vie);
+      if (s.dessus_poussiere) { g.globalAlpha = a; g.drawImage(s.dessus_poussiere, p.x - 4, p.y - 5, 8, 9); g.globalAlpha = 1; }
+      else { g.fillStyle = `rgba(220,225,235,${a})`; g.fillRect(p.x - 1.5, p.y - 1.5, 3, 3); }
+    }
     // Julien (vue du dessus si livrée, sinon ses poses de face), avec son ombre ; blanc un instant quand il est touché
     const p = s.dessus_julien_marche0 ? 'dessus_julien_' : 'julien_';
-    const pj = M.flash > 0 ? s[p + 'touche'] : M.lanceT > 0 ? s[p + 'lance'] : s[p + (((t * 4) | 0) % 2 ? 'marche1' : 'marche0')];
+    const marche = s.dessus_julien_marche2 ? ['dessus_julien_marche2', 'dessus_julien_marche3'] : [p + 'marche0', p + 'marche1'];
+    const pj = M.flash > 0 ? s[p + 'touche']
+      : M.lanceT > 0 ? (M.murN % 2 && s.dessus_julien_pointe ? s.dessus_julien_pointe : s[p + 'lance'])   // il lance, ou il pointe du doigt
+      : (M.rageT > 0 || this.julien.phase === 3) && s.dessus_julien_rage && ((t * 3) | 0) % 2 ? s.dessus_julien_rage   // touché / phase 3 : RAGE
+      : s[marche[((t * 4) | 0) % 2]];
     ombre(M.prof, 50, 13, 4);
     if (pj) { const h = 46, w = h * pj.width / pj.height; g.drawImage(pj, M.prof - w / 2, 6 - (M.lanceT > 0 ? 2 : 0), w, h); }
     if (M.flash > 0) { g.fillStyle = `rgba(255,255,255,${M.flash * 3})`; g.beginPath(); g.arc(M.prof, 26, 18 + (0.15 - M.flash) * 60, 0, Math.PI * 2); g.fill(); }
@@ -643,7 +667,10 @@ export class JulienClasse extends JulienManif {
     }
     // toi (vu du dessus, de dos), avec ton ombre ; tu clignotes après un coup
     ombre(M.px, M.py + 17, 10, 3.5);
-    const ph = M.invT > 0.3 ? s.dessus_heros_touche : Math.abs(M.dir || 0) > 0.3 ? s.dessus_heros_cote : s.dessus_heros;
+    const victoire = M.fin != null && M.touches === 0 && s.dessus_heros_victoire;
+    const bouge = M.bouge && s.dessus_heros_marche0;
+    const ph = victoire ? s.dessus_heros_victoire : M.invT > 0.3 ? s.dessus_heros_touche : M.souffleT > 0 && s.dessus_heros_souffle ? s.dessus_heros_souffle
+      : Math.abs(M.dir || 0) > 0.3 ? s.dessus_heros_cote : bouge ? s[((t * 8) | 0) % 2 ? 'dessus_heros_marche1' : 'dessus_heros_marche0'] : s.dessus_heros;
     if (ph && (M.invT <= 0 || ((t * 16) | 0) % 2)) {
       const h = 40, w = h * ph.width / ph.height, rebond = Math.abs(M.dir || 0) > 0.3 ? Math.abs(Math.sin(t * 14)) * 1.5 : 0;
       g.save();
@@ -665,6 +692,11 @@ export class JulienClasse extends JulienManif {
         g.restore();
       }
     }
+    for (const f of M.fx) {   // effets en image
+      const i = s[f.nom]; if (!i) continue;
+      const k = f.t / f.vie, h = f.taille * (0.7 + 0.5 * k), w = h * i.width / i.height;
+      g.globalAlpha = 1 - k * k; g.drawImage(i, f.x - w / 2, f.y - h / 2, w, h); g.globalAlpha = 1;
+    }
     // vignette (bords plus sombres), coup reçu (rouge), entrée (fondu depuis le noir), sortie (flash blanc)
     if (!this.T.vignette) {
       const v = document.createElement('canvas'); v.width = L; v.height = VUE_H;
@@ -675,7 +707,12 @@ export class JulienClasse extends JulienManif {
     g.drawImage(this.T.vignette, 0, 0);
     if (M.rouge > 0) { g.fillStyle = `rgba(220,30,20,${M.rouge * 0.4})`; g.fillRect(0, 0, L, VUE_H); }
     if (M.entree > 0) { g.fillStyle = `rgba(0,0,0,${Math.min(1, M.entree / 0.45)})`; g.fillRect(0, 0, L, VUE_H); }
-    if (M.fin != null) { g.fillStyle = `rgba(255,255,255,${1 - Math.max(0, M.fin) / 0.35})`; g.fillRect(0, 0, L, VUE_H); }
+    if (M.fin != null) {   // la NOTE de la rafale, tamponnée au milieu, puis le flash blanc
+      const n = M.touches === 0 ? s.dessus_note20 : s.dessus_note0, dn = RG.julien.dessus.note, ecoule = dn + 0.35 - M.fin;
+      if (n) { const k = Math.min(1, ecoule / 0.15), h = 70 * (1.6 - 0.6 * k), w = h * n.width / n.height;
+        g.globalAlpha = k; g.drawImage(n, L / 2 - w / 2, VUE_H / 2 - h / 2 - 10, w, h); g.globalAlpha = 1; }
+      if (M.fin < 0.35) { g.fillStyle = `rgba(255,255,255,${1 - Math.max(0, M.fin) / 0.35})`; g.fillRect(0, 0, L, VUE_H); }
+    }
   }
 
   // phase 3 : les sprinklers mouillent le sol, tu glisses (tu continues un peu sur ta lancée)

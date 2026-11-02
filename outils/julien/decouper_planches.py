@@ -48,6 +48,13 @@ GROUPES = {
         ('dessus_julien_touche', (385, 871))]),
     'dessus_heros': ('julien_dessus_persos.jpg', 100, [   # « de côté » : il vise vers la GAUCHE (le jeu le retourne)
         ('dessus_heros', (251, 1247)), ('dessus_heros_cote', (207, 1594)), ('dessus_heros_touche', (227, 1947))]),
+    # VUE DU DESSUS, animations en plus (section 18e) ; planche en colonne ; la 3e pose de marche du héros est ignorée
+    'dessus_julien2': ('julien_dessus_anim.jpg', 120, [
+        ('dessus_julien_marche2', (124, 213)), ('dessus_julien_marche3', (374, 206)), ('dessus_julien_rage', (138, 607)),
+        ('dessus_julien_pointe', (391, 609))]),
+    'dessus_heros2': ('julien_dessus_anim.jpg', 100, [
+        ('dessus_heros_marche0', (131, 955)), ('dessus_heros_marche1', (375, 955)), (None, (250, 1271)),
+        ('dessus_heros_souffle', (280, 1611)), ('dessus_heros_victoire', (253, 1957))]),
     # élèves assis (rangée du haut ; celle du bas est un doublon) : A content, A caché, B…, D caché
     'eleves': ('julien_eleves.jpg', 180, [(f'eleve_{k // 2}_{"content" if k % 2 == 0 else "cache"}', (x, 200))
         for k, x in enumerate([115, 300, 465, 630, 815, 990, 1165, 1325])]),
@@ -88,9 +95,14 @@ OBJETS_DESSUS = ('julien_dessus_objets.jpg', [   # 2 rangées : boulettes en tro
     ('dessus_copie_0', (176, 193), 40), ('dessus_copie_1', (537, 193), 40), ('dessus_copie_2', (877, 193), 40),
     ('dessus_boulette', (1238, 193), 12), (None, (176, 577), 12), (None, (528, 571), 12), (None, (880, 572), 40)])
 
+OBJETS_EFFETS = ('julien_dessus_effets.jpg', [   # section 18f
+    ('dessus_explosion', (117, 383), 40), ('dessus_etoile', (352, 383), 36), ('dessus_poussiere', (587, 383), 28),
+    ('dessus_feuilles', (822, 383), 40), ('dessus_note0', (1056, 383), 46), ('dessus_note20', (1290, 383), 46)])
+
 # traits de grille que le nettoyage automatique rate (cases de largeurs différentes selon la rangée) :
 # planche → [(x0, y0, x1, y1), ...] effacés en blanc
 TRAITS = {
+    'julien_dessus_effets.jpg': [(x - 4, 255, x + 5, 512) for x in (0, 235, 469, 704, 939, 1173, 1406)] + [(0, 258, 1408, 268), (0, 498, 1408, 508)],
     'julien_dessus_objets.jpg': [(x - 3, 0, x + 4, 768) for x in (352, 705, 1057)] + [(0, 381, 1408, 388)],
     'julien_objets_lycee.jpg': [(x - 3, 0, x + 4, 386) for x in (325, 705, 1093)] + [(x - 3, 380, x + 4, 768) for x in (452, 985)]
     + [(0, 380, 1408, 388)],
@@ -277,7 +289,7 @@ def main():
     planche.save(SORTIE + 'julien_tetes.png')
     print('   tetes', L, 'x 96 ×', len(cases))
 
-    for fichier, liste in (OBJETS, OBJETS_ARMES, OBJETS_BONUS, OBJETS_CLASSE, OBJETS_LYCEE, OBJETS_DESSUS):
+    for fichier, liste in (OBJETS, OBJETS_ARMES, OBJETS_BONUS, OBJETS_CLASSE, OBJETS_LYCEE, OBJETS_DESSUS, OBJETS_EFFETS):
         if not os.path.exists(ENTREE + fichier):
             continue
         img = charger(fichier).copy()

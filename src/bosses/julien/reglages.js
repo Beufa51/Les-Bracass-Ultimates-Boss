@@ -131,7 +131,7 @@ export const REGLAGES = {
     murs: { nombre: [5, 5, 6], intervalle: [0.95, 0.85, 0.75] },
     // VUE DU DESSUS pendant la rafale de murs (en pixels de la vue 480 × 222) : attente avant le 1er mur (s), ta vitesse,
     // vitesse des murs, largeur du trou, décalage du trou d'un mur à l'autre, vitesse de Julien en haut, de tes boulettes
-    dessus: { attente: 1.0, vitesse: 150, vitesseMur: 75, trou: 64, derive: [50, 95], vitesseProf: 70, vitesseTir: 280 },
+    dessus: { attente: 1.0, vitesse: 150, vitesseMur: 75, trou: 64, derive: [50, 95], vitesseProf: 70, vitesseTir: 280, note: 1.0 },   // note : s où la note (20/20 ou 0/20) reste affichée
   },
   classe: {
     glisse: 0.45,            // phase 3 (sprinklers) : tu glisses encore ce temps-là (s) après avoir lâché (petit = moins de glissade)
