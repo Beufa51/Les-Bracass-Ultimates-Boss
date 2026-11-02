@@ -1111,6 +1111,8 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   mains de Julien, particules (`particules` : feuilles qui volent quand tu es touché / quand il lance, bouts de papier
   quand une boulette le touche + flash blanc, poussière quand tu bouges), traînée des boulettes, petit rebond en
   marchant, vignette, voile rouge au coup reçu, fondu d'entrée (noir) et flash de sortie (blanc).
+  PROMPTS pour aller plus loin (à brancher à la livraison) : 18d tables d'élèves vues du dessus, 18e plus d'animations
+  (Julien de côté, en rage, qui pointe ; héros qui marche, qui souffle, victoire), 18f effets (explosion de papier, « 0/20 », « 20/20 »…).
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».

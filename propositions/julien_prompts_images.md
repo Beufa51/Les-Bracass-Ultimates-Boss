@@ -258,3 +258,31 @@ Pixel art background in the style of a 16-bit top-down arcade shoot 'em up, wide
 A French high-school classroom floor seen from above: along the TOP edge, the green chalkboard on the wall and a wooden teacher's platform (parquet) about one fifth of the height; the rest is an EMPTY floor of grey-blue linoleum tiles (no desks, no chairs, no people in the middle, it must stay clear for the action); thin walls on the left and right edges with a window on each side.
 No text, no characters, no frame.
 ```
+
+### 18d. Tables d'élèves vues du dessus (décor des côtés) — `julien_dessus_tables.jpg`
+```
+Pixel art sprite sheet in the style of a 16-bit top-down arcade shoot 'em up (like Pocky & Rocky or Zelda: A Link to the Past): seen from ABOVE (3/4 top-down), limited color palette, visible chunky pixels, strong shading, humorous.
+6 separate items in one row, each in its own equal-size cell, same scale: a French school desk for one (light wood top, metal legs) with its chair, and a teenage student sitting at it, seen from above:
+1) a student (red hoodie) cheering with both arms up; 2) the same student hiding under the desk, hands on his head; 3) a girl (yellow sweater, ponytail) cheering, arms up; 4) the same girl hiding, hands on her head; 5) an empty desk with an open notebook and a pencil case; 6) an empty desk with a schoolbag on the chair.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every item is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no part may touch another item or the cell border.
+```
+
+### 18e. Plus d'animations (Julien et le héros vus du dessus) — `julien_dessus_anim.jpg` (joindre `julien_dessus_persos.jpg` pour garder les mêmes personnages)
+```
+Pixel art sprite sheet in the style of a 16-bit top-down arcade shoot 'em up: the SAME two characters as in the attached image, same style, same scale, 3/4 top-down view.
+8 poses in TWO rows of 4, each in its own equal-size cell:
+Row 1, the teacher (glasses, green jacket, geeky horror video game t-shirt), FACING DOWN: 1) walking sideways to the left, step A; 2) walking sideways to the left, step B; 3) furious, red face, steam coming out of his ears, shaking a fist; 4) pointing straight down at the viewer and shouting.
+Row 2, the student (navy blue hoodie, brown hair) seen from ABOVE AND BEHIND, FACING UP, holding the clear Bic pen peashooter: 5) walking up, left foot forward; 6) walking up, right foot forward; 7) blowing into the pen, cheeks puffed, a paper ball shooting out upward; 8) victory pose, both arms up.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no part may touch another pose or the cell border.
+```
+
+### 18f. Effets (petits, vus du dessus) — `julien_dessus_effets.jpg`
+```
+Pixel art sprite sheet in the style of a 16-bit arcade game: limited color palette, visible chunky pixels, strong outlines.
+6 separate small effects in one row, each in its own equal-size cell, same pixel scale:
+1) a white paper explosion (burst of torn paper bits and a white flash star); 2) a cartoon impact star (yellow and white); 3) a small cloud of grey dust; 4) three small exam sheets fluttering in the air; 5) a big red "0/20" written with a red pen, slightly tilted, like a teacher's grade stamp; 6) a big green "20/20" written the same way.
+Plain solid pure white background (#FFFFFF) — every effect must have a thin dark outline so it stays visible —, no ground shadow, no frame, no grid lines, no text except the grades.
+IMPORTANT: every effect is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no effect may touch another effect or the cell border.
+```
