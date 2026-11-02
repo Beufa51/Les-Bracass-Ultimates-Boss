@@ -61,7 +61,13 @@
     (`DEMI_VELO` 50, allongé 40 x 45, debout / traverse 160 de haut = impossibles à sauter), portée de la sonnette dessinée
     sur la route + cloche au-dessus du bourré qui l'entendra, recharge 1 s (cercle), clignotement invincible 1,2 s après
     une chute, traits de vitesse en sprint, bourrés écartés qui restent sur le trottoir du fond.
-    Bots : NORMAL sans sprint = arrivé, 0 chute, 8 s d'avance (temps alors 60, passé à 65) ; CHAMPION = de justesse (57 s). : `python3 outils/remi/preparer_images.py`.
+    Bots : NORMAL sans sprint = arrivé, 0 chute, 8 s d'avance (temps alors 60, passé à 65) ; CHAMPION = de justesse (57 s).
+  - BEER PONG (B1-B5) : caméra proche (table 1,8 m, `CAM_*` en tête de RemiPong.js), verres de Rémi ~2 fois plus gros ;
+    tes verres = encart « TES VERRES » en bas à droite (la balle de Rémi file sous l'écran). LANCE-PIERRE : doigt posé sous
+    Rémi, tirer vers le bas (longueur = force, `tirage` 180 px ; côté = direction inversée), pointillés de trajectoire
+    (`apercu` : 1 / 0,5 / 0,3) ; clavier ◀ ▶ ▲ ▼ + ESPACE. Traînée, RALENTI près d'un verre, balle qui TOURNE sur le rebord,
+    gerbe de bière, « TU BOIS ! » + flash ambre. EN FEU après 3 verres de suite (trajectoire entière, erreur / 2).
+    Rémi agite les bras (`distrait` 0 / 0,3 / 0,5) : ta visée tremble ; le toucher (ou Z) = « Chut ! ». B6 (10 verres) non fait. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

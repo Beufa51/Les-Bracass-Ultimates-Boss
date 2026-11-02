@@ -6,22 +6,22 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 // Niveaux de difficulté (choisis avant le vélo, gardés pour les 3 jeux)
 //  VÉLO : temps = secondes avant la fermeture du bar ; densite = obstacles (x) ; traverse = vitesse des bourrés qui traversent (x)
 //         sonnette = distance max (px) où la sonnette fait s'écarter un bourré debout
-//  PONG : erreur = imprécision de TES lancers (m) ; zoneForce = largeur de la zone VERTE de la jauge de force (0 à 1) ;
-//         remi = chance que Rémi mette un verre ; aide = point d'arrivée affiché sur la table pendant la jauge
-//         (la vitesse du curseur de force = « visee », comme à la porte)
+//  PONG : erreur = imprécision de TES lancers (m) ; apercu = part de la trajectoire montrée en visant (1 = toute) ;
+//         distrait = chance que Rémi agite les bras pendant ta visée (ça fait trembler ton lancer) ;
+//         remi = chance que Rémi mette un verre ; aide = (non utilisé au pong depuis le lance-pierre)
 //  PORTE : remiMin / remiMax = scores de Rémi ; zone = largeur de la zone parfaite de la visée (0 à 1) ; visee = vitesse du curseur (x)
 export const DIFFICULTES = {
   facile: { nom: 'FACILE', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
     temps: 78, densite: 0.75, traverse: 0.8, sonnette: 560,
-    erreur: 0.012, zoneForce: 0.3, remi: 0.28, aide: true,
+    erreur: 0.012, apercu: 1, distrait: 0, remi: 0.28, aide: true,
     remiMin: 560, remiMax: 760, zone: 0.22, visee: 0.8 },
   normal: { nom: 'NORMAL', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 65, densite: 1, traverse: 1, sonnette: 500,
-    erreur: 0.018, zoneForce: 0.2, remi: 0.38, aide: false,
+    erreur: 0.018, apercu: 0.5, distrait: 0.3, remi: 0.38, aide: false,
     remiMin: 650, remiMax: 850, zone: 0.15, visee: 1 },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 57, densite: 1.3, traverse: 1.25, sonnette: 440,
-    erreur: 0.025, zoneForce: 0.13, remi: 0.5, aide: false,
+    erreur: 0.025, apercu: 0.3, distrait: 0.5, remi: 0.5, aide: false,
     remiMin: 760, remiMax: 930, zone: 0.1, visee: 1.3 },
 };
 
@@ -50,13 +50,14 @@ export const VELO = {
 
 export const PONG = {
   verres: 6,              // verres par joueur (6 = pyramide 3-2-1 ; 10 = 4-3-2-1)
-  table: { largeur: 1.2, longueur: 2.4 },
+  table: { largeur: 1.2, longueur: 1.8 },   // table raccourcie (caméra proche : les verres de Rémi bien visibles)
   rayon: 0.085,           // rayon d'un verre (m)
   dedans: 0.8,            // la balle tombe à moins de rayon x ce chiffre du centre : DEDANS
   rebord: 1.2,            // entre « dedans » et rayon x ce chiffre : sur le REBORD (une chance sur deux)
-  dureeVol: 0.85,         // durée du vol de la balle (s)
+  dureeVol: 0.75,         // durée du vol de la balle (s)
+  tirage: 180,            // lance-pierre : longueur de tirage (px) pour la force maximale
+  serieFeu: 3,            // verres de suite pour être EN FEU (trajectoire entière montrée, lancer plus précis)
   ivresse: 0.012,         // chaque verre bu fait tanguer ta visée de ce nombre de mètres en plus
-  balancier: 1.5,         // durée (s) d'un aller-retour du curseur de force (à vitesse x1)
 };
 
 export const PORTE = {
