@@ -125,7 +125,13 @@
   lui, toucher / ESPACE dans les 0,3 dernières s = « FFFFF ! » (-0,3 à sa chance).
   VÉLO : SALTO (SAUTE dans les 0,3 s après l'envol d'un tremplin ; tour de 0,42 s à finir avant d'atterrir = +3 s, sinon
   chute) ; CHUTE CARTOON (il décolle, fait la toupie, étoiles autour de la tête) ; obstacles propres aux routes (`special`) :
-  PÊCHEUR sur les quais (DRING), POUBELLE dans les ruelles (grand saut), CHORALE de 3 fêtards au centre-ville (un DRING). : `python3 outils/remi/preparer_images.py`.
+  PÊCHEUR sur les quais (DRING), POUBELLE dans les ruelles (grand saut), CHORALE de 3 fêtards au centre-ville (un DRING).
+- V10 : vélo RALLONGÉ (`longueur` 30000, temps 88 / 70 / 58 s ; bots NORMAL 15 % d'erreurs : 15 s d'avance) ;
+  CARREFOUR : 2 gros panneaux EN BAS (à la place des boutons, 3,5 s) ; raccourcis vraiment chargés (`densite` 1,9,
+  obstacles de la route 50 %) ; pas de tremplin / voitures juste avant un carrefour. PONG : OMBRE des pointillés sur la table.
+  AUDIT PORTE `propositions/remi_audit_porte.md` (4,3/10 joueur) : refonte proposée « LA PORTE ET LE VIDEUR »
+  (maintenir pour charger, lâcher avant que le videur regarde ; une seule règle : la solidité) — EN ATTENTE de l'accord de
+  Fabien ; prompts 16 (videur) et 17 (foule). : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

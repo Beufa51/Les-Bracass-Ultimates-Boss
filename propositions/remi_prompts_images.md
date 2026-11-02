@@ -114,3 +114,17 @@ une citadine rouge, une berline bleue, une petite camionnette jaune. Toit plat b
 Style manga/anime, contours noirs nets, fond BLANC uni, aucun texte. Vu STRICTEMENT DE PROFIL : un tremplin de fortune fait d'une
 planche de bois posée en pente (montant vers la DROITE) sur une pile de caisses de bière en plastique jaune. Une seule image, centrée.
 ```
+
+## 16. Le videur (refonte de la porte) — `remi_videur_planche.jpg`
+```
+Style manga/anime coloré, contours noirs nets, fond BLANC uni, aucun texte, aucun cadre. Un videur de bar costaud, crâne rasé,
+tee-shirt noir moulant avec « SECURITY » illisible, oreillette, bras énormes. 2 poses côte à côte, même échelle, bien espacées,
+vu de face et coupé à la taille, comme s'il passait la tête et une épaule au coin d'un mur (le mur n'est PAS dessiné) :
+1 : il jette un coup d'œil distrait sur le côté, en mâchant un chewing-gum ; 2 : il te repère, furieux, il pointe du doigt.
+```
+
+## 17. (facultatif) La foule du bar au bout du couloir — `remi_foule_couloir.jpg`
+```
+Style manga/anime coloré, contours noirs nets, fond BLANC uni, aucun texte. Un petit groupe de 6 clients d'un bar, vus de face,
+coupés à la taille, serrés les uns contre les autres, qui crient et lèvent leurs verres (encouragements), une seule image large.
+```

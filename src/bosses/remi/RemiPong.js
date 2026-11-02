@@ -498,6 +498,9 @@ export class RemiPong extends BossScene {
           const t = (k / 24) * vol.T;
           const q = proj(DEPART.x + vol.vx * t, DEPART.y + vol.vy * t - G * t * t / 2, DEPART.z + vol.vz * t);
           const rr = Math.max(2.5, q.k * 0.009);
+          // OMBRE de la trajectoire sur la table : on voit où passe la balle (et où elle tombe)
+          const o = proj(DEPART.x + vol.vx * t, 0, DEPART.z + vol.vz * t);
+          gv.fillStyle(0x000000, 0.35).fillEllipse(o.x, o.y, rr * 2.4, rr * 1);
           gv.fillStyle(0x000000, 0.6).fillCircle(q.x, q.y, rr + 1.5);   // contour sombre : lisible même devant Rémi
           gv.fillStyle(this.feu ? 0xff8a2a : 0xffffff, 0.95).fillCircle(q.x, q.y, rr);
         }
@@ -546,7 +549,8 @@ export class RemiPong extends BossScene {
     for (let k = 1; k <= 10; k++) { const t = k / 10 * r.v2.T; pts.push([r.xb + r.v2.vx * t, r.v2.vy * t - G * t * t / 2, r.zb + r.v2.vz * t]); }
     const n = Math.round(pts.length * this.partCourbe());
     for (const [x, y, z] of pts.slice(0, n)) {
-      const q = proj(x, y, z), rr = Math.max(2.5, q.k * 0.009);
+      const q = proj(x, y, z), rr = Math.max(2.5, q.k * 0.009), o = proj(x, 0, z);
+      g.fillStyle(0x000000, 0.35).fillEllipse(o.x, o.y, rr * 2.4, rr);   // ombre sur la table
       g.fillStyle(0x000000, 0.6).fillCircle(q.x, q.y, rr + 1.5);
       g.fillStyle(0xffb070, 1).fillCircle(q.x, q.y, rr);
     }

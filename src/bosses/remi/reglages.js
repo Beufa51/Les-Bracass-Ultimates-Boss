@@ -13,22 +13,22 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 //  PORTE : remiMin / remiMax = scores de Rémi ; zone = largeur de la zone parfaite de la visée (0 à 1) ; visee = vitesse du curseur (x)
 export const DIFFICULTES = {
   facile: { nom: 'FACILE', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
-    temps: 58, densite: 0.8, traverse: 0.8, sonnette: 730,
+    temps: 88, densite: 0.8, traverse: 0.8, sonnette: 730,
     erreur: 0.025, apercu: 1, distrait: 0, remi: 0.32, aide: true,
     remiMin: 560, remiMax: 760, zone: 0.22, visee: 0.8 },
   normal: { nom: 'NORMAL', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
-    temps: 46, densite: 1, traverse: 1, sonnette: 650,
+    temps: 70, densite: 1, traverse: 1, sonnette: 650,
     erreur: 0.035, apercu: 0.85, distrait: 0.35, remi: 0.42, aide: false,
     remiMin: 650, remiMax: 850, zone: 0.15, visee: 1 },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
-    temps: 38, densite: 1.2, traverse: 1.25, sonnette: 570,
+    temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
     erreur: 0.05, apercu: 0.6, distrait: 0.55, remi: 0.52, aide: false,
     remiMin: 760, remiMax: 930, zone: 0.1, visee: 1.3 },
 };
 
 export const VELO = {
   // V6 : tout est 1,3 fois plus GRAND qu'en V5 (vélo, bourrés, sauts, vitesses), la durée du trajet ne change pas
-  longueur: 19500,        // longueur du trajet jusqu'au bar (px)
+  longueur: 30000,        // longueur du trajet jusqu'au bar (px) — V10 : rallongé (environ 1 min en NORMAL)
   vitesseDepart: 390,     // le vélo roule TOUT SEUL ; il accélère doucement jusqu'au bar (px/s)
   vitesseFin: 560,
   saut: 624,              // vitesse de départ du saut (px/s)
@@ -40,7 +40,7 @@ export const VELO = {
   chute: 1.2,             // secondes au sol après une chute
   invincible: 1.2,        // après une chute, le vélo clignote et ne peut pas retomber (s)
   ralenti: 1.5,           // verre cassé (crevaison) ou flaque non sautés : vitesse x 0,55 pendant ce temps (s)
-  ecart: [1.25, 2.1],     // temps entre deux obstacles (s, à la vitesse du moment), divisé par la densité
+  ecart: [1.1, 1.9],       // temps entre deux obstacles (s, à la vitesse du moment), divisé par la densité
   types: { allonge: 3, verre: 2, debout: 3, traverse: 2, vomi: 2 },
   pintes: 0.45,           // chance d'une PINTE à attraper en sautant entre deux obstacles
   bonusPinte: 1,          // secondes gagnées par pinte

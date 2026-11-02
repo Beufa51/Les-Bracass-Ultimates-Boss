@@ -30,9 +30,9 @@ const BOUTON_G = { x: 88, y: 448, r: 74 }, BOUTON_D = { x: LARGEUR - 88, y: 448,
 const DEPART_ROUTE = { nom: 'LA RUE DES BARS', image: 'remi_rue', teinte: 0xffffff, longueur: 1, densite: 1, pintes: 1, voitures: 1 };
 const CARREFOURS = [
   [{ nom: 'LES QUAIS', texte: 'tranquille, plein de pintes', image: 'remi_rue2', teinte: 0x9fb8ff, longueur: 1, densite: 0.75, pintes: 1.6, voitures: 1, special: 'pecheur' },
-    { nom: 'LA RUELLE', texte: 'RACCOURCI, mais bondé', image: '', teinte: 0x9a80c0, longueur: 0.65, densite: 1.35, pintes: 0.6, voitures: 0, special: 'poubelle' }],
+    { nom: 'LA RUELLE', texte: 'RACCOURCI, mais plein de bourrés et de poubelles', image: '', teinte: 0x9a80c0, longueur: 0.65, densite: 1.9, pintes: 0.6, voitures: 0, special: 'poubelle' }],
   [{ nom: 'LE CENTRE-VILLE', texte: 'la fête : tremplins et pintes', image: 'remi_rue3', teinte: 0xffc8a0, longueur: 1, densite: 1, pintes: 1.5, voitures: 2, special: 'chorale' },
-    { nom: 'LES PETITES RUES', texte: 'RACCOURCI, mais bondé', image: '', teinte: 0x80a8c0, longueur: 0.65, densite: 1.35, pintes: 0.6, voitures: 0, special: 'poubelle' }],
+    { nom: 'LES PETITES RUES', texte: 'RACCOURCI, mais plein de bourrés et de poubelles', image: '', teinte: 0x80a8c0, longueur: 0.65, densite: 1.9, pintes: 0.6, voitures: 0, special: 'poubelle' }],
 // obstacles propres aux routes : PÊCHEUR (quais : sa canne barre la route → DRING), POUBELLE (ruelles : haute → grand saut),
 // CHORALE (centre-ville : 3 fêtards qui chantent → un DRING les écarte tous)
 ];
@@ -155,7 +155,7 @@ export class RemiVelo extends BossScene {
     const marge = x1 >= this.longueur - 1 ? 800 : 1700;   // pas d'obstacle pendant le panneau du carrefour
     while (x < x1 - marge) {
       // tous les « tousLes » obstacles : un TREMPLIN puis 2 VOITURES garées (on roule sur le toit, pintes au-dessus)
-      if (k > 3 && k % tousLes === 0) {
+      if (k > 3 && k % tousLes === 0 && x + 1500 < x1 - marge) {   // (une séquence entière, finie avant le carrefour)
         const L = V.longueurVoiture, H = V.hauteurVoiture;
         const lt = 150, ht = this.textures.exists('remi_tremplin') ? Math.round(lt / TREMPLIN_IMG.haut * TREMPLIN_IMG.h / TREMPLIN_IMG.l) : 70;
         this.tremplins.push({ x0: x, l: lt, h: ht });
@@ -173,7 +173,7 @@ export class RemiVelo extends BossScene {
       }
       let type = k < debut.length ? debut[k] : tirer();
       k++;
-      const sp = k > debut.length && route.special && Math.random() < 0.3 ? route.special : null;
+      const sp = k > debut.length && route.special && Math.random() < (route.longueur < 1 ? 0.5 : 0.3) ? route.special : null;
       if (sp === 'poubelle') { type = 'poubelle'; this.ajouter('poubelle', x); }
       else if (sp === 'pecheur') { type = 'debout'; this.ajouter('debout', x); this.obstacles[this.obstacles.length - 1].peche = true; }
       else if (sp === 'chorale') { type = 'debout'; for (let n = 0; n < 3; n++) { this.ajouter('debout', x + n * 85); this.obstacles[this.obstacles.length - 1].chante = true; } x += 170; }
@@ -333,15 +333,19 @@ export class RemiVelo extends BossScene {
   // ---------- carrefours ----------
   ouvrirCarrefour() {
     const [a, b] = CARREFOURS[this.numCarrefour];
-    this.carrefourOuvert = true; this.choixTemps = 3; this.choix = null;
+    this.carrefourOuvert = true; this.choixTemps = 3.5; this.choix = null;
     const t = estTactile();
-    this.panneau = [
-      this.add.rectangle(LARGEUR / 2, 150, 860, 150, 0x000000, 0.75).setDepth(950).setStrokeStyle(3, 0xffd84a),
-      texte(this, LARGEUR / 2, 92, 'CARREFOUR : CHOISIS TA ROUTE !', 24, '#ffd84a', { fontStyle: 'bold' }).setDepth(951),
-      texte(this, 250, 150, `◀ ${a.nom}\n${a.texte}`, 22, '#9fe0ff', { fontStyle: 'bold' }).setDepth(951),
-      texte(this, LARGEUR - 250, 150, `${b.nom} ▶\n${b.texte}`, 22, '#ffb070', { fontStyle: 'bold' }).setDepth(951),
-      texte(this, LARGEUR / 2, 205, t ? 'touche la gauche ou la droite de l\'écran' : '◀ ou ▶', 16, '#ffffff').setDepth(951),
+    // deux GROS PANNEAUX en bas de l'écran, là où sont les pouces (à la place des boutons DRING / SAUTE)
+    const panneau = (x, r, coul, fleche) => [
+      this.add.rectangle(x, 440, 400, 150, 0x000000, 0.8).setDepth(950).setStrokeStyle(5, coul),
+      texte(this, x, 410, fleche === '◀' ? `◀ ${r.nom}` : `${r.nom} ▶`, 28, '#' + coul.toString(16).padStart(6, '0'), { fontStyle: 'bold' }).setDepth(951),
+      texte(this, x, 460, r.texte, 19, '#ffffff', { wordWrap: { width: 370 } }).setDepth(951),
     ];
+    this.panneau = [
+      texte(this, LARGEUR / 2, 330, `CARREFOUR ! ${t ? 'Touche' : '◀ ou ▶'} ta route`, 28, '#ffd84a', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 4 } }).setDepth(951),
+      ...panneau(220, a, 0x9fe0ff, '◀'), ...panneau(LARGEUR - 220, b, 0xffb070, '▶'),
+    ];
+    this.gBoutons.setVisible(false); this.zoneG.setAlpha(0); this.zoneD.setAlpha(0);
     jouerSon(this, 'remi_texto');
   }
 
@@ -360,6 +364,7 @@ export class RemiVelo extends BossScene {
     const r = CARREFOURS[this.numCarrefour][n];
     this.choix = r; this.carrefourOuvert = false;
     for (const e of this.panneau) e.destroy();
+    this.gBoutons.setVisible(true); this.zoneG.setAlpha(0.95); this.zoneD.setAlpha(0.95);
     jouerSon(this, 'ui_valider');
     bulle(this, `Direction : ${r.nom}`, n ? '#ffb070' : '#9fe0ff', 1.4, 140);
     // la suite du trajet : ce tronçon (plus court si raccourci), puis le reste prévu au plus long
