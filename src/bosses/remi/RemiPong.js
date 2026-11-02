@@ -1,12 +1,13 @@
 // =====================================================================
 // RÉMI — JEU 2 : LE BEER PONG (vu de ton bout de la table, Rémi en face)
 // Chacun lance 2 balles par tour. Les 2 dedans = BALLS BACK (tu relances). Le premier qui vide les verres d'en face gagne.
-// Lancer : GLISSE le doigt (ou la souris) vers le haut : la longueur = la force, le côté = la direction.
-// Clavier : ◀ ▶ viser, ESPACE maintenu = jauge de force, relâcher = lancer.
+// Lancer en 2 temps : 1) VISER : toucher (ou cliquer) le verre visé ; clavier : ◀ ▶ ▲ ▼ puis ESPACE.
+//                     2) FORCE : la jauge va et vient ; toucher / ESPACE quand le curseur est dans le VERT.
+// Dans le vert = la balle tombe sur la cible (à un poil près) ; trop fort / pas assez = trop loin / trop court.
 // Chaque verre que Rémi te met, tu le bois : ta visée tangue de plus en plus.
 // =====================================================================
 import { BossScene } from '../../core/BossScene.js';
-import { creerTouches } from '../../core/clavier.js';
+import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { texte } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
@@ -43,8 +44,8 @@ export class RemiPong extends BossScene {
   create() {
     this.etat = 'intro';             // intro | vise | vol | remi | fin
     this.horloge = 0; this.ivresse = 0; this.ivresseRemi = 0;
-    this.balle = null; this.glisse = null;
-    this.visee = { x: 0, force: 0, charge: false, t: 0 };
+    this.balle = null;
+    this.visee = { x: 0, z: D - 0.25, force: 0, t: 0 };
     this.verresRemi = pyramide(P.verres, true);
     this.verresToi = pyramide(P.verres, false);
     this.decor();
@@ -53,16 +54,18 @@ export class RemiPong extends BossScene {
     this.gVisee = this.add.graphics().setDepth(6);
     this.hud = texte(this, LARGEUR / 2, 24, '', 20, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
     this.hudTour = texte(this, LARGEUR / 2, 520, '', 22, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 10, y: 3 } }).setDepth(900);
+    this.txtCourt = texte(this, 225, 463, 'court', 16, '#ffb0b0').setDepth(901).setVisible(false);
+    this.txtLoin = texte(this, 735, 463, 'loin', 16, '#ffb0b0').setDepth(901).setVisible(false);
     this.touches = creerTouches(this);
-    this.installerGlisse();
+    this.installerVisee();
     this.pose = 'face';
 
     etiquettesTactiles({ ...ETIQUETTES_VIDES, espace: 'OK' });
     const t = estTactile();
     this.afficherIntro('RÉMI - Le beer pong', [
       'Vide les verres de Rémi avant qu\'il vide les tiens !',
-      'GLISSE ' + (t ? 'le doigt' : 'la souris') + ' vers le haut : longueur = force, côté = direction',
-      t ? '' : 'ou : ◀ ▶ viser, ESPACE maintenu = force, relâche = lance',
+      `1) VISE : ${t ? 'touche' : 'clique sur'} le verre que tu vises${t ? '' : ' (ou ◀ ▶ ▲ ▼ puis ESPACE)'}`,
+      `2) FORCE : ${t ? 'touche' : 'clique (ou ESPACE)'} quand le curseur est dans le VERT`,
       '2 balles par tour ; les 2 dedans = BALLS BACK (tu rejoues)',
       'Chaque verre que Rémi te met... tu le bois : ta visée tangue !',
     ].filter(Boolean), () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.demarrer(); }));
@@ -75,7 +78,7 @@ export class RemiPong extends BossScene {
 
   tourDe(qui) {
     this.qui = qui; this.balles = 2; this.reussis = 0; this.ballsBack = false;
-    if (qui === 'toi') { this.etat = 'vise'; etiquettesTactiles(ETIQUETTES_VIDES); }
+    if (qui === 'toi') { this.commencerVisee(); etiquettesTactiles(ETIQUETTES_VIDES); }
     else { this.etat = 'remi'; this.time.delayedCall(900, () => this.lancerRemi()); }
   }
 
@@ -106,28 +109,41 @@ export class RemiPong extends BossScene {
     t.fillStyle(0x0e2240, 1).fillRect(a.x, a.y, b.x - a.x, 24);   // épaisseur du bord de table
   }
 
-  // ---------- lancer au doigt / à la souris ----------
-  installerGlisse() {
+  // ---------- viser au doigt / à la souris ----------
+  commencerVisee() {
+    this.etat = 'vise';
+    const v = this.visee, pleins = this.verresRemi.filter(c => c.plein);
+    if (pleins.length) { const c = pleins.reduce((a, b) => (Math.abs(b.x) + Math.abs(b.z - (D - 0.25)) < Math.abs(a.x) + Math.abs(a.z - (D - 0.25)) ? b : a)); v.x = c.x; v.z = c.z; }
+    etiquettesTactiles({ ...ETIQUETTES_VIDES, espace: 'OK' });
+  }
+
+  commencerForce() {
+    this.etat = 'force'; this.visee.t = Math.random() * 0.3; this.visee.force = 0;
+    etiquettesTactiles({ ...ETIQUETTES_VIDES, espace: 'LANCE !' });
+    jouerSon(this, 'ui_valider');
+  }
+
+  installerVisee() {
     this.input.on('pointerdown', (p) => {
-      if (this.etat !== 'vise' || this.termine) return;
-      this.glisse = { x0: p.x, y0: p.y, x: p.x, y: p.y };
-    });
-    this.input.on('pointermove', (p) => { if (this.glisse) { this.glisse.x = p.x; this.glisse.y = p.y; } });
-    this.input.on('pointerup', (p) => {
-      if (!this.glisse) return;
-      const gl = this.glisse; this.glisse = null;
+      if (this.termine) return;
+      if (this.etat === 'force') { this.lancerToi(); return; }
       if (this.etat !== 'vise') return;
-      const cible = this.cibleGlisse(gl.x0, gl.y0, p.x, p.y);
-      if (cible) this.lancerToi(cible.x, cible.z);
+      // point de la table sous le doigt (au niveau du haut des verres), puis aimanté sur le verre le plus proche
+      if (p.y <= HORIZON + 5) return;
+      const z = CAM_Z + (CAM_H - H_VERRE) * F / (p.y - HORIZON), x = (p.x - CX) * (z - CAM_Z) / F;
+      let meilleur = null, dmin = 0.16;
+      for (const c of this.verresRemi) if (c.plein) { const d = Math.hypot(c.x - x, c.z - z); if (d < dmin) { dmin = d; meilleur = c; } }
+      if (meilleur) { this.visee.x = meilleur.x; this.visee.z = meilleur.z; }
+      else if (z > D / 2 && z < D + 0.2) { this.visee.x = Phaser.Math.Clamp(x, -W / 2, W / 2); this.visee.z = z; }
+      else return;
+      this.commencerForce();
     });
   }
 
-  // longueur du geste vers le haut = force (portée), écart sur le côté = direction
-  cibleGlisse(x0, y0, x1, y1) {
-    const dy = y0 - y1, dx = x1 - x0;
-    if (dy < 35) return null;
-    const force = Phaser.Math.Clamp((dy - 35) / 300, 0, 1.15);
-    return { x: Phaser.Math.Clamp(dx / 230, -1, 1) * (W / 2), z: 0.6 + force * 2.0 };
+  // écart de portée dû à la jauge : dans le vert = presque rien ; hors du vert = trop court / trop loin
+  ecartForce(f) {
+    const off = f - 0.5, z = this.diff.zoneForce / 2, a = Math.abs(off);
+    return Math.sign(off) * (a <= z ? a * 0.25 : z * 0.25 + (a - z) * 1.0);
   }
 
   // tangage de l'ivresse (visible sur la visée)
@@ -139,33 +155,37 @@ export class RemiPong extends BossScene {
   update(temps, delta) {
     const dt = Math.min(delta, 50) / 1000;
     this.horloge += dt;
-    if (this.etat === 'vise') this.viseClavier(dt);
+    if (this.etat === 'vise' || this.etat === 'force') this.viseClavier(dt);
     if (this.balle) this.balleVol(dt);
     this.dessiner(dt);
   }
 
   viseClavier(dt) {
     const T = this.touches, v = this.visee;
-    if (T.gauche.isDown) v.x -= 0.45 * dt;
-    if (T.droite.isDown) v.x += 0.45 * dt;
-    v.x = Phaser.Math.Clamp(v.x, -W / 2, W / 2);
-    if (T.espace.isDown) {
-      if (!v.charge) { v.charge = true; v.t = 0; }
-      v.t += dt;
-      const ph = (v.t / P.balancier) % 1;
-      v.force = ph < 0.5 ? ph * 2 : 2 - ph * 2;
-    } else if (v.charge) {
-      v.charge = false;
-      this.lancerToi(v.x, 0.6 + v.force * 2.0);
+    if (this.etat === 'vise') {
+      if (T.gauche.isDown) v.x -= 0.35 * dt;
+      if (T.droite.isDown) v.x += 0.35 * dt;
+      if (T.haut.isDown) v.z += 0.35 * dt;
+      if (T.bas.isDown) v.z -= 0.35 * dt;
+      v.x = Phaser.Math.Clamp(v.x, -W / 2, W / 2); v.z = Phaser.Math.Clamp(v.z, D / 2, D);
+      if (vientDAppuyer(T.espace)) this.commencerForce();
+      return;
     }
+    v.t += dt;
+    const ph = (v.t * this.diff.visee / P.balancier) % 1;
+    v.force = ph < 0.5 ? ph * 2 : 2 - ph * 2;
+    if (vientDAppuyer(T.espace) && v.t > 0.15) this.lancerToi();
   }
 
-  lancerToi(tx, tz) {
-    const s = this.tangage(), e = this.diff.erreur;
-    const ex = (hasard(-1, 1) + hasard(-1, 1)) / 2 * e, ez = (hasard(-1, 1) + hasard(-1, 1)) / 2 * e * 1.5;
+  lancerToi() {
+    const s = this.tangage(), e = this.diff.erreur, v = this.visee;
+    const ex = (hasard(-1, 1) + hasard(-1, 1)) / 2 * e, ez = (hasard(-1, 1) + hasard(-1, 1)) / 2 * e;
+    const f = v.force, dz = this.ecartForce(f);
+    if (Math.abs(f - 0.5) <= this.diff.zoneForce / 2) bulle(this, 'Bonne force !', '#7fff7f', 0.7, 120);
+    else bulle(this, f > 0.5 ? 'Trop fort !' : 'Trop court !', '#ffb0b0', 0.7, 120);
     this.balles--;
     this.etat = 'vol';
-    this.lancer({ x: 0.05, y: 0.3, z: -0.3 }, tx + s.x + ex, tz + s.z + ez, this.verresRemi, 'toi');
+    this.lancer({ x: 0.05, y: 0.3, z: -0.3 }, v.x + s.x + ex, v.z + s.z + ez + dz, this.verresRemi, 'toi');
     jouerSon(this, 'remi_lance');
   }
 
@@ -255,12 +275,12 @@ export class RemiPong extends BossScene {
     if (b.qui === 'remi' && b.etat !== 'dedans' && Math.random() < 0.4) bulle(this, `Rémi : « ${choisir(REPLIQUES.pongRateRemi)} »`, '#ffd84a', 1.4, 70);
     if (!this.verresRemi.some(v => v.plein)) { this.gagne(); return; }
     if (!this.verresToi.some(v => v.plein)) { this.etat = 'fin'; this.time.delayedCall(600, () => ecranPerdu(this, 'PERDU AU BEER PONG', REPLIQUES.pongPerdu, this.nomDiff)); return; }
-    if (this.balles > 0) { if (b.qui === 'toi') this.etat = 'vise'; else this.time.delayedCall(700, () => this.lancerRemi()); return; }
+    if (this.balles > 0) { if (b.qui === 'toi') this.commencerVisee(); else this.time.delayedCall(700, () => this.lancerRemi()); return; }
     // fin du tour : les 2 dedans = BALLS BACK (une fois par tour)
     if (this.reussis === 2 && !this.ballsBack) {
       this.ballsBack = true;
       annonce(this, 'BALLS BACK !', '#7fff7f');
-      this.time.delayedCall(900, () => { this.balles = 2; this.reussis = 0; if (b.qui === 'toi') this.etat = 'vise'; else this.lancerRemi(); });
+      this.time.delayedCall(900, () => { this.balles = 2; this.reussis = 0; if (b.qui === 'toi') this.commencerVisee(); else this.lancerRemi(); });
       if (b.qui !== 'toi') this.etat = 'remi';
       else this.etat = 'pause';
       return;
@@ -283,9 +303,18 @@ export class RemiPong extends BossScene {
     // Rémi derrière la table (il tangue un peu plus à chaque verre bu)
     const gr = this.gRemi.clear();
     const bal = Math.sin(this.horloge * 1.5) * (2 + this.ivresseRemi * 2);
+    if (this.textures.exists('remi_presentation') && this.textures.get('remi_presentation').key !== '__MISSING') {
+      // l'illustration de Rémi (buste, pinte à la main), cachée en bas par la table ; il se penche en lançant
+      if (!this.imgRemi) this.imgRemi = this.add.image(CX, 0, 'remi_presentation').setOrigin(0.5, 1).setDepth(3).setScale(210 / 1202);
+      this.imgRemi.setPosition(CX + bal, proj(0, 0, D).y + 40 + (this.pose === 'lance' ? -10 : 0)).setRotation(bal * 0.004 + (this.pose === 'lance' ? 0.12 : 0));
+      return this.dessinerTable();
+    }
     gr.setPosition(CX + bal, proj(0, 0, D).y + 6).setRotation(bal * 0.004);
     remi(gr, this.pose, this.horloge);
+    this.dessinerTable();
+  }
 
+  dessinerTable() {
     const g = this.g.clear();
     const objets = [];
     for (const v of [...this.verresRemi, ...this.verresToi]) if (v.plein || v.bu > 0) objets.push({ z: v.z, f: () => this.verre(g, v) });
@@ -294,34 +323,32 @@ export class RemiPong extends BossScene {
     objets.sort((a, c) => c.z - a.z).forEach(o => o.f());
     for (const v of [...this.verresRemi, ...this.verresToi]) if (!v.plein && v.bu > 0) v.bu = Math.max(0, v.bu - 0.025);
 
-    // visée (ton tour)
+    // visée (ton tour) : la cible tangue avec l'ivresse ; la jauge de force en bas
     const gv = this.gVisee.clear();
-    if (this.etat === 'vise') {
-      const s = this.tangage();
-      if (this.visee.charge || !estTactile()) {
-        const x = this.visee.x + s.x;
-        const p0 = proj(x, 0, 0.1), p1 = proj(x, 0, D);
-        gv.lineStyle(3, 0xffffff, 0.35);
-        for (let k = 0; k < 14; k++) { const a = k / 14, c = (k + 0.5) / 14; gv.lineBetween(p0.x + (p1.x - p0.x) * a, p0.y + (p1.y - p0.y) * a, p0.x + (p1.x - p0.x) * c, p0.y + (p1.y - p0.y) * c); }
-      }
-      if (this.visee.charge) {
-        gv.fillStyle(0x000000, 0.6).fillRect(LARGEUR - 70, 160, 34, 260);
-        const f = this.visee.force;
-        gv.fillStyle(f > 0.65 && f < 0.85 ? 0x7fff7f : 0xffd84a, 1).fillRect(LARGEUR - 66, 416 - 252 * f, 26, 252 * f);
-        if (this.diff.aide) this.repere(gv, this.visee.x + s.x, 0.6 + f * 2.0 + s.z);
-      }
-      if (this.glisse) {
-        const gl = this.glisse;
-        gv.lineStyle(5, 0xffd84a, 0.8).lineBetween(gl.x0, gl.y0, gl.x, gl.y);
-        gv.fillStyle(0xffd84a, 1).fillCircle(gl.x, gl.y, 8);
-        const c = this.cibleGlisse(gl.x0, gl.y0, gl.x, gl.y);
-        if (c && this.diff.aide) this.repere(gv, c.x + s.x, c.z + s.z);
+    if (this.etat === 'vise' || this.etat === 'force') {
+      const s = this.tangage(), v = this.visee;
+      const p = proj(v.x + s.x, H_VERRE, v.z + s.z), r = P.rayon * p.k;
+      const pulse = this.etat === 'vise' ? 1 + 0.15 * Math.sin(this.horloge * 8) : 1;
+      gv.lineStyle(3, 0xffd84a, 1).strokeEllipse(p.x, p.y, r * 2.6 * pulse, r * 1.2 * pulse);
+      gv.lineBetween(p.x - r * 1.8, p.y, p.x - r * 0.7, p.y).lineBetween(p.x + r * 0.7, p.y, p.x + r * 1.8, p.y);
+      gv.lineBetween(p.x, p.y - r * 1.2, p.x, p.y - r * 0.4);
+      if (this.etat === 'force') {
+        const x0 = 260, L = 440, y = 452, z = this.diff.zoneForce;
+        gv.fillStyle(0x000000, 0.7).fillRect(x0 - 6, y - 6, L + 12, 34);
+        gv.fillStyle(0xb03a3a, 1).fillRect(x0, y, L, 22);
+        gv.fillStyle(0xffd84a, 1).fillRect(x0 + L * (0.5 - z / 2 - 0.1), y, L * (z + 0.2), 22);
+        gv.fillStyle(0x3ad03a, 1).fillRect(x0 + L * (0.5 - z / 2), y, L * z, 22);
+        gv.fillStyle(0xffffff, 1).fillRect(x0 + L * v.force - 4, y - 10, 8, 42);
+        this.txtCourt.setVisible(true); this.txtLoin.setVisible(true);
+        if (this.diff.aide) { const q = proj(v.x + s.x, H_VERRE, v.z + s.z + this.ecartForce(v.force)); gv.fillStyle(0x7fff7f, 0.9).fillCircle(q.x, q.y, 4); }
       }
     }
+    if (this.etat !== 'force') { this.txtCourt.setVisible(false); this.txtLoin.setVisible(false); }
     // HUD
     const n = (l) => l.filter(v => v.plein).length;
     this.hud.setText(`TOI : ${n(this.verresToi)} verres      RÉMI : ${n(this.verresRemi)} verres      bus : ${this.ivresse}`);
-    const tour = this.etat === 'vise' ? `À TOI  -  balle ${3 - this.balles} / 2  -  ${estTactile() ? 'glisse le doigt vers le haut' : 'glisse la souris, ou ◀ ▶ + ESPACE'}`
+    const tour = this.etat === 'vise' ? `À TOI  -  balle ${3 - this.balles} / 2  -  ${estTactile() ? 'touche le verre visé' : 'clique sur un verre (ou ◀ ▶ ▲ ▼ + ESPACE)'}`
+      : this.etat === 'force' ? `${estTactile() ? 'TOUCHE' : 'CLIQUE / ESPACE'} quand le curseur est dans le VERT !`
       : (this.etat === 'remi' || (this.balle && this.balle.qui === 'remi')) ? 'RÉMI LANCE...' : '';
     this.hudTour.setText(tour).setVisible(!!tour);
     // l'ivresse fait un peu tanguer l'écran

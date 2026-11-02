@@ -32,13 +32,16 @@
   (DRING, recharge 1,5 s). Bourré allongé / verre cassé / flaque : sauter ; bourré debout : sonner (trop haut pour sauter) ;
   bourré qui traverse (vient du fond, « ! » rouge) : freiner ou foncer. Chrono « fermeture du bar » ; textos de Rémi.
   Les 3 premiers obstacles = allongé, debout, traverse (avec aide écrite, sauf CHAMPION).
-- 2) BEER PONG, vu de ton bout de table (projection 3D maison) : glisser le doigt/souris vers le haut (longueur = force,
-  côté = direction) ou ◀ ▶ + ESPACE maintenu (jauge). 6 verres (réglable : 10), 2 balles/tour, BALLS BACK, rebord = 1 chance
+- 2) BEER PONG, vu de ton bout de table (projection 3D maison). VISÉE V2 (retour : « je n'y arrive pas » avec le glissé) :
+  1) toucher / cliquer le verre visé (aimanté au verre le plus proche ; clavier ◀ ▶ ▲ ▼ + ESPACE), 2) jauge de FORCE qui va et
+  vient, toucher / ESPACE dans le VERT (`zoneForce` par difficulté) ; hors du vert = trop court / trop loin. 6 verres (réglable : 10), 2 balles/tour, BALLS BACK, rebord = 1 chance
   sur 2. Chaque verre que Rémi te met = tu bois : ta visée tangue (et l'écran penche). FACILE : point d'arrivée affiché.
 - 3) LA PORTE (WC du bar), façon borne « boxeur » : Rémi frappe, puis toi : ÉLAN (tapoter 2,6 s) puis VISÉE (zone verte).
   Score /999 sur un afficheur rouge, fissures, 2 manches gagnées = la porte cède = BADGE.
 - Bot (test playwright, NORMAL) : bar atteint avec 26 s d'avance, 1 chute ; pong gagné 2 verres à 1 ; porte 2-0.
-- RESTE : faire jouer Fabien et équilibrer ; images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
+- IMAGES REÇUES (V2) : planche du vélo → `remi_velo.png` (6 pédalages + saut + chute) et buste de Rémi →
+  `remi_presentation.png` (présentation + Rémi derrière la table au beer pong) : `python3 outils/remi/preparer_images.py`.
+- RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
 ## Décisions

@@ -44,6 +44,8 @@ export class RemiVelo extends BossScene {
     this.creerDecor();
     this.decor = this.add.graphics().setDepth(2);
     this.gVelo = this.add.graphics().setDepth(10);
+    // l'illustration du vélo (8 poses) ; sans fichier, c'est le dessin du code
+    this.sprVelo = this.textures.exists('remi_velo') ? this.add.sprite(0, 0, 'remi_velo', 0).setOrigin(0.5, 1).setDepth(10).setScale(0.6) : null;
     this.gRemi = this.add.graphics().setDepth(6);
     this.enseigne = texte(this, 0, 0, 'BAR', 54, '#ff4fd8', { fontStyle: 'bold', stroke: '#5a0a4a', strokeThickness: 6 }).setDepth(4).setVisible(false);
     this.creerHud();
@@ -314,7 +316,12 @@ export class RemiVelo extends BossScene {
     gv.setPosition(210 + this.v * 0.25, SOL + bond);
     if (this.chute > 0) gv.setRotation(-1.3 + (1 - this.chute / V.chute) * 0.2).setPosition(gv.x + 20, SOL - 30);
     else gv.setRotation((this.vy > 0 ? -0.12 : this.y > 0 ? 0.08 : 0) + zig);
-    cycliste(gv, this.a, { danseuse: this.touches && this.touches.droite.isDown && this.v < 300, sonnette: this.dring > 0 });
+    if (this.sprVelo) {
+      const f = this.chute > 0 ? 7 : this.y > 0 ? 6 : Math.floor(this.a / (Math.PI * 2) * 6) % 6;
+      this.sprVelo.setFrame(f).setPosition(210 + this.v * 0.25, SOL + bond + 6).setRotation(this.chute > 0 ? 0 : gv.rotation);
+      gv.setRotation(0);
+      if (this.dring > 0) gv.lineStyle(3, 0xffe680, 1).strokeCircle(60, -150, 8).strokeCircle(60, -150, 16);
+    } else cycliste(gv, this.a, { danseuse: this.touches && this.touches.droite.isDown && this.v < 300, sonnette: this.dring > 0 });
     // HUD
     if (this.etat === 'jeu' || this.etat === 'arrivee') {
       const s = Math.max(0, Math.ceil(this.tempsRestant));

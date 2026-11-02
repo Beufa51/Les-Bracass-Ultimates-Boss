@@ -5,7 +5,7 @@ Tout est dessiné au code pour l'instant (`src/bosses/remi/dessins.js`). Dépose
 
 Style commun à mettre dans chaque prompt : **manga / anime coloré, contours noirs nets, fond BLANC uni** (pour le détourage).
 
-## 1. Présentation de Rémi — `remi_presentation.jpg`
+## 1. Présentation de Rémi — `remi_presentation.jpg` ✅ REÇUE ET INTÉGRÉE
 À joindre : **une ou deux photos de Rémi** (visage bien visible).
 ```
 Dessine la personne de la photo jointe en style manga/anime coloré, contours noirs nets, NON caricatural (on doit le reconnaître).
@@ -13,7 +13,7 @@ Buste coupé aux hanches, de 3/4 face, sourire chambreur, une pinte de bière le
 Tenue de sortie au bar (tee-shirt orange ou chemise ouverte, casquette noire). Fond blanc uni, aucun texte, image verticale.
 ```
 
-## 2. Toi à vélo, de profil — `remi_velo_planche.jpg`
+## 2. Toi à vélo, de profil — `remi_velo_planche.jpg` ✅ REÇUE ET INTÉGRÉE
 À joindre : rien (ou ta photo si tu veux être reconnaissable).
 ```
 Planche de sprites style manga/anime coloré, contours noirs nets, fond blanc uni. Un jeune homme à vélo de ville vu

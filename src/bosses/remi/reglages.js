@@ -6,20 +6,22 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 // Niveaux de difficulté (choisis avant le vélo, gardés pour les 3 jeux)
 //  VÉLO : temps = secondes avant la fermeture du bar ; densite = obstacles (x) ; traverse = vitesse des bourrés qui traversent (x)
 //         sonnette = distance max (px) où la sonnette fait s'écarter un bourré debout
-//  PONG : erreur = imprécision de TES lancers (m) ; remi = chance que Rémi mette un verre ; aide = point d'arrivée affiché en visant
+//  PONG : erreur = imprécision de TES lancers (m) ; zoneForce = largeur de la zone VERTE de la jauge de force (0 à 1) ;
+//         remi = chance que Rémi mette un verre ; aide = point d'arrivée affiché sur la table pendant la jauge
+//         (la vitesse du curseur de force = « visee », comme à la porte)
 //  PORTE : remiMin / remiMax = scores de Rémi ; zone = largeur de la zone parfaite de la visée (0 à 1) ; visee = vitesse du curseur (x)
 export const DIFFICULTES = {
   facile: { nom: 'FACILE', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
     temps: 80, densite: 0.75, traverse: 0.8, sonnette: 560,
-    erreur: 0.025, remi: 0.28, aide: true,
+    erreur: 0.012, zoneForce: 0.3, remi: 0.28, aide: true,
     remiMin: 560, remiMax: 760, zone: 0.22, visee: 0.8 },
   normal: { nom: 'NORMAL', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 66, densite: 1, traverse: 1, sonnette: 500,
-    erreur: 0.035, remi: 0.38, aide: false,
+    erreur: 0.018, zoneForce: 0.2, remi: 0.38, aide: false,
     remiMin: 650, remiMax: 850, zone: 0.15, visee: 1 },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 56, densite: 1.3, traverse: 1.25, sonnette: 440,
-    erreur: 0.045, remi: 0.5, aide: false,
+    erreur: 0.025, zoneForce: 0.13, remi: 0.5, aide: false,
     remiMin: 760, remiMax: 930, zone: 0.1, visee: 1.3 },
 };
 
@@ -47,7 +49,7 @@ export const PONG = {
   rebord: 1.2,            // entre « dedans » et rayon x ce chiffre : sur le REBORD (une chance sur deux)
   dureeVol: 0.85,         // durée du vol de la balle (s)
   ivresse: 0.012,         // chaque verre bu fait tanguer ta visée de ce nombre de mètres en plus
-  balancier: 1.5,         // durée (s) d'un aller-retour de la jauge de force (clavier)
+  balancier: 1.5,         // durée (s) d'un aller-retour du curseur de force (à vitesse x1)
 };
 
 export const PORTE = {
