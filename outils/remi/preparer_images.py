@@ -85,5 +85,18 @@ def presentation():
     im.save(DST + 'remi_presentation.png')
     print('remi_presentation.png', im.size)
 
+def planche_pong():
+    # 4 cases (2 x 2) séparées par des traits noirs, chacune finie en bas par un bout de table en bois (retiré) :
+    # attend, lance, boit, nargue -> remi_pong.png (Rémi de face, coupé à la taille)
+    im = Image.open(SRC + 'remi_pong_planche.jpg').convert('RGB')
+    cases = [(3, 3, 405, 580), (426, 3, 829, 580), (3, 644, 405, 1216), (426, 644, 829, 1216)]
+    poses = [detourer(im.crop(c), grand=1500) for c in cases]
+    W = max(p.size[0] for p in poses); H = max(p.size[1] for p in poses)
+    bande = Image.new('RGBA', (W * 4, H), (0, 0, 0, 0))
+    for k, p in enumerate(poses): bande.paste(p, (k * W + (W - p.size[0]) // 2, H - p.size[1]))
+    bande.save(DST + 'remi_pong.png')
+    print('remi_pong.png', W, H)
+
 planche_velo()
 presentation()
+planche_pong()

@@ -40,7 +40,8 @@
   Score /999 sur un afficheur rouge, fissures, 2 manches gagnées = la porte cède = BADGE.
 - Bot (test playwright, NORMAL) : bar atteint avec 26 s d'avance, 1 chute ; pong gagné 2 verres à 1 ; porte 2-0.
 - IMAGES REÇUES (V2) : planche du vélo → `remi_velo.png` (6 pédalages + saut + chute) et buste de Rémi →
-  `remi_presentation.png` (présentation + Rémi derrière la table au beer pong) : `python3 outils/remi/preparer_images.py`.
+  `remi_presentation.png` (présentation) ; planche 2x2 du beer pong → `remi_pong.png` (attend, lance, boit quand tu le
+  touches, nargue quand il te touche) : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

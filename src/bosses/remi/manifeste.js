@@ -9,7 +9,9 @@ export const MANIFESTE = {
   images: {
     // outils/remi/preparer_images.py : planche de assets_inbox/remi/ détourée et découpée
     // vélo de profil : 6 poses de pédalage, saut, chute (posées en bas, centrées)
-    remi_velo: { fichier: 'sprites/remi/remi_velo.png', largeur: 267, hauteur: 296, images: 8, vitesse: 10 },
+    remi_velo: { fichier: 'sprites/remi/remi_velo.png', largeur: 266, hauteur: 296, images: 8, vitesse: 10 },
+    // Rémi de face au beer pong : attend, lance, boit, nargue
+    remi_pong: { fichier: 'sprites/remi/remi_pong.png', largeur: 403, hauteur: 577, images: 4, vitesse: 1 },
     remi_presentation: { fichier: 'sprites/remi/remi_presentation.png', largeur: 832, hauteur: 1202, images: 1, vitesse: 1 },
   },
   sons: {

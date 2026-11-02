@@ -43,7 +43,7 @@ Façade d'un bar de quartier la nuit, style manga/anime, vue de face : enseigne 
 porte en bois, quelques tables hautes en terrasse. Aucun personnage. Fond = la rue de nuit. Image horizontale.
 ```
 
-## 6. Le beer pong : Rémi en face — `remi_pong_planche.jpg`
+## 6. Le beer pong : Rémi en face — `remi_pong_planche.jpg` ✅ REÇUE ET INTÉGRÉE
 À joindre : les photos de Rémi (et l'image `remi_presentation.jpg` une fois faite, pour garder le même style).
 ```
 Même personnage que l'image jointe, style manga/anime, contours noirs nets, fond blanc uni. Vu DE FACE, coupé à la taille

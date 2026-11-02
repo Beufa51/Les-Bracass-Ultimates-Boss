@@ -58,7 +58,7 @@ export class RemiPong extends BossScene {
     this.txtLoin = texte(this, 735, 463, 'loin', 16, '#ffb0b0').setDepth(901).setVisible(false);
     this.touches = creerTouches(this);
     this.installerVisee();
-    this.pose = 'face';
+    this.pose = 'face'; this.poseFin = 0;
 
     etiquettesTactiles({ ...ETIQUETTES_VIDES, espace: 'OK' });
     const t = estTactile();
@@ -111,7 +111,7 @@ export class RemiPong extends BossScene {
 
   // ---------- viser au doigt / à la souris ----------
   commencerVisee() {
-    this.etat = 'vise';
+    this.etat = 'vise'; this.viseDepuis = this.horloge;
     const v = this.visee, pleins = this.verresRemi.filter(c => c.plein);
     if (pleins.length) { const c = pleins.reduce((a, b) => (Math.abs(b.x) + Math.abs(b.z - (D - 0.25)) < Math.abs(a.x) + Math.abs(a.z - (D - 0.25)) ? b : a)); v.x = c.x; v.z = c.z; }
     etiquettesTactiles({ ...ETIQUETTES_VIDES, espace: 'OK' });
@@ -168,7 +168,7 @@ export class RemiPong extends BossScene {
       if (T.haut.isDown) v.z += 0.35 * dt;
       if (T.bas.isDown) v.z -= 0.35 * dt;
       v.x = Phaser.Math.Clamp(v.x, -W / 2, W / 2); v.z = Phaser.Math.Clamp(v.z, D / 2, D);
-      if (vientDAppuyer(T.espace)) this.commencerForce();
+      if (vientDAppuyer(T.espace) && this.horloge - this.viseDepuis > 0.25) this.commencerForce();
       return;
     }
     v.t += dt;
@@ -199,8 +199,7 @@ export class RemiPong extends BossScene {
     if (Math.random() < chance) { const r = Math.random() * P.rayon * 0.5; tx = cible.x + Math.cos(a) * r; tz = cible.z + Math.sin(a) * r; }
     else { const r = hasard(P.rayon * 1.3, P.rayon * 3.2); tx = cible.x + Math.cos(a) * r; tz = cible.z + Math.sin(a) * r; }
     this.balles--;
-    this.pose = 'lance';
-    this.time.delayedCall(350, () => { this.pose = 'face'; });
+    this.poseTemp('lance', 0.6);
     this.lancer({ x: hasard(-0.12, 0.12), y: 0.55, z: D + 0.25 }, tx, tz, this.verresToi, 'remi');
     jouerSon(this, 'remi_lance');
   }
@@ -259,10 +258,12 @@ export class RemiPong extends BossScene {
     this.cameras.main.shake(120, 0.004);
     if (b.qui === 'toi') {
       this.ivresseRemi++;
+      this.time.delayedCall(450, () => this.poseTemp('boit', 1.6));
       bulle(this, choisir(['PLOUF !', 'DEDANS !', 'Bois, Rémi !']), '#7fff7f', 1, 300);
       if (Math.random() < 0.6) this.time.delayedCall(700, () => bulle(this, `Rémi : « ${choisir(REPLIQUES.pongToucheToi)} »`, '#ffd84a', 1.6, 250));
     } else {
       this.ivresse++;
+      this.time.delayedCall(300, () => this.poseTemp('nargue', 1.6));
       bulle(this, `Tu bois ! (verres bus : ${this.ivresse})`, '#ffb0b0', 1.3, 300);
       this.time.delayedCall(600, () => bulle(this, `Rémi : « ${choisir(REPLIQUES.pongToucheRemi)} »`, '#ffd84a', 1.6, 250));
       this.cameras.main.shake(300, 0.006);
@@ -303,16 +304,21 @@ export class RemiPong extends BossScene {
     // Rémi derrière la table (il tangue un peu plus à chaque verre bu)
     const gr = this.gRemi.clear();
     const bal = Math.sin(this.horloge * 1.5) * (2 + this.ivresseRemi * 2);
-    if (this.textures.exists('remi_presentation') && this.textures.get('remi_presentation').key !== '__MISSING') {
-      // l'illustration de Rémi (buste, pinte à la main), cachée en bas par la table ; il se penche en lançant
-      if (!this.imgRemi) this.imgRemi = this.add.image(CX, 0, 'remi_presentation').setOrigin(0.5, 1).setDepth(3).setScale(210 / 1202);
-      this.imgRemi.setPosition(CX + bal, proj(0, 0, D).y + 40 + (this.pose === 'lance' ? -10 : 0)).setRotation(bal * 0.004 + (this.pose === 'lance' ? 0.12 : 0));
+    if (this.pose !== 'face' && this.horloge > this.poseFin) this.pose = 'face';
+    if (this.textures.exists('remi_pong')) {
+      // la planche de Rémi de face (attend, lance, boit, nargue), coupée à la taille : la table cache le bas
+      if (!this.imgRemi) this.imgRemi = this.add.sprite(CX, 0, 'remi_pong', 0).setOrigin(0.5, 1).setDepth(3).setScale(0.36);
+      this.imgRemi.setFrame({ face: 0, lance: 1, boit: 2, nargue: 3 }[this.pose] ?? 0);
+      this.imgRemi.setPosition(CX + bal, proj(0, 0, D).y + 34).setRotation(bal * 0.004);
       return this.dessinerTable();
     }
     gr.setPosition(CX + bal, proj(0, 0, D).y + 6).setRotation(bal * 0.004);
     remi(gr, this.pose, this.horloge);
     this.dessinerTable();
   }
+
+  // pose de Rémi pendant d secondes, puis il revient en attente
+  poseTemp(p, d = 1.4) { this.pose = p; this.poseFin = this.horloge + d; }
 
   dessinerTable() {
     const g = this.g.clear();
