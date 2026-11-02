@@ -155,6 +155,11 @@
   2 poses comme le videur) → REÇUES ET INTÉGRÉES : `remi_pisseur.png`, `remi_mamie.png` (`videur()` dans preparer_images.py). VÉLO : pédalage = 3 poses de la 1re rangée en 0-1-2-1, cases calées
   à droite (plus de vélo qui saute) ; 0,85 s mini entre 2 obstacles (+0,5 s après une poubelle) ; pintes : « +1 s » qui
   file vers l'horloge (qui clignote en vert), explication à la 1re pinte, compteur 🍺 en haut à droite. : `python3 outils/remi/preparer_images.py`.
+- V17 (retour de Fabien : trop d'intrus, le videur manquait ; fissures vers la serrure pas crédibles) : MAMIE RETIRÉE
+  (image `remi_mamie.png` gardée dans le manifeste, plus utilisée) : il reste le VIDEUR (62 %, t'attrape) et le GARS QUI
+  VIENT PISSER (38 %, ne t'attrape jamais = feinte, même annonce que le videur). PORTE : plus de fissures en étoile ni de
+  creux ; un TROU déchiqueté AU MILIEU du battant (`formeTrou` / `dessinerTrou`), qui grandit avec les dégâts et rétrécit
+  quand le barman rafistole ; le poing frappe désormais au centre (`IMPACT.x` = milieu de la porte).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

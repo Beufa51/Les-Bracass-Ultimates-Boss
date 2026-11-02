@@ -21,7 +21,8 @@ import { bulle, annonce, ecranPerdu, difficulteOuChoix, hasard, choisir, laisser
 const BATTANT = { x: 774, y: 147, l: 140, h: 322 };
 const ZOOM = 1.5, DECOR_X = -480, DECOR_Y = -183;
 const PORTE = { x: DECOR_X + BATTANT.x * ZOOM, y: DECOR_Y + BATTANT.y * ZOOM, l: BATTANT.l * ZOOM, h: BATTANT.h * ZOOM };
-const IMPACT = { x: 730, y: 272 };   // où le poing touche la porte (écran)
+// V17 : le poing frappe AU MILIEU de la porte (c'est là qu'elle se casse, plus de traits vers la serrure)
+const IMPACT = { x: PORTE.x + PORTE.l / 2, y: 272 };   // où le poing touche la porte (écran)
 // planches de dos : cases alignées à gauche ; « poing » = où est le poing dans la case de l'impact
 const DOS = {
   // V16 : planche « coups » (en pied, le poing qui écrase la porte) : poing de l'impact à x 321 / 317, y 107 dans la case
@@ -32,12 +33,11 @@ const VIDEUR = { x: 120, echelle: 0.42 };   // l'intrus passe la tête au coin d
 // LES INTRUS (V13) : pas que le videur ! Chacun a ses pas, son ombre, son rythme et ses feintes préférées.
 //  lent : x durée de l'annonce ; regard : x durée du regard ; ombre : taille ; feinte : mode préféré (en plus des autres)
 const INTRUS = {
-  videur: { poids: 0.45, nom: 'Le videur', lent: 1, regard: 1, ombre: 1, pas: ['remi_atterrit', 0.6], rythme: [0.18, 0.4], feinte: null,
+  videur: { poids: 0.62, nom: 'Le videur', lent: 1, regard: 1, ombre: 1, pas: ['remi_atterrit', 0.6], rythme: [0.18, 0.4], feinte: null,
     repliques: 'porteAttrape' },
-  pisseur: { poids: 0.33, nom: 'Le gars qui vient pisser', lent: 1, regard: 1.3, ombre: 1, pas: ['remi_atterrit', 0.8], rythme: [0.2, 0.65], feinte: 'fausse',
+  pisseur: { poids: 0.38, nom: 'Le gars qui vient pisser', lent: 1, regard: 1.3, ombre: 1, pas: ['remi_atterrit', 0.8], rythme: [0.2, 0.65], feinte: 'fausse',
     repliques: 'porteAttrapePisseur' },
-  mamie: { poids: 0.22, nom: 'La mamie', lent: 1, regard: 1.6, ombre: 1, pas: ['remi_rebond', 0.45], rythme: [0.45, 0.6], feinte: 'retour',
-    repliques: 'porteAttrapeMamie' },
+  // (V17 : la mamie est retirée à la demande de Fabien : plus que le videur, et le gars qui vient pisser pour les feintes)
 };
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 
@@ -51,7 +51,7 @@ export class RemiPorte extends BossScene {
     this.etat = 'intro';         // intro | remi | toi | coup | pause | fin
     this.horloge = 0; this.frappeur = 'remi'; this.pose = { remi: 'garde', toi: 'garde' };
     this.solidite = R.solidite; this.puissance = 0; this.cible = { x: 0, y: 0 }; this.tCible = 0; this.tCoup = 0;
-    this.fissures = []; this.eclats = []; this.creux = []; this.elan = 0; this.flash = 0; this.gel = 0; this.tremble = 0; this.entree = 1; this.dernierFrappeur = null;
+    this.eclats = []; this.degats = 0; this.trou = this.formeTrou(); this.elan = 0; this.flash = 0; this.gel = 0; this.tremble = 0; this.entree = 1; this.dernierFrappeur = null;
     this.compteur = 0; this.coups = { toi: 0, remi: 0 }; this.attrapes = { toi: 0, remi: 0 };
     this.videur = { etat: 'absent', t: 2.5, x: -300, pose: 0 };
     this.doigt = false; this.charge = false; this.remiAttend = 0;
@@ -64,11 +64,9 @@ export class RemiPorte extends BossScene {
       toi: this.add.sprite(0, 0, DOS.toi.tex, 0).setOrigin(0, 0).setScale(DOS.toi.echelle).setDepth(6).setVisible(false),
     };
     this.sprVideur = this.add.sprite(-300, HAUTEUR + 10, 'remi_videur', 0).setOrigin(0.5, 1).setScale(VIDEUR.echelle).setDepth(7);
-    // le gars qui vient pisser : son image si elle existe, sinon un bourré (debout / il sursaute) ; la mamie : image ou dessin
+    // le gars qui vient pisser : son image si elle existe, sinon un bourré (debout / il sursaute)
     this.sprPisseur = this.textures.exists('remi_pisseur') ? this.add.sprite(-300, HAUTEUR + 10, 'remi_pisseur', 0).setOrigin(0.5, 1).setScale(VIDEUR.echelle).setDepth(7)
       : this.add.sprite(-300, HAUTEUR + 60, 'remi_bourres', 0).setOrigin(0.5, 1).setScale(0.62).setDepth(7);
-    this.sprMamie = this.textures.exists('remi_mamie') ? this.add.sprite(-300, HAUTEUR + 10, 'remi_mamie', 0).setOrigin(0.5, 1).setScale(VIDEUR.echelle).setDepth(7) : null;
-    this.gMamie = this.add.graphics().setDepth(7);
     this.gJauges = this.add.graphics().setDepth(900);
     this.ecran = texte(this, 130, 110, '000', 54, '#ff3030', { fontStyle: 'bold', stroke: '#300000', strokeThickness: 6, backgroundColor: '#100000' }).setDepth(4);
     this.hud = texte(this, 190, 28, '', 20, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
@@ -90,7 +88,7 @@ export class RemiPorte extends BossScene {
       `MAINTIENS ${t ? 'le doigt sur l\'écran' : 'ESPACE'} : tu armes ton poing (ça monte de plus en plus vite)`,
       'LÂCHE : le coup part. Lâche quand la cible passe sur ton poing (+) = coup parfait.',
       'Des pas, une ombre, le « ! »... QUELQU\'UN ARRIVE. S\'il te voit charger : ATTRAPÉ !',
-      'Mais qui ? Le VIDEUR ne rate rien ; la MAMIE n\'entend que les gros coups ; le GARS QUI VIENT PISSER s\'en fiche !',
+      'Mais qui ? Le VIDEUR ne rate rien... mais si c\'est juste le GARS QUI VIENT PISSER, il s\'en fiche !',
       'Et il FEINTE : fausse alerte, il surgit sans prévenir, il revient d\'un coup...',
       'Celui dont le coup fait CÉDER la porte gagne.',
     ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.tour('remi'); }));
@@ -193,7 +191,6 @@ export class RemiPorte extends BossScene {
       const I = INTRUS[v.qui];
       const f = this.diff.feintes, r = Math.random();
       v.mode = v.retourPrevu ? 'retour' : I.feinte && Math.random() < f * 0.6 ? I.feinte : r < f * 0.45 ? 'fausse' : r < f * 0.8 ? 'surprise' : 'normal';
-      if (v.mode === 'retour' && !v.retourPrevu) v.mode = 'normal', v.retourForce = true;   // (la mamie revient toujours)
       v.retourPrevu = false;
       const base = R.videurAnnonce * this.diff.videur * I.lent;
       v.duree = v.mode === 'surprise' ? 0.3 : v.mode === 'retour' ? 0.4 : base * hasard(0.6, 1.3);
@@ -211,9 +208,8 @@ export class RemiPorte extends BossScene {
         v.etat = 'regarde'; v.t = hasard(R.videurRegard[0], R.videurRegard[1]) * INTRUS[v.qui].regard * (v.mode === 'retour' ? 0.6 : 1);
         v.pose = 0; v.vu = false; jouerSon(this, 'remi_scratch');
         // ... et on découvre QUI c'est : le gars qui vient pisser s'en fiche (on aurait pu continuer !),
-        // la mamie n'entend que les GROS coups (charge à plus de 50 %) ; le videur, lui, ne rate rien
+        // le videur, lui, ne rate rien
         if (v.qui === 'pisseur') { bulle(this, 'Le gars : « Pardon, pardon... URGENCE ! » (il s\'en fiche : continue !)', '#9fe0ff', 1.6, 150); this.time.delayedCall(300, () => jouerSon(this, 'remi_hips')); }
-        if (v.qui === 'mamie') { bulle(this, 'La mamie : « Hein ? C\'est quoi ce bruit ? » (elle est un peu sourde...)', '#d8b0ff', 1.6, 150); jouerSon(this, 'remi_rebond', { rate: 0.45 }); }
       }
     } else if (v.etat === 'repart') {
       v.pas -= dt;
@@ -224,13 +220,11 @@ export class RemiPorte extends BossScene {
       let fautif = (this.etat === 'toi' || this.etat === 'remi') && this.charge ? this.frappeur
         : this.etat === 'coup' && this.tCoup < 0.25 ? this.frappeur : null;
       if (v.qui === 'pisseur') fautif = null;                                                  // trop pressé pour regarder
-      if (v.qui === 'mamie' && this.etat !== 'coup' && this.puissance < 0.5) fautif = null;   // un peu sourde : seulement les gros coups
       if (fautif && !v.vu) this.attraper(fautif);
       if (v.t <= 0) {
         v.etat = 'absent'; v.pose = 0;
         // le coup du 2e coup d'œil : il revient tout de suite
-        v.retourPrevu = v.mode !== 'retour' && (v.retourForce || Math.random() < this.diff.feintes * 0.5);
-        v.retourForce = false;
+        v.retourPrevu = v.mode !== 'retour' && Math.random() < this.diff.feintes * 0.5;
         v.t = v.retourPrevu ? hasard(0.4, 0.8) : hasard(R.videurAttente[0], R.videurAttente[1]) * this.diff.videur;
       }
     }
@@ -270,7 +264,6 @@ export class RemiPorte extends BossScene {
   impact(qui, score) {
     // LE COUP SE VOIT (V15) : le frappeur plonge en avant, une bulle de BD « BAM ! » éclate sur la porte, le bois garde un CREUX
     this.elan = 0.18;
-    this.creux.push({ x: IMPACT.x + hasard(-8, 8), y: IMPACT.y + hasard(-8, 8), r: 8 + score / 45 });
     this.bulleBD(score);
     this.solidite = Math.max(0, this.solidite - score);
     this.gel = 0.06 + score / 999 * 0.1;
@@ -279,8 +272,6 @@ export class RemiPorte extends BossScene {
     jouerSon(this, score >= R.casse ? 'remi_porte_fort' : 'remi_porte');
     // la porte se BOMBE puis revient
     this.tweens.add({ targets: this.battant, scaleX: ZOOM * (1 - 0.06 * score / 999), scaleY: ZOOM * (1 + 0.03 * score / 999), duration: 70, yoyo: true });
-    const n = 2 + Math.floor(score / 140), L = 20 + score / 7;
-    for (let k = 0; k < n; k++) this.fissures.push(this.fissure(Math.random() * Math.PI * 2, L * hasard(0.5, 1)));
     for (let k = 0; k < Math.floor(score / 60); k++) this.eclats.push({ x: IMPACT.x, y: IMPACT.y, vx: hasard(-260, 260), vy: hasard(-380, 80), r: hasard(-6, 6), a: 0, vie: hasard(0.5, 1) });
     if (score >= R.casse) this.flash = 1;
     this.compteur = 0; this.tweens.add({ targets: this, compteur: score, duration: 600, ease: 'Cubic.Out' });
@@ -305,13 +296,39 @@ export class RemiPorte extends BossScene {
     this.tweens.add({ targets: [gb, t], alpha: 0, delay: 450, duration: 200, onComplete: () => { gb.destroy(); t.destroy(); } });
   }
 
-  fissure(angle, longueur) {
-    const pts = [[IMPACT.x, IMPACT.y]];
-    for (let k = 1; k <= 5; k++) {
-      const r = longueur * k / 5, a = angle + hasard(-0.25, 0.25);
-      pts.push([Phaser.Math.Clamp(IMPACT.x + Math.cos(a) * r, PORTE.x + 6, PORTE.x + PORTE.l - 6), Phaser.Math.Clamp(IMPACT.y + Math.sin(a) * r, PORTE.y + 6, PORTE.y + PORTE.h - 6)]);
+  // le TROU au milieu de la porte (V17) : une forme déchiquetée tirée une fois, qui grandit avec les dégâts
+  formeTrou() {
+    const n = 22, bords = [], echardes = [], fentes = [];
+    for (let i = 0; i < n; i++) bords.push(hasard(0.7, 1.15) * (i % 2 ? 0.82 : 1));
+    for (let i = 0; i < 9; i++) echardes.push({ a: Math.random() * Math.PI * 2, l: hasard(0.25, 0.55), w: hasard(0.12, 0.22) });
+    for (let i = 0; i < 6; i++) {
+      const a = i / 6 * Math.PI * 2 + hasard(-0.3, 0.3), pts = [];
+      for (let k = 0; k <= 3; k++) pts.push([a + hasard(-0.2, 0.2), k / 3]);
+      fentes.push(pts);
     }
-    return pts;
+    return { bords, echardes, fentes };
+  }
+
+  dessinerTrou(g, dx) {
+    const d = this.degats;
+    if (d <= 0.01) return;
+    const cx = IMPACT.x + dx, cy = IMPACT.y, R0 = 10 + d * 72, n = this.trou.bords.length;
+    const pt = (a, r) => ({ x: cx + Math.cos(a) * r * Math.min(1, (PORTE.l / 2 - 6) / (R0 * 1.25)), y: cy + Math.sin(a) * r * 1.3 });
+    const contour = k => this.trou.bords.map((b, i) => pt(i / n * Math.PI * 2, R0 * b * k));
+    // le bois enfoncé autour (plus sombre), le bois cassé (clair) puis le trou noir
+    g.fillStyle(0x2a1608, 0.55).fillPoints(contour(1.45), true);
+    g.fillStyle(0xd9a866, 1).fillPoints(contour(1.12), true);
+    g.fillStyle(0x070403, 1).fillPoints(contour(1), true);
+    // échardes qui pointent vers l'intérieur du trou
+    g.fillStyle(0xc89050, 1);
+    for (const e of this.trou.echardes) g.fillTriangle(pt(e.a - e.w, R0 * 1.05).x, pt(e.a - e.w, R0 * 1.05).y, pt(e.a + e.w, R0 * 1.05).x, pt(e.a + e.w, R0 * 1.05).y, pt(e.a, R0 * (1 - e.l)).x, pt(e.a, R0 * (1 - e.l)).y);
+    // quelques fentes COURTES qui partent du trou (pas jusqu'au bord de la porte)
+    g.lineStyle(3, 0x1a0e06, 1);
+    for (const f of this.trou.fentes) {
+      g.beginPath();
+      f.forEach(([a, k], i) => { const p = pt(a, R0 * 1.1 + k * (8 + d * 30)); i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y); });
+      g.strokePath();
+    }
   }
 
   porteCede(qui) {
@@ -319,7 +336,7 @@ export class RemiPorte extends BossScene {
     jouerSon(this, 'remi_porte_fort'); jouerSon(this, 'remi_foule');
     this.cameras.main.shake(500, 0.02);
     this.tweens.add({ targets: this.battant, x: PORTE.x + PORTE.l, scaleX: 0.1, duration: 260, ease: 'Cubic.In' });
-    this.fissures = []; this.creux = [];
+    this.degats = 0;
     if (qui === 'toi') {
       annonce(this, 'LA PORTE CÈDE !', '#ffd84a', 1.4);
       this.time.delayedCall(1800, () => this.victoire(REPLIQUES.porteGagne));
@@ -337,16 +354,9 @@ export class RemiPorte extends BossScene {
     const dx = Math.sin(this.horloge * 60) * this.tremble * 5;
     if (this.etat !== 'fin') this.battant.x = PORTE.x + PORTE.l / 2 + dx;
     this.elan = Math.max(0, this.elan - dt);
-    // les CREUX dans le bois (sous les fissures) : plus le coup est fort, plus le creux est grand
-    for (const c of this.creux) {
-      g.fillStyle(0x1a0e06, 0.55).fillEllipse(c.x + dx, c.y, c.r * 2, c.r * 1.6);
-      g.fillStyle(0x3a2412, 0.6).fillEllipse(c.x + dx - c.r * 0.2, c.y - c.r * 0.2, c.r * 1.2, c.r * 0.9);
-    }
-    for (const f of this.fissures) {
-      g.lineStyle(3, 0x1a0e06, 1).beginPath(); g.moveTo(f[0][0] + dx, f[0][1]);
-      for (const [x, y] of f.slice(1)) g.lineTo(x + dx, y);
-      g.strokePath();
-    }
+    // le TROU au milieu : il suit les dégâts (et rétrécit quand le barman rafistole)
+    if (this.etat !== 'fin') { const cible = 1 - this.solidite / R.solidite; this.degats += (cible - this.degats) * Math.min(1, dt * 12); }
+    this.dessinerTrou(g, dx);
     // éclats de bois et flash
     for (const e of this.eclats) { e.x += e.vx * dt; e.y += e.vy * dt; e.vy += 900 * dt; e.a += e.r * dt; e.vie -= dt; }
     this.eclats = this.eclats.filter(e => e.vie > 0);
@@ -407,21 +417,6 @@ export class RemiPorte extends BossScene {
     this.sprVideur.setPosition(v.qui === 'videur' || !v.qui ? v.x : -400, HAUTEUR + 10).setFrame(v.pose);
     if (this.textures.exists('remi_pisseur')) this.sprPisseur.setPosition(v.qui === 'pisseur' ? v.x : -400, HAUTEUR + 10).setFrame(v.pose);
     else this.sprPisseur.setPosition(v.qui === 'pisseur' ? v.x + 30 : -400, HAUTEUR + 60).setFrame(v.pose ? 1 : 0).setFlipX(true).setRotation(Math.sin(this.horloge * 3) * 0.06);
-    const gm = this.gMamie.clear();
-    if (this.sprMamie) this.sprMamie.setPosition(v.qui === 'mamie' ? v.x : -400, HAUTEUR + 10).setFrame(v.pose);
-    else if (v.qui === 'mamie') this.dessinerMamie(gm, v.x, HAUTEUR, v.pose);
-  }
-
-  // la mamie dessinée au code (en attendant son image) : chignon gris, lunettes, gilet violet, canne
-  dessinerMamie(g, x, bas, furieuse) {
-    g.fillStyle(0x6a3a8a, 1).fillRoundedRect(x - 60, bas - 190, 120, 200, 30);                      // gilet
-    g.fillStyle(0xf1c27d, 1).fillCircle(x, bas - 230, 42);                                           // tête
-    g.fillStyle(0xc8c8d0, 1).fillCircle(x, bas - 278, 22).fillEllipse(x, bas - 258, 96, 34);       // chignon, cheveux
-    g.lineStyle(3, 0x222222, 1).strokeCircle(x - 15, bas - 232, 10).strokeCircle(x + 15, bas - 232, 10);   // lunettes
-    if (furieuse) { g.lineStyle(4, 0x222222, 1).lineBetween(x - 26, bas - 252, x - 6, bas - 244).lineBetween(x + 26, bas - 252, x + 6, bas - 244); }
-    g.lineStyle(3, 0x8a3a3a, 1).lineBetween(x - 12, bas - 205, x + 12, bas - 205 + (furieuse ? 4 : -2));
-    g.lineStyle(8, 0x5a3a1a, 1).lineBetween(x + 70, bas - (furieuse ? 260 : 120), x + 80, bas);      // la canne (levée si furieuse)
-    g.fillStyle(0xf1c27d, 1).fillCircle(x + 70, bas - (furieuse ? 260 : 120), 12);
   }
 
   dessinerJauges() {
