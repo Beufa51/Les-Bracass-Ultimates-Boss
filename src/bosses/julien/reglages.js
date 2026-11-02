@@ -102,7 +102,7 @@ export const REGLAGES = {
     vie: 3, vitesse: 1.0, vue: 9, distance: 4, cadence: 2.8, preavis: 0.7,
     degats: 8, rayon: 0.9, flaque: 6, ralenti: 0.45, replique: '« Reprends donc de la purée ! »',
   },
-  lycee: { canette: 15, fayotCri: 3.5, fayotAlerte: 10, fayotVue: 8 },   // canette : vie rendue ; fayot : s entre 2 cris, rayon d'alerte, vue
+  lycee: { anarchisteAlerte: 1.5, canette: 15, fayotCri: 3.5, fayotAlerte: 10, fayotVue: 8 },   // canette : vie rendue ; fayot : s entre 2 cris, rayon d'alerte, vue
   // NIVEAU 2 : JULIEN, le prof (JulienClasse.js). 3 phases : > 50 % de vie, 50-20 %, < 20 % (il pète un câble)
   julien: {
     vie: 55,             // (Fabien : trop simple → 40 → 55) 1 boulette = 1, 1 tomate = 2, 1 coup de pancarte = 1 ; DE DOS : ×2
@@ -119,12 +119,13 @@ export const REGLAGES = {
     eventail: 0.28,      // écart (radians) entre les 3 livres de l'éventail
     dico: { vitesse: 4.5, degats: 22, rebonds: 3, preavis: 0.8 },   // le dictionnaire rebondit sur les murs (pas sur les tables)
     copies: { nombre: 5, vitesse: 3, degats: 7, ecart: 0.22 },   // copies d'interro : lentes, en vague
-    mur: { vitesse: 2.6, degats: 10, ecart: 0.3, trou: 1.8, preavis: 1.0 },   // mur de copies : toute la largeur, UN trou ; passe au-dessus des tables
+    mur: { degats: 10, preavis: 1.0 },   // rafale de murs de copies (vue du dessus, dessus.js) : dégâts d'un mur, préavis
     craies: { nombre: 5, intervalle: 0.11, vitesse: 9, degats: 4, dispersion: 0.07, preavis: 0.55 },   // rapides, petits dégâts
     aimant: { duree: 2, force: 2.4, preavis: 0.8, degats: 15 },   // « AU TABLEAU ! » : il t'attire (force < ta vitesse : cours vers le fond)
     confisque: { portee: 2.8, duree: 8, preavis: 0.7 },   // « CONFISQUÉ ! » : trop près, il prend ton arme
     regle: { portee: 1.9, degats: 18, recul: 1.3, preavis: 0.45 },   // règle géante au contact
     rafale: { nombre: 3, intervalle: 0.28 },
+    anarchiste: { vie: 1.3, vagues: 2 },   // ANARCHISTE : × la vie de Julien, vagues de copies en plus (+ rafale de murs à chaque phase)
     // DÉLUGE DE COPIES (bullet hell) : vagues par phase, s entre 2 vagues, copies par éventail, cercle d'une vague sur 3
     deluge: { vagues: [3, 5, 7], intervalle: [0.75, 0.6, 0.5], nombre: 9, ecart: 0.2, cercle: 18, vitesse: 3.3, degats: 7, preavis: 0.9 },
     // RAFALE DE MURS (shoot them up) : murs d'affilée par phase (« murs » : +1), s entre 2 murs, décalage du trou (cases)

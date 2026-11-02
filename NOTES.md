@@ -1132,6 +1132,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   lycée, textes incohérents (« ta sarbacane », plus d'œufs dans les répliques de la classe, « Ma veste ! »).
   Reste conseillé : ménage du code (extraire `dessus.js`, boucle update commune, code mort des murs 3D), alléger les
   textes en combat, surprise en ANARCHISTE au lycée / en classe, vérif automatique `outils/julien_verif.mjs`.
+  → FAIT (voir la fin du rapport d'audit) : `dessus.js` (vue du dessus, mixin ajouté à JulienClasse), boucle update
+  commune (`majJeu` / `zonesNiveau` par niveau), code mort retiré, textes allégés, ANARCHISTE (renforts du lycée
+  `RENFORTS_LYCEE`, `RG.julien.anarchiste`), VÉRIF : `node outils/julien_verif.mjs` (0 erreur ; aussi dans CLAUDE.md).
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».

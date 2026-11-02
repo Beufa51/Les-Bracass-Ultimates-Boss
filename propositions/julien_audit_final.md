@@ -78,3 +78,13 @@ vieux téléphone, le volume relatif des musiques et des bruitages.
 Un boss riche, drôle et varié, le plus ambitieux du jeu. Pour viser 8,5 : faire le ménage du code (dessus.js,
 boucle commune, code mort), alléger les textes en combat, ajouter une vraie surprise en ANARCHISTE, et faire la passe
 de FINITION des textes avec Fabien (répliques personnalisées).
+
+## Corrections faites après l'audit (demandées par Fabien)
+- Code : la vue du dessus est sortie dans `dessus.js` (JulienClasse : ~880 → ~630 lignes) ; UNE boucle `update()`
+  commune dans JulienManif (chaque niveau ne fournit que `majJeu()` et `zonesNiveau()`) ; code mort retiré (murs de
+  copies en 3D, poses inutilisées du héros vu du dessus, tests sur la pancarte, répliques plus utilisées, imports).
+- Textes en combat allégés : une attaque annoncée en grand n'a plus de réplique en plus, répliques au hasard 2 fois
+  moins fréquentes, élèves qui parlent moins souvent ; réplique de phase 2 périmée corrigée (« on éteint la lumière »).
+- ANARCHISTE : lycée = 3 renforts (2 surveillants, 1 cantinière) et fayots qui alertent 1,5 fois plus loin ; classe =
+  Julien +30 % de vie, rafale de murs imposée à chaque changement de phase, pluies de copies +2 vagues.
+- Vérification automatique : `node outils/julien_verif.mjs` (plans atteignables, 87 images, 26 sons, réglages).

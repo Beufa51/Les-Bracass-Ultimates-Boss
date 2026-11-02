@@ -44,6 +44,8 @@ export const OBJETS_LYCEE = {
 };
 export const SECRETS_LYCEE = { X: '1' };
 export const PORTE_SALLE_12 = { x: 3, y: 1 };
+// ANARCHISTE : renforts (type, case x, case y) — couloir des casiers, 2e couloir, cantine
+export const RENFORTS_LYCEE = [['surveillant', 3, 6], ['cantiniere', 14, 13], ['surveillant', 20, 4]];
 
 // Messages à la 1re entrée dans une zone (x0, y0, x1, y1 : cases, bornes comprises)
 export const ZONES_LYCEE = [

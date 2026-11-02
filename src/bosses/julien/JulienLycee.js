@@ -12,13 +12,11 @@ import { JulienManif } from './JulienManif.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { estTactile } from '../../core/tactile.js';
-import { vientDAppuyer } from '../../core/clavier.js';
 import { texte, voile } from '../../core/ui.js';
 import { LARGEUR } from '../../core/reglages.js';
-import { REGLAGES as RG } from './reglages.js';
-import { ARMES, choisirArme } from './armes.js';
+import { REGLAGES as RG, DIFFICULTES } from './reglages.js';
 import { vueLibre } from './raycaster.js';
-import { PLAN_LYCEE, OBJETS_LYCEE, SECRETS_LYCEE, PORTE_SALLE_12, ZONES_LYCEE, REPLIQUES_LYCEE as TXT } from './niveau_lycee.js';
+import { PLAN_LYCEE, OBJETS_LYCEE, SECRETS_LYCEE, PORTE_SALLE_12, ZONES_LYCEE, RENFORTS_LYCEE, REPLIQUES_LYCEE as TXT } from './niveau_lycee.js';
 import { construireDecorLycee, spritesLycee, spritesClasse, HAUTEURS_LYCEE } from './decor_classe.js';
 import { mainSarbacane } from './JulienClasse.js';
 
@@ -90,8 +88,16 @@ export class JulienLycee extends JulienManif {
     ], () => this.demarrer());
   }
 
+  demarrer() {
+    super.demarrer();
+    if (this.anarchiste) this.message('ANARCHISTE : le CPE a doublé les surveillants… et les fayots ont l\'oreille fine !', 4);
+  }
+
   appliquerDifficulte() {
     this.j.mun.oeufs = 0; this.j.mun.tomates = 0;   // armes de la manif interdites : seulement la sarbacane
+    // ANARCHISTE (audit : « pas de surprise ») : renforts de surveillants et de cantinières, fayots qui alertent plus loin
+    this.anarchiste = this.diff === DIFFICULTES.anarchiste;
+    if (this.anarchiste) for (const [type, x, y] of RENFORTS_LYCEE) this.ajouterEnnemi(type, x, y);
     this.total = this.ennemis.filter(e => e.actif).length;
   }
 
@@ -132,33 +138,19 @@ export class JulienLycee extends JulienManif {
       ronde: true, rdx: x % 2 ? 1 : -1, rdy: 0, rondeT: 2.5 });
   }
 
-  // ------------------------------------------------------------------ boucle
-  update(temps, delta) {
-    const dt = Math.min(delta / 1000, 0.05);
-    if (this.enJeu && !this.termine) {
-      const j = this.j;
-      if (vientDAppuyer(this.touchesCarte.tab) || vientDAppuyer(this.touchesCarte.m)) this.carte = !this.carte;
-      ['a1', 'a2', 'a3', 'a4', 'a5', 'a6'].forEach((t, i) => { if (vientDAppuyer(this.touchesArmes[t])) choisirArme(this, ARMES[i].id); });
-      for (const f of this.flaques) f.t -= dt;
-      this.flaques = this.flaques.filter(f => f.t > 0);
-      j.lent = this.flaques.some(f => Math.hypot(f.x - j.x, f.y - j.y) < 0.8);
-      this.bougerJoueur(dt);
-      this.ennemis.forEach(e => this.ia(e, dt));
-      this.fayots(dt);
-      this.projectiles(dt);
-      this.ramasser();
-      this.temps += dt;
-      j.echarpe = Math.max(0, j.echarpe - dt); j.cafe = Math.max(0, j.cafe - dt);
-      j.changeT = Math.max(0, (j.changeT || 0) - dt);
-      for (const f of this.farines) f.t -= dt;
-      this.farines = this.farines.filter(f => f.t > 0);
-      ZONES_LYCEE.forEach((z, i) => {   // message à la première entrée dans une zone
-        if (!this.zonesVues.has(i) && j.x >= z.x0 && j.x < z.x1 + 1 && j.y >= z.y0 && j.y < z.y1 + 1) { this.zonesVues.add(i); this.message(z.texte, 4.5); }
-      });
-      this.porte(dt);
-    }
-    this.majVisage(dt);
-    this.dessiner(dt);
+  // ------------------------------------------------------------------ boucle (la boucle commune est dans JulienManif)
+  zonesNiveau() { return ZONES_LYCEE; }
+  majJeu(dt) {
+    const j = this.j;
+    for (const f of this.flaques) f.t -= dt;
+    this.flaques = this.flaques.filter(f => f.t > 0);
+    j.lent = this.flaques.some(f => Math.hypot(f.x - j.x, f.y - j.y) < 0.8);
+    this.bougerJoueur(dt);
+    this.ennemis.forEach(e => this.ia(e, dt));
+    this.fayots(dt);
+    this.projectiles(dt);
+    this.ramasser();
+    this.porte(dt);
   }
 
   // les FAYOTS : ils te voient → ils crient et alertent tout le monde ; trop près → ils s'enfuient (en courant)
@@ -181,7 +173,7 @@ export class JulienLycee extends JulienManif {
         this.message(hasard(TXT.fayot), 2);
         jouerSon(this, 'julien_halte', { rate: 1.5 });
         // il alerte tout le monde autour (même ceux qui ne te voient pas) : ils savent où tu es
-        for (const e of this.ennemis) if (e.actif && e.etat !== 'fuite' && Math.hypot(e.x - o.x, e.y - o.y) < F.fayotAlerte) {
+        for (const e of this.ennemis) if (e.actif && e.etat !== 'fuite' && Math.hypot(e.x - o.x, e.y - o.y) < F.fayotAlerte * (this.anarchiste ? F.anarchisteAlerte : 1)) {
           e.alerte = true; e.vuX = j.x; e.vuY = j.y; if (e.etat === 'attente') e.t = 0.6;
         }
       }

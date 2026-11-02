@@ -432,30 +432,38 @@ export class JulienManif extends BossScene {
   }
 
   // ------------------------------------------------------------------ boucle
+  // BOUCLE COMMUNE aux 3 niveaux (manif, lycée, classe) : chaque niveau ne remplace que majJeu() et zonesNiveau()
+  // (audit final : la boucle était recopiée 3 fois)
   update(temps, delta) {
     const dt = Math.min(delta / 1000, 0.05);
     if (this.enJeu && !this.termine) {
-      if (vientDAppuyer(this.touchesCarte.tab) || vientDAppuyer(this.touchesCarte.m)) this.carte = !this.carte;
-      ['a1', 'a2', 'a3', 'a4', 'a5'].forEach((t, i) => { if (vientDAppuyer(this.touchesArmes[t])) choisirArme(this, ARMES[i].id); });
-      this.bougerJoueur(dt);
-      this.ennemis.forEach(e => this.ia(e, dt));
-      this.projectiles(dt);
-      this.ramasser();
-      this.temps += dt;
-      this.j.echarpe = Math.max(0, this.j.echarpe - dt); this.j.cafe = Math.max(0, this.j.cafe - dt);
       const j = this.j;
-      ZONES.forEach((z, i) => {   // message à la première entrée dans une zone
-        if (!this.zonesVues.has(i) && j.x >= z.x0 && j.x < z.x1 + 1 && j.y >= z.y0 && j.y < z.y1 + 1) { this.zonesVues.add(i); this.message(this.portailOuvert && z.ouvert ? z.ouvert : z.texte, 4.5); }
-      });
-      this.majFourgon(dt);
-      if (!this.portailOuvert && this.fourgonFait && this.ennemis.every(e => !e.parvis || !e.actif || e.etat === 'fuite')) this.ouvrirPortail();
-      this.j.changeT = Math.max(0, (this.j.changeT || 0) - dt);
+      if (vientDAppuyer(this.touchesCarte.tab) || vientDAppuyer(this.touchesCarte.m)) this.carte = !this.carte;
+      ['a1', 'a2', 'a3', 'a4', 'a5', 'a6'].forEach((t, i) => { if (vientDAppuyer(this.touchesArmes[t])) choisirArme(this, ARMES[i].id); });
+      this.majJeu(dt);
+      this.temps += dt;
+      j.echarpe = Math.max(0, j.echarpe - dt); j.cafe = Math.max(0, j.cafe - dt);
+      j.changeT = Math.max(0, (j.changeT || 0) - dt);
       for (const f of this.farines) f.t -= dt;
       this.farines = this.farines.filter(f => f.t > 0);
-      if (this.sortieCases.has(`${j.x | 0},${j.y | 0}`)) this.finNiveau();
+      this.zonesNiveau().forEach((z, i) => {   // message à la première entrée dans une zone
+        if (!this.zonesVues.has(i) && j.x >= z.x0 && j.x < z.x1 + 1 && j.y >= z.y0 && j.y < z.y1 + 1) { this.zonesVues.add(i); this.message(this.portailOuvert && z.ouvert ? z.ouvert : z.texte, 4.5); }
+      });
     }
     this.majVisage(dt);
     this.dessiner(dt);
+  }
+  zonesNiveau() { return ZONES; }
+  // la manif : déplacements, policiers, tirs, fourgon de la dernière vague, portail, arrivée dans la cour
+  majJeu(dt) {
+    const j = this.j;
+    this.bougerJoueur(dt);
+    this.ennemis.forEach(e => this.ia(e, dt));
+    this.projectiles(dt);
+    this.ramasser();
+    this.majFourgon(dt);
+    if (!this.portailOuvert && this.fourgonFait && this.ennemis.every(e => !e.parvis || !e.actif || e.etat === 'fuite')) this.ouvrirPortail();
+    if (this.sortieCases.has(`${j.x | 0},${j.y | 0}`)) this.finNiveau();
   }
 
   bougerJoueur(dt) {

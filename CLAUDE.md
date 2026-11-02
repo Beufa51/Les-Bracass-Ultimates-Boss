@@ -14,6 +14,9 @@ Quand les 6 boss sont finalisés : lui rappeler la passe de FINITION où l'on pe
 ## Beufa
 Après tout changement de `src/bosses/beufa/reglages.js` : `node outils/beufa_verif.mjs` doit finir à 0 erreur, 0 avertissement.
 
+## Julien
+Après tout changement de `src/bosses/julien/` (plans, réglages, images) : `node outils/julien_verif.mjs` doit finir à 0 erreur.
+
 ## Économiser l'utilisation (demande du propriétaire)
 Le propriétaire atteint vite la limite d'utilisation. Donc :
 - À la fin de chaque tâche terminée (commit poussé), ajoute UNE ligne de conseil :
