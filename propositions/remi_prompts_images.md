@@ -64,3 +64,7 @@ bras tendu (frappe, traits de vitesse). Ligne 2 : un jeune homme en tee-shirt bl
 Décor de jeu style manga/anime : couloir des toilettes d'un bar, vu de côté, carrelage, néon blafard, une porte de WC en bois
 à DROITE de l'image (bien visible, de face, pictogramme WC), murs couverts d'autocollants. Aucun personnage, image horizontale 16:9.
 ```
+
+## 9. La porte vue DE DOS (audit V3, amélioration C1)
+Prompts dans `propositions/remi_audit.md`, section 5 : `remi_porte_dos_planche.jpg` (Rémi de dos) et
+`remi_toi_dos_planche.jpg` (toi de dos).
