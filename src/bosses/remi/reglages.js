@@ -11,20 +11,21 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 //         distrait = chance que Rémi agite les bras pendant ta visée (ça fait trembler ton lancer) ;
 //         remi = chance que Rémi mette un verre ; aide = (non utilisé au pong depuis le lance-pierre)
 //  PORTE : remiCharge = jusqu'où Rémi charge (0 à 1) ; remiPrudent = chance qu'il lâche quand le videur arrive ;
-//          videur = temps d'annonce du videur (x, + petit = moins prévenu) ; zone = rayon de la cible parfaite ; visee = vitesse de la cible
+//          videur = temps d'annonce du videur (x, + petit = moins prévenu) ; feintes = part de passages piégés
+//          (fausse alerte, surgit sans prévenir, revient aussitôt) ; zone = rayon de la cible parfaite ; visee = vitesse de la cible
 export const DIFFICULTES = {
   facile: { nom: 'FACILE', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
     temps: 88, densite: 0.8, traverse: 0.8, sonnette: 730,
     erreur: 0.025, apercu: 1, distrait: 0, remi: 0.32, aide: true,
-    remiCharge: 0.6, remiPrudent: 0.3, videur: 1.3, zone: 0.22, visee: 0.8 },
+    remiCharge: 0.6, remiPrudent: 0.3, videur: 1.3, feintes: 0.25, zone: 0.22, visee: 0.8 },
   normal: { nom: 'NORMAL', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 70, densite: 1, traverse: 1, sonnette: 650,
     erreur: 0.035, apercu: 0.85, distrait: 0.35, remi: 0.42, aide: false,
-    remiCharge: 0.72, remiPrudent: 0.5, videur: 1, zone: 0.15, visee: 1 },
+    remiCharge: 0.72, remiPrudent: 0.5, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
     erreur: 0.05, apercu: 0.6, distrait: 0.55, remi: 0.52, aide: false,
-    remiCharge: 0.84, remiPrudent: 0.85, videur: 0.75, zone: 0.1, visee: 1.3 },
+    remiCharge: 0.84, remiPrudent: 0.85, videur: 0.75, feintes: 0.65, zone: 0.1, visee: 1.3 },
 };
 
 export const VELO = {

@@ -141,7 +141,9 @@
   gourmand attrapé 4 fois et perd.
 - MUSIQUE DE LA PORTE : `remi_musique_porte.mp3` (Street Fighter II, Ken, donnée par le propriétaire) à la place de la Cantina ;
   baissée à 35 % quand le videur approche, COUPÉE net (+ « scratch » `remi_scratch`) quand il regarde, revient ensuite.
-  Ajout optionnel dans le moteur : `facteurMusique(cle, f)` (src/core/musique.js), sans effet sur les autres boss. : `python3 outils/remi/preparer_images.py`.
+  Ajout optionnel dans le moteur : `facteurMusique(cle, f)` (src/core/musique.js), sans effet sur les autres boss.
+- V12 : le videur FEINTE (`feintes` 0,25 / 0,45 / 0,65 par difficulté) : annonce de durée et de rythme de pas variables,
+  FAUSSE ALERTE (demi-tour, l'ombre recule), SURPRISE (0,3 s d'annonce), RETOUR (2e coup d'œil juste après). : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

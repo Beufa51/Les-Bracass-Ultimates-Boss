@@ -71,6 +71,7 @@ export class RemiPorte extends BossScene {
       `MAINTIENS ${t ? 'le doigt sur l\'écran' : 'ESPACE'} : tu armes ton poing (ça monte de plus en plus vite)`,
       'LÂCHE : le coup part. Lâche quand la cible passe sur ton poing (+) = coup parfait.',
       'LE VIDEUR : ses pas, son ombre, le « ! »... puis il regarde. S\'il te voit charger : ATTRAPÉ !',
+      'Et il FEINTE : fausse alerte, il surgit sans prévenir, il revient d\'un coup...',
       'Celui dont le coup fait CÉDER la porte gagne.',
     ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.tour('remi'); }));
   }
@@ -154,21 +155,47 @@ export class RemiPorte extends BossScene {
   }
 
   // ---------- le videur ----------
+  // LE VIDEUR ET SES FEINTES (V12) : à chaque passage, il choisit une façon de venir (plus de feintes en CHAMPION) :
+  //  normal   : ses pas, son ombre, le « ! »… puis il regarde (annonce de durée VARIABLE, pas toujours au même rythme)
+  //  fausse   : il approche… et fait DEMI-TOUR (ceux qui ont lâché trop tôt ont gâché leur charge)
+  //  surprise : presque pas d'annonce (un seul pas), il surgit
+  //  retour   : après avoir regardé, il repart… et revient aussitôt jeter un 2e coup d'œil
   pasVideur(dt) {
     const v = this.videur;
     v.t -= dt;
     if (v.etat === 'absent' && v.t <= 0) {
-      v.etat = 'annonce'; v.t = R.videurAnnonce * this.diff.videur; v.pas = 0;
+      const f = this.diff.feintes, r = Math.random();
+      v.mode = v.retourPrevu ? 'retour' : r < f * 0.45 ? 'fausse' : r < f * 0.8 ? 'surprise' : 'normal';
+      v.retourPrevu = false;
+      const base = R.videurAnnonce * this.diff.videur;
+      v.duree = v.mode === 'surprise' ? 0.3 : v.mode === 'retour' ? 0.4 : base * hasard(0.6, 1.3);
+      v.etat = 'annonce'; v.t = v.duree; v.pas = 0;
+      v.rythme = v.mode === 'surprise' ? 1 : hasard(0.18, 0.4);   // ses pas plus ou moins rapides
+      v.demiTour = v.mode === 'fausse' ? v.duree * hasard(0.45, 0.8) : -1;
     } else if (v.etat === 'annonce') {
       v.pas -= dt;
-      if (v.pas <= 0) { v.pas = 0.3; jouerSon(this, 'remi_atterrit', { rate: 0.6 }); }   // ses pas
-      if (v.t <= 0) { v.etat = 'regarde'; v.t = hasard(R.videurRegard[0], R.videurRegard[1]); v.pose = 0; v.vu = false; jouerSon(this, 'remi_scratch'); }
+      if (v.pas <= 0) { v.pas = v.rythme; jouerSon(this, 'remi_atterrit', { rate: 0.6 }); }   // ses pas
+      // fausse alerte : il fait demi-tour avant d'arriver
+      if (v.demiTour > 0 && v.duree - v.t >= v.demiTour) { v.etat = 'repart'; v.t = 0.6; return; }
+      if (v.t <= 0) {
+        v.etat = 'regarde'; v.t = hasard(R.videurRegard[0], R.videurRegard[1]) * (v.mode === 'retour' ? 0.6 : 1);
+        v.pose = 0; v.vu = false; jouerSon(this, 'remi_scratch');
+      }
+    } else if (v.etat === 'repart') {
+      v.pas -= dt;
+      if (v.pas <= 0) { v.pas = 0.35; jouerSon(this, 'remi_atterrit', { rate: 0.5, volume: 0.5 }); }
+      if (v.t <= 0) { v.etat = 'absent'; v.t = hasard(0.5, 1.5) * this.diff.videur; }
     } else if (v.etat === 'regarde') {
       // il regarde : celui qui charge (ou qui vient juste de frapper) se fait ATTRAPER
       const fautif = (this.etat === 'toi' || this.etat === 'remi') && this.charge ? this.frappeur
         : this.etat === 'coup' && this.tCoup < 0.25 ? this.frappeur : null;
       if (fautif && !v.vu) this.attraper(fautif);
-      if (v.t <= 0) { v.etat = 'absent'; v.t = hasard(R.videurAttente[0], R.videurAttente[1]) * this.diff.videur; v.pose = 0; }
+      if (v.t <= 0) {
+        v.etat = 'absent'; v.pose = 0;
+        // le coup du 2e coup d'œil : il revient tout de suite
+        v.retourPrevu = v.mode !== 'retour' && Math.random() < this.diff.feintes * 0.5;
+        v.t = v.retourPrevu ? hasard(0.4, 0.8) : hasard(R.videurAttente[0], R.videurAttente[1]) * this.diff.videur;
+      }
     }
   }
 
@@ -299,12 +326,13 @@ export class RemiPorte extends BossScene {
   dessinerVideur(dt) {
     const v = this.videur, o = this.gOmbre.clear();
     // volume de la musique selon le videur (baissée quand il approche, coupée quand il regarde)
-    const voulu = this.etat === 'fin' ? 1 : v.etat === 'regarde' ? 0 : v.etat === 'annonce' ? 0.35 : 1;
+    const voulu = this.etat === 'fin' ? 1 : v.etat === 'regarde' ? 0 : v.etat === 'annonce' || v.etat === 'repart' ? 0.35 : 1;
     this.volMusique += (voulu - this.volMusique) * Math.min(1, dt * (voulu === 0 ? 30 : 4));
     facteurMusique('remi_musique_porte', this.volMusique);
     // son OMBRE s'allonge sur le sol du couloir pendant qu'il approche
+    if (v.etat === 'repart') o.fillStyle(0x000000, 0.45 * v.t / 0.6).fillEllipse(30 + 120 * v.t / 0.6, HAUTEUR - 18, 120 + 260 * v.t / 0.6, 34);   // l'ombre recule
     if (v.etat === 'annonce' || v.etat === 'regarde') {
-      const k = v.etat === 'annonce' ? 1 - v.t / (R.videurAnnonce * this.diff.videur) : 1;
+      const k = v.etat === 'annonce' ? 1 - v.t / v.duree : 1;
       o.fillStyle(0x000000, 0.45 * k).fillEllipse(30 + 120 * k, HAUTEUR - 18, 120 + 260 * k, 34);
     }
     const cible = v.etat === 'regarde' ? VIDEUR.x : -260;

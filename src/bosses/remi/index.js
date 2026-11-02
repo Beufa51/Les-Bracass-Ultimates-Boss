@@ -37,6 +37,7 @@ export default {
       { groupe: D[n].nom, nom: 'Porte : charge visée par Rémi', objet: D[n], champ: 'remiCharge', pas: 0.02, min: 0.2, max: 1 },
       { groupe: D[n].nom, nom: 'Porte : prudence de Rémi', objet: D[n], champ: 'remiPrudent', pas: 0.05, min: 0, max: 1 },
       { groupe: D[n].nom, nom: 'Porte : annonce du videur (x)', objet: D[n], champ: 'videur', pas: 0.05, min: 0.3, max: 3 },
+      { groupe: D[n].nom, nom: 'Porte : feintes du videur (part)', objet: D[n], champ: 'feintes', pas: 0.05, min: 0, max: 1 },
       { groupe: D[n].nom, nom: 'Porte : largeur zone verte', objet: D[n], champ: 'zone', pas: 0.01, min: 0.02, max: 0.6 },
     ]),
   ],
