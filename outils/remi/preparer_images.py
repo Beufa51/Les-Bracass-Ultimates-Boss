@@ -106,10 +106,12 @@ def planche_pong():
     bande.save(DST + 'remi_pong.png')
     print('remi_pong.png', W, H)
 
-def poses_planche(fichier, grand=20000, seuil_rangee=None):
+def poses_planche(fichier, grand=20000, seuil_rangee=None, bas=None):
     # découpe une planche en poses : groupes de pixels reliés (un peu épaissis) ; les petits morceaux (traits de vitesse)
     # rejoignent la pose la plus proche ; on ne garde QUE les pixels de chaque pose. Rangées de haut en bas, puis de gauche à droite.
-    im = detourer(Image.open(SRC + fichier))
+    src = Image.open(SRC + fichier)
+    if bas: src = src.crop((0, 0, src.size[0], bas))   # coupe sous les poses (ex. la ligne du sol qui relie les voitures)
+    im = detourer(src)
     al = np.asarray(im)[:, :, 3] > 40
     lab, n = ndimage.label(ndimage.binary_dilation(al, iterations=2))
     boites = ndimage.find_objects(lab)
@@ -201,6 +203,45 @@ def rue():
     Image.fromarray(out.clip(0, 255).astype(np.uint8)).save(DST + 'remi_rue.jpg', quality=88)
     print('remi_rue.jpg', out.shape[1], out.shape[0])
 
+def tuile(a, F=90):
+    # bords gauche / droit fondus l'un dans l'autre sur F px : l'image se répète sans couture
+    t = np.linspace(0, 1, F)[None, :, None]
+    return np.concatenate([a[:, -F:] * (1 - t) + a[:, :F] * t, a[:, F:-F]], axis=1)
+
+def rues_quartiers():
+    # 2e quartier (les quais) : vue de profil, répétable -> remi_rue2.jpg (hauteur 575 comme la rue de base)
+    a = np.asarray(Image.open(SRC + 'remi_rue2.jpg').convert('RGB')).astype(float)[:575]
+    Image.fromarray(tuile(a).clip(0, 255).astype(np.uint8)).save(DST + 'remi_rue2.jpg', quality=88)
+    # 3e quartier (centre-ville) : l'image est en perspective (la rue file au centre) : on garde les deux rangées de
+    # façades à terrasses (gauche et droite) mises bout à bout -> remi_rue3.jpg
+    b = np.asarray(Image.open(SRC + 'remi_rue3.jpg').convert('RGB')).astype(float)[:575]
+    g, d = b[:, :640], b[:, 1150:]
+    F = 60; t = np.linspace(0, 1, F)[None, :, None]
+    joint = np.concatenate([g[:, :-F], g[:, -F:] * (1 - t) + d[:, :F] * t, d[:, F:]], axis=1)
+    Image.fromarray(tuile(joint).clip(0, 255).astype(np.uint8)).save(DST + 'remi_rue3.jpg', quality=88)
+    print('remi_rue2.jpg / remi_rue3.jpg', tuile(a).shape[1], tuile(joint).shape[1])
+
+def petites_images():
+    # tremplin, Rémi qui t'accueille (en pied) : fond retiré, recadrés
+    for nom, mini in (('remi_tremplin', 3000), ('remi_accueil', 5000)):
+        im = detourer(Image.open(SRC + nom + '.jpg'), grand=400)
+        a = np.asarray(im)[:, :, 3] > 40
+        lab, n = ndimage.label(a)
+        t = ndimage.sum(a, lab, range(1, n + 1))
+        garde = np.isin(lab, [i + 1 for i in range(n) if t[i] > mini])   # (la ligne du sol du tremplin est fine : jetée)
+        im.putalpha(Image.fromarray(np.where(garde, np.asarray(im)[:, :, 3], 0).astype(np.uint8)))
+        im = im.crop(im.getbbox()); im.save(DST + nom + '.png'); print(nom + '.png', im.size)
+    # voitures : 3 cases (citadine, berline, camionnette), posées en bas, centrées
+    p = poses_planche('remi_voitures_planche.jpg', grand=20000, bas=468)
+    W = max(x.size[0] for x in p); H = max(x.size[1] for x in p)
+    bande = Image.new('RGBA', (W * len(p), H), (0, 0, 0, 0))
+    for k, x in enumerate(p): bande.paste(x, (k * W + (W - x.size[0]) // 2, H - x.size[1]))
+    bande.save(DST + 'remi_voitures.png'); print('remi_voitures.png', W, H, [x.size for x in p])
+    # intérieur du bar (fond du beer pong) à la largeur du jeu
+    im = Image.open(SRC + 'remi_bar_interieur.jpg').convert('RGB')
+    im = im.resize((960, round(im.size[1] * 960 / im.size[0])), Image.LANCZOS); im.save(DST + 'remi_bar_interieur.jpg', quality=88)
+    print('remi_bar_interieur.jpg', im.size)
+
 def facade():
     # façade du bar (arrivée du vélo) : fond blanc retiré (et entre les pieds des tabourets) -> remi_bar_facade.png
     im = detourer(Image.open(SRC + 'remi_bar_facade.jpg'), grand=300, seuil=225)
@@ -229,4 +270,6 @@ planches_dos()
 planche_bourres()
 rue()
 facade()
+rues_quartiers()
+petites_images()
 decor_porte()

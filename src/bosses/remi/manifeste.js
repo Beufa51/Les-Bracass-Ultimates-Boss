@@ -24,6 +24,13 @@ export const MANIFESTE = {
     // la porte VUE DE DOS : Rémi (garde, coup, impact) et toi (garde, élan, coup, impact), cases alignées à gauche
     remi_dos: { fichier: 'sprites/remi/remi_dos.png', largeur: 532, hauteur: 570, images: 3, vitesse: 1 },
     remi_toi_dos: { fichier: 'sprites/remi/remi_toi_dos.png', largeur: 347, hauteur: 554, images: 4, vitesse: 1 },
+    // V7 : décors et objets du vélo, fond du beer pong (outils/remi/preparer_images.py)
+    remi_rue2: { fichier: 'sprites/remi/remi_rue2.jpg', largeur: 1702, hauteur: 575, images: 1, vitesse: 1 },   // les quais
+    remi_rue3: { fichier: 'sprites/remi/remi_rue3.jpg', largeur: 1132, hauteur: 575, images: 1, vitesse: 1 },   // le centre-ville
+    remi_tremplin: { fichier: 'sprites/remi/remi_tremplin.png', largeur: 1114, hauteur: 459, images: 1, vitesse: 1 },
+    remi_voitures: { fichier: 'sprites/remi/remi_voitures.png', largeur: 434, hauteur: 213, images: 3, vitesse: 1 },  // citadine, berline, camionnette
+    remi_accueil: { fichier: 'sprites/remi/remi_accueil.png', largeur: 501, hauteur: 1207, images: 1, vitesse: 1 },  // Rémi qui t'attend au bar
+    remi_bar_interieur: { fichier: 'sprites/remi/remi_bar_interieur.jpg', largeur: 960, hauteur: 536, images: 1, vitesse: 1 },
     remi_presentation: { fichier: 'sprites/remi/remi_presentation.png', largeur: 832, hauteur: 1202, images: 1, vitesse: 1 },
   },
   sons: {

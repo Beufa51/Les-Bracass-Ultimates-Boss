@@ -31,6 +31,10 @@ const QUARTIERS = [
   { a: 0.34, nom: 'LES QUAIS', image: 'remi_rue2', teinte: 0x9fb8ff },
   { a: 0.67, nom: 'LE CENTRE-VILLE', image: 'remi_rue3', teinte: 0xffc8a0 },
 ];
+// voitures illustrées (remi_voitures.png, 3 cases) : taille réelle de chaque voiture dans sa case ; ECH_VOIT = taille à l'écran
+const VOIT_IMG = [{ l: 394, h: 175 }, { l: 434, h: 179 }, { l: 382, h: 213 }], ECH_VOIT = 0.74;
+// tremplin illustré : le haut de la planche est à 81 % de la largeur de l'image
+const TREMPLIN_IMG = { l: 1114, h: 459, haut: 0.81 };
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 // hauteur et demi-largeur de chaque obstacle (chocs) ; debout et traverse sont plus hauts que le plus grand saut
 const TAILLE = { allonge: [52, 58], verre: [13, 36], debout: [210, 23], traverse: [210, 26], vomi: [5, 55] };
@@ -124,7 +128,7 @@ export class RemiVelo extends BossScene {
   demanderDring() { this.appuiG = 0.15; if (this.recharge <= 0 && this.chute <= 0) this.sonner(); }
 
   genererParcours() {
-    for (const o of this.obstacles) { o.g.destroy(); if (o.spr) o.spr.destroy(); }
+    for (const o of [...this.obstacles, ...(this.voitures || []), ...(this.tremplins || [])]) { if (o.g) o.g.destroy(); if (o.spr) o.spr.destroy(); }
     this.obstacles = []; this.pintes = []; this.voitures = []; this.tremplins = [];
     const poids = Object.entries(V.types), total = poids.reduce((s, [, p]) => s + p, 0);
     const tirer = () => { let r = Math.random() * total; for (const [n, p] of poids) { r -= p; if (r <= 0) return n; } return 'debout'; };
@@ -135,13 +139,18 @@ export class RemiVelo extends BossScene {
       // tous les « voitures » obstacles : un TREMPLIN puis 2 VOITURES garées (on roule sur le toit, pintes au-dessus)
       if (k > 3 && k % V.voitures === 0) {
         const L = V.longueurVoiture, H = V.hauteurVoiture;
-        this.tremplins.push({ x0: x, l: 150, h: 70 });
-        const v1 = x + 150 + 130;
-        for (const xv of [v1, v1 + L + 40]) {
-          this.voitures.push({ x0: xv, l: L, h: H, couleur: choisir([0xb03a3a, 0x3a6ab0, 0xd8c060, 0x5a8a4a, 0x8a4ab0]), touche: false });
-          this.pintes.push({ x: xv + L * 0.5, h: H + 140, prise: false, t: Math.random() * 6 });
+        const lt = 150, ht = this.textures.exists('remi_tremplin') ? Math.round(lt / TREMPLIN_IMG.haut * TREMPLIN_IMG.h / TREMPLIN_IMG.l) : 70;
+        this.tremplins.push({ x0: x, l: lt, h: ht });
+        let xv = x + lt + 130;
+        for (let n = 0; n < 2; n++) {
+          // une voiture illustrée au hasard (sa longueur et sa hauteur de toit viennent de l'image), sinon la voiture dessinée
+          const img = this.textures.exists('remi_voitures') ? Math.floor(Math.random() * 3) : -1;
+          const l = img >= 0 ? VOIT_IMG[img].l * ECH_VOIT : L, h = img >= 0 ? VOIT_IMG[img].h * ECH_VOIT : H;
+          this.voitures.push({ x0: xv, l, h, img, couleur: choisir([0xb03a3a, 0x3a6ab0, 0xd8c060, 0x5a8a4a, 0x8a4ab0]), touche: false });
+          this.pintes.push({ x: xv + l * 0.5, h: h + 140, prise: false, t: Math.random() * 6 });
+          xv += l + 40;
         }
-        x = v1 + 2 * L + 40 + 520; k++;
+        x = xv + 480; k++;
         continue;
       }
       const type = k < debut.length ? debut[k] : tirer();
@@ -490,6 +499,8 @@ export class RemiVelo extends BossScene {
     const g = this.gVoit.clear();
     for (const t of this.tremplins) {
       const x = t.x0 - cam;
+      if (!t.spr && this.textures.exists('remi_tremplin')) t.spr = this.add.image(0, 0, 'remi_tremplin').setOrigin(0, 1).setDepth(7).setScale(t.l / TREMPLIN_IMG.haut / TREMPLIN_IMG.l);
+      if (t.spr) { t.spr.setPosition(x, SOL + 3).setVisible(x < LARGEUR + 50 && x + t.l > -80); continue; }
       if (x > LARGEUR + 50 || x + t.l < -50) continue;
       // tremplin : une planche posée sur des caisses de bière
       g.fillStyle(0x5a3a1a, 1).fillRect(x + t.l - 60, SOL - t.h + 8, 60, t.h - 8);
@@ -499,6 +510,11 @@ export class RemiVelo extends BossScene {
     }
     for (const v of this.voitures) {
       const x = v.x0 - cam;
+      if (v.img >= 0) {
+        if (!v.spr) v.spr = this.add.sprite(0, 0, 'remi_voitures', v.img).setOrigin(0.5, 1).setDepth(7).setScale(ECH_VOIT);
+        v.spr.setPosition(x + v.l / 2, SOL + 4).setVisible(x < LARGEUR + 50 && x + v.l > -50);
+        continue;
+      }
       if (x > LARGEUR + 50 || x + v.l < -50) continue;
       const L = v.l, H = v.h;
       g.fillStyle(0x000000, 0.3).fillEllipse(x + L / 2, SOL + 2, L, 14);

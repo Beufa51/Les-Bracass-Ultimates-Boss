@@ -103,7 +103,12 @@
   BUG TACTILE : les blocs de boutons HTML (même vides) restaient posés sur l'écran et mangeaient les touchers →
   `laisserPasserTactile(scene)` (commun.js) dans les 3 jeux (vérifié en émulation téléphone : le toucher arrive au jeu).
   Pong : `erreur` 0,035 / 0,05 / 0,065, `apercu` 1 / 0,8 / 0,55. Rémi devant le bar : pose « attend » du pong, plus petit,
-  derrière une table haute dessinée ; `remi_accueil` (en pied) utilisé s'il est ajouté au manifeste. Prompts 10 à 15 donnés. : `python3 outils/remi/preparer_images.py`.
+  derrière une table haute dessinée ; `remi_accueil` (en pied) utilisé s'il est ajouté au manifeste. Prompts 10 à 15 donnés.
+- V7 : IMAGES REÇUES ET INTÉGRÉES (preparer_images.py : `rues_quartiers`, `petites_images`) : quais `remi_rue2.jpg`,
+  centre-ville `remi_rue3.jpg` (image en perspective : on garde les 2 rangées de façades bout à bout), tremplin
+  `remi_tremplin.png` (haut de planche à 81 % : `TREMPLIN_IMG`), voitures `remi_voitures.png` (3 cases, `VOIT_IMG`,
+  `ECH_VOIT` 0,74 : longueur et hauteur de toit propres à chaque voiture), Rémi en pied qui t'accueille `remi_accueil.png`,
+  intérieur du bar derrière Rémi au pong `remi_bar_interieur.jpg`. `node outils/remi_verif.mjs` : 0 erreur. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

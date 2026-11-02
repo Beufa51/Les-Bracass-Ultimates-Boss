@@ -106,8 +106,10 @@ export class RemiPong extends BossScene {
       const im = this.add.image(LARGEUR / 2, 0, 'remi_bar_interieur').setOrigin(0.5, 0).setDepth(1.5);
       im.setScale(Math.max(LARGEUR / im.width, 300 / im.height));
     }
-    const neon = texte(this, 140, 30, 'BEER PONG', 26, '#4fe8ff', { fontStyle: 'bold', stroke: '#06404a', strokeThickness: 5 }).setDepth(2).setAngle(-6);
-    this.tweens.add({ targets: neon, alpha: 0.6, yoyo: true, repeat: -1, duration: 700 });
+    if (!this.textures.exists('remi_bar_interieur')) {   // (l'illustration a déjà son néon)
+      const neon = texte(this, 140, 30, 'BEER PONG', 26, '#4fe8ff', { fontStyle: 'bold', stroke: '#06404a', strokeThickness: 5 }).setDepth(2).setAngle(-6);
+      this.tweens.add({ targets: neon, alpha: 0.6, yoyo: true, repeat: -1, duration: 700 });
+    }
     // table (trapèze en perspective) : du bout de Rémi jusque sous l'écran
     const t = this.add.graphics().setDepth(4);
     const a = proj(-W / 2, 0, 0), b = proj(W / 2, 0, 0), c = proj(W / 2, 0, D), d = proj(-W / 2, 0, D);

@@ -69,7 +69,7 @@ Décor de jeu style manga/anime : couloir des toilettes d'un bar, vu de côté, 
 Prompts dans `propositions/remi_audit.md`, section 5 : `remi_porte_dos_planche.jpg` (Rémi de dos) et
 `remi_toi_dos_planche.jpg` (toi de dos).
 
-## 10. L'intérieur du bar (fond du beer pong, derrière Rémi) — `remi_bar_interieur.jpg`
+## 10. L'intérieur du bar (fond du beer pong, derrière Rémi) — `remi_bar_interieur.jpg` ✅ REÇUE ET INTÉGRÉE
 À joindre : la façade du bar (`remi_bar_facade.jpg`) pour garder le style.
 ```
 Même style que l'image jointe (manga/anime, contours nets, couleurs chaudes). Intérieur d'un bar de quartier la nuit, vu DE FACE,
@@ -78,7 +78,7 @@ un néon rose « BAR » et un néon bleu « BEER PONG » au mur, guirlandes lumi
 les côtés. Le CENTRE de l'image reste dégagé (un personnage s'y tiendra). Aucun texte lisible à part les néons. Image 16:9.
 ```
 
-## 11. Les quais de nuit (2e quartier du vélo) — `remi_rue2.jpg`
+## 11. Les quais de nuit (2e quartier du vélo) — `remi_rue2.jpg` ✅ REÇUE ET INTÉGRÉE
 À joindre : la rue de nuit (`remi_rue.jpg`) pour garder le style.
 ```
 Même style et même cadrage que l'image jointe (décor de jeu en défilement horizontal, vue STRICTEMENT DE PROFIL, la nuit) :
@@ -87,14 +87,14 @@ des immeubles sur l'autre rive au loin, ciel nuit avec lune. Le bas de l'image s
 Image très large (format 3:1), bords gauche et droit raccordables. Aucun personnage, aucun texte.
 ```
 
-## 12. Le centre-ville animé (3e quartier du vélo) — `remi_rue3.jpg`
+## 12. Le centre-ville animé (3e quartier du vélo) — `remi_rue3.jpg` ✅ REÇUE ET INTÉGRÉE
 ```
 Même style et même cadrage que l'image jointe (défilement horizontal, vue de profil, la nuit) : une rue piétonne animée du
 centre-ville, terrasses de bars éclairées, guirlandes lumineuses au-dessus de la rue, enseignes néon (sans texte lisible),
 façades colorées. Le bas de l'image s'arrête au pied des façades. Image très large (3:1), bords raccordables, aucun personnage.
 ```
 
-## 13. Rémi qui t'attend devant le bar (fin du vélo) — `remi_accueil.png` (détendu, PAS en garde)
+## 13. Rémi qui t'attend devant le bar (fin du vélo) — `remi_accueil.png` (détendu, PAS en garde) ✅ REÇUE ET INTÉGRÉE
 À joindre : l'image de présentation de Rémi.
 ```
 Même personnage que l'image jointe (casquette noire à l'envers, barbe, veste en jean, tee-shirt orange, jean, baskets), même style
@@ -102,14 +102,14 @@ manga/anime, contours noirs nets, fond BLANC uni, aucun texte. Vu de 3/4 face, E
 détendu et souriant : il lève une pinte de bière d'une main et fait un grand signe « viens ! » de l'autre. Une seule pose, centrée.
 ```
 
-## 14. Les voitures garées du vélo — `remi_voitures_planche.jpg`
+## 14. Les voitures garées du vélo — `remi_voitures_planche.jpg` ✅ REÇUE ET INTÉGRÉE
 ```
 Planche de sprites style manga/anime, contours noirs nets, fond BLANC uni, aucun texte. 3 petites voitures de ville garées,
 vues STRICTEMENT DE PROFIL, toutes tournées vers la DROITE, même échelle et même hauteur, alignées sur une ligne et bien espacées :
 une citadine rouge, une berline bleue, une petite camionnette jaune. Toit plat bien visible (on roule dessus à vélo). Pas d'ombre au sol.
 ```
 
-## 15. Le tremplin du vélo — `remi_tremplin.png`
+## 15. Le tremplin du vélo — `remi_tremplin.png` ✅ REÇUE ET INTÉGRÉE
 ```
 Style manga/anime, contours noirs nets, fond BLANC uni, aucun texte. Vu STRICTEMENT DE PROFIL : un tremplin de fortune fait d'une
 planche de bois posée en pente (montant vers la DROITE) sur une pile de caisses de bière en plastique jaune. Une seule image, centrée.
