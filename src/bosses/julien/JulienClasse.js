@@ -133,7 +133,6 @@ export class JulienClasse extends JulienManif {
     this.txtMsg.setY(66);   // les répliques sous la barre de vie de Julien
     this.txtAnnonce = texte(this, LARGEUR / 2, 102, '', 30, '#ffd84a').setStroke('#000', 6).setDepth(5);   // l'attaque qui arrive
     this.txtConseil = texte(this, LARGEUR / 2, 130, '', 16, '#ffffff').setStroke('#000', 4).setDepth(5);
-    this.txtTrou = texte(this, LARGEUR / 2, VUE_H * 2 - 64, '', 26, '#7fff7f').setStroke('#000', 6).setDepth(5);   // où est le trou du mur
     this.txtEleves = texte(this, LARGEUR / 2, VUE_H * 2 - 24, '', 16, '#9fd8ff').setStroke('#000', 4).setDepth(5);
     this.annonceT = 0; this.elevesT = 0;
     this.dessiner(0);
@@ -205,9 +204,12 @@ export class JulienClasse extends JulienManif {
       if (vientDAppuyer(this.touchesCarte.tab) || vientDAppuyer(this.touchesCarte.m)) this.carte = !this.carte;
       ['a1', 'a2', 'a3', 'a4', 'a5', 'a6'].forEach((t, i) => { if (vientDAppuyer(this.touchesArmes[t])) choisirArme(this, ARMES[i].id); });
       const x0 = this.j.x, y0 = this.j.y;
-      this.bougerJoueur(dt);
-      this.glisser(dt, x0, y0);
-      this.iaJulien(this.julien, dt);
+      if (this.dessus) this.majDessus(dt);   // rafale de murs de copies : shoot them up vu du dessus
+      else {
+        this.bougerJoueur(dt);
+        this.glisser(dt, x0, y0);
+        this.iaJulien(this.julien, dt);
+      }
       this.majSalle(dt);
       this.projectiles(dt);   // tes tirs (armes.js) et les taches
       this.avancerLivres(dt);
@@ -260,6 +262,7 @@ export class JulienClasse extends JulienManif {
         if (e.t <= 0 && !this.finDemandee) { this.finDemandee = true; this.gagne(); }
         return;
       case 'pause': if (e.t <= 0) { e.etat = 'marche'; e.t = 0.6; e.cible = null; } return;
+      case 'interro': return;   // la rafale de murs en vue du dessus (majDessus)
       case 'touche': if (e.t <= 0) { e.etat = e.apres; e.t = e.tApres; } return;
       case 'dos':   // la FENÊTRE DE PUNITION : il écrit au tableau
         if (e.t <= 0) { e.etat = 'marche'; e.t = J.cadence[ph] * this.diff.cadence * (0.6 + Math.random() * 0.3); this.txtAnnonce.setText(''); }
@@ -293,7 +296,6 @@ export class JulienClasse extends JulienManif {
         if (e.reste > 0) {
           e.reste--;
           if (e.motif === 'deluge') { this.vagueCopies(e, voit); e.t = J.deluge.intervalle[e.phase - 1]; return; }
-          if (e.motif === 'mur' || e.motif === 'murs') { this.murCopies(e); e.t = J.murs.intervalle[e.phase - 1]; return; }
           if (e.motif === 'craies') this.lancerLivre(e, 'craie', this.angleVers(e, voit) + (Math.random() - 0.5) * 2 * J.craies.dispersion);
           else this.lancerLivre(e, 'livre', this.angleVers(e, voit));
           e.t = e.motif === 'craies' ? J.craies.intervalle : J.rafale.intervalle; return;
@@ -308,9 +310,6 @@ export class JulienClasse extends JulienManif {
     e.motif = this.choisirMotif(e, d);
     const P = { deluge: J.deluge.preavis, murs: J.mur.preavis, dico: J.dico.preavis, mur: J.mur.preavis, craies: J.craies.preavis, aimant: J.aimant.preavis, confisque: J.confisque.preavis, regle: J.regle.preavis };
     e.etat = 'prepare'; e.t = P[e.motif] || J.preavis[ph];
-    if (e.motif === 'mur' || e.motif === 'murs') {   // le trou du 1er mur est connu (et montré au sol) dès le préavis
-      e.trou = Math.max(2, Math.min(this.plan[0].length - 2, this.j.x + (Math.random() - 0.5) * 4)); e.premier = true;
-    }
     if (ANNONCES[e.motif]) this.annoncer(e.motif, e.t + 0.6);
     if (e.motif === 'mur' || e.motif === 'murs' || e.motif === 'deluge') { this.message(e.motif === 'deluge' ? REPLIQUES.deluge : REPLIQUES.mur, 2.2); jouerSon(this, 'julien_papier'); }
     else if (e.motif === 'aimant') this.message(REPLIQUES.aimant, 2.2);
@@ -347,8 +346,9 @@ export class JulienClasse extends JulienManif {
       e.etat = 'lance'; e.t = 0.35; e.reste = 0;
       return;
     }
+    if (e.motif === 'mur' || e.motif === 'murs') { this.entrerDessus(e); return; }   // rafale de murs : VUE DU DESSUS
     this.lancerMotif(e, voit);
-    e.etat = 'lance'; e.t = e.motif === 'mur' || e.motif === 'murs' ? 1.6 : e.motif === 'dico' ? 0.8 : 0.35;   // il se retourne quand le mur / le dico est passé
+    e.etat = 'lance'; e.t = e.motif === 'dico' ? 0.8 : 0.35;   // il se retourne quand le dico est passé
   }
 
   // fin d'une attaque : après une grosse (ou parfois une petite en phase 2-3), il se retourne au tableau
@@ -403,32 +403,11 @@ export class JulienClasse extends JulienManif {
     else if (e.motif === 'copies') {
       const n = J.copies.nombre;
       for (let k = 0; k < n; k++) this.lancerLivre(e, 'copie', a + (k - (n - 1) / 2) * J.copies.ecart);
-    } else if (e.motif === 'mur' || e.motif === 'murs') {   // RAFALE de murs (façon shoot them up) : le trou zigzague
-      e.sens = Math.random() < 0.5 ? -1 : 1;
-      this.murCopies(e); e.reste = J.murs.nombre[e.phase - 1] + (e.motif === 'murs' ? 1 : 0) - 1;
     }
     else if (e.motif === 'deluge') { e.vague = 0; this.vagueCopies(e, voit); e.reste = J.deluge.vagues[e.phase - 1] - 1; }
     else if (e.motif === 'craies') { this.lancerLivre(e, 'craie', a); e.reste = J.craies.nombre - 1; }
     else { this.lancerLivre(e, 'livre', a); if (e.motif === 'rafale') e.reste = J.rafale.nombre - 1; }
     jouerSon(this, 'julien_lancer', { rate: e.motif === 'dico' ? 0.55 : 0.75 });
-  }
-
-  // un mur de copies : toute la largeur de la salle, sauf UN trou. 1er mur : le trou pas loin de toi ; les suivants :
-  // il se décale de « derive » cases (et rebondit sur les bords), il faut le suivre
-  murCopies(e) {
-    const J = RG.julien, W = this.plan[0].length, [d0, d1] = J.murs.derive;
-    if (e.premier) e.premier = false;   // 1er mur : le trou choisi au préavis
-    else {
-      e.trou += e.sens * (d0 + Math.random() * (d1 - d0));
-      if (e.trou < 2 || e.trou > W - 2) { e.sens = -e.sens; e.trou += 2 * e.sens * (d0 + Math.random() * (d1 - d0)); }
-      if (Math.random() < 0.3) e.sens = -e.sens;   // il change parfois de sens
-    }
-    e.trou = Math.max(2, Math.min(W - 2, e.trou));
-    const id = (this.murId = (this.murId || 0) + 1);
-    for (let x = 1.25; x < W - 1; x += J.mur.ecart) if (Math.abs(x - e.trou) > J.mur.trou / 2) {
-      this.livres.push({ genre: 'mur', mur: id, trou: e.trou, traverse: true, x, y: e.y + 0.7, dx: 0, dy: 1, v: J.mur.vitesse, degats: J.mur.degats, rebonds: 0, t: 0, ph: Math.random() * 6 });
-    }
-    jouerSon(this, 'julien_papier', { rate: 1.2 });
   }
 
   // DÉLUGE (bullet hell) : vagues de copies qui passent au-dessus des tables ; les trous se décalent d'une vague à
@@ -488,7 +467,6 @@ export class JulienClasse extends JulienManif {
 
   // ------------------------------------------------------------------ la salle (phases, élèves, arme confisquée)
   majSalle(dt) {
-    this.montrerTrou();
     const C = RG.classe;
     this.annonceT -= dt; if (this.annonceT <= 0) { this.txtAnnonce.setText(''); this.txtConseil.setText(''); }
     this.elevesT -= dt; if (this.elevesT <= 0) this.txtEleves.setText('');
@@ -505,23 +483,130 @@ export class JulienClasse extends JulienManif {
     if (this.alarme && (this.alarmeT -= dt) <= 0) { jouerSon(this, 'julien_alarme', { volume: 0.35 }); this.alarmeT = 4; }
   }
 
-  // le TROU du prochain mur de copies : couloir vert au sol (du mur jusqu'au fond de la salle) + flèche à l'écran
-  montrerTrou() {
-    const j = this.j, e = this.julien, S = this.decor.sol, W = this.plan[0].length;
-    if (!this.genres0) this.genres0 = S.genres.slice();
-    S.genres.set(this.genres0);
-    let trou = null, y0 = 1;
-    const prochain = this.livres.filter(b => b.genre === 'mur' && b.y < j.y + 0.2).sort((a, b) => b.y - a.y)[0];
-    if (prochain) { trou = prochain.trou; y0 = Math.floor(prochain.y); }
-    else if (e.etat === 'prepare' && (e.motif === 'mur' || e.motif === 'murs')) { trou = e.trou; y0 = Math.floor(e.y); }
-    if (trou == null) { this.txtTrou.setText(''); return; }
-    const demi = RG.julien.mur.trou / 2;
-    for (let y = Math.max(1, y0); y < this.plan.length - 1; y++) for (let x = 1; x < W - 1; x++) {
-      if (Math.abs(x + 0.5 - trou) < demi) S.genres[y * W + x] = 3;
+  // ------------------------------------------------------------------ VUE DU DESSUS (rafale de murs de copies)
+  // L'écran bascule en shoot them up vertical (2D, dans la vue 480 × 222) : Julien en haut fait des allers-retours,
+  // les murs de copies DESCENDENT (un trou chacun, qui zigzague d'un mur à l'autre), tu te déplaces en bas et tu tires
+  // vers le haut. Réglages : RG.julien.dessus (px, px/s), RG.julien.murs (nombre et cadence des murs), RG.julien.mur.
+  entrerDessus(e) {
+    const D = RG.julien.dessus;
+    this.livres = [];
+    this.dessus = { prochain: D.attente, restants: RG.julien.murs.nombre[e.phase - 1] + (e.motif === 'murs' ? 1 : 0),
+      murs: [], tirs: [], px: L / 2, py: VUE_H - 26, prof: L / 2, profV: 1, invT: 0, trou: null, sens: Math.random() < 0.5 ? -1 : 1,
+      recharge: 0, lanceT: 0, flash: 0 };
+    e.etat = 'interro';
+    this.txtAnnonce.setText('INTERRO : ESQUIVE LES COPIES !'); this.annonceT = 2.5;
+    this.txtConseil.setText(!this.vus.has('dessus') ? 'Vue du dessus : passe dans les TROUS (gauche / droite) et tire vers le haut sur Julien !' : '');
+    this.vus.add('dessus');
+    jouerSon(this, 'julien_papier', { rate: 0.8 });
+  }
+
+  // commandes en vue du dessus : gauche / droite (pas de côté OU tourner), haut / bas (avancer / reculer), tirer
+  commandesDessus() {
+    const k = this.touches, m = this.cmd;
+    let x = 0, y = 0, tir;
+    if (this.tactile) {
+      if (k.gauche.isDown || k.z.isDown) x -= 1;
+      if (k.droite.isDown || k.espace.isDown) x += 1;
+      if (k.haut.isDown) y -= 1;
+      if (k.bas.isDown) y += 1;
+      if (this.joy) { const v = this.joy.valeur(); x += v.x; y -= v.y; }
+      tir = k.x.isDown;
+    } else {
+      x = (m.bas('coteG') || m.bas('tourneG') ? -1 : 0) + (m.bas('coteD') || m.bas('tourneD') ? 1 : 0);
+      y = (m.bas('avancer') ? -1 : 0) + (m.bas('reculer') ? 1 : 0);
+      tir = m.bas('tirer') || this.clic;
     }
-    const ecart = trou - j.x;
-    const cote = ecart * -Math.sin(j.a);   // > 0 : le trou est à ta droite quand tu regardes vers le tableau
-    this.txtTrou.setText(Math.abs(ecart) < demi - 0.25 ? '✔ RESTE LÀ' : cote > 0 ? 'LE TROU ▶▶' : '◀◀ LE TROU').setColor(Math.abs(ecart) < demi - 0.25 ? '#7fff7f' : '#ffd84a');
+    return { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, y)), tir };
+  }
+
+  majDessus(dt) {
+    const M = this.dessus, D = RG.julien.dessus, J = RG.julien, e = this.julien, j = this.j;
+    const X0 = 12, X1 = L - 12;
+    const c = this.commandesDessus();
+    M.px = Math.max(X0 + 8, Math.min(X1 - 8, M.px + c.x * D.vitesse * dt));
+    M.py = Math.max(VUE_H - 90, Math.min(VUE_H - 12, M.py + c.y * D.vitesse * dt));
+    M.invT -= dt; M.lanceT -= dt; M.flash -= dt;
+    // Julien fait des allers-retours en haut
+    M.prof += M.profV * D.vitesseProf * dt;
+    if (M.prof < X0 + 30 || M.prof > X1 - 30) M.profV = -M.profV;
+    // un nouveau mur : le trou près de toi au 1er, puis il zigzague (rebondit sur les bords, change parfois de sens)
+    M.prochain -= dt;
+    if (M.restants > 0 && M.prochain <= 0) {
+      const [d0, d1] = D.derive;
+      // trous : jamais sous les boutons du téléphone (joystick en bas à gauche, LANCER / ARME à droite)
+      const g0 = (this.tactile ? 85 : X0) + D.trou / 2, g1 = (this.tactile ? 365 : X1) - D.trou / 2;
+      if (M.trou == null) M.trou = M.px + (Math.random() - 0.5) * 120;
+      else {
+        M.trou += M.sens * (d0 + Math.random() * (d1 - d0));
+        if (M.trou < g0 || M.trou > g1) { M.sens = -M.sens; M.trou += 2 * M.sens * (d0 + Math.random() * (d1 - d0)); }
+        if (Math.random() < 0.3) M.sens = -M.sens;
+      }
+      M.trou = Math.max(g0, Math.min(g1, M.trou));
+      M.murs.push({ y: 40, trou: M.trou, touche: false });
+      M.restants--; M.prochain = J.murs.intervalle[e.phase - 1]; M.lanceT = 0.3;
+      jouerSon(this, 'julien_papier', { rate: 1.3, volume: 0.7 });
+    }
+    for (const w of M.murs) {
+      w.y += D.vitesseMur * dt;
+      if (!w.touche && j.vie > 0 && M.invT <= 0 && Math.abs(w.y - M.py) < 11 && Math.abs(M.px - w.trou) > D.trou / 2 - 6) {
+        w.touche = true; M.invT = 0.6;
+        this.degats(J.mur.degats, e.x, e.y);
+        this.parlerEleves('aie');
+      }
+    }
+    M.murs = M.murs.filter(w => w.y < VUE_H + 12);
+    // tes boulettes, vers le haut (sauf sarbacane confisquée)
+    M.recharge -= dt;
+    if (c.tir && M.recharge <= 0 && !this.confisque) {
+      M.tirs.push({ x: M.px, y: M.py - 10 }); M.recharge = RG.sarbacane.cadence;
+      jouerSon(this, 'julien_lancer', { rate: 1.6 });
+    }
+    for (const b of M.tirs) {
+      b.y -= D.vitesseTir * dt;
+      if (!b.fini && b.y < 50 && b.y > 8 && Math.abs(b.x - M.prof) < 14) {
+        b.fini = true; M.flash = 0.12;
+        this.toucherEnnemi(e, RG.sarbacane.degats, { genre: 'boulette' });
+        if (e.etat !== 'interro') { this.sortirDessus(false); return; }   // changement de phase ou vaincu : on revient en 3D
+      }
+    }
+    M.tirs = M.tirs.filter(b => !b.fini && b.y > 0);
+    if (M.restants === 0 && M.murs.length === 0) this.sortirDessus(true);
+  }
+
+  sortirDessus(punir) {
+    this.dessus = null;
+    if (punir && this.julien.etat === 'interro') this.finAttaque(this.julien, 'mur');   // ouf ! il se retourne : punis-le
+  }
+
+  dessinerDessus(g) {
+    const M = this.dessus, D = RG.julien.dessus, s = this.T.spr, t = this.time.now / 1000;
+    // la salle vue du dessus : lino en damier, estrade en parquet, le tableau tout en haut
+    g.fillStyle = '#7d8590'; g.fillRect(0, 0, L, VUE_H);
+    g.fillStyle = '#737a85';
+    for (let y = 56; y < VUE_H; y += 24) for (let x = ((y / 24) | 0) % 2 ? 0 : 24; x < L; x += 48) g.fillRect(x, y, 24, 24);
+    g.fillStyle = '#8a5f38'; g.fillRect(0, 0, L, 56); g.fillStyle = '#5c3e22'; for (let y = 8; y < 56; y += 8) g.fillRect(0, y, L, 1);
+    g.fillStyle = '#2f4a32'; g.fillRect(140, 0, 200, 7); g.fillStyle = '#4b3a2a'; g.fillRect(0, 0, 12, VUE_H); g.fillRect(L - 12, 0, 12, VUE_H);
+    // Julien (de face, petit) en haut
+    const pj = M.flash > 0 ? s.julien_touche : M.lanceT > 0 ? s.julien_lance : s[((t * 4) | 0) % 2 ? 'julien_marche1' : 'julien_marche0'];
+    if (pj) { const h = 46, w = h * pj.width / pj.height; g.drawImage(pj, M.prof - w / 2, 6, w, h); }
+    // les murs de copies (le trou bien visible)
+    for (const w of M.murs) for (let x = 12; x < L - 12; x += 15) {
+      if (Math.abs(x + 6 - w.trou) <= D.trou / 2) continue;
+      const y = w.y - 8 + Math.sin(x * 0.7 + t * 6) * 1.5;
+      g.fillStyle = '#2a2a2a'; g.fillRect(x - 1, y - 1, 14, 18);
+      g.fillStyle = '#f6f3ea'; g.fillRect(x, y, 12, 16);
+      g.fillStyle = '#9fb6d8'; for (let l = 4; l < 16; l += 3) g.fillRect(x + 1, y + l, 10, 1);
+      g.fillStyle = '#d84a4a'; g.fillRect(x + 3, y, 1, 16);
+    }
+    // tes boulettes
+    g.fillStyle = '#ffffff'; for (const b of M.tirs) g.fillRect(b.x - 2, b.y - 2, 4, 4);
+    // toi, vu du dessus (capuche bleu marine, cheveux bruns) ; clignote après un coup
+    if (M.invT <= 0 || ((t * 16) | 0) % 2) {
+      g.fillStyle = '#1e2a5a'; g.beginPath(); g.ellipse(M.px, M.py + 2, 9, 7, 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#5a3a1a'; g.beginPath(); g.arc(M.px, M.py - 2, 5, 0, Math.PI * 2); g.fill();
+      g.fillStyle = '#e8b48a'; g.fillRect(M.px + 6, M.py - 6, 3, 3);   // la main qui tient la sarbacane
+      g.fillStyle = '#c9d6ea'; g.fillRect(M.px + 7, M.py - 14, 1, 9);
+    }
   }
 
   // phase 3 : les sprinklers mouillent le sol, tu glisses (tu continues un peu sur ta lancée)
@@ -632,6 +717,7 @@ export class JulienClasse extends JulienManif {
   // barre de vie de Julien en haut de la vue (repères des phases à 50 % et 20 %)
   dessinerEnPlus(g) {
     const t = this.time.now / 1000;
+    if (this.dessus) this.dessinerDessus(g);
     if (this.alarme) {   // alarme incendie (flash rouge) et sprinklers (gouttes)
       if (Math.sin(t * 9) > 0.6) { g.fillStyle = 'rgba(255,40,30,0.12)'; g.fillRect(0, 0, L, VUE_H); }
       g.fillStyle = 'rgba(190,220,255,0.45)';

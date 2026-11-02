@@ -128,7 +128,10 @@ export const REGLAGES = {
     // DÉLUGE DE COPIES (bullet hell) : vagues par phase, s entre 2 vagues, copies par éventail, cercle d'une vague sur 3
     deluge: { vagues: [3, 5, 7], intervalle: [0.75, 0.6, 0.5], nombre: 9, ecart: 0.2, cercle: 18, vitesse: 3.3, degats: 7, preavis: 0.9 },
     // RAFALE DE MURS (shoot them up) : murs d'affilée par phase (« murs » : +1), s entre 2 murs, décalage du trou (cases)
-    murs: { nombre: [5, 5, 6], intervalle: [0.95, 0.85, 0.75], derive: [1.3, 2.4] },
+    murs: { nombre: [5, 5, 6], intervalle: [0.95, 0.85, 0.75] },
+    // VUE DU DESSUS pendant la rafale de murs (en pixels de la vue 480 × 222) : attente avant le 1er mur (s), ta vitesse,
+    // vitesse des murs, largeur du trou, décalage du trou d'un mur à l'autre, vitesse de Julien en haut, de tes boulettes
+    dessus: { attente: 1.0, vitesse: 150, vitesseMur: 75, trou: 64, derive: [50, 95], vitesseProf: 70, vitesseTir: 280 },
   },
   classe: {
     glisse: 0.45,            // phase 3 (sprinklers) : tu glisses encore ce temps-là (s) après avoir lâché (petit = moins de glissade)
