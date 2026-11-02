@@ -73,7 +73,7 @@ export class RemiPong extends BossScene {
 
   demarrer() {
     this.tourDe('toi');
-    bulle(this, 'Rémi : « Les invités d\'abord. Vas-y, rate. »', '#ffd84a', 2.4, 70);
+    bulle(this, 'Rémi : « Les invités d\'abord. Vas-y, rate. »', '#ffd84a', 2.4, 250);
   }
 
   tourDe(qui) {
@@ -181,8 +181,8 @@ export class RemiPong extends BossScene {
     const s = this.tangage(), e = this.diff.erreur, v = this.visee;
     const ex = (hasard(-1, 1) + hasard(-1, 1)) / 2 * e, ez = (hasard(-1, 1) + hasard(-1, 1)) / 2 * e;
     const f = v.force, dz = this.ecartForce(f);
-    if (Math.abs(f - 0.5) <= this.diff.zoneForce / 2) bulle(this, 'Bonne force !', '#7fff7f', 0.7, 120);
-    else bulle(this, f > 0.5 ? 'Trop fort !' : 'Trop court !', '#ffb0b0', 0.7, 120);
+    if (Math.abs(f - 0.5) <= this.diff.zoneForce / 2) bulle(this, 'Bonne force !', '#7fff7f', 0.7, 300);
+    else bulle(this, f > 0.5 ? 'Trop fort !' : 'Trop court !', '#ffb0b0', 0.7, 300);
     this.balles--;
     this.etat = 'vol';
     this.lancer({ x: 0.05, y: 0.3, z: -0.3 }, v.x + s.x + ex, v.z + s.z + ez + dz, this.verresRemi, 'toi');
@@ -247,7 +247,7 @@ export class RemiPong extends BossScene {
     const b = this.balle;
     if (Math.random() < 0.5) { this.dedans(); return; }
     b.etat = 'libre'; b.vy = 1.2; b.vx = (b.x - b.verre.x) * 12; b.vz = (b.z - b.verre.z) * 12 + (b.qui === 'toi' ? 0.6 : -0.6);
-    bulle(this, 'Sur le rebord... et non !', '#ffb0b0', 1, 120);
+    bulle(this, 'Sur le rebord... et non !', '#ffb0b0', 1, 300);
   }
 
   dedans() {
@@ -259,12 +259,12 @@ export class RemiPong extends BossScene {
     this.cameras.main.shake(120, 0.004);
     if (b.qui === 'toi') {
       this.ivresseRemi++;
-      bulle(this, choisir(['PLOUF !', 'DEDANS !', 'Bois, Rémi !']), '#7fff7f', 1, 120);
-      if (Math.random() < 0.6) this.time.delayedCall(700, () => bulle(this, `Rémi : « ${choisir(REPLIQUES.pongToucheToi)} »`, '#ffd84a', 1.6, 70));
+      bulle(this, choisir(['PLOUF !', 'DEDANS !', 'Bois, Rémi !']), '#7fff7f', 1, 300);
+      if (Math.random() < 0.6) this.time.delayedCall(700, () => bulle(this, `Rémi : « ${choisir(REPLIQUES.pongToucheToi)} »`, '#ffd84a', 1.6, 250));
     } else {
       this.ivresse++;
-      bulle(this, `Tu bois ! (verres bus : ${this.ivresse})`, '#ffb0b0', 1.3, 120);
-      this.time.delayedCall(600, () => bulle(this, `Rémi : « ${choisir(REPLIQUES.pongToucheRemi)} »`, '#ffd84a', 1.6, 70));
+      bulle(this, `Tu bois ! (verres bus : ${this.ivresse})`, '#ffb0b0', 1.3, 300);
+      this.time.delayedCall(600, () => bulle(this, `Rémi : « ${choisir(REPLIQUES.pongToucheRemi)} »`, '#ffd84a', 1.6, 250));
       this.cameras.main.shake(300, 0.006);
     }
   }
@@ -272,7 +272,7 @@ export class RemiPong extends BossScene {
   finBalle() {
     const b = this.balle;
     this.balle = null;
-    if (b.qui === 'remi' && b.etat !== 'dedans' && Math.random() < 0.4) bulle(this, `Rémi : « ${choisir(REPLIQUES.pongRateRemi)} »`, '#ffd84a', 1.4, 70);
+    if (b.qui === 'remi' && b.etat !== 'dedans' && Math.random() < 0.4) bulle(this, `Rémi : « ${choisir(REPLIQUES.pongRateRemi)} »`, '#ffd84a', 1.4, 250);
     if (!this.verresRemi.some(v => v.plein)) { this.gagne(); return; }
     if (!this.verresToi.some(v => v.plein)) { this.etat = 'fin'; this.time.delayedCall(600, () => ecranPerdu(this, 'PERDU AU BEER PONG', REPLIQUES.pongPerdu, this.nomDiff)); return; }
     if (this.balles > 0) { if (b.qui === 'toi') this.commencerVisee(); else this.time.delayedCall(700, () => this.lancerRemi()); return; }

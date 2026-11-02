@@ -10,12 +10,15 @@ from scipy import ndimage
 
 SRC, DST = 'assets_inbox/remi/', 'assets/sprites/remi/'
 
-def detourer(img, seuil=232):
+def detourer(img, seuil=232, grand=10**9):
     a = np.asarray(img.convert('RGB')).astype(int)
     blanc = (a.min(axis=2) >= seuil)
     lab, _ = ndimage.label(blanc)
     bord = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
-    fond = np.isin(lab, list(bord))
+    # + les grandes zones blanches fermées (l'intérieur des roues, entre les rayons)
+    tailles = ndimage.sum(blanc, lab, range(1, lab.max() + 1))
+    grandes = [i + 1 for i, t in enumerate(tailles) if t > grand]
+    fond = np.isin(lab, list(bord) + grandes)
     fond = ndimage.binary_opening(fond, iterations=1)
     alpha = np.where(fond, 0, 255).astype(np.uint8)
     alpha = ndimage.uniform_filter(alpha.astype(float), 2).astype(np.uint8)   # bord adouci
@@ -37,7 +40,7 @@ def bandes(plein, axe, ecart):
     return [r for r in res if r[1] - r[0] > 40]
 
 def planche_velo():
-    im = detourer(Image.open(SRC + 'remi_velo_planche.jpg'))
+    im = detourer(Image.open(SRC + 'remi_velo_planche.jpg'), seuil=205, grand=350)
     al = np.asarray(im)[:, :, 3] > 40
     # chaque pose = un groupe de pixels reliés (un peu épaissis pour garder les rayons des roues) ;
     # les petits morceaux (casquette qui vole) rejoignent la pose la plus proche
