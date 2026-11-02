@@ -16,6 +16,8 @@ export const MANIFESTE = {
     remi_porte: { fichier: 'sprites/remi/remi_porte.png', largeur: 345, hauteur: 562, images: 6, vitesse: 1 },
     // les bourrés du vélo : debout (titube), sursaute (sonnette), allongé (bouteilles), traverse de face
     remi_bourres: { fichier: 'sprites/remi/remi_bourres.png', largeur: 495, hauteur: 560, images: 4, vitesse: 1 },
+    // le fond de rue de nuit (répétable), derrière le vélo
+    remi_rue: { fichier: 'sprites/remi/remi_rue.jpg', largeur: 1702, hauteur: 575, images: 1, vitesse: 1 },
     remi_presentation: { fichier: 'sprites/remi/remi_presentation.png', largeur: 832, hauteur: 1202, images: 1, vitesse: 1 },
   },
   sons: {

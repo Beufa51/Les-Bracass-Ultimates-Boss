@@ -30,7 +30,7 @@ ou de 3/4, même échelle, sur une ligne : 1 : debout qui titube, bouteille à l
 zigzag, vu de FACE, bras écartés ; 5 : un groupe de 3 copains bras dessus bras dessous qui chantent. Pas d'ombre, aucun texte.
 ```
 
-## 4. La rue de nuit (fond qui défile) — `remi_rue.jpg`
+## 4. La rue de nuit (fond qui défile) — `remi_rue.jpg` ✅ REÇUE ET INTÉGRÉE
 ```
 Décor de jeu vidéo en défilement horizontal, style manga/anime, rue d'une petite ville française LA NUIT, vue de PROFIL (de côté) :
 façades d'immeubles avec fenêtres éclairées, bars et kebabs fermés, lampadaires orangés, trottoir au premier plan, ciel nuit avec lune.

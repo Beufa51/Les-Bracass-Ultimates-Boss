@@ -164,8 +164,20 @@ def planche_bourres():
     bande.save(DST + 'remi_bourres.png')
     print('remi_bourres.png', W, H, len(poses))
 
+def rue():
+    # fond de rue (défile derrière le vélo) : bande noire du bas coupée, bords gauche / droit fondus l'un dans l'autre
+    # sur 90 px pour que l'image se répète sans couture -> remi_rue.jpg
+    a = np.asarray(Image.open(SRC + 'remi_rue.jpg').convert('RGB')).astype(float)[:575]
+    F = 90
+    t = np.linspace(0, 1, F)[None, :, None]
+    debut = a[:, -F:] * (1 - t) + a[:, :F] * t       # la fin de l'image se fond dans le début
+    out = np.concatenate([debut, a[:, F:-F]], axis=1)
+    Image.fromarray(out.clip(0, 255).astype(np.uint8)).save(DST + 'remi_rue.jpg', quality=88)
+    print('remi_rue.jpg', out.shape[1], out.shape[0])
+
 planche_velo()
 presentation()
 planche_pong()
 planche_porte()
 planche_bourres()
+rue()

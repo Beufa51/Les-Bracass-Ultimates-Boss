@@ -127,6 +127,13 @@ export class RemiVelo extends BossScene {
     for (let k = 0; k < 40; k++) ciel.fillStyle(0xffffff, Math.random() * 0.6 + 0.2).fillRect(Math.random() * LARGEUR, Math.random() * 200, 2, 2);
     this.planLoin = this.add.tileSprite(0, SOL - 230, LARGEUR, 230, this.texImmeubles('remi_loin', 0x1c1a3a, 0.35, 160)).setOrigin(0, 0).setDepth(1);
     this.planPres = this.add.tileSprite(0, SOL - 260, LARGEUR, 260, this.texImmeubles('remi_pres', 0x2a2448, 0.8, 230)).setOrigin(0, 0).setDepth(1);
+    // l'illustration de la rue (ciel, façades, lampadaires), posée sur le trottoir : remplace les immeubles dessinés
+    if (this.textures.exists('remi_rue')) {
+      const k = (SOL - 14) / 575;
+      this.rue = this.add.tileSprite(0, 0, LARGEUR, SOL - 14, 'remi_rue').setOrigin(0, 0).setTileScale(k).setDepth(1);
+      this.rueEchelle = k;
+      ciel.setVisible(false); this.planLoin.setVisible(false); this.planPres.setVisible(false);
+    }
   }
 
   texImmeubles(cle, couleur, lumiere, hMax) {
@@ -269,6 +276,7 @@ export class RemiVelo extends BossScene {
     const cam = this.bx - (210 + this.v * 0.25);
     this.planLoin.tilePositionX = cam * 0.15;
     this.planPres.tilePositionX = cam * 0.35;
+    if (this.rue) this.rue.tilePositionX = cam * 0.8 / this.rueEchelle;   // presque au pas de la route
     const g = this.decor.clear();
     // trottoir, route, marquages
     g.fillStyle(0x3a3a48, 1).fillRect(0, SOL - 14, LARGEUR, 14);
@@ -277,7 +285,7 @@ export class RemiVelo extends BossScene {
     g.fillStyle(0xdddddd, 0.7);
     for (let x = -((cam) % 120) - 120; x < LARGEUR; x += 120) g.fillRect(x, SOL + 52, 60, 6);
     // lampadaires
-    for (let x = -((cam) % 380) - 380; x < LARGEUR + 380; x += 380) {
+    for (let x = -((cam) % 380) - 380; !this.rue && x < LARGEUR + 380; x += 380) {   // (la rue illustrée a les siens)
       g.fillStyle(0xffe9a0, 0.08).fillTriangle(x + 20, SOL - 186, x - 70, SOL, x + 110, SOL);
       g.fillStyle(0x15151c, 1).fillRect(x - 3, SOL - 190, 6, 176).fillRect(x - 3, SOL - 192, 26, 5);
       g.fillStyle(0xffe9a0, 1).fillCircle(x + 20, SOL - 186, 5);
