@@ -93,6 +93,7 @@ export class RemiPorte extends BossScene {
       `MAINTIENS ${t ? 'le doigt sur l\'écran' : 'ESPACE'} : tu armes ton poing (ça monte de plus en plus vite)`,
       'LÂCHE : le coup part. Lâche quand la cible passe sur ton poing (+) = coup parfait.',
       'Des pas, une ombre, le « ! »... QUELQU\'UN ARRIVE. S\'il te voit charger : ATTRAPÉ !',
+      'LÂCHE pendant qu\'il arrive = tu FAIS GENRE DE RIEN : pas de coup, tu gardes ton tour et tu recharges après.',
       'Mais qui ? Le VIDEUR ne rate rien... mais si c\'est juste le GARS QUI VIENT PISSER, il s\'en fiche !',
       'Et il FEINTE : fausse alerte, il surgit sans prévenir, il revient d\'un coup...',
       'Quand la porte CÈDE, celui qui a fait le PLUS DE DÉGÂTS gagne. Taper fort ET juste, pas juste le dernier !',
@@ -160,9 +161,12 @@ export class RemiPorte extends BossScene {
 
   pasToi(dt) {
     const tenu = this.doigt || this.touches.espace.isDown;
+    const danger = this.videur.etat === 'annonce' || this.videur.etat === 'regarde';
     if (tenu) this.charger(dt);
+    else if (this.charge && danger) { this.faireGenre('toi'); }   // V17 : lâcher quand quelqu'un arrive = pas de coup
     else if (this.charge) { this.frapper('toi'); return; }
-    this.consigne.setText(this.charge ? `PUISSANCE ${Math.round(this.puissance * 100)} %  -  LÂCHE quand la cible est sur le + !`
+    this.consigne.setText(this.charge && danger ? 'QUELQU\'UN ARRIVE !  LÂCHE pour faire genre de rien...'
+      : this.charge ? `PUISSANCE ${Math.round(this.puissance * 100)} %  -  LÂCHE quand la cible est sur le + !`
       : `${estTactile() ? 'MAINTIENS le doigt' : 'MAINTIENS ESPACE'} pour charger... gare à qui arrive !`);
   }
 
@@ -175,11 +179,18 @@ export class RemiPorte extends BossScene {
       this.remiReaction = (this.remiReaction ?? hasard(0.25, 0.7)) - dt;
       if (this.remiReaction <= 0) { this.remiPrudence = Math.random() < this.diff.remiPrudent; this.remiReaction = undefined; }
     }
-    if (this.remiPrudence) { this.frapper('remi'); return; }
+    if (this.remiPrudence) { this.faireGenre('remi'); this.remiPrudence = undefined; return; }
     this.charger(dt * 0.8);
     // il lâche quand la cible passe près de son poing, une fois assez chargé
     const d = Math.hypot(this.cible.x - IMPACT.x, this.cible.y - IMPACT.y);
     if (this.puissance >= this.remiVise && (d < 40 || this.puissance >= 1)) this.frapper('remi');
+  }
+
+  // FAIRE GENRE DE RIEN (V17, choix de Fabien) : on baisse le poing sans frapper, le tour continue
+  faireGenre(qui) {
+    this.puissance = 0; this.charge = false; this.pose[qui] = 'garde';
+    if (qui === 'toi') bulle(this, choisir(['*sifflote*', '*regarde ses chaussures*', '*se recoiffe*', '*fait genre de rien*']), '#cccccc', 0.9, 330);
+    else bulle(this, 'Rémi : *sifflote innocemment*', '#ffd84a', 0.9, 80);
   }
 
   // ---------- le videur ----------

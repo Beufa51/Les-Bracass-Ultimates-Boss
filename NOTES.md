@@ -203,6 +203,9 @@
   aimant jamais sous `aimantMini` 0,15 ; courbe toujours visible à 55 % (`courbeMini`) ; imprécision +6 %/verre
   (`erreurBue`, avant 15 %). Mesure à 6 verres bus, visée parfaite au hasard du tangage : 33 % en bougeant, 69 % concentré
   (avant : quasi 0). PORTE : Rémi un peu moins fort (précision 0,5-0,95, `remiCharge` 0,45 / 0,55 / 0,68 / 0,84).
+- V17 PORTE « FAIRE GENRE DE RIEN » (choix de Fabien) : lâcher pendant que quelqu'un arrive (annonce / regard) = PAS de
+  coup (`faireGenre`), le tour continue, on recharge après (avant : coup mou forcé). Rémi fait pareil quand il est prudent.
+  Bots PRESSION : bon joueur GAGNE 3291-2809 (46 s), joueur nul PERD 2081-3783.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
