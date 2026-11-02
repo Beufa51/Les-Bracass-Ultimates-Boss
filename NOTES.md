@@ -196,6 +196,13 @@
   d'avance. Bots NORMAL : « nul » perd 2072-4237 et 2210-4073, ~70 s par partie, 6 tours chacun.
   PONG : `dedans` 0,7 → 0,62, `aimant` 0,6 → 0,35 ; Rémi vise mieux (`remi` 0,38 / 0,5 / 0,6), toi moins précis
   (`erreur` 0,012 / 0,021 / 0,03), moins de courbe d'aide (`apercu` 0,72 en PRESSION, 0,5 en CUL SEC), plus distrait.
+- V17 PONG, VISÉE IVRE REFAITE (retour : « impossible vers la fin après avoir bu », il faut une visée juste mais pas trop
+  simple) : tangage RÉGULIER (rythme constant, on peut lâcher au bon moment) et PLAFONNÉ (`ivresse` 0,014/verre jusqu'à
+  `tangageMax` 0,065) ; CONCENTRATION : doigt immobile `concentration` 0,8 s = tangage -42 % (`concentrationEffet`),
+  jauge « ne bouge plus... / CONCENTRÉ ! » à gauche des verres ; hoquet annoncé « hic... » 0,6 s avant, moins fréquent ;
+  aimant jamais sous `aimantMini` 0,15 ; courbe toujours visible à 55 % (`courbeMini`) ; imprécision +6 %/verre
+  (`erreurBue`, avant 15 %). Mesure à 6 verres bus, visée parfaite au hasard du tangage : 33 % en bougeant, 69 % concentré
+  (avant : quasi 0). PORTE : Rémi un peu moins fort (précision 0,5-0,95, `remiCharge` 0,45 / 0,55 / 0,68 / 0,84).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

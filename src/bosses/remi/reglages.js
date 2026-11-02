@@ -19,15 +19,15 @@ export const DIFFICULTES = {
   entrainement: { nom: 'DIABOLO', couleur: '#9fe0ff', texte: 'Pour apprendre : large, lent, Rémi est déjà pompette et le videur ne feinte jamais.',
     temps: 110, densite: 0.65, traverse: 0.7, sonnette: 800,
     erreur: 0.006, apercu: 1, distrait: 0, remi: 0.22, aide: true,
-    remiCharge: 0.5, remiPrudent: 0.2, videur: 1.6, feintes: 0, zone: 0.28, visee: 0.65 },
+    remiCharge: 0.45, remiPrudent: 0.2, videur: 1.6, feintes: 0, zone: 0.28, visee: 0.65 },
   facile: { nom: 'PANACHÉ', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
     temps: 88, densite: 0.8, traverse: 0.8, sonnette: 730,
     erreur: 0.012, apercu: 1, distrait: 0.15, remi: 0.38, aide: true,
-    remiCharge: 0.6, remiPrudent: 0.3, videur: 1.3, feintes: 0.25, zone: 0.22, visee: 0.8 },
+    remiCharge: 0.55, remiPrudent: 0.3, videur: 1.3, feintes: 0.25, zone: 0.22, visee: 0.8 },
   normal: { nom: 'PRESSION', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 70, densite: 1, traverse: 1, sonnette: 650,
     erreur: 0.021, apercu: 0.72, distrait: 0.45, remi: 0.5, aide: false,
-    remiCharge: 0.75, remiPrudent: 0.35, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
+    remiCharge: 0.68, remiPrudent: 0.35, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
   champion: { nom: 'CUL SEC', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
     erreur: 0.03, apercu: 0.5, distrait: 0.65, remi: 0.6, aide: false,
@@ -90,8 +90,14 @@ export const PONG = {
   dureeVol: 0.65,         // durée du vol de la balle (s)
   tirage: 175,            // lance-pierre : longueur de tirage (px) pour la force maximale (+ grand = geste plus précis)
   serieFeu: 3,            // verres de suite pour être EN FEU (trajectoire entière montrée, lancer plus précis)
-  ivresse: 0.02,          // chaque verre BU fait tanguer ta visée de ce nombre de mètres en plus
-  aimant: 0.35,           // (V17 : 0,6 → 0,35) À JEUN la balle est attirée vers le verre visé (part du chemin) ; -0,12 par verre bu
+  ivresse: 0.014,         // chaque verre BU fait tanguer ta visée de ce nombre de mètres en plus...
+  tangageMax: 0.065,      // ... jusqu'à ce plafond (V17 : avant, aucun plafond = impossible en fin de partie)
+  concentration: 0.8,     // doigt immobile pendant ce temps (s) = CONCENTRÉ...
+  concentrationEffet: 0.42, // ... le tangage baisse de cette part (0,42 = 42 %)
+  erreurBue: 0.06,        // chaque verre bu ajoute cette part d'imprécision du bras (avant : 0,15)
+  aimantMini: 0.15,       // l'aimant ne descend jamais sous ce chiffre, même ivre
+  courbeMini: 0.55,       // part de la courbe d'aide toujours visible, même ivre (avant : 0,25)
+  aimant: 0.35,           // (V17 : 0,6 → 0,35 ; -0,05 par verre bu, jamais sous aimantMini) À JEUN la balle est attirée vers le verre visé (part du chemin) ; -0,12 par verre bu
   courbeBue: 0.13,        // chaque verre bu efface cette part de la fin de la courbe d'aide (la retombée disparaît d'abord)
   hoquet: 2,              // à partir de ce nombre de verres bus : HOQUETS (secousse soudaine de la visée)
 };

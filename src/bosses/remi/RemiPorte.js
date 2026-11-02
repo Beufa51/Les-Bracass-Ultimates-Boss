@@ -274,7 +274,8 @@ export class RemiPorte extends BossScene {
   // ---------- le coup ----------
   frapper(qui) {
     const d = Math.hypot(this.cible.x - IMPACT.x, this.cible.y - IMPACT.y), zr = this.diff.zone * 200;
-    const precision = qui === 'remi' ? hasard(0.65, 1) : d <= zr ? 1 : Math.max(0.2, 1 - (d - zr) / 130);
+    const precision = qui === 'remi' ? hasard(0.5, 0.95) :   // (V17 : Rémi un peu moins précis, avant 0,65-1)
+      d <= zr ? 1 : Math.max(0.2, 1 - (d - zr) / 130);
     const score = Math.round(999 * (R.degatsMin + (1 - R.degatsMin) * this.puissance) * (0.55 + 0.45 * precision));
     this.etat = 'coup'; this.tCoup = 0; this.charge = false; this.consigne.setVisible(false);
     this.coups[qui]++;
