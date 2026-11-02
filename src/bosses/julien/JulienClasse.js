@@ -118,9 +118,10 @@ export class JulienClasse extends JulienManif {
       if (img('main_sarbacane')) { T.main.sarbacane = img('main_sarbacane'); T.main.sarbacane_tir = img('main_sarbacane_tir') || T.main.sarbacane; }
       else { T.main.sarbacane = mainSarbacane(false); T.main.sarbacane_tir = mainSarbacane(true); }
       // bureau renversé (phase 3) : le bureau la tête en bas, pieds en l'air
-      const b = T.spr.bureau, c = document.createElement('canvas'); c.width = b.width; c.height = b.height;
-      const g = c.getContext('2d'); g.translate(0, b.height); g.scale(1, -1); g.drawImage(b, 0, 0);
-      T.spr.bureau_renverse = c; T.hauteurs.bureau_renverse = (T.hauteurs.bureau || 0.6) * 0.85;
+      // (étiré ×1,6 en largeur : il doit paraître aussi large que la zone qui arrête les tirs)
+      const b = T.spr.bureau, c = document.createElement('canvas'); c.width = Math.round(b.width * 1.6); c.height = b.height;
+      const g = c.getContext('2d'); g.translate(0, b.height); g.scale(1, -1); g.drawImage(b, 0, 0, c.width, b.height);
+      T.spr.bureau_renverse = c; T.hauteurs.bureau_renverse = (T.hauteurs.bureau || 0.6) * 1.6;   // presque aussi haut que Julien : on voit qu'il est à l'abri
       for (const [code, n] of Object.entries(MURS_IMAGES)) {
         const i = img(n); if (!i || code === 'a') continue;
         const m = T.classe.murs;
@@ -237,7 +238,8 @@ export class JulienClasse extends JulienManif {
   nouvelleCible(e) {
     if (e.phase < 3) return { x: ESTRADE.x0 + Math.random() * (ESTRADE.x1 - ESTRADE.x0), y: ESTRADE.y0 + Math.random() * (ESTRADE.y1 - ESTRADE.y0) };
     // phase 3 : il reste planqué derrière son bureau renversé (il en dépasse un peu : contourne-le !)
-    return { x: BUREAU_RENVERSE.x + (Math.random() - 0.5) * 3.2, y: 1.5 + Math.random() * 0.6 };
+    // (bug corrigé : il allait jusqu'à 1,6 case de chaque côté et dépassait du bureau)
+    return { x: BUREAU_RENVERSE.x + (Math.random() - 0.5) * BUREAU_RENVERSE.marche, y: 1.5 + Math.random() * 0.5 };
   }
 
   // grosse annonce au centre (+ le conseil, seulement la 1re fois)
@@ -752,7 +754,7 @@ export class JulienClasse extends JulienManif {
     } else {          // RETENUE : il renverse son bureau, l'alarme incendie sonne
       const b = this.bureau;
       if (b) { b.type = 'bureau_renverse'; b.x = BUREAU_RENVERSE.x; b.y = BUREAU_RENVERSE.y; b.rayon = BUREAU_RENVERSE.rayon; }
-      if (e.y > BUREAU_RENVERSE.y - BUREAU_RENVERSE.rayon - 0.3) e.y = 1.7;
+      e.x = BUREAU_RENVERSE.x; e.y = 1.7;   // il file se planquer derrière
       const j = this.j;   // pas coincé dans le bureau qui tombe
       if (Math.hypot(j.x - BUREAU_RENVERSE.x, j.y - BUREAU_RENVERSE.y) < BUREAU_RENVERSE.rayon + 0.4) j.y = BUREAU_RENVERSE.y + BUREAU_RENVERSE.rayon + 0.45;
       this.alarme = true; this.alarmeT = 0;

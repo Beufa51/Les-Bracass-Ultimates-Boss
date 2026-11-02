@@ -24,7 +24,7 @@ export const RAYONS_CLASSE = { table: 0.48, bureau: 0.6 };
 
 // Zone où Julien fait les cent pas (phases 1 et 2) ; en phase 3, il reste derrière son bureau renversé
 export const ESTRADE = { x0: 1.6, x1: 12.4, y0: 1.5, y1: 3.2 };
-export const BUREAU_RENVERSE = { x: 7.5, y: 3.3, rayon: 0.85 };
+export const BUREAU_RENVERSE = { x: 7.5, y: 3.3, rayon: 0.8, marche: 0.4 };   // rayon ≈ la largeur dessinée ; marche : il bouge de ± 0,2 case derrière
 
 // Répliques des ÉLÈVES (à personnaliser lors de la passe de finition)
 export const ELEVES = {

@@ -1122,6 +1122,10 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   testé : à découvert −28, derrière une table 0) ; plus de ×3 de dos pour la sarbacane (×2 comme le reste) ; vue du
   dessus : le héros n'utilise plus les poses « marche » et « de côté » (il marchait en diagonale) → pose droite + petit
   rebond quand il bouge (souffle / touché / victoire gardés).
+- BUG CORRIGÉ (phase 3, « il ne se cache pas derrière le bureau ») : Julien allait jusqu'à ±1,6 case du bureau renversé
+  (qui n'en couvrait que 0,85) → il reste à ±0,2 case derrière (`BUREAU_RENVERSE.marche`), y est replacé au changement
+  de phase ; bureau dessiné plus haut et étiré ×1,6 pour que ce qu'on voit = ce qui bloque (rayon 0,8). Testé : de face
+  0 touche sur 25 tirs ; contourné par la gauche ou la droite : 23 à 25 sur 25.
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».
