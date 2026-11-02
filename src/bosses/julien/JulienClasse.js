@@ -600,8 +600,8 @@ export class JulienClasse extends JulienManif {
     for (const w of M.murs) for (let x = 12; x < L - 12; x += 15) {
       if (Math.abs(x + 6 - w.trou) <= D.trou / 2) continue;
       const y = w.y - 8 + Math.sin(x * 0.7 + t * 6) * 1.5;
-      const cp = s['dessus_copie_' + (((x / 15) + ((t * 5) | 0)) % 3 | 0)];
-      if (cp) { const h = 18, lw = h * cp.width / cp.height; g.drawImage(cp, x + 6 - lw / 2, y - 1, lw, h); continue; }
+      const cp = s['dessus_copie_' + ((x * 7 + (w.trou | 0)) % 5 === 0 ? 1 + ((x / 15) & 1) : 0)];   // surtout des copies droites, quelques-unes penchées
+      if (cp) { const h = 16, lw = h * cp.width / cp.height; g.drawImage(cp, x + 6 - lw / 2, y, lw, h); continue; }
       g.fillStyle = '#2a2a2a'; g.fillRect(x - 1, y - 1, 14, 18);
       g.fillStyle = '#f6f3ea'; g.fillRect(x, y, 12, 16);
       g.fillStyle = '#9fb6d8'; for (let l = 4; l < 16; l += 3) g.fillRect(x + 1, y + l, 10, 1);
@@ -612,8 +612,8 @@ export class JulienClasse extends JulienManif {
     // toi, vu du dessus (capuche bleu marine, cheveux bruns) ; clignote après un coup
     const ph = M.invT > 0.3 ? s.dessus_heros_touche : Math.abs(M.dir || 0) > 0.3 ? s.dessus_heros_cote : s.dessus_heros;
     if (ph && (M.invT <= 0 || ((t * 16) | 0) % 2)) {   // vraie image (vu du dessus, de dos)
-      const h = 30, w = h * ph.width / ph.height; g.save();
-      if ((M.dir || 0) < -0.3 && ph === s.dessus_heros_cote) { g.translate(M.px * 2, 0); g.scale(-1, 1); }   // de côté vers la gauche : miroir
+      const h = 40, w = h * ph.width / ph.height; g.save();
+      if ((M.dir || 0) > 0.3 && ph === s.dessus_heros_cote) { g.translate(M.px * 2, 0); g.scale(-1, 1); }   // l'image vise à gauche : miroir vers la droite
       g.drawImage(ph, M.px - w / 2, M.py - h / 2, w, h); g.restore();
     } else if (!ph && (M.invT <= 0 || ((t * 16) | 0) % 2)) {
       g.fillStyle = '#1e2a5a'; g.beginPath(); g.ellipse(M.px, M.py + 2, 9, 7, 0, 0, Math.PI * 2); g.fill();

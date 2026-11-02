@@ -42,12 +42,12 @@ GROUPES = {
         ('cantiniere_lance', (870, 420)), ('cantiniere_touche', (1065, 440)), ('cantiniere_fuite', (1280, 410))]),
     'fayot': ('julien_fayot.jpg', 200, [
         ('fayot_bras', (178, 394)), ('fayot_crie', (541, 400)), ('fayot_saute', (881, 360)), ('fayot_fuite', (1234, 394))]),
-    # VUE DU DESSUS (rafale de murs, section 18 des prompts) : centres À AJUSTER à la livraison (7 cases supposées)
+    # VUE DU DESSUS (rafale de murs, section 18 des prompts) : planche livrée en COLONNE (496 × 2118)
     'dessus_julien': ('julien_dessus_persos.jpg', 120, [
-        ('dessus_julien_marche0', (100, 384)), ('dessus_julien_marche1', (301, 384)), ('dessus_julien_lance', (503, 384)),
-        ('dessus_julien_touche', (704, 384))]),
-    'dessus_heros': ('julien_dessus_persos.jpg', 100, [
-        ('dessus_heros', (905, 384)), ('dessus_heros_cote', (1107, 384)), ('dessus_heros_touche', (1308, 384))]),
+        ('dessus_julien_marche0', (125, 211)), ('dessus_julien_marche1', (373, 210)), ('dessus_julien_lance', (233, 595)),
+        ('dessus_julien_touche', (385, 871))]),
+    'dessus_heros': ('julien_dessus_persos.jpg', 100, [   # « de côté » : il vise vers la GAUCHE (le jeu le retourne)
+        ('dessus_heros', (251, 1247)), ('dessus_heros_cote', (207, 1594)), ('dessus_heros_touche', (227, 1947))]),
     # élèves assis (rangée du haut ; celle du bas est un doublon) : A content, A caché, B…, D caché
     'eleves': ('julien_eleves.jpg', 180, [(f'eleve_{k // 2}_{"content" if k % 2 == 0 else "cache"}', (x, 200))
         for k, x in enumerate([115, 300, 465, 630, 815, 990, 1165, 1325])]),
@@ -84,13 +84,14 @@ OBJETS_LYCEE = ('julien_objets_lycee.jpg', [
     ('carnet', (160, 190), 50), ('puree', (510, 190), 40), ('flaque', (890, 285), 24), (None, (1245, 265), 50),
     (None, (230, 640), 24), ('comptoir', (715, 555), 120), ('mousse', (1215, 565), 160)])
 
-OBJETS_DESSUS = ('julien_dessus_objets.jpg', [
-    ('dessus_copie_0', (140, 384), 40), ('dessus_copie_1', (422, 384), 40), ('dessus_copie_2', (704, 384), 40),
-    ('dessus_boulette', (985, 384), 12), (None, (1267, 384), 40)])
+OBJETS_DESSUS = ('julien_dessus_objets.jpg', [   # 2 rangées : boulettes en trop et pile de copies ignorées
+    ('dessus_copie_0', (176, 193), 40), ('dessus_copie_1', (537, 193), 40), ('dessus_copie_2', (877, 193), 40),
+    ('dessus_boulette', (1238, 193), 12), (None, (176, 577), 12), (None, (528, 571), 12), (None, (880, 572), 40)])
 
 # traits de grille que le nettoyage automatique rate (cases de largeurs différentes selon la rangée) :
 # planche → [(x0, y0, x1, y1), ...] effacés en blanc
 TRAITS = {
+    'julien_dessus_objets.jpg': [(x - 3, 0, x + 4, 768) for x in (352, 705, 1057)] + [(0, 381, 1408, 388)],
     'julien_objets_lycee.jpg': [(x - 3, 0, x + 4, 386) for x in (325, 705, 1093)] + [(x - 3, 380, x + 4, 768) for x in (452, 985)]
     + [(0, 380, 1408, 388)],
     'julien_surveillant.jpg': [(255, 0, 262, 768), (930, 0, 937, 768)],   # poses qui se touchent
