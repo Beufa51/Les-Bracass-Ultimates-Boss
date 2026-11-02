@@ -52,6 +52,9 @@ export class RemiVelo extends BossScene {
   constructor() { super('RemiVelo', IDENTITE); }
 
   create() {
+    // la scène est RÉUTILISÉE d'une partie à l'autre : on oublie les objets créés « à la demande » la fois d'avant
+    // (sinon on réutilise un texte déjà détruit → bug « drawImage » à la 2e partie)
+    this.gVoit = null; this.motAction = null; this.salto = null; this.envolT = 0; this.carrefourOuvert = false; this.choix = null; this.toucheChoix = undefined; this.quartier = undefined; this.panneau = [];
     this.etat = 'intro';
     this.nomDiff = 'normal'; this.diff = DIFFICULTES.normal;
     this.bx = 0; this.v = 0; this.y = 0; this.vy = 0; this.a = 0; this.tenu = 0; this.tampon = 0;

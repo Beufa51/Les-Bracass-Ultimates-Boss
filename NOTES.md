@@ -143,7 +143,10 @@
   baissée à 35 % quand le videur approche, COUPÉE net (+ « scratch » `remi_scratch`) quand il regarde, revient ensuite.
   Ajout optionnel dans le moteur : `facteurMusique(cle, f)` (src/core/musique.js), sans effet sur les autres boss.
 - V12 : le videur FEINTE (`feintes` 0,25 / 0,45 / 0,65 par difficulté) : annonce de durée et de rythme de pas variables,
-  FAUSSE ALERTE (demi-tour, l'ombre recule), SURPRISE (0,3 s d'annonce), RETOUR (2e coup d'œil juste après). : `python3 outils/remi/preparer_images.py`.
+  FAUSSE ALERTE (demi-tour, l'ombre recule), SURPRISE (0,3 s d'annonce), RETOUR (2e coup d'œil juste après).
+- BUG CORRIGÉ « Cannot read properties of null (reading 'drawImage') » à la 2e partie : Phaser RÉUTILISE l'objet scène,
+  les objets créés « à la demande » (`if (!this.motAction) ...`) gardaient un texte DÉTRUIT. Chaque `create()` des 3 jeux
+  remet ces propriétés à zéro. RÈGLE pour la suite : tout objet créé à la demande doit être remis à null dans `create()`. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

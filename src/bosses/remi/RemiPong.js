@@ -48,6 +48,9 @@ export class RemiPong extends BossScene {
   constructor() { super('RemiPong', IDENTITE); }
 
   create() {
+    // la scène est RÉUTILISÉE d'une partie à l'autre : on oublie les objets créés « à la demande » la fois d'avant
+    // (sinon on réutilise un texte déjà détruit → bug « drawImage » à la 2e partie)
+    this.imgRemi = null; this.imgDouble = null; this.txtRebond = null; this.rebond = false; this.prochainHoquet = undefined; this.hoquet = 0; this.prep = null;
     this.etat = 'intro';             // intro | vise | vol | remi | pause | fin
     this.horloge = 0; this.ivresse = 0; this.ivresseRemi = 0; this.serie = 0; this.feu = false;
     this.balle = null; this.tir = null; this.distrait = 0; this.gouttes = []; this.flashBiere = 0;

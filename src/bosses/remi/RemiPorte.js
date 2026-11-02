@@ -34,6 +34,9 @@ export class RemiPorte extends BossScene {
   constructor() { super('RemiPorte', IDENTITE); }
 
   create() {
+    // la scène est RÉUTILISÉE d'une partie à l'autre : on oublie les objets créés « à la demande » la fois d'avant
+    // (sinon on réutilise un texte déjà détruit → bug « drawImage » à la 2e partie)
+    this.txtSolidite = null; this.alerte = false; this.remiPrudence = undefined;
     this.etat = 'intro';         // intro | remi | toi | coup | pause | fin
     this.horloge = 0; this.frappeur = 'remi'; this.pose = { remi: 'garde', toi: 'garde' };
     this.solidite = R.solidite; this.puissance = 0; this.cible = { x: 0, y: 0 }; this.tCible = 0; this.tCoup = 0;
