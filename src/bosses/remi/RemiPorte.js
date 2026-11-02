@@ -9,13 +9,15 @@
 // =====================================================================
 import { BossScene } from '../../core/BossScene.js';
 import { creerTouches } from '../../core/clavier.js';
-import { texte } from '../../core/ui.js';
+import { texte, voile } from '../../core/ui.js';
+import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
+import { cleRecord } from './difficulte.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique, facteurMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
-import { IDENTITE, PORTE as R, REPLIQUES } from './reglages.js';
-import { bulle, annonce, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile } from './commun.js';
+import { IDENTITE, PORTE as R, REPLIQUES, POINTS, RANGS } from './reglages.js';
+import { bulle, annonce, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile, bilanDe, noterJeu } from './commun.js';
 
 // la porte du décor illustré (remi_porte_decor.jpg, 960 x 536), zoomé x1,5 sur la porte (à droite)
 const BATTANT = { x: 774, y: 147, l: 140, h: 322 };
@@ -52,7 +54,7 @@ export class RemiPorte extends BossScene {
     this.horloge = 0; this.frappeur = 'remi'; this.pose = { remi: 'garde', toi: 'garde' };
     this.solidite = R.solidite; this.puissance = 0; this.cible = { x: 0, y: 0 }; this.tCible = 0; this.tCoup = 0;
     this.eclats = []; this.degats = 0; this.trou = this.formeTrou(); this.elan = 0; this.flash = 0; this.gel = 0; this.tremble = 0; this.entree = 1; this.dernierFrappeur = null;
-    this.compteur = 0; this.coups = { toi: 0, remi: 0 }; this.attrapes = { toi: 0, remi: 0 };
+    this.compteur = 0; this.coups = { toi: 0, remi: 0 }; this.attrapes = { toi: 0, remi: 0 }; this.parfaits = 0;
     this.videur = { etat: 'absent', t: 2.5, x: -300, pose: 0 };
     this.doigt = false; this.charge = false; this.remiAttend = 0;
 
@@ -80,6 +82,7 @@ export class RemiPorte extends BossScene {
     // MAINTENIR = le doigt posé n'importe où (ou ESPACE)
     this.input.on('pointerdown', () => { this.doigt = true; });
     this.input.on('pointerup', () => { this.doigt = false; });
+    this.input.on('pointerupoutside', () => { this.doigt = false; });   // doigt lâché hors de l'écran : la charge ne reste plus bloquée
 
     etiquettesTactiles({ ...VIDES, espace: 'OK' });
     const t = estTactile();
@@ -91,7 +94,7 @@ export class RemiPorte extends BossScene {
       'Mais qui ? Le VIDEUR ne rate rien... mais si c\'est juste le GARS QUI VIENT PISSER, il s\'en fiche !',
       'Et il FEINTE : fausse alerte, il surgit sans prévenir, il revient d\'un coup...',
       'Celui dont le coup fait CÉDER la porte gagne.',
-    ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.tour('remi'); }));
+    ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.tour('remi'); }));
   }
 
   decor() {
@@ -231,6 +234,9 @@ export class RemiPorte extends BossScene {
   }
 
   attraper(qui) {
+    // (BUG corrigé V17 : attrapé juste après le coup qui fait céder la porte → le « rafistolage » la remettait debout
+    //  et un nouveau tour repartait derrière l'écran de victoire)
+    if (this.solidite <= 0 || this.etat === 'fin') return;
     const v = this.videur;
     v.vu = true; v.pose = 1; v.t = Math.max(v.t, 1.3);
     this.attrapes[qui]++;
@@ -254,7 +260,7 @@ export class RemiPorte extends BossScene {
     const score = Math.round(999 * (R.degatsMin + (1 - R.degatsMin) * this.puissance) * (0.55 + 0.45 * precision));
     this.etat = 'coup'; this.tCoup = 0; this.charge = false; this.consigne.setVisible(false);
     this.coups[qui]++;
-    if (qui === 'toi' && precision === 1 && this.puissance > 0.9) { bulle(this, 'COUP PARFAIT !', '#ffd84a', 1, 150); jouerSon(this, 'remi_foule'); }
+    if (qui === 'toi' && precision === 1 && this.puissance > 0.9) { this.parfaits++; bulle(this, 'COUP PARFAIT !', '#ffd84a', 1, 150); jouerSon(this, 'remi_foule'); }
     else if (qui === 'toi' && precision === 1) bulle(this, 'PILE DESSUS !', '#7fff7f', 0.8, 150);
     this.pose[qui] = 'coup';
     this.time.delayedCall(90, () => { this.pose[qui] = 'frappe'; this.impact(qui, score); });
@@ -338,12 +344,56 @@ export class RemiPorte extends BossScene {
     this.tweens.add({ targets: this.battant, x: PORTE.x + PORTE.l, scaleX: 0.1, duration: 260, ease: 'Cubic.In' });
     this.degats = 0;
     if (qui === 'toi') {
+      noterJeu(this, 'porte', POINTS.porteGagne + this.parfaits * POINTS.porteParfait - this.attrapes.toi * POINTS.porteAttrape
+        + Math.max(0, POINTS.porteCoups - this.coups.toi) * POINTS.porteCoupEnMoins);
       annonce(this, 'LA PORTE CÈDE !', '#ffd84a', 1.4);
       this.time.delayedCall(1800, () => this.victoire(REPLIQUES.porteGagne));
     } else {
       annonce(this, 'RÉMI A DÉFONCÉ LA PORTE', '#ff5a5a', 1.4);
       this.time.delayedCall(1800, () => ecranPerdu(this, 'RÉMI A DÉFONCÉ LA PORTE', REPLIQUES.portePerdu, this.nomDiff));
     }
+  }
+
+  // ---------- fin de la soirée (V17) : points des 3 jeux, RANG et record (soirée complète seulement) ----------
+  ecranVictoire(message) {
+    const P = 1000, b = this.bilan || { temps: 0 }, cx = LARGEUR / 2;
+    const complet = b.velo !== undefined && b.pong !== undefined && b.porte !== undefined;
+    const total = (b.velo || 0) + (b.pong || 0) + (b.porte || 0);
+    voile(this, 0.9).setDepth(P);
+    const titre = texte(this, cx, 52, 'VICTOIRE !', 54, '#ffd84a', { fontStyle: 'bold italic', strokeThickness: 8 }).setDepth(P + 1).setScale(2.5).setAlpha(0);
+    this.tweens.add({ targets: titre, scale: 1, alpha: 1, duration: 300, ease: 'Back.Out' });
+    texte(this, cx, 102, message, 18, '#ffffff', { wordWrap: { width: 820 } }).setDepth(P + 1);
+    const badge = this.add.image(150, 250, 'badge_' + this.identite.id).setDepth(P + 1).setScale(0);
+    this.tweens.add({ targets: badge, scale: 2, delay: 300, duration: 300, ease: 'Back.Out' });
+    texte(this, 150, 310, 'Badge Rémi !', 18, '#ffd84a').setDepth(P + 1);
+    // les points, ligne par ligne
+    const lignes = [['VÉLO', b.velo], ['BEER PONG', b.pong], ['PORTE', b.porte], ['TOTAL', complet ? total : undefined]];
+    lignes.forEach(([nom, pts], n) => this.time.delayedCall(400 + n * 350, () => {
+      const y = 160 + n * 44, fort = nom === 'TOTAL';
+      texte(this, cx + 40, y, nom, fort ? 28 : 24, fort ? '#ffd84a' : '#ff9a5a').setOrigin(1, 0.5).setDepth(P + 1);
+      texte(this, cx + 70, y, pts === undefined ? '—' : `${pts} pts`, fort ? 28 : 24, '#ffffff').setOrigin(0, 0.5).setDepth(P + 1);
+      jouerSon(this, 'remi_pinte');
+    }));
+    this.time.delayedCall(400 + lignes.length * 350, () => {
+      if (!complet) {
+        texte(this, cx + 60, 360, 'Joue la SOIRÉE COMPLÈTE (vélo, pong, porte)\npour avoir un RANG et un record.', 18, '#aaaaaa', { align: 'center' }).setDepth(P + 1);
+        return;
+      }
+      const r = RANGS.find(x => total >= x.seuil);
+      const record = Sauvegarde.proposerRecord(cleRecord(IDENTITE.id, this.nomDiff), r.rang, b.temps, RANGS.map(x => x.rang));
+      const nouveau = record.rang === r.rang && Math.abs(record.temps - b.temps) < 0.01;
+      const lettre = texte(this, 150, 430, r.rang, 90, '#ffffff', { fontStyle: 'bold', stroke: '#e8742a', strokeThickness: 12 }).setDepth(P + 2).setScale(0);
+      this.tweens.add({ targets: lettre, scale: 1, duration: 300, ease: 'Back.Out', onComplete: () => this.cameras.main.shake(200, 0.008) });
+      texte(this, 150, 368, 'RANG', 20, '#ffd84a').setDepth(P + 1);
+      texte(this, cx + 60, 362, r.nom, 30, '#ffd84a', { fontStyle: 'bold' }).setDepth(P + 1);
+      const d = this.diff || {};
+      texte(this, cx + 60, 400, `${d.nom || ''}   -   temps de jeu ${formatTemps(b.temps)}`, 18, d.couleur || '#ffffff').setDepth(P + 1);
+      texte(this, cx + 60, 430, nouveau ? '★ NOUVEAU RECORD ★' : `Record : rang ${record.rang} en ${formatTemps(record.temps)}`, 18, nouveau ? '#7fff7f' : '#aaaaaa').setDepth(P + 1);
+      const suivant = RANGS[RANGS.indexOf(r) - 1];
+      if (suivant) texte(this, cx + 60, 460, `Rang ${suivant.rang} (${suivant.nom}) à ${suivant.seuil} pts`, 15, '#9fe0ff').setDepth(P + 1);
+      jouerSon(this, 'remi_foule');
+    });
+    texte(this, cx, HAUTEUR - 22, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, 18, '#aaaaaa').setDepth(P + 1);
   }
 
   // ---------- dessin ----------

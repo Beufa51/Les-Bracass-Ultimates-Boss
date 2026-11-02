@@ -17,9 +17,9 @@ import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
-import { IDENTITE, DIFFICULTES, VELO as V, REPLIQUES } from './reglages.js';
+import { IDENTITE, DIFFICULTES, VELO as V, REPLIQUES, POINTS } from './reglages.js';
 import { cycliste, bourre, verreCasse, flaque, remi, COULEURS } from './dessins.js';
-import { bulle, annonce, jeuSuivant, ecranPerdu, hasard, choisir , laisserPasserTactile } from './commun.js';
+import { bulle, annonce, jeuSuivant, ecranPerdu, hasard, choisir, laisserPasserTactile, bilanDe, noterJeu } from './commun.js';
 import { choisirDifficulte } from './difficulte.js';
 
 const SOL = 440;                     // hauteur de la route à l'écran
@@ -127,6 +127,7 @@ export class RemiVelo extends BossScene {
     this.genererParcours();
     this.bx = 0; this.v = V.vitesseDepart; this.y = 0; this.vy = 0; this.invincible = 0; this.auSol = true; this.surTremplin = null;
     this.score = 0; this.serie = 0; this.pintesPrises = 0; this.chutes = 0;
+    this.bilan = bilanDe(this); this.debutJeu = Date.now();
     this.tempsRestant = this.diff.temps;
     this.quartier = undefined; this.changerQuartier(DEPART_ROUTE); this.carrefourOuvert = false;
     this.etat = 'jeu';
@@ -144,7 +145,9 @@ export class RemiVelo extends BossScene {
       else if (p.y >= LIGNE_BAS) { this.esqDoigt = true; this.doigtEsq = p.id; this.demanderEsquive(); }
       else { this.sautDoigt = true; this.doigtSaut = p.id; this.tampon = V.tampon; this.appuiD = 0.15; }
     });
-    this.input.on('pointerup', (p) => { if (p.id === this.doigtSaut) this.sautDoigt = false; if (p.id === this.doigtEsq) this.esqDoigt = false; });
+    // (doigt relâché HORS de l'écran aussi : sinon le saut ou l'esquive restait bloqué)
+    const lacher = (p) => { if (p.id === this.doigtSaut) this.sautDoigt = false; if (p.id === this.doigtEsq) this.esqDoigt = false; };
+    this.input.on('pointerup', lacher); this.input.on('pointerupoutside', lacher);
   }
 
   // ESQUIVE : le vélo descend vers le bas de l'écran (seulement sur la route, pas en l'air ni sur un toit)
@@ -565,6 +568,7 @@ export class RemiVelo extends BossScene {
     jouerSon(this, 'remi_arrivee');
     annonce(this, 'AU BAR !', '#ff4fd8', 1.2);
     const marge = Math.ceil(this.tempsRestant);
+    noterJeu(this, 'velo', this.score + marge * POINTS.veloSeconde - this.chutes * POINTS.veloChute);
     this.time.delayedCall(700, () => bulle(this, `${marge} s d'avance  -  ${this.pintesPrises} pinte${this.pintesPrises > 1 ? 's' : ''}  -  ${this.chutes ? `${this.chutes} chute${this.chutes > 1 ? 's' : ''}` : 'aucune chute !'}  -  score ${this.score}`, '#7fff7f', 3, 140));
     this.time.delayedCall(900, () => bulle(this, `Rémi : « ${REPLIQUES.arrivee} »`, '#ffd84a', 2.6, 90));
     this.time.delayedCall(3600, () => jeuSuivant(this, 'velo', this.nomDiff));

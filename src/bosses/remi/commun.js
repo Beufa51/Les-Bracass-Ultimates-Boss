@@ -34,11 +34,18 @@ export function annonce(scene, titre, couleur = '#ffd84a', duree = 1.1) {
   scene.tweens.add({ targets: t, alpha: 0, delay: duree * 1000, duration: 250, onComplete: () => t.destroy() });
 }
 
-// Jeu suivant (même difficulté)
+// BILAN de la soirée (V17) : les points de chaque jeu + le temps de jeu, passés d'un jeu à l'autre
+export function bilanDe(scene) { const b = scene.donnees.bilan; return b ? { ...b } : { temps: 0 }; }
+export function noterJeu(scene, id, points) {
+  scene.bilan[id] = Math.max(0, Math.round(points));
+  scene.bilan.temps += scene.debutJeu ? (Date.now() - scene.debutJeu) / 1000 : 0;
+}
+
+// Jeu suivant (même difficulté, le bilan suit)
 export function jeuSuivant(scene, idActuel, nomDiff) {
   const i = ORDRE.findIndex(o => o.id === idActuel);
   const s = ORDRE[i + 1];
-  scene.scene.start(s.scene, { phase: s.id, diff: nomDiff, enchaine: true });
+  scene.scene.start(s.scene, { phase: s.id, diff: nomDiff, enchaine: true, bilan: scene.bilan });
 }
 
 // PERDU : ESPACE = rejouer CE jeu (même difficulté), X = retour au hub
@@ -54,7 +61,7 @@ export function ecranPerdu(scene, titre, message, nomDiff) {
   texte(scene, LARGEUR / 2, HAUTEUR - 80, `${t ? 'Rejouer' : 'ESPACE'} : rejouer ce jeu     ${t ? 'Hub' : 'X'} : retour au hub`, 22, '#7fff7f').setDepth(1001);
   scene.time.delayedCall(700, () => {
     const kb = scene.input.keyboard;
-    kb.once('keydown-SPACE', () => scene.scene.restart({ phase: scene.donnees.phase, diff: nomDiff }));
+    kb.once('keydown-SPACE', () => scene.scene.restart({ phase: scene.donnees.phase, diff: nomDiff, bilan: scene.donnees.bilan }));
     kb.once('keydown-X', () => scene.retourHub());
   });
 }

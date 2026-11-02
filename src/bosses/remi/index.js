@@ -29,7 +29,7 @@ export default {
     { groupe: 'BEER PONG', nom: 'Tangage par verre bu (m)', objet: PONG, champ: 'ivresse', pas: 0.002, min: 0, max: 0.04 },
     { groupe: 'PORTE', nom: 'Solidité de la porte', objet: PORTE, champ: 'solidite', pas: 250, min: 1000, max: 10000 },
     { groupe: 'PORTE', nom: 'Vitesse de charge', objet: PORTE, champ: 'charge', pas: 0.05, min: 0.1, max: 1.5 },
-    ...['facile', 'normal', 'champion'].flatMap(n => [
+    ...['entrainement', 'facile', 'normal', 'champion'].flatMap(n => [
       { groupe: D[n].nom, nom: 'Vélo : temps avant la fermeture (s)', objet: D[n], champ: 'temps', pas: 2, min: 30, max: 150 },
       { groupe: D[n].nom, nom: 'Vélo : densité des obstacles (x)', objet: D[n], champ: 'densite', pas: 0.05, min: 0.3, max: 2.5 },
       { groupe: D[n].nom, nom: 'Pong : chance que Rémi mette un verre', objet: D[n], champ: 'remi', pas: 0.02, min: 0, max: 1 },

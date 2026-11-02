@@ -174,6 +174,17 @@
   AVANT (0,6 s) et APRÈS (0,7 s) chaque poubelle. SAUTE quand on est en bas = saut immédiat ; un obstacle commencé à passer
   en bas compte comme esquivé même si on saute avant de l'avoir dépassé (`o.esquive`). Bots : ruelles 6 poubelles 0 touchée,
   route normale 0 chute.
+- V17 AUDIT GLOBAL `propositions/remi_audit_v17.md` (bugs, UI, plaisir ; propositions : défis de maîtrise, pintes « en bas »,
+  verre de la honte, porte plus courte en facile, écran PERDU avec conseil). Corrigés : attrapé après le coup final
+  (la porte se relevait), doigt lâché hors de l'écran (porte / vélo / pong : `pointerupoutside`), mamie plus chargée.
+- V17 DIFFICULTÉS façon Kédric, noms de boissons : DIABOLO (`entrainement`), PANACHÉ (`facile`), PRESSION (`normal`),
+  CUL SEC (`champion`) ; record par difficulté (`cleRecord`). POINTS de chaque jeu (`POINTS` dans reglages.js) gardés
+  dans le BILAN (`bilanDe` / `noterJeu` dans commun.js, passé de jeu en jeu et au « rejouer ») ; RANGS (`RANGS`) : S ROI DU
+  COMPTOIR 1700, A PILIER DE BAR 1300, B HABITUÉ DU ZINC 900, C BUVEUR DE DIABOLO — seulement pour la soirée complète.
+  Écran de victoire `ecranVictoire` dans RemiPorte.js. Repère bot : vélo parfait ≈ 1050 pts.
+  ATTENTION : `node --check` ne voit pas toutes les erreurs (un retour à la ligne dans un texte a bloqué tout le jeu) :
+  vérifier avec `node outils/verif_modules.cjs $(find src -name "*.js")` (serveur sur le port 8765), seules les erreurs
+  « Phaser » sont normales.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

@@ -13,20 +13,45 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 //  PORTE : remiCharge = jusqu'où Rémi charge (0 à 1) ; remiPrudent = chance qu'il lâche quand le videur arrive ;
 //          videur = temps d'annonce du videur (x, + petit = moins prévenu) ; feintes = part de passages piégés
 //          (fausse alerte, surgit sans prévenir, revient aussitôt) ; zone = rayon de la cible parfaite ; visee = vitesse de la cible
+// V17 : 4 niveaux comme Kédric (ENTRAÎNEMENT, FACILE, NORMAL, CHAMPION), avec des noms de boissons
+// (les clés restent entrainement / facile / normal / champion : records et réglages développeur)
 export const DIFFICULTES = {
-  facile: { nom: 'FACILE', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
+  entrainement: { nom: 'DIABOLO', couleur: '#9fe0ff', texte: 'Pour apprendre : large, lent, Rémi est déjà pompette et le videur ne feinte jamais.',
+    temps: 110, densite: 0.65, traverse: 0.7, sonnette: 800,
+    erreur: 0.006, apercu: 1, distrait: 0, remi: 0.22, aide: true,
+    remiCharge: 0.5, remiPrudent: 0.2, videur: 1.6, feintes: 0, zone: 0.28, visee: 0.65 },
+  facile: { nom: 'PANACHÉ', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
     temps: 88, densite: 0.8, traverse: 0.8, sonnette: 730,
     erreur: 0.01, apercu: 1, distrait: 0, remi: 0.32, aide: true,
     remiCharge: 0.6, remiPrudent: 0.3, videur: 1.3, feintes: 0.25, zone: 0.22, visee: 0.8 },
-  normal: { nom: 'NORMAL', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
+  normal: { nom: 'PRESSION', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 70, densite: 1, traverse: 1, sonnette: 650,
     erreur: 0.016, apercu: 0.85, distrait: 0.35, remi: 0.42, aide: false,
     remiCharge: 0.75, remiPrudent: 0.35, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
+  champion: { nom: 'CUL SEC', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
     erreur: 0.025, apercu: 0.6, distrait: 0.55, remi: 0.52, aide: false,
     remiCharge: 0.84, remiPrudent: 0.85, videur: 0.75, feintes: 0.65, zone: 0.1, visee: 1.3 },
 };
+
+// V17 : POINTS de la soirée (affichés à la fin) et RANGS S / A / B / C (seulement pour la soirée complète)
+export const POINTS = {
+  veloSeconde: 10,        // vélo : par seconde d'avance à l'arrivée (+ le score du vélo : obstacles, série, pintes, saltos)
+  veloChute: 50,          // vélo : par chute
+  pongVerre: 80,          // pong : par verre qu'il te reste à la fin (Rémi en a mis peu)
+  pongBallsBack: 40,      // pong : par BALLS BACK réussi
+  porteGagne: 300,        // porte : pour l'avoir fait céder
+  porteParfait: 60,       // porte : par COUP PARFAIT
+  porteAttrape: 60,       // porte : par fois où tu t'es fait attraper
+  porteCoups: 6,          // porte : en dessous de ce nombre de coups...
+  porteCoupEnMoins: 40,   // ... tant de points par coup en moins
+};
+export const RANGS = [
+  { rang: 'S', nom: 'ROI DU COMPTOIR', seuil: 1700 },
+  { rang: 'A', nom: 'PILIER DE BAR', seuil: 1300 },
+  { rang: 'B', nom: 'HABITUÉ DU ZINC', seuil: 900 },
+  { rang: 'C', nom: 'BUVEUR DE DIABOLO', seuil: -Infinity },
+];
 
 export const VELO = {
   // V6 : tout est 1,3 fois plus GRAND qu'en V5 (vélo, bourrés, sauts, vitesses), la durée du trajet ne change pas

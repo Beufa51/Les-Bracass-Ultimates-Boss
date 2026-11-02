@@ -16,9 +16,9 @@ import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
-import { IDENTITE, PONG as P, REPLIQUES } from './reglages.js';
+import { IDENTITE, PONG as P, REPLIQUES, POINTS } from './reglages.js';
 import { remi } from './dessins.js';
-import { bulle, annonce, jeuSuivant, ecranPerdu, difficulteOuChoix, hasard, choisir , laisserPasserTactile } from './commun.js';
+import { bulle, annonce, jeuSuivant, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile, bilanDe, noterJeu } from './commun.js';
 
 // ---------- projection : caméra en retrait et en hauteur : toute la table tient dans l'écran (bord de Rémi y≈190, le tien y≈520) ----------
 const CAM_Z = -2, CAM_H = 1.416, F = 984, HORIZON = -177, CX = LARGEUR / 2;
@@ -85,6 +85,7 @@ export class RemiPong extends BossScene {
   }
 
   demarrer() {
+    this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.nbBallsBack = 0;
     this.tourDe('toi');
     bulle(this, 'Rémi : « Les invités d\'abord. Vas-y, rate. »', '#ffd84a', 2.4, 250);
   }
@@ -176,11 +177,13 @@ export class RemiPong extends BossScene {
       this.tir = { x0: p.x, y0: p.y, x: p.x, y: p.y };
     });
     this.input.on('pointermove', (p) => { if (this.tir) { this.tir.x = p.x; this.tir.y = p.y; } });
-    this.input.on('pointerup', () => {
+    // (lâché HORS de l'écran aussi : sinon le lancer restait coincé)
+    const lacher = () => {
       if (!this.tir) return;
       const c = this.cibleTir(); this.tir = null;
       if (this.etat === 'vise' && c) this.lancerToi(c.x, c.z);
-    });
+    };
+    this.input.on('pointerup', lacher); this.input.on('pointerupoutside', lacher);
   }
 
   // cible (sans tangage) du lance-pierre en cours : tirer vers le bas = force ; tirer à gauche = envoie à droite
@@ -426,6 +429,7 @@ export class RemiPong extends BossScene {
     // fin du tour : les 2 dedans = BALLS BACK (une fois par tour)
     if (this.reussis === 2 && !this.ballsBack) {
       this.ballsBack = true;
+      if (b.qui === 'toi') this.nbBallsBack = (this.nbBallsBack || 0) + 1;
       annonce(this, 'BALLS BACK !', '#7fff7f');
       this.etat = b.qui === 'toi' ? 'pause' : 'remi';
       this.time.delayedCall(900, () => { this.balles = 2; this.reussis = 0; if (b.qui === 'toi') this.commencerVisee(); else this.prepRemi(); });
@@ -438,6 +442,7 @@ export class RemiPong extends BossScene {
 
   gagne() {
     this.etat = 'fin';
+    noterJeu(this, 'pong', this.verresToi.filter(v => v.plein).length * POINTS.pongVerre + (this.nbBallsBack || 0) * POINTS.pongBallsBack);
     annonce(this, 'GAGNÉ !', '#7fff7f', 1.4);
     jouerSon(this, 'remi_arrivee');
     this.time.delayedCall(900, () => bulle(this, `Rémi : « ${REPLIQUES.pongGagne} »`, '#ffd84a', 2.8, 90));
