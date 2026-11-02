@@ -51,7 +51,8 @@ const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null,
 // hauteur et demi-largeur de chaque obstacle (chocs) ; debout et traverse sont plus hauts que le plus grand saut
 const TAILLE = { allonge: [52, 58], verre: [13, 36], debout: [210, 23], traverse: [210, 26], vomi: [5, 55], poubelle: [95, 32] };
 const SONNER = { debout: true, traverse: true };    // les obstacles qui demandent la sonnette
-const ESQUIVER = { allonge: true };                 // V17 : ceux qu'on évite en descendant (les autres : sauter)
+// V17 : ceux qu'on évite en descendant (les autres : sauter). La POUBELLE : en descendant OU par un grand saut.
+const ESQUIVER = { allonge: true, poubelle: true }, SAUTABLE = { poubelle: true };
 // illustration des bourrés (remi_bourres.png : debout, sursaute, allongé, traverse de face) et sa taille à l'écran
 const BOURRE = 0.33, IMAGE_BOURRE = { debout: 0, ecarte: 1, allonge: 2, marche: 3 };
 const TEINTES = [0xffffff, 0xffe2d8, 0xdfe6ff, 0xe4ffd9, 0xfff3c0];
@@ -100,8 +101,8 @@ export class RemiVelo extends BossScene {
     this.afficherIntro('RÉMI - Direction le bar', [
       'Rémi t\'attend au bar... et le bar ferme bientôt ! Le vélo roule tout seul.',
       `SAUTE : ${t ? 'touche à DROITE, en HAUT' : '▲ ou ESPACE'} (garde appuyé = plus haut)`,
-      '   → verre cassé, flaque, poubelle, tremplins... et attrape les PINTES (+1 s)',
-      `EN BAS : ${t ? 'touche à DROITE, en BAS' : '▼'} → tu passes DEVANT le bourré ALLONGÉ (garde appuyé = tu restes en bas)`,
+      '   → verre cassé, flaque, tremplins... et attrape les PINTES (+1 s)',
+      `EN BAS : ${t ? 'touche à DROITE, en BAS' : '▼'} → tu passes DEVANT le bourré ALLONGÉ et les POUBELLES (garde appuyé = tu restes en bas)`,
       `DRING : ${t ? 'touche à GAUCHE' : 'Z ou ◀'} quand le bourré est dans la zone jaune`,
       '   → le bourré DEBOUT s\'écarte, celui qui TRAVERSE s\'arrête',
       'L\'icône au-dessus de chaque obstacle te dit quoi faire. Série de 5 = +2 s.',
@@ -153,7 +154,7 @@ export class RemiVelo extends BossScene {
 
   genererParcours() {
     for (const o of [...this.obstacles, ...(this.voitures || []), ...(this.tremplins || []), ...(this.pintes || [])]) { if (o.g) o.g.destroy(); if (o.spr) o.spr.destroy(); if (o.img) o.img.destroy(); }
-    this.obstacles = []; this.pintes = []; this.voitures = []; this.tremplins = [];
+    this.obstacles = []; this.pintes = []; this.voitures = []; this.tremplins = []; this.avantPoubelle = false;
     this.troncon = V.longueur / 3;                 // longueur d'un tronçon « normal »
     this.route = DEPART_ROUTE; this.numCarrefour = 0; this.choix = null;
     this.finTroncon = this.troncon;               // où finit le tronçon en cours (le carrefour ou le bar)
@@ -190,15 +191,18 @@ export class RemiVelo extends BossScene {
       }
       let type = k < debut.length ? debut[k] : tirer();
       k++;
-      const sp = k > debut.length && route.special && Math.random() < (route.longueur < 1 ? 0.5 : 0.3) ? route.special : null;
-      if (sp === 'poubelle') { type = 'poubelle'; this.ajouter('poubelle', x); }
+      let sp = k > debut.length && route.special && Math.random() < (route.longueur < 1 ? 0.5 : 0.3) ? route.special : null;
+      if (sp === 'poubelle' && this.avantPoubelle) sp = null;   // jamais deux poubelles de suite
+      this.avantPoubelle = sp === 'poubelle';
+      // une poubelle a de la place AVANT elle aussi (le temps de remonter après l'obstacle d'avant, puis de redescendre)
+      if (sp === 'poubelle') { x += (V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, x / V.longueur)) * 0.6; type = 'poubelle'; this.ajouter('poubelle', x); }
       else if (sp === 'pecheur') { type = 'debout'; this.ajouter('debout', x); this.obstacles[this.obstacles.length - 1].peche = true; }
       else if (sp === 'chorale') { type = 'debout'; for (let n = 0; n < 3; n++) { this.ajouter('debout', x + n * 85); const o = this.obstacles[this.obstacles.length - 1]; o.chante = true; o.centreChorale = n === 1; } x += 170; }
       else this.ajouter(type, x);
       // l'écart se compte en TEMPS, à la vitesse prévue à cet endroit : jamais deux obstacles collés
       const vit = V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, x / V.longueur);
       // jamais moins de 0,85 s entre deux obstacles (même dans un raccourci bondé) ; après une POUBELLE (grand saut), 0,5 s de plus
-      const ecart = vit * Math.max(0.85, hasard(V.ecart[0], V.ecart[1]) / (this.diff.densite * route.densite)) + (type === 'traverse' ? 120 : 0) + (type === 'poubelle' ? vit * 0.5 : 0);
+      const ecart = vit * Math.max(0.85, hasard(V.ecart[0], V.ecart[1]) / (this.diff.densite * route.densite)) + (type === 'traverse' ? 120 : 0) + (type === 'poubelle' ? vit * 0.7 : 0);
       if (k > 2 && Math.random() < V.pintes * route.pintes) this.pintes.push({ x: x + ecart / 2, h: HAUT_PINTE, prise: false, t: Math.random() * 6 });
       x += ecart;
     }
@@ -305,7 +309,7 @@ export class RemiVelo extends BossScene {
       // vitesse : de plus en plus vite vers le bar ; ralentie après une crevaison ou une glissade
       const cible = (V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, this.bx / this.longueur)) * (this.ralenti > 0 ? 0.55 : 1);
       this.v += Math.sign(cible - this.v) * Math.min(Math.abs(cible - this.v), 500 * dt);
-      if (this.auSol && this.tampon > 0 && this.dy < 10) { this.vy = V.saut; this.tenu = 0; this.tampon = 0; this.auSol = false; jouerSon(this, 'remi_saut'); }
+      if (this.auSol && this.tampon > 0) { this.esq = 0; this.vy = V.saut; this.tenu = 0; this.tampon = 0; this.auSol = false; jouerSon(this, 'remi_saut'); }
     }
     // le SOL sous le vélo : la route (0), un tremplin (pente), le toit d'une voiture
     const avant = this.surTremplin;
@@ -506,7 +510,9 @@ export class RemiVelo extends BossScene {
       if (Math.abs(d) > w + DEMI_VELO) continue;
       if (o.type === 'debout' && o.etat === 'ecarte') continue;
       if (o.type === 'traverse' && (o.p < 0.36 || o.p > 0.74)) continue;
-      if (ESQUIVER[o.type] ? this.dy > V.esquiveBas * 0.6 : this.y >= h) continue;   // l'allongé : seulement en passant devant
+      const enBas = this.dy > V.esquiveBas * 0.6, dessus = this.y >= h;
+      if (ESQUIVER[o.type] && enBas) o.esquive = true;   // commencé à passer par le bas : c'est gagné (même si on saute ensuite)
+      if (ESQUIVER[o.type] ? o.esquive || (SAUTABLE[o.type] && dessus) : dessus) continue;   // l'allongé : seulement en passant devant
       o.touche = true;
       this.serie = 0;
       if (o.type === 'verre') { this.ralenti = V.ralenti; bulle(this, 'Crevaison... ça roule mal !', '#ffb0b0', 1.2, 140); jouerSon(this, 'remi_crevaison'); }

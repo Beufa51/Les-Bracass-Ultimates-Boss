@@ -169,6 +169,11 @@
   Pouce GAUCHE = DRING dans le coin (ne cache plus le vélo) ; pouce DROIT = SAUTE en haut (y 318) et EN BAS juste dessous
   (y 462), empilés comme une croix. Zones : moitié gauche = DRING ; moitié droite au-dessus de `LIGNE_BAS` = SAUTE, en
   dessous = EN BAS. Boutons plus petits (r 62) et presque transparents au repos (on voit les obstacles à travers).
+- V17 VÉLO, POUBELLES (retour : trop rapprochées, on ne comprend pas qu'on ne puisse pas les esquiver en bas) : la poubelle
+  s'évite EN BAS (comme l'allongé) OU par un grand saut (`ESQUIVER` / `SAUTABLE`) ; jamais deux poubelles de suite ; place
+  AVANT (0,6 s) et APRÈS (0,7 s) chaque poubelle. SAUTE quand on est en bas = saut immédiat ; un obstacle commencé à passer
+  en bas compte comme esquivé même si on saute avant de l'avoir dépassé (`o.esquive`). Bots : ruelles 6 poubelles 0 touchée,
+  route normale 0 chute.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
