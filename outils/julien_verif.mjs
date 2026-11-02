@@ -48,7 +48,7 @@ verifierPlan('manif', PLAN_MANIF, new Set(['J', 'S', ...Object.keys(OBJETS), ...
   if (!PLAN_MANIF.some((l, y) => [...l].some((c, x) => c === 'S' && vu.has(`${x},${y}`)))) err('manif : la cour du lycée (S) n\'est pas atteignable'); }
 
 verifierPlan('lycée', PLAN_LYCEE, new Set(['J', ...Object.keys(OBJETS_LYCEE), ...Object.keys(SECRETS_LYCEE)]));
-{ const vu = atteignables(PLAN_LYCEE, 'dqxF', 'X');   // le casier ouvert (X) s'ouvre en poussant
+{ const vu = atteignables(PLAN_LYCEE, 'dqxFEBLO', 'X');   // le casier ouvert (X) s'ouvre en poussant
   const k = position(PLAN_LYCEE, 'k');
   if (!k || !aCote(vu, ...k)) err('lycée : le CARNET (k) n\'est pas atteignable');
   if (!aCote(vu, PORTE_SALLE_12.x, PORTE_SALLE_12.y + 1)) err('lycée : la porte de la salle 12 n\'est pas atteignable');

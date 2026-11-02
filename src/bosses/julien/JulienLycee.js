@@ -28,10 +28,11 @@ const POSES = {
   fayot: ['bras', 'crie', 'saute', 'fuite'],
 };
 // vraies images des murs (outils/julien/decouper_planches.py) : code du plan → image
-const MURS_IMAGES = { 1: 'mur_casiers', 2: 'mur_couloir', 3: 'mur_cantine', 4: 'porte_classe', 5: 'mur_classe' };
+const MURS_IMAGES = { 1: 'mur_casiers', 2: 'mur_couloir', 3: 'mur_cantine', 4: 'porte_classe', 5: 'mur_classe', 6: 'mur_cdi' };
 const IMAGES = [...Object.entries(POSES).flatMap(([t, ps]) => ps.map(p => `${t}_${p}`)), ...Object.values(MURS_IMAGES),
-  'table', 'bureau', 'canette', 'extincteur', 'carnet', 'puree', 'flaque', 'comptoir', 'mousse', 'main_sarbacane', 'main_sarbacane_tir'];   // (5 derniers : section 17 des prompts)
-const RAYONS = { table: 0.48, comptoir: 0.55, extincteur: 0.3, fayot: 0.3 };
+  'table', 'bureau', 'canette', 'extincteur', 'carnet', 'puree', 'flaque', 'comptoir', 'mousse', 'main_sarbacane', 'main_sarbacane_tir',
+  'etagere', 'etagere_basse', 'table_lecture', 'ordinateur', 'surveillant_touche_papier', 'cantiniere_touche_papier'];   // (section 19)   // (5 derniers : section 17 des prompts)
+const RAYONS = { table: 0.48, comptoir: 0.55, extincteur: 0.3, fayot: 0.3, etagere: 0.45, etagere_basse: 0.45, table_lecture: 0.45, ordinateur: 0.38 };
 const estCantine = (x, y) => x >= 8 && x <= 21 && y >= 2 && y <= 9;
 
 export class JulienLycee extends JulienManif {
@@ -55,7 +56,10 @@ export class JulienLycee extends JulienManif {
       Object.assign(T.hauteurs, HAUTEURS_LYCEE);
       for (const [t, ps] of Object.entries(POSES)) for (const p of ps) { const i = img(`${t}_${p}`); if (i) T.spr[`${t}_${p}`] = i; }
       T.spr.surveillant_essouffle = T.spr.surveillant_marche0;   // (l'IA du CRS a une pose « essoufflé »)
-      for (const n of ['table', 'canette', 'extincteur', 'carnet', 'puree', 'flaque', 'mousse']) { const i = img(n); if (i) T.spr[n] = i; }
+      for (const n of ['table', 'canette', 'extincteur', 'carnet', 'puree', 'flaque', 'mousse', 'etagere', 'etagere_basse', 'table_lecture', 'ordinateur']) { const i = img(n); if (i) T.spr[n] = i; }
+      for (const n of ['etagere', 'etagere_basse', 'table_lecture', 'ordinateur']) if (!T.spr[n]) T.spr[n] = T.spr.table;   // (image absente : une table)
+      // touchés par une BOULETTE (sans jaune d'œuf) : l'IA choisit « <type>_touche_propre » quand le coup ne fait pas de tache
+      for (const t of ['surveillant', 'cantiniere']) { const i = img(t + '_touche_papier'); if (i) T.spr[t + '_touche_propre'] = i; }
       T.spr.comptoir = img('comptoir') || img('bureau') || T.spr.bureau;   // vraie image du comptoir, sinon le bureau du prof
       T.lycee = construireDecorLycee(this.ctx, L, VUE_H, PLAN_LYCEE, estCantine);
       for (const [code, n] of Object.entries(MURS_IMAGES)) { const i = img(n); if (i) T.lycee.murs[code] = i; }

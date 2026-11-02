@@ -1142,6 +1142,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   `outils/julien/plan_lycee.py` (vérifie le parcours). Reste possible : vraies images (étagères du CDI ; surveillant
   et cantinière « touchés » ont aussi du jaune d'œuf alors que ce sont des boulettes).
   → PROMPTS : section 19 de `julien_prompts_images.md` (19a touchés par une boulette, 19b étagères du CDI, 19c mur du CDI).
+  LIVRÉES et branchées : mur du CDI (mur n° 6), étagère haute 'E' / basse 'B', table de lecture 'L', ordinateur 'O'
+  (abris du CDI, plan regénéré) ; poses « touché par une boulette » : surveillant et cantinière (servent de
+  `<type>_touche_propre`, choisi quand le coup ne fait pas de tache), Julien (`julien_touche_papier` en classe).
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».

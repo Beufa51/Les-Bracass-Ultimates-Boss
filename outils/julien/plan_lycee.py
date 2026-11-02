@@ -16,7 +16,7 @@ salle(13, 10, 15, 15, 'hall')     # 2e couloir hall -> cantine (boucle)
 salle(6, 10, 7, 12, 'placard')    # placard secret derrière un casier
 salle(22, 5, 23, 6, 'cdi')        # porte cantine -> CDI
 salle(24, 2, 29, 19, 'cdi')       # le CDI (étagères = abris)
-code = {'casiers': '1', 'cantine': '3', 'hall': '2', 'placard': '1', 'cdi': '5'}
+code = {'casiers': '1', 'cantine': '3', 'hall': '2', 'placard': '1', 'cdi': '6'}
 for y in range(H):
     for x in range(W):
         if g[y][x] != '#': continue
@@ -35,9 +35,10 @@ for (x, y, c) in [
     (15, 2, 'q'), (16, 2, 'q'), (17, 2, 'q'), (18, 2, 'q'),                           # comptoir
     (10, 5, 'd'), (12, 5, 'd'), (14, 5, 'd'), (10, 7, 'd'), (12, 7, 'd'), (14, 7, 'd'), (18, 4, 'd'),
     (6, 11, 's'), (7, 10, 'K'), (7, 12, 'n'),                                         # placard secret
-    # CDI : rangées d'étagères (abris), 2 surveillants, une cantinière égarée, 2 fayots, le CARNET au fond
-    (25, 4, 'd'), (27, 4, 'd'), (25, 7, 'd'), (28, 7, 'd'), (24, 10, 'd'), (26, 10, 'd'), (28, 10, 'd'),
-    (25, 13, 'd'), (27, 13, 'd'), (25, 16, 'd'), (28, 16, 'd'),
+    # CDI : étagères hautes 'E' et basses 'B', tables de lecture 'L', ordinateurs 'O' (tous des abris),
+    # 2 surveillants, une cantinière égarée, 2 fayots, le CARNET au fond
+    (25, 4, 'E'), (27, 4, 'E'), (25, 7, 'B'), (28, 7, 'O'), (24, 10, 'E'), (26, 10, 'E'), (28, 10, 'E'),
+    (25, 13, 'L'), (27, 13, 'L'), (25, 16, 'O'), (28, 16, 'B'),
     (26, 3, 'F'), (29, 12, 'F'), (27, 8, 'V'), (25, 14, 'V'), (28, 18, 'Q'),
     (29, 2, 'x'), (24, 12, 'x'), (29, 9, 'n'), (24, 17, 's'), (27, 19, 'k'),
 ]:
@@ -46,7 +47,7 @@ rows = [''.join(r) for r in g]
 for r in rows: print(f"  '{r}',")
 # vérif : le carnet, le passage secret et la porte sont atteignables depuis J
 from collections import deque
-bloque = set('12345#dqxF')
+bloque = set('123456#dqxFEBLO')
 d = deque([(9, 20)]); vu = {(9, 20)}
 while d:
     x, y = d.popleft()

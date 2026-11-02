@@ -5,43 +5,44 @@
 // recopier après un changement).
 //
 // Murs (chiffres) : 1 casiers, 2 couloir (panneau d'affichage), 3 cantine (carrelage), 4 PORTE DE LA SALLE 12,
-//                   5 mur peint (le CDI et l'extérieur).
+//                   5 mur peint (l'extérieur), 6 mur du CDI (étagères de livres).
 // Secret : 'X' = casier ouvert (aspect casiers) : on pousse dedans → placard secret (sandwich, K-Way, canette).
 // Sol : '.' vide, 'J' départ (regarde vers le haut).
 // Ennemis : 'V' surveillant (le pion : il siffle puis te fonce dessus ; pas de bouclier),
 //           'Q' dame de cantine (lance de la purée : flaque où tu avances au ralenti).
 // 'F' FAYOT : on ne peut pas le blesser ; quand il te voit il crie « M'SIEUR ! IL EST LÀ ! » et alerte tout le monde.
 // Objets : 'x' extincteur (un œuf dessus → nuage de mousse : les ennemis autour glissent et sont aveuglés),
-//          'n' canette (petit soin), 'k' CARNET (la clé), 'd' table (cantine) / étagère (CDI) : abri, 'q' comptoir,
+//          'n' canette (petit soin), 'k' CARNET (la clé), 'd' table de cantine (abri), 'q' comptoir,
+//          CDI : 'E' étagère haute, 'B' étagère basse, 'L' table de lecture, 'O' ordinateur (tous des abris),
 //          's' sandwich, 'K' K-Way. (Pas d'œufs ni de tomates : les armes de la manif sont interdites au lycée.)
 export const PLAN_LYCEE = [
   '55555555555555555555555555555555',
-  '51141153333333333333333555555555',
-  '51...153.......qqqq...35.....x55',
-  '51...111...Q..........35..F...55',
-  '51.V..............d...35.d.d..55',
-  '51........d.d.d...............55',
-  '51...111...........Q..........55',
-  '51..F153..d.d.d.......35.d..d.55',
-  '51...153........x...V.35...V..55',
-  '51.x.153.s............35.....n55',
-  '51...1.K33333...33333335d.d.d.55',
-  '51...Xs.55552...25555555......55',
-  '51F..1.n55552.F.25555555x....F55',
-  '51...15555552...25555555.d.d..55',
-  '51...15555552n..25555555.V....55',
-  '51...12222222...25555555......55',
-  '51sV............25555555.d..d.55',
-  '52..............25555555s.....55',
-  '52..............25555555....Q.55',
-  '52.n.......n....25555555...k..55',
-  '52.......J......2555555555555555',
+  '51141153333333333333333666666665',
+  '51...153.......qqqq...36.....x65',
+  '51...111...Q..........36..F...65',
+  '51.V..............d...36.E.E..65',
+  '51........d.d.d...............65',
+  '51...111...........Q..........65',
+  '51..F153..d.d.d.......36.B..O.65',
+  '51...153........x...V.36...V..65',
+  '51.x.153.s............36.....n65',
+  '51...1.K33333...33333336E.E.E.65',
+  '51...Xs.55552...25555556......65',
+  '51F..1.n55552.F.25555556x....F65',
+  '51...15555552...25555556.L.L..65',
+  '51...15555552n..25555556.V....65',
+  '51...12222222...25555556......65',
+  '51sV............25555556.O..B.65',
+  '52..............25555556s.....65',
+  '52..............25555556....Q.65',
+  '52.n.......n....25555556...k..65',
+  '52.......J......2555555666666665',
   '52222222222222222555555555555555',
 ];
 
 export const OBJETS_LYCEE = {
   V: 'surveillant', Q: 'cantiniere', F: 'fayot', x: 'extincteur', n: 'canette', k: 'carnet', d: 'table', q: 'comptoir',
-  s: 'sandwich', K: 'kway',
+  s: 'sandwich', K: 'kway', E: 'etagere', B: 'etagere_basse', L: 'table_lecture', O: 'ordinateur',
 };
 export const SECRETS_LYCEE = { X: '1' };
 export const PORTE_SALLE_12 = { x: 3, y: 1 };

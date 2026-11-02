@@ -60,6 +60,10 @@ GROUPES = {
         ('dessus_table_a_content', (210, 211)), ('dessus_table_a_cache', (552, 246)), ('dessus_table_b_content', (890, 222)),
         ('dessus_table_b_cache', (1211, 246)), ('dessus_table_vide', (230, 548)), ('dessus_table_cahier', (708, 554)),
         ('dessus_table_sac', (1172, 547))]),
+    # « touchés par une BOULETTE » (section 19a) : remplacent les poses avec du jaune d'œuf au lycée et en classe
+    'touche_surveillant': ('julien_touches_boulette.jpg', 200, [('surveillant_touche_papier', (206, 419))]),
+    'touche_cantiniere': ('julien_touches_boulette.jpg', 190, [('cantiniere_touche_papier', (709, 442))]),
+    'touche_julien': ('julien_touches_boulette.jpg', 240, [('julien_touche_papier', (1168, 421))]),
     # élèves assis (rangée du haut ; celle du bas est un doublon) : A content, A caché, B…, D caché
     'eleves': ('julien_eleves.jpg', 180, [(f'eleve_{k // 2}_{"content" if k % 2 == 0 else "cache"}', (x, 200))
         for k, x in enumerate([115, 300, 465, 630, 815, 990, 1165, 1325])]),
@@ -103,6 +107,9 @@ OBJETS_DESSUS = ('julien_dessus_objets.jpg', [   # 2 rangées : boulettes en tro
 OBJETS_EFFETS = ('julien_dessus_effets.jpg', [   # section 18f
     ('dessus_explosion', (117, 383), 40), ('dessus_etoile', (352, 383), 36), ('dessus_poussiere', (587, 383), 28),
     ('dessus_feuilles', (822, 383), 40), ('dessus_note0', (1056, 383), 46), ('dessus_note20', (1290, 383), 46)])
+
+OBJETS_CDI = ('julien_cdi.jpg', [   # section 19b
+    ('etagere', (198, 369), 160), ('etagere_basse', (545, 425), 100), ('table_lecture', (909, 416), 100), ('ordinateur', (1243, 445), 110)])
 
 # traits de grille que le nettoyage automatique rate (cases de largeurs différentes selon la rangée) :
 # planche → [(x0, y0, x1, y1), ...] effacés en blanc
@@ -294,7 +301,7 @@ def main():
     planche.save(SORTIE + 'julien_tetes.png')
     print('   tetes', L, 'x 96 ×', len(cases))
 
-    for fichier, liste in (OBJETS, OBJETS_ARMES, OBJETS_BONUS, OBJETS_CLASSE, OBJETS_LYCEE, OBJETS_DESSUS, OBJETS_EFFETS):
+    for fichier, liste in (OBJETS, OBJETS_ARMES, OBJETS_BONUS, OBJETS_CLASSE, OBJETS_LYCEE, OBJETS_DESSUS, OBJETS_EFFETS, OBJETS_CDI):
         if not os.path.exists(ENTREE + fichier):
             continue
         img = charger(fichier).copy()
@@ -329,7 +336,7 @@ def main():
 
     # murs : carré réduit à 128 × 128
     for nom in ['mur_briques', 'mur_immeuble', 'mur_boutique', 'mur_tag', 'mur_palissade', 'mur_lycee', 'portail_lycee', 'mur_boutique2', 'mur_rideau',
-                'mur_casiers', 'mur_couloir', 'mur_cantine']:   # (les 3 derniers : le lycée, niveau 2)
+                'mur_casiers', 'mur_couloir', 'mur_cantine', 'mur_cdi']:   # (les 3 derniers : le lycée, niveau 2)
         if os.path.exists(ENTREE + f'julien_{nom}.jpg'):
             mur = Image.open(ENTREE + f'julien_{nom}.jpg').convert('RGB')
             if nom in SANS_PANNEAU:

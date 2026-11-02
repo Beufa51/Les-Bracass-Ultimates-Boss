@@ -75,7 +75,7 @@ export class JulienManif extends BossScene {
     this.lblLycee = texte(this, 868, yb + 20, 'LYCÉE', 14, '#c9b48a');
     // tête du héros (vraie image, en haute résolution par-dessus la barre)
     this.tete = T.tetes ? this.add.image(LARGEUR / 2, yb + 50, 'julien_tetes', 0).setDisplaySize(82, 84) : null;
-    this.txtMsg = texte(this, 16, 14, '', 18, '#ffffff').setOrigin(0, 0).setStroke('#000', 4).setWordWrapWidth(LARGEUR - 40);   // (les longs messages passent à la ligne)
+    this.txtMsg = texte(this, 16, 14, '', 18, '#ffffff').setOrigin(0, 0).setStroke('#000', 4).setWordWrapWidth(LARGEUR - 40).setAlign('left');   // (les longs messages passent à la ligne)
     this.msgT = 0;
 
     this.touches = creerTouches(this);
