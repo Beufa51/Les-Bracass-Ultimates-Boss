@@ -1380,3 +1380,7 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
 - V14 : FEINTES PAR L'IDENTITÉ (idée de Fabien) : pendant l'annonce, tous les intrus font le MÊME bruit, la même ombre et le
   même « ! » (musique coupée pareil) : on ne sait qu'en le voyant. Le GARS QUI VIENT PISSER n'attrape personne (« Pardon,
   urgence ! » : on aurait pu continuer), la MAMIE (un peu sourde) n'attrape que si la charge dépasse 50 %, le VIDEUR attrape tout.
+- V15 : porte : jauge de PUISSANCE déplacée à DROITE (ne cache plus les intrus). Pong plus JUSTE : imprécision aléatoire
+  très faible (0,01 / 0,016 / 0,025 : ce qu'on vise = ce qu'on touche, la difficulté vient de la courbe, de l'alcool visible,
+  de Rémi) ; tir rebond : imprécision mini 0,045 ; rebord : chance de rentrer selon la distance au centre (15 à 85 %) ;
+  `tirage` 175 (geste plus précis). Prompts vélo 20 (obstacles + pinte), 21 (pêcheur), 22 (chorale).

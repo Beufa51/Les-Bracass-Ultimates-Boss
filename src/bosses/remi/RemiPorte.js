@@ -409,8 +409,10 @@ export class RemiPorte extends BossScene {
     // PUISSANCE en 10 paliers (celui qui frappe)
     if (this.etat === 'toi' || this.etat === 'remi' || this.etat === 'coup') {
       const COUL = [0x3ad03a, 0x5ad03a, 0x8ad03a, 0xb8d03a, 0xe0d03a, 0xffc03a, 0xff9a3a, 0xff6a3a, 0xff3a3a, 0xff2080];
-      j.fillStyle(0x000000, 0.65).fillRect(36, 166, 48, 288);
-      for (let k = 0; k < 10; k++) j.fillStyle(COUL[k], this.puissance * 10 > k ? 1 : 0.18).fillRect(42, 446 - (k + 1) * 27.6 + 3, 36, 22);
+      // (à DROITE, contre le bord de l'écran : elle ne cache plus les intrus qui arrivent à gauche)
+      const xj = LARGEUR - 46;
+      j.fillStyle(0x000000, 0.65).fillRect(xj - 6, 136, 40, 288);
+      for (let k = 0; k < 10; k++) j.fillStyle(COUL[k], this.puissance * 10 > k ? 1 : 0.18).fillRect(xj - 1, 416 - (k + 1) * 27.6 + 3, 30, 22);
     }
     // le videur arrive : « ! » rouge qui clignote, à gauche
     if (this.videur.etat === 'annonce' && Math.floor(this.horloge * 8) % 2) {

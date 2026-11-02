@@ -146,3 +146,31 @@ comme si elle passait la tête au coin d'un mur). Une petite mamie à chignon gr
 canne. 2 poses côte à côte, même échelle, bien espacées : 1 : elle regarde, curieuse, en plissant les yeux ;
 2 : elle te voit, furieuse, elle lève sa canne d'un air menaçant.
 ```
+
+## 20. Les petits obstacles du vélo — `remi_obstacles_planche.jpg`
+À joindre : la planche des bourrés (pour garder le style).
+```
+Même style que l'image jointe (manga/anime, contours noirs nets), fond BLANC uni, aucun texte. Planche de 4 objets vus
+STRICTEMENT DE PROFIL, posés au sol, même échelle, bien espacés sur une ligne : 1 : une grosse poubelle de rue verte à roulettes,
+couvercle fermé ; 2 : des tessons de bouteille de bière cassée par terre (verre vert et brun qui brille) ; 3 : une flaque de
+bière renversée, mousseuse et dorée, avec un gobelet en plastique couché ; 4 : une pinte de bière dorée avec de la mousse, entourée
+d'un petit halo lumineux (un bonus à attraper).
+```
+
+## 21. Le pêcheur des quais (vélo) — `remi_pecheur_planche.jpg`
+À joindre : la planche des bourrés.
+```
+Même style que l'image jointe (manga/anime, contours noirs nets), fond BLANC uni, aucun texte. Un vieux pêcheur de nuit, en ciré
+jaune, bonnet, bottes, une canne à pêche à la main, entier, vu de profil tourné vers la GAUCHE. 2 poses côte à côte, même échelle,
+bien espacées : 1 : il pêche tranquillement, sa longue canne tendue horizontalement vers la gauche (elle barre le passage) ;
+2 : il sursaute (sonnette !) et relève sa canne vers le ciel.
+```
+
+## 22. La chorale de fêtards (vélo, centre-ville) — `remi_chorale_planche.jpg`
+À joindre : la planche des bourrés.
+```
+Même style que l'image jointe (manga/anime, contours noirs nets, drôle), fond BLANC uni, aucun texte. 3 fêtards éméchés bras dessus
+bras dessous, entiers, vus de face, qui chantent à tue-tête (bouches grandes ouvertes, notes de musique), une pinte à la main.
+2 poses côte à côte, même échelle, bien espacées : 1 : ils chantent en se balançant ; 2 : ils sursautent ensemble et s'écartent
+(sonnette !), surpris.
+```

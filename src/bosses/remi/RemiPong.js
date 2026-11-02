@@ -245,7 +245,7 @@ export class RemiPong extends BossScene {
   lancerToi(tx, tz) {
     const s = this.tangage(), e = this.diff.erreur * (this.feu ? 0.5 : 1);
     // imprécision du bras (augmente avec l'alcool)
-    const e2 = e * (1 + this.ivresse * 0.15) * (this.rebond ? 1.5 : 1), ex = hasard(-1, 1) * e2, ez = hasard(-1, 1) * e2 * 1.2;
+    const e2 = this.rebond ? Math.max(0.045, e * 1.5) * (1 + this.ivresse * 0.15) : e * (1 + this.ivresse * 0.15), ex = hasard(-1, 1) * e2, ez = hasard(-1, 1) * e2 * 1.2;
     this.balles--;
     this.etat = 'vol'; this.distrait = 0;
     // AIMANT : à jeun, la balle est attirée vers le verre le plus proche de la cible (de moins en moins quand on a bu)
@@ -349,6 +349,7 @@ export class RemiPong extends BossScene {
     b.verre = meilleur;
     if (meilleur && dmin < r * P.dedans) { this.dedans(); return; }
     if (meilleur && dmin < r * P.rebord) {
+      b.dRebord = dmin;
       b.etat = 'rebord'; b.fin = 0.9; b.angle = Math.atan2(b.z - meilleur.z, b.x - meilleur.x);
       jouerSon(this, 'remi_rebond');
       if (b.qui === 'toi') bulle(this, 'LE REBORD...', '#ffd84a', 0.8, 300);
@@ -359,7 +360,10 @@ export class RemiPong extends BossScene {
 
   resoudreRebord() {
     const b = this.balle;
-    if (Math.random() < 0.5) { this.dedans(); return; }
+    // plus la balle est tombée près du centre, plus elle a de chances de rentrer (plus juste qu'un pile ou face)
+    const r = P.rayon, d = b.dRebord ?? r;
+    const chance = Phaser.Math.Clamp(1 - (d - r * P.dedans) / (r * (P.rebord - P.dedans)), 0.15, 0.85);
+    if (Math.random() < chance) { this.dedans(); return; }
     b.etat = 'libre'; b.vy = 1.2; b.vx = (b.x - b.verre.x) * 12; b.vz = (b.z - b.verre.z) * 12 + (b.qui === 'toi' ? 0.6 : -0.6);
     bulle(this, '... et non !', '#ffb0b0', 1, 300);
   }
