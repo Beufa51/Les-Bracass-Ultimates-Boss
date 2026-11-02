@@ -20,10 +20,9 @@ export default {
   // réglages développeur (écran caché du hub : 5 appuis sur « Badges ») ; voir src/core/reglagesDev.js
   reglagesDev: [
     { groupe: 'VÉLO', nom: 'Longueur du trajet (px)', objet: VELO, champ: 'longueur', pas: 1000, min: 4000, max: 40000 },
-    { groupe: 'VÉLO', nom: 'Vitesse de croisière (px/s)', objet: VELO, champ: 'croisiere', pas: 20, min: 150, max: 600 },
-    { groupe: 'VÉLO', nom: 'Vitesse en sprint (px/s)', objet: VELO, champ: 'vitesseMax', pas: 20, min: 200, max: 800 },
-    { groupe: 'VÉLO', nom: 'Sprint : endurance perdue par s', objet: VELO, champ: 'endurance', pas: 0.05, min: 0.05, max: 2 },
-    { groupe: 'VÉLO', nom: 'Recharge de la sonnette (s)', objet: VELO, champ: 'sonnette', pas: 0.1, min: 0.2, max: 3 },
+    { groupe: 'VÉLO', nom: 'Vitesse au départ (px/s)', objet: VELO, champ: 'vitesseDepart', pas: 20, min: 150, max: 700 },
+    { groupe: 'VÉLO', nom: 'Vitesse à l\'arrivée (px/s)', objet: VELO, champ: 'vitesseFin', pas: 20, min: 150, max: 800 },
+    { groupe: 'VÉLO', nom: 'Recharge de la sonnette (s)', objet: VELO, champ: 'sonnette', pas: 0.1, min: 0.1, max: 3 },
     { groupe: 'VÉLO', nom: 'Hauteur du saut (vitesse de départ)', objet: VELO, champ: 'saut', pas: 20, min: 300, max: 900 },
     { groupe: 'BEER PONG', nom: 'Verres par joueur (6 ou 10)', objet: PONG, champ: 'verres', pas: 4, min: 6, max: 10 },
     { groupe: 'BEER PONG', nom: 'Taille du « dedans » (x rayon)', objet: PONG, champ: 'dedans', pas: 0.05, min: 0.4, max: 1.2 },
