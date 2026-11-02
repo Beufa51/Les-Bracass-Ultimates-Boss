@@ -108,7 +108,15 @@
   centre-ville `remi_rue3.jpg` (image en perspective : on garde les 2 rangées de façades bout à bout), tremplin
   `remi_tremplin.png` (haut de planche à 81 % : `TREMPLIN_IMG`), voitures `remi_voitures.png` (3 cases, `VOIT_IMG`,
   `ECH_VOIT` 0,74 : longueur et hauteur de toit propres à chaque voiture), Rémi en pied qui t'accueille `remi_accueil.png`,
-  intérieur du bar derrière Rémi au pong `remi_bar_interieur.jpg`. `node outils/remi_verif.mjs` : 0 erreur. : `python3 outils/remi/preparer_images.py`.
+  intérieur du bar derrière Rémi au pong `remi_bar_interieur.jpg`. `node outils/remi_verif.mjs` : 0 erreur.
+- V8 (retours : visée trop dure à jeun ; vélo : quand sauter / sonner ? ; changer de route) + AUDIT FUN
+  `propositions/remi_audit_fun.md` (joueur 6,9/10, dev 7/10 ; prochaines étapes : porte avec barre de solidité commune,
+  tir rebond + déconcentrer Rémi au pong, salto / chute cartoon / événement par route au vélo).
+  PONG : `aimant` 0,6 (à jeun la balle file vers le verre visé ; -0,12 par verre bu), `erreur` 0,025 / 0,035 / 0,05.
+  VÉLO : `actionDuMoment()` → gros « SAUTE ! » / « DRING ! » au-dessus de l'obstacle + le bouton à presser clignote
+  (pas en CHAMPION) ; RALENTI x0,3 les 2 premières fois de chaque geste. ROUTES : 3 tronçons, 2 CARREFOURS (`CARREFOURS`,
+  panneau 3 s, gauche / droite) : quais (tranquille) ou ruelle (raccourci 35 % plus court, bondé) ; centre-ville (tremplins
+  x2) ou petites rues (raccourci). `this.longueur` = longueur réelle (raccourcis), `genererTroncon()` à chaque choix. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

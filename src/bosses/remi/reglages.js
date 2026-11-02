@@ -14,15 +14,15 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 export const DIFFICULTES = {
   facile: { nom: 'FACILE', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
     temps: 58, densite: 0.8, traverse: 0.8, sonnette: 730,
-    erreur: 0.035, apercu: 1, distrait: 0, remi: 0.32, aide: true,
+    erreur: 0.025, apercu: 1, distrait: 0, remi: 0.32, aide: true,
     remiMin: 560, remiMax: 760, zone: 0.22, visee: 0.8 },
   normal: { nom: 'NORMAL', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 46, densite: 1, traverse: 1, sonnette: 650,
-    erreur: 0.05, apercu: 0.8, distrait: 0.35, remi: 0.42, aide: false,
+    erreur: 0.035, apercu: 0.85, distrait: 0.35, remi: 0.42, aide: false,
     remiMin: 650, remiMax: 850, zone: 0.15, visee: 1 },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 38, densite: 1.2, traverse: 1.25, sonnette: 570,
-    erreur: 0.065, apercu: 0.55, distrait: 0.55, remi: 0.52, aide: false,
+    erreur: 0.05, apercu: 0.6, distrait: 0.55, remi: 0.52, aide: false,
     remiMin: 760, remiMax: 930, zone: 0.1, visee: 1.3 },
 };
 
@@ -63,6 +63,7 @@ export const PONG = {
   tirage: 150,            // lance-pierre : longueur de tirage (px) pour la force maximale
   serieFeu: 3,            // verres de suite pour être EN FEU (trajectoire entière montrée, lancer plus précis)
   ivresse: 0.02,          // chaque verre BU fait tanguer ta visée de ce nombre de mètres en plus
+  aimant: 0.6,            // À JEUN la balle est attirée vers le verre visé (part du chemin) ; -0,12 par verre bu
   courbeBue: 0.13,        // chaque verre bu efface cette part de la fin de la courbe d'aide (la retombée disparaît d'abord)
   hoquet: 2,              // à partir de ce nombre de verres bus : HOQUETS (secousse soudaine de la visée)
 };

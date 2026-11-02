@@ -216,7 +216,13 @@ export class RemiPong extends BossScene {
     const e2 = e * (1 + this.ivresse * 0.15), ex = hasard(-1, 1) * e2, ez = hasard(-1, 1) * e2 * 1.2;
     this.balles--;
     this.etat = 'vol'; this.distrait = 0;
-    this.lancer(DEPART, tx + s.x + ex, tz + s.z + ez, this.verresRemi, 'toi');
+    // AIMANT : à jeun, la balle est attirée vers le verre le plus proche de la cible (de moins en moins quand on a bu)
+    let ax = tx + s.x, az = tz + s.z;
+    const aim = Math.max(0, P.aimant - this.ivresse * 0.12);
+    let proche = null, dmin = 0.13;
+    for (const v of this.verresRemi) if (v.plein) { const d = Math.hypot(v.x - ax, v.z - az); if (d < dmin) { dmin = d; proche = v; } }
+    if (proche) { ax += (proche.x - ax) * aim; az += (proche.z - az) * aim; }
+    this.lancer(DEPART, ax + ex, az + ez, this.verresRemi, 'toi');
     jouerSon(this, 'remi_lance');
   }
 

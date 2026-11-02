@@ -24,12 +24,14 @@ const X_VELO = 260;                  // le vélo reste à cet endroit de l'écra
 const DEMI_VELO = 65;                // demi-longueur du vélo pour les chocs (un peu plus petite que l'image : indulgent)
 const HAUT_PINTE = 260;              // hauteur des pintes au-dessus de la route (on ne les attrape qu'en sautant)
 const BOUTON_G = { x: 88, y: 448, r: 74 }, BOUTON_D = { x: LARGEUR - 88, y: 448, r: 74 };   // les 2 gros boutons
-// LES QUARTIERS traversés (« routes ») : à partir de cette part du trajet ; image remi_rue2 / remi_rue3 si elle existe,
-// sinon la rue de base teintée
-const QUARTIERS = [
-  { a: 0, nom: 'LA RUE DES BARS', image: 'remi_rue', teinte: 0xffffff },
-  { a: 0.34, nom: 'LES QUAIS', image: 'remi_rue2', teinte: 0x9fb8ff },
-  { a: 0.67, nom: 'LE CENTRE-VILLE', image: 'remi_rue3', teinte: 0xffc8a0 },
+// LES ROUTES (V8) : le trajet = 3 tronçons. Au bout des 2 premiers, un CARREFOUR : on choisit la suite (gauche / droite).
+//  longueur : part de la longueur d'un tronçon (raccourci = plus court mais plus chargé) ; densite / pintes / voitures : x
+const DEPART_ROUTE = { nom: 'LA RUE DES BARS', image: 'remi_rue', teinte: 0xffffff, longueur: 1, densite: 1, pintes: 1, voitures: 1 };
+const CARREFOURS = [
+  [{ nom: 'LES QUAIS', texte: 'tranquille, plein de pintes', image: 'remi_rue2', teinte: 0x9fb8ff, longueur: 1, densite: 0.75, pintes: 1.6, voitures: 1 },
+    { nom: 'LA RUELLE', texte: 'RACCOURCI, mais bondé', image: '', teinte: 0x9a80c0, longueur: 0.65, densite: 1.35, pintes: 0.6, voitures: 0 }],
+  [{ nom: 'LE CENTRE-VILLE', texte: 'la fête : tremplins et pintes', image: 'remi_rue3', teinte: 0xffc8a0, longueur: 1, densite: 1, pintes: 1.5, voitures: 2 },
+    { nom: 'LES PETITES RUES', texte: 'RACCOURCI, mais bondé', image: '', teinte: 0x80a8c0, longueur: 0.65, densite: 1.35, pintes: 0.6, voitures: 0 }],
 ];
 // voitures illustrées (remi_voitures.png, 3 cases) : taille réelle de chaque voiture dans sa case ; ECH_VOIT = taille à l'écran
 const VOIT_IMG = [{ l: 394, h: 175 }, { l: 434, h: 179 }, { l: 382, h: 213 }], ECH_VOIT = 0.74;
@@ -53,7 +55,7 @@ export class RemiVelo extends BossScene {
     this.chute = 0; this.ralenti = 0; this.glisse = 0; this.recharge = 0; this.dring = 0; this.invincible = 0; this.horloge = 0;
     this.prochainTexto = 9; this.chutes = 0; this.score = 0; this.serie = 0; this.pintesPrises = 0;
     this.obstacles = []; this.pintes = [];
-    this.sautDoigt = false; this.voitures = []; this.tremplins = []; this.auSol = true;
+    this.sautDoigt = false; this.voitures = []; this.tremplins = []; this.auSol = true; this.apprentissage = {}; this.action = null;
 
     this.creerDecor();
     this.decor = this.add.graphics().setDepth(2);
@@ -109,7 +111,7 @@ export class RemiVelo extends BossScene {
     this.bx = 0; this.v = V.vitesseDepart; this.y = 0; this.vy = 0; this.invincible = 0; this.auSol = true; this.surTremplin = null;
     this.score = 0; this.serie = 0; this.pintesPrises = 0; this.chutes = 0;
     this.tempsRestant = this.diff.temps;
-    this.quartier = undefined; this.changerQuartier(0);
+    this.quartier = undefined; this.changerQuartier(DEPART_ROUTE); this.carrefourOuvert = false;
     this.etat = 'jeu';
     etiquettesTactiles(VIDES);   // sur téléphone : pas de boutons, deux grandes moitiés d'écran
     annonce(this, 'C\'EST PARTI !', '#7fff7f', 0.8);
@@ -119,6 +121,7 @@ export class RemiVelo extends BossScene {
   installerZones() {
     this.input.on('pointerdown', (p) => {
       if (this.etat !== 'jeu') return;
+      if (this.carrefourOuvert && !this.choix) { this.toucheChoix = p.x < LARGEUR / 2 ? 0 : 1; return; }
       if (p.x < LARGEUR / 2) this.demanderDring();
       else { this.sautDoigt = true; this.doigtSaut = p.id; this.tampon = V.tampon; this.appuiD = 0.15; }
     });
@@ -130,14 +133,25 @@ export class RemiVelo extends BossScene {
   genererParcours() {
     for (const o of [...this.obstacles, ...(this.voitures || []), ...(this.tremplins || [])]) { if (o.g) o.g.destroy(); if (o.spr) o.spr.destroy(); }
     this.obstacles = []; this.pintes = []; this.voitures = []; this.tremplins = [];
+    this.troncon = V.longueur / 3;                 // longueur d'un tronçon « normal »
+    this.route = DEPART_ROUTE; this.numCarrefour = 0; this.choix = null;
+    this.finTroncon = this.troncon;               // où finit le tronçon en cours (le carrefour ou le bar)
+    this.longueur = V.longueur;                   // longueur totale prévue (change avec les raccourcis)
+    this.genererTroncon(0, this.finTroncon, DEPART_ROUTE, true);
+  }
+
+  // obstacles d'un tronçon [x0, x1] selon la route choisie ; rien juste avant le carrefour (on lit les panneaux)
+  genererTroncon(x0, x1, route, debutPartie) {
     const poids = Object.entries(V.types), total = poids.reduce((s, [, p]) => s + p, 0);
     const tirer = () => { let r = Math.random() * total; for (const [n, p] of poids) { r -= p; if (r <= 0) return n; } return 'debout'; };
     // les 3 premiers obstacles apprennent les gestes : allongé (saut), debout (sonnette), traverse (sonnette)
-    const debut = ['allonge', 'debout', 'traverse'];
-    let x = 1100, k = 0;
-    while (x < V.longueur - 800) {
-      // tous les « voitures » obstacles : un TREMPLIN puis 2 VOITURES garées (on roule sur le toit, pintes au-dessus)
-      if (k > 3 && k % V.voitures === 0) {
+    const debut = debutPartie ? ['allonge', 'debout', 'traverse'] : [];
+    let x = debutPartie ? 1100 : x0 + 500, k = debutPartie ? 0 : 4;
+    const tousLes = route.voitures > 0 ? Math.max(2, Math.round(V.voitures / route.voitures)) : 999;
+    const marge = x1 >= this.longueur - 1 ? 800 : 1700;   // pas d'obstacle pendant le panneau du carrefour
+    while (x < x1 - marge) {
+      // tous les « tousLes » obstacles : un TREMPLIN puis 2 VOITURES garées (on roule sur le toit, pintes au-dessus)
+      if (k > 3 && k % tousLes === 0) {
         const L = V.longueurVoiture, H = V.hauteurVoiture;
         const lt = 150, ht = this.textures.exists('remi_tremplin') ? Math.round(lt / TREMPLIN_IMG.haut * TREMPLIN_IMG.h / TREMPLIN_IMG.l) : 70;
         this.tremplins.push({ x0: x, l: lt, h: ht });
@@ -157,9 +171,9 @@ export class RemiVelo extends BossScene {
       k++;
       this.ajouter(type, x);
       // l'écart se compte en TEMPS, à la vitesse prévue à cet endroit : jamais deux obstacles collés
-      const vit = V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * x / V.longueur;
-      const ecart = vit * hasard(V.ecart[0], V.ecart[1]) / this.diff.densite + (type === 'traverse' ? 120 : 0);
-      if (k > 2 && Math.random() < V.pintes) this.pintes.push({ x: x + ecart / 2, h: HAUT_PINTE, prise: false, t: Math.random() * 6 });
+      const vit = V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, x / V.longueur);
+      const ecart = vit * hasard(V.ecart[0], V.ecart[1]) / (this.diff.densite * route.densite) + (type === 'traverse' ? 120 : 0);
+      if (k > 2 && Math.random() < V.pintes * route.pintes) this.pintes.push({ x: x + ecart / 2, h: HAUT_PINTE, prise: false, t: Math.random() * 6 });
       x += ecart;
     }
   }
@@ -228,8 +242,13 @@ export class RemiVelo extends BossScene {
     this.dessiner(dt);
   }
 
-  pas(dt) {
+  pas(dt0) {
     const T = this.touches;
+    // RALENTI D'APPRENTISSAGE : les premières fois, le jeu ralentit au bon moment et dit quoi faire
+    this.action = this.etat === 'jeu' ? this.actionDuMoment() : null;
+    const apprendre = this.action && this.action.maintenant && this.nomDiff !== 'champion' && (this.apprentissage[this.action.geste] || 0) < 2;
+    const dt = apprendre ? dt0 * 0.3 : dt0;
+    if (apprendre && !this.action.o.vuApprendre) { this.action.o.vuApprendre = true; this.apprentissage[this.action.geste] = (this.apprentissage[this.action.geste] || 0) + 1; }
     this.tempsRestant -= dt;
     if (this.tempsRestant <= 0) {
       this.tempsRestant = 0; this.etat = 'fin';
@@ -243,14 +262,15 @@ export class RemiVelo extends BossScene {
     this.glisse = Math.max(0, this.glisse - dt);
     if (vientDAppuyer(T.haut) || vientDAppuyer(T.espace)) { this.tampon = V.tampon; this.appuiD = 0.15; }   // un saut demandé un peu trop tôt est gardé
     this.tampon = Math.max(0, this.tampon - dt);
-    if (vientDAppuyer(T.z) || vientDAppuyer(T.x) || vientDAppuyer(T.gauche)) this.demanderDring();
+    if (this.carrefourOuvert && !this.choix && vientDAppuyer(T.gauche)) this.toucheChoix = 0;
+    else if (vientDAppuyer(T.z) || vientDAppuyer(T.x) || vientDAppuyer(T.gauche)) this.demanderDring();
     const tenu = T.haut.isDown || T.espace.isDown || this.sautDoigt;
     if (this.chute > 0) {
       this.chute -= dt; this.v = 0;
       if (this.chute <= 0) { this.y = 0; this.vy = 0; this.auSol = true; this.invincible = V.invincible; }
     } else {
       // vitesse : de plus en plus vite vers le bar ; ralentie après une crevaison ou une glissade
-      const cible = (V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, this.bx / V.longueur)) * (this.ralenti > 0 ? 0.55 : 1);
+      const cible = (V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, this.bx / this.longueur)) * (this.ralenti > 0 ? 0.55 : 1);
       this.v += Math.sign(cible - this.v) * Math.min(Math.abs(cible - this.v), 500 * dt);
       if (this.auSol && this.tampon > 0) { this.vy = V.saut; this.tenu = 0; this.tampon = 0; this.auSol = false; jouerSon(this, 'remi_saut'); }
     }
@@ -279,21 +299,73 @@ export class RemiVelo extends BossScene {
     this.a += this.v * dt / 14;
     this.obstaclesPas(dt);
     this.pintesPas();
-    // changement de QUARTIER
-    const q = QUARTIERS.filter(z => this.bx >= z.a * V.longueur).length - 1;
-    if (q !== this.quartier) this.changerQuartier(q);
+    // CARREFOUR : on approche de la fin du tronçon (pas le dernier) → on choisit la route ; au bout, on y entre
+    if (this.numCarrefour < CARREFOURS.length) {
+      if (!this.choix && !this.carrefourOuvert && this.bx > this.finTroncon - 1500) this.ouvrirCarrefour();
+      if (this.carrefourOuvert) this.pasCarrefour(dt);
+      if (this.bx >= this.finTroncon) this.entrerRoute();
+    }
     this.prochainTexto -= dt;
     if (this.prochainTexto <= 0) { this.prochainTexto = hasard(10, 15); bulle(this, '📱 ' + choisir(REPLIQUES.textos), '#9fe0ff', 2.4, 76); jouerSon(this, 'remi_texto'); }
-    if (this.bx >= V.longueur) this.arriver();
+    if (this.bx >= this.longueur) this.arriver();
   }
 
-  changerQuartier(q) {
-    const premier = this.quartier === undefined || this.quartier < 0;
-    this.quartier = q;
+  // ---------- carrefours ----------
+  ouvrirCarrefour() {
+    const [a, b] = CARREFOURS[this.numCarrefour];
+    this.carrefourOuvert = true; this.choixTemps = 3; this.choix = null;
+    const t = estTactile();
+    this.panneau = [
+      this.add.rectangle(LARGEUR / 2, 150, 860, 150, 0x000000, 0.75).setDepth(950).setStrokeStyle(3, 0xffd84a),
+      texte(this, LARGEUR / 2, 92, 'CARREFOUR : CHOISIS TA ROUTE !', 24, '#ffd84a', { fontStyle: 'bold' }).setDepth(951),
+      texte(this, 250, 150, `◀ ${a.nom}\n${a.texte}`, 22, '#9fe0ff', { fontStyle: 'bold' }).setDepth(951),
+      texte(this, LARGEUR - 250, 150, `${b.nom} ▶\n${b.texte}`, 22, '#ffb070', { fontStyle: 'bold' }).setDepth(951),
+      texte(this, LARGEUR / 2, 205, t ? 'touche la gauche ou la droite de l\'écran' : '◀ ou ▶', 16, '#ffffff').setDepth(951),
+    ];
+    jouerSon(this, 'remi_texto');
+  }
+
+  pasCarrefour(dt) {
+    const T = this.touches;
+    this.choixTemps -= dt;
+    if (!this.choix) {
+      if (vientDAppuyer(T.droite)) this.choisir(1);
+      else if (this.toucheChoix !== undefined) this.choisir(this.toucheChoix);
+      else if (this.choixTemps <= 0) this.choisir(0);   // pas de choix : la première route
+    }
+    this.toucheChoix = undefined;
+  }
+
+  choisir(n) {
+    const r = CARREFOURS[this.numCarrefour][n];
+    this.choix = r; this.carrefourOuvert = false;
+    for (const e of this.panneau) e.destroy();
+    jouerSon(this, 'ui_valider');
+    bulle(this, `Direction : ${r.nom}`, n ? '#ffb070' : '#9fe0ff', 1.4, 140);
+    // la suite du trajet : ce tronçon (plus court si raccourci), puis le reste prévu au plus long
+    const x0 = this.finTroncon, x1 = x0 + this.troncon * r.longueur;
+    const restants = CARREFOURS.length - 1 - this.numCarrefour;
+    this.longueur = x1 + restants * this.troncon;
+    this.genererTroncon(x0, x1, r, false);
+    this.prochainFin = x1;
+  }
+
+  entrerRoute() {
+    if (!this.choix) this.choisir(0);
+    const r = this.choix;
+    this.route = r; this.numCarrefour++; this.choix = null;
+    this.finTroncon = this.prochainFin;
+    this.changerQuartier(r);
+  }
+
+  changerQuartier(z) {
+    const premier = this.quartier === undefined;
+    this.quartier = z;
     if (!this.rue) return;
-    const z = QUARTIERS[q], appliquer = () => {
-      this.rue.setTexture(this.textures.exists(z.image) ? z.image : 'remi_rue');
-      this.rue.setTint(this.textures.exists(z.image) ? 0xffffff : z.teinte);
+    const appliquer = () => {
+      const img = z.image && this.textures.exists(z.image);
+      this.rue.setTexture(img ? z.image : 'remi_rue');
+      this.rue.setTint(img ? 0xffffff : z.teinte);
     };
     if (premier) { appliquer(); return; }
     // petit fondu au noir pendant qu'on change de quartier
@@ -341,6 +413,25 @@ export class RemiVelo extends BossScene {
       // celui qui traverse s'arrête et recule, s'il n'est pas déjà au milieu de la route
       if (o.type === 'traverse' && o.etat !== 'recule' && o.p < 0.36) o.etat = 'recule';
     }
+  }
+
+  // L'OBSTACLE À GÉRER MAINTENANT (le plus proche devant, pas encore passé) et si c'est le bon moment :
+  //  sauter : quand il est à 0,22 - 0,5 s devant ; sonner : quand il est dans la zone jaune (et la sonnette prête)
+  actionDuMoment() {
+    for (const o of this.obstacles) {
+      const d = o.x - this.bx;
+      if (d < 0 || o.touche || o.etat === 'ecarte' || o.etat === 'recule') continue;
+      if (SONNER[o.type]) {
+        if (o.type === 'traverse' && o.p >= 0.36) continue;
+        const dedans = d > 80 && d < this.diff.sonnette;
+        if (d < this.diff.sonnette + 300) return { o, geste: 'dring', maintenant: dedans && this.recharge <= 0 };
+      } else {
+        const tps = (d - DEMI_VELO - TAILLE[o.type][1]) / Math.max(1, this.v);
+        if (tps < 1.2) return { o, geste: 'saute', maintenant: tps > 0.05 && tps < 0.32 };
+      }
+      return null;
+    }
+    return null;
   }
 
   obstaclesPas(dt) {
@@ -464,7 +555,7 @@ export class RemiVelo extends BossScene {
   }
 
   dessinerBar(g, cam) {
-    const xBar = V.longueur + 260 - cam;
+    const xBar = (this.longueur || V.longueur) + 260 - cam;
     if (xBar < LARGEUR + 400) {
       if (this.facade) {
         this.facade.setVisible(true).setPosition(xBar + 60, SOL + 2);
@@ -530,6 +621,14 @@ export class RemiVelo extends BossScene {
 
   dessinerObstacles(g, cam) {
     const icones = this.nomDiff !== 'champion' && this.etat === 'jeu';
+    // le BON MOMENT : un gros mot au-dessus de l'obstacle, de la couleur du bouton à presser (pas en CHAMPION)
+    const a = icones ? this.action : null;
+    if (!this.motAction) this.motAction = texte(this, 0, 0, '', 34, '#ffffff', { fontStyle: 'bold italic', strokeThickness: 7 }).setDepth(940);
+    if (a && a.maintenant) {
+      const dring = a.geste === 'dring';
+      this.motAction.setVisible(true).setText(dring ? 'DRING !' : 'SAUTE !').setColor(dring ? '#ffe680' : '#9fe0ff')
+        .setPosition(a.o.x - cam, SOL - (dring ? 300 : 150)).setScale(1 + 0.12 * Math.sin(this.horloge * 20));
+    } else this.motAction.setVisible(false);
     for (const o of this.obstacles) {
       const sx = o.x - cam;
       o.g.clear();
@@ -594,7 +693,7 @@ export class RemiVelo extends BossScene {
     const s = Math.max(0, Math.ceil(this.tempsRestant));
     this.hudTemps.setText(`FERMETURE DANS ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`).setColor(s <= 10 ? '#ff5a5a' : '#ffd84a');
     this.hudScore.setText(`${this.score} pts${this.serie >= 2 ? `   série ${this.serie}` : ''}`);
-    const hb = this.hudBarre.clear(), x0 = 300, x1 = 720, pr = Math.min(1, this.bx / V.longueur);
+    const hb = this.hudBarre.clear(), x0 = 300, x1 = 720, pr = Math.min(1, this.bx / (this.longueur || V.longueur));
     hb.fillStyle(0x000000, 0.5).fillRect(x0 - 4, 18, x1 - x0 + 8, 16);
     hb.fillStyle(0x7fff7f, 1).fillRect(x0, 22, (x1 - x0) * pr, 8);
     hb.fillStyle(0xff4fd8, 1).fillRect(x1 - 6, 14, 12, 24);
@@ -605,10 +704,12 @@ export class RemiVelo extends BossScene {
     if (this.etat === 'jeu') {
       this.appuiG = Math.max(0, this.appuiG - 1 / 60); this.appuiD = Math.max(0, this.appuiD - 1 / 60);
       const tenu = this.sautDoigt || this.touches.haut.isDown || this.touches.espace.isDown;
-      for (const [b, c, actif] of [[BOUTON_G, 0xffe680, this.appuiG > 0], [BOUTON_D, 0x9fe0ff, this.appuiD > 0 || tenu]]) {
+      const a = this.nomDiff !== 'champion' && this.action && this.action.maintenant ? this.action.geste : null;
+      const clign = Math.floor(this.horloge * 10) % 2 === 0;
+      for (const [b, c, actif, appel] of [[BOUTON_G, 0xffe680, this.appuiG > 0, a === 'dring'], [BOUTON_D, 0x9fe0ff, this.appuiD > 0 || tenu, a === 'saute']]) {
         gb.fillStyle(0x000000, actif ? 0.55 : 0.35).fillCircle(b.x, b.y, b.r);
-        gb.fillStyle(c, actif ? 0.45 : 0.15).fillCircle(b.x, b.y, b.r - 6);
-        gb.lineStyle(4, c, 0.9).strokeCircle(b.x, b.y, b.r);
+        gb.fillStyle(c, actif ? 0.45 : appel && clign ? 0.6 : 0.15).fillCircle(b.x, b.y, b.r - 6);
+        gb.lineStyle(appel ? 8 : 4, c, 0.9).strokeCircle(b.x, b.y, b.r + (appel ? 6 : 0));   // le bouton à presser MAINTENANT clignote
       }
       // icône cloche / flèche
       const g0 = BOUTON_G, d0 = BOUTON_D;
