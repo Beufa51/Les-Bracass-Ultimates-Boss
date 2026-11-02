@@ -1090,11 +1090,12 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   bureau. Testé (navigateur) : tout le parcours jusqu'à l'entrée en classe, sans erreur.
   PROMPT des vraies images (carnet, purée, flaque, comptoir, mousse de l'extincteur) : section 17 de
   `julien_prompts_images.md` → `julien_objets_lycee.jpg` ; découpe prévue (`OBJETS_LYCEE`, centres à ajuster) et
-  branchement automatique (image absente = dessin provisoire).
+  branchement automatique (image absente = dessin provisoire). LIVRÉES et découpées : carnet, purée, flaque, comptoir,
+  mousse (la pile de plateaux et la 2e flaque de la planche sont ignorées ; traits de grille dans `TRAITS`).
 - SARBACANE EN MAIN (Fabien : « moche ») : dessin provisoire refait en gros pixels (`mainSarbacane` dans
   JulienClasse.js : poing, tube de Bic transparent, manche ; pose de tir avec la boulette). Vraie image à faire :
   prompt `julien_main_sarbacane.jpg` (section 9a de `julien_prompts_images.md`), découpe déjà prévue dans
-  `decouper_planches.py` (centres À AJUSTER) → `julien_main_sarbacane(_tir).png`, branchée automatiquement.
+  `decouper_planches.py` → `julien_main_sarbacane(_tir).png`. LIVRÉE, découpée et branchée (le dessin reste en secours).
 - BUG ANDROID (rectangle de sol gris périmé quand on s'arrête, vu sur le téléphone de Fabien, pas reproduit en
   émulation) : le sol n'est plus écrit par putImageData dans la vue (toile accélérée par la carte graphique) ; il est
   calculé sur une petite toile à part (`willReadFrequently`) puis collé par drawImage (`raycaster.js`, fonction sol).

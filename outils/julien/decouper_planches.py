@@ -31,8 +31,8 @@ GROUPES = {
     'main_tomates': ('julien_main_tomates.jpg', 240, [('main_tomates', (330, 330)), ('main_tomates_tir', (1060, 370))]),
     'main_eau': ('julien_main_eau.jpg', 240, [('main_eau', (340, 460)), ('main_eau_tir', (1130, 420))]),
     'main_fumigenes': ('julien_main_fumigenes.jpg', 240, [('main_fumigenes', (360, 330)), ('main_fumigenes_tir', (1060, 500))]),
-    # niveau 2 : centres À AJUSTER quand l'image sera livrée
-    'main_sarbacane': ('julien_main_sarbacane.jpg', 240, [('main_sarbacane', (340, 400)), ('main_sarbacane_tir', (1100, 400))]),
+    # niveau 2 (la classe) ; pose de tir : la boulette et le souffle sont pris avec la main
+    'main_sarbacane': ('julien_main_sarbacane.jpg', 240, [('main_sarbacane', (300, 450)), ('main_sarbacane_tir', (1010, 450))]),
     # MINI-NIVEAU « LE LYCÉE » : surveillant (le pion), dame de cantine, fayot
     'surveillant': ('julien_surveillant.jpg', 200, [
         ('surveillant_marche0', (135, 400)), ('surveillant_marche1', (380, 400)), ('surveillant_cri', (610, 400)),
@@ -73,14 +73,16 @@ OBJETS_CLASSE = ('julien_objets_classe.jpg', [
     ('copie', (1290, 185), 50), (None, (115, 555), 50), ('craie', (350, 555), 24), ('sarbacane', (565, 570), 70),
     ('extincteur', (820, 560), 110), ('cartable', (1055, 580), 80), ('canette', (1290, 580), 50)])
 
-# objets du LYCÉE (mini-niveau) : centres À AJUSTER quand l'image sera livrée (5 cases de même largeur supposées)
+# objets du LYCÉE (mini-niveau) : 2 rangées ; la pile de plateaux et la 2e flaque (en trop) sont ignorées
 OBJETS_LYCEE = ('julien_objets_lycee.jpg', [
-    ('carnet', (140, 384), 50), ('puree', (422, 384), 40), ('flaque', (704, 384), 24), ('comptoir', (985, 384), 120),
-    ('mousse', (1267, 384), 160)])
+    ('carnet', (160, 190), 50), ('puree', (510, 190), 40), ('flaque', (890, 285), 24), (None, (1245, 265), 50),
+    (None, (230, 640), 24), ('comptoir', (715, 555), 120), ('mousse', (1215, 565), 160)])
 
 # traits de grille que le nettoyage automatique rate (cases de largeurs différentes selon la rangée) :
 # planche → [(x0, y0, x1, y1), ...] effacés en blanc
 TRAITS = {
+    'julien_objets_lycee.jpg': [(x - 3, 0, x + 4, 386) for x in (325, 705, 1093)] + [(x - 3, 380, x + 4, 768) for x in (452, 985)]
+    + [(0, 380, 1408, 388)],
     'julien_surveillant.jpg': [(255, 0, 262, 768), (930, 0, 937, 768)],   # poses qui se touchent
     'julien_cantiniere.jpg': [(940, 150, 1110, 290)],                    # la louche en vol (le projectile, dessiné à part)
     'julien_objets_classe.jpg': [(x - 3, 0, x + 4, 386) for x in (292, 703, 938, 1173)]
