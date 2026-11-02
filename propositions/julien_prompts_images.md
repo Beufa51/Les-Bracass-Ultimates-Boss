@@ -217,3 +217,14 @@ IMPORTANT: every object is clearly SEPARATED from the others by a wide empty whi
 
 ## 16. Rideau de fer (mur de la manif, embuscade du passage) — `julien_mur_rideau.png`
 Prompt de la section 7 (murs, thème « Parisian street »), ligne : `Wall: a closed corrugated metal shop shutter (rolling steel shutter), grey, with a few graffiti tags and a padlock at the bottom.`
+
+## 17. Objets du LYCÉE (mini-niveau) — `julien_objets_lycee.jpg`
+Remplacent les dessins provisoires (carnet, purée, flaque, comptoir, mousse de l'extincteur). Découpe déjà prévue
+(`OBJETS_LYCEE` dans `decouper_planches.py`, centres à ajuster à la livraison).
+```
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. French high-school theme.
+5 separate objects in one row, each in its own equal-size cell, seen strictly from the FRONT, same pixel scale, resting on the same bottom line:
+1) a small closed red French school "carnet de correspondance" (thin red booklet with a white label on the cover); 2) a big blob of mashed potatoes flying through the air, creamy pale yellow, a few drops around it; 3) a flat puddle of mashed potatoes on the floor, seen from the front at floor level (wide and very low); 4) a French school canteen self-service counter: stainless steel, a glass sneeze guard on top, metal food trays with mashed potatoes and peas, a stack of brown plastic trays on one side; 5) a big puffy cloud of white fire-extinguisher foam (soft bubbly shape).
+Plain solid pure white background (#FFFFFF) — EXCEPT the foam cloud, which must be light grey-white with a dark grey outline so it stays visible —, no ground shadow, no text except on the label of the booklet, no frame, no grid lines.
+IMPORTANT: every object is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no object may touch or overlap another object or the cell border.
+```

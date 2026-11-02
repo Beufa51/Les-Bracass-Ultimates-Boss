@@ -609,7 +609,7 @@ export class JulienManif extends BossScene {
     if (!sac.actif) return;
     sac.actif = false;
     const F = RG.farine, j = this.j;
-    this.farines.push({ x: sac.x, y: sac.y, t: 1.6 });
+    this.farines.push({ x: sac.x, y: sac.y, t: 1.6, mousse: sac.type === 'extincteur' });
     jouerSon(this, 'julien_farine');
     if (sac.type === 'extincteur') this.message('PSCHHHT ! De la mousse partout : ils glissent et n\'y voient plus rien !', 2.5);
     if (Math.hypot(j.x - sac.x, j.y - sac.y) < 6) this.cameras.main.shake(180, 0.007);
@@ -914,7 +914,7 @@ export class JulienManif extends BossScene {
       if (o.genre === 'fumi') liste.push({ x: o.x, y: o.y, toile: s.fumi, haut: 0.14, z: o.z });
       else if (o.genre !== 'eau' || o.t > 0.05) liste.push({ x: o.x, y: o.y, toile: s[o.genre], haut: o.genre === 'eau' ? 0.05 : T.hauteurs.oeuf, z: o.genre === 'eau' ? 0.4 : 0.42 });
     }
-    for (const f of this.farines) liste.push({ x: f.x, y: f.y, toile: s.nuage_farine, haut: 1.0 + (1.6 - f.t) * 0.5, z: 0 });
+    for (const f of this.farines) liste.push({ x: f.x, y: f.y, toile: f.mousse && s.mousse ? s.mousse : s.nuage_farine, haut: 1.0 + (1.6 - f.t) * 0.5, z: 0 });
     for (const f of this.fumees) liste.push({ x: f.x, y: f.y, toile: s.fumee, haut: 1.3 + 0.1 * Math.sin(f.t * 2), z: 0 });
     for (const gr of this.grenades) liste.push({ x: gr.x, y: gr.y, toile: gr.puree ? s.puree : s.grenade, haut: gr.puree ? T.hauteurs.puree : T.hauteurs.grenade, z: gr.z });
     for (const sp of this.splats) liste.push({ x: sp.x, y: sp.y, toile: sp.rouge ? s.splat_rouge : s.splat, haut: T.hauteurs.splat, z: 0.38 });

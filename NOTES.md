@@ -1088,6 +1088,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   Boussole : le carnet, puis la porte ; « CARNET OUI/NON » sous la boussole. Images découpées (surveillant 6 poses,
   cantinière 6, fayot 4, murs casiers / couloir / cantine). Provisoires : carnet, purée, flaque ; comptoir = image du
   bureau. Testé (navigateur) : tout le parcours jusqu'à l'entrée en classe, sans erreur.
+  PROMPT des vraies images (carnet, purée, flaque, comptoir, mousse de l'extincteur) : section 17 de
+  `julien_prompts_images.md` → `julien_objets_lycee.jpg` ; découpe prévue (`OBJETS_LYCEE`, centres à ajuster) et
+  branchement automatique (image absente = dessin provisoire).
 - SARBACANE EN MAIN (Fabien : « moche ») : dessin provisoire refait en gros pixels (`mainSarbacane` dans
   JulienClasse.js : poing, tube de Bic transparent, manche ; pose de tir avec la boulette). Vraie image à faire :
   prompt `julien_main_sarbacane.jpg` (section 9a de `julien_prompts_images.md`), découpe déjà prévue dans

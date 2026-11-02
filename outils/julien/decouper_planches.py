@@ -73,6 +73,11 @@ OBJETS_CLASSE = ('julien_objets_classe.jpg', [
     ('copie', (1290, 185), 50), (None, (115, 555), 50), ('craie', (350, 555), 24), ('sarbacane', (565, 570), 70),
     ('extincteur', (820, 560), 110), ('cartable', (1055, 580), 80), ('canette', (1290, 580), 50)])
 
+# objets du LYCÉE (mini-niveau) : centres À AJUSTER quand l'image sera livrée (5 cases de même largeur supposées)
+OBJETS_LYCEE = ('julien_objets_lycee.jpg', [
+    ('carnet', (140, 384), 50), ('puree', (422, 384), 40), ('flaque', (704, 384), 24), ('comptoir', (985, 384), 120),
+    ('mousse', (1267, 384), 160)])
+
 # traits de grille que le nettoyage automatique rate (cases de largeurs différentes selon la rangée) :
 # planche → [(x0, y0, x1, y1), ...] effacés en blanc
 TRAITS = {
@@ -233,7 +238,7 @@ def main():
     planche.save(SORTIE + 'julien_tetes.png')
     print('   tetes', L, 'x 96 ×', len(cases))
 
-    for fichier, liste in (OBJETS, OBJETS_ARMES, OBJETS_BONUS, OBJETS_CLASSE):
+    for fichier, liste in (OBJETS, OBJETS_ARMES, OBJETS_BONUS, OBJETS_CLASSE, OBJETS_LYCEE):
         if not os.path.exists(ENTREE + fichier):
             continue
         img = charger(fichier).copy()
