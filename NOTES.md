@@ -1126,6 +1126,12 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   (qui n'en couvrait que 0,85) → il reste à ±0,2 case derrière (`BUREAU_RENVERSE.marche`), y est replacé au changement
   de phase ; bureau dessiné plus haut et étiré ×1,6 pour que ce qu'on voit = ce qui bloque (rayon 0,8). Testé : de face
   0 touche sur 25 tirs ; contourné par la gauche ou la droite : 23 à 25 sur 25.
+- AUDIT FINAL (version économe, dev + joueur + QA) : `propositions/julien_audit_final.md`, NOTE 7,5 / 10.
+  Corrigés pendant l'audit : PLANTAGE en rejouant la classe / le lycée (scène réutilisée : état remis à zéro dans
+  create), textes qui débordaient (intros raccourcies, `txtMsg` passe à la ligne), surveillant trop près du départ du
+  lycée, textes incohérents (« ta sarbacane », plus d'œufs dans les répliques de la classe, « Ma veste ! »).
+  Reste conseillé : ménage du code (extraire `dessus.js`, boucle update commune, code mort des murs 3D), alléger les
+  textes en combat, surprise en ANARCHISTE au lycée / en classe, vérif automatique `outils/julien_verif.mjs`.
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».

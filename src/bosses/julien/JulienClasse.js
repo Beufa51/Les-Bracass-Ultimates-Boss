@@ -155,9 +155,9 @@ export class JulienClasse extends JulienManif {
     const tact = estTactile();
     this.afficherIntro('LA SALLE DE CLASSE', [
       'Julien, le prof, te bombarde : livres, craies, copies, dictionnaire…',
-      'Chaque attaque s\'annonce : lis l\'écran et réagis (pas de côté, table, trou dans les copies…).',
+      'Chaque attaque s\'annonce à l\'écran : lis et réagis vite !',
       'Après une grosse attaque, il écrit au tableau DE DOS : FONCE, dégâts ×2 !',
-      'Les TABLES arrêtent les livres et les copies. Trop près, il CONFISQUE ta sarbacane !',
+      'Les TABLES t\'abritent. Trop près, il CONFISQUE ta sarbacane !',
       ...(tact ? [this.joy ? 'Joystick : avancer, reculer, pas de côté     ↺ ↻ : tourner' : '▲ ▼ avancer / reculer   ◀ ▶ pas de côté   ↺ ↻ tourner',
         'LANCER : tirer      ARME : changer d\'arme'] : this.lignesCommandes()),
     ], () => this.demarrer());

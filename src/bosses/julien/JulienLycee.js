@@ -80,9 +80,9 @@ export class JulienLycee extends JulienManif {
     const tact = estTactile();
     this.afficherIntro('LE LYCÉE', [
       'Tu es dans le lycée… et en RETARD ! Julien t\'attend en SALLE 12.',
-      'Œufs et tomates sont INTERDITS ici : tu n\'as plus que ta SARBACANE (munitions infinies).',
-      'La porte est fermée : récupère d\'abord ton CARNET DE CORRESPONDANCE à la CANTINE.',
-      'SURVEILLANT : il siffle puis il fonce → pas de côté.   DAME DE CANTINE : évite la purée.',
+      'Œufs et tomates INTERDITS ici : seulement ta SARBACANE (infinie).',
+      'Salle 12 fermée : va d\'abord chercher ton CARNET à la CANTINE.',
+      'SURVEILLANT : il siffle puis fonce → pas de côté. CANTINIÈRE : gare à la purée.',
       'Les FAYOTS te dénoncent : on ne peut pas les toucher, contourne-les.',
       'Une boulette sur un EXTINCTEUR : mousse partout !   Les CANETTES soignent.',
       ...(tact ? [this.joy ? 'Joystick : avancer, reculer, pas de côté     ↺ ↻ : tourner' : '▲ ▼ avancer / reculer   ◀ ▶ pas de côté   ↺ ↻ tourner',
