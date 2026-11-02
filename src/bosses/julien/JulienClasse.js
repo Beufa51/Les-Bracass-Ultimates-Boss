@@ -525,6 +525,10 @@ export class JulienClasse extends JulienManif {
       if (!silencieux) this.bulle(`×${m}`);
     }
     e.vie = Math.max(0, e.vie - degats); e.flash = 0.15;
+    if (genre === 'boulette') {   // petite explosion de papier sur lui (pas de jaune d'œuf : c'est une boulette)
+      const j = this.j, d = Math.hypot(j.x - e.x, j.y - e.y) || 1;
+      this.splats.push({ x: e.x + (j.x - e.x) / d * 0.25, y: e.y + (j.y - e.y) / d * 0.25, t: 0.35, papier: true });
+    }
     for (const el of this.eleves) el.t = Math.max(el.t, 1);
     if (Math.random() < 0.35) this.parlerEleves('touche');
     if (tache && e.taches.length < 6) e.taches.push({ o: Math.random() * 1.6 - 0.8, h: 0.3 + Math.random() * 0.4, rouge: tache === 'tomate' });
@@ -572,7 +576,7 @@ export class JulienClasse extends JulienManif {
     if (e.type !== 'julien') return super.imageEnnemi(e);
     const s = this.T.spr;
     if (e.etat === 'fuite') return s.julien_vaincu;
-    if (e.etat === 'touche' || e.flash > 0) return s.julien_touche;
+    if (e.etat === 'touche' || e.flash > 0) return s.julien_rage || s.julien_touche;   // (l'image « touché » a du jaune d'œuf : ici ce sont des boulettes)
     if (e.etat === 'dos') return s.julien_dos || s.julien_marche0;
     if (e.etat === 'prepare' || e.etat === 'aimant') return s.julien_bras;
     if (e.etat === 'lance') return s.julien_lance;

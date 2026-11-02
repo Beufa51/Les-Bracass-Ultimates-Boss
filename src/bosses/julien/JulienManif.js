@@ -523,12 +523,15 @@ export class JulienManif extends BossScene {
   }
 
   // plusieurs policiers mis en fuite en moins de 3 s : « OMELETTE ×N ! »
-  combo() {
+  // le nom du combo dépend de l'arme qui a fini le dernier (Fabien : « OMELETTE » même avec des tomates)
+  combo(tache, genre) {
+    const nom = genre === 'boulette' ? 'PAPIER MÂCHÉ' : tache === 'tomate' ? 'SAUCE TOMATE' : tache === 'oeuf' ? 'OMELETTE'
+      : genre === 'pancarte' ? 'K.-O.' : genre === 'eau' ? 'DOUCHE FROIDE' : 'DÉROUTE';
     const t = this.time.now;
     this.comboN = t - (this.comboT || -1e9) < 3000 ? (this.comboN || 1) + 1 : 1;
     this.comboT = t;
     if (this.comboN < 2) return;
-    const txt = texte(this, LARGEUR / 2, 150, `OMELETTE ×${this.comboN} !`, 44, '#ffd84a').setDepth(50).setScale(0.4);
+    const txt = texte(this, LARGEUR / 2, 150, `${nom} ×${this.comboN} !`, 44, '#ffd84a').setDepth(50).setScale(0.4);
     this.tweens.add({ targets: txt, scale: 1, duration: 180, ease: 'Back.out' });
     this.tweens.add({ targets: txt, alpha: 0, y: 120, delay: 900, duration: 500, onComplete: () => txt.destroy() });
     jouerSon(this, 'julien_ramasse', { rate: 1.2 });
@@ -748,7 +751,7 @@ export class JulienManif extends BossScene {
 
   // degats : 1 = un œuf ; options : recul [dx, dy], perceBouclier (fumée), silencieux (eau, fumée : pas de son ni de sursaut)
   // tache : 'oeuf' (jaune), 'tomate' (rouge) ou null (pancarte, eau, fumée : pas de trace)
-  toucherEnnemi(e, degats = 1, { recul = null, perceBouclier = false, silencieux = false, tache = null } = {}) {
+  toucherEnnemi(e, degats = 1, { recul = null, perceBouclier = false, silencieux = false, tache = null, genre = null } = {}) {
     if (recul) this.deplacer(e, recul[0], recul[1], 0.28);
     if (e.type === 'bouclier' && !this.bouclierBaisse(e) && !perceBouclier) { if (!silencieux) jouerSon(this, 'julien_plonk'); return; }
     e.vie -= degats;
@@ -763,7 +766,7 @@ export class JulienManif extends BossScene {
         this.objets.push({ type: 'sandwich', x: e.x, y: e.y, solide: false, rayon: 0.3, actif: true, n: 0, lache: true });
         this.time.delayedCall(900, () => this.message('Il a lâché son casse-croûte !', 2));
       }
-      this.combo();
+      this.combo(tache, genre);
       this.message(['Il s\'enfuit tout dégoulinant !', 'Omelette !', 'Un de moins !', 'Retour au commissariat !'][this.repousses % 4]);
       this.j.expr = 'content'; this.j.exprT = 0.9;
       return;
@@ -936,7 +939,8 @@ export class JulienManif extends BossScene {
     for (const f of this.farines) liste.push({ x: f.x, y: f.y, toile: f.mousse && s.mousse ? s.mousse : s.nuage_farine, haut: 1.0 + (1.6 - f.t) * 0.5, z: 0 });
     for (const f of this.fumees) liste.push({ x: f.x, y: f.y, toile: s.fumee, haut: 1.3 + 0.1 * Math.sin(f.t * 2), z: 0 });
     for (const gr of this.grenades) liste.push({ x: gr.x, y: gr.y, toile: gr.puree ? s.puree : s.grenade, haut: gr.puree ? T.hauteurs.puree : T.hauteurs.grenade, z: gr.z });
-    for (const sp of this.splats) liste.push({ x: sp.x, y: sp.y, toile: sp.rouge ? s.splat_rouge : s.splat, haut: T.hauteurs.splat, z: 0.38 });
+    for (const sp of this.splats) liste.push({ x: sp.x, y: sp.y, toile: sp.papier && s.dessus_explosion ? s.dessus_explosion : sp.rouge ? s.splat_rouge : s.splat,
+      haut: sp.papier ? 0.22 : T.hauteurs.splat, z: sp.papier ? 0.55 : 0.38 });   // papier : boulette sur Julien (la classe)
     for (const n of this.nuages) liste.push({ x: n.x, y: n.y, toile: s.nuage, haut: T.hauteurs.nuage + 0.1 * Math.sin(n.t * 3), z: 0 });
 
     const tps = this.time.now / 1000;   // néons des vitrines : ils grésillent

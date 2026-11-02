@@ -1135,6 +1135,12 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   → FAIT (voir la fin du rapport d'audit) : `dessus.js` (vue du dessus, mixin ajouté à JulienClasse), boucle update
   commune (`majJeu` / `zonesNiveau` par niveau), code mort retiré, textes allégés, ANARCHISTE (renforts du lycée
   `RENFORTS_LYCEE`, `RG.julien.anarchiste`), VÉRIF : `node outils/julien_verif.mjs` (0 erreur ; aussi dans CLAUDE.md).
+- RETOUR FABIEN (4) — FAIT : Julien touché par une boulette → pose RAGE + petite explosion de papier (l'image
+  « touché » a du jaune d'œuf) ; nom du combo selon l'arme (OMELETTE œufs, SAUCE TOMATE, PAPIER MÂCHÉ boulettes,
+  K.-O. pancarte, DOUCHE FROIDE eau) ; LYCÉE PLUS GRAND (32 × 22) : nouveau CDI à droite de la cantine (étagères =
+  tables, 2 surveillants, 1 cantinière, 2 fayots, 2 extincteurs) où est maintenant le CARNET ; plan généré par
+  `outils/julien/plan_lycee.py` (vérifie le parcours). Reste possible : vraies images (étagères du CDI ; surveillant
+  et cantinière « touchés » ont aussi du jaune d'œuf alors que ce sont des boulettes).
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».

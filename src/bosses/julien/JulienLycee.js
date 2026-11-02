@@ -1,6 +1,6 @@
 // Boss Julien — MINI-NIVEAU « LE LYCÉE » (entre la manif et la salle de classe ; audit A :
 // propositions/julien_audit_classe.md). Même moteur 3D que la manif (JulienManif.js, dont cette scène hérite).
-// Hall → couloir des casiers → cantine (le CARNET DE CORRESPONDANCE, la clé) → porte de la salle 12 → Julien.
+// Hall → cantine → CDI (le CARNET DE CORRESPONDANCE, la clé) → couloir des casiers → porte de la salle 12 → Julien.
 //  - SURVEILLANT (le pion) : IA du CRS sans bouclier (il siffle, puis il fonce : pas de côté, puis bombarde-le).
 //  - DAME DE CANTINE : IA du lanceur, mais de la PURÉE : flaque où l'on avance au ralenti.
 //  - FAYOTS : invincibles ; quand ils te voient ils crient et ALERTENT tout le monde ; de près, ils s'enfuient.
@@ -79,7 +79,7 @@ export class JulienLycee extends JulienManif {
     this.afficherIntro('LE LYCÉE', [
       'Tu es dans le lycée… et en RETARD ! Julien t\'attend en SALLE 12.',
       'Œufs et tomates INTERDITS ici : seulement ta SARBACANE (infinie).',
-      'Salle 12 fermée : va d\'abord chercher ton CARNET à la CANTINE.',
+      'Salle 12 fermée : va chercher ton CARNET au CDI (après la cantine).',
       'SURVEILLANT : il siffle puis fonce → pas de côté. CANTINIÈRE : gare à la purée.',
       'Les FAYOTS te dénoncent : on ne peut pas les toucher, contourne-les.',
       'Une boulette sur un EXTINCTEUR : mousse partout !   Les CANETTES soignent.',
