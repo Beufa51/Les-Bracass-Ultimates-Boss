@@ -151,7 +151,7 @@ export class RemiVelo extends BossScene {
   }
 
   // ESQUIVE : le vélo descend vers le bas de l'écran (seulement sur la route, pas en l'air ni sur un toit)
-  demanderEsquive() { this.appuiB = 0.15; if (this.chute <= 0 && this.auSol && this.y <= 1 && this.esq <= 0) { this.esq = V.esquive; jouerSon(this, 'remi_glisse', { rate: 1.6, volume: 0.4 }); } }
+  demanderEsquive() { this.appuiB = 0.15; if (this.chute <= 0 && this.auSol && this.y <= 1 && this.esq <= 0) { this.esq = V.esquive; jouerSon(this, 'remi_esquive'); } }
 
   demanderDring() { this.appuiG = 0.15; if (this.recharge <= 0 && this.chute <= 0) this.sonner(); }
 

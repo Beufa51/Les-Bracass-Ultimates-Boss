@@ -102,3 +102,11 @@ d = 0.35; x = t(d)
 f = 900 * np.exp(-x / 0.08) + 120
 ecrire('remi_scratch', np.sin(2 * np.pi * np.cumsum(f) / SR) * env(d, 0.002, 0.12) + 0.6 * passe_haut(bruit(d), 2500) * env(d, 0.001, 0.08), 0.6)
 print('scratch ajouté')
+
+# ESQUIVE du vélo (V17) : « fffouit » d'écart — souffle filtré qui glisse vers l'aigu puis retombe + crissement léger du pneu
+d = 0.32; x = t(d)
+souffle = passe_haut(passe_bas(bruit(d), 2600), 500) * np.sin(np.pi * np.clip(x / d, 0, 1)) ** 1.5
+siff = balayage(d, 300, 900, 10) * np.exp(-((x - 0.12) / 0.07) ** 2) * 0.25
+pneu = passe_haut(bruit(d), 3500) * env(d, 0.01, 0.06) * 0.35
+ecrire('remi_esquive', souffle + siff + pneu, 0.55)
+print('esquive ajoutée')

@@ -185,6 +185,10 @@
   ATTENTION : `node --check` ne voit pas toutes les erreurs (un retour à la ligne dans un texte a bloqué tout le jeu) :
   vérifier avec `node outils/verif_modules.cjs $(find src -name "*.js")` (serveur sur le port 8765), seules les erreurs
   « Phaser » sont normales.
+- V17 (choix de Fabien) : PORTE : attrapé au moment du coup = coup ANNULÉ (dégâts rendus, coup parfait pas compté,
+  afficheur à 000 ; `coupEnCours`) ; si on est attrapé avant que le poing touche, pas d'impact du tout (sauf le coup qui
+  fait céder la porte : il reste). VÉLO : son propre pour l'esquive `remi_esquive.wav` (« fffouit », généré par
+  `outils/remi/generer_sons.py`, ajouté à la fin du script).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

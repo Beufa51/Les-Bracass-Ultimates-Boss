@@ -56,6 +56,7 @@ export const MANIFESTE = {
     remi_chute: son('chute', 90, 0.3),
     remi_crevaison: son('crevaison', 140, 0.25),
     remi_glisse: son('glisse', 300, 0.2),
+    remi_esquive: son('esquive', 600, 0.12),
     remi_texto: son('texto', 1320, 0.07),
     remi_pinte: son('pinte', 990, 0.08),
     remi_arrivee: son('arrivee', 880, 0.35),

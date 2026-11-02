@@ -240,13 +240,21 @@ export class RemiPorte extends BossScene {
     const v = this.videur;
     v.vu = true; v.pose = 1; v.t = Math.max(v.t, 1.3);
     this.attrapes[qui]++;
+    // V17 (demande de Fabien) : attrapé au moment du coup = le coup est ANNULÉ (dégâts rendus, coup parfait pas compté)
+    const c = this.coupEnCours;
+    if (this.etat === 'coup' && c && c.qui === qui) {
+      this.solidite = Math.min(R.solidite, this.solidite + c.score);
+      if (c.parfait) this.parfaits = Math.max(0, this.parfaits - 1);
+      this.tweens.killTweensOf(this); this.compteur = 0;   // (l'afficheur retombe à 000)
+    }
+    this.coupEnCours = null;
     this.solidite = Math.min(R.solidite, this.solidite + R.scotch);   // le barman rafistole la porte
     jouerSon(this, 'remi_porte', { rate: 0.6 });
     this.cameras.main.shake(200, 0.006);
     annonce(this, qui === 'toi' ? 'ATTRAPÉ !' : 'RÉMI ATTRAPÉ !', qui === 'toi' ? '#ff5a5a' : '#7fff7f', 1);
     const I = INTRUS[v.qui] || INTRUS.videur;
     bulle(this, `${I.nom} : « ${choisir(REPLIQUES[I.repliques])} »`, '#ffb070', 1.8, 150);
-    this.time.delayedCall(500, () => bulle(this, `Coup perdu, et le barman rafistole la porte (+${R.scotch})`, '#ffffff', 1.4, 330));
+    this.time.delayedCall(500, () => bulle(this, `Coup ANNULÉ, et le barman rafistole la porte (+${R.scotch})`, '#ffffff', 1.4, 330));
     if (qui === 'remi') this.time.delayedCall(900, () => bulle(this, 'Rémi : « Mais... j\'ai rien fait ! »', '#ffd84a', 1.2, 80));
     this.etat = 'pause'; this.puissance = 0; this.charge = false; this.pose[qui] = 'garde';
     this.consigne.setVisible(false);
@@ -260,10 +268,12 @@ export class RemiPorte extends BossScene {
     const score = Math.round(999 * (R.degatsMin + (1 - R.degatsMin) * this.puissance) * (0.55 + 0.45 * precision));
     this.etat = 'coup'; this.tCoup = 0; this.charge = false; this.consigne.setVisible(false);
     this.coups[qui]++;
+    this.coupEnCours = { qui, score: 0, parfait: qui === 'toi' && precision === 1 && this.puissance > 0.9 };
     if (qui === 'toi' && precision === 1 && this.puissance > 0.9) { this.parfaits++; bulle(this, 'COUP PARFAIT !', '#ffd84a', 1, 150); jouerSon(this, 'remi_foule'); }
     else if (qui === 'toi' && precision === 1) bulle(this, 'PILE DESSUS !', '#7fff7f', 0.8, 150);
     this.pose[qui] = 'coup';
-    this.time.delayedCall(90, () => { this.pose[qui] = 'frappe'; this.impact(qui, score); });
+    // (V17 : attrapé avant que le poing touche → pas d'impact du tout)
+    this.time.delayedCall(90, () => { if (this.etat !== 'coup') return; this.pose[qui] = 'frappe'; this.impact(qui, score); });
     this.time.delayedCall(550, () => { this.pose[qui] = 'garde'; });
   }
 
@@ -271,6 +281,7 @@ export class RemiPorte extends BossScene {
     // LE COUP SE VOIT (V15) : le frappeur plonge en avant, une bulle de BD « BAM ! » éclate sur la porte, le bois garde un CREUX
     this.elan = 0.18;
     this.bulleBD(score);
+    if (this.coupEnCours && this.coupEnCours.qui === qui) this.coupEnCours.score = Math.min(score, this.solidite);
     this.solidite = Math.max(0, this.solidite - score);
     this.gel = 0.06 + score / 999 * 0.1;
     this.tremble = score / 999;
