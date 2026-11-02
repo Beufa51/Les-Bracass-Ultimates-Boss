@@ -22,15 +22,15 @@ export const DIFFICULTES = {
     remiCharge: 0.5, remiPrudent: 0.2, videur: 1.6, feintes: 0, zone: 0.28, visee: 0.65 },
   facile: { nom: 'PANACHÉ', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
     temps: 88, densite: 0.8, traverse: 0.8, sonnette: 730,
-    erreur: 0.01, apercu: 1, distrait: 0, remi: 0.32, aide: true,
+    erreur: 0.012, apercu: 1, distrait: 0.15, remi: 0.38, aide: true,
     remiCharge: 0.6, remiPrudent: 0.3, videur: 1.3, feintes: 0.25, zone: 0.22, visee: 0.8 },
   normal: { nom: 'PRESSION', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 70, densite: 1, traverse: 1, sonnette: 650,
-    erreur: 0.016, apercu: 0.85, distrait: 0.35, remi: 0.42, aide: false,
+    erreur: 0.021, apercu: 0.72, distrait: 0.45, remi: 0.5, aide: false,
     remiCharge: 0.75, remiPrudent: 0.35, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
   champion: { nom: 'CUL SEC', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
-    erreur: 0.025, apercu: 0.6, distrait: 0.55, remi: 0.52, aide: false,
+    erreur: 0.03, apercu: 0.5, distrait: 0.65, remi: 0.6, aide: false,
     remiCharge: 0.84, remiPrudent: 0.85, videur: 0.75, feintes: 0.65, zone: 0.1, visee: 1.3 },
 };
 
@@ -40,11 +40,10 @@ export const POINTS = {
   veloChute: 50,          // vélo : par chute
   pongVerre: 80,          // pong : par verre qu'il te reste à la fin (Rémi en a mis peu)
   pongBallsBack: 40,      // pong : par BALLS BACK réussi
-  porteGagne: 300,        // porte : pour l'avoir fait céder
+  porteGagne: 300,        // porte : pour avoir gagné (plus de dégâts que Rémi)
   porteParfait: 60,       // porte : par COUP PARFAIT
   porteAttrape: 60,       // porte : par fois où tu t'es fait attraper
-  porteCoups: 6,          // porte : en dessous de ce nombre de coups...
-  porteCoupEnMoins: 40,   // ... tant de points par coup en moins
+  porteEcart: 0.2,        // porte : points par point de dégâts d'avance sur Rémi
 };
 export const RANGS = [
   { rang: 'S', nom: 'ROI DU COMPTOIR', seuil: 1700 },
@@ -86,13 +85,13 @@ export const PONG = {
   verres: 6,              // verres par joueur (6 = pyramide 3-2-1 ; 10 = 4-3-2-1)
   table: { largeur: 1.2, longueur: 1.8 },   // table raccourcie (caméra proche : les verres de Rémi bien visibles)
   rayon: 0.085,           // rayon d'un verre (m)
-  dedans: 0.7,            // la balle tombe à moins de rayon x ce chiffre du centre : DEDANS
+  dedans: 0.62,           // (V17 : 0,7 → 0,62, pong trop facile) la balle tombe à moins de rayon x ce chiffre du centre : DEDANS
   rebord: 1.2,            // entre « dedans » et rayon x ce chiffre : sur le REBORD (une chance sur deux)
   dureeVol: 0.65,         // durée du vol de la balle (s)
   tirage: 175,            // lance-pierre : longueur de tirage (px) pour la force maximale (+ grand = geste plus précis)
   serieFeu: 3,            // verres de suite pour être EN FEU (trajectoire entière montrée, lancer plus précis)
   ivresse: 0.02,          // chaque verre BU fait tanguer ta visée de ce nombre de mètres en plus
-  aimant: 0.6,            // À JEUN la balle est attirée vers le verre visé (part du chemin) ; -0,12 par verre bu
+  aimant: 0.35,           // (V17 : 0,6 → 0,35) À JEUN la balle est attirée vers le verre visé (part du chemin) ; -0,12 par verre bu
   courbeBue: 0.13,        // chaque verre bu efface cette part de la fin de la courbe d'aide (la retombée disparaît d'abord)
   hoquet: 2,              // à partir de ce nombre de verres bus : HOQUETS (secousse soudaine de la visée)
 };
@@ -100,10 +99,10 @@ export const PONG = {
 export const PORTE = {
   // V11 : « LA PORTE ET LE VIDEUR ». Chacun son tour : MAINTENIR pour charger, LÂCHER pour frapper. Le videur fait sa ronde :
   // s'il regarde pendant que tu charges (ou juste au moment du coup) : ATTRAPÉ (coup perdu, la porte est rafistolée).
-  solidite: 7500,         // SOLIDITÉ de la porte : chaque coup en enlève ses dégâts ; celui qui la fait céder GAGNE
+  solidite: 5500,         // (V17 : 7500 → 5500, parties trop longues) SOLIDITÉ de la porte : chaque coup en enlève ses dégâts ; quand elle cède, le PLUS DE DÉGÂTS gagne
   charge: 0.35,           // vitesse de charge au départ (puissance par seconde) ; elle accélère en chargeant
   accel: 1.3,             // accélération de la charge
-  degatsMin: 0.25,        // part des dégâts même avec une charge nulle
+  degatsMin: 0.15,        // (V17 : 0,25 → 0,15 : un coup mou rapporte moins) part des dégâts même avec une charge nulle
   scotch: 300,            // solidité rendue à la porte quand quelqu'un se fait attraper (le barman la rafistole)
   periodeVisee: 1.1,      // vitesse de la cible sur la porte
   casse: 850,             // un coup à ce score ou plus : gros craquement, éclats, flash

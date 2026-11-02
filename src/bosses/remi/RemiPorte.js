@@ -5,7 +5,8 @@
 //   LÂCHER = le coup part. Dégâts = puissance x précision (la cible qui se promène sur la porte doit être sur ton poing +).
 // LE VIDEUR fait sa ronde : on entend ses pas, son ombre s'allonge dans le couloir, puis il passe la tête (à gauche).
 //   S'il te voit en train de charger (ou au moment du coup) : ATTRAPÉ — coup perdu, la porte est rafistolée.
-// Une seule règle : la porte a une SOLIDITÉ commune ; celui dont le coup la fait CÉDER gagne (et le badge).
+// Une seule règle (V17) : la porte a une SOLIDITÉ commune ; quand elle CÈDE, celui qui a fait le PLUS DE DÉGÂTS gagne
+// (chacun le même nombre de tours : si Rémi la casse, tu as un DERNIER COUP). Avant : le dernier qui tapait gagnait.
 // =====================================================================
 import { BossScene } from '../../core/BossScene.js';
 import { creerTouches } from '../../core/clavier.js';
@@ -55,6 +56,7 @@ export class RemiPorte extends BossScene {
     this.solidite = R.solidite; this.puissance = 0; this.cible = { x: 0, y: 0 }; this.tCible = 0; this.tCoup = 0;
     this.eclats = []; this.degats = 0; this.trou = this.formeTrou(); this.elan = 0; this.flash = 0; this.gel = 0; this.tremble = 0; this.entree = 1; this.dernierFrappeur = null;
     this.compteur = 0; this.coups = { toi: 0, remi: 0 }; this.attrapes = { toi: 0, remi: 0 }; this.parfaits = 0;
+    this.total = { toi: 0, remi: 0 }; this.tours = { toi: 0, remi: 0 }; this.dernierTour = false; this.txtDegats = null;
     this.videur = { etat: 'absent', t: 2.5, x: -300, pose: 0 };
     this.doigt = false; this.charge = false; this.remiAttend = 0;
 
@@ -93,7 +95,7 @@ export class RemiPorte extends BossScene {
       'Des pas, une ombre, le « ! »... QUELQU\'UN ARRIVE. S\'il te voit charger : ATTRAPÉ !',
       'Mais qui ? Le VIDEUR ne rate rien... mais si c\'est juste le GARS QUI VIENT PISSER, il s\'en fiche !',
       'Et il FEINTE : fausse alerte, il surgit sans prévenir, il revient d\'un coup...',
-      'Celui dont le coup fait CÉDER la porte gagne.',
+      'Quand la porte CÈDE, celui qui a fait le PLUS DE DÉGÂTS gagne. Taper fort ET juste, pas juste le dernier !',
     ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.tour('remi'); }));
   }
 
@@ -109,7 +111,8 @@ export class RemiPorte extends BossScene {
 
   // ---------- les tours ----------
   tour(qui) {
-    if (this.termine || this.solidite <= 0) return;
+    if (this.termine || (this.solidite <= 0 && !this.dernierTour)) return;
+    this.tours[qui]++;
     this.frappeur = qui; this.puissance = 0; this.charge = false; this.tCible = Math.random() * 3;
     this.pose[qui] = 'garde';
     this.etat = qui;
@@ -236,19 +239,20 @@ export class RemiPorte extends BossScene {
   attraper(qui) {
     // (BUG corrigé V17 : attrapé juste après le coup qui fait céder la porte → le « rafistolage » la remettait debout
     //  et un nouveau tour repartait derrière l'écran de victoire)
-    if (this.solidite <= 0 || this.etat === 'fin') return;
+    if (this.etat === 'fin' || (this.solidite <= 0 && !this.dernierTour)) return;
     const v = this.videur;
     v.vu = true; v.pose = 1; v.t = Math.max(v.t, 1.3);
     this.attrapes[qui]++;
     // V17 (demande de Fabien) : attrapé au moment du coup = le coup est ANNULÉ (dégâts rendus, coup parfait pas compté)
     const c = this.coupEnCours;
     if (this.etat === 'coup' && c && c.qui === qui) {
-      this.solidite = Math.min(R.solidite, this.solidite + c.score);
+      this.total[qui] -= c.score;
+      if (!this.dernierTour) this.solidite = Math.min(R.solidite, this.solidite + c.score);
       if (c.parfait) this.parfaits = Math.max(0, this.parfaits - 1);
       this.tweens.killTweensOf(this); this.compteur = 0;   // (l'afficheur retombe à 000)
     }
     this.coupEnCours = null;
-    this.solidite = Math.min(R.solidite, this.solidite + R.scotch);   // le barman rafistole la porte
+    if (!this.dernierTour) this.solidite = Math.min(R.solidite, this.solidite + R.scotch);   // le barman rafistole la porte
     jouerSon(this, 'remi_porte', { rate: 0.6 });
     this.cameras.main.shake(200, 0.006);
     annonce(this, qui === 'toi' ? 'ATTRAPÉ !' : 'RÉMI ATTRAPÉ !', qui === 'toi' ? '#ff5a5a' : '#7fff7f', 1);
@@ -258,7 +262,13 @@ export class RemiPorte extends BossScene {
     if (qui === 'remi') this.time.delayedCall(900, () => bulle(this, 'Rémi : « Mais... j\'ai rien fait ! »', '#ffd84a', 1.2, 80));
     this.etat = 'pause'; this.puissance = 0; this.charge = false; this.pose[qui] = 'garde';
     this.consigne.setVisible(false);
-    this.time.delayedCall(1800, () => this.tour(qui === 'toi' ? 'remi' : 'toi'));
+    this.time.delayedCall(1800, () => this.dernierTour ? this.finir() : this.tour(qui === 'toi' ? 'remi' : 'toi'));
+  }
+
+  // la porte a cédé (et chacun a eu ses tours) : celui qui a fait le PLUS DE DÉGÂTS gagne
+  finir() {
+    if (this.etat === 'fin') return;
+    this.porteCede(this.total.toi >= this.total.remi ? 'toi' : 'remi');
   }
 
   // ---------- le coup ----------
@@ -281,7 +291,9 @@ export class RemiPorte extends BossScene {
     // LE COUP SE VOIT (V15) : le frappeur plonge en avant, une bulle de BD « BAM ! » éclate sur la porte, le bois garde un CREUX
     this.elan = 0.18;
     this.bulleBD(score);
-    if (this.coupEnCours && this.coupEnCours.qui === qui) this.coupEnCours.score = Math.min(score, this.solidite);
+    const effectif = this.dernierTour ? score : Math.min(score, this.solidite);   // (au dernier coup, la porte est déjà par terre)
+    if (this.coupEnCours && this.coupEnCours.qui === qui) this.coupEnCours.score = effectif;
+    this.total[qui] += effectif;
     this.solidite = Math.max(0, this.solidite - score);
     this.gel = 0.06 + score / 999 * 0.1;
     this.tremble = score / 999;
@@ -294,7 +306,17 @@ export class RemiPorte extends BossScene {
     this.compteur = 0; this.tweens.add({ targets: this, compteur: score, duration: 600, ease: 'Cubic.Out' });
     const pop = texte(this, IMPACT.x, IMPACT.y - 100, String(score), 30 + score / 25, score >= R.casse ? '#ffd84a' : '#ffffff', { fontStyle: 'bold italic', strokeThickness: 8 }).setDepth(950);
     this.tweens.add({ targets: pop, y: IMPACT.y - 170, alpha: 0, scale: 1.3, duration: 1000, delay: 200, onComplete: () => pop.destroy() });
-    if (this.solidite <= 0) { this.time.delayedCall(700, () => this.porteCede(qui)); return; }
+    if (this.dernierTour) { this.time.delayedCall(900, () => this.finir()); return; }
+    if (this.solidite <= 0) {
+      // Rémi tape en premier : s'il la casse, tu n'as pas encore eu autant de tours que lui → DERNIER COUP pour toi
+      if (qui === 'remi' && this.tours.toi < this.tours.remi) {
+        this.dernierTour = true;
+        this.time.delayedCall(700, () => { annonce(this, 'DERNIER COUP !', '#ffd84a', 1); bulle(this, `La porte est cassée... mais il te reste un coup : TOI ${this.total.toi} - ${this.total.remi} RÉMI`, '#ffffff', 2, 330); });
+        this.time.delayedCall(1700, () => this.tour('toi'));
+        return;
+      }
+      this.time.delayedCall(700, () => this.finir()); return;
+    }
     if (this.solidite < R.solidite * 0.25 && !this.alerte) { this.alerte = true; this.time.delayedCall(800, () => bulle(this, 'La porte ne tient plus qu\'à un fil !', '#ff9a5a', 1.6, 200)); }
     this.time.delayedCall(1300, () => { if (this.etat === 'coup') this.tour(qui === 'toi' ? 'remi' : 'toi'); });
   }
@@ -356,12 +378,13 @@ export class RemiPorte extends BossScene {
     this.degats = 0;
     if (qui === 'toi') {
       noterJeu(this, 'porte', POINTS.porteGagne + this.parfaits * POINTS.porteParfait - this.attrapes.toi * POINTS.porteAttrape
-        + Math.max(0, POINTS.porteCoups - this.coups.toi) * POINTS.porteCoupEnMoins);
+        + (this.total.toi - this.total.remi) * POINTS.porteEcart);
       annonce(this, 'LA PORTE CÈDE !', '#ffd84a', 1.4);
+      bulle(this, `Dégâts : TOI ${this.total.toi} - ${this.total.remi} RÉMI`, '#7fff7f', 1.6, 330);
       this.time.delayedCall(1800, () => this.victoire(REPLIQUES.porteGagne));
     } else {
-      annonce(this, 'RÉMI A DÉFONCÉ LA PORTE', '#ff5a5a', 1.4);
-      this.time.delayedCall(1800, () => ecranPerdu(this, 'RÉMI A DÉFONCÉ LA PORTE', REPLIQUES.portePerdu, this.nomDiff));
+      annonce(this, 'RÉMI A TAPÉ PLUS FORT', '#ff5a5a', 1.4);
+      this.time.delayedCall(1800, () => ecranPerdu(this, 'RÉMI A TAPÉ PLUS FORT', `${REPLIQUES.portePerdu}\nDégâts : TOI ${this.total.toi} - ${this.total.remi} RÉMI`, this.nomDiff));
     }
   }
 
@@ -489,6 +512,10 @@ export class RemiPorte extends BossScene {
     j.fillStyle(0x3a2a1a, 1).fillRect(x0, 18, L, 18);
     j.fillStyle(v < 0.25 ? (Math.floor(this.horloge * 6) % 2 ? 0xff3030 : 0xffd84a) : 0xc89050, 1).fillRect(x0, 18, L * v, 18);
     if (!this.txtSolidite) this.txtSolidite = texte(this, x0 + L / 2, 52, 'SOLIDITÉ DE LA PORTE', 14, '#ffd84a').setDepth(901);
+    // V17 : qui MÈNE aux dégâts (c'est ça qui fait gagner)
+    if (!this.txtDegats) this.txtDegats = texte(this, x0 + L / 2, 76, '', 18, '#ffffff', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 8, y: 2 } }).setDepth(901);
+    const t = this.total;
+    this.txtDegats.setText(`TOI ${t.toi}  ${t.toi > t.remi ? '▲' : t.toi < t.remi ? '▼' : '='}  ${t.remi} RÉMI`).setColor(t.toi >= t.remi ? '#7fff7f' : '#ff7a7a');
     this.hud.setText(this.frappeur === 'toi' ? 'À TOI' : 'À RÉMI');
     // PUISSANCE en 10 paliers (celui qui frappe)
     if (this.etat === 'toi' || this.etat === 'remi' || this.etat === 'coup') {

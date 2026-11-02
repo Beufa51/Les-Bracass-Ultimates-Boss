@@ -189,6 +189,13 @@
   afficheur à 000 ; `coupEnCours`) ; si on est attrapé avant que le poing touche, pas d'impact du tout (sauf le coup qui
   fait céder la porte : il reste). VÉLO : son propre pour l'esquive `remi_esquive.wav` (« fffouit », généré par
   `outils/remi/generer_sons.py`, ajouté à la fin du script).
+- V17 ÉQUILIBRAGE (retour : « à la porte tu peux être nul, si tu es le dernier à taper tu gagnes » ; pong trop facile) :
+  PORTE : quand la porte cède, celui qui a fait le PLUS DE DÉGÂTS gagne (`total`, affiché sous la barre : TOI x ▲▼ y RÉMI) ;
+  même nombre de tours (`tours`) : si Rémi (qui commence) la casse, DERNIER COUP pour toi (`dernierTour`, puis `finir()`).
+  Coup annulé = retiré du total. `solidite` 7500 → 5500, `degatsMin` 0,25 → 0,15. Points porte : `porteEcart` 0,2 par point
+  d'avance. Bots NORMAL : « nul » perd 2072-4237 et 2210-4073, ~70 s par partie, 6 tours chacun.
+  PONG : `dedans` 0,7 → 0,62, `aimant` 0,6 → 0,35 ; Rémi vise mieux (`remi` 0,38 / 0,5 / 0,6), toi moins précis
+  (`erreur` 0,012 / 0,021 / 0,03), moins de courbe d'aide (`apercu` 0,72 en PRESSION, 0,5 en CUL SEC), plus distrait.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
