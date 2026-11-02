@@ -175,9 +175,22 @@ def rue():
     Image.fromarray(out.clip(0, 255).astype(np.uint8)).save(DST + 'remi_rue.jpg', quality=88)
     print('remi_rue.jpg', out.shape[1], out.shape[0])
 
+def facade():
+    # façade du bar (arrivée du vélo) : fond blanc retiré (et entre les pieds des tabourets) -> remi_bar_facade.png
+    im = detourer(Image.open(SRC + 'remi_bar_facade.jpg'), grand=300, seuil=225)
+    a = np.asarray(im)[:, :, 3] > 40
+    lab, n = ndimage.label(a)
+    t = ndimage.sum(a, lab, range(1, n + 1))
+    garde = np.isin(lab, [i + 1 for i in range(n) if t[i] > 5000])   # miettes du fond (bruit du JPEG) jetées
+    im.putalpha(Image.fromarray(np.where(garde, np.asarray(im)[:, :, 3], 0).astype(np.uint8)))
+    im = im.crop(im.getbbox())
+    im.save(DST + 'remi_bar_facade.png')
+    print('remi_bar_facade.png', im.size)
+
 planche_velo()
 presentation()
 planche_pong()
 planche_porte()
 planche_bourres()
 rue()
+facade()

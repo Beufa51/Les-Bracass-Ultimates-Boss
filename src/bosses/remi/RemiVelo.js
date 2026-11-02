@@ -50,6 +50,8 @@ export class RemiVelo extends BossScene {
     // l'illustration du vélo (8 poses) ; sans fichier, c'est le dessin du code
     this.sprVelo = this.textures.exists('remi_velo') ? this.add.sprite(0, 0, 'remi_velo', 0).setOrigin(0.5, 1).setDepth(10).setScale(0.6) : null;
     this.gRemi = this.add.graphics().setDepth(6);
+    this.facade = this.textures.exists('remi_bar_facade') ? this.add.image(0, 0, 'remi_bar_facade').setOrigin(0.5, 1).setScale(340 / 917).setDepth(3).setVisible(false) : null;
+    this.sprRemi = this.textures.exists('remi_porte') ? this.add.sprite(0, 0, 'remi_porte', 0).setFlipX(true).setOrigin(0.7, 1).setScale(0.42).setDepth(6).setVisible(false) : null;
     this.enseigne = texte(this, 0, 0, 'BAR', 54, '#ff4fd8', { fontStyle: 'bold', stroke: '#5a0a4a', strokeThickness: 6 }).setDepth(4).setVisible(false);
     this.creerHud();
 
@@ -293,14 +295,21 @@ export class RemiVelo extends BossScene {
     // le bar au bout du trajet
     const xBar = V.longueur + 260 - cam;
     if (xBar < LARGEUR + 400) {
-      g.fillStyle(0x3b1f2b, 1).fillRect(xBar - 200, SOL - 300, 520, 286);
-      g.fillStyle(0xffc860, 0.85).fillRect(xBar - 160, SOL - 170, 120, 90).fillRect(xBar + 140, SOL - 170, 120, 90);
-      g.fillStyle(0x5a2a10, 1).fillRect(xBar + 30, SOL - 140, 70, 126);
-      g.fillStyle(0xffd84a, 1).fillCircle(xBar + 88, SOL - 76, 4);
-      this.enseigne.setVisible(true).setPosition(xBar + 60, SOL - 240).setAlpha(0.75 + 0.25 * Math.sin(this.horloge * 9));
-      const gr = this.gRemi.clear().setPosition(xBar - 20, SOL);
-      remi(gr, 'garde', this.horloge);
-    } else { this.enseigne.setVisible(false); this.gRemi.clear(); }
+      if (this.facade) {
+        // l'illustration du bar (le néon clignote un peu)
+        this.facade.setVisible(true).setPosition(xBar + 60, SOL + 2);
+        this.facade.setTint(Math.sin(this.horloge * 9) > 0.6 ? 0xffe6ff : 0xffffff);
+      } else {
+        g.fillStyle(0x3b1f2b, 1).fillRect(xBar - 200, SOL - 300, 520, 286);
+        g.fillStyle(0xffc860, 0.85).fillRect(xBar - 160, SOL - 170, 120, 90).fillRect(xBar + 140, SOL - 170, 120, 90);
+        g.fillStyle(0x5a2a10, 1).fillRect(xBar + 30, SOL - 140, 70, 126);
+        g.fillStyle(0xffd84a, 1).fillCircle(xBar + 88, SOL - 76, 4);
+        this.enseigne.setVisible(true).setPosition(xBar + 60, SOL - 240).setAlpha(0.75 + 0.25 * Math.sin(this.horloge * 9));
+      }
+      const gr = this.gRemi.clear().setPosition(this.facade ? xBar - 120 : xBar - 20, SOL);
+      if (this.sprRemi) this.sprRemi.setVisible(true).setPosition(xBar - 110, SOL + 4);   // Rémi (illustration de la porte, tourné vers toi)
+      else remi(gr, 'garde', this.horloge);
+    } else { this.enseigne.setVisible(false); this.gRemi.clear(); if (this.facade) this.facade.setVisible(false); if (this.sprRemi) this.sprRemi.setVisible(false); }
     // obstacles
     for (const o of this.obstacles) {
       const sx = o.x - cam;

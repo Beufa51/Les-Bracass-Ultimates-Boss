@@ -18,6 +18,8 @@ export const MANIFESTE = {
     remi_bourres: { fichier: 'sprites/remi/remi_bourres.png', largeur: 495, hauteur: 560, images: 4, vitesse: 1 },
     // le fond de rue de nuit (répétable), derrière le vélo
     remi_rue: { fichier: 'sprites/remi/remi_rue.jpg', largeur: 1702, hauteur: 575, images: 1, vitesse: 1 },
+    // la façade du bar (arrivée du vélo)
+    remi_bar_facade: { fichier: 'sprites/remi/remi_bar_facade.png', largeur: 763, hauteur: 917, images: 1, vitesse: 1 },
     remi_presentation: { fichier: 'sprites/remi/remi_presentation.png', largeur: 832, hauteur: 1202, images: 1, vitesse: 1 },
   },
   sons: {

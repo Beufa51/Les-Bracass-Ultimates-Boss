@@ -37,7 +37,7 @@ façades d'immeubles avec fenêtres éclairées, bars et kebabs fermés, lampada
 Image très large (format 3:1), les bords gauche et droit doivent pouvoir se raccorder (répétable), aucun personnage, aucun texte lisible.
 ```
 
-## 5. La façade du bar (arrivée) — `remi_bar_facade.jpg`
+## 5. La façade du bar (arrivée) — `remi_bar_facade.jpg` ✅ REÇUE ET INTÉGRÉE
 ```
 Façade d'un bar de quartier la nuit, style manga/anime, vue de face : enseigne néon rose « BAR », vitrines chaudes et éclairées,
 porte en bois, quelques tables hautes en terrasse. Aucun personnage. Fond = la rue de nuit. Image horizontale.

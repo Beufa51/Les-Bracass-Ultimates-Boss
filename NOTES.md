@@ -45,7 +45,8 @@
   cases alignées sur le pied arrière, le poing de l'impact arrive sur la porte : `POING` / `ECHELLE` en tête de RemiPorte.js) ;
   planche des bourrés → `remi_bourres.png` (debout, sursaute, allongé, traverse de face ; teinte au hasard pour varier ;
   `BOURRE` = taille en tête de RemiVelo.js ; allongé : collision 40 px de haut) ; rue de nuit → `remi_rue.jpg`
-  (bande noire coupée, bords fondus sur 90 px = répétable ; défile à 0,8 x la route ; remplace ciel, immeubles et lampadaires dessinés) : `python3 outils/remi/preparer_images.py`.
+  (bande noire coupée, bords fondus sur 90 px = répétable ; défile à 0,8 x la route ; remplace ciel, immeubles et lampadaires dessinés) ; façade du bar → `remi_bar_facade.png` (arrivée ; Rémi l'attend
+  devant, en garde : case 0 de `remi_porte` retournée) : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
