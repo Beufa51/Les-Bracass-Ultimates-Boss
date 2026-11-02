@@ -335,3 +335,11 @@ REALISTIC PROPORTIONS: normal-size head (NOT a big head, NOT a bobblehead), natu
 Framing: from the top of the head down to the hips, facing the viewer, slightly turned three-quarter, confident pose.
 Plain solid pure white background (#FFFFFF), no shadow, no text, no frame.
 ```
+
+## julien_presentation.png — version non coupée (optionnel)
+Joindre : `assets_inbox/julien/julien_presentation.jpg`. Fichier attendu : `assets_inbox/julien/julien_presentation.png`.
+```
+Reprends exactement ce personnage (même visage, même tee-shirt Pyramid Head, même livre bleu, même style),
+en pied de la tête aux genoux, ENTIÈREMENT dans le cadre : bras droit et livre non coupés, avec une marge
+de chaque côté. Fond transparent (PNG), sans ombre ni halo blanc autour. Format portrait 2:3.
+```
