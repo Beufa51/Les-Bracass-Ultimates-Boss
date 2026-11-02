@@ -90,7 +90,11 @@ function solsClasse() {
     g.fillStyle = '#d8d6cc'; g.fillRect(0, 0, 32, 32); g.fillStyle = '#c4c2b8'; g.fillRect(0, 0, 16, 16); g.fillRect(16, 16, 16, 16);
     g.fillStyle = '#9a988f'; g.fillRect(0, 0, 32, 1); g.fillRect(0, 0, 1, 32); g.fillRect(0, 16, 32, 1); g.fillRect(16, 0, 1, 32);
   });
-  const sols = [lino, parquet, carrelage];
+  const couloir = texture32((g) => {   // classe : le COULOIR SÛR du mur de copies (vert vif, flèches vers l'avant)
+    g.fillStyle = '#3fbf4a'; g.fillRect(0, 0, 32, 32); g.fillStyle = '#6ae070'; g.fillRect(0, 0, 16, 16); g.fillRect(16, 16, 16, 16);
+    g.fillStyle = '#d8ffd0'; g.fillRect(14, 6, 4, 20); g.fillRect(10, 10, 12, 3);
+  });
+  const sols = [lino, parquet, carrelage, couloir];
   sols[16] = sombre(lino); sols[17] = sombre(parquet); sols[18] = sombre(carrelage);
   return sols;
 }

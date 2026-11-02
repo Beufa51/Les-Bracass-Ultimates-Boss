@@ -1097,6 +1097,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   « murs » : +1) espacés de 0,95 / 0,85 / 0,75 s ; le trou ZIGZAGUE (`RG.julien.murs.derive` 1,3 à 2,4 cases, rebond
   sur les bords, change parfois de sens) ; un coup par mur (`mur` = numéro du mur). Testé : immobile = presque tout
   pris ; un bot qui suit le trou : 2 touches sur 8 en phase 3.
+  LISIBILITÉ (Fabien : « on ne voit pas assez où éviter ») : COULOIR VERT au sol sur le trou du prochain mur (dès
+  le préavis : le trou du 1er mur est choisi à la préparation), texture n° 3 des sols de la classe (`montrerTrou`) ;
+  flèche « ◀◀ LE TROU / LE TROU ▶▶ / ✔ RESTE LÀ » en bas de la vue ; copies des murs plus grandes (0,42).
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».

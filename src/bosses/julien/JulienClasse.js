@@ -133,6 +133,7 @@ export class JulienClasse extends JulienManif {
     this.txtMsg.setY(66);   // les répliques sous la barre de vie de Julien
     this.txtAnnonce = texte(this, LARGEUR / 2, 102, '', 30, '#ffd84a').setStroke('#000', 6).setDepth(5);   // l'attaque qui arrive
     this.txtConseil = texte(this, LARGEUR / 2, 130, '', 16, '#ffffff').setStroke('#000', 4).setDepth(5);
+    this.txtTrou = texte(this, LARGEUR / 2, VUE_H * 2 - 64, '', 26, '#7fff7f').setStroke('#000', 6).setDepth(5);   // où est le trou du mur
     this.txtEleves = texte(this, LARGEUR / 2, VUE_H * 2 - 24, '', 16, '#9fd8ff').setStroke('#000', 4).setDepth(5);
     this.annonceT = 0; this.elevesT = 0;
     this.dessiner(0);
@@ -307,6 +308,9 @@ export class JulienClasse extends JulienManif {
     e.motif = this.choisirMotif(e, d);
     const P = { deluge: J.deluge.preavis, murs: J.mur.preavis, dico: J.dico.preavis, mur: J.mur.preavis, craies: J.craies.preavis, aimant: J.aimant.preavis, confisque: J.confisque.preavis, regle: J.regle.preavis };
     e.etat = 'prepare'; e.t = P[e.motif] || J.preavis[ph];
+    if (e.motif === 'mur' || e.motif === 'murs') {   // le trou du 1er mur est connu (et montré au sol) dès le préavis
+      e.trou = Math.max(2, Math.min(this.plan[0].length - 2, this.j.x + (Math.random() - 0.5) * 4)); e.premier = true;
+    }
     if (ANNONCES[e.motif]) this.annoncer(e.motif, e.t + 0.6);
     if (e.motif === 'mur' || e.motif === 'murs' || e.motif === 'deluge') { this.message(e.motif === 'deluge' ? REPLIQUES.deluge : REPLIQUES.mur, 2.2); jouerSon(this, 'julien_papier'); }
     else if (e.motif === 'aimant') this.message(REPLIQUES.aimant, 2.2);
@@ -400,7 +404,7 @@ export class JulienClasse extends JulienManif {
       const n = J.copies.nombre;
       for (let k = 0; k < n; k++) this.lancerLivre(e, 'copie', a + (k - (n - 1) / 2) * J.copies.ecart);
     } else if (e.motif === 'mur' || e.motif === 'murs') {   // RAFALE de murs (façon shoot them up) : le trou zigzague
-      e.trou = null; e.sens = Math.random() < 0.5 ? -1 : 1;
+      e.sens = Math.random() < 0.5 ? -1 : 1;
       this.murCopies(e); e.reste = J.murs.nombre[e.phase - 1] + (e.motif === 'murs' ? 1 : 0) - 1;
     }
     else if (e.motif === 'deluge') { e.vague = 0; this.vagueCopies(e, voit); e.reste = J.deluge.vagues[e.phase - 1] - 1; }
@@ -413,7 +417,7 @@ export class JulienClasse extends JulienManif {
   // il se décale de « derive » cases (et rebondit sur les bords), il faut le suivre
   murCopies(e) {
     const J = RG.julien, W = this.plan[0].length, [d0, d1] = J.murs.derive;
-    if (e.trou == null) e.trou = this.j.x + (Math.random() - 0.5) * 4;
+    if (e.premier) e.premier = false;   // 1er mur : le trou choisi au préavis
     else {
       e.trou += e.sens * (d0 + Math.random() * (d1 - d0));
       if (e.trou < 2 || e.trou > W - 2) { e.sens = -e.sens; e.trou += 2 * e.sens * (d0 + Math.random() * (d1 - d0)); }
@@ -422,7 +426,7 @@ export class JulienClasse extends JulienManif {
     e.trou = Math.max(2, Math.min(W - 2, e.trou));
     const id = (this.murId = (this.murId || 0) + 1);
     for (let x = 1.25; x < W - 1; x += J.mur.ecart) if (Math.abs(x - e.trou) > J.mur.trou / 2) {
-      this.livres.push({ genre: 'mur', mur: id, traverse: true, x, y: e.y + 0.7, dx: 0, dy: 1, v: J.mur.vitesse, degats: J.mur.degats, rebonds: 0, t: 0, ph: Math.random() * 6 });
+      this.livres.push({ genre: 'mur', mur: id, trou: e.trou, traverse: true, x, y: e.y + 0.7, dx: 0, dy: 1, v: J.mur.vitesse, degats: J.mur.degats, rebonds: 0, t: 0, ph: Math.random() * 6 });
     }
     jouerSon(this, 'julien_papier', { rate: 1.2 });
   }
@@ -484,6 +488,7 @@ export class JulienClasse extends JulienManif {
 
   // ------------------------------------------------------------------ la salle (phases, élèves, arme confisquée)
   majSalle(dt) {
+    this.montrerTrou();
     const C = RG.classe;
     this.annonceT -= dt; if (this.annonceT <= 0) { this.txtAnnonce.setText(''); this.txtConseil.setText(''); }
     this.elevesT -= dt; if (this.elevesT <= 0) this.txtEleves.setText('');
@@ -498,6 +503,25 @@ export class JulienClasse extends JulienManif {
       this.message(`Julien te rend ta ${armeDe(id).nom.toLowerCase()}. « Et que je ne vous y reprenne pas ! »`, 2.5);
     }
     if (this.alarme && (this.alarmeT -= dt) <= 0) { jouerSon(this, 'julien_alarme', { volume: 0.35 }); this.alarmeT = 4; }
+  }
+
+  // le TROU du prochain mur de copies : couloir vert au sol (du mur jusqu'au fond de la salle) + flèche à l'écran
+  montrerTrou() {
+    const j = this.j, e = this.julien, S = this.decor.sol, W = this.plan[0].length;
+    if (!this.genres0) this.genres0 = S.genres.slice();
+    S.genres.set(this.genres0);
+    let trou = null, y0 = 1;
+    const prochain = this.livres.filter(b => b.genre === 'mur' && b.y < j.y + 0.2).sort((a, b) => b.y - a.y)[0];
+    if (prochain) { trou = prochain.trou; y0 = Math.floor(prochain.y); }
+    else if (e.etat === 'prepare' && (e.motif === 'mur' || e.motif === 'murs')) { trou = e.trou; y0 = Math.floor(e.y); }
+    if (trou == null) { this.txtTrou.setText(''); return; }
+    const demi = RG.julien.mur.trou / 2;
+    for (let y = Math.max(1, y0); y < this.plan.length - 1; y++) for (let x = 1; x < W - 1; x++) {
+      if (Math.abs(x + 0.5 - trou) < demi) S.genres[y * W + x] = 3;
+    }
+    const ecart = trou - j.x;
+    const cote = ecart * -Math.sin(j.a);   // > 0 : le trou est à ta droite quand tu regardes vers le tableau
+    this.txtTrou.setText(Math.abs(ecart) < demi - 0.25 ? '✔ RESTE LÀ' : cote > 0 ? 'LE TROU ▶▶' : '◀◀ LE TROU').setColor(Math.abs(ecart) < demi - 0.25 ? '#7fff7f' : '#ffd84a');
   }
 
   // phase 3 : les sprinklers mouillent le sol, tu glisses (tu continues un peu sur ta lancée)
@@ -601,7 +625,7 @@ export class JulienClasse extends JulienManif {
     const s = this.T.spr, H = this.T.hauteurs;
     for (const b of this.livres) {
       const g = b.genre === 'mur' ? 'copie' : b.genre;
-      liste.push({ x: b.x, y: b.y, toile: s[g], haut: b.genre === 'mur' ? 0.3 : H[g], z: (b.genre === 'mur' ? 0.3 : 0.42) + (b.genre !== 'craie' ? Math.sin(b.t * 9 + b.ph) * 0.04 : 0) });
+      liste.push({ x: b.x, y: b.y, toile: s[g], haut: b.genre === 'mur' ? 0.42 : b.traverse ? 0.24 : H[g], z: (b.genre === 'mur' ? 0.22 : 0.42) + (b.genre !== 'craie' ? Math.sin(b.t * 9 + b.ph) * 0.04 : 0) });
     }
   }
 
