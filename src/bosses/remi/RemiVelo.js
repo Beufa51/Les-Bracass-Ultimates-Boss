@@ -183,7 +183,8 @@ export class RemiVelo extends BossScene {
       else this.ajouter(type, x);
       // l'écart se compte en TEMPS, à la vitesse prévue à cet endroit : jamais deux obstacles collés
       const vit = V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, x / V.longueur);
-      const ecart = vit * hasard(V.ecart[0], V.ecart[1]) / (this.diff.densite * route.densite) + (type === 'traverse' ? 120 : 0);
+      // jamais moins de 0,85 s entre deux obstacles (même dans un raccourci bondé) ; après une POUBELLE (grand saut), 0,5 s de plus
+      const ecart = vit * Math.max(0.85, hasard(V.ecart[0], V.ecart[1]) / (this.diff.densite * route.densite)) + (type === 'traverse' ? 120 : 0) + (type === 'poubelle' ? vit * 0.5 : 0);
       if (k > 2 && Math.random() < V.pintes * route.pintes) this.pintes.push({ x: x + ecart / 2, h: HAUT_PINTE, prise: false, t: Math.random() * 6 });
       x += ecart;
     }
@@ -235,7 +236,7 @@ export class RemiVelo extends BossScene {
   creerHud() {
     this.hudTemps = texte(this, 140, 26, '', 22, '#ffd84a', { fontStyle: 'bold' }).setDepth(900);
     this.hudBarre = this.add.graphics().setDepth(900);
-    this.hudScore = texte(this, LARGEUR - 110, 26, '', 20, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
+    this.hudScore = texte(this, LARGEUR - 12, 26, '', 20, '#ffffff', { fontStyle: 'bold' }).setOrigin(1, 0.5).setDepth(900);
     // DEUX GROS BOUTONS dessinés en bas (toute la moitié d'écran marche, mais on voit où appuyer)
     const t = estTactile();
     this.gBoutons = this.add.graphics().setDepth(899);
@@ -509,8 +510,13 @@ export class RemiVelo extends BossScene {
       if (Math.abs(d) < 55 && this.y + 215 >= p.h - 12) {
         p.prise = true; this.pintesPrises++;
         this.tempsRestant += V.bonusPinte; this.score += 25;
-        bulle(this, `🍺 +${V.bonusPinte} s`, '#ffd84a', 0.7, 140);
         jouerSon(this, 'remi_pinte');
+        // « +1 s » qui jaillit de la pinte et file vers l'horloge (en haut à gauche) ; l'horloge clignote en vert
+        const sx = p.x - (this.bx - X_VELO), sy = SOL - p.h;
+        const t = texte(this, sx, sy, `+${V.bonusPinte} s`, 30, '#7fff7f', { fontStyle: 'bold', strokeThickness: 6 }).setDepth(950);
+        this.tweens.add({ targets: t, x: 140, y: 26, scale: 0.6, duration: 650, ease: 'Cubic.In', onComplete: () => t.destroy() });
+        this.flashHorloge = 0.8;
+        if (this.pintesPrises === 1) bulle(this, '🍺 Chaque PINTE attrapée = +1 SECONDE avant la fermeture du bar !', '#ffd84a', 2.4, 140);
       }
     }
   }
@@ -723,7 +729,9 @@ export class RemiVelo extends BossScene {
     gv.setPosition(X_VELO, SOL + bond).setRotation(0);
     const rot = this.salto ? -Math.PI * 2 * Math.min(1, this.salto.t / this.salto.d) : this.chute > 0 ? 0 : (this.auSol && this.surTremplin ? -Math.atan2(this.surTremplin.h, this.surTremplin.l) : this.vy > 0 ? -0.12 : !this.auSol ? 0.08 : 0) + zig;
     if (this.sprVelo) {
-      const f = this.chute > 0 ? 7 : !this.auSol ? 6 : Math.floor(this.a / (Math.PI * 2) * 6) % 6;
+      // pédalage : seulement les 3 poses de la 1re rangée de la planche (même dessin, même échelle), en aller-retour 0-1-2-1
+      // (les 6 poses mélangées faisaient « sauter » le vélo : 2 dessins différents)
+      const f = this.chute > 0 ? 7 : !this.auSol ? 6 : [0, 1, 2, 1][Math.floor(this.a / (Math.PI * 2) * 2.4) % 4];
       // CHUTE CARTOON : le cycliste décolle, fait la toupie et retombe, des étoiles tournent autour de sa tête
       const pc = this.chute > 0 ? 1 - this.chute / V.chute : 0;
       const vol = this.chute > 0 ? Math.sin(Math.min(1, pc * 1.6) * Math.PI) * 110 : 0;
@@ -750,8 +758,10 @@ export class RemiVelo extends BossScene {
     this.zoneG.setVisible(this.etat === 'jeu'); this.zoneD.setVisible(this.etat === 'jeu');
     if (!jeu) return;
     const s = Math.max(0, Math.ceil(this.tempsRestant));
-    this.hudTemps.setText(`FERMETURE DANS ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`).setColor(s <= 10 ? '#ff5a5a' : '#ffd84a');
-    this.hudScore.setText(`${this.score} pts${this.serie >= 2 ? `   série ${this.serie}` : ''}`);
+    this.flashHorloge = Math.max(0, (this.flashHorloge || 0) - 1 / 60);
+    this.hudTemps.setText(`FERMETURE DANS ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`)
+      .setColor(this.flashHorloge > 0 && Math.floor(this.flashHorloge * 10) % 2 ? '#7fff7f' : s <= 10 ? '#ff5a5a' : '#ffd84a');
+    this.hudScore.setText(`🍺 ${this.pintesPrises}   ${this.score} pts${this.serie >= 2 ? `   série ${this.serie}` : ''}`);
     const hb = this.hudBarre.clear(), x0 = 300, x1 = 720, pr = Math.min(1, this.bx / (this.longueur || V.longueur));
     hb.fillStyle(0x000000, 0.5).fillRect(x0 - 4, 18, x1 - x0 + 8, 16);
     hb.fillStyle(0x7fff7f, 1).fillRect(x0, 22, (x1 - x0) * pr, 8);

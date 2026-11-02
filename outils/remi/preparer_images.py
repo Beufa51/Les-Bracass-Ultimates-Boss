@@ -79,7 +79,7 @@ def planche_velo():
     W = max(p.size[0] for p in poses); H = max(p.size[1] for p in poses)
     bande = Image.new('RGBA', (W * len(poses), H), (0, 0, 0, 0))
     for k, p in enumerate(poses):
-        bande.paste(p, (k * W + (W - p.size[0]) // 2, H - p.size[1]))   # posé en bas, centré
+        bande.paste(p, (k * W + (W - p.size[0]), H - p.size[1]))   # posé en bas, CALÉ À DROITE (la roue avant) : plus de vélo qui glisse d'une image à l'autre
     bande.save(DST + 'remi_velo.png')
     print('remi_velo.png', W, H, len(poses))
 
