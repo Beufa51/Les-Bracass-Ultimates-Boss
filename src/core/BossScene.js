@@ -9,7 +9,7 @@ import { LARGEUR, HAUTEUR } from './reglages.js';
 import { Sauvegarde } from './sauvegarde.js';
 import { texte, voile } from './ui.js';
 import { jouerSon, chargerFichiers, preparerVisuels } from './ressources.js';
-import { estTactile, etiquettesTactiles } from './tactile.js';
+import { estTactile, etiquettesTactiles, etiquettesActuelles } from './tactile.js';
 
 export class BossScene extends Phaser.Scene {
   // cle : nom unique de la scène ; identite : { id, nom } du boss
@@ -64,6 +64,7 @@ export class BossScene extends Phaser.Scene {
   // Écran de PRÉSENTATION du boss (comme Greg, Kédric, Lionel) : son avatar glisse depuis la droite,
   // son nom, son surnom et quelques infos à gauche. o = { image, nom, surnom, infos: [...], couleur, fond, invite, son }
   afficherPresentation(o, ensuite) {
+    const avant = etiquettesActuelles();   // boutons du jeu (ex. Sprint de Beufa) : remis après la présentation
     etiquettesTactiles({ espace: 'OK', z: null, x: null });
     const el = [];
     el.push(this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, o.fond ?? 0x0b0b14, 1).setDepth(1000));
@@ -89,6 +90,7 @@ export class BossScene extends Phaser.Scene {
     this.time.delayedCall(500, () => {
       this.input.keyboard.once('keydown-SPACE', () => {
         el.forEach(e => e.destroy());
+        etiquettesTactiles(avant);
         jouerSon(this, 'ui_valider');
         ensuite();
       });
