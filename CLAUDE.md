@@ -17,6 +17,11 @@ Après tout changement de `src/bosses/beufa/reglages.js` : `node outils/beufa_ve
 ## Julien
 Après tout changement de `src/bosses/julien/` (plans, réglages, images) : `node outils/julien_verif.mjs` doit finir à 0 erreur.
 
+## Images (demande du propriétaire)
+Dès qu'une image manque ou qu'une nouvelle image améliorerait le jeu, DONNE DIRECTEMENT le prompt prêt à copier
+(dans la réponse, en bloc de code, avec le nom du fichier attendu et ce qu'il faut joindre), sans attendre qu'il le
+demande. Range-le aussi dans le fichier de prompts du boss (`propositions/<boss>_prompts_images.md`).
+
 ## Économiser l'utilisation (demande du propriétaire)
 Le propriétaire atteint vite la limite d'utilisation. Donc :
 - À la fin de chaque tâche terminée (commit poussé), ajoute UNE ligne de conseil :
