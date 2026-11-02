@@ -28,6 +28,7 @@ function proj(x, y, z) {
   return { x: CX + x * p, y: HORIZON + (CAM_H - y) * p, k: p };
 }
 const DEPART = { x: 0, y: 0.1, z: 0.55 };       // ta balle, juste devant ta pyramide de verres
+const BOUTON_REBOND = { x: 880, y: 455, r: 52 };   // bouton « REBOND » (en bas à droite)
 const ETIQUETTES_VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 
 // pyramide de verres, pointe vers le milieu de la table ; loin = côté de Rémi
@@ -75,6 +76,8 @@ export class RemiPong extends BossScene {
       t ? '' : 'Clavier : ◀ ▶ direction, ▲ ▼ force, ESPACE lance',
       '2 balles par tour ; les 2 dedans = BALLS BACK ; 3 de suite = EN FEU',
       `Rémi agite les bras ? ${t ? 'Touche-le' : 'Clique sur lui (ou Z)'} : « Chut ! »`,
+      `Bouton REBOND${t ? '' : ' (ou X)'} : la balle rebondit sur la table, plus dur... mais 2 VERRES !`,
+      `Quand Rémi se concentre : ${t ? 'touche' : 'ESPACE'} quand le cercle est tout petit = tu le déconcentres`,
     ].filter(Boolean), () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.demarrer(); }));
   }
 
@@ -86,7 +89,7 @@ export class RemiPong extends BossScene {
   tourDe(qui) {
     this.qui = qui; this.balles = 2; this.reussis = 0; this.ballsBack = false;
     if (qui === 'toi') this.commencerVisee();
-    else { this.etat = 'remi'; etiquettesTactiles(ETIQUETTES_VIDES); this.time.delayedCall(600, () => this.lancerRemi()); }
+    else { this.etat = 'remi'; etiquettesTactiles(ETIQUETTES_VIDES); this.time.delayedCall(500, () => this.prepRemi()); }
   }
 
   // ---------- décor fixe : le bar, la table ----------
@@ -136,6 +139,23 @@ export class RemiPong extends BossScene {
     }
   }
 
+  // TIR REBOND : la balle rebondit une fois sur la table avant les verres. Plus dur (imprécision x1,5, aimant /2),
+  // mais s'il rentre : DEUX VERRES d'un coup.
+  basculerRebond() {
+    this.rebond = !this.rebond;
+    jouerSon(this, 'remi_rebond');
+    bulle(this, this.rebond ? 'TIR REBOND : plus dur, mais 2 verres s\'il rentre !' : 'Tir normal', this.rebond ? '#ffb070' : '#ffffff', 1, 300);
+  }
+
+  // vol du tir rebond : jusqu'à la table (point de rebond), puis de la table jusqu'au haut des verres
+  volRebond(depart, tx, tz) {
+    const zb = tz - 0.45, xb = depart.x + (tx - depart.x) * 0.55;
+    const T1 = P.dureeVol * 0.55, T2 = 0.32;
+    const v1 = { T: T1, vx: (xb - depart.x) / T1, vz: (zb - depart.z) / T1, vy: (0 - depart.y + G * T1 * T1 / 2) / T1 };
+    const v2 = { T: T2, vx: (tx - xb) / T2, vz: (tz - zb) / T2, vy: (H_VERRE + G * T2 * T2 / 2) / T2 };
+    return { v1, v2, xb, zb };
+  }
+
   chut() {
     if (this.distrait <= 0) return;
     this.distrait = 0; this.pose = 'face';
@@ -145,7 +165,10 @@ export class RemiPong extends BossScene {
 
   installerTir() {
     this.input.on('pointerdown', (p) => {
-      if (this.termine || this.etat !== 'vise') return;
+      if (this.termine) return;
+      if (this.etat === 'remiPrep') { this.souffler(); return; }
+      if (this.etat !== 'vise') return;
+      if (Math.hypot(p.x - BOUTON_REBOND.x, p.y - BOUTON_REBOND.y) < BOUTON_REBOND.r) { this.basculerRebond(); return; }
       if (p.y < 240 && Math.abs(p.x - CX) < 150) { this.chut(); return; }   // toucher Rémi
       this.tir = { x0: p.x, y0: p.y, x: p.x, y: p.y };
     });
@@ -194,6 +217,11 @@ export class RemiPong extends BossScene {
       }
     }
     if (this.etat === 'vise') this.viseClavier(dt);
+    if (this.etat === 'remiPrep') {
+      this.prep.t += dt;
+      if (vientDAppuyer(this.touches.espace) || vientDAppuyer(this.touches.z)) this.souffler();
+      if (this.prep.t >= this.prep.d) this.lancerRemi();
+    }
     if (this.balle) this.balleVol(dt);
     this.gouttesPas(dt);
     this.dessiner(dt);
@@ -207,30 +235,52 @@ export class RemiPong extends BossScene {
     if (T.bas.isDown) v.f -= 0.5 * dt;
     v.x = Phaser.Math.Clamp(v.x, -W / 2, W / 2); v.f = Phaser.Math.Clamp(v.f, 0, 1);
     if (vientDAppuyer(T.z)) this.chut();
+    if (vientDAppuyer(T.x)) this.basculerRebond();
     if (vientDAppuyer(T.espace) && this.horloge - this.viseDepuis > 0.25) this.lancerToi(v.x, 1.0 + v.f * 1.05);
   }
 
   lancerToi(tx, tz) {
     const s = this.tangage(), e = this.diff.erreur * (this.feu ? 0.5 : 1);
     // imprécision du bras (augmente avec l'alcool)
-    const e2 = e * (1 + this.ivresse * 0.15), ex = hasard(-1, 1) * e2, ez = hasard(-1, 1) * e2 * 1.2;
+    const e2 = e * (1 + this.ivresse * 0.15) * (this.rebond ? 1.5 : 1), ex = hasard(-1, 1) * e2, ez = hasard(-1, 1) * e2 * 1.2;
     this.balles--;
     this.etat = 'vol'; this.distrait = 0;
     // AIMANT : à jeun, la balle est attirée vers le verre le plus proche de la cible (de moins en moins quand on a bu)
     let ax = tx + s.x, az = tz + s.z;
-    const aim = Math.max(0, P.aimant - this.ivresse * 0.12);
+    const aim = Math.max(0, P.aimant - this.ivresse * 0.12) * (this.rebond ? 0.5 : 1);
     let proche = null, dmin = 0.13;
     for (const v of this.verresRemi) if (v.plein) { const d = Math.hypot(v.x - ax, v.z - az); if (d < dmin) { dmin = d; proche = v; } }
     if (proche) { ax += (proche.x - ax) * aim; az += (proche.z - az) * aim; }
     this.lancer(DEPART, ax + ex, az + ez, this.verresRemi, 'toi');
+    if (this.rebond) {
+      const r = this.volRebond(DEPART, ax + ex, az + ez);
+      Object.assign(this.balle, r.v1, { etat: 'vol1', rebondTir: r });
+    }
     jouerSon(this, 'remi_lance');
+  }
+
+  // Rémi se concentre 1 s avant de lancer : un cercle se resserre sur lui ; toucher (ou ESPACE / Z) quand il est TOUT PETIT
+  // = « FFFFF ! » : tu le déconcentres, son lancer est bien moins précis. Trop tôt = raté pour ce lancer.
+  prepRemi() {
+    if (this.termine) return;
+    this.etat = 'remiPrep'; this.prep = { t: 0, d: 1.0, fait: false, reussi: false };
+  }
+
+  souffler() {
+    const p = this.prep;
+    if (!p || p.fait) return;
+    p.fait = true;
+    p.reussi = p.t > p.d - 0.3;
+    if (p.reussi) { bulle(this, '« FFFFFF ! » Rémi est déconcentré !', '#7fff7f', 1, 300); jouerSon(this, 'remi_hips', { rate: 0.6 }); }
+    else bulle(this, 'Trop tôt...', '#ffb0b0', 0.7, 300);
   }
 
   lancerRemi() {
     if (this.termine) return;
+    const souffle = this.prep && this.prep.reussi; this.prep = null; this.etat = 'remi';
     const pleins = this.verresToi.filter(v => v.plein);
     const cible = choisir(pleins);
-    const chance = Math.max(0.1, this.diff.remi - this.ivresseRemi * 0.025);
+    const chance = Math.max(0.05, this.diff.remi - this.ivresseRemi * 0.025 - (souffle ? 0.3 : 0));
     let tx, tz;
     const a = Math.random() * Math.PI * 2;
     if (Math.random() < chance) { const r = Math.random() * P.rayon * 0.5; tx = cible.x + Math.cos(a) * r; tz = cible.z + Math.sin(a) * r; }
@@ -271,6 +321,12 @@ export class RemiPong extends BossScene {
       return;
     }
     b.x += b.vx * dt; b.z += b.vz * dt; b.vy -= G * dt; b.y += b.vy * dt;
+    if (b.etat === 'vol1' && b.t >= b.T) {
+      // le rebond sur la table, puis la 2e partie du vol
+      b.y = 0; b.t = 0; Object.assign(b, b.rebondTir.v2, { etat: 'vol' });
+      jouerSon(this, 'remi_rebond');
+      return;
+    }
     if (b.etat === 'vol' && b.t >= b.T) { this.arrivee(); return; }
     if (b.etat === 'libre') {
       const surTable = Math.abs(b.x) <= W / 2 && b.z >= 0 && b.z <= D;
@@ -310,6 +366,13 @@ export class RemiPong extends BossScene {
     b.etat = 'dedans'; b.fin = 0.5; b.x = v.x; b.z = v.z; b.y = H_VERRE;
     v.plein = false; v.bu = 1; v.flash = 1;
     this.reussis++;
+    // TIR REBOND réussi : un 2e verre (le plus proche) saute aussi
+    if (b.qui === 'toi' && b.rebondTir) {
+      let autre = null, dmin = 9;
+      for (const w of b.verres) if (w.plein) { const d = Math.hypot(w.x - v.x, w.z - v.z); if (d < dmin) { dmin = d; autre = w; } }
+      if (autre) { autre.plein = false; autre.bu = 1; this.ivresseRemi++; this.time.delayedCall(300, () => this.eclabousser(autre)); }
+      this.time.delayedCall(200, () => annonce(this, 'REBOND : 2 VERRES !', '#ffb070', 1.1));
+    }
     jouerSon(this, 'remi_plouf');
     if (b.qui === 'toi') {
       this.eclabousser(v);
@@ -350,7 +413,7 @@ export class RemiPong extends BossScene {
     if (!this.verresToi.some(v => v.plein)) { this.etat = 'fin'; this.time.delayedCall(600, () => ecranPerdu(this, 'PERDU AU BEER PONG', REPLIQUES.pongPerdu, this.nomDiff)); return; }
     if (this.balles > 0) {
       if (b.qui === 'toi') this.commencerVisee();
-      else { this.etat = 'remi'; this.time.delayedCall(450, () => this.lancerRemi()); }
+      else { this.etat = 'remi'; this.time.delayedCall(350, () => this.prepRemi()); }
       return;
     }
     // fin du tour : les 2 dedans = BALLS BACK (une fois par tour)
@@ -358,7 +421,7 @@ export class RemiPong extends BossScene {
       this.ballsBack = true;
       annonce(this, 'BALLS BACK !', '#7fff7f');
       this.etat = b.qui === 'toi' ? 'pause' : 'remi';
-      this.time.delayedCall(900, () => { this.balles = 2; this.reussis = 0; if (b.qui === 'toi') this.commencerVisee(); else this.lancerRemi(); });
+      this.time.delayedCall(900, () => { this.balles = 2; this.reussis = 0; if (b.qui === 'toi') this.commencerVisee(); else this.prepRemi(); });
       return;
     }
     const suivant = b.qui === 'toi' ? 'remi' : 'toi';
@@ -428,9 +491,10 @@ export class RemiPong extends BossScene {
       }
       if (c) {
         const vol = this.parametresVol(DEPART, c.x + s.x, c.z + s.z);
+        if (this.rebond) this.apercuRebond(gv, c, s);
         // TOUTE la courbe jusqu'à la retombée ; en CHAMPION, des pointillés plus espacés et pas de point d'arrivée
         const part = this.feu ? 1 : this.diff.apercu, pas = 1, fin = Math.round(24 * this.partCourbe());
-        for (let k = 1; k <= fin; k += pas) {
+        for (let k = 1; k <= (this.rebond ? 0 : fin); k += pas) {
           const t = (k / 24) * vol.T;
           const q = proj(DEPART.x + vol.vx * t, DEPART.y + vol.vy * t - G * t * t / 2, DEPART.z + vol.vz * t);
           const rr = Math.max(2.5, q.k * 0.009);
@@ -448,14 +512,44 @@ export class RemiPong extends BossScene {
       gv.fillStyle(this.feu ? 0xff8a2a : 0x222222, 1).fillCircle(bx, by, r + 2);
       gv.fillStyle(this.feu ? 0xffd27a : 0xffffff, 1).fillCircle(bx, by, r);
     }
+    // bouton REBOND (pendant ta visée)
+    if (this.etat === 'vise') {
+      const b = BOUTON_REBOND;
+      gv.fillStyle(0x000000, 0.5).fillCircle(b.x, b.y, b.r);
+      gv.fillStyle(0xffb070, this.rebond ? 0.75 : 0.15).fillCircle(b.x, b.y, b.r - 5);
+      gv.lineStyle(4, 0xffb070, 1).strokeCircle(b.x, b.y, b.r);
+    }
+    if (!this.txtRebond) this.txtRebond = texte(this, BOUTON_REBOND.x, BOUTON_REBOND.y, 'REBOND\nx2', 16, '#ffffff', { fontStyle: 'bold' }).setDepth(901);
+    this.txtRebond.setVisible(this.etat === 'vise');
+    // Rémi se concentre : le cercle qui se resserre (vert quand c'est le moment de souffler)
+    if (this.etat === 'remiPrep' && this.prep && !this.prep.fait) {
+      const k = 1 - this.prep.t / this.prep.d, bon = this.prep.t > this.prep.d - 0.3;
+      const y = proj(0, 0, D).y - 140;
+      gv.lineStyle(6, bon ? 0x7fff7f : 0xffffff, 0.9).strokeCircle(CX, y, 30 + 110 * k);
+      gv.lineStyle(3, 0x7fff7f, 0.6).strokeCircle(CX, y, 34);
+    }
     // HUD
     const n = (l) => l.filter(v => v.plein).length;
     this.hud.setText(`TOI ${n(this.verresToi)}  -  ${n(this.verresRemi)} RÉMI      verres bus : ${this.ivresse}${this.feu ? '      🔥 EN FEU' : ''}`);
     const tour = this.etat === 'vise' ? `À TOI (balle ${3 - this.balles}/2) : ${estTactile() ? 'tire vers toi et lâche' : 'tire avec la souris, ou ◀ ▶ ▲ ▼ + ESPACE'}`
+      : this.etat === 'remiPrep' ? `Rémi se concentre... ${estTactile() ? 'TOUCHE' : 'ESPACE'} quand le cercle est tout petit !`
       : (this.etat === 'remi' || (this.balle && this.balle.qui === 'remi')) ? 'RÉMI LANCE...' : '';
     this.hudTour.setText(tour).setVisible(!!tour);
     // l'ivresse fait un peu tanguer l'écran
     this.cameras.main.setRotation(Math.sin(this.horloge * 0.9) * this.ivresse * 0.008);
+  }
+
+  // pointillés du tir rebond (orange) : jusqu'à la table, puis jusqu'aux verres (raccourcis par l'alcool comme l'autre)
+  apercuRebond(g, c, s) {
+    const r = this.volRebond(DEPART, c.x + s.x, c.z + s.z), pts = [];
+    for (let k = 1; k <= 14; k++) { const t = k / 14 * r.v1.T; pts.push([DEPART.x + r.v1.vx * t, DEPART.y + r.v1.vy * t - G * t * t / 2, DEPART.z + r.v1.vz * t]); }
+    for (let k = 1; k <= 10; k++) { const t = k / 10 * r.v2.T; pts.push([r.xb + r.v2.vx * t, r.v2.vy * t - G * t * t / 2, r.zb + r.v2.vz * t]); }
+    const n = Math.round(pts.length * this.partCourbe());
+    for (const [x, y, z] of pts.slice(0, n)) {
+      const q = proj(x, y, z), rr = Math.max(2.5, q.k * 0.009);
+      g.fillStyle(0x000000, 0.6).fillCircle(q.x, q.y, rr + 1.5);
+      g.fillStyle(0xffb070, 1).fillCircle(q.x, q.y, rr);
+    }
   }
 
   // VUE DE CÔTÉ (encart en haut à droite) : la table de profil, les verres de Rémi, et la courbe qui monte puis RETOMBE
