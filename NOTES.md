@@ -72,7 +72,13 @@
     (`remi_dos.png` : garde, coup, impact ; `remi_toi_dos.png` : garde, élan, coup, impact ; réglages `DOS` / `IMPACT` en tête
     de RemiPorte.js), il arrive par la gauche à chaque tour. Impact selon la force : fissures en étoile autour du poing,
     éclats de bois, flash blanc à 900+. Jauge d'élan en 10 paliers colorés. C3 (pari) non fait.
-  - Chaîne complète (bot NORMAL) : bar atteint (8 s d'avance), pong gagné 6-1... porte 2-0, aucune erreur. : `python3 outils/remi/preparer_images.py`.
+  - Chaîne complète (bot NORMAL) : bar atteint (8 s d'avance), pong gagné 6-1... porte 2-0, aucune erreur.
+- V5 (retour : vélo injouable / touches mal placées / « images par 4 » ; pong : on ne voit ni nos verres ni la courbe) :
+  audit `propositions/remi_audit_v5.md`. VÉLO refait : BUG des bourrés debout figés corrigé ; plus de boutons, 2 moitiés
+  d'écran (gauche DRING, droite SAUTE) ; roule tout seul en accélérant (`vitesseDepart` / `vitesseFin`) ; traverse = sonnette ;
+  icônes ▲ / cloche au-dessus des obstacles (pas en CHAMPION) ; écarts en temps ; PINTES (+1 s) ; SÉRIE de 5 = +2 s ; score.
+  PONG : caméra qui montre toute la table (tes verres en bas), courbe entière + encart « vue de côté » (`vueCote`).
+  PORTE : visée = cible qui se promène sur la porte, PARI pendant l'élan de Rémi (+60), arrêt sur image + score qui jaillit. : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

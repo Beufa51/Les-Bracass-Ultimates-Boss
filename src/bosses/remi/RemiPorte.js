@@ -62,7 +62,8 @@ export class RemiPorte extends BossScene {
     this.consigne = texte(this, LARGEUR / 2, 505, '', 30, '#ffd84a', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 4 } }).setDepth(900).setVisible(false);
     this.touches = creerTouches(this);
     jouerMusique(this, 'remi_musique_bar');   // la musique du bar (dès l'écran des commandes)
-    this.input.on('pointerdown', () => { this.toucher = true; });
+    this.input.on('pointerdown', (p) => { this.toucher = true; this.toucheX = p.x; });
+    this.gel = 0; this.bonusPari = 0; this.cible = { x: 0, y: 0 };
 
     etiquettesTactiles({ ...VIDES, espace: 'OK' });
     const t = estTactile();
@@ -123,11 +124,24 @@ export class RemiPorte extends BossScene {
     etiquettesTactiles(VIDES);
     this.poseRemi = 'elan';
     bulle(this, `Rémi : « ${choisir(REPLIQUES.porteRemiFrappe)} »`, '#ffd84a', 1.4, 80);
-    this.time.delayedCall(900, () => {
-      const s = Math.round(hasard(this.diff.remiMin, this.diff.remiMax));
-      this.frapper('remi', s);
-      this.time.delayedCall(1900, () => this.tourToi());
-    });
+    // PARI (audit C3) : pendant que Rémi prend son élan, devine s'il fera PLUS ou MOINS que le seuil
+    this.seuilPari = Math.round((this.diff.remiMin + this.diff.remiMax) / 20) * 10;
+    this.pari = null; this.bonusPari = 0; this.etat = 'pari'; this.chrono = 2.2;
+    etiquettesTactiles({ ...VIDES, gauche: 'MOINS', droite: 'PLUS' });
+  }
+
+  // fin du pari (ou pas de réponse) : Rémi frappe
+  coupRemi() {
+    this.etat = 'remi';
+    etiquettesTactiles(VIDES);
+    const s = Math.round(hasard(this.diff.remiMin, this.diff.remiMax));
+    this.frapper('remi', s);
+    if (this.pari) {
+      const bon = (this.pari === 'plus') === (s > this.seuilPari);
+      this.bonusPari = bon ? 60 : 0;
+      this.time.delayedCall(1000, () => bulle(this, bon ? 'PARI GAGNÉ : +60 à ta frappe !' : 'Pari perdu...', bon ? '#7fff7f' : '#ffb0b0', 1.2, 200));
+    }
+    this.time.delayedCall(2100, () => this.tourToi());
   }
 
   tourToi() {
@@ -142,8 +156,25 @@ export class RemiPorte extends BossScene {
   update(temps, delta) {
     const dt = Math.min(delta, 50) / 1000;
     this.horloge += dt;
-    const appui = vientDAppuyer(this.touches.espace) || this.toucher;
+    const T = this.touches;
+    const appui = vientDAppuyer(T.espace) || this.toucher;
+    const toucheX = this.toucher ? this.toucheX : null;
     this.toucher = false;
+    // GEL d'impact : le jeu s'arrête un instant au moment du coup
+    if (this.gel > 0) { this.gel -= dt; this.dessiner(0); return; }
+    if (this.etat === 'pari') {
+      this.chrono -= dt;
+      if (!this.pari) {
+        if (vientDAppuyer(T.gauche) || (toucheX !== null && toucheX < LARGEUR / 2)) this.pari = 'moins';
+        if (vientDAppuyer(T.droite) || (toucheX !== null && toucheX >= LARGEUR / 2)) this.pari = 'plus';
+        if (this.pari) jouerSon(this, 'ui_valider');
+      }
+      this.consigne.setVisible(true).setText(this.pari ? `Pari : ${this.pari.toUpperCase()} de ${this.seuilPari}` :
+        `PARI : Rémi fera ◀ MOINS ou PLUS ▶ de ${this.seuilPari} ?`);
+      if (this.chrono <= 0) this.coupRemi();
+      this.dessiner(dt);
+      return;
+    }
     if (this.etat === 'elan') {
       if (appui) { this.jauge += R.parTape; this.tapes++; jouerSon(this, 'remi_tape', { rate: 0.8 + this.jauge * 0.8 }); }
       this.jauge = Phaser.Math.Clamp(this.jauge - R.baisse * dt, 0, 1);
@@ -158,7 +189,13 @@ export class RemiPorte extends BossScene {
       this.chrono += dt;
       const ph = (this.chrono * this.diff.visee / R.periodeVisee) % 1;
       this.curseur = ph < 0.5 ? ph * 2 : 2 - ph * 2;
-      this.consigne.setVisible(true).setText(`${estTactile() ? 'TOUCHE' : 'ESPACE'} dans la zone VERTE !`);
+      if (this.vueDos) {
+        // VISÉE SUR LA PORTE : une cible se promène sur le battant ; frappe quand elle passe sur ton poing (+)
+        const t = this.chrono * this.diff.visee, b = this.bat;
+        this.cible.x = b.x + b.l / 2 + (b.l / 2 - 26) * Math.sin(t * 2.3);
+        this.cible.y = IMPACT.y + 110 * Math.sin(t * 3.1 + 0.8);
+      }
+      this.consigne.setVisible(true).setText(this.vueDos ? `${estTactile() ? 'TOUCHE' : 'ESPACE'} quand la cible passe sur le + !` : `${estTactile() ? 'TOUCHE' : 'ESPACE'} dans la zone VERTE !`);
       // un petit délai pour ne pas frapper avec la dernière tape de l'élan ; au bout de 4 s, ça part tout seul
       if ((appui && this.chrono > 0.25) || this.chrono > 4) this.frappeToi();
     } else this.consigne.setVisible(false);
@@ -166,9 +203,15 @@ export class RemiPorte extends BossScene {
   }
 
   frappeToi() {
-    const ecart = Math.abs(this.curseur - 0.5), z = this.diff.zone / 2;
-    const precision = ecart <= z ? 1 : Math.max(0, 1 - (ecart - z) / (0.5 - z));
-    const s = Math.round(999 * (R.poidsElan * this.elanFinal + (1 - R.poidsElan) * precision));
+    let precision;
+    if (this.vueDos) {
+      const d = Math.hypot(this.cible.x - IMPACT.x, this.cible.y - IMPACT.y), zr = this.diff.zone * 200;
+      precision = d <= zr ? 1 : Math.max(0, 1 - (d - zr) / 130);
+    } else {
+      const ecart = Math.abs(this.curseur - 0.5), z = this.diff.zone / 2;
+      precision = ecart <= z ? 1 : Math.max(0, 1 - (ecart - z) / (0.5 - z));
+    }
+    const s = Math.min(999, Math.round(999 * (R.poidsElan * this.elanFinal + (1 - R.poidsElan) * precision)) + this.bonusPari);
     this.etat = 'frappe';
     etiquettesTactiles(VIDES);
     if (precision === 1) bulle(this, 'PILE AU CENTRE !', '#7fff7f', 1, 120);
@@ -184,7 +227,14 @@ export class RemiPorte extends BossScene {
     this.time.delayedCall(90, () => { if (qui === 'remi') this.poseRemi = 'frappe'; else this.poseToi = 'frappe'; });
     this.time.delayedCall(450, () => { if (qui === 'remi') this.poseRemi = 'garde'; else this.poseToi = 'garde'; });
     this.tremble = score / 999;
-    this.cameras.main.shake(180 + score / 4, 0.004 + score / 999 * 0.014);
+    this.time.delayedCall(90, () => {
+      this.gel = 0.08 + score / 999 * 0.1;   // petit arrêt sur image, plus long pour un gros coup
+      this.cameras.main.shake(180 + score / 4, 0.004 + score / 999 * 0.014);
+      if (this.vueDos) {
+        const pop = texte(this, IMPACT.x, IMPACT.y - 40, String(score), 30 + score / 25, score >= R.casse ? '#ffd84a' : '#ffffff', { fontStyle: 'bold italic', strokeThickness: 8 }).setDepth(950);
+        this.tweens.add({ targets: pop, y: IMPACT.y - 120, alpha: 0, scale: 1.3, duration: 1100, delay: 200, onComplete: () => pop.destroy() });
+      }
+    });
     jouerSon(this, score >= R.casse ? 'remi_porte_fort' : 'remi_porte');
     if (this.vueDos) {
       // IMPACT proportionnel à la force (C2) : fissures en étoile, éclats de bois et flash blanc pour les gros coups
@@ -278,9 +328,26 @@ export class RemiPorte extends BossScene {
         if (!vis) continue;
         const pose = qui === 'remi' ? this.poseRemi : this.poseToi;
         const x = IMPACT.x - c.poing * c.echelle - 400 * this.entree * this.entree;
-        const bal = pose === 'garde' ? Math.sin(this.horloge * 4) * 4 : 0;
+        // en garde il respire ; pendant l'élan il TREMBLE de plus en plus (jauge)
+        const bal = pose === 'garde' ? Math.sin(this.horloge * 4) * 4 : pose === 'elan' && qui === 'toi' ? Math.sin(this.horloge * 47) * 5 * this.jauge : 0;
         spr.setFrame(c.cases[pose] ?? 0).setPosition(x - (pose === 'elan' && qui === 'remi' ? 30 : 0), c.haut + bal)
           .setRotation(pose === 'elan' && qui === 'remi' ? -0.06 : 0);
+      }
+    }
+    // ÉLAN : les bords de l'écran rougissent à mesure que la jauge monte (la tension monte)
+    if (this.vueDos) {
+      const e = this.etat === 'elan' ? this.jauge : this.etat === 'visee' ? this.elanFinal : 0;
+      if (e > 0) {
+        for (let k = 0; k < 6; k++) {
+          const m = 14 + k * 14;
+          g.fillStyle(0xff2020, e * 0.07).fillRect(-g.x, 0, LARGEUR, m).fillRect(-g.x, HAUTEUR - m, LARGEUR, m).fillRect(-g.x, 0, m, HAUTEUR).fillRect(LARGEUR - m - g.x, 0, m, HAUTEUR);
+        }
+      }
+      if (this.etat === 'visee') {
+        const c = this.cible, zr = this.diff.zone * 200;
+        g.lineStyle(4, 0xff3030, 0.95).strokeCircle(c.x - g.x, c.y, zr + 10).strokeCircle(c.x - g.x, c.y, zr * 0.5 + 4);
+        g.fillStyle(0xff3030, 0.25).fillCircle(c.x - g.x, c.y, zr + 10);
+        g.lineStyle(4, 0xffffff, 1).lineBetween(IMPACT.x - 16 - g.x, IMPACT.y, IMPACT.x + 16 - g.x, IMPACT.y).lineBetween(IMPACT.x - g.x, IMPACT.y - 16, IMPACT.x - g.x, IMPACT.y + 16);
       }
     }
     // éclats de bois et flash
@@ -321,7 +388,7 @@ export class RemiPorte extends BossScene {
         j.fillStyle(COUL[k], allume ? 1 : 0.18).fillRect(42, yk + 3, 36, 24);
       }
     }
-    if (this.etat === 'visee') {
+    if (this.etat === 'visee' && !this.vueDos) {
       const x0 = 220, L = 520, y = 440, z = this.diff.zone;
       j.fillStyle(0x000000, 0.7).fillRect(x0 - 6, y - 6, L + 12, 34);
       j.fillStyle(0xb03a3a, 1).fillRect(x0, y, L, 22);
