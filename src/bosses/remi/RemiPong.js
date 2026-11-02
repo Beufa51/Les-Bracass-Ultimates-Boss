@@ -1,9 +1,9 @@
 // =====================================================================
 // RÉMI — JEU 2 : LE BEER PONG (V4 : caméra proche, LANCE-PIERRE)
-// Tu es à ton bout de la table, Rémi en face derrière ses verres (bien visibles). Tes verres sont en bas à droite (encart).
+// Toute la table est visible (V5) : tes verres en bas, ceux de Rémi en haut, Rémi derrière.
 // LANCER : pose le doigt (ou la souris) n'importe où sous Rémi et TIRE VERS LE BAS (vers toi) comme un lance-pierre ;
-//   plus tu tires loin = plus loin ; tirer à gauche envoie à droite (et inversement). Les POINTILLÉS montrent la trajectoire
-//   (toute en FACILE, la moitié en NORMAL, un tiers en CHAMPION). Lâche = la balle part.
+//   plus tu tires loin = plus loin ; tirer à gauche envoie à droite (et inversement). Les POINTILLÉS montrent TOUTE la trajectoire,
+//   jusqu'à la retombée (FACILE : + le point d'arrivée ; CHAMPION : pointillés plus espacés). Lâche = la balle part.
 //   Clavier : ◀ ▶ direction, ▲ ▼ force, ESPACE lance.
 // 2 balles par tour ; les 2 dedans = BALLS BACK. 3 verres de suite = EN FEU (trajectoire entière, lancer plus précis).
 // Chaque verre que Rémi te met, tu le bois : ta visée tangue. Rémi agite parfois les bras pour te déconcentrer :
@@ -20,14 +20,14 @@ import { IDENTITE, PONG as P, REPLIQUES } from './reglages.js';
 import { remi } from './dessins.js';
 import { bulle, annonce, jeuSuivant, ecranPerdu, difficulteOuChoix, hasard, choisir } from './commun.js';
 
-// ---------- projection : caméra juste derrière ton bout de table, assez haute ----------
-const CAM_Z = -0.8, CAM_H = 1.6, F = 979, HORIZON = -402, CX = LARGEUR / 2;
+// ---------- projection : caméra en retrait et en hauteur : toute la table tient dans l'écran (bord de Rémi y≈190, le tien y≈520) ----------
+const CAM_Z = -2, CAM_H = 1.416, F = 984, HORIZON = -177, CX = LARGEUR / 2;
 const D = P.table.longueur, W = P.table.largeur, H_VERRE = 0.12, G = 9.8;
 function proj(x, y, z) {
   const p = F / (z - CAM_Z);
   return { x: CX + x * p, y: HORIZON + (CAM_H - y) * p, k: p };
 }
-const DEPART = { x: 0, y: 0.08, z: 0.95 };      // ta balle, posée sur la table en bas au milieu de l'écran
+const DEPART = { x: 0, y: 0.1, z: 0.55 };       // ta balle, juste devant ta pyramide de verres
 const ETIQUETTES_VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 
 // pyramide de verres, pointe vers le milieu de la table ; loin = côté de Rémi
@@ -57,10 +57,8 @@ export class RemiPong extends BossScene {
     this.gRemi = this.add.graphics().setDepth(3);
     this.g = this.add.graphics().setDepth(5);
     this.gVisee = this.add.graphics().setDepth(6);
-    this.gEncart = this.add.graphics().setDepth(890);
     this.hud = texte(this, LARGEUR / 2, 24, '', 20, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
     this.hudTour = texte(this, 16, 516, '', 18, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 8, y: 3 }, align: 'left' }).setOrigin(0, 0.5).setDepth(900);
-    this.txtEncart = texte(this, 890, 436, 'TES VERRES', 14, '#ffffff').setDepth(901);
     this.touches = creerTouches(this);
     jouerMusique(this, 'remi_musique_bar');   // la musique du bar (dès l'écran des commandes)
     this.installerTir();
@@ -105,13 +103,14 @@ export class RemiPong extends BossScene {
     this.tweens.add({ targets: neon, alpha: 0.6, yoyo: true, repeat: -1, duration: 700 });
     // table (trapèze en perspective) : du bout de Rémi jusque sous l'écran
     const t = this.add.graphics().setDepth(4);
-    const a = proj(-W / 2, 0, 0.3), b = proj(W / 2, 0, 0.3), c = proj(W / 2, 0, D), d = proj(-W / 2, 0, D);
+    const a = proj(-W / 2, 0, 0), b = proj(W / 2, 0, 0), c = proj(W / 2, 0, D), d = proj(-W / 2, 0, D);
     t.fillStyle(0x1a3a6a, 1).fillPoints([a, b, c, d], true);
     t.lineStyle(5, 0xffffff, 0.85).strokePoints([a, b, c, d], true);
-    const m1 = proj(0, 0, 0.3), m2 = proj(0, 0, D);
+    const m1 = proj(0, 0, 0), m2 = proj(0, 0, D);
     t.lineStyle(2, 0xffffff, 0.3).lineBetween(m1.x, m1.y, m2.x, m2.y);
     const e = proj(-W / 2, 0, D / 2), f = proj(W / 2, 0, D / 2);
     t.lineStyle(3, 0xffffff, 0.5).lineBetween(e.x, e.y, f.x, f.y);
+    t.fillStyle(0x0e2240, 1).fillRect(a.x, a.y, b.x - a.x, 18);   // épaisseur du bord de table
   }
 
   // ---------- ton tour : le lance-pierre ----------
@@ -351,9 +350,9 @@ export class RemiPong extends BossScene {
     const yBord = proj(0, 0, D).y;
     if (this.textures.exists('remi_pong')) {
       // la planche de Rémi de face (attend, lance, boit, nargue), coupée à la taille : la table cache le bas
-      if (!this.imgRemi) this.imgRemi = this.add.sprite(CX, 0, 'remi_pong', 0).setOrigin(0.5, 1).setDepth(3).setScale(0.4);
+      if (!this.imgRemi) this.imgRemi = this.add.sprite(CX, 0, 'remi_pong', 0).setOrigin(0.5, 1).setDepth(3).setScale(0.34);
       this.imgRemi.setFrame({ face: 0, lance: 1, boit: 2, nargue: 3 }[this.pose] ?? 0);
-      this.imgRemi.setPosition(CX + bal, yBord + 30).setRotation(bal * 0.004);
+      this.imgRemi.setPosition(CX + bal, yBord + 26).setRotation(bal * 0.004);
     } else {
       gr.setPosition(CX + bal, yBord + 6).setRotation(bal * 0.004);
       remi(gr, this.pose, this.horloge);
@@ -367,7 +366,7 @@ export class RemiPong extends BossScene {
   dessinerTable() {
     const g = this.g.clear();
     const objets = [];
-    for (const v of this.verresRemi) if (v.plein || v.bu > 0) objets.push({ z: v.z, f: () => this.verre(g, v) });
+    for (const v of [...this.verresRemi, ...this.verresToi]) if (v.plein || v.bu > 0) objets.push({ z: v.z, f: () => this.verre(g, v) });
     const b = this.balle;
     if (b) objets.push({ z: b.etat === 'dedans' ? b.z + 0.001 : b.z - 0.02, f: () => this.dessinerBalle(g, b) });
     objets.sort((a, c) => c.z - a.z).forEach(o => o.f());
@@ -388,13 +387,17 @@ export class RemiPong extends BossScene {
       }
       if (c) {
         const vol = this.parametresVol(DEPART, c.x + s.x, c.z + s.z);
-        const part = this.feu ? 1 : this.diff.apercu, n = Math.round(22 * part);
-        for (let k = 1; k <= n; k++) {
-          const t = (k / 22) * vol.T;
+        // TOUTE la courbe jusqu'à la retombée ; en CHAMPION, des pointillés plus espacés et pas de point d'arrivée
+        const part = this.feu ? 1 : this.diff.apercu, pas = part >= 0.5 ? 1 : 2;
+        for (let k = 1; k <= 24; k += pas) {
+          const t = (k / 24) * vol.T;
           const q = proj(DEPART.x + vol.vx * t, DEPART.y + vol.vy * t - G * t * t / 2, DEPART.z + vol.vz * t);
-          gv.fillStyle(this.feu ? 0xff8a2a : 0xffffff, 0.85 - k * 0.025).fillCircle(q.x, q.y, Math.max(2, q.k * 0.008));
+          const rr = Math.max(2.5, q.k * 0.009);
+          gv.fillStyle(0x000000, 0.6).fillCircle(q.x, q.y, rr + 1.5);   // contour sombre : lisible même devant Rémi
+          gv.fillStyle(this.feu ? 0xff8a2a : 0xffffff, 0.95).fillCircle(q.x, q.y, rr);
         }
-        if (part >= 1) { const q = proj(c.x + s.x, H_VERRE, c.z + s.z); gv.lineStyle(2, 0x7fff7f, 0.9).strokeEllipse(q.x, q.y, q.k * 0.07, q.k * 0.03); }
+        this.vueCote(gv, vol, c, s, pas);
+        if (part >= 0.5 || this.feu) { const q = proj(c.x + s.x, H_VERRE, c.z + s.z); gv.lineStyle(2, 0x7fff7f, 0.9).strokeEllipse(q.x, q.y, q.k * 0.07, q.k * 0.03); }
         if (!this.tir) {   // jauge de force (clavier)
           gv.fillStyle(0x000000, 0.5).fillRect(LARGEUR - 60, 280, 22, 150);
           gv.fillStyle(0xffd84a, 1).fillRect(LARGEUR - 57, 427 - 144 * c.f, 16, 144 * c.f);
@@ -404,7 +407,6 @@ export class RemiPong extends BossScene {
       gv.fillStyle(this.feu ? 0xff8a2a : 0x222222, 1).fillCircle(bx, by, r + 2);
       gv.fillStyle(this.feu ? 0xffd27a : 0xffffff, 1).fillCircle(bx, by, r);
     }
-    this.dessinerEncart();
     // HUD
     const n = (l) => l.filter(v => v.plein).length;
     this.hud.setText(`TOI ${n(this.verresToi)}  -  ${n(this.verresRemi)} RÉMI      verres bus : ${this.ivresse}${this.feu ? '      🔥 EN FEU' : ''}`);
@@ -415,18 +417,21 @@ export class RemiPong extends BossScene {
     this.cameras.main.setRotation(Math.sin(this.horloge * 0.9) * this.ivresse * 0.004);
   }
 
-  // tes verres (hors de l'écran, juste sous toi) : petit encart en bas à droite
-  dessinerEncart() {
-    const g = this.gEncart.clear(), x0 = 890, y0 = 470;
-    g.fillStyle(0x000000, 0.55).fillRoundedRect(x0 - 64, 424, 128, 108, 10);
-    for (const v of this.verresToi) {
-      const x = x0 + v.col * 30, y = y0 + v.rang * 26;
-      if (v.plein) {
-        g.fillStyle(0xc81e2a, 1).fillCircle(x, y, 12);
-        g.fillStyle(0xe8a52a, 1).fillCircle(x, y, 8);
-      } else g.lineStyle(2, 0x666666, 0.8).strokeCircle(x, y, 12);
-      if (v.flash > 0) g.lineStyle(4, 0xffd84a, v.flash).strokeCircle(x, y, 14 + (1 - v.flash) * 14);
+  // VUE DE CÔTÉ (encart en haut à droite) : la table de profil, les verres de Rémi, et la courbe qui monte puis RETOMBE
+  vueCote(g, vol, c, s, pas) {
+    const x0 = LARGEUR - 250, y0 = 120, L = 230, H = 80, zMin = DEPART.z - 0.1;
+    const X = (z) => x0 + (z - zMin) / (D + 0.1 - zMin) * L, Y = (y) => y0 - y * 95;
+    g.fillStyle(0x000000, 0.6).fillRoundedRect(x0 - 10, y0 - H, L + 20, H + 22, 8);
+    g.lineStyle(3, 0x4f7fc0, 1).lineBetween(X(zMin), y0, X(D), y0);
+    // verres de Rémi : un rectangle par rang (vus de côté)
+    const rangs = new Map();
+    for (const v of this.verresRemi) if (v.plein) rangs.set(v.rang, v.z);
+    for (const z of rangs.values()) g.fillStyle(0xc81e2a, 1).fillRect(X(z) - 4, Y(H_VERRE), 8, Y(0) - Y(H_VERRE));
+    for (let k = 0; k <= 24; k += pas) {
+      const t = (k / 24) * vol.T;
+      g.fillStyle(this.feu ? 0xff8a2a : 0xffffff, 1).fillCircle(X(DEPART.z + vol.vz * t), Y(DEPART.y + vol.vy * t - G * t * t / 2), 2);
     }
+    g.fillStyle(0x7fff7f, 1).fillCircle(X(c.z + s.z), Y(H_VERRE), 3.5);
   }
 
   verre(g, v) {
@@ -445,7 +450,6 @@ export class RemiPong extends BossScene {
   dessinerBalle(g, b) {
     const p = proj(b.x, b.y, b.z), o = proj(b.x, 0, b.z);
     const r = Math.max(3, 0.022 * p.k);
-    if (p.y > HAUTEUR + 40) return;   // la balle de Rémi file vers toi, sous l'écran
     if (b.y > -0.05 && Math.abs(b.x) < W / 2 && b.z > 0 && b.z < D) g.fillStyle(0x000000, 0.3).fillEllipse(o.x, o.y, r * 2.2, r * 0.9);
     if (b.etat === 'dedans' && b.fin < 0.3) return;
     // traînée (orange quand tu es EN FEU)

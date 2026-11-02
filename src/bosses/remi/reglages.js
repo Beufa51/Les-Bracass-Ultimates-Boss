@@ -6,7 +6,8 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 // Niveaux de difficulté (choisis avant le vélo, gardés pour les 3 jeux)
 //  VÉLO : temps = secondes avant la fermeture du bar ; densite = obstacles (x) ; traverse = vitesse des bourrés qui traversent (x)
 //         sonnette = portée (px) de la sonnette (les bourrés debout ou qui traversent s'écartent / s'arrêtent)
-//  PONG : erreur = imprécision de TES lancers (m) ; apercu = part de la trajectoire montrée en visant (1 = toute) ;
+//  PONG : erreur = imprécision de TES lancers (m) ; apercu = aide de la trajectoire (1 = courbe + point d'arrivée,
+//         0,5 = courbe entière, 0,3 = courbe en pointillés espacés) ;
 //         distrait = chance que Rémi agite les bras pendant ta visée (ça fait trembler ton lancer) ;
 //         remi = chance que Rémi mette un verre ; aide = (non utilisé au pong depuis le lance-pierre)
 //  PORTE : remiMin / remiMax = scores de Rémi ; zone = largeur de la zone parfaite de la visée (0 à 1) ; visee = vitesse du curseur (x)
@@ -51,7 +52,7 @@ export const PONG = {
   rayon: 0.085,           // rayon d'un verre (m)
   dedans: 0.8,            // la balle tombe à moins de rayon x ce chiffre du centre : DEDANS
   rebord: 1.2,            // entre « dedans » et rayon x ce chiffre : sur le REBORD (une chance sur deux)
-  dureeVol: 0.75,         // durée du vol de la balle (s)
+  dureeVol: 0.65,         // durée du vol de la balle (s)
   tirage: 180,            // lance-pierre : longueur de tirage (px) pour la force maximale
   serieFeu: 3,            // verres de suite pour être EN FEU (trajectoire entière montrée, lancer plus précis)
   ivresse: 0.012,         // chaque verre bu fait tanguer ta visée de ce nombre de mètres en plus
