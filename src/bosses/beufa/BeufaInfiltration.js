@@ -159,7 +159,16 @@ export class BeufaInfiltration extends BossScene {
       'Le HALO des projecteurs te voit aussi : passe quand il repart.',
       'Dans un cône, la jauge « ? » monte : sors avant le « ! ».',
       'La SORTIE pulse en vert. Touché = retour à l\'entrée de la pièce.',
-    ], () => this.cinema());
+    ], () => this.afficherPresentation({
+      image: 'beufa_presentation', nom: 'BEUFA', surnom: '« LE COMMANDANT »', couleur: '#3d5a2a', fond: 0x0a120c,
+      infos: [
+        'Repaire : sa base militaire',
+        'Arme secrète : LE QUIZ (60 questions)',
+        'Signe distinctif : chemise impeccable',
+        'Conseil : reste dans l\'ombre…',
+      ],
+      invite: 'infiltration !',
+    }, () => this.cinema()));
   }
 
   // ---------- les IMAGES DE FABIEN : fond retiré, recadrées, à la taille du jeu ----------

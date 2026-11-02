@@ -101,7 +101,16 @@ export class JulienManif extends BossScene {
     this.diff = DIFFICULTES[Sauvegarde.difficulte(IDENTITE.id)] || DIFFICULTES.bloqueur;
     if (this.donnees.rejouer) { this.appliquerDifficulte(); this.time.delayedCall(60, () => this.demarrer()); }   // « recommencer » : direct
     else if (this.donnees.depuisManif) { this.appliquerDifficulte(); this.time.delayedCall(120, () => this.intro()); }   // niveau 2 : difficulté déjà choisie
-    else this.choisirDifficulte(() => this.time.delayedCall(120, () => this.intro()));
+    else this.afficherPresentation({
+      image: 'julien_presentation', nom: 'JULIEN', surnom: '« LE PROF »', couleur: '#1f8a2e',
+      infos: [
+        'Terrain : la manif, le lycée, puis SA classe',
+        'Arme secrète : « Sortez une feuille ! »',
+        'Signe distinctif : veste de survêt\' verte',
+        'Tee-shirt : Pyramid Head (Silent Hill)',
+      ],
+      invite: 'à la manif !',
+    }, () => this.choisirDifficulte(() => this.time.delayedCall(120, () => this.intro())));
   }
 
   // --- points d'entrée que le niveau 2 (JulienClasse) remplace

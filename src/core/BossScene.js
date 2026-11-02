@@ -61,6 +61,38 @@ export class BossScene extends Phaser.Scene {
     });
   }
 
+  // Écran de PRÉSENTATION du boss (comme Greg, Kédric, Lionel) : son avatar glisse depuis la droite,
+  // son nom, son surnom et quelques infos à gauche. o = { image, nom, surnom, infos: [...], couleur, fond, invite, son }
+  afficherPresentation(o, ensuite) {
+    etiquettesTactiles({ espace: 'OK', z: null, x: null });
+    const el = [];
+    el.push(this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, o.fond ?? 0x0b0b14, 1).setDepth(1000));
+    const g = this.add.graphics().setDepth(1001);
+    g.lineStyle(2, 0xffffff, 0.12);
+    for (let k = 0; k < 40; k++) { const y = Math.random() * HAUTEUR; g.lineBetween(0, y, 600, y + (Math.random() - 0.5) * 20); }
+    el.push(g);
+    if (this.textures.exists(o.image)) {
+      const p = this.add.image(LARGEUR + 250, HAUTEUR / 2 + 10, o.image).setDepth(1001);
+      const s = Math.min(560 / p.height, 380 / p.width);   // tient dans 380 × 560
+      p.setScale(s);
+      this.tweens.add({ targets: p, x: LARGEUR - 40 - p.displayWidth / 2, duration: 350, ease: 'Cubic.Out' });
+      el.push(p);
+    }
+    el.push(texte(this, 300, 90, o.nom, 96, '#ffffff', { fontStyle: 'bold italic', stroke: o.couleur || '#b3202c', strokeThickness: 14 }).setDepth(1002));
+    el.push(texte(this, 300, 175, o.surnom, 34, '#ffd84a').setDepth(1002));
+    el.push(texte(this, 300, 300, o.infos.join('\n'), 20, '#dddddd', { lineSpacing: 10, wordWrap: { width: 540 } }).setDepth(1002));
+    el.push(texte(this, 300, 460, `${estTactile() ? 'OK' : 'ESPACE'} : ${o.invite || 'c\'est parti !'}`, 22, '#7fff7f').setDepth(1002));
+    if (o.son) jouerSon(this, o.son);
+    this.cameras.main.shake(200, 0.008);
+    this.time.delayedCall(500, () => {
+      this.input.keyboard.once('keydown-SPACE', () => {
+        el.forEach(e => e.destroy());
+        jouerSon(this, 'ui_valider');
+        ensuite();
+      });
+    });
+  }
+
   victoire(message = 'Badge obtenu !') {
     if (this.termine) return;
     this.termine = true;
