@@ -1,5 +1,5 @@
 # Prépare les images de Rémi (assets_inbox/remi/ -> assets/sprites/remi/) :
-#  - fond blanc retiré (le blanc relié au bord devient transparent)
+#  - fond blanc retiré (le blanc relié au bord devient transparent) + liseré blanc « démélangé » sur les bords
 #  - remi_velo_planche.jpg : découpée en poses (2 rangées) -> remi_velo.png (bande de cases égales, roues en bas)
 #    ordre : 6 poses de pédalage, saut, chute
 #  - remi_presentation.jpg -> remi_presentation.png
@@ -21,8 +21,17 @@ def detourer(img, seuil=232, grand=10**9):
     fond = np.isin(lab, list(bord) + grandes)
     fond = ndimage.binary_opening(fond, iterations=1)
     alpha = np.where(fond, 0, 255).astype(np.uint8)
-    alpha = ndimage.uniform_filter(alpha.astype(float), 2).astype(np.uint8)   # bord adouci
-    rgba = np.dstack([a.astype(np.uint8), alpha])
+    # LISERÉ BLANC (audit V3) : sur une bande de 4 px le long du fond, chaque pixel est « démélangé » du blanc
+    # (méthode « couleur vers transparence ») : un gris clair devient un noir à moitié transparent, un trait noir reste plein.
+    bande = ndimage.binary_dilation(fond, iterations=4) & ~fond
+    c = a.astype(float)
+    opac = np.clip((255 - c).max(axis=2) / 255 * 1.25, 0, 1)          # 0 = blanc pur, 1 = couleur franche
+    opac = np.where(bande, opac, 1.0)
+    alpha = (np.where(fond, 0, 255) * opac).astype(float)
+    sur = np.maximum(opac, 1e-3)[:, :, None]
+    c = np.where(bande[:, :, None], 255 - (255 - c) / sur, c)            # couleur sans le blanc mélangé
+    alpha = ndimage.uniform_filter(alpha, 2)                            # bord adouci
+    rgba = np.dstack([np.clip(c, 0, 255).astype(np.uint8), alpha.clip(0, 255).astype(np.uint8)])
     return Image.fromarray(rgba, 'RGBA')
 
 def bandes(plein, axe, ecart):
@@ -40,7 +49,7 @@ def bandes(plein, axe, ecart):
     return [r for r in res if r[1] - r[0] > 40]
 
 def planche_velo():
-    im = detourer(Image.open(SRC + 'remi_velo_planche.jpg'), seuil=205, grand=350)
+    im = detourer(Image.open(SRC + 'remi_velo_planche.jpg'), seuil=200, grand=60)
     al = np.asarray(im)[:, :, 3] > 40
     # chaque pose = un groupe de pixels reliés (un peu épaissis pour garder les rayons des roues) ;
     # les petits morceaux (casquette qui vole) rejoignent la pose la plus proche

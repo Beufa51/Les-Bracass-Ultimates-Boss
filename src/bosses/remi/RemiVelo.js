@@ -18,10 +18,12 @@ import { bulle, annonce, jeuSuivant, ecranPerdu, hasard, choisir } from './commu
 import { choisirDifficulte } from './difficulte.js';
 
 const SOL = 440;                     // hauteur de la route à l'écran
-const DEMI_VELO = 40;                // demi-longueur du vélo (collisions)
-const ETIQUETTES_JEU = { gauche: '◀ Frein', droite: 'Pédale ▶', haut: '▲ Saut', bas: null, espace: null, z: 'DRING', x: null };
+const DEMI_VELO = 50;                // demi-longueur du vélo pour les chocs (un peu plus petite que l'image : indulgent)
+const X_VELO = 260;                  // le vélo reste à cet endroit de l'écran (c'est la rue qui défile)
+const ETIQUETTES_JEU = { gauche: '◀ Frein', droite: 'Sprint ▶', haut: '▲ Saut', bas: null, espace: null, z: 'DRING', x: null };
 // hauteur et demi-largeur de chaque obstacle (collisions)
-const TAILLE = { allonge: [40, 55], verre: [10, 28], debout: [130, 18], traverse: [130, 20], vomi: [4, 42] };
+// (debout et traverse : plus hauts que le plus grand saut, on ne peut pas les sauter)
+const TAILLE = { allonge: [40, 45], verre: [10, 28], debout: [160, 18], traverse: [160, 20], vomi: [4, 42] };
 // illustration des bourrés (remi_bourres.png : debout, sursaute, allongé, traverse de face) et sa taille à l'écran
 const BOURRE = 0.25, IMAGE_BOURRE = { debout: 0, ecarte: 1, allonge: 2, marche: 3 };
 const TEINTES = [0xffffff, 0xffe2d8, 0xdfe6ff, 0xe4ffd9, 0xfff3c0];
@@ -42,6 +44,7 @@ export class RemiVelo extends BossScene {
     this.bx = 0; this.v = 0; this.y = 0; this.vy = 0; this.a = 0;
     this.chute = 0; this.glisse = 0; this.recharge = 0; this.dring = 0; this.horloge = 0;
     this.prochainTexto = 9; this.aidesVues = {}; this.chutes = 0;
+    this.souffle = 1; this.tenu = 0; this.tampon = 0; this.invincible = 0;
     this.obstacles = [];
 
     this.creerDecor();
@@ -64,7 +67,8 @@ export class RemiVelo extends BossScene {
     const t = estTactile();
     this.afficherIntro('RÉMI - Direction le bar', [
       'Rémi t\'attend au bar... et le bar ferme bientôt !',
-      '▶ : pédaler      ◀ : freiner      ▲' + (t ? '' : ' (ou ESPACE)') + ' : sauter',
+      'Le vélo roule tout seul.   ▶ : SPRINT (jauge d\'endurance)   ◀ : freiner',
+      '▲' + (t ? '' : ' (ou ESPACE)') + ' : sauter (garde appuyé = saut plus haut et plus long)',
       (t ? 'DRING' : 'Z') + ' : sonnette (un bourré DEBOUT s\'écarte, pas trop tôt !)',
       'Bourré ALLONGÉ, verre cassé, flaque : saute par-dessus.',
       'Bourré qui TRAVERSE : freine pour le laisser passer (ou fonce).',
@@ -88,7 +92,7 @@ export class RemiVelo extends BossScene {
   // (re)démarrage du trajet (aussi appelé directement par les tests)
   demarrer() {
     this.genererParcours();
-    this.bx = 0; this.v = 120; this.y = 0; this.vy = 0;
+    this.bx = 0; this.v = 120; this.y = 0; this.vy = 0; this.souffle = 1; this.invincible = 0;
     this.tempsRestant = this.diff.temps;
     this.etat = 'jeu';
     etiquettesTactiles(ETIQUETTES_JEU);
@@ -182,20 +186,31 @@ export class RemiVelo extends BossScene {
     }
     this.recharge = Math.max(0, this.recharge - dt);
     this.dring = Math.max(0, this.dring - dt);
+    this.invincible = Math.max(0, this.invincible - dt);
+    const sauter = vientDAppuyer(T.haut) || vientDAppuyer(T.espace), tenu = T.haut.isDown || T.espace.isDown;
+    if (sauter) this.tampon = V.tampon;            // un saut demandé un peu trop tôt est gardé en mémoire
+    this.tampon = Math.max(0, this.tampon - dt);
     if (this.chute > 0) {
       this.chute -= dt; this.v = 0;
-      if (this.chute <= 0) { this.y = 0; this.vy = 0; }
+      if (this.chute <= 0) { this.y = 0; this.vy = 0; this.invincible = V.invincible; this.v = V.croisiere * 0.5; }
     } else {
-      if (T.droite.isDown) this.v += V.acceleration * dt;
-      else this.v -= V.rouleLibre * dt;
-      if (T.gauche.isDown) this.v -= V.freinage * dt;
-      this.v = Phaser.Math.Clamp(this.v, 0, V.vitesseMax);
-      if (this.y === 0 && (vientDAppuyer(T.haut) || vientDAppuyer(T.espace))) { this.vy = V.saut; jouerSon(this, 'remi_saut'); }
+      // vitesse voulue : croisière ; SPRINT (▶) tant qu'il reste du souffle ; ◀ freine
+      const sprint = T.droite.isDown && this.souffle > 0.02 && !T.gauche.isDown;
+      this.souffle = Phaser.Math.Clamp(this.souffle + (sprint ? -V.endurance : V.recup) * dt, 0, 1);
+      if (T.gauche.isDown) this.v = Math.max(0, this.v - V.freinage * dt);
+      else {
+        const cible = sprint ? V.vitesseMax : V.croisiere;
+        this.v += Math.sign(cible - this.v) * Math.min(Math.abs(cible - this.v), V.acceleration * dt);
+      }
+      this.sprint = sprint;
+      if (this.y === 0 && this.vy === 0 && this.tampon > 0) { this.vy = V.saut; this.tenu = 0; this.tampon = 0; jouerSon(this, 'remi_saut'); }
       if (vientDAppuyer(T.z) && this.recharge <= 0) this.sonner();
     }
-    // saut
+    // saut : tant que ▲ est maintenu (au début), la gravité est plus faible = saut plus haut et plus long
     if (this.y > 0 || this.vy > 0) {
-      this.y += this.vy * dt; this.vy -= V.gravite * dt;
+      this.tenu += dt;
+      const leger = tenu && this.vy > 0 && this.tenu < V.sautTenu;
+      this.y += this.vy * dt; this.vy -= (leger ? V.graviteTenue : V.gravite) * dt;
       if (this.y <= 0) { this.y = 0; this.vy = 0; jouerSon(this, 'remi_atterrit'); }
     }
     this.glisse = Math.max(0, this.glisse - dt);
@@ -209,7 +224,7 @@ export class RemiVelo extends BossScene {
   }
 
   sonner() {
-    this.recharge = 1.5; this.dring = 0.35;
+    this.recharge = V.sonnette; this.dring = 0.35;
     jouerSon(this, 'remi_sonnette');
     for (const o of this.obstacles) {
       const d = o.x - this.bx;
@@ -233,7 +248,7 @@ export class RemiVelo extends BossScene {
         if (d < 0) this.aidesVues[o.type] = true;
         else if (o.etat !== 'ecarte') texteAide = AIDES[o.type]();
       }
-      if (o.touche || this.chute > 0) continue;
+      if (o.touche || this.chute > 0 || (this.invincible > 0 && o.type !== 'verre' && o.type !== 'vomi')) continue;
       const [h, w] = TAILLE[o.type];
       if (Math.abs(d) > w + DEMI_VELO) continue;
       if (o.type === 'debout' && o.etat === 'ecarte') continue;
@@ -275,7 +290,7 @@ export class RemiVelo extends BossScene {
 
   // ---------- dessin ----------
   dessiner() {
-    const cam = this.bx - (210 + this.v * 0.25);
+    const cam = this.bx - (X_VELO);
     this.planLoin.tilePositionX = cam * 0.15;
     this.planPres.tilePositionX = cam * 0.35;
     if (this.rue) this.rue.tilePositionX = cam * 0.8 / this.rueEchelle;   // presque au pas de la route
@@ -336,8 +351,8 @@ export class RemiVelo extends BossScene {
       }
       // debout : titube ; s'il a entendu la sonnette, il fait un bond vers le fond
       const p = o.etat === 'ecarte' ? o.p : 0;
-      o.g.setPosition(sx + p * 18, SOL - p * 52).setScale(1 - p * 0.25).setAlpha(1 - p * 0.35).setRotation(Math.sin(o.t * 2.1) * 0.14 - p * 0.3);
-      if (o.spr) o.spr.setVisible(true).setFrame(IMAGE_BOURRE[p > 0 ? 'ecarte' : 'debout']).setPosition(o.g.x, o.g.y)
+      o.g.setPosition(sx + p * 18, SOL - p * 30 - Math.sin(p * Math.PI) * 40).setScale(1 - p * 0.25).setAlpha(1 - p * 0.3).setRotation(Math.sin(o.t * 2.1) * 0.14 - p * 0.3);
+      if (o.spr) o.spr.setVisible(true).setFrame(IMAGE_BOURRE[p > 0 && p < 1 ? 'ecarte' : 'debout']).setDepth(p >= 1 ? 4 : 8)   // écarté : il reste sur le trottoir du fond.setPosition(o.g.x, o.g.y)
         .setScale(BOURRE * o.g.scaleX).setAlpha(o.g.alpha).setRotation(o.g.rotation);
       else bourre(o.g, p > 0 ? 'ecarte' : 'debout', o.t, o.couleur);
     }
@@ -345,15 +360,35 @@ export class RemiVelo extends BossScene {
     const gv = this.gVelo.clear();
     const zig = this.glisse > 0 ? Math.sin(this.horloge * 30) * 0.12 : 0;
     const bond = this.chute > 0 ? 0 : -this.y;
-    gv.setPosition(210 + this.v * 0.25, SOL + bond);
+    gv.setPosition(X_VELO, SOL + bond);
     if (this.chute > 0) gv.setRotation(-1.3 + (1 - this.chute / V.chute) * 0.2).setPosition(gv.x + 20, SOL - 30);
     else gv.setRotation((this.vy > 0 ? -0.12 : this.y > 0 ? 0.08 : 0) + zig);
     if (this.sprVelo) {
       const f = this.chute > 0 ? 7 : this.y > 0 ? 6 : Math.floor(this.a / (Math.PI * 2) * 6) % 6;
-      this.sprVelo.setFrame(f).setPosition(210 + this.v * 0.25, SOL + bond + 6).setRotation(this.chute > 0 ? 0 : gv.rotation);
+      this.sprVelo.setFrame(f).setPosition(X_VELO, SOL + bond + 6).setRotation(this.chute > 0 ? 0 : gv.rotation)
+        .setAlpha(this.invincible > 0 && Math.floor(this.horloge * 12) % 2 ? 0.35 : 1);   // clignote après une chute
       gv.setRotation(0);
+      // traits de vitesse en SPRINT
+      if (this.sprint && this.etat === 'jeu') {
+        gv.lineStyle(3, 0xffffff, 0.5);
+        for (let k = 0; k < 5; k++) { const y = -30 - k * 26, x = -95 - ((this.horloge * 900 + k * 47) % 80); gv.lineBetween(x, y, x - 50, y); }
+      }
       if (this.dring > 0) gv.lineStyle(3, 0xffe680, 1).strokeCircle(60, -150, 8).strokeCircle(60, -150, 16);
-    } else cycliste(gv, this.a, { danseuse: this.touches && this.touches.droite.isDown && this.v < 300, sonnette: this.dring > 0 });
+    }
+    // PORTÉE DE LA SONNETTE, sur la route devant toi (jaune = prête ; un bourré debout dedans sera écarté)
+    if (this.etat === 'jeu') {
+      const x0 = X_VELO + 60, x1 = X_VELO + this.diff.sonnette, pret = this.recharge <= 0;
+      g.fillStyle(pret ? 0xffe680 : 0x888888, pret ? 0.14 : 0.06).fillRect(x0, SOL - 6, x1 - x0, 12);
+      g.lineStyle(2, pret ? 0xffe680 : 0x888888, pret ? 0.7 : 0.3).lineBetween(x1, SOL - 14, x1, SOL + 8);
+      for (const o of this.obstacles) {
+        const d = o.x - this.bx;
+        if (pret && o.type === 'debout' && o.etat === 'normal' && d > 60 && d < this.diff.sonnette) {
+          g.fillStyle(0xffe680, 1).fillCircle(X_VELO + d, SOL - 175, 9);   // « il entend la sonnette » : petite cloche
+          g.fillStyle(0xffe680, 1).fillTriangle(X_VELO + d - 9, SOL - 175, X_VELO + d + 9, SOL - 175, X_VELO + d, SOL - 166);
+        }
+      }
+    }
+    if (!this.sprVelo) cycliste(gv, this.a, { danseuse: this.sprint, sonnette: this.dring > 0 });
     // HUD
     if (this.etat === 'jeu' || this.etat === 'arrivee') {
       const s = Math.max(0, Math.ceil(this.tempsRestant));
@@ -364,8 +399,12 @@ export class RemiVelo extends BossScene {
       hb.fillStyle(0x7fff7f, 1).fillRect(x0, 22, (x1 - x0) * pr, 8);
       hb.fillStyle(0xff4fd8, 1).fillRect(x1 - 6, 14, 12, 24);
       hb.fillStyle(0xffffff, 1).fillCircle(x0 + (x1 - x0) * pr, 26, 7);
-      // sonnette rechargée ?
-      hb.fillStyle(this.recharge > 0 ? 0x555555 : 0xffe680, 1).fillCircle(LARGEUR - 200, 26, 9);
+      // sonnette : cercle qui se remplit pendant la recharge
+      hb.fillStyle(0x000000, 0.5).fillCircle(LARGEUR - 200, 26, 12);
+      hb.fillStyle(0xffe680, 1).slice(LARGEUR - 200, 26, 10, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (1 - this.recharge / V.sonnette), false).fillPath();
+      // endurance du sprint (sous la barre du trajet)
+      hb.fillStyle(0x000000, 0.5).fillRect(x0 - 4, 40, 164, 12);
+      hb.fillStyle(this.souffle < 0.25 ? 0xff5a5a : 0x5ad0ff, 1).fillRect(x0, 43, 156 * this.souffle, 6);
     }
   }
 }

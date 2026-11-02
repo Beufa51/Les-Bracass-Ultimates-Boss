@@ -12,28 +12,35 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 //  PORTE : remiMin / remiMax = scores de Rémi ; zone = largeur de la zone parfaite de la visée (0 à 1) ; visee = vitesse du curseur (x)
 export const DIFFICULTES = {
   facile: { nom: 'FACILE', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
-    temps: 80, densite: 0.75, traverse: 0.8, sonnette: 560,
+    temps: 78, densite: 0.75, traverse: 0.8, sonnette: 560,
     erreur: 0.012, zoneForce: 0.3, remi: 0.28, aide: true,
     remiMin: 560, remiMax: 760, zone: 0.22, visee: 0.8 },
   normal: { nom: 'NORMAL', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
-    temps: 66, densite: 1, traverse: 1, sonnette: 500,
+    temps: 65, densite: 1, traverse: 1, sonnette: 500,
     erreur: 0.018, zoneForce: 0.2, remi: 0.38, aide: false,
     remiMin: 650, remiMax: 850, zone: 0.15, visee: 1 },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
-    temps: 56, densite: 1.3, traverse: 1.25, sonnette: 440,
+    temps: 57, densite: 1.3, traverse: 1.25, sonnette: 440,
     erreur: 0.025, zoneForce: 0.13, remi: 0.5, aide: false,
     remiMin: 760, remiMax: 930, zone: 0.1, visee: 1.3 },
 };
 
 export const VELO = {
   longueur: 15000,        // longueur du trajet jusqu'au bar (px)
-  vitesseMax: 460,        // px/s en pédalant
-  acceleration: 330,      // px/s² (▶ appuyé)
+  croisiere: 300,         // le vélo roule TOUT SEUL à cette vitesse (px/s)
+  vitesseMax: 480,        // vitesse en SPRINT (▶ maintenu, tant qu'il reste de l'endurance)
+  acceleration: 420,      // px/s² pour rejoindre la vitesse voulue
   freinage: 900,          // px/s² (◀ appuyé)
-  rouleLibre: 70,         // px/s² perdus sans pédaler
-  saut: 560,              // vitesse de départ du saut (px/s)
+  endurance: 0.4,         // part de la jauge de sprint vidée par seconde de sprint (pleine = 1)
+  recup: 0.2,             // part de la jauge regagnée par seconde sans sprint
+  saut: 480,              // vitesse de départ du saut (px/s)
+  sautTenu: 0.28,         // ▲ maintenu jusqu'à ce temps (s) = saut plus haut et plus long
+  graviteTenue: 600,      // gravité tant que ▲ est maintenu (au début du saut)
   gravite: 1600,          // px/s²
+  sonnette: 1.0,          // recharge de la sonnette (s) ; plus court que l'écart entre 2 bourrés debout
+  tampon: 0.15,           // ▲ appuyé un peu AVANT d'atterrir : le saut part quand même (s)
   chute: 1.4,             // secondes au sol après une chute
+  invincible: 1.2,        // après une chute, le vélo clignote et ne peut pas retomber (s)
   crevaison: 0.35,        // verre cassé non sauté : vitesse x ce chiffre
   glissade: 0.55,         // flaque non sautée à plus de 250 px/s : vitesse x ce chiffre + le vélo zigzague
   ecart: [520, 900],      // écart entre deux obstacles (px), divisé par la densité
