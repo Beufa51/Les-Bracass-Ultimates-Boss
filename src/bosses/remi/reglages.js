@@ -8,7 +8,7 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 //         sonnette = portée (px) de la sonnette (les bourrés debout ou qui traversent s'écartent / s'arrêtent)
 //  PONG : erreur = imprécision de TES lancers (m) ; apercu = part de la courbe d'aide montrée (1 = toute + point d'arrivée ;
 //         0,65 = jusqu'un peu après le sommet ; l'alcool en efface encore : voir PONG.courbeBue) ;
-//         distrait = chance que Rémi agite les bras pendant ta visée (ça fait trembler ton lancer) ;
+//         distrait = (plus utilisé depuis V18) ;
 //         remi = chance que Rémi mette un verre ; aide = (non utilisé au pong depuis le lance-pierre)
 //  PORTE : remiCharge = jusqu'où Rémi charge (0 à 1) ; remiPrudent = chance qu'il lâche quand le videur arrive ;
 //          videur = temps d'annonce du videur (x, + petit = moins prévenu) ; feintes = part de passages piégés
@@ -88,18 +88,16 @@ export const PONG = {
   dedans: 0.62,           // (V17 : 0,7 → 0,62, pong trop facile) la balle tombe à moins de rayon x ce chiffre du centre : DEDANS
   rebord: 1.2,            // entre « dedans » et rayon x ce chiffre : sur le REBORD (une chance sur deux)
   dureeVol: 0.65,         // durée du vol de la balle (s)
-  tirage: 175,            // lance-pierre : longueur de tirage (px) pour la force maximale (+ grand = geste plus précis)
+  // V18 PICHENETTE : glisser VERS LE HAUT ; longueur du geste = force, côté = direction
+  geste: 200,             // longueur du geste (px) pour la force maximale (+ grand = geste plus précis)
+  cote: 0.9,              // un geste de « geste » px sur le côté envoie la balle à ce nombre de mètres du milieu
+  zMin: 1.1, zMax: 1.9,   // où tombe la balle (m depuis ton bord) avec une force nulle / maximale (verres de Rémi : 1,37 à 1,67)
   serieFeu: 3,            // verres de suite pour être EN FEU (trajectoire entière montrée, lancer plus précis)
-  ivresse: 0.014,         // chaque verre BU fait tanguer ta visée de ce nombre de mètres en plus...
-  tangageMax: 0.065,      // ... jusqu'à ce plafond (V17 : avant, aucun plafond = impossible en fin de partie)
-  concentration: 0.8,     // doigt immobile pendant ce temps (s) = CONCENTRÉ...
-  concentrationEffet: 0.42, // ... le tangage baisse de cette part (0,42 = 42 %)
-  erreurBue: 0.06,        // chaque verre bu ajoute cette part d'imprécision du bras (avant : 0,15)
-  aimantMini: 0.15,       // l'aimant ne descend jamais sous ce chiffre, même ivre
-  courbeMini: 0.55,       // part de la courbe d'aide toujours visible, même ivre (avant : 0,25)
-  aimant: 0.35,           // (V17 : 0,6 → 0,35 ; -0,05 par verre bu, jamais sous aimantMini) À JEUN la balle est attirée vers le verre visé (part du chemin) ; -0,12 par verre bu
+  erreurBue: 0.25,        // chaque verre BU ajoute cette part d'imprécision du bras (ton bras tremble)
+  aimantMini: 0.05,       // l'aimant ne descend jamais sous ce chiffre, même ivre
+  courbeMini: 0.55,       // part de la courbe d'aide toujours visible, même ivre
+  aimant: 0.15,           // aimant invisible : la balle est attirée vers le verre le plus proche (part du chemin) ; -0,05 par verre bu
   courbeBue: 0.13,        // chaque verre bu efface cette part de la fin de la courbe d'aide (la retombée disparaît d'abord)
-  hoquet: 2,              // à partir de ce nombre de verres bus : HOQUETS (secousse soudaine de la visée)
 };
 
 export const PORTE = {
@@ -114,6 +112,7 @@ export const PORTE = {
   casse: 850,             // un coup à ce score ou plus : gros craquement, éclats, flash
   // le videur : attente avant de revenir (s), annonce (ses pas, son ombre : s), regard (s)
   videurAttente: [1.4, 3.6], videurAnnonce: 1.1, videurRegard: [1.0, 1.5],
+  annonceMini: 0.85,      // V18 : une arrivée est TOUJOURS annoncée au moins ce temps (s), même ses feintes (temps de réagir)
 };
 
 // Répliques de Rémi (provisoires : à personnaliser à la passe de FINITION)

@@ -206,6 +206,19 @@
 - V17 PORTE « FAIRE GENRE DE RIEN » (choix de Fabien) : lâcher pendant que quelqu'un arrive (annonce / regard) = PAS de
   coup (`faireGenre`), le tour continue, on recharge après (avant : coup mou forcé). Rémi fait pareil quand il est prudent.
   Bots PRESSION : bon joueur GAGNE 3291-2809 (46 s), joueur nul PERD 2081-3783.
+- V18 (retours : « pong : concept nul pour la jouabilité » ; porte : « Rémi commence toujours », « lâcher pour faire genre
+  pas clair », « feintes trop dures, pas le temps de réagir ») — passe game design :
+  - PONG REFAIT EN PICHENETTE (choix de Fabien) : doigt n'importe où, GLISSER VERS LE HAUT, lâcher. Sens du geste =
+    direction (même sens que le doigt), longueur = force (`geste` 200 px, `cote`, `zMin` / `zMax`). Flèche verte du geste +
+    jauge de force près du doigt, la balle suit un peu le doigt, petite flèche qui monte au repos. RETIRÉS : lance-pierre
+    inversé, tir rebond, tangage, concentration, hoquet, « chut » (diff `distrait` plus utilisé). Gardés : courbe d'aide
+    (raccourcie par l'alcool), BALLS BACK, EN FEU, souffler sur Rémi pendant son tour, vision double. Alcool = bras qui
+    tremble (`erreurBue` 0,25/verre). Aimant 0,15. Mesure PRESSION (geste humain ±20 px, 6 verres) : 70 % à jeun, 59 % à
+    6 verres bus (± 30 px : 63 %).
+  - PORTE : TU COMMENCES ; dernier coup symétrique (celui qui casse a un tour de plus → l'autre a un DERNIER COUP).
+    « Faire genre » → POING CACHÉ : lâcher pendant une arrivée garde la charge (jauge cerclée de bleu, consigne
+    « POING CACHÉ (x % gardés) » puis « VOIE LIBRE ! remaintiens : tu repars de x % ») ; bords de l'écran ROUGES dès le
+    premier pas. Annonce jamais sous `annonceMini` 0,85 s (avant : surprise 0,3 s, 2e coup d'œil 0,4 s).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

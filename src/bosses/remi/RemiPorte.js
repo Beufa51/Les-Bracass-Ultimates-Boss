@@ -6,7 +6,9 @@
 // LE VIDEUR fait sa ronde : on entend ses pas, son ombre s'allonge dans le couloir, puis il passe la tête (à gauche).
 //   S'il te voit en train de charger (ou au moment du coup) : ATTRAPÉ — coup perdu, la porte est rafistolée.
 // Une seule règle (V17) : la porte a une SOLIDITÉ commune ; quand elle CÈDE, celui qui a fait le PLUS DE DÉGÂTS gagne
-// (chacun le même nombre de tours : si Rémi la casse, tu as un DERNIER COUP). Avant : le dernier qui tapait gagnait.
+// (chacun le même nombre de tours : celui qui la casse a eu un tour de plus → DERNIER COUP pour l'autre).
+// V18 : TU COMMENCES (avant : toujours Rémi). Lâcher quand quelqu'un arrive = POING CACHÉ, la charge est GARDÉE (bords
+//   rouges + consigne) ; on reprend en remaintenant. Une arrivée est toujours annoncée au moins PORTE.annonceMini s.
 // =====================================================================
 import { BossScene } from '../../core/BossScene.js';
 import { creerTouches } from '../../core/clavier.js';
@@ -93,11 +95,11 @@ export class RemiPorte extends BossScene {
       `MAINTIENS ${t ? 'le doigt sur l\'écran' : 'ESPACE'} : tu armes ton poing (ça monte de plus en plus vite)`,
       'LÂCHE : le coup part. Lâche quand la cible passe sur ton poing (+) = coup parfait.',
       'Des pas, une ombre, le « ! »... QUELQU\'UN ARRIVE. S\'il te voit charger : ATTRAPÉ !',
-      'LÂCHE pendant qu\'il arrive = tu FAIS GENRE DE RIEN : pas de coup, tu gardes ton tour et tu recharges après.',
+      'Quelqu\'un arrive ? LÂCHE : tu CACHES TON POING (pas de coup, ta charge est GARDÉE). Il repart ? Remaintiens et continue !',
       'Mais qui ? Le VIDEUR ne rate rien... mais si c\'est juste le GARS QUI VIENT PISSER, il s\'en fiche !',
-      'Et il FEINTE : fausse alerte, il surgit sans prévenir, il revient d\'un coup...',
+      'Et il FEINTE : fausse alerte, il arrive plus vite, il revient jeter un 2e coup d\'œil...',
       'Quand la porte CÈDE, celui qui a fait le PLUS DE DÉGÂTS gagne. Taper fort ET juste, pas juste le dernier !',
-    ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.tour('remi'); }));
+    ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.tour('toi'); }));
   }
 
   decor() {
@@ -114,7 +116,7 @@ export class RemiPorte extends BossScene {
   tour(qui) {
     if (this.termine || (this.solidite <= 0 && !this.dernierTour)) return;
     this.tours[qui]++;
-    this.frappeur = qui; this.puissance = 0; this.charge = false; this.tCible = Math.random() * 3;
+    this.frappeur = qui; this.puissance = 0; this.charge = false; this.poingCache = false; this.tCible = Math.random() * 3;
     this.pose[qui] = 'garde';
     this.etat = qui;
     etiquettesTactiles(VIDES);
@@ -162,18 +164,24 @@ export class RemiPorte extends BossScene {
   pasToi(dt) {
     const tenu = this.doigt || this.touches.espace.isDown;
     const danger = this.videur.etat === 'annonce' || this.videur.etat === 'regarde';
-    if (tenu) this.charger(dt);
-    else if (this.charge && danger) { this.faireGenre('toi'); }   // V17 : lâcher quand quelqu'un arrive = pas de coup
+    const maintiens = estTactile() ? 'REMETS le doigt' : 'REMAINTIENS ESPACE';
+    if (tenu) { this.poingCache = false; this.charger(dt); }
+    else if (this.charge && danger) { this.faireGenre('toi'); }   // V18 : lâcher quand quelqu'un arrive = poing CACHÉ, charge gardée
     else if (this.charge) { this.frapper('toi'); return; }
-    this.consigne.setText(this.charge && danger ? 'QUELQU\'UN ARRIVE !  LÂCHE pour faire genre de rien...'
-      : this.charge ? `PUISSANCE ${Math.round(this.puissance * 100)} %  -  LÂCHE quand la cible est sur le + !`
+    const pc = Math.round(this.puissance * 100);
+    this.consigne.setColor(this.charge && danger ? '#ff5a5a' : this.poingCache ? '#9fe0ff' : '#ffd84a');
+    this.consigne.setText(this.charge && danger ? 'QUELQU\'UN ARRIVE !  LÂCHE = tu caches ton poing (charge gardée)'
+      : this.poingCache && danger ? `POING CACHÉ (${pc} % gardés)  -  attends qu'il reparte...`
+      : this.poingCache ? `VOIE LIBRE !  ${maintiens} : tu repars de ${pc} %`
+      : this.charge ? `PUISSANCE ${pc} %  -  LÂCHE quand la cible est sur le + !`
       : `${estTactile() ? 'MAINTIENS le doigt' : 'MAINTIENS ESPACE'} pour charger... gare à qui arrive !`);
   }
 
   pasRemi(dt) {
     if (this.remiAttend > 0) { this.remiAttend -= dt; return; }
     // Rémi ne commence pas à charger quand le videur arrive ; s'il charge déjà, il lâche (selon sa prudence)... ou il insiste
-    if (this.videur.etat !== 'absent' && this.puissance === 0) return;
+    if (this.videur.etat !== 'absent' && (this.puissance === 0 || this.poingCache)) return;
+    this.poingCache = false;
     if (this.videur.etat === 'annonce' && this.remiPrudence === undefined) {
       // il lui faut un moment pour réagir (et il est parfois trop sûr de lui)
       this.remiReaction = (this.remiReaction ?? hasard(0.25, 0.7)) - dt;
@@ -187,8 +195,9 @@ export class RemiPorte extends BossScene {
   }
 
   // FAIRE GENRE DE RIEN (V17, choix de Fabien) : on baisse le poing sans frapper, le tour continue
+  // V18 (retour : « pas clair ») : le poing est CACHÉ, la charge est GARDÉE ; on repart de là quand la voie est libre
   faireGenre(qui) {
-    this.puissance = 0; this.charge = false; this.pose[qui] = 'garde';
+    this.charge = false; this.poingCache = true; this.pose[qui] = 'garde';
     if (qui === 'toi') bulle(this, choisir(['*sifflote*', '*regarde ses chaussures*', '*se recoiffe*', '*fait genre de rien*']), '#cccccc', 0.9, 330);
     else bulle(this, 'Rémi : *sifflote innocemment*', '#ffd84a', 0.9, 80);
   }
@@ -210,9 +219,10 @@ export class RemiPorte extends BossScene {
       v.mode = v.retourPrevu ? 'retour' : I.feinte && Math.random() < f * 0.6 ? I.feinte : r < f * 0.45 ? 'fausse' : r < f * 0.8 ? 'surprise' : 'normal';
       v.retourPrevu = false;
       const base = R.videurAnnonce * this.diff.videur * I.lent;
-      v.duree = v.mode === 'surprise' ? 0.3 : v.mode === 'retour' ? 0.4 : base * hasard(0.6, 1.3);
+      // V18 (retour : « pas le temps de réagir ») : jamais moins de R.annonceMini (avant : 0,3 s en surprise, 0,4 s au retour)
+      v.duree = v.mode === 'surprise' || v.mode === 'retour' ? R.annonceMini : Math.max(R.annonceMini, base * hasard(0.7, 1.3));
       v.etat = 'annonce'; v.t = v.duree; v.pas = 0;
-      v.rythme = v.mode === 'surprise' ? 1 : hasard(I.rythme[0], I.rythme[1]);   // ses pas plus ou moins rapides
+      v.rythme = v.mode === 'surprise' || v.mode === 'retour' ? 0.12 : hasard(I.rythme[0], I.rythme[1]);   // pressé : pas rapides   // ses pas plus ou moins rapides
       v.demiTour = v.mode === 'fausse' ? v.duree * hasard(0.45, 0.8) : -1;
     } else if (v.etat === 'annonce') {
       v.pas -= dt;
@@ -320,11 +330,16 @@ export class RemiPorte extends BossScene {
     this.tweens.add({ targets: pop, y: IMPACT.y - 170, alpha: 0, scale: 1.3, duration: 1000, delay: 200, onComplete: () => pop.destroy() });
     if (this.dernierTour) { this.time.delayedCall(900, () => this.finir()); return; }
     if (this.solidite <= 0) {
-      // Rémi tape en premier : s'il la casse, tu n'as pas encore eu autant de tours que lui → DERNIER COUP pour toi
-      if (qui === 'remi' && this.tours.toi < this.tours.remi) {
+      // celui qui la casse a eu un tour de plus que l'autre → DERNIER COUP pour l'autre (V18 : toi tu commences, donc
+      // c'est en général Rémi qui a le dernier coup ; avant, Rémi commençait toujours)
+      const autre = qui === 'toi' ? 'remi' : 'toi';
+      if (this.tours[autre] < this.tours[qui]) {
         this.dernierTour = true;
-        this.time.delayedCall(700, () => { annonce(this, 'DERNIER COUP !', '#ffd84a', 1); bulle(this, `La porte est cassée... mais il te reste un coup : TOI ${this.total.toi} - ${this.total.remi} RÉMI`, '#ffffff', 2, 330); });
-        this.time.delayedCall(1700, () => this.tour('toi'));
+        this.time.delayedCall(700, () => {
+          annonce(this, autre === 'toi' ? 'DERNIER COUP !' : 'DERNIER COUP DE RÉMI', '#ffd84a', 1);
+          bulle(this, `La porte est cassée... ${autre === 'toi' ? 'mais il te reste un coup' : 'mais Rémi a encore un coup'} : TOI ${this.total.toi} - ${this.total.remi} RÉMI`, '#ffffff', 2, 330);
+        });
+        this.time.delayedCall(1700, () => this.tour(autre));
         return;
       }
       this.time.delayedCall(700, () => this.finir()); return;
@@ -537,8 +552,19 @@ export class RemiPorte extends BossScene {
       j.fillStyle(0x000000, 0.65).fillRect(xj - 6, 136, 40, 288);
       for (let k = 0; k < 10; k++) j.fillStyle(COUL[k], this.puissance * 10 > k ? 1 : 0.18).fillRect(xj - 1, 416 - (k + 1) * 27.6 + 3, 30, 22);
     }
+    // V18 : quelqu'un arrive = BORDS DE L'ÉCRAN ROUGES dès le premier pas (on le voit même sans le son)
+    const va = this.videur.etat;
+    if (va === 'annonce' || va === 'regarde') {
+      const a = va === 'regarde' ? 0.55 : 0.3 + 0.25 * Math.abs(Math.sin(this.horloge * 10));
+      j.fillStyle(0xff2020, a).fillRect(0, 0, LARGEUR, 14).fillRect(0, HAUTEUR - 14, LARGEUR, 14).fillRect(0, 0, 14, HAUTEUR).fillRect(LARGEUR - 14, 0, 14, HAUTEUR);
+    }
+    // poing caché : la jauge passe en bleu (la charge est gardée)
+    if (this.poingCache && (this.etat === 'toi' || this.etat === 'remi')) {
+      const xj = LARGEUR - 46;
+      j.lineStyle(3, 0x9fe0ff, 1).strokeRect(xj - 6, 136, 40, 288);
+    }
     // le videur arrive : « ! » rouge qui clignote, à gauche
-    if (this.videur.etat === 'annonce' && Math.floor(this.horloge * 8) % 2) {
+    if (va === 'annonce' && Math.floor(this.horloge * 8) % 2) {
       j.fillStyle(0xff3030, 1).fillTriangle(140, 320, 200, 320, 170, 250);
       j.fillStyle(0xffffff, 1).fillRect(167, 270, 6, 30).fillRect(167, 305, 6, 7);
     }

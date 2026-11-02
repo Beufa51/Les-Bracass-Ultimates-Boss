@@ -1,15 +1,13 @@
 // =====================================================================
-// RÉMI — JEU 2 : LE BEER PONG (V4 : caméra proche, LANCE-PIERRE)
-// Toute la table est visible (V5) : tes verres en bas, ceux de Rémi en haut, Rémi derrière.
-// LANCER : pose le doigt (ou la souris) n'importe où sous Rémi et TIRE VERS LE BAS (vers toi) comme un lance-pierre ;
-//   plus tu tires loin = plus loin ; tirer à gauche envoie à droite (et inversement). Les POINTILLÉS montrent TOUTE la trajectoire,
-//   jusqu'à la retombée (FACILE : + le point d'arrivée ; CHAMPION : pointillés plus espacés). Lâche = la balle part.
-//   Clavier : ◀ ▶ direction, ▲ ▼ force, ESPACE lance.
+// RÉMI — JEU 2 : LE BEER PONG (V18 : PICHENETTE, refonte « une seule règle »)
+// Toute la table est visible : tes verres en bas, ceux de Rémi en haut, Rémi derrière.
+// LANCER (comme les jeux de beer pong sur téléphone) : pose le doigt n'importe où, GLISSE VERS LE HAUT, lâche.
+//   Le sens du geste = la direction ; la longueur du geste = la force (plus long = plus loin). La balle suit le doigt
+//   et les pointillés montrent la trajectoire. Clavier : ◀ ▶ direction, ▲ ▼ force, ESPACE lance.
 // 2 balles par tour ; les 2 dedans = BALLS BACK. 3 verres de suite = EN FEU (trajectoire entière, lancer plus précis).
-// Chaque verre que Rémi te met, tu le bois : ta visée tangue (V17 : tangage RÉGULIER et plafonné, qu'on peut chronométrer ;
-//   garder le doigt IMMOBILE = CONCENTRATION : le tangage diminue de moitié ; le hoquet est annoncé « hic... » avant).
-// Rémi agite parfois les bras pour te déconcentrer :
-//   touche-le (ou Z) pour lui dire « Chut ! ».
+// Chaque verre que Rémi te met, tu le bois : ton bras tremble un peu plus (la balle dévie) et la courbe d'aide raccourcit.
+// Pendant le tour de Rémi : un cercle se resserre sur lui, touche quand il est tout petit = « FFFFF ! » (il rate plus).
+// (V18 : retirés car trop de règles : lance-pierre inversé, tir rebond, tangage, concentration, hoquet, « chut ».)
 // =====================================================================
 import { BossScene } from '../../core/BossScene.js';
 import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
@@ -30,7 +28,6 @@ function proj(x, y, z) {
   return { x: CX + x * p, y: HORIZON + (CAM_H - y) * p, k: p };
 }
 const DEPART = { x: 0, y: 0.1, z: 0.55 };       // ta balle, juste devant ta pyramide de verres
-const BOUTON_REBOND = { x: 880, y: 455, r: 52 };   // bouton « REBOND » (en bas à droite)
 const ETIQUETTES_VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 
 // pyramide de verres, pointe vers le milieu de la table ; loin = côté de Rémi
@@ -52,10 +49,10 @@ export class RemiPong extends BossScene {
   create() {
     // la scène est RÉUTILISÉE d'une partie à l'autre : on oublie les objets créés « à la demande » la fois d'avant
     // (sinon on réutilise un texte déjà détruit → bug « drawImage » à la 2e partie)
-    this.imgRemi = null; this.imgDouble = null; this.txtRebond = null; this.txtConc = null; this.calme = 0; this.hicPrevenu = false; this.rebond = false; this.prochainHoquet = undefined; this.hoquet = 0; this.prep = null;
+    this.imgRemi = null; this.imgDouble = null; this.prep = null;
     this.etat = 'intro';             // intro | vise | vol | remi | pause | fin
     this.horloge = 0; this.ivresse = 0; this.ivresseRemi = 0; this.serie = 0; this.feu = false;
-    this.balle = null; this.tir = null; this.distrait = 0; this.gouttes = []; this.flashBiere = 0;
+    this.balle = null; this.tir = null; this.gouttes = []; this.flashBiere = 0;
     this.visee = { x: 0, f: 0.45 };   // clavier : direction (m) et force (0 à 1)
     this.verresRemi = pyramide(P.verres, true);
     this.verresToi = pyramide(P.verres, false);
@@ -76,12 +73,11 @@ export class RemiPong extends BossScene {
     const t = estTactile();
     this.afficherIntro('RÉMI - Le beer pong', [
       'Vide les verres de Rémi avant qu\'il vide les tiens !',
-      `LANCE-PIERRE : pose ${t ? 'le doigt' : 'la souris'} au milieu de l'écran, TIRE VERS LE BAS, lâche`,
-      'Plus tu tires loin = plus loin ; les pointillés montrent la trajectoire',
+      `${t ? 'Pose le doigt' : 'Clique'} n'importe où, GLISSE VERS LE HAUT, lâche : la balle part`,
+      'Le sens du geste = la direction ; plus le geste est LONG = plus la balle va loin',
       t ? '' : 'Clavier : ◀ ▶ direction, ▲ ▼ force, ESPACE lance',
       '2 balles par tour ; les 2 dedans = BALLS BACK ; 3 de suite = EN FEU',
-      `Rémi agite les bras ? ${t ? 'Touche-le' : 'Clique sur lui (ou Z)'} : « Chut ! »`,
-      `Bouton REBOND${t ? '' : ' (ou X)'} : la balle rebondit sur la table, plus dur... mais 2 VERRES !`,
+      'Chaque verre que Rémi te met, tu le bois : ton bras tremble un peu plus',
       `Quand Rémi se concentre : ${t ? 'touche' : 'ESPACE'} quand le cercle est tout petit = tu le déconcentres`,
     ].filter(Boolean), () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.demarrer(); }));
   }
@@ -135,38 +131,6 @@ export class RemiPong extends BossScene {
   commencerVisee() {
     this.etat = 'vise'; this.viseDepuis = this.horloge; this.tir = null;
     etiquettesTactiles(ETIQUETTES_VIDES);
-    // Rémi essaie parfois de te déconcentrer
-    if (Math.random() < this.diff.distrait) {
-      this.time.delayedCall(hasard(300, 1200), () => {
-        if (this.etat !== 'vise') return;
-        this.distrait = 3; this.poseTemp('nargue', 3);
-        bulle(this, `Rémi agite les bras ! ${estTactile() ? 'Touche-le' : 'Clique sur lui (ou Z)'} : « Chut ! »`, '#ffb070', 1.6, 300);
-      });
-    }
-  }
-
-  // TIR REBOND : la balle rebondit une fois sur la table avant les verres. Plus dur (imprécision x1,5, aimant /2),
-  // mais s'il rentre : DEUX VERRES d'un coup.
-  basculerRebond() {
-    this.rebond = !this.rebond;
-    jouerSon(this, 'remi_rebond');
-    bulle(this, this.rebond ? 'TIR REBOND : plus dur, mais 2 verres s\'il rentre !' : 'Tir normal', this.rebond ? '#ffb070' : '#ffffff', 1, 300);
-  }
-
-  // vol du tir rebond : jusqu'à la table (point de rebond), puis de la table jusqu'au haut des verres
-  volRebond(depart, tx, tz) {
-    const zb = tz - 0.45, xb = depart.x + (tx - depart.x) * 0.55;
-    const T1 = P.dureeVol * 0.55, T2 = 0.32;
-    const v1 = { T: T1, vx: (xb - depart.x) / T1, vz: (zb - depart.z) / T1, vy: (0 - depart.y + G * T1 * T1 / 2) / T1 };
-    const v2 = { T: T2, vx: (tx - xb) / T2, vz: (tz - zb) / T2, vy: (H_VERRE + G * T2 * T2 / 2) / T2 };
-    return { v1, v2, xb, zb };
-  }
-
-  chut() {
-    if (this.distrait <= 0) return;
-    this.distrait = 0; this.pose = 'face';
-    bulle(this, '« CHUT ! »', '#7fff7f', 0.9, 300);
-    jouerSon(this, 'ui_valider');
   }
 
   installerTir() {
@@ -174,40 +138,27 @@ export class RemiPong extends BossScene {
       if (this.termine) return;
       if (this.etat === 'remiPrep') { this.souffler(); return; }
       if (this.etat !== 'vise') return;
-      if (Math.hypot(p.x - BOUTON_REBOND.x, p.y - BOUTON_REBOND.y) < BOUTON_REBOND.r) { this.basculerRebond(); return; }
-      if (p.y < 240 && Math.abs(p.x - CX) < 150) { this.chut(); return; }   // toucher Rémi
-      this.tir = { x0: p.x, y0: p.y, x: p.x, y: p.y }; this.calme = 0;
+      this.tir = { x0: p.x, y0: p.y, x: p.x, y: p.y };
     });
-    // CONCENTRATION : un geste franc la remet à zéro (les petits tremblements du doigt sont tolérés)
-    this.input.on('pointermove', (p) => { if (this.tir) { if (Math.hypot(p.x - this.tir.x, p.y - this.tir.y) > 3) this.calme = 0; this.tir.x = p.x; this.tir.y = p.y; } });
+    this.input.on('pointermove', (p) => { if (this.tir) { this.tir.x = p.x; this.tir.y = p.y; } });
     // (lâché HORS de l'écran aussi : sinon le lancer restait coincé)
     const lacher = () => {
       if (!this.tir) return;
       const c = this.cibleTir(); this.tir = null;
       if (this.etat === 'vise' && c) this.lancerToi(c.x, c.z);
+      else if (this.etat === 'vise') bulle(this, 'GLISSE VERS LE HAUT (plus long = plus loin)', '#9fe0ff', 1.2, 300);
     };
     this.input.on('pointerup', lacher); this.input.on('pointerupoutside', lacher);
   }
 
-  // cible (sans tangage) du lance-pierre en cours : tirer vers le bas = force ; tirer à gauche = envoie à droite
+  // PICHENETTE : geste VERS LE HAUT ; longueur = force, côté = direction (dans le même sens que le doigt)
   cibleTir() {
     const t = this.tir;
     if (!t) return null;
-    const dx = t.x - t.x0, dy = t.y - t.y0, l = Math.hypot(dx, dy);
-    if (l < 25 || dy < 10) return null;
-    const f = Math.min(1, l / P.tirage);
-    return { x: Phaser.Math.Clamp(-dx / P.tirage * 0.9, -W / 2, W / 2), z: 1.0 + f * 1.05, f };
-  }
-
-  // tangage de l'ivresse (+ Rémi qui agite les bras)
-  // V17 : amplitude PLAFONNÉE (P.tangageMax) et rythme CONSTANT (on peut lâcher au bon moment), divisée jusqu'à 2 par la
-  // CONCENTRATION (doigt immobile pendant P.concentration s)
-  concentration() { return Math.min(1, (this.calme || 0) / P.concentration); }
-  tangage() {
-    const a = Math.min(P.tangageMax, this.ivresse * P.ivresse) * (1 - P.concentrationEffet * this.concentration()) + (this.distrait > 0 ? 0.05 : 0);
-    // HOQUET : une secousse brève et forte (annoncée « hic... » juste avant)
-    const h = this.hoquet > 0 ? Math.sin(this.hoquet * 30) * 0.09 * this.hoquet / 0.4 : 0;
-    return { x: a * Math.sin(this.horloge * 1.7) + h, z: a * 1.4 * Math.cos(this.horloge * 1.13) + h * 0.8 };
+    const dx = t.x - t.x0, dy = t.y0 - t.y;
+    if (dy < 25) return null;
+    const f = Math.min(1, Math.hypot(dx, dy) / P.geste);
+    return { x: Phaser.Math.Clamp(dx / P.geste * P.cote, -W / 2, W / 2), z: P.zMin + f * (P.zMax - P.zMin), f };
   }
 
   // part de la courbe d'aide encore visible (l'alcool efface la retombée)
@@ -216,21 +167,7 @@ export class RemiPong extends BossScene {
   update(temps, delta) {
     const dt = Math.min(delta, 50) / 1000;
     this.horloge += dt;
-    this.distrait = Math.max(0, this.distrait - dt);
     this.flashBiere = Math.max(0, this.flashBiere - dt);
-    // hoquets quand on a trop bu (pendant ta visée)
-    this.hoquet = Math.max(0, (this.hoquet || 0) - dt);
-    if (this.etat === 'vise') this.calme = (this.calme || 0) + dt;
-    if (this.etat === 'vise' && this.ivresse >= P.hoquet) {
-      this.prochainHoquet = (this.prochainHoquet ?? 3) - dt;
-      if (this.prochainHoquet < 0.6 && !this.hicPrevenu) { this.hicPrevenu = true; bulle(this, 'hic...', '#ffb070', 0.5, 300); }
-      if (this.prochainHoquet <= 0) {
-        this.hicPrevenu = false;
-        this.prochainHoquet = hasard(3.5, 7) / (1 + (this.ivresse - P.hoquet) * 0.15);
-        this.hoquet = 0.4; jouerSon(this, 'remi_hips');
-        bulle(this, 'HIPS !', '#ffb070', 0.6, 300);
-      }
-    }
     if (this.etat === 'vise') this.viseClavier(dt);
     if (this.etat === 'remiPrep') {
       this.prep.t += dt;
@@ -244,34 +181,27 @@ export class RemiPong extends BossScene {
 
   viseClavier(dt) {
     const T = this.touches, v = this.visee;
-    if (T.gauche.isDown || T.droite.isDown || T.haut.isDown || T.bas.isDown) this.calme = 0;   // on bouge : pas concentré
     if (T.gauche.isDown) v.x -= 0.4 * dt;
     if (T.droite.isDown) v.x += 0.4 * dt;
     if (T.haut.isDown) v.f += 0.5 * dt;
     if (T.bas.isDown) v.f -= 0.5 * dt;
     v.x = Phaser.Math.Clamp(v.x, -W / 2, W / 2); v.f = Phaser.Math.Clamp(v.f, 0, 1);
-    if (vientDAppuyer(T.z)) this.chut();
-    if (vientDAppuyer(T.x)) this.basculerRebond();
-    if (vientDAppuyer(T.espace) && this.horloge - this.viseDepuis > 0.25) this.lancerToi(v.x, 1.0 + v.f * 1.05);
+    if (vientDAppuyer(T.espace) && this.horloge - this.viseDepuis > 0.25) this.lancerToi(v.x, P.zMin + v.f * (P.zMax - P.zMin));
   }
 
   lancerToi(tx, tz) {
-    const s = this.tangage(), e = this.diff.erreur * (this.feu ? 0.5 : 1);
-    // imprécision du bras (augmente avec l'alcool)
-    const e2 = this.rebond ? Math.max(0.045, e * 1.5) * (1 + this.ivresse * P.erreurBue) : e * (1 + this.ivresse * P.erreurBue), ex = hasard(-1, 1) * e2, ez = hasard(-1, 1) * e2 * 1.2;
+    // imprécision du bras : elle augmente avec chaque verre bu (moitié moins EN FEU)
+    const e = this.diff.erreur * (this.feu ? 0.5 : 1) * (1 + this.ivresse * P.erreurBue);
+    const ex = hasard(-1, 1) * e, ez = hasard(-1, 1) * e * 1.2;
     this.balles--;
-    this.etat = 'vol'; this.distrait = 0;
-    // AIMANT : à jeun, la balle est attirée vers le verre le plus proche de la cible (de moins en moins quand on a bu)
-    let ax = tx + s.x, az = tz + s.z;
-    const aim = Math.max(P.aimantMini, P.aimant - this.ivresse * 0.05) * (this.rebond ? 0.5 : 1);
+    this.etat = 'vol';
+    // petit AIMANT invisible vers le verre le plus proche (une balle presque parfaite rentre)
+    let ax = tx, az = tz;
+    const aim = Math.max(P.aimantMini, P.aimant - this.ivresse * 0.05);
     let proche = null, dmin = 0.13;
     for (const v of this.verresRemi) if (v.plein) { const d = Math.hypot(v.x - ax, v.z - az); if (d < dmin) { dmin = d; proche = v; } }
     if (proche) { ax += (proche.x - ax) * aim; az += (proche.z - az) * aim; }
     this.lancer(DEPART, ax + ex, az + ez, this.verresRemi, 'toi');
-    if (this.rebond) {
-      const r = this.volRebond(DEPART, ax + ex, az + ez);
-      Object.assign(this.balle, r.v1, { etat: 'vol1', rebondTir: r });
-    }
     jouerSon(this, 'remi_lance');
   }
 
@@ -337,12 +267,6 @@ export class RemiPong extends BossScene {
       return;
     }
     b.x += b.vx * dt; b.z += b.vz * dt; b.vy -= G * dt; b.y += b.vy * dt;
-    if (b.etat === 'vol1' && b.t >= b.T) {
-      // le rebond sur la table, puis la 2e partie du vol
-      b.y = 0; b.t = 0; Object.assign(b, b.rebondTir.v2, { etat: 'vol' });
-      jouerSon(this, 'remi_rebond');
-      return;
-    }
     if (b.etat === 'vol' && b.t >= b.T) { this.arrivee(); return; }
     if (b.etat === 'libre') {
       const surTable = Math.abs(b.x) <= W / 2 && b.z >= 0 && b.z <= D;
@@ -386,13 +310,6 @@ export class RemiPong extends BossScene {
     b.etat = 'dedans'; b.fin = 0.5; b.x = v.x; b.z = v.z; b.y = H_VERRE;
     v.plein = false; v.bu = 1; v.flash = 1;
     this.reussis++;
-    // TIR REBOND réussi : un 2e verre (le plus proche) saute aussi
-    if (b.qui === 'toi' && b.rebondTir) {
-      let autre = null, dmin = 9;
-      for (const w of b.verres) if (w.plein) { const d = Math.hypot(w.x - v.x, w.z - v.z); if (d < dmin) { dmin = d; autre = w; } }
-      if (autre) { autre.plein = false; autre.bu = 1; this.ivresseRemi++; this.time.delayedCall(300, () => this.eclabousser(autre)); }
-      this.time.delayedCall(200, () => annonce(this, 'REBOND : 2 VERRES !', '#ffb070', 1.1));
-    }
     jouerSon(this, 'remi_plouf');
     if (b.qui === 'toi') {
       this.eclabousser(v);
@@ -406,8 +323,8 @@ export class RemiPong extends BossScene {
     } else {
       this.ivresse++; this.flashBiere = 0.8;
       this.time.delayedCall(250, () => jouerSon(this, 'remi_boit'));
-      if (this.ivresse === 1) this.time.delayedCall(1500, () => bulle(this, 'Ta visée TANGUE : garde le doigt IMMOBILE pour te CONCENTRER (ça tangue 2 fois moins)', '#9fe0ff', 2.8, 300));
-      if (this.ivresse === P.hoquet) this.time.delayedCall(1500, () => bulle(this, 'Pompette : la fin de la courbe s\'efface et tu as le HOQUET (« hic... » = attends un peu avant de lâcher)', '#ffb070', 2.8, 300));
+      if (this.ivresse === 1) this.time.delayedCall(1500, () => bulle(this, 'Tu as bu : ton bras tremble un peu, la balle dévie plus', '#9fe0ff', 2.4, 300));
+      if (this.ivresse === 3) this.time.delayedCall(1500, () => bulle(this, 'Pompette : la fin de la courbe d\'aide s\'efface', '#ffb070', 2.4, 300));
       annonce(this, 'TU BOIS !', '#ffb070', 0.9);
       this.time.delayedCall(300, () => this.poseTemp('nargue', 1.6));
       this.time.delayedCall(700, () => bulle(this, `Rémi : « ${choisir(REPLIQUES.pongToucheRemi)} »`, '#ffd84a', 1.6, 250));
@@ -462,10 +379,9 @@ export class RemiPong extends BossScene {
 
   // ---------- dessin ----------
   dessiner() {
-    // Rémi derrière la table (il tangue un peu plus à chaque verre bu ; il gigote quand il te déconcentre)
+    // Rémi derrière la table (il tangue un peu plus à chaque verre bu)
     const gr = this.gRemi.clear();
     let bal = Math.sin(this.horloge * 1.5) * (2 + this.ivresseRemi * 2);
-    if (this.distrait > 0) bal += Math.sin(this.horloge * 18) * 10;
     if (this.pose !== 'face' && this.horloge > this.poseFin) this.pose = 'face';
     const yBord = proj(0, 0, D).y;
     if (this.textures.exists('remi_pong')) {
@@ -501,31 +417,28 @@ export class RemiPong extends BossScene {
     for (const d of this.gouttes) g.fillStyle(0xe8a52a, Math.min(1, d.vie * 2)).fillCircle(d.x, d.y, 4);
     if (this.flashBiere > 0) g.fillStyle(0xe8a52a, this.flashBiere * 0.5).fillRect(0, 0, LARGEUR, HAUTEUR);
 
-    // visée : la balle dans le lance-pierre, l'élastique, les pointillés de la trajectoire
+    // visée : la balle suit le doigt vers le haut, flèche du geste, pointillés de la trajectoire
     const gv = this.gVisee.clear();
     if (this.etat === 'vise') {
-      const s = this.tangage(), base = proj(DEPART.x, DEPART.y, DEPART.z);
-      let c = this.cibleTir(), tire = { x: 0, y: 0 };
-      if (this.tir) { tire = { x: (this.tir.x - this.tir.x0) * 0.35, y: Math.max(0, this.tir.y - this.tir.y0) * 0.35 }; }
-      else c = { x: this.visee.x, z: 1.0 + this.visee.f * 1.05, f: this.visee.f };   // clavier
-      const bx = base.x + tire.x, by = Math.min(base.y + tire.y, HAUTEUR - 8);
+      const base = proj(DEPART.x, DEPART.y, DEPART.z);
+      let c = this.cibleTir(), bx = base.x, by = base.y;
       if (this.tir) {
-        gv.lineStyle(4, 0x8a5a2b, 1).lineBetween(base.x - 40, base.y, bx, by).lineBetween(base.x + 40, base.y, bx, by);
-      }
-      // jauge de CONCENTRATION (seulement quand on a bu) : elle se remplit si on ne bouge plus
-      if (this.ivresse > 0 && (this.tir || !estTactile())) {
-        const k = this.concentration(), jx = base.x - 290, jy = Math.min(base.y + 40, HAUTEUR - 60);   // (à gauche des verres)
-        gv.fillStyle(0x000000, 0.6).fillRect(jx - 2, jy - 2, 124, 10);
-        gv.fillStyle(k >= 1 ? 0x7fff7f : 0x9fe0ff, 1).fillRect(jx, jy, 120 * k, 6);
-        if (!this.txtConc) this.txtConc = texte(this, 0, 0, '', 14, '#9fe0ff', { fontStyle: 'bold' }).setDepth(30);
-        this.txtConc.setVisible(true).setPosition(jx + 60, jy - 12).setText(k >= 1 ? 'CONCENTRÉ !' : 'ne bouge plus...').setColor(k >= 1 ? '#7fff7f' : '#9fe0ff');
-      } else if (this.txtConc) this.txtConc.setVisible(false);
+        const dx = this.tir.x - this.tir.x0, dy = Math.min(0, this.tir.y - this.tir.y0);
+        bx = base.x + dx * 0.25; by = base.y + dy * 0.25;   // la balle « suit » un peu le doigt
+        // flèche du geste (vert quand le geste est valable)
+        gv.lineStyle(5, c ? 0x7fff7f : 0x888888, 0.8).lineBetween(this.tir.x0, this.tir.y0, this.tir.x, Math.min(this.tir.y, this.tir.y0));
+        gv.fillStyle(c ? 0x7fff7f : 0x888888, 0.8).fillCircle(this.tir.x0, this.tir.y0, 8);
+        // jauge de force à côté du doigt
+        if (c) {
+          const jx = Math.min(LARGEUR - 30, this.tir.x0 + 40), jy = this.tir.y0;
+          gv.fillStyle(0x000000, 0.55).fillRect(jx - 2, jy - 102, 14, 104);
+          gv.fillStyle(0xffd84a, 1).fillRect(jx, jy - 100 * c.f, 10, 100 * c.f);
+        }
+      } else if (!estTactile()) c = { x: this.visee.x, z: P.zMin + this.visee.f * (P.zMax - P.zMin), f: this.visee.f };   // clavier
       if (c) {
-        const vol = this.parametresVol(DEPART, c.x + s.x, c.z + s.z);
-        if (this.rebond) this.apercuRebond(gv, c, s);
-        // TOUTE la courbe jusqu'à la retombée ; en CHAMPION, des pointillés plus espacés et pas de point d'arrivée
-        const part = this.feu ? 1 : this.diff.apercu, pas = 1, fin = Math.round(24 * this.partCourbe());
-        for (let k = 1; k <= (this.rebond ? 0 : fin); k += pas) {
+        const s = { x: 0, z: 0 }, vol = this.parametresVol(DEPART, c.x, c.z);
+        const part = this.feu ? 1 : this.diff.apercu, fin = Math.round(24 * this.partCourbe());
+        for (let k = 1; k <= fin; k++) {
           const t = (k / 24) * vol.T;
           const q = proj(DEPART.x + vol.vx * t, DEPART.y + vol.vy * t - G * t * t / 2, DEPART.z + vol.vz * t);
           const rr = Math.max(2.5, q.k * 0.009);
@@ -535,8 +448,8 @@ export class RemiPong extends BossScene {
           gv.fillStyle(0x000000, 0.6).fillCircle(q.x, q.y, rr + 1.5);   // contour sombre : lisible même devant Rémi
           gv.fillStyle(this.feu ? 0xff8a2a : 0xffffff, 0.95).fillCircle(q.x, q.y, rr);
         }
-        this.vueCote(gv, vol, c, s, pas, fin);
-        if ((part >= 0.5 && fin >= 24) || this.feu) { const q = proj(c.x + s.x, H_VERRE, c.z + s.z); gv.lineStyle(2, 0x7fff7f, 0.9).strokeEllipse(q.x, q.y, q.k * 0.07, q.k * 0.03); }
+        this.vueCote(gv, vol, c, s, 1, fin);
+        if ((part >= 0.5 && fin >= 24) || this.feu) { const q = proj(c.x, H_VERRE, c.z); gv.lineStyle(2, 0x7fff7f, 0.9).strokeEllipse(q.x, q.y, q.k * 0.07, q.k * 0.03); }
         if (!this.tir) {   // jauge de force (clavier)
           gv.fillStyle(0x000000, 0.5).fillRect(LARGEUR - 60, 280, 22, 150);
           gv.fillStyle(0xffd84a, 1).fillRect(LARGEUR - 57, 427 - 144 * c.f, 16, 144 * c.f);
@@ -545,16 +458,12 @@ export class RemiPong extends BossScene {
       const r = Math.max(6, 0.022 * base.k);
       gv.fillStyle(this.feu ? 0xff8a2a : 0x222222, 1).fillCircle(bx, by, r + 2);
       gv.fillStyle(this.feu ? 0xffd27a : 0xffffff, 1).fillCircle(bx, by, r);
+      // au repos : une flèche qui monte montre le geste à faire
+      if (!this.tir && estTactile()) {
+        const k = (this.horloge * 1.2) % 1, y = base.y + 70 - k * 90;
+        gv.fillStyle(0x9fe0ff, 0.8 * (1 - k)).fillTriangle(base.x - 14, y + 12, base.x + 14, y + 12, base.x, y - 8);
+      }
     }
-    // bouton REBOND (pendant ta visée)
-    if (this.etat === 'vise') {
-      const b = BOUTON_REBOND;
-      gv.fillStyle(0x000000, 0.5).fillCircle(b.x, b.y, b.r);
-      gv.fillStyle(0xffb070, this.rebond ? 0.75 : 0.15).fillCircle(b.x, b.y, b.r - 5);
-      gv.lineStyle(4, 0xffb070, 1).strokeCircle(b.x, b.y, b.r);
-    }
-    if (!this.txtRebond) this.txtRebond = texte(this, BOUTON_REBOND.x, BOUTON_REBOND.y, 'REBOND\nx2', 16, '#ffffff', { fontStyle: 'bold' }).setDepth(901);
-    this.txtRebond.setVisible(this.etat === 'vise');
     // Rémi se concentre : le cercle qui se resserre (vert quand c'est le moment de souffler)
     if (this.etat === 'remiPrep' && this.prep && !this.prep.fait) {
       const k = 1 - this.prep.t / this.prep.d, bon = this.prep.t > this.prep.d - 0.3;
@@ -565,26 +474,12 @@ export class RemiPong extends BossScene {
     // HUD
     const n = (l) => l.filter(v => v.plein).length;
     this.hud.setText(`TOI ${n(this.verresToi)}  -  ${n(this.verresRemi)} RÉMI      verres bus : ${this.ivresse}${this.feu ? '      🔥 EN FEU' : ''}`);
-    const tour = this.etat === 'vise' ? `À TOI (balle ${3 - this.balles}/2) : ${estTactile() ? 'tire vers toi et lâche' : 'tire avec la souris, ou ◀ ▶ ▲ ▼ + ESPACE'}`
+    const tour = this.etat === 'vise' ? `À TOI (balle ${3 - this.balles}/2) : ${estTactile() ? 'glisse vers le haut et lâche' : 'glisse la souris vers le haut, ou ◀ ▶ ▲ ▼ + ESPACE'}`
       : this.etat === 'remiPrep' ? `Rémi se concentre... ${estTactile() ? 'TOUCHE' : 'ESPACE'} quand le cercle est tout petit !`
       : (this.etat === 'remi' || (this.balle && this.balle.qui === 'remi')) ? 'RÉMI LANCE...' : '';
     this.hudTour.setText(tour).setVisible(!!tour);
     // l'ivresse fait un peu tanguer l'écran
     this.cameras.main.setRotation(Math.sin(this.horloge * 0.9) * this.ivresse * 0.008);
-  }
-
-  // pointillés du tir rebond (orange) : jusqu'à la table, puis jusqu'aux verres (raccourcis par l'alcool comme l'autre)
-  apercuRebond(g, c, s) {
-    const r = this.volRebond(DEPART, c.x + s.x, c.z + s.z), pts = [];
-    for (let k = 1; k <= 14; k++) { const t = k / 14 * r.v1.T; pts.push([DEPART.x + r.v1.vx * t, DEPART.y + r.v1.vy * t - G * t * t / 2, DEPART.z + r.v1.vz * t]); }
-    for (let k = 1; k <= 10; k++) { const t = k / 10 * r.v2.T; pts.push([r.xb + r.v2.vx * t, r.v2.vy * t - G * t * t / 2, r.zb + r.v2.vz * t]); }
-    const n = Math.round(pts.length * this.partCourbe());
-    for (const [x, y, z] of pts.slice(0, n)) {
-      const q = proj(x, y, z), rr = Math.max(2.5, q.k * 0.009), o = proj(x, 0, z);
-      g.fillStyle(0x000000, 0.35).fillEllipse(o.x, o.y, rr * 2.4, rr);   // ombre sur la table
-      g.fillStyle(0x000000, 0.6).fillCircle(q.x, q.y, rr + 1.5);
-      g.fillStyle(0xffb070, 1).fillCircle(q.x, q.y, rr);
-    }
   }
 
   // VUE DE CÔTÉ (encart en haut à droite) : la table de profil, les verres de Rémi, et la courbe qui monte puis RETOMBE
