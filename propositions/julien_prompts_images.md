@@ -286,3 +286,33 @@ Pixel art sprite sheet in the style of a 16-bit arcade game: limited color palet
 Plain solid pure white background (#FFFFFF) — every effect must have a thin dark outline so it stays visible —, no ground shadow, no frame, no grid lines, no text except the grades.
 IMPORTANT: every effect is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no effect may touch another effect or the cell border.
 ```
+
+## 19. Lycée : « touchés par une boulette » + le CDI
+Les images « touché » du surveillant, de la cantinière et de Julien ont du jaune d'ŒUF ; au lycée et en classe, ce
+sont des BOULETTES DE PAPIER. Et le CDI n'a pas encore ses vraies étagères.
+
+### 19a. Touchés par une boulette — `julien_touches_boulette.jpg` (joindre `julien_surveillant.jpg`, `julien_cantiniere.jpg` et `julien_reference.jpg` pour garder les mêmes personnages)
+```
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. Humorous, cartoonish French high-school theme, no blood, no gore.
+The SAME three characters as in the attached images, same style, same scale, full body, seen strictly from the FRONT, facing the viewer, no perspective tilt.
+3 poses in one row, each in its own equal-size cell, feet aligned on the same bottom line:
+1) the school supervisor (red hoodie, jeans, whistle, lanyard badge) hit on the forehead by a crumpled white paper ball, flinching, eyes shut, little white paper bits flying, NO egg, NO yolk;
+2) the canteen lady (white apron, blue hairnet, yellow rubber gloves, ladle) hit by a crumpled white paper ball, flinching, outraged, little white paper bits flying, NO egg, NO yolk;
+3) the teacher (dark hair, glasses, green jacket, geeky horror video game t-shirt, jeans) hit on the forehead by a crumpled white paper ball, flinching, furious, little white paper bits flying, NO egg, NO yolk.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no part may touch another pose or the cell border.
+```
+
+### 19b. Le CDI : étagères et objets — `julien_cdi.jpg`
+```
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. French high-school library ("CDI") theme.
+4 separate objects in one row, each in its own equal-size cell, seen strictly from the FRONT, same pixel scale, resting on the same bottom line:
+1) a tall wooden bookshelf full of colorful books, about as tall as an adult; 2) a low wooden bookshelf (waist height) with books and a small plant on top; 3) a library reading table with open books and a desk lamp; 4) an old beige computer on a small desk with a chair.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every object is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no object may touch another object or the cell border.
+```
+
+### 19c. Le mur du CDI — `julien_mur_cdi.jpg`
+Prompt de la section 7 (murs), en remplaçant « Parisian street theme » par « French high-school interior theme » et la
+ligne « Wall: … » par :
+`Wall: school library wall covered with built-in wooden bookshelves full of colorful books, a small "CDI" sign near the top.`
