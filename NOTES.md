@@ -1377,3 +1377,6 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,
   dictionnaire qui rebondit ; copies d'interro sous 50 % ; on riposte avec boulettes/craies) et le badge.
+- V14 : FEINTES PAR L'IDENTITÉ (idée de Fabien) : pendant l'annonce, tous les intrus font le MÊME bruit, la même ombre et le
+  même « ! » (musique coupée pareil) : on ne sait qu'en le voyant. Le GARS QUI VIENT PISSER n'attrape personne (« Pardon,
+  urgence ! » : on aurait pu continuer), la MAMIE (un peu sourde) n'attrape que si la charge dépasse 50 %, le VIDEUR attrape tout.

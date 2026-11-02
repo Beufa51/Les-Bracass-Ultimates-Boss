@@ -33,9 +33,9 @@ const VIDEUR = { x: 120, echelle: 0.42 };   // l'intrus passe la tête au coin d
 const INTRUS = {
   videur: { poids: 0.45, nom: 'Le videur', lent: 1, regard: 1, ombre: 1, pas: ['remi_atterrit', 0.6], rythme: [0.18, 0.4], feinte: null,
     repliques: 'porteAttrape' },
-  pisseur: { poids: 0.33, nom: 'Le gars qui vient pisser', lent: 1.2, regard: 1.3, ombre: 0.85, pas: ['remi_atterrit', 0.8], rythme: [0.2, 0.65], feinte: 'fausse',
+  pisseur: { poids: 0.33, nom: 'Le gars qui vient pisser', lent: 1, regard: 1.3, ombre: 1, pas: ['remi_atterrit', 0.8], rythme: [0.2, 0.65], feinte: 'fausse',
     repliques: 'porteAttrapePisseur' },
-  mamie: { poids: 0.22, nom: 'La mamie', lent: 1.7, regard: 1.6, ombre: 0.6, pas: ['remi_rebond', 0.45], rythme: [0.45, 0.6], feinte: 'retour',
+  mamie: { poids: 0.22, nom: 'La mamie', lent: 1, regard: 1.6, ombre: 1, pas: ['remi_rebond', 0.45], rythme: [0.45, 0.6], feinte: 'retour',
     repliques: 'porteAttrapeMamie' },
 };
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
@@ -88,7 +88,8 @@ export class RemiPorte extends BossScene {
       REPLIQUES.porteIntro,
       `MAINTIENS ${t ? 'le doigt sur l\'écran' : 'ESPACE'} : tu armes ton poing (ça monte de plus en plus vite)`,
       'LÂCHE : le coup part. Lâche quand la cible passe sur ton poing (+) = coup parfait.',
-      'LE VIDEUR (ou un gars qui vient pisser, ou une mamie !) : des pas, une ombre, le « ! »... S\'il te voit charger : ATTRAPÉ !',
+      'Des pas, une ombre, le « ! »... QUELQU\'UN ARRIVE. S\'il te voit charger : ATTRAPÉ !',
+      'Mais qui ? Le VIDEUR ne rate rien ; la MAMIE n\'entend que les gros coups ; le GARS QUI VIENT PISSER s\'en fiche !',
       'Et il FEINTE : fausse alerte, il surgit sans prévenir, il revient d\'un coup...',
       'Celui dont le coup fait CÉDER la porte gagne.',
     ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.tour('remi'); }));
@@ -200,17 +201,18 @@ export class RemiPorte extends BossScene {
       v.demiTour = v.mode === 'fausse' ? v.duree * hasard(0.45, 0.8) : -1;
     } else if (v.etat === 'annonce') {
       v.pas -= dt;
-      if (v.pas <= 0) {   // ses pas (le pisseur titube : rythme irrégulier ; la mamie : sa canne « toc »)
-        const I = INTRUS[v.qui];
-        v.pas = v.qui === 'pisseur' ? hasard(I.rythme[0], I.rythme[1]) : v.rythme;
-        jouerSon(this, I.pas[0], { rate: I.pas[1] });
-        if (v.qui === 'pisseur' && Math.random() < 0.25) jouerSon(this, 'remi_hips');
-      }
+      // FEINTE : tant qu'il n'est pas là, TOUT LE MONDE fait le même bruit et la même ombre : impossible de savoir
+      // si c'est le videur... ou juste le gars qui vient pisser (qui, lui, s'en fiche)
+      if (v.pas <= 0) { v.pas = v.rythme; jouerSon(this, 'remi_atterrit', { rate: 0.6 }); }
       // fausse alerte : il fait demi-tour avant d'arriver
       if (v.demiTour > 0 && v.duree - v.t >= v.demiTour) { v.etat = 'repart'; v.t = 0.6; return; }
       if (v.t <= 0) {
         v.etat = 'regarde'; v.t = hasard(R.videurRegard[0], R.videurRegard[1]) * INTRUS[v.qui].regard * (v.mode === 'retour' ? 0.6 : 1);
         v.pose = 0; v.vu = false; jouerSon(this, 'remi_scratch');
+        // ... et on découvre QUI c'est : le gars qui vient pisser s'en fiche (on aurait pu continuer !),
+        // la mamie n'entend que les GROS coups (charge à plus de 50 %) ; le videur, lui, ne rate rien
+        if (v.qui === 'pisseur') { bulle(this, 'Le gars : « Pardon, pardon... URGENCE ! » (il s\'en fiche : continue !)', '#9fe0ff', 1.6, 150); this.time.delayedCall(300, () => jouerSon(this, 'remi_hips')); }
+        if (v.qui === 'mamie') { bulle(this, 'La mamie : « Hein ? C\'est quoi ce bruit ? » (elle est un peu sourde...)', '#d8b0ff', 1.6, 150); jouerSon(this, 'remi_rebond', { rate: 0.45 }); }
       }
     } else if (v.etat === 'repart') {
       v.pas -= dt;
@@ -218,8 +220,10 @@ export class RemiPorte extends BossScene {
       if (v.t <= 0) { v.etat = 'absent'; v.t = hasard(0.5, 1.5) * this.diff.videur; }
     } else if (v.etat === 'regarde') {
       // il regarde : celui qui charge (ou qui vient juste de frapper) se fait ATTRAPER
-      const fautif = (this.etat === 'toi' || this.etat === 'remi') && this.charge ? this.frappeur
+      let fautif = (this.etat === 'toi' || this.etat === 'remi') && this.charge ? this.frappeur
         : this.etat === 'coup' && this.tCoup < 0.25 ? this.frappeur : null;
+      if (v.qui === 'pisseur') fautif = null;                                                  // trop pressé pour regarder
+      if (v.qui === 'mamie' && this.etat !== 'coup' && this.puissance < 0.5) fautif = null;   // un peu sourde : seulement les gros coups
       if (fautif && !v.vu) this.attraper(fautif);
       if (v.t <= 0) {
         v.etat = 'absent'; v.pose = 0;
