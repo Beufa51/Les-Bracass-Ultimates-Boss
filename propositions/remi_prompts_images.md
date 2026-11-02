@@ -65,6 +65,6 @@ Décor de jeu style manga/anime : couloir des toilettes d'un bar, vu de côté, 
 à DROITE de l'image (bien visible, de face, pictogramme WC), murs couverts d'autocollants. Aucun personnage, image horizontale 16:9.
 ```
 
-## 9. La porte vue DE DOS (audit V3, amélioration C1)
+## 9. La porte vue DE DOS (audit V3, amélioration C1) ✅ REÇUES ET INTÉGRÉES
 Prompts dans `propositions/remi_audit.md`, section 5 : `remi_porte_dos_planche.jpg` (Rémi de dos) et
 `remi_toi_dos_planche.jpg` (toi de dos).

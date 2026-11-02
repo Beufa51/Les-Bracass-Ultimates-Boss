@@ -94,7 +94,7 @@ nulle et on voit du blanc autour ».
 
 ---
 
-## 4. Ordre de travail proposé
+## 4. Ordre de travail proposé (validé ; FAIT en V4 : A1-A5, A7, détourage, B1-B5, C1, C2, C4 — RESTE : A6, B6, C3)
 1. **Vélo** : A1, A2, A3, A4, A5 + nouveau détourage `rembg` de TOUTES les images (règle aussi « le blanc autour »).
 2. **Beer pong** : B1, B2, B3, puis B4 / B5.
 3. **Porte** : C1 (dès réception des planches de dos), C2, C4 ; C3 en option.

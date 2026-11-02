@@ -106,15 +106,15 @@ def planche_pong():
     bande.save(DST + 'remi_pong.png')
     print('remi_pong.png', W, H)
 
-def planche_porte():
-    # 2 rangées de 3 poses de profil (Rémi en haut, toi en bas) : garde, coup, impact (traits de vitesse)
-    # -> remi_porte.png : 6 cases ALIGNÉES À GAUCHE (le pied arrière reste au même endroit), posées en bas
-    im = detourer(Image.open(SRC + 'remi_porte_planche.jpg'))
+def poses_planche(fichier, grand=20000, seuil_rangee=None):
+    # découpe une planche en poses : groupes de pixels reliés (un peu épaissis) ; les petits morceaux (traits de vitesse)
+    # rejoignent la pose la plus proche ; on ne garde QUE les pixels de chaque pose. Rangées de haut en bas, puis de gauche à droite.
+    im = detourer(Image.open(SRC + fichier))
     al = np.asarray(im)[:, :, 3] > 40
     lab, n = ndimage.label(ndimage.binary_dilation(al, iterations=2))
     boites = ndimage.find_objects(lab)
     tailles = ndimage.sum(np.ones_like(lab), lab, range(1, n + 1))
-    grands = [i for i in range(n) if tailles[i] > 20000]
+    grands = [i for i in range(n) if tailles[i] > grand]
     groupes = {i: list(boites[i]) for i in grands}
     membres = {i: [i + 1] for i in grands}   # étiquettes de chaque pose (pour ne garder QUE ses pixels)
     for i in range(n):
@@ -128,7 +128,8 @@ def planche_porte():
             return (dx + dy, abs((gg[0].start + gg[0].stop) / 2 - cy) + abs(gg[1].stop - cx) * 0.2)
         j = min(grands, key=dist); g = groupes[j]; membres[j].append(i + 1)
         groupes[j] = [slice(min(g[0].start, b[0].start), max(g[0].stop, b[0].stop)), slice(min(g[1].start, b[1].start), max(g[1].stop, b[1].stop))]
-    ordre = sorted(groupes, key=lambda j: (groupes[j][0].start > al.shape[0] / 2, groupes[j][1].start))
+    milieu = seuil_rangee or al.shape[0] / 2
+    ordre = sorted(groupes, key=lambda j: (groupes[j][0].start > milieu, groupes[j][1].start))
     rgba = np.asarray(im).copy()
     poses = []
     for j in ordre:
@@ -136,12 +137,28 @@ def planche_porte():
         m = np.isin(lab, membres[j])
         r = rgba.copy(); r[:, :, 3] = np.where(m, r[:, :, 3], 0)
         poses.append(Image.fromarray(r, 'RGBA').crop((b[1].start, b[0].start, b[1].stop, b[0].stop)))
-    print('porte : poses', [p.size for p in poses])
+    print(fichier, ': poses', [p.size for p in poses])
+    return poses
+
+def bande_gauche(poses, nom):
+    # cases ALIGNÉES À GAUCHE (le corps reste au même endroit, le bras part à droite), posées en bas
     W = max(p.size[0] for p in poses); H = max(p.size[1] for p in poses)
     bande = Image.new('RGBA', (W * len(poses), H), (0, 0, 0, 0))
     for k, p in enumerate(poses): bande.paste(p, (k * W, H - p.size[1]))
-    bande.save(DST + 'remi_porte.png')
-    print('remi_porte.png', W, H, len(poses))
+    bande.save(DST + nom)
+    print(nom, W, H, len(poses), 'largeurs', [p.size[0] for p in poses])
+
+def planche_porte():
+    # 2 rangées de 3 poses de profil (Rémi en haut, toi en bas) : garde, coup, impact (traits de vitesse) -> remi_porte.png
+    bande_gauche(poses_planche('remi_porte_planche.jpg'), 'remi_porte.png')
+
+def planches_dos():
+    # LA PORTE VUE DE DOS (audit C1). Toi : rangée 1 = garde, élan, coup ; rangée 2 = garde, élan haut, impact
+    # -> remi_toi_dos.png : garde, élan, coup, impact. Rémi : rangée 1 = garde, coup ; rangée 2 = impact -> remi_dos.png
+    t = poses_planche('remi_toi_dos_planche.jpg')
+    bande_gauche([t[3], t[1], t[2], t[5]], 'remi_toi_dos.png')
+    r = poses_planche('remi_porte_dos_planche.jpg')
+    bande_gauche([r[0], r[1], r[2]], 'remi_dos.png')
 
 def planche_bourres():
     # 4 bourrés sur une ligne : debout, sursaute, allongé (bouteilles), traverse de face.
@@ -208,6 +225,7 @@ planche_velo()
 presentation()
 planche_pong()
 planche_porte()
+planches_dos()
 planche_bourres()
 rue()
 facade()
