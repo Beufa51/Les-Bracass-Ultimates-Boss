@@ -252,6 +252,18 @@ def videur():
         for k, x in enumerate(p): bande.paste(x, (k * W + (W - x.size[0]) // 2, H - x.size[1]))
         bande.save(DST + f'remi_{nom}.png'); print(f'remi_{nom}.png', W, H, len(p))
 
+def planches_velo_v15():
+    # pêcheur (2 poses, la canne fine est gardée : petits morceaux rattachés), obstacles (4 objets ; la ligne du sol est
+    # coupée), chorale (2 poses ; les « La la » et les notes restent avec le groupe) -> cases posées en bas, centrées
+    def bande(poses, nom, aligne='centre'):
+        W = max(x.size[0] for x in poses); H = max(x.size[1] for x in poses)
+        b = Image.new('RGBA', (W * len(poses), H), (0, 0, 0, 0))
+        for k, x in enumerate(poses): b.paste(x, (k * W + ((W - x.size[0]) // 2 if aligne == 'centre' else W - x.size[0]), H - x.size[1]))
+        b.save(DST + nom); print(nom, W, H, len(poses), [x.size for x in poses])
+    bande(poses_planche('remi_pecheur_planche.jpg', grand=15000), 'remi_pecheur.png', 'droite')   # (calé à droite : le corps ne bouge pas)
+    bande(poses_planche('remi_obstacles_planche.jpg', grand=3000, bas=574), 'remi_obstacles.png')
+    bande(poses_planche('remi_chorale_planche.jpg', grand=30000), 'remi_chorale.png')
+
 def facade():
     # façade du bar (arrivée du vélo) : fond blanc retiré (et entre les pieds des tabourets) -> remi_bar_facade.png
     im = detourer(Image.open(SRC + 'remi_bar_facade.jpg'), grand=300, seuil=225)
@@ -283,4 +295,5 @@ facade()
 rues_quartiers()
 petites_images()
 videur()
+planches_velo_v15()
 decor_porte()

@@ -1384,3 +1384,8 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   très faible (0,01 / 0,016 / 0,025 : ce qu'on vise = ce qu'on touche, la difficulté vient de la courbe, de l'alcool visible,
   de Rémi) ; tir rebond : imprécision mini 0,045 ; rebord : chance de rentrer selon la distance au centre (15 à 85 %) ;
   `tirage` 175 (geste plus précis). Prompts vélo 20 (obstacles + pinte), 21 (pêcheur), 22 (chorale).
+- V15b : IMAGES DU VÉLO intégrées (`planches_velo_v15` dans preparer_images.py) : `remi_obstacles.png` (poubelle, pinte,
+  verre cassé, flaque ; collisions poubelle 95 de haut), `remi_pecheur.png` (canne tendue / relevée), `remi_chorale.png`
+  (3 fêtards : chante / sursaute ; dessinée sur le bourré du milieu `centreChorale`). Méthode `image(o, cle, frame...)`.
+  PORTE : les coups se voient : le frappeur plonge vers la porte (`elan`), bulle de BD « BAM ! / POW ! / KRAK ! », CREUX qui
+  restent dans le bois, score affiché plus haut. Prompt 23 (facultatif) : planche de coups qui touchent vraiment une porte.

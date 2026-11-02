@@ -36,6 +36,10 @@ export const MANIFESTE = {
     // les 2 autres intrus de la porte : le gars qui vient pisser, la mamie (distrait / furieux, coupés à la taille)
     remi_pisseur: { fichier: 'sprites/remi/remi_pisseur.png', largeur: 548, hauteur: 756, images: 2, vitesse: 1 },
     remi_mamie: { fichier: 'sprites/remi/remi_mamie.png', largeur: 709, hauteur: 750, images: 2, vitesse: 1 },
+    // vélo (V15) : poubelle, pinte, verre cassé, flaque ; le pêcheur (canne tendue / relevée) ; la chorale (chante / sursaute)
+    remi_obstacles: { fichier: 'sprites/remi/remi_obstacles.png', largeur: 343, hauteur: 382, images: 4, vitesse: 1 },
+    remi_pecheur: { fichier: 'sprites/remi/remi_pecheur.png', largeur: 767, hauteur: 731, images: 2, vitesse: 1 },
+    remi_chorale: { fichier: 'sprites/remi/remi_chorale.png', largeur: 665, hauteur: 648, images: 2, vitesse: 1 },
     remi_presentation: { fichier: 'sprites/remi/remi_presentation.png', largeur: 832, hauteur: 1202, images: 1, vitesse: 1 },
   },
   sons: {

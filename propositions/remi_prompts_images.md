@@ -147,7 +147,7 @@ canne. 2 poses côte à côte, même échelle, bien espacées : 1 : elle regarde
 2 : elle te voit, furieuse, elle lève sa canne d'un air menaçant.
 ```
 
-## 20. Les petits obstacles du vélo — `remi_obstacles_planche.jpg`
+## 20. Les petits obstacles du vélo — `remi_obstacles_planche.jpg` ✅ REÇUE ET INTÉGRÉE
 À joindre : la planche des bourrés (pour garder le style).
 ```
 Même style que l'image jointe (manga/anime, contours noirs nets), fond BLANC uni, aucun texte. Planche de 4 objets vus
@@ -157,7 +157,7 @@ bière renversée, mousseuse et dorée, avec un gobelet en plastique couché ; 4
 d'un petit halo lumineux (un bonus à attraper).
 ```
 
-## 21. Le pêcheur des quais (vélo) — `remi_pecheur_planche.jpg`
+## 21. Le pêcheur des quais (vélo) — `remi_pecheur_planche.jpg` ✅ REÇUE ET INTÉGRÉE
 À joindre : la planche des bourrés.
 ```
 Même style que l'image jointe (manga/anime, contours noirs nets), fond BLANC uni, aucun texte. Un vieux pêcheur de nuit, en ciré
@@ -166,11 +166,21 @@ bien espacées : 1 : il pêche tranquillement, sa longue canne tendue horizontal
 2 : il sursaute (sonnette !) et relève sa canne vers le ciel.
 ```
 
-## 22. La chorale de fêtards (vélo, centre-ville) — `remi_chorale_planche.jpg`
+## 22. La chorale de fêtards (vélo, centre-ville) — `remi_chorale_planche.jpg` ✅ REÇUE ET INTÉGRÉE
 À joindre : la planche des bourrés.
 ```
 Même style que l'image jointe (manga/anime, contours noirs nets, drôle), fond BLANC uni, aucun texte. 3 fêtards éméchés bras dessus
 bras dessous, entiers, vus de face, qui chantent à tue-tête (bouches grandes ouvertes, notes de musique), une pinte à la main.
 2 poses côte à côte, même échelle, bien espacées : 1 : ils chantent en se balançant ; 2 : ils sursautent ensemble et s'écartent
 (sonnette !), surpris.
+```
+
+## 23. (facultatif) Les coups dans la porte, mieux « portés » — `remi_coups_planche.jpg`
+À joindre : les planches de dos de Rémi et du jeune homme (pour garder les mêmes personnages).
+```
+Même style et mêmes personnages que les images jointes (manga/anime, contours noirs nets), fond BLANC uni, aucun texte.
+Vue de 3/4 DOS, coupés à mi-cuisses. Une porte en bois est dessinée À DROITE de chaque case, vue de face (juste le bord gauche
+de la porte, de haut en bas). Ligne du haut : le personnage barbu à casquette ; ligne du bas : le jeune homme en tee-shirt bleu.
+3 poses par ligne, même échelle : 1 : poing armé en arrière, tout le corps tendu ; 2 : le coup part, l'épaule en avant ;
+3 : le poing ÉCRASÉ contre la porte, le bois qui se fend autour, éclats qui volent, traits d'impact.
 ```

@@ -42,7 +42,7 @@ const VOIT_IMG = [{ l: 394, h: 175 }, { l: 434, h: 179 }, { l: 382, h: 213 }], E
 const TREMPLIN_IMG = { l: 1114, h: 459, haut: 0.81 };
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 // hauteur et demi-largeur de chaque obstacle (chocs) ; debout et traverse sont plus hauts que le plus grand saut
-const TAILLE = { allonge: [52, 58], verre: [13, 36], debout: [210, 23], traverse: [210, 26], vomi: [5, 55], poubelle: [80, 30] };
+const TAILLE = { allonge: [52, 58], verre: [13, 36], debout: [210, 23], traverse: [210, 26], vomi: [5, 55], poubelle: [95, 32] };
 const SONNER = { debout: true, traverse: true };    // les obstacles qui demandent la sonnette (les autres : sauter)
 // illustration des bourrés (remi_bourres.png : debout, sursaute, allongé, traverse de face) et sa taille à l'écran
 const BOURRE = 0.33, IMAGE_BOURRE = { debout: 0, ecarte: 1, allonge: 2, marche: 3 };
@@ -138,7 +138,7 @@ export class RemiVelo extends BossScene {
   demanderDring() { this.appuiG = 0.15; if (this.recharge <= 0 && this.chute <= 0) this.sonner(); }
 
   genererParcours() {
-    for (const o of [...this.obstacles, ...(this.voitures || []), ...(this.tremplins || [])]) { if (o.g) o.g.destroy(); if (o.spr) o.spr.destroy(); }
+    for (const o of [...this.obstacles, ...(this.voitures || []), ...(this.tremplins || []), ...(this.pintes || [])]) { if (o.g) o.g.destroy(); if (o.spr) o.spr.destroy(); if (o.img) o.img.destroy(); }
     this.obstacles = []; this.pintes = []; this.voitures = []; this.tremplins = [];
     this.troncon = V.longueur / 3;                 // longueur d'un tronçon « normal »
     this.route = DEPART_ROUTE; this.numCarrefour = 0; this.choix = null;
@@ -179,7 +179,7 @@ export class RemiVelo extends BossScene {
       const sp = k > debut.length && route.special && Math.random() < (route.longueur < 1 ? 0.5 : 0.3) ? route.special : null;
       if (sp === 'poubelle') { type = 'poubelle'; this.ajouter('poubelle', x); }
       else if (sp === 'pecheur') { type = 'debout'; this.ajouter('debout', x); this.obstacles[this.obstacles.length - 1].peche = true; }
-      else if (sp === 'chorale') { type = 'debout'; for (let n = 0; n < 3; n++) { this.ajouter('debout', x + n * 85); this.obstacles[this.obstacles.length - 1].chante = true; } x += 170; }
+      else if (sp === 'chorale') { type = 'debout'; for (let n = 0; n < 3; n++) { this.ajouter('debout', x + n * 85); const o = this.obstacles[this.obstacles.length - 1]; o.chante = true; o.centreChorale = n === 1; } x += 170; }
       else this.ajouter(type, x);
       // l'écart se compte en TEMPS, à la vitesse prévue à cet endroit : jamais deux obstacles collés
       const vit = V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, x / V.longueur);
@@ -578,8 +578,10 @@ export class RemiVelo extends BossScene {
     const gp = this.gPintes.clear();
     for (const p of this.pintes) {
       const sx = p.x - cam;
+      if (p.img) p.img.setVisible(false);
       if (p.prise || sx < -50 || sx > LARGEUR + 50) continue;
       const y = SOL - p.h + Math.sin(this.horloge * 4 + p.t) * 6;
+      if (this.textures.exists('remi_obstacles')) { this.image(p, 'remi_obstacles', 1, sx, y + 32, 0.19, 9); continue; }   // la pinte illustrée
       gp.fillStyle(0xffd84a, 0.25).fillCircle(sx, y, 26);
       gp.fillStyle(0xe8a52a, 1).fillRect(sx - 11, y - 14, 22, 28);
       gp.fillStyle(0xffffff, 1).fillRect(sx - 12, y - 19, 24, 7);
@@ -654,6 +656,12 @@ export class RemiVelo extends BossScene {
     }
   }
 
+  // une image (créée la 1re fois) attachée à un obstacle ou une pinte
+  image(o, cle, frame, x, y, echelle, prof) {
+    if (!o.img) o.img = this.add.sprite(0, 0, cle, frame).setOrigin(0.5, 1).setDepth(prof);
+    return o.img.setVisible(true).setFrame(frame).setPosition(x, y).setScale(echelle).setDepth(prof);
+  }
+
   dessinerObstacles(g, cam) {
     const icones = this.nomDiff !== 'champion' && this.etat === 'jeu';
     // le BON MOMENT : un gros mot au-dessus de l'obstacle, de la couleur du bouton à presser (pas en CHAMPION)
@@ -668,6 +676,7 @@ export class RemiVelo extends BossScene {
       const sx = o.x - cam;
       o.g.clear();
       if (o.spr) o.spr.setVisible(false);
+      if (o.img) o.img.setVisible(false);
       if (sx < -200 || sx > LARGEUR + 200) continue;
       // icône : quoi faire (▲ = saute, 🔔 = sonne), tant qu'on ne l'a pas encore passé
       if (icones && !o.touche && o.x > this.bx && sx < LARGEUR - 20 && o.etat !== 'ecarte' && o.etat !== 'recule') {
@@ -677,6 +686,9 @@ export class RemiVelo extends BossScene {
         if (son) { g.fillStyle(0x222222, 1).fillTriangle(sx - 8, y + 5, sx + 8, y + 5, sx, y - 9).fillCircle(sx, y + 7, 2.5); }
         else g.fillStyle(0x10304a, 1).fillTriangle(sx - 9, y + 6, sx + 9, y + 6, sx, y - 8);
       }
+      // objets illustrés (remi_obstacles.png : poubelle, pinte, verre cassé, flaque) ; sinon le dessin du code
+      const OBJ = { poubelle: [0, 0.27], verre: [2, 0.3], vomi: [3, 0.34] }[o.type];
+      if (OBJ && this.textures.exists('remi_obstacles')) { this.image(o, 'remi_obstacles', OBJ[0], sx, SOL + 4, OBJ[1], 8); continue; }
       if (o.type === 'verre') { o.g.setPosition(sx, SOL); verreCasse(o.g); continue; }
       if (o.type === 'poubelle') {
         // grosse poubelle verte (ruelles) : plus haute qu'un bourré allongé, il faut un GRAND saut
@@ -707,6 +719,17 @@ export class RemiVelo extends BossScene {
       // debout : titube ; s'il a entendu la sonnette, il fait un bond et reste sur le trottoir du fond
       const p = o.etat === 'ecarte' ? o.p : 0;
       const x = sx + p * 18, y = SOL - p * 30 - Math.sin(p * Math.PI) * 40, k = 1 - p * 0.25, rot = Math.sin(o.t * 2.1) * 0.14 - p * 0.3;
+      // le PÊCHEUR des quais et la CHORALE du centre-ville ont leurs images (2 poses : normal / il a entendu la sonnette)
+      if (o.peche && this.textures.exists('remi_pecheur')) {
+        if (o.spr) o.spr.setVisible(false);
+        this.image(o, 'remi_pecheur', p > 0 ? 1 : 0, sx - 88, SOL + 4 - p * 20, 0.31 * k, p >= 1 ? 4 : 8).setAlpha(1 - p * 0.3);
+        continue;
+      }
+      if (o.chante && this.textures.exists('remi_chorale')) {
+        if (o.spr) o.spr.setVisible(false);
+        if (o.centreChorale) this.image(o, 'remi_chorale', p > 0 ? 1 : 0, sx, SOL + 4 - p * 20, 0.29 * k, p >= 1 ? 4 : 8).setAlpha(1 - p * 0.3);
+        continue;
+      }
       if (o.spr) {
         o.spr.setVisible(true).setFrame(IMAGE_BOURRE[p > 0 && p < 1 ? 'ecarte' : 'debout']).setDepth(p >= 1 ? 4 : 8)
           .setPosition(x, y).setScale(BOURRE * k).setAlpha(1 - p * 0.3).setRotation(rot).setTint(o.peche ? 0x9fc8ff : o.chante ? 0xffd0e0 : o.spr.tintTopLeft);

@@ -50,7 +50,7 @@ export class RemiPorte extends BossScene {
     this.etat = 'intro';         // intro | remi | toi | coup | pause | fin
     this.horloge = 0; this.frappeur = 'remi'; this.pose = { remi: 'garde', toi: 'garde' };
     this.solidite = R.solidite; this.puissance = 0; this.cible = { x: 0, y: 0 }; this.tCible = 0; this.tCoup = 0;
-    this.fissures = []; this.eclats = []; this.flash = 0; this.gel = 0; this.tremble = 0; this.entree = 1; this.dernierFrappeur = null;
+    this.fissures = []; this.eclats = []; this.creux = []; this.elan = 0; this.flash = 0; this.gel = 0; this.tremble = 0; this.entree = 1; this.dernierFrappeur = null;
     this.compteur = 0; this.coups = { toi: 0, remi: 0 }; this.attrapes = { toi: 0, remi: 0 };
     this.videur = { etat: 'absent', t: 2.5, x: -300, pose: 0 };
     this.doigt = false; this.charge = false; this.remiAttend = 0;
@@ -267,6 +267,10 @@ export class RemiPorte extends BossScene {
   }
 
   impact(qui, score) {
+    // LE COUP SE VOIT (V15) : le frappeur plonge en avant, une bulle de BD « BAM ! » éclate sur la porte, le bois garde un CREUX
+    this.elan = 0.18;
+    this.creux.push({ x: IMPACT.x + hasard(-8, 8), y: IMPACT.y + hasard(-8, 8), r: 8 + score / 45 });
+    this.bulleBD(score);
     this.solidite = Math.max(0, this.solidite - score);
     this.gel = 0.06 + score / 999 * 0.1;
     this.tremble = score / 999;
@@ -279,11 +283,25 @@ export class RemiPorte extends BossScene {
     for (let k = 0; k < Math.floor(score / 60); k++) this.eclats.push({ x: IMPACT.x, y: IMPACT.y, vx: hasard(-260, 260), vy: hasard(-380, 80), r: hasard(-6, 6), a: 0, vie: hasard(0.5, 1) });
     if (score >= R.casse) this.flash = 1;
     this.compteur = 0; this.tweens.add({ targets: this, compteur: score, duration: 600, ease: 'Cubic.Out' });
-    const pop = texte(this, IMPACT.x, IMPACT.y - 40, String(score), 30 + score / 25, score >= R.casse ? '#ffd84a' : '#ffffff', { fontStyle: 'bold italic', strokeThickness: 8 }).setDepth(950);
-    this.tweens.add({ targets: pop, y: IMPACT.y - 120, alpha: 0, scale: 1.3, duration: 1000, delay: 200, onComplete: () => pop.destroy() });
+    const pop = texte(this, IMPACT.x, IMPACT.y - 100, String(score), 30 + score / 25, score >= R.casse ? '#ffd84a' : '#ffffff', { fontStyle: 'bold italic', strokeThickness: 8 }).setDepth(950);
+    this.tweens.add({ targets: pop, y: IMPACT.y - 170, alpha: 0, scale: 1.3, duration: 1000, delay: 200, onComplete: () => pop.destroy() });
     if (this.solidite <= 0) { this.time.delayedCall(700, () => this.porteCede(qui)); return; }
     if (this.solidite < R.solidite * 0.25 && !this.alerte) { this.alerte = true; this.time.delayedCall(800, () => bulle(this, 'La porte ne tient plus qu\'à un fil !', '#ff9a5a', 1.6, 200)); }
     this.time.delayedCall(1300, () => { if (this.etat === 'coup') this.tour(qui === 'toi' ? 'remi' : 'toi'); });
+  }
+
+  // bulle de bande dessinée sur la porte : étoile jaune + « BAM ! » (« KRAK ! » pour un gros coup)
+  bulleBD(score) {
+    const fort = score >= R.casse, k = 0.6 + score / 999 * 0.7;
+    const gb = this.add.graphics().setDepth(940).setPosition(IMPACT.x, IMPACT.y);
+    const pts = [];
+    for (let i = 0; i < 24; i++) { const a = i / 24 * Math.PI * 2, r = (i % 2 ? 38 : 70) * k; pts.push({ x: Math.cos(a) * r, y: Math.sin(a) * r * 0.8 }); }
+    gb.fillStyle(0x000000, 1).fillPoints(pts.map(p => ({ x: p.x * 1.08, y: p.y * 1.08 })), true);
+    gb.fillStyle(fort ? 0xff4020 : 0xffd84a, 1).fillPoints(pts, true);
+    const t = texte(this, IMPACT.x, IMPACT.y, fort ? 'KRAK !' : choisir(['BAM !', 'POW !', 'BOUM !']), 30 * k + 6, fort ? '#ffffff' : '#c81e2a', { fontStyle: 'bold italic', stroke: '#000000', strokeThickness: 5 }).setDepth(941).setAngle(hasard(-12, 12));
+    gb.setScale(0.3); t.setScale(0.3);
+    this.tweens.add({ targets: [gb, t], scale: 1, duration: 90, ease: 'Back.Out' });
+    this.tweens.add({ targets: [gb, t], alpha: 0, delay: 450, duration: 200, onComplete: () => { gb.destroy(); t.destroy(); } });
   }
 
   fissure(angle, longueur) {
@@ -300,7 +318,7 @@ export class RemiPorte extends BossScene {
     jouerSon(this, 'remi_porte_fort'); jouerSon(this, 'remi_foule');
     this.cameras.main.shake(500, 0.02);
     this.tweens.add({ targets: this.battant, x: PORTE.x + PORTE.l, scaleX: 0.1, duration: 260, ease: 'Cubic.In' });
-    this.fissures = [];
+    this.fissures = []; this.creux = [];
     if (qui === 'toi') {
       annonce(this, 'LA PORTE CÈDE !', '#ffd84a', 1.4);
       this.time.delayedCall(1800, () => this.victoire(REPLIQUES.porteGagne));
@@ -317,6 +335,12 @@ export class RemiPorte extends BossScene {
     const g = this.gPorte.clear();
     const dx = Math.sin(this.horloge * 60) * this.tremble * 5;
     if (this.etat !== 'fin') this.battant.x = PORTE.x + PORTE.l / 2 + dx;
+    this.elan = Math.max(0, this.elan - dt);
+    // les CREUX dans le bois (sous les fissures) : plus le coup est fort, plus le creux est grand
+    for (const c of this.creux) {
+      g.fillStyle(0x1a0e06, 0.55).fillEllipse(c.x + dx, c.y, c.r * 2, c.r * 1.6);
+      g.fillStyle(0x3a2412, 0.6).fillEllipse(c.x + dx - c.r * 0.2, c.y - c.r * 0.2, c.r * 1.2, c.r * 0.9);
+    }
     for (const f of this.fissures) {
       g.lineStyle(3, 0x1a0e06, 1).beginPath(); g.moveTo(f[0][0] + dx, f[0][1]);
       for (const [x, y] of f.slice(1)) g.lineTo(x + dx, y);
@@ -356,7 +380,10 @@ export class RemiPorte extends BossScene {
       const ch = pose === 'charge' ? this.puissance : 0;
       const bal = pose === 'garde' ? Math.sin(this.horloge * 4) * 4 : Math.sin(this.horloge * 47) * 6 * ch;
       const x = IMPACT.x - c.poing * c.echelle - 400 * this.entree * this.entree - ch * 40;
-      spr.setFrame(c.cases[pose] ?? 0).setPosition(x + bal, c.haut + ch * 10).setRotation(-0.08 * ch);
+      // au moment du coup : il plonge vers la porte (élan) et grossit un peu (il se rapproche de nous)
+      const pl = pose === 'frappe' ? Math.min(1, this.elan / 0.18) : 0;
+      spr.setFrame(c.cases[pose] ?? 0).setPosition(x + bal + pl * 30, c.haut + ch * 10 - pl * 8).setRotation(-0.08 * ch + pl * 0.05)
+        .setScale(c.echelle * (1 + pl * 0.06));
     }
   }
 
