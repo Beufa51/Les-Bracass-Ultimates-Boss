@@ -31,6 +31,9 @@ const MURS_IMAGES = { 1: 'mur_classe', 3: 'fenetres_classe', 4: 'porte_classe', 
 const OBJETS_IMAGES = ['table', 'bureau', 'livre', 'dico', 'copie', 'craie'];
 const HAUTEURS_IMAGES_CLASSE = { table: 0.72, bureau: 0.62, livre: 0.15, dico: 0.17, copie: 0.15, craie: 0.06 };
 const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'dos', 'rage', 'vaincu'];
+// vue du dessus (section 18 des prompts) ; image absente = dessin fait par le code
+const DESSUS_IMAGES = ['dessus_salle', 'dessus_julien_marche0', 'dessus_julien_marche1', 'dessus_julien_lance', 'dessus_julien_touche',
+  'dessus_heros', 'dessus_heros_cote', 'dessus_heros_touche', 'dessus_copie_0', 'dessus_copie_1', 'dessus_copie_2', 'dessus_boulette'];
 const ELEVES_IMAGES = [0, 1, 2, 3].flatMap(k => [`eleve_${k}_content`, `eleve_${k}_cache`]);
 const GROSSES = new Set(['eventail', 'mur', 'murs', 'deluge', 'dico', 'aimant', 'rafale']);   // après elles : il se retourne (fenêtre de punition)
 // ce qu'on annonce en grand quand il prépare une attaque, et le conseil la 1re fois
@@ -76,7 +79,7 @@ export class JulienClasse extends JulienManif {
 
   // vraies images de Julien (outils/julien/decouper_prof.py) ; image absente = dessin provisoire
   preload() {
-    for (const n of [...POSES_PROF.map(p => 'julien_' + p), ...Object.values(MURS_IMAGES), ...OBJETS_IMAGES, ...ELEVES_IMAGES, 'main_sarbacane', 'main_sarbacane_tir']) {
+    for (const n of [...POSES_PROF.map(p => 'julien_' + p), ...Object.values(MURS_IMAGES), ...OBJETS_IMAGES, ...ELEVES_IMAGES, ...DESSUS_IMAGES, 'main_sarbacane', 'main_sarbacane_tir']) {
       if (!this.textures.exists('julien_' + n)) this.load.image('julien_' + n, `assets/sprites/julien/julien_${n}.png`);
     }
     super.preload();
@@ -92,7 +95,7 @@ export class JulienClasse extends JulienManif {
       T.classe = construireDecorClasse(this.ctx, L, VUE_H);
       const img = (n) => this.textures.exists('julien_' + n) ? this.textures.get('julien_' + n).getSourceImage() : null;
       for (const n of OBJETS_IMAGES) { const i = img(n); if (i) { T.spr[n] = i; T.hauteurs[n] = HAUTEURS_IMAGES_CLASSE[n]; } }
-      for (const n of ELEVES_IMAGES) { const i = img(n); if (i) T.spr[n] = i; }
+      for (const n of [...ELEVES_IMAGES, ...DESSUS_IMAGES]) { const i = img(n); if (i) T.spr[n] = i; }
       // chaque élève assis derrière SA table : une seule image (pas d'élève qui passe devant / derrière la table)
       const tb = T.spr.table, ppu = tb.height / T.hauteurs.table;
       for (let k = 0; k < 4; k++) for (const p of ['content', 'cache']) {
@@ -523,7 +526,7 @@ export class JulienClasse extends JulienManif {
     const M = this.dessus, D = RG.julien.dessus, J = RG.julien, e = this.julien, j = this.j;
     const X0 = 12, X1 = L - 12;
     const c = this.commandesDessus();
-    M.px = Math.max(X0 + 8, Math.min(X1 - 8, M.px + c.x * D.vitesse * dt));
+    M.px = Math.max(X0 + 8, Math.min(X1 - 8, M.px + c.x * D.vitesse * dt)); M.dir = c.x;
     M.py = Math.max(VUE_H - 90, Math.min(VUE_H - 12, M.py + c.y * D.vitesse * dt));
     M.invT -= dt; M.lanceT -= dt; M.flash -= dt;
     // Julien fait des allers-retours en haut
@@ -580,28 +583,39 @@ export class JulienClasse extends JulienManif {
 
   dessinerDessus(g) {
     const M = this.dessus, D = RG.julien.dessus, s = this.T.spr, t = this.time.now / 1000;
-    // la salle vue du dessus : lino en damier, estrade en parquet, le tableau tout en haut
-    g.fillStyle = '#7d8590'; g.fillRect(0, 0, L, VUE_H);
-    g.fillStyle = '#737a85';
-    for (let y = 56; y < VUE_H; y += 24) for (let x = ((y / 24) | 0) % 2 ? 0 : 24; x < L; x += 48) g.fillRect(x, y, 24, 24);
-    g.fillStyle = '#8a5f38'; g.fillRect(0, 0, L, 56); g.fillStyle = '#5c3e22'; for (let y = 8; y < 56; y += 8) g.fillRect(0, y, L, 1);
-    g.fillStyle = '#2f4a32'; g.fillRect(140, 0, 200, 7); g.fillStyle = '#4b3a2a'; g.fillRect(0, 0, 12, VUE_H); g.fillRect(L - 12, 0, 12, VUE_H);
+    // la salle vue du dessus (vraie image, sinon : lino en damier, estrade en parquet, le tableau tout en haut)
+    if (s.dessus_salle) g.drawImage(s.dessus_salle, 0, 0, L, VUE_H);
+    else {
+      g.fillStyle = '#7d8590'; g.fillRect(0, 0, L, VUE_H);
+      g.fillStyle = '#737a85';
+      for (let y = 56; y < VUE_H; y += 24) for (let x = ((y / 24) | 0) % 2 ? 0 : 24; x < L; x += 48) g.fillRect(x, y, 24, 24);
+      g.fillStyle = '#8a5f38'; g.fillRect(0, 0, L, 56); g.fillStyle = '#5c3e22'; for (let y = 8; y < 56; y += 8) g.fillRect(0, y, L, 1);
+      g.fillStyle = '#2f4a32'; g.fillRect(140, 0, 200, 7); g.fillStyle = '#4b3a2a'; g.fillRect(0, 0, 12, VUE_H); g.fillRect(L - 12, 0, 12, VUE_H);
+    }
     // Julien (de face, petit) en haut
-    const pj = M.flash > 0 ? s.julien_touche : M.lanceT > 0 ? s.julien_lance : s[((t * 4) | 0) % 2 ? 'julien_marche1' : 'julien_marche0'];
+    const p = s.dessus_julien_marche0 ? 'dessus_julien_' : 'julien_';   // vue du dessus si livrée, sinon ses poses de face
+    const pj = M.flash > 0 ? s[p + 'touche'] : M.lanceT > 0 ? s[p + 'lance'] : s[p + (((t * 4) | 0) % 2 ? 'marche1' : 'marche0')];
     if (pj) { const h = 46, w = h * pj.width / pj.height; g.drawImage(pj, M.prof - w / 2, 6, w, h); }
     // les murs de copies (le trou bien visible)
     for (const w of M.murs) for (let x = 12; x < L - 12; x += 15) {
       if (Math.abs(x + 6 - w.trou) <= D.trou / 2) continue;
       const y = w.y - 8 + Math.sin(x * 0.7 + t * 6) * 1.5;
+      const cp = s['dessus_copie_' + (((x / 15) + ((t * 5) | 0)) % 3 | 0)];
+      if (cp) { const h = 18, lw = h * cp.width / cp.height; g.drawImage(cp, x + 6 - lw / 2, y - 1, lw, h); continue; }
       g.fillStyle = '#2a2a2a'; g.fillRect(x - 1, y - 1, 14, 18);
       g.fillStyle = '#f6f3ea'; g.fillRect(x, y, 12, 16);
       g.fillStyle = '#9fb6d8'; for (let l = 4; l < 16; l += 3) g.fillRect(x + 1, y + l, 10, 1);
       g.fillStyle = '#d84a4a'; g.fillRect(x + 3, y, 1, 16);
     }
     // tes boulettes
-    g.fillStyle = '#ffffff'; for (const b of M.tirs) g.fillRect(b.x - 2, b.y - 2, 4, 4);
+    for (const b of M.tirs) { if (s.dessus_boulette) g.drawImage(s.dessus_boulette, b.x - 3, b.y - 3, 6, 6); else { g.fillStyle = '#ffffff'; g.fillRect(b.x - 2, b.y - 2, 4, 4); } }
     // toi, vu du dessus (capuche bleu marine, cheveux bruns) ; clignote après un coup
-    if (M.invT <= 0 || ((t * 16) | 0) % 2) {
+    const ph = M.invT > 0.3 ? s.dessus_heros_touche : Math.abs(M.dir || 0) > 0.3 ? s.dessus_heros_cote : s.dessus_heros;
+    if (ph && (M.invT <= 0 || ((t * 16) | 0) % 2)) {   // vraie image (vu du dessus, de dos)
+      const h = 30, w = h * ph.width / ph.height; g.save();
+      if ((M.dir || 0) < -0.3 && ph === s.dessus_heros_cote) { g.translate(M.px * 2, 0); g.scale(-1, 1); }   // de côté vers la gauche : miroir
+      g.drawImage(ph, M.px - w / 2, M.py - h / 2, w, h); g.restore();
+    } else if (!ph && (M.invT <= 0 || ((t * 16) | 0) % 2)) {
       g.fillStyle = '#1e2a5a'; g.beginPath(); g.ellipse(M.px, M.py + 2, 9, 7, 0, 0, Math.PI * 2); g.fill();
       g.fillStyle = '#5a3a1a'; g.beginPath(); g.arc(M.px, M.py - 2, 5, 0, Math.PI * 2); g.fill();
       g.fillStyle = '#e8b48a'; g.fillRect(M.px + 6, M.py - 6, 3, 3);   // la main qui tient la sarbacane

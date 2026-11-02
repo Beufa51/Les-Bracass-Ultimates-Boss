@@ -228,3 +228,33 @@ Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized
 Plain solid pure white background (#FFFFFF) — EXCEPT the foam cloud, which must be light grey-white with a dark grey outline so it stays visible —, no ground shadow, no text except on the label of the booklet, no frame, no grid lines.
 IMPORTANT: every object is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no object may touch or overlap another object or the cell border.
 ```
+
+## 18. VUE DU DESSUS (la rafale de murs de copies, shoot them up vertical) — 3 images
+Remplacent les dessins faits par le code. Découpe et branchement déjà prévus (`decouper_planches.py`, centres à ajuster
+à la livraison ; image absente = dessin provisoire). Style commun : vue de dessus 3/4 façon jeu d'arcade 16 bits.
+
+### 18a. Les personnages — `julien_dessus_persos.jpg` (joindre `julien_reference.jpg` pour que Julien ressemble)
+```
+Pixel art sprite sheet in the style of a 16-bit top-down arcade shoot 'em up (like Pocky & Rocky or Zelda: A Link to the Past): 3/4 top-down view (seen from above and slightly in front), limited color palette, visible chunky pixels, strong shading, humorous.
+7 poses in one row, each in its own equal-size cell, same scale:
+Character A = the teacher from the attached reference image (dark hair, glasses, green jacket, geeky retro horror video game t-shirt, jeans), FACING DOWN toward the viewer: 1) walking, left foot forward; 2) walking, right foot forward; 3) throwing a big stack of white exam papers forward with both hands; 4) hit by a paper ball, flinching, angry.
+Character B = a French teenage student in a navy blue hoodie and jeans, brown hair, seen from ABOVE AND BEHIND (we see the top of his head and his back), FACING UP, holding an emptied clear Bic pen used as a peashooter pointed straight up: 5) standing, ready; 6) strafing to the side; 7) hit, flinching, sheets of paper flying around him.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no part may touch another pose or the cell border.
+```
+
+### 18b. Les objets — `julien_dessus_objets.jpg`
+```
+Pixel art sprite sheet in the style of a 16-bit top-down arcade shoot 'em up: seen strictly from ABOVE, limited color palette, visible chunky pixels, strong shading.
+5 separate objects in one row, each in its own equal-size cell, same pixel scale:
+1) a white lined exam sheet with a red margin and "0/20" in red, flat, seen from above; 2) the same sheet slightly tilted to the left, flying; 3) the same sheet slightly tilted to the right, flying; 4) a small crumpled white paper ball; 5) a small stack of exam papers.
+Plain solid pure white background (#FFFFFF) — the sheets must have a thin dark grey outline so they stay visible —, no ground shadow, no text except "0/20", no frame, no grid lines.
+IMPORTANT: every object is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no object may touch another object or the cell border.
+```
+
+### 18c. La salle vue du dessus — `julien_dessus_salle.jpg` (image LARGE : format 21:9)
+```
+Pixel art background in the style of a 16-bit top-down arcade shoot 'em up, wide 21:9 image, seen strictly from ABOVE (bird's eye view), limited color palette, visible chunky pixels.
+A French high-school classroom floor seen from above: along the TOP edge, the green chalkboard on the wall and a wooden teacher's platform (parquet) about one fifth of the height; the rest is an EMPTY floor of grey-blue linoleum tiles (no desks, no chairs, no people in the middle, it must stay clear for the action); thin walls on the left and right edges with a window on each side.
+No text, no characters, no frame.
+```

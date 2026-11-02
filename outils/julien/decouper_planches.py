@@ -42,6 +42,12 @@ GROUPES = {
         ('cantiniere_lance', (870, 420)), ('cantiniere_touche', (1065, 440)), ('cantiniere_fuite', (1280, 410))]),
     'fayot': ('julien_fayot.jpg', 200, [
         ('fayot_bras', (178, 394)), ('fayot_crie', (541, 400)), ('fayot_saute', (881, 360)), ('fayot_fuite', (1234, 394))]),
+    # VUE DU DESSUS (rafale de murs, section 18 des prompts) : centres À AJUSTER à la livraison (7 cases supposées)
+    'dessus_julien': ('julien_dessus_persos.jpg', 120, [
+        ('dessus_julien_marche0', (100, 384)), ('dessus_julien_marche1', (301, 384)), ('dessus_julien_lance', (503, 384)),
+        ('dessus_julien_touche', (704, 384))]),
+    'dessus_heros': ('julien_dessus_persos.jpg', 100, [
+        ('dessus_heros', (905, 384)), ('dessus_heros_cote', (1107, 384)), ('dessus_heros_touche', (1308, 384))]),
     # élèves assis (rangée du haut ; celle du bas est un doublon) : A content, A caché, B…, D caché
     'eleves': ('julien_eleves.jpg', 180, [(f'eleve_{k // 2}_{"content" if k % 2 == 0 else "cache"}', (x, 200))
         for k, x in enumerate([115, 300, 465, 630, 815, 990, 1165, 1325])]),
@@ -77,6 +83,10 @@ OBJETS_CLASSE = ('julien_objets_classe.jpg', [
 OBJETS_LYCEE = ('julien_objets_lycee.jpg', [
     ('carnet', (160, 190), 50), ('puree', (510, 190), 40), ('flaque', (890, 285), 24), (None, (1245, 265), 50),
     (None, (230, 640), 24), ('comptoir', (715, 555), 120), ('mousse', (1215, 565), 160)])
+
+OBJETS_DESSUS = ('julien_dessus_objets.jpg', [
+    ('dessus_copie_0', (140, 384), 40), ('dessus_copie_1', (422, 384), 40), ('dessus_copie_2', (704, 384), 40),
+    ('dessus_boulette', (985, 384), 12), (None, (1267, 384), 40)])
 
 # traits de grille que le nettoyage automatique rate (cases de largeurs différentes selon la rangée) :
 # planche → [(x0, y0, x1, y1), ...] effacés en blanc
@@ -266,7 +276,7 @@ def main():
     planche.save(SORTIE + 'julien_tetes.png')
     print('   tetes', L, 'x 96 ×', len(cases))
 
-    for fichier, liste in (OBJETS, OBJETS_ARMES, OBJETS_BONUS, OBJETS_CLASSE, OBJETS_LYCEE):
+    for fichier, liste in (OBJETS, OBJETS_ARMES, OBJETS_BONUS, OBJETS_CLASSE, OBJETS_LYCEE, OBJETS_DESSUS):
         if not os.path.exists(ENTREE + fichier):
             continue
         img = charger(fichier).copy()
@@ -314,6 +324,14 @@ def main():
             mur.resize((128, 128), Image.LANCZOS).save(SORTIE + f'julien_{nom}.png')
             print('  ', nom, '128 x 128', '(+ version avec panneau)' if nom in SANS_PANNEAU else '')
 
+    # la salle vue du dessus : recadrée au format de la vue (480 × 222)
+    if os.path.exists(ENTREE + 'julien_dessus_salle.jpg'):
+        f = Image.open(ENTREE + 'julien_dessus_salle.jpg').convert('RGB')
+        h = round(f.width * 222 / 480)
+        if h <= f.height: f = f.crop((0, 0, f.width, h))   # on garde le HAUT (le tableau, l'estrade)
+        else: w = round(f.height * 480 / 222); f = f.crop(((f.width - w) // 2, 0, (f.width + w) // 2, f.height))
+        f.resize((480, 222), Image.LANCZOS).save(SORTIE + 'julien_dessus_salle.png')
+        print('   dessus_salle 480 x 222')
     for nom in MURS_CLASSE:
         if os.path.exists(ENTREE + f'julien_{nom}.jpg'):
             Image.open(ENTREE + f'julien_{nom}.jpg').convert('RGB').resize((128, 192), Image.LANCZOS).save(SORTIE + f'julien_{nom}.png')

@@ -1103,6 +1103,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   (pas de côté / tourner = gauche-droite, avancer / reculer = haut-bas) et tu tires vers le haut ; fin de la rafale →
   retour en 3D, Julien DE DOS. Sur téléphone, les trous évitent les bords cachés par les boutons. Réglages :
   `RG.julien.dessus`. Testé : bot qui suit les trous = 0 dégât ; immobile = −40.
+  Fabien : « il faut des nouveaux sprites, ça fait moche » → PROMPTS section 18 de `julien_prompts_images.md`
+  (`julien_dessus_persos.jpg` : Julien 4 poses + héros 3 poses ; `julien_dessus_objets.jpg` : copies, boulette ;
+  `julien_dessus_salle.jpg` : la salle 21:9). Découpe prévue (centres À AJUSTER) et branchement fait (`DESSUS_IMAGES`).
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».
