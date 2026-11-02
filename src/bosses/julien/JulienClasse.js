@@ -35,14 +35,14 @@ const ELEVES_IMAGES = [0, 1, 2, 3].flatMap(k => [`eleve_${k}_content`, `eleve_${
 const GROSSES = new Set(['eventail', 'mur', 'murs', 'deluge', 'dico', 'aimant', 'rafale']);   // après elles : il se retourne (fenêtre de punition)
 // ce qu'on annonce en grand quand il prépare une attaque, et le conseil la 1re fois
 const ANNONCES = {
-  mur: ['SORTEZ UNE FEUILLE !', 'Un MUR DE COPIES : trouve le TROU et place-toi dedans !'],
+  mur: ['SORTEZ UNE FEUILLE !', 'Des MURS DE COPIES en rafale : suis le TROU, il se déplace à chaque mur !'],
   dico: ['LE DICTIONNAIRE !', 'Il rebondit sur les murs : reste loin des murs !'],
   aimant: ['AU TABLEAU !', 'Il t\'attire : COURS vers le fond ou colle-toi à une table !'],
   confisque: ['DONNE-MOI ÇA !', 'Trop près : il va CONFISQUER ton arme. Recule !'],
   regle: ['LA RÈGLE !', 'Au contact, il frappe : RECULE !'],
   craies: ['CRAIES !', 'Des craies en rafale : planque-toi derrière une TABLE !'],
   deluge: ['CONTRÔLE SURPRISE !', 'Une PLUIE de copies (au-dessus des tables) : faufile-toi dans les trous !'],
-  murs: ['RECOPIEZ TROIS FOIS !', 'Plusieurs murs de copies d\'affilée : trouve chaque trou !'],
+  murs: ['RECOPIEZ CENT FOIS !', 'Encore plus de murs, plus vite : suis le TROU qui zigzague !'],
 };
 
 // Dessin provisoire de la main qui tient la sarbacane (stylo Bic vidé), en gros pixels comme les vraies mains :
@@ -292,7 +292,7 @@ export class JulienClasse extends JulienManif {
         if (e.reste > 0) {
           e.reste--;
           if (e.motif === 'deluge') { this.vagueCopies(e, voit); e.t = J.deluge.intervalle[e.phase - 1]; return; }
-          if (e.motif === 'murs') { this.murCopies(e); e.t = J.murs.intervalle; return; }
+          if (e.motif === 'mur' || e.motif === 'murs') { this.murCopies(e); e.t = J.murs.intervalle[e.phase - 1]; return; }
           if (e.motif === 'craies') this.lancerLivre(e, 'craie', this.angleVers(e, voit) + (Math.random() - 0.5) * 2 * J.craies.dispersion);
           else this.lancerLivre(e, 'livre', this.angleVers(e, voit));
           e.t = e.motif === 'craies' ? J.craies.intervalle : J.rafale.intervalle; return;
@@ -321,8 +321,8 @@ export class JulienClasse extends JulienManif {
     if (d < J.regle.portee) return 'regle';
     if (d < J.confisque.portee && !this.confisque && j.arme !== 'pancarte' && Math.random() < [0.5, 0.6, 0.85][e.phase - 1]) return 'confisque';
     if (e.phase === 1) return r < 0.3 ? 'livre' : r < 0.5 ? 'eventail' : r < 0.68 ? 'craies' : r < 0.84 ? 'mur' : 'deluge';
-    if (e.phase === 2) return r < 0.3 ? 'deluge' : r < 0.45 ? 'murs' : r < 0.6 ? 'dico' : r < 0.72 ? 'eventail' : r < 0.86 ? 'aimant' : 'craies';
-    return r < 0.3 ? 'deluge' : r < 0.45 ? 'murs' : r < 0.55 ? 'rafale' : r < 0.65 ? 'dico' : r < 0.82 ? 'aimant' : r < 0.92 ? 'craies' : 'eventail';
+    if (e.phase === 2) return r < 0.25 ? 'deluge' : r < 0.5 ? 'murs' : r < 0.62 ? 'dico' : r < 0.72 ? 'eventail' : r < 0.86 ? 'aimant' : 'craies';
+    return r < 0.25 ? 'deluge' : r < 0.52 ? 'murs' : r < 0.6 ? 'rafale' : r < 0.68 ? 'dico' : r < 0.84 ? 'aimant' : r < 0.93 ? 'craies' : 'eventail';
   }
 
   // l'attaque part
@@ -399,19 +399,30 @@ export class JulienClasse extends JulienManif {
     else if (e.motif === 'copies') {
       const n = J.copies.nombre;
       for (let k = 0; k < n; k++) this.lancerLivre(e, 'copie', a + (k - (n - 1) / 2) * J.copies.ecart);
-    } else if (e.motif === 'mur') this.murCopies(e);
-    else if (e.motif === 'murs') { this.murCopies(e); e.reste = J.murs.nombre - 1; }
+    } else if (e.motif === 'mur' || e.motif === 'murs') {   // RAFALE de murs (façon shoot them up) : le trou zigzague
+      e.trou = null; e.sens = Math.random() < 0.5 ? -1 : 1;
+      this.murCopies(e); e.reste = J.murs.nombre[e.phase - 1] + (e.motif === 'murs' ? 1 : 0) - 1;
+    }
     else if (e.motif === 'deluge') { e.vague = 0; this.vagueCopies(e, voit); e.reste = J.deluge.vagues[e.phase - 1] - 1; }
     else if (e.motif === 'craies') { this.lancerLivre(e, 'craie', a); e.reste = J.craies.nombre - 1; }
     else { this.lancerLivre(e, 'livre', a); if (e.motif === 'rafale') e.reste = J.rafale.nombre - 1; }
     jouerSon(this, 'julien_lancer', { rate: e.motif === 'dico' ? 0.55 : 0.75 });
   }
 
-  // un mur de copies : toute la largeur de la salle, sauf UN trou (pas loin de toi)
+  // un mur de copies : toute la largeur de la salle, sauf UN trou. 1er mur : le trou pas loin de toi ; les suivants :
+  // il se décale de « derive » cases (et rebondit sur les bords), il faut le suivre
   murCopies(e) {
-    const J = RG.julien, W = this.plan[0].length, trou = Math.max(2, Math.min(W - 2, this.j.x + (Math.random() - 0.5) * 6));
-    for (let x = 1.25; x < W - 1; x += J.mur.ecart) if (Math.abs(x - trou) > J.mur.trou / 2) {
-      this.livres.push({ genre: 'mur', traverse: true, x, y: e.y + 0.7, dx: 0, dy: 1, v: J.mur.vitesse, degats: J.mur.degats, rebonds: 0, t: 0, ph: Math.random() * 6 });
+    const J = RG.julien, W = this.plan[0].length, [d0, d1] = J.murs.derive;
+    if (e.trou == null) e.trou = this.j.x + (Math.random() - 0.5) * 4;
+    else {
+      e.trou += e.sens * (d0 + Math.random() * (d1 - d0));
+      if (e.trou < 2 || e.trou > W - 2) { e.sens = -e.sens; e.trou += 2 * e.sens * (d0 + Math.random() * (d1 - d0)); }
+      if (Math.random() < 0.3) e.sens = -e.sens;   // il change parfois de sens
+    }
+    e.trou = Math.max(2, Math.min(W - 2, e.trou));
+    const id = (this.murId = (this.murId || 0) + 1);
+    for (let x = 1.25; x < W - 1; x += J.mur.ecart) if (Math.abs(x - e.trou) > J.mur.trou / 2) {
+      this.livres.push({ genre: 'mur', mur: id, traverse: true, x, y: e.y + 0.7, dx: 0, dy: 1, v: J.mur.vitesse, degats: J.mur.degats, rebonds: 0, t: 0, ph: Math.random() * 6 });
     }
     jouerSon(this, 'julien_papier', { rate: 1.2 });
   }
@@ -464,7 +475,7 @@ export class JulienClasse extends JulienManif {
         this.degats(b.degats, b.x - b.dx, b.y - b.dy);
         this.parlerEleves('aie');
         if (b.genre === 'dico') this.cameras.main.shake(200, 0.01);
-        if (b.genre === 'mur') for (const c of this.livres) if (c.genre === 'mur') c.fini = true;   // un seul coup par mur
+        if (b.genre === 'mur') for (const c of this.livres) if (c.mur === b.mur) c.fini = true;   // un seul coup par mur
       }
       if (b.t > 6) b.fini = true;
     }

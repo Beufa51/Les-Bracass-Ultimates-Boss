@@ -119,7 +119,7 @@ export const REGLAGES = {
     eventail: 0.28,      // écart (radians) entre les 3 livres de l'éventail
     dico: { vitesse: 4.5, degats: 22, rebonds: 3, preavis: 0.8 },   // le dictionnaire rebondit sur les murs (pas sur les tables)
     copies: { nombre: 5, vitesse: 3, degats: 7, ecart: 0.22 },   // copies d'interro : lentes, en vague
-    mur: { vitesse: 2.4, degats: 12, ecart: 0.3, trou: 1.6, preavis: 1.1 },   // mur de copies : toute la largeur, UN trou ; passe au-dessus des tables
+    mur: { vitesse: 2.6, degats: 10, ecart: 0.3, trou: 1.8, preavis: 1.0 },   // mur de copies : toute la largeur, UN trou ; passe au-dessus des tables
     craies: { nombre: 5, intervalle: 0.11, vitesse: 9, degats: 4, dispersion: 0.07, preavis: 0.55 },   // rapides, petits dégâts
     aimant: { duree: 2, force: 2.4, preavis: 0.8, degats: 15 },   // « AU TABLEAU ! » : il t'attire (force < ta vitesse : cours vers le fond)
     confisque: { portee: 2.8, duree: 8, preavis: 0.7 },   // « CONFISQUÉ ! » : trop près, il prend ton arme
@@ -127,7 +127,8 @@ export const REGLAGES = {
     rafale: { nombre: 3, intervalle: 0.28 },
     // DÉLUGE DE COPIES (bullet hell) : vagues par phase, s entre 2 vagues, copies par éventail, cercle d'une vague sur 3
     deluge: { vagues: [3, 5, 7], intervalle: [0.75, 0.6, 0.5], nombre: 9, ecart: 0.2, cercle: 18, vitesse: 3.3, degats: 7, preavis: 0.9 },
-    murs: { nombre: 3, intervalle: 1.1 },   // phases 2-3 : plusieurs murs de copies d'affilée, chacun son trou   // phase 3 : 3 livres coup sur coup
+    // RAFALE DE MURS (shoot them up) : murs d'affilée par phase (« murs » : +1), s entre 2 murs, décalage du trou (cases)
+    murs: { nombre: [5, 5, 6], intervalle: [0.95, 0.85, 0.75], derive: [1.3, 2.4] },
   },
   classe: {
     glisse: 0.45,            // phase 3 (sprinklers) : tu glisses encore ce temps-là (s) après avoir lâché (petit = moins de glissade)

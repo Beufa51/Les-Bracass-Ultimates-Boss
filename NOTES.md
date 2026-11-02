@@ -1093,6 +1093,10 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   charge 15. Julien trop simple → vie 55, cadences / préavis / fenêtre de dos plus courts, livre 14 ; nouvelles
   attaques BULLET HELL : DÉLUGE (`RG.julien.deluge` : 3 / 5 / 7 vagues selon la phase, éventail visé puis décalé,
   1 vague sur 3 en cercle qui tourne, copies au-dessus des tables) et MURS (3 murs de copies d'affilée, phases 2-3).
+  RAFALE DE MURS (Fabien : « enchaîner 5 ou 6, façon shoot them up ») : chaque attaque « mur » = 5 murs (phase 3 : 6,
+  « murs » : +1) espacés de 0,95 / 0,85 / 0,75 s ; le trou ZIGZAGUE (`RG.julien.murs.derive` 1,3 à 2,4 cases, rebond
+  sur les bords, change parfois de sens) ; un coup par mur (`mur` = numéro du mur). Testé : immobile = presque tout
+  pris ; un bot qui suit le trou : 2 touches sur 8 en phase 3.
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».
