@@ -75,7 +75,9 @@ export class BossScene extends Phaser.Scene {
       const p = this.add.image(LARGEUR + 250, HAUTEUR / 2 + 18, o.image).setDepth(1001);
       const s = Math.min(500 / p.height, 380 / p.width);   // tient dans 380 × 500 (marge en haut)
       p.setScale(s);
-      this.tweens.add({ targets: p, x: LARGEUR - 40 - p.displayWidth / 2, duration: 350, ease: 'Cubic.Out' });
+      // centré dans la zone libre à droite des textes (x 570 → LARGEUR), sans coller au bord
+      const cible = Math.min((570 + LARGEUR) / 2, LARGEUR - 20 - p.displayWidth / 2);
+      this.tweens.add({ targets: p, x: cible, duration: 350, ease: 'Cubic.Out' });
       el.push(p);
     }
     el.push(texte(this, 300, 90, o.nom, 96, '#ffffff', { fontStyle: 'bold italic', stroke: o.couleur || '#b3202c', strokeThickness: 14 }).setDepth(1002));
