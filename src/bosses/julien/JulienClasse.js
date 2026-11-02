@@ -178,7 +178,7 @@ export class JulienClasse extends JulienManif {
     this.ennemis = []; this.objets = []; this.tirs = []; this.fumees = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.farines = []; this.rideaux = []; this.secrets = new Map(); this.secretsTrouves = 0; this.fourgonFait = true;
     this.livres = []; this.finDemandee = false; this.dessus = null;
-    this.eleves = []; this.alarme = false; this.alarmeT = 0; this.confisque = null;
+    this.eleves = []; this.alarme = false; this.confisque = null;
     this.vus = new Set(); this.bureau = null;
     this.plan = this.plan.map((ligne, y) => [...ligne].map((c, x) => {
       const px = x + 0.5, py = y + 0.5;
@@ -479,7 +479,6 @@ export class JulienClasse extends JulienManif {
       const id = this.confisque.id; this.confisque = null;
       this.message(`Julien te rend ta ${armeDe(id).nom.toLowerCase()}. « Et que je ne vous y reprenne pas ! »`, 2.5);
     }
-    if (this.alarme && (this.alarmeT -= dt) <= 0) { jouerSon(this, 'julien_alarme', { volume: 0.35 }); this.alarmeT = 4; }
   }
 
   // phase 3 : les sprinklers mouillent le sol, tu glisses (tu continues un peu sur ta lancée)
@@ -505,7 +504,8 @@ export class JulienClasse extends JulienManif {
       e.x = BUREAU_RENVERSE.x; e.y = 1.7;   // il file se planquer derrière
       const j = this.j;   // pas coincé dans le bureau qui tombe
       if (Math.hypot(j.x - BUREAU_RENVERSE.x, j.y - BUREAU_RENVERSE.y) < BUREAU_RENVERSE.rayon + 0.4) j.y = BUREAU_RENVERSE.y + BUREAU_RENVERSE.rayon + 0.45;
-      this.alarme = true; this.alarmeT = 0;
+      this.alarme = true;   // alarme : UNE seule sonnerie, douce (rejouée toutes les 4 s, elle était insupportable)
+      jouerSon(this, 'julien_alarme', { volume: 0.2 });
       this.txtAnnonce.setText('TOUT LE MONDE EN RETENUE !'); this.annonceT = 3;
       this.txtConseil.setText('Il se planque derrière son bureau : CONTOURNE-LE ! Le sol est mouillé : ça glisse.');
       this.parlerEleves('alarme');
