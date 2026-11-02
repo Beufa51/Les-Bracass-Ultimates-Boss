@@ -1389,3 +1389,7 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   (3 fêtards : chante / sursaute ; dessinée sur le bourré du milieu `centreChorale`). Méthode `image(o, cle, frame...)`.
   PORTE : les coups se voient : le frappeur plonge vers la porte (`elan`), bulle de BD « BAM ! / POW ! / KRAK ! », CREUX qui
   restent dans le bois, score affiché plus haut. Prompt 23 (facultatif) : planche de coups qui touchent vraiment une porte.
+- V16 : NOUVELLE PLANCHE DES COUPS (`remi_coups_planche.jpg`, prompt 23) : en pied, la porte dessinée sur l'image est
+  EFFACÉE par `coups_porte()` (on garde à droite de son bord la peau, le jean, l'éclat blanc) → remplace `remi_dos.png` /
+  `remi_toi_dos.png` (3 cases : garde, coup, impact ; poing de l'impact x 321 / 317, y 107 ; `DOS` dans RemiPorte.js,
+  échelle 0,8, poing calé sur `IMPACT`). (L'ancienne planche de dos reste dans assets_inbox, plus utilisée.)

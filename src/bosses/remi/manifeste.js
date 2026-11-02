@@ -22,8 +22,8 @@ export const MANIFESTE = {
     // fond du jeu de la porte (toilettes du bar) : sa porte est à x 774 - 914 (voir BATTANT dans RemiPorte.js)
     remi_porte_decor: { fichier: 'sprites/remi/remi_porte_decor.jpg', largeur: 960, hauteur: 536, images: 1, vitesse: 1 },
     // la porte VUE DE DOS : Rémi (garde, coup, impact) et toi (garde, élan, coup, impact), cases alignées à gauche
-    remi_dos: { fichier: 'sprites/remi/remi_dos.png', largeur: 532, hauteur: 570, images: 3, vitesse: 1 },
-    remi_toi_dos: { fichier: 'sprites/remi/remi_toi_dos.png', largeur: 347, hauteur: 554, images: 4, vitesse: 1 },
+    remi_dos: { fichier: 'sprites/remi/remi_dos.png', largeur: 344, hauteur: 535, images: 3, vitesse: 1 },
+    remi_toi_dos: { fichier: 'sprites/remi/remi_toi_dos.png', largeur: 335, hauteur: 557, images: 3, vitesse: 1 },
     // V7 : décors et objets du vélo, fond du beer pong (outils/remi/preparer_images.py)
     remi_rue2: { fichier: 'sprites/remi/remi_rue2.jpg', largeur: 1702, hauteur: 575, images: 1, vitesse: 1 },   // les quais
     remi_rue3: { fichier: 'sprites/remi/remi_rue3.jpg', largeur: 1132, hauteur: 575, images: 1, vitesse: 1 },   // le centre-ville

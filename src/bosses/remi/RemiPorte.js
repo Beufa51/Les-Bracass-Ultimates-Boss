@@ -24,8 +24,9 @@ const PORTE = { x: DECOR_X + BATTANT.x * ZOOM, y: DECOR_Y + BATTANT.y * ZOOM, l:
 const IMPACT = { x: 730, y: 272 };   // où le poing touche la porte (écran)
 // planches de dos : cases alignées à gauche ; « poing » = où est le poing dans la case de l'impact
 const DOS = {
-  remi: { tex: 'remi_dos', echelle: 0.75, haut: 150, cases: { garde: 0, charge: 0, coup: 1, frappe: 2 }, poing: 520 },
-  toi: { tex: 'remi_toi_dos', echelle: 1.1, haut: 128, cases: { garde: 0, charge: 1, coup: 2, frappe: 3 }, poing: 336 },
+  // V16 : planche « coups » (en pied, le poing qui écrase la porte) : poing de l'impact à x 321 / 317, y 107 dans la case
+  remi: { tex: 'remi_dos', echelle: 0.8, haut: 272 - 107 * 0.8, cases: { garde: 0, charge: 0, coup: 1, frappe: 2 }, poing: 321 },
+  toi: { tex: 'remi_toi_dos', echelle: 0.8, haut: 272 - 107 * 0.8, cases: { garde: 0, charge: 1, coup: 1, frappe: 2 }, poing: 317 },
 };
 const VIDEUR = { x: 120, echelle: 0.42 };   // l'intrus passe la tête au coin du couloir (à gauche)
 // LES INTRUS (V13) : pas que le videur ! Chacun a ses pas, son ombre, son rythme et ses feintes préférées.

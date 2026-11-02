@@ -264,6 +264,37 @@ def planches_velo_v15():
     bande(poses_planche('remi_obstacles_planche.jpg', grand=3000, bas=574), 'remi_obstacles.png')
     bande(poses_planche('remi_chorale_planche.jpg', grand=30000), 'remi_chorale.png')
 
+def coups_porte():
+    # planche des COUPS (V16) : Rémi (ligne 1) et toi (ligne 2), en pied, garde / coup / impact ; une porte est dessinée à
+    # droite des impacts : on l'EFFACE (on ne garde à droite de son bord que la peau, le jean, le blanc de l'éclat, et les
+    # traits noirs tout près d'eux) -> remi_coups_sans_porte.png, puis découpe -> remi_dos.png / remi_toi_dos.png
+    a = np.asarray(Image.open(SRC + 'remi_coups_planche.jpg').convert('RGB')).astype(int)
+    r, g, b = a[:, :, 0], a[:, :, 1], a[:, :, 2]
+    peau = (r > 205) & (g > 150) & (b > 120) & (r - b > 30)   # (le bois de la porte est plus sombre : r < 180)
+    eclat = a.min(axis=2) > 215
+    jean = (b > r + 15) & (b > 80)
+    garder = ndimage.binary_dilation(peau | eclat, iterations=5) | ndimage.binary_dilation(jean, iterations=2)
+    zone = np.zeros(r.shape, bool); zone[:, 712:] = True
+    out = a.copy()
+    out[zone & ~garder] = 255
+    # (le blanc pur de l'éclat qui touche la porte devient du blanc de fond : on le teinte à peine pour le garder)
+    out[zone & eclat & garder] = np.clip(out[zone & eclat & garder] - [0, 10, 40], 0, 255)
+    # le chant de la porte (bande claire) : effacé partout sauf à hauteur des poings et des pieds
+    for y0, y1 in ((0, 100), (250, 545), (610, 715), (880, 1165)):
+        out[y0:y1, 712:] = 255
+    pres_peau = ndimage.binary_dilation(peau, iterations=3)
+    for y0, y1 in ((100, 250), (715, 880)):                      # à hauteur des poings : le chant de la porte, sauf la peau
+        bande = ~pres_peau[y0:y1, 712:742]
+        out[y0:y1, 712:742][bande] = 255
+    for y0, y1 in ((545, 610), (1165, 1260)):                    # à hauteur des pieds : le bas de la porte
+        out[y0:y1, 745:] = 255
+        clair = out[y0:y1, 712:745].min(axis=2) > 150                   # (le bois clair, pas les chaussures)
+        out[y0:y1, 712:745][clair] = 255
+    Image.fromarray(out.astype(np.uint8)).save(SRC + 'remi_coups_sans_porte.png')
+    p = poses_planche('remi_coups_sans_porte.png', grand=20000)
+    bande_gauche(p[0:3], 'remi_dos.png')
+    bande_gauche(p[3:6], 'remi_toi_dos.png')
+
 def facade():
     # façade du bar (arrivée du vélo) : fond blanc retiré (et entre les pieds des tabourets) -> remi_bar_facade.png
     im = detourer(Image.open(SRC + 'remi_bar_facade.jpg'), grand=300, seuil=225)
@@ -289,6 +320,7 @@ presentation()
 planche_pong()
 planche_porte()
 planches_dos()
+coups_porte()
 planche_bourres()
 rue()
 facade()

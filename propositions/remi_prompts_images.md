@@ -175,7 +175,7 @@ bras dessous, entiers, vus de face, qui chantent à tue-tête (bouches grandes o
 (sonnette !), surpris.
 ```
 
-## 23. (facultatif) Les coups dans la porte, mieux « portés » — `remi_coups_planche.jpg`
+## 23. (facultatif) Les coups dans la porte, mieux « portés » — `remi_coups_planche.jpg` ✅ REÇUE ET INTÉGRÉE (la porte dessinée est effacée par le script)
 À joindre : les planches de dos de Rémi et du jeune homme (pour garder les mêmes personnages).
 ```
 Même style et mêmes personnages que les images jointes (manga/anime, contours noirs nets), fond BLANC uni, aucun texte.
