@@ -495,7 +495,7 @@ export class JulienClasse extends JulienManif {
     this.livres = [];
     this.dessus = { prochain: D.attente, restants: RG.julien.murs.nombre[e.phase - 1] + (e.motif === 'murs' ? 1 : 0),
       murs: [], tirs: [], px: L / 2, py: VUE_H - 26, prof: L / 2, profV: 1, invT: 0, trou: null, sens: Math.random() < 0.5 ? -1 : 1,
-      recharge: 0, lanceT: 0, flash: 0 };
+      recharge: 0, lanceT: 0, flash: 0, parts: [], entree: 0.45, fin: null, rouge: 0, poussiere: 0 };
     e.etat = 'interro';
     this.txtAnnonce.setText('INTERRO : ESQUIVE LES COPIES !'); this.annonceT = 2.5;
     this.txtConseil.setText(!this.vus.has('dessus') ? 'Vue du dessus : passe dans les TROUS (gauche / droite) et tire vers le haut sur Julien !' : '');
@@ -522,12 +522,27 @@ export class JulienClasse extends JulienManif {
     return { x: Math.max(-1, Math.min(1, x)), y: Math.max(-1, Math.min(1, y)), tir };
   }
 
+  // petites particules de la vue du dessus : 'feuille' (copie qui vole en tournant), 'bout' (papier), 'poussiere'
+  particules(M, x, y, n, genre, force = 60) {
+    for (let k = 0; k < n; k++) {
+      const a = Math.random() * Math.PI * 2, v = force * (0.4 + Math.random() * 0.8);
+      M.parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, t: 0, vie: genre === 'poussiere' ? 0.35 : 0.5 + Math.random() * 0.4,
+        rot: Math.random() * 6, vr: (Math.random() - 0.5) * 12, genre });
+    }
+  }
+
   majDessus(dt) {
     const M = this.dessus, D = RG.julien.dessus, J = RG.julien, e = this.julien, j = this.j;
     const X0 = 12, X1 = L - 12;
+    M.entree -= dt; M.rouge = Math.max(0, M.rouge - dt * 2);
+    for (const p of M.parts) { p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= 0.94; p.vy *= 0.94; p.rot += p.vr * dt; }
+    M.parts = M.parts.filter(p => p.t < p.vie);
+    if (M.fin != null) { M.fin -= dt; if (M.fin <= 0) this.sortirDessus(true); return; }   // flash de sortie
     const c = this.commandesDessus();
+    const ax = M.px, ay = M.py;
     M.px = Math.max(X0 + 8, Math.min(X1 - 8, M.px + c.x * D.vitesse * dt)); M.dir = c.x;
     M.py = Math.max(VUE_H - 90, Math.min(VUE_H - 12, M.py + c.y * D.vitesse * dt));
+    if (Math.hypot(M.px - ax, M.py - ay) > 1 && (M.poussiere -= dt) <= 0) { this.particules(M, M.px, M.py + 14, 1, 'poussiere', 15); M.poussiere = 0.08; }
     M.invT -= dt; M.lanceT -= dt; M.flash -= dt;
     // Julien fait des allers-retours en haut
     M.prof += M.profV * D.vitesseProf * dt;
@@ -545,15 +560,18 @@ export class JulienClasse extends JulienManif {
         if (Math.random() < 0.3) M.sens = -M.sens;
       }
       M.trou = Math.max(g0, Math.min(g1, M.trou));
-      M.murs.push({ y: 40, trou: M.trou, touche: false });
+      M.murs.push({ y: 40, trou: M.trou, touche: false, x0: M.prof, ouv: 0 });   // il se déploie depuis les mains de Julien
       M.restants--; M.prochain = J.murs.intervalle[e.phase - 1]; M.lanceT = 0.3;
+      this.particules(M, M.prof, 40, 5, 'feuille', 70);
       jouerSon(this, 'julien_papier', { rate: 1.3, volume: 0.7 });
     }
     for (const w of M.murs) {
-      w.y += D.vitesseMur * dt;
+      w.y += D.vitesseMur * dt; w.ouv = Math.min(1, w.ouv + dt / 0.3);
       if (!w.touche && j.vie > 0 && M.invT <= 0 && Math.abs(w.y - M.py) < 11 && Math.abs(M.px - w.trou) > D.trou / 2 - 6) {
-        w.touche = true; M.invT = 0.6;
+        w.touche = true; M.invT = 0.6; M.rouge = 0.5;
         this.degats(J.mur.degats, e.x, e.y);
+        this.cameras.main.shake(140, 0.006);
+        this.particules(M, M.px, M.py, 8, 'feuille', 90);
         this.parlerEleves('aie');
       }
     }
@@ -561,19 +579,21 @@ export class JulienClasse extends JulienManif {
     // tes boulettes, vers le haut (sauf sarbacane confisquée)
     M.recharge -= dt;
     if (c.tir && M.recharge <= 0 && !this.confisque) {
-      M.tirs.push({ x: M.px, y: M.py - 10 }); M.recharge = RG.sarbacane.cadence;
+      M.tirs.push({ x: M.px + 4, y: M.py - 16 }); M.recharge = RG.sarbacane.cadence;
+      this.particules(M, M.px + 4, M.py - 18, 2, 'poussiere', 25);
       jouerSon(this, 'julien_lancer', { rate: 1.6 });
     }
     for (const b of M.tirs) {
       b.y -= D.vitesseTir * dt;
-      if (!b.fini && b.y < 50 && b.y > 8 && Math.abs(b.x - M.prof) < 14) {
-        b.fini = true; M.flash = 0.12;
+      if (!b.fini && b.y < 50 && b.y > 8 && Math.abs(b.x - M.prof) < 17) {
+        b.fini = true; M.flash = 0.15;
+        this.particules(M, b.x, b.y, 7, 'bout', 80);
         this.toucherEnnemi(e, RG.sarbacane.degats, { genre: 'boulette' });
         if (e.etat !== 'interro') { this.sortirDessus(false); return; }   // changement de phase ou vaincu : on revient en 3D
       }
     }
     M.tirs = M.tirs.filter(b => !b.fini && b.y > 0);
-    if (M.restants === 0 && M.murs.length === 0) this.sortirDessus(true);
+    if (M.restants === 0 && M.murs.length === 0) M.fin = 0.35;   // fini : petit flash, puis retour en 3D
   }
 
   sortirDessus(punir) {
@@ -583,6 +603,7 @@ export class JulienClasse extends JulienManif {
 
   dessinerDessus(g) {
     const M = this.dessus, D = RG.julien.dessus, s = this.T.spr, t = this.time.now / 1000;
+    const ombre = (x, y, rx, ry, a = 0.28) => { g.fillStyle = `rgba(10,15,30,${a})`; g.beginPath(); g.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); g.fill(); };
     // la salle vue du dessus (vraie image, sinon : lino en damier, estrade en parquet, le tableau tout en haut)
     if (s.dessus_salle) g.drawImage(s.dessus_salle, 0, 0, L, VUE_H);
     else {
@@ -592,35 +613,69 @@ export class JulienClasse extends JulienManif {
       g.fillStyle = '#8a5f38'; g.fillRect(0, 0, L, 56); g.fillStyle = '#5c3e22'; for (let y = 8; y < 56; y += 8) g.fillRect(0, y, L, 1);
       g.fillStyle = '#2f4a32'; g.fillRect(140, 0, 200, 7); g.fillStyle = '#4b3a2a'; g.fillRect(0, 0, 12, VUE_H); g.fillRect(L - 12, 0, 12, VUE_H);
     }
-    // Julien (de face, petit) en haut
-    const p = s.dessus_julien_marche0 ? 'dessus_julien_' : 'julien_';   // vue du dessus si livrée, sinon ses poses de face
+    // poussière au sol (sous tout le reste)
+    for (const p of M.parts) if (p.genre === 'poussiere') { g.fillStyle = `rgba(220,225,235,${0.5 * (1 - p.t / p.vie)})`; g.fillRect(p.x - 1.5, p.y - 1.5, 3, 3); }
+    // Julien (vue du dessus si livrée, sinon ses poses de face), avec son ombre ; blanc un instant quand il est touché
+    const p = s.dessus_julien_marche0 ? 'dessus_julien_' : 'julien_';
     const pj = M.flash > 0 ? s[p + 'touche'] : M.lanceT > 0 ? s[p + 'lance'] : s[p + (((t * 4) | 0) % 2 ? 'marche1' : 'marche0')];
-    if (pj) { const h = 46, w = h * pj.width / pj.height; g.drawImage(pj, M.prof - w / 2, 6, w, h); }
-    // les murs de copies (le trou bien visible)
-    for (const w of M.murs) for (let x = 12; x < L - 12; x += 15) {
-      if (Math.abs(x + 6 - w.trou) <= D.trou / 2) continue;
-      const y = w.y - 8 + Math.sin(x * 0.7 + t * 6) * 1.5;
-      const cp = s['dessus_copie_' + ((x * 7 + (w.trou | 0)) % 5 === 0 ? 1 + ((x / 15) & 1) : 0)];   // surtout des copies droites, quelques-unes penchées
-      if (cp) { const h = 16, lw = h * cp.width / cp.height; g.drawImage(cp, x + 6 - lw / 2, y, lw, h); continue; }
-      g.fillStyle = '#2a2a2a'; g.fillRect(x - 1, y - 1, 14, 18);
-      g.fillStyle = '#f6f3ea'; g.fillRect(x, y, 12, 16);
-      g.fillStyle = '#9fb6d8'; for (let l = 4; l < 16; l += 3) g.fillRect(x + 1, y + l, 10, 1);
-      g.fillStyle = '#d84a4a'; g.fillRect(x + 3, y, 1, 16);
+    ombre(M.prof, 50, 13, 4);
+    if (pj) { const h = 46, w = h * pj.width / pj.height; g.drawImage(pj, M.prof - w / 2, 6 - (M.lanceT > 0 ? 2 : 0), w, h); }
+    if (M.flash > 0) { g.fillStyle = `rgba(255,255,255,${M.flash * 3})`; g.beginPath(); g.arc(M.prof, 26, 18 + (0.15 - M.flash) * 60, 0, Math.PI * 2); g.fill(); }
+    // les murs de copies : ombres d'abord, puis les copies ; le mur se déploie depuis les mains de Julien
+    for (const w of M.murs) {
+      const portee = w.ouv * L;
+      for (let pass = 0; pass < 2; pass++) for (let x = 12; x < L - 12; x += 15) {
+        if (Math.abs(x + 6 - w.trou) <= D.trou / 2 || Math.abs(x + 6 - w.x0) > portee) continue;
+        const y = w.y - 8 + Math.sin(x * 0.7 + t * 6) * 1.5;
+        if (pass === 0) { g.fillStyle = 'rgba(10,15,30,0.25)'; g.fillRect(x + 2, y + 4, 12, 15); continue; }
+        const cp = s['dessus_copie_' + ((x * 7 + (w.trou | 0)) % 5 === 0 ? 1 + ((x / 15) & 1) : 0)];   // surtout des copies droites
+        if (cp) { const h = 16, lw = h * cp.width / cp.height; g.drawImage(cp, x + 6 - lw / 2, y, lw, h); continue; }
+        g.fillStyle = '#2a2a2a'; g.fillRect(x - 1, y - 1, 14, 18);
+        g.fillStyle = '#f6f3ea'; g.fillRect(x, y, 12, 16);
+        g.fillStyle = '#9fb6d8'; for (let l = 4; l < 16; l += 3) g.fillRect(x + 1, y + l, 10, 1);
+        g.fillStyle = '#d84a4a'; g.fillRect(x + 3, y, 1, 16);
+      }
     }
-    // tes boulettes
-    for (const b of M.tirs) { if (s.dessus_boulette) g.drawImage(s.dessus_boulette, b.x - 3, b.y - 3, 6, 6); else { g.fillStyle = '#ffffff'; g.fillRect(b.x - 2, b.y - 2, 4, 4); } }
-    // toi, vu du dessus (capuche bleu marine, cheveux bruns) ; clignote après un coup
+    // tes boulettes, avec une petite traînée
+    for (const b of M.tirs) {
+      g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(b.x - 1, b.y + 4, 2, 6);
+      if (s.dessus_boulette) g.drawImage(s.dessus_boulette, b.x - 3, b.y - 3, 6, 6); else { g.fillStyle = '#ffffff'; g.fillRect(b.x - 2, b.y - 2, 4, 4); }
+    }
+    // toi (vu du dessus, de dos), avec ton ombre ; tu clignotes après un coup
+    ombre(M.px, M.py + 17, 10, 3.5);
     const ph = M.invT > 0.3 ? s.dessus_heros_touche : Math.abs(M.dir || 0) > 0.3 ? s.dessus_heros_cote : s.dessus_heros;
-    if (ph && (M.invT <= 0 || ((t * 16) | 0) % 2)) {   // vraie image (vu du dessus, de dos)
-      const h = 40, w = h * ph.width / ph.height; g.save();
+    if (ph && (M.invT <= 0 || ((t * 16) | 0) % 2)) {
+      const h = 40, w = h * ph.width / ph.height, rebond = Math.abs(M.dir || 0) > 0.3 ? Math.abs(Math.sin(t * 14)) * 1.5 : 0;
+      g.save();
       if ((M.dir || 0) > 0.3 && ph === s.dessus_heros_cote) { g.translate(M.px * 2, 0); g.scale(-1, 1); }   // l'image vise à gauche : miroir vers la droite
-      g.drawImage(ph, M.px - w / 2, M.py - h / 2, w, h); g.restore();
+      g.drawImage(ph, M.px - w / 2, M.py - h / 2 - rebond, w, h); g.restore();
     } else if (!ph && (M.invT <= 0 || ((t * 16) | 0) % 2)) {
       g.fillStyle = '#1e2a5a'; g.beginPath(); g.ellipse(M.px, M.py + 2, 9, 7, 0, 0, Math.PI * 2); g.fill();
       g.fillStyle = '#5a3a1a'; g.beginPath(); g.arc(M.px, M.py - 2, 5, 0, Math.PI * 2); g.fill();
-      g.fillStyle = '#e8b48a'; g.fillRect(M.px + 6, M.py - 6, 3, 3);   // la main qui tient la sarbacane
+      g.fillStyle = '#e8b48a'; g.fillRect(M.px + 6, M.py - 6, 3, 3);
       g.fillStyle = '#c9d6ea'; g.fillRect(M.px + 7, M.py - 14, 1, 9);
     }
+    // feuilles et bouts de papier qui volent
+    for (const q of M.parts) {
+      const a = 1 - q.t / q.vie;
+      if (q.genre === 'bout') { g.fillStyle = `rgba(255,255,255,${a})`; g.fillRect(q.x - 1.5, q.y - 1.5, 3, 3); }
+      else if (q.genre === 'feuille') {
+        g.save(); g.globalAlpha = a; g.translate(q.x, q.y); g.rotate(q.rot);
+        if (s.dessus_copie_0) g.drawImage(s.dessus_copie_0, -4, -5, 8, 10); else { g.fillStyle = '#f6f3ea'; g.fillRect(-4, -5, 8, 10); }
+        g.restore();
+      }
+    }
+    // vignette (bords plus sombres), coup reçu (rouge), entrée (fondu depuis le noir), sortie (flash blanc)
+    if (!this.T.vignette) {
+      const v = document.createElement('canvas'); v.width = L; v.height = VUE_H;
+      const gv = v.getContext('2d'), gr = gv.createRadialGradient(L / 2, VUE_H / 2, VUE_H * 0.45, L / 2, VUE_H / 2, L * 0.62);
+      gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,0.45)'); gv.fillStyle = gr; gv.fillRect(0, 0, L, VUE_H);
+      this.T.vignette = v;
+    }
+    g.drawImage(this.T.vignette, 0, 0);
+    if (M.rouge > 0) { g.fillStyle = `rgba(220,30,20,${M.rouge * 0.4})`; g.fillRect(0, 0, L, VUE_H); }
+    if (M.entree > 0) { g.fillStyle = `rgba(0,0,0,${Math.min(1, M.entree / 0.45)})`; g.fillRect(0, 0, L, VUE_H); }
+    if (M.fin != null) { g.fillStyle = `rgba(255,255,255,${1 - Math.max(0, M.fin) / 0.35})`; g.fillRect(0, 0, L, VUE_H); }
   }
 
   // phase 3 : les sprinklers mouillent le sol, tu glisses (tu continues un peu sur ta lancée)

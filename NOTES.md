@@ -1107,6 +1107,10 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   (`julien_dessus_persos.jpg` : Julien 4 poses + héros 3 poses ; `julien_dessus_objets.jpg` : copies, boulette ;
   `julien_dessus_salle.jpg` : la salle 21:9). Découpe et branchement faits (`DESSUS_IMAGES`). LIVRÉES et découpées (planche des persos en colonne ; le héros « de
   côté » vise à gauche → miroir quand il va à droite ; boulettes en trop et pile de copies ignorées).
+  EFFETS (Fabien : « améliorer encore les graphismes ») : ombres (persos, copies), murs qui se déploient depuis les
+  mains de Julien, particules (`particules` : feuilles qui volent quand tu es touché / quand il lance, bouts de papier
+  quand une boulette le touche + flash blanc, poussière quand tu bouges), traînée des boulettes, petit rebond en
+  marchant, vignette, voile rouge au coup reçu, fondu d'entrée (noir) et flash de sortie (blanc).
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».
