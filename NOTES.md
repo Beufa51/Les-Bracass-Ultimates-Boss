@@ -1088,6 +1088,12 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
     passer des œufs ». « CONFISQUÉ ! » : la sarbacane est prise 8 s (on ne peut plus tirer, la main disparaît).
   · MUSIQUES : lycée = thème de Duke Nukem 3D (`julien_lycee_musique.mp3`), boss = « One-Winged Angel » de Sephiroth
     (`julien_boss_musique.mp3`) ; la manif garde Doom. Chargées seulement quand elles jouent.
+- RETOUR FABIEN (2) — FAIT : surveillants qui « n'enlèvent pas de vie » → au contact ils t'ATTRAPENT
+  (`RG.surveillant.attrape` : 8 toutes les 0,9 s + bousculade ; géré dans l'IA du CRS de JulienManif), plus rapides,
+  charge 15. Julien trop simple → vie 55, cadences / préavis / fenêtre de dos plus courts, livre 14 ; nouvelles
+  attaques BULLET HELL : DÉLUGE (`RG.julien.deluge` : 3 / 5 / 7 vagues selon la phase, éventail visé puis décalé,
+  1 vague sur 3 en cercle qui tourne, copies au-dessus des tables) et MURS (3 murs de copies d'affilée, phases 2-3).
+  MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».
   Hall → couloir des casiers (porte de la salle 12 en haut, FERMÉE sans le carnet) → cantine (CARNET DE

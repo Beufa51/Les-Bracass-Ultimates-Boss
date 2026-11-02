@@ -32,7 +32,7 @@ const OBJETS_IMAGES = ['table', 'bureau', 'livre', 'dico', 'copie', 'craie'];
 const HAUTEURS_IMAGES_CLASSE = { table: 0.72, bureau: 0.62, livre: 0.15, dico: 0.17, copie: 0.15, craie: 0.06 };
 const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'dos', 'rage', 'vaincu'];
 const ELEVES_IMAGES = [0, 1, 2, 3].flatMap(k => [`eleve_${k}_content`, `eleve_${k}_cache`]);
-const GROSSES = new Set(['eventail', 'mur', 'dico', 'aimant', 'rafale']);   // après elles : il se retourne (fenêtre de punition)
+const GROSSES = new Set(['eventail', 'mur', 'murs', 'deluge', 'dico', 'aimant', 'rafale']);   // après elles : il se retourne (fenêtre de punition)
 // ce qu'on annonce en grand quand il prépare une attaque, et le conseil la 1re fois
 const ANNONCES = {
   mur: ['SORTEZ UNE FEUILLE !', 'Un MUR DE COPIES : trouve le TROU et place-toi dedans !'],
@@ -41,6 +41,8 @@ const ANNONCES = {
   confisque: ['DONNE-MOI ÇA !', 'Trop près : il va CONFISQUER ton arme. Recule !'],
   regle: ['LA RÈGLE !', 'Au contact, il frappe : RECULE !'],
   craies: ['CRAIES !', 'Des craies en rafale : planque-toi derrière une TABLE !'],
+  deluge: ['CONTRÔLE SURPRISE !', 'Une PLUIE de copies (au-dessus des tables) : faufile-toi dans les trous !'],
+  murs: ['RECOPIEZ TROIS FOIS !', 'Plusieurs murs de copies d\'affilée : trouve chaque trou !'],
 };
 
 // Dessin provisoire de la main qui tient la sarbacane (stylo Bic vidé), en gros pixels comme les vraies mains :
@@ -289,6 +291,8 @@ export class JulienClasse extends JulienManif {
         if (e.t > 0) return;
         if (e.reste > 0) {
           e.reste--;
+          if (e.motif === 'deluge') { this.vagueCopies(e, voit); e.t = J.deluge.intervalle[e.phase - 1]; return; }
+          if (e.motif === 'murs') { this.murCopies(e); e.t = J.murs.intervalle; return; }
           if (e.motif === 'craies') this.lancerLivre(e, 'craie', this.angleVers(e, voit) + (Math.random() - 0.5) * 2 * J.craies.dispersion);
           else this.lancerLivre(e, 'livre', this.angleVers(e, voit));
           e.t = e.motif === 'craies' ? J.craies.intervalle : J.rafale.intervalle; return;
@@ -301,10 +305,10 @@ export class JulienClasse extends JulienManif {
   preparer(e, d) {
     const J = RG.julien, ph = e.phase - 1;
     e.motif = this.choisirMotif(e, d);
-    const P = { dico: J.dico.preavis, mur: J.mur.preavis, craies: J.craies.preavis, aimant: J.aimant.preavis, confisque: J.confisque.preavis, regle: J.regle.preavis };
+    const P = { deluge: J.deluge.preavis, murs: J.mur.preavis, dico: J.dico.preavis, mur: J.mur.preavis, craies: J.craies.preavis, aimant: J.aimant.preavis, confisque: J.confisque.preavis, regle: J.regle.preavis };
     e.etat = 'prepare'; e.t = P[e.motif] || J.preavis[ph];
     if (ANNONCES[e.motif]) this.annoncer(e.motif, e.t + 0.6);
-    if (e.motif === 'mur') { this.message(REPLIQUES.mur, 2.2); jouerSon(this, 'julien_papier'); }
+    if (e.motif === 'mur' || e.motif === 'murs' || e.motif === 'deluge') { this.message(e.motif === 'deluge' ? REPLIQUES.deluge : REPLIQUES.mur, 2.2); jouerSon(this, 'julien_papier'); }
     else if (e.motif === 'aimant') this.message(REPLIQUES.aimant, 2.2);
     else if (e.motif === 'confisque') this.message(REPLIQUES.confisque, 2);
     else if (e.motif === 'regle') this.message(REPLIQUES.regle, 1.5);
@@ -316,9 +320,9 @@ export class JulienClasse extends JulienManif {
     const J = RG.julien, j = this.j, r = Math.random();
     if (d < J.regle.portee) return 'regle';
     if (d < J.confisque.portee && !this.confisque && j.arme !== 'pancarte' && Math.random() < [0.5, 0.6, 0.85][e.phase - 1]) return 'confisque';
-    if (e.phase === 1) return r < 0.4 ? 'livre' : r < 0.62 ? 'eventail' : r < 0.82 ? 'craies' : 'mur';
-    if (e.phase === 2) return r < 0.28 ? 'mur' : r < 0.5 ? 'dico' : r < 0.68 ? 'eventail' : r < 0.86 ? 'aimant' : 'craies';
-    return r < 0.18 ? 'rafale' : r < 0.32 ? 'dico' : r < 0.47 ? 'mur' : r < 0.7 ? 'aimant' : r < 0.85 ? 'craies' : 'eventail';
+    if (e.phase === 1) return r < 0.3 ? 'livre' : r < 0.5 ? 'eventail' : r < 0.68 ? 'craies' : r < 0.84 ? 'mur' : 'deluge';
+    if (e.phase === 2) return r < 0.3 ? 'deluge' : r < 0.45 ? 'murs' : r < 0.6 ? 'dico' : r < 0.72 ? 'eventail' : r < 0.86 ? 'aimant' : 'craies';
+    return r < 0.3 ? 'deluge' : r < 0.45 ? 'murs' : r < 0.55 ? 'rafale' : r < 0.65 ? 'dico' : r < 0.82 ? 'aimant' : r < 0.92 ? 'craies' : 'eventail';
   }
 
   // l'attaque part
@@ -340,7 +344,7 @@ export class JulienClasse extends JulienManif {
       return;
     }
     this.lancerMotif(e, voit);
-    e.etat = 'lance'; e.t = e.motif === 'mur' ? 1.6 : e.motif === 'dico' ? 0.8 : 0.35;   // il se retourne quand le mur / le dico est passé
+    e.etat = 'lance'; e.t = e.motif === 'mur' || e.motif === 'murs' ? 1.6 : e.motif === 'dico' ? 0.8 : 0.35;   // il se retourne quand le mur / le dico est passé
   }
 
   // fin d'une attaque : après une grosse (ou parfois une petite en phase 2-3), il se retourne au tableau
@@ -395,14 +399,32 @@ export class JulienClasse extends JulienManif {
     else if (e.motif === 'copies') {
       const n = J.copies.nombre;
       for (let k = 0; k < n; k++) this.lancerLivre(e, 'copie', a + (k - (n - 1) / 2) * J.copies.ecart);
-    } else if (e.motif === 'mur') {   // toute la largeur de la salle, sauf UN trou (pas loin de toi)
-      const W = this.plan[0].length, trou = Math.max(2, Math.min(W - 2, this.j.x + (Math.random() - 0.5) * 6));
-      for (let x = 1.25; x < W - 1; x += J.mur.ecart) if (Math.abs(x - trou) > J.mur.trou / 2) {
-        this.livres.push({ genre: 'mur', x, y: e.y + 0.7, dx: 0, dy: 1, v: J.mur.vitesse, degats: J.mur.degats, rebonds: 0, t: 0, ph: Math.random() * 6 });
-      }
-    } else if (e.motif === 'craies') { this.lancerLivre(e, 'craie', a); e.reste = J.craies.nombre - 1; }
+    } else if (e.motif === 'mur') this.murCopies(e);
+    else if (e.motif === 'murs') { this.murCopies(e); e.reste = J.murs.nombre - 1; }
+    else if (e.motif === 'deluge') { e.vague = 0; this.vagueCopies(e, voit); e.reste = J.deluge.vagues[e.phase - 1] - 1; }
+    else if (e.motif === 'craies') { this.lancerLivre(e, 'craie', a); e.reste = J.craies.nombre - 1; }
     else { this.lancerLivre(e, 'livre', a); if (e.motif === 'rafale') e.reste = J.rafale.nombre - 1; }
     jouerSon(this, 'julien_lancer', { rate: e.motif === 'dico' ? 0.55 : 0.75 });
+  }
+
+  // un mur de copies : toute la largeur de la salle, sauf UN trou (pas loin de toi)
+  murCopies(e) {
+    const J = RG.julien, W = this.plan[0].length, trou = Math.max(2, Math.min(W - 2, this.j.x + (Math.random() - 0.5) * 6));
+    for (let x = 1.25; x < W - 1; x += J.mur.ecart) if (Math.abs(x - trou) > J.mur.trou / 2) {
+      this.livres.push({ genre: 'mur', traverse: true, x, y: e.y + 0.7, dx: 0, dy: 1, v: J.mur.vitesse, degats: J.mur.degats, rebonds: 0, t: 0, ph: Math.random() * 6 });
+    }
+    jouerSon(this, 'julien_papier', { rate: 1.2 });
+  }
+
+  // DÉLUGE (bullet hell) : vagues de copies qui passent au-dessus des tables ; les trous se décalent d'une vague à
+  // l'autre (éventail visé sur toi, puis le même décalé d'un demi-écart), et une vague sur 3 est un cercle qui tourne
+  vagueCopies(e, voit) {
+    const D = RG.julien.deluge, a = this.angleVers(e, voit), k = e.vague++;
+    const tirer = (ang) => { const dx = Math.cos(ang), dy = Math.sin(ang);
+      this.livres.push({ genre: 'copie', traverse: true, droit: true, x: e.x + dx * 0.4, y: e.y + dy * 0.4, dx, dy, v: D.vitesse, degats: D.degats, rebonds: 0, t: 0, ph: Math.random() * 6 }); };
+    if (k % 3 === 2) for (let i = 0; i < D.cercle; i++) tirer(i / D.cercle * Math.PI * 2 + k * 0.37);
+    else for (let i = 0; i < D.nombre; i++) tirer(a + (i - (D.nombre - 1) / 2) * D.ecart + (k % 2 ? D.ecart / 2 : 0));
+    jouerSon(this, 'julien_papier', { rate: 1.4 + (k % 3) * 0.1, volume: 0.6 });
   }
 
   lancerLivre(e, genre, a) {
@@ -417,7 +439,7 @@ export class JulienClasse extends JulienManif {
     for (const b of this.livres) {
       b.t += dt;
       let vx = b.dx, vy = b.dy;
-      if (b.genre === 'copie') { const w = Math.sin(b.t * 7 + b.ph) * 0.45; vx += -b.dy * w; vy += b.dx * w; }   // elles volettent
+      if (b.genre === 'copie' && !b.droit) { const w = Math.sin(b.t * 7 + b.ph) * 0.45; vx += -b.dy * w; vy += b.dx * w; }   // elles volettent
       const nx = b.x + vx * b.v * dt, ny = b.y + vy * b.v * dt;
       if (murEn(this.plan, nx, ny)) {
         if (b.rebonds > 0) {   // le dictionnaire rebondit
@@ -431,13 +453,13 @@ export class JulienClasse extends JulienManif {
       }
       b.x = nx; b.y = ny;
       // une table : abri ! (le mur de copies passe au-dessus ; son bureau renversé ne gêne pas Julien)
-      if (b.genre !== 'mur') for (const o of this.objets) if (o.actif && o.solide && o.type !== 'bureau_renverse' && Math.hypot(o.x - b.x, o.y - b.y) < o.rayon) {
+      if (!b.traverse) for (const o of this.objets) if (o.actif && o.solide && o.type !== 'bureau_renverse' && Math.hypot(o.x - b.x, o.y - b.y) < o.rayon) {
         b.fini = true;
         if (Math.hypot(b.x - j.x, b.y - j.y) < 5) jouerSon(this, 'julien_plonk', { rate: b.genre === 'copie' ? 1.6 : b.genre === 'craie' ? 2 : 0.9 });
         break;
       }
       if (b.fini) continue;
-      if (j.vie > 0 && Math.hypot(b.x - j.x, b.y - j.y) < (b.genre === 'mur' ? 0.32 : 0.38)) {
+      if (j.vie > 0 && Math.hypot(b.x - j.x, b.y - j.y) < (b.traverse ? 0.32 : 0.38)) {
         b.fini = true;
         this.degats(b.degats, b.x - b.dx, b.y - b.dy);
         this.parlerEleves('aie');

@@ -43,6 +43,7 @@ export const REPLIQUES = {
     '« Tu copieras 100 fois : je ne manifeste pas ! »', '« Et ça se dit étudiant ! »'],
   dos: ['« Notez bien ! »', '« Je l\'écris au tableau… »', '« Page 42, exercice 3… »'],
   mur: '« SORTEZ UNE FEUILLE ! »',
+  deluge: '« CONTRÔLE ! Et je ramasse les copies ! »',
   aimant: '« TOI ! AU TABLEAU ! »',
   confisque: '« Donne-moi ça ! »',
   confisqueOk: '« CONFISQUÉ ! »',

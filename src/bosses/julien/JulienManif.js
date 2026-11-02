@@ -681,7 +681,18 @@ export class JulienManif extends BossScene {
       return;
     }
 
-    // CRS au bouclier
+    // CRS au bouclier (et le surveillant du lycée, sans bouclier)
+    // surveillant : au contact, il t'ATTRAPE (dégâts + il te bouscule), même sans charger
+    if (R.attrape && (e.etat === 'approche' || e.etat === 'cri') && voit) {
+      e.attrapeT = (e.attrapeT || 0) - dt;
+      if (d < R.attrape.portee && e.attrapeT <= 0) {
+        e.attrapeT = R.attrape.cadence;
+        this.degats(R.attrape.degats, e.x, e.y);
+        this.deplacer(j, ox / d * 0.6, oy / d * 0.6, RG.joueur.rayon);
+        this.cameras.main.shake(150, 0.008);
+        if (Math.random() < 0.5) this.message(R.attrape.replique, 1.5);
+      }
+    }
     if (e.etat === 'attente') { if (e.alerte) e.etat = 'approche'; else if (e.ronde) this.ronde(e, marcher, dt); return; }
     if (e.etat === 'approche') {
       if (voit) {

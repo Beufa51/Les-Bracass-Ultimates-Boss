@@ -222,6 +222,10 @@ def corriger_tableau(t):
     return t
 
 
+# mains dessinées en MAIN GAUCHE par Gemini (le bras entre par le bas à gauche) : retournées en miroir → main droite
+MAINS_MIROIR = {'main_lance', 'main_pancarte_tir', 'main_fumigenes', 'main_fumigenes_tir', 'main_sarbacane', 'main_sarbacane_tir'}
+
+
 def main():
     os.makedirs(SORTIE, exist_ok=True)
     morceaux = {}
@@ -247,6 +251,8 @@ def main():
                 morceaux[n] = i
             continue
         for n, i in zip(noms, meme_taille(ims, hauteur)):
+            if n in MAINS_MIROIR:
+                i = i.transpose(Image.FLIP_LEFT_RIGHT)
             i.save(SORTIE + f'julien_{n}.png')
             print('  ', n, i.size)
 
