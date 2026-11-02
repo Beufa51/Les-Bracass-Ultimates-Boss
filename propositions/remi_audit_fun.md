@@ -72,7 +72,7 @@ bar visible (têtes en bas de l'écran qui crient), (3) Rémi qui réagit (se ti
 | Porte | 6,7/10 | 6,7/10 |
 | **Rémi** | **6,9/10** | **7/10** |
 
-## Ordre proposé pour passer à 8/10
+## Ordre proposé pour passer à 8/10 (validé et FAIT en V9 : points 1, 2 et 3)
 1. **Porte : barre de solidité commune** (celui qui la fait céder gagne) — donne un vrai suspense à la fin de la soirée.
 2. **Beer pong : tir rebond + déconcentrer Rémi pendant son tour** — enlève le temps mort et ajoute un choix.
 3. **Vélo : salto au tremplin + une chute cartoon + un événement par route.**

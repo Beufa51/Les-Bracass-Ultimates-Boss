@@ -116,7 +116,16 @@
   VÉLO : `actionDuMoment()` → gros « SAUTE ! » / « DRING ! » au-dessus de l'obstacle + le bouton à presser clignote
   (pas en CHAMPION) ; RALENTI x0,3 les 2 premières fois de chaque geste. ROUTES : 3 tronçons, 2 CARREFOURS (`CARREFOURS`,
   panneau 3 s, gauche / droite) : quais (tranquille) ou ruelle (raccourci 35 % plus court, bondé) ; centre-ville (tremplins
-  x2) ou petites rues (raccourci). `this.longueur` = longueur réelle (raccourcis), `genererTroncon()` à chaque choix. : `python3 outils/remi/preparer_images.py`.
+  x2) ou petites rues (raccourci). `this.longueur` = longueur réelle (raccourcis), `genererTroncon()` à chaque choix.
+- V9 (les 3 propositions de l'audit fun, validées) :
+  PORTE : barre de SOLIDITÉ commune (`PORTE.solidite` 4200) : chaque coup enlève son score ; celui qui la fait céder gagne
+  tout (sinon les manches) ; alerte « ne tient plus qu'à un fil » ; chacun commence une manche sur deux (`suite()`).
+  PONG : TIR REBOND (bouton orange en bas à droite / X) : la balle rebondit sur la table (`volRebond`), imprécision x1,5,
+  aimant /2, mais 2 VERRES s'il rentre ; DÉCONCENTRER RÉMI (`prepRemi`) : 1 s de concentration, un cercle se resserre sur
+  lui, toucher / ESPACE dans les 0,3 dernières s = « FFFFF ! » (-0,3 à sa chance).
+  VÉLO : SALTO (SAUTE dans les 0,3 s après l'envol d'un tremplin ; tour de 0,42 s à finir avant d'atterrir = +3 s, sinon
+  chute) ; CHUTE CARTOON (il décolle, fait la toupie, étoiles autour de la tête) ; obstacles propres aux routes (`special`) :
+  PÊCHEUR sur les quais (DRING), POUBELLE dans les ruelles (grand saut), CHORALE de 3 fêtards au centre-ville (un DRING). : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

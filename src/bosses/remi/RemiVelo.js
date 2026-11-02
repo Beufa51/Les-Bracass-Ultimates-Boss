@@ -28,10 +28,12 @@ const BOUTON_G = { x: 88, y: 448, r: 74 }, BOUTON_D = { x: LARGEUR - 88, y: 448,
 //  longueur : part de la longueur d'un tronçon (raccourci = plus court mais plus chargé) ; densite / pintes / voitures : x
 const DEPART_ROUTE = { nom: 'LA RUE DES BARS', image: 'remi_rue', teinte: 0xffffff, longueur: 1, densite: 1, pintes: 1, voitures: 1 };
 const CARREFOURS = [
-  [{ nom: 'LES QUAIS', texte: 'tranquille, plein de pintes', image: 'remi_rue2', teinte: 0x9fb8ff, longueur: 1, densite: 0.75, pintes: 1.6, voitures: 1 },
-    { nom: 'LA RUELLE', texte: 'RACCOURCI, mais bondé', image: '', teinte: 0x9a80c0, longueur: 0.65, densite: 1.35, pintes: 0.6, voitures: 0 }],
-  [{ nom: 'LE CENTRE-VILLE', texte: 'la fête : tremplins et pintes', image: 'remi_rue3', teinte: 0xffc8a0, longueur: 1, densite: 1, pintes: 1.5, voitures: 2 },
-    { nom: 'LES PETITES RUES', texte: 'RACCOURCI, mais bondé', image: '', teinte: 0x80a8c0, longueur: 0.65, densite: 1.35, pintes: 0.6, voitures: 0 }],
+  [{ nom: 'LES QUAIS', texte: 'tranquille, plein de pintes', image: 'remi_rue2', teinte: 0x9fb8ff, longueur: 1, densite: 0.75, pintes: 1.6, voitures: 1, special: 'pecheur' },
+    { nom: 'LA RUELLE', texte: 'RACCOURCI, mais bondé', image: '', teinte: 0x9a80c0, longueur: 0.65, densite: 1.35, pintes: 0.6, voitures: 0, special: 'poubelle' }],
+  [{ nom: 'LE CENTRE-VILLE', texte: 'la fête : tremplins et pintes', image: 'remi_rue3', teinte: 0xffc8a0, longueur: 1, densite: 1, pintes: 1.5, voitures: 2, special: 'chorale' },
+    { nom: 'LES PETITES RUES', texte: 'RACCOURCI, mais bondé', image: '', teinte: 0x80a8c0, longueur: 0.65, densite: 1.35, pintes: 0.6, voitures: 0, special: 'poubelle' }],
+// obstacles propres aux routes : PÊCHEUR (quais : sa canne barre la route → DRING), POUBELLE (ruelles : haute → grand saut),
+// CHORALE (centre-ville : 3 fêtards qui chantent → un DRING les écarte tous)
 ];
 // voitures illustrées (remi_voitures.png, 3 cases) : taille réelle de chaque voiture dans sa case ; ECH_VOIT = taille à l'écran
 const VOIT_IMG = [{ l: 394, h: 175 }, { l: 434, h: 179 }, { l: 382, h: 213 }], ECH_VOIT = 0.74;
@@ -39,7 +41,7 @@ const VOIT_IMG = [{ l: 394, h: 175 }, { l: 434, h: 179 }, { l: 382, h: 213 }], E
 const TREMPLIN_IMG = { l: 1114, h: 459, haut: 0.81 };
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 // hauteur et demi-largeur de chaque obstacle (chocs) ; debout et traverse sont plus hauts que le plus grand saut
-const TAILLE = { allonge: [52, 58], verre: [13, 36], debout: [210, 23], traverse: [210, 26], vomi: [5, 55] };
+const TAILLE = { allonge: [52, 58], verre: [13, 36], debout: [210, 23], traverse: [210, 26], vomi: [5, 55], poubelle: [80, 30] };
 const SONNER = { debout: true, traverse: true };    // les obstacles qui demandent la sonnette (les autres : sauter)
 // illustration des bourrés (remi_bourres.png : debout, sursaute, allongé, traverse de face) et sa taille à l'écran
 const BOURRE = 0.33, IMAGE_BOURRE = { debout: 0, ecarte: 1, allonge: 2, marche: 3 };
@@ -167,9 +169,13 @@ export class RemiVelo extends BossScene {
         x = xv + 480; k++;
         continue;
       }
-      const type = k < debut.length ? debut[k] : tirer();
+      let type = k < debut.length ? debut[k] : tirer();
       k++;
-      this.ajouter(type, x);
+      const sp = k > debut.length && route.special && Math.random() < 0.3 ? route.special : null;
+      if (sp === 'poubelle') { type = 'poubelle'; this.ajouter('poubelle', x); }
+      else if (sp === 'pecheur') { type = 'debout'; this.ajouter('debout', x); this.obstacles[this.obstacles.length - 1].peche = true; }
+      else if (sp === 'chorale') { type = 'debout'; for (let n = 0; n < 3; n++) { this.ajouter('debout', x + n * 85); this.obstacles[this.obstacles.length - 1].chante = true; } x += 170; }
+      else this.ajouter(type, x);
       // l'écart se compte en TEMPS, à la vitesse prévue à cet endroit : jamais deux obstacles collés
       const vit = V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, x / V.longueur);
       const ecart = vit * hasard(V.ecart[0], V.ecart[1]) / (this.diff.densite * route.densite) + (type === 'traverse' ? 120 : 0);
@@ -280,11 +286,16 @@ export class RemiVelo extends BossScene {
     if (this.auSol && avant && !this.surTremplin && this.bx > avant.x0 + avant.l) {
       // bout du tremplin : ENVOL !
       this.vy = V.tremplin; this.auSol = false; this.surTremplin = null; this.tenu = 0;
-      jouerSon(this, 'remi_saut', { rate: 0.8 }); bulle(this, 'ENVOL !', '#9fe0ff', 0.6, 140); this.score += 15;
+      jouerSon(this, 'remi_saut', { rate: 0.8 }); bulle(this, 'ENVOL ! (SAUTE maintenant = SALTO)', '#9fe0ff', 0.9, 140); this.score += 15;
+      this.envolT = 0.3; this.tampon = 0;
     } else if (this.auSol && this.vy <= 0) {
       if (sol < this.y - 2) this.auSol = false;   // on quitte le toit (ou la fin du tremplin) : on tombe
       else this.y = sol;
     }
+    // SALTO : appuyer sur SAUTE juste après l'envol d'un tremplin ; il faut finir le tour avant de toucher le sol
+    this.envolT = Math.max(0, (this.envolT || 0) - dt);
+    if (!this.auSol && this.envolT > 0 && this.tampon > 0 && !this.salto) { this.salto = { t: 0, d: 0.42 }; this.tampon = 0; jouerSon(this, 'remi_saut', { rate: 1.3 }); }
+    if (this.salto) this.salto.t += dt;
     // saut : tant qu'on garde appuyé (au début), la gravité est plus faible = saut plus haut et plus long
     if (!this.auSol) {
       this.tenu += dt;
@@ -292,7 +303,14 @@ export class RemiVelo extends BossScene {
       const yAvant = this.y;
       this.y += this.vy * dt; this.vy -= (leger ? V.graviteTenue : V.gravite) * dt;
       const sol2 = this.solSous(Math.max(this.y, yAvant));   // (vu d'où on était : on ne traverse pas un toit en tombant vite)
-      if (this.vy <= 0 && this.y <= sol2) { this.y = sol2; this.vy = 0; this.auSol = true; jouerSon(this, 'remi_atterrit'); }
+      if (this.vy <= 0 && this.y <= sol2) {
+        this.y = sol2; this.vy = 0; this.auSol = true; jouerSon(this, 'remi_atterrit');
+        if (this.salto) {
+          const fini = this.salto.t >= this.salto.d; this.salto = null;
+          if (fini) { this.tempsRestant += 3; this.score += 50; annonce(this, 'SALTO ! +3 s', '#ffd84a', 0.9); jouerSon(this, 'remi_foule'); }
+          else if (this.invincible <= 0) this.tomber({ type: 'salto', etat: '', p: 0 });
+        }
+      }
     }
     this.voituresPas();
     this.bx += this.v * dt;
@@ -490,7 +508,8 @@ export class RemiVelo extends BossScene {
   tomber(o) {
     this.chute = V.chute; this.chutes++;
     this.y = 0; this.vy = 0;
-    if (o.type === 'traverse') o.etat = 'recule'; else if (o.type !== 'voiture') { o.etat = 'ecarte'; o.p = 1; }
+    if (o.type === 'traverse') o.etat = 'recule'; else if (o.type !== 'voiture' && o.type !== 'salto') { o.etat = 'ecarte'; o.p = 1; }
+    this.salto = null;
     this.cameras.main.shake(250, 0.012);
     jouerSon(this, 'remi_chute');
     bulle(this, choisir(['Aïe !', 'Il m\'a pas vu !', 'Oh le boulet...', 'Ma roue !']), '#ff9a9a', 1.2, 140);
@@ -643,6 +662,16 @@ export class RemiVelo extends BossScene {
         else g.fillStyle(0x10304a, 1).fillTriangle(sx - 9, y + 6, sx + 9, y + 6, sx, y - 8);
       }
       if (o.type === 'verre') { o.g.setPosition(sx, SOL); verreCasse(o.g); continue; }
+      if (o.type === 'poubelle') {
+        // grosse poubelle verte (ruelles) : plus haute qu'un bourré allongé, il faut un GRAND saut
+        o.g.setPosition(sx, SOL).setRotation(0);
+        o.g.fillStyle(0x111111, 1).fillRoundedRect(-33, -82, 66, 82, 6);
+        o.g.fillStyle(0x2f7a3a, 1).fillRoundedRect(-30, -78, 60, 76, 5);
+        o.g.fillStyle(0x24602e, 1).fillRect(-34, -88, 68, 12);
+        o.g.lineStyle(2, 0x1a4020, 1).lineBetween(-15, -70, -15, -8).lineBetween(0, -70, 0, -8).lineBetween(15, -70, 15, -8);
+        o.g.fillStyle(0x111111, 1).fillCircle(-22, -2, 6).fillCircle(22, -2, 6);
+        continue;
+      }
       if (o.type === 'vomi') { o.g.setPosition(sx, SOL); flaque(o.g); continue; }
       if (o.type === 'allonge') {
         if (o.spr) o.spr.setVisible(true).setFrame(IMAGE_BOURRE.allonge).setPosition(sx, SOL + 4).setScale(BOURRE);
@@ -664,7 +693,15 @@ export class RemiVelo extends BossScene {
       const x = sx + p * 18, y = SOL - p * 30 - Math.sin(p * Math.PI) * 40, k = 1 - p * 0.25, rot = Math.sin(o.t * 2.1) * 0.14 - p * 0.3;
       if (o.spr) {
         o.spr.setVisible(true).setFrame(IMAGE_BOURRE[p > 0 && p < 1 ? 'ecarte' : 'debout']).setDepth(p >= 1 ? 4 : 8)
-          .setPosition(x, y).setScale(BOURRE * k).setAlpha(1 - p * 0.3).setRotation(rot);
+          .setPosition(x, y).setScale(BOURRE * k).setAlpha(1 - p * 0.3).setRotation(rot).setTint(o.peche ? 0x9fc8ff : o.chante ? 0xffd0e0 : o.spr.tintTopLeft);
+        if (o.peche && p === 0) {   // sa canne à pêche barre la route
+          g.lineStyle(3, 0x5a3a1a, 1).lineBetween(x - 20, y - 120, x - 170, y - 175);
+          g.lineStyle(1, 0xdddddd, 0.8).lineBetween(x - 170, y - 175, x - 170, SOL - 10);
+        }
+        if (o.chante && p === 0) {   // ils chantent : des notes
+          const ny = y - 230 - ((this.horloge * 40 + o.x) % 40);
+          g.fillStyle(0xffffff, 0.9).fillCircle(x + 10, ny, 5).fillRect(x + 14, ny - 18, 2, 18);
+        }
       } else { o.g.setPosition(x, y).setScale(k).setAlpha(1 - p * 0.3).setRotation(rot); bourre(o.g, p > 0 ? 'ecarte' : 'debout', o.t, o.couleur); }
     }
   }
@@ -674,11 +711,23 @@ export class RemiVelo extends BossScene {
     const zig = this.glisse > 0 ? Math.sin(this.horloge * 30) * 0.12 : 0;
     const bond = this.chute > 0 ? 0 : -this.y;
     gv.setPosition(X_VELO, SOL + bond).setRotation(0);
-    const rot = this.chute > 0 ? 0 : (this.auSol && this.surTremplin ? -Math.atan2(this.surTremplin.h, this.surTremplin.l) : this.vy > 0 ? -0.12 : !this.auSol ? 0.08 : 0) + zig;
+    const rot = this.salto ? -Math.PI * 2 * Math.min(1, this.salto.t / this.salto.d) : this.chute > 0 ? 0 : (this.auSol && this.surTremplin ? -Math.atan2(this.surTremplin.h, this.surTremplin.l) : this.vy > 0 ? -0.12 : !this.auSol ? 0.08 : 0) + zig;
     if (this.sprVelo) {
       const f = this.chute > 0 ? 7 : !this.auSol ? 6 : Math.floor(this.a / (Math.PI * 2) * 6) % 6;
-      this.sprVelo.setFrame(f).setPosition(X_VELO, SOL + bond + 6).setRotation(rot)
+      // CHUTE CARTOON : le cycliste décolle, fait la toupie et retombe, des étoiles tournent autour de sa tête
+      const pc = this.chute > 0 ? 1 - this.chute / V.chute : 0;
+      const vol = this.chute > 0 ? Math.sin(Math.min(1, pc * 1.6) * Math.PI) * 110 : 0;
+      this.sprVelo.setFrame(f).setPosition(X_VELO + (this.chute > 0 ? Math.min(1, pc * 1.6) * 70 : 0), SOL + bond + 6 - vol)
+        .setRotation(this.chute > 0 ? Math.min(1, pc * 1.6) * Math.PI * 2 : rot)
+        .setOrigin(0.5, this.salto || this.chute > 0 ? 0.6 : 1)
         .setAlpha(this.invincible > 0 && Math.floor(this.horloge * 12) % 2 ? 0.35 : 1);   // clignote après une chute
+      if (this.salto || (this.chute > 0 && pc < 0.62)) this.sprVelo.y -= 296 * 0.78 * 0.4;   // (tourne autour de son centre)
+      if (this.chute > 0 && pc > 0.55) {
+        for (let k = 0; k < 4; k++) {
+          const a = this.horloge * 6 + k * Math.PI / 2, ex = 70 + Math.cos(a) * 40, ey = -190 + Math.sin(a) * 12;
+          gv.fillStyle(0xffe680, 1).fillTriangle(ex - 7, ey, ex + 7, ey, ex, ey - 12).fillTriangle(ex - 7, ey - 8, ex + 7, ey - 8, ex, ey + 4);
+        }
+      }
     } else {
       if (this.chute > 0) gv.setRotation(-1.3).setPosition(X_VELO + 20, SOL - 30); else gv.setRotation(rot);
       cycliste(gv, this.a, { sonnette: this.dring > 0 });
