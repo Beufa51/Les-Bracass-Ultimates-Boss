@@ -1118,6 +1118,10 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   poussière, feuilles quand tu es touché, NOTE tamponnée à la fin de la rafale : 20/20 sans être touché, sinon 0/20,
   `RG.julien.dessus.note` s). 18d LIVRÉE : 6 tables d'élèves sur les bords (`TABLES_DESSUS`), l'élève se cache quand un
   mur passe à sa hauteur, lève les bras quand Julien est touché ou au 20/20 ; zone de jeu réduite (x 56 à 424).
+- RETOUR FABIEN (3) — FAIT : le DÉLUGE (contrôle surprise) s'arrête maintenant sur les tables (on peut s'abriter ;
+  testé : à découvert −28, derrière une table 0) ; plus de ×3 de dos pour la sarbacane (×2 comme le reste) ; vue du
+  dessus : le héros n'utilise plus les poses « marche » et « de côté » (il marchait en diagonale) → pose droite + petit
+  rebond quand il bouge (souffle / touché / victoire gardés).
   MAINS GAUCHES (lancer, coup de pancarte, fumigène, sarbacane) : retournées en miroir à la découpe (`MAINS_MIROIR`).
 - FAIT (A, le mini-niveau « LE LYCÉE », `JulienLycee.js` hérite de JulienManif ; plan `niveau_lycee.js` 24 × 22, fait et
   vérifié atteignable par un script) : manif finie → LYCÉE → porte de la salle 12 → classe. Menu de test : « Le lycée ».

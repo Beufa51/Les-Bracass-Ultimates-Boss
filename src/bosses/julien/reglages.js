@@ -46,7 +46,7 @@ export const REGLAGES = {
   // AUTRES ARMES (touches 1 à 5 ; bouton ARME sur téléphone). La 1re cagette / pistolet / fumigène trouvé donne l'arme.
   pancarte: { cadence: 0.45, portee: 1.4, degats: 1, recul: 0.7, etourdit: 1.4 },   // un CRS frappé baisse son bouclier (etourdit s)
   tomates: { cagette: 10, maxi: 40, cadence: 0.6, vitesse: 8, duree: 0.9, degats: 2, recul: 0.5 },   // une tomate = 2 œufs, fait bien reculer
-  sarbacane: { cadence: 0.3, vitesse: 12, duree: 1.2, degats: 1, recul: 0 },   // lycée et classe : SEULE arme (celles de la manif sont interdites), infinie ; ×3 DE DOS
+  sarbacane: { cadence: 0.3, vitesse: 12, duree: 1.2, degats: 1, recul: 0 },   // lycée et classe : SEULE arme (celles de la manif sont interdites), infinie
   eau: { bouteille: 120, maxi: 300, cadence: 0.07, vitesse: 11, duree: 0.45, degats: 0.2, recul: 0.06, eteint: 0.3 },   // eteint : s de lacrymo en moins par goutte
   fumigenes: { boite: 3, maxi: 9, cadence: 1.0, distance: 5, vol: 0.8, duree: 6, rayon: 1.6, degats: 1 },   // degats : par seconde dans la fumée
   sandwich: 35,          // vie rendue par un sandwich (Fabien : trop dur → 25 → 35)
@@ -105,7 +105,7 @@ export const REGLAGES = {
   lycee: { canette: 15, fayotCri: 3.5, fayotAlerte: 10, fayotVue: 8 },   // canette : vie rendue ; fayot : s entre 2 cris, rayon d'alerte, vue
   // NIVEAU 2 : JULIEN, le prof (JulienClasse.js). 3 phases : > 50 % de vie, 50-20 %, < 20 % (il pète un câble)
   julien: {
-    vie: 55,             // (Fabien : trop simple → 40 → 55) 1 boulette = 1, 1 tomate = 2, 1 coup de pancarte = 1 ; DE DOS : ×2 (sarbacane ×3)
+    vie: 55,             // (Fabien : trop simple → 40 → 55) 1 boulette = 1, 1 tomate = 2, 1 coup de pancarte = 1 ; DE DOS : ×2
     vitesse: 1.1,        // il fait les cent pas devant le tableau (phase 3 : vitesseRage, derrière son bureau renversé)
     vitesseRage: 1.6,
     cadence: [1.9, 1.5, 1.1],    // secondes entre 2 attaques, par phase (× la difficulté)
@@ -114,7 +114,7 @@ export const REGLAGES = {
     pause: 1.6,          // changement de phase : il s'arrête, crie, et ne prend pas de coups
     dos: [1.9, 1.7, 2.0],         // FENÊTRE DE PUNITION : après une grosse attaque, il écrit au tableau DE DOS (s)
     dosApresPetite: [0, 0.2, 0.6], // chance qu'il se retourne aussi après une petite attaque (il perd ses moyens)
-    multDos: 2, multDosSarbacane: 3,
+    multDos: 2,          // (le ×3 de la sarbacane a été retiré : demande de Fabien)
     livre: { vitesse: 6, degats: 14 },
     eventail: 0.28,      // écart (radians) entre les 3 livres de l'éventail
     dico: { vitesse: 4.5, degats: 22, rebonds: 3, preavis: 0.8 },   // le dictionnaire rebondit sur les murs (pas sur les tables)

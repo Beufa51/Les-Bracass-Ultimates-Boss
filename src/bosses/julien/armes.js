@@ -4,7 +4,7 @@
 //  3 TOMATES   : une tomate vaut 2 œufs et fait bien reculer
 //  4 PISTOLET À EAU : jet continu, petits dégâts, ÉTEINT les nuages de lacrymo
 //  5 FUMIGÈNES : nuage coloré ; les policiers dedans ne te voient plus et s'étouffent ; caché dedans, tu es invisible
-//  6 SARBACANE : (niveau 2) boulettes de papier, infinie, précise, petits dégâts ; ×3 dans le dos de Julien
+//  6 SARBACANE : (niveau 2) boulettes de papier, infinie, précise, petits dégâts (×2 dans le dos de Julien, comme le reste)
 // Les projectiles partagent une seule liste (scene.tirs) : { genre, x, y, dx, dy, t, ... }.
 import { REGLAGES as RG } from './reglages.js';
 import { murEn } from './raycaster.js';

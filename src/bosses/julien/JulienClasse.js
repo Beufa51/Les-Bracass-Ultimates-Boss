@@ -1,7 +1,7 @@
 // Boss Julien — NIVEAU 2 : LA SALLE DE CLASSE (même moteur 3D que la manif, JulienManif.js dont elle hérite).
 // Combat refait d'après l'audit (propositions/julien_audit_classe.md, partie B). Réglages : RG.julien et RG.classe.
 // - FENÊTRE DE PUNITION : après chaque grosse attaque, Julien écrit au tableau DE DOS (« Notez bien ! ») :
-//   dégâts ×2 (sarbacane ×3), les élèves chuchotent « VAS-Y ! ». Esquiver → foncer → punir.
+//   dégâts ×2, les élèves chuchotent « VAS-Y ! ». Esquiver → foncer → punir.
 // - Chaque attaque a SON préavis et SA réponse : livre / éventail (pas de côté), MUR DE COPIES avec un trou (s'y
 //   placer), DICO qui rebondit (s'éloigner des murs), « AU TABLEAU ! » qui t'attire (courir vers le fond, se coller
 //   à une table), « CONFISQUÉ ! » si tu es trop près (il prend ta sarbacane 8 s), CRAIES en rafale (derrière une
@@ -51,7 +51,7 @@ const ANNONCES = {
   confisque: ['DONNE-MOI ÇA !', 'Trop près : il va CONFISQUER ton arme. Recule !'],
   regle: ['LA RÈGLE !', 'Au contact, il frappe : RECULE !'],
   craies: ['CRAIES !', 'Des craies en rafale : planque-toi derrière une TABLE !'],
-  deluge: ['CONTRÔLE SURPRISE !', 'Une PLUIE de copies (au-dessus des tables) : faufile-toi dans les trous !'],
+  deluge: ['CONTRÔLE SURPRISE !', 'Une PLUIE de copies : planque-toi derrière une TABLE ou faufile-toi dans les trous !'],
   murs: ['RECOPIEZ CENT FOIS !', 'Encore plus de murs, plus vite : suis le TROU qui zigzague !'],
 };
 
@@ -154,7 +154,7 @@ export class JulienClasse extends JulienManif {
       'Julien, le prof, te bombarde : livres, craies, copies, dictionnaire…',
       'Chaque attaque s\'annonce : lis l\'écran et réagis (pas de côté, table, trou dans les copies…).',
       'Après une grosse attaque, il écrit au tableau DE DOS : FONCE, dégâts ×2 !',
-      'Les TABLES arrêtent les livres. Ta SARBACANE fait ×3 dans le dos ! (trop près : il la confisque)',
+      'Les TABLES arrêtent les livres et les copies. Trop près, il CONFISQUE ta sarbacane !',
       ...(tact ? [this.joy ? 'Joystick : avancer, reculer, pas de côté     ↺ ↻ : tourner' : '▲ ▼ avancer / reculer   ◀ ▶ pas de côté   ↺ ↻ tourner',
         'LANCER : tirer      ARME : changer d\'arme'] : this.lignesCommandes()),
     ], () => this.demarrer());
@@ -420,12 +420,12 @@ export class JulienClasse extends JulienManif {
     jouerSon(this, 'julien_lancer', { rate: e.motif === 'dico' ? 0.55 : 0.75 });
   }
 
-  // DÉLUGE (bullet hell) : vagues de copies qui passent au-dessus des tables ; les trous se décalent d'une vague à
+  // DÉLUGE (bullet hell) : vagues de copies (les TABLES les arrêtent : on peut s'y abriter, demande de Fabien) ; les trous se décalent d'une vague à
   // l'autre (éventail visé sur toi, puis le même décalé d'un demi-écart), et une vague sur 3 est un cercle qui tourne
   vagueCopies(e, voit) {
     const D = RG.julien.deluge, a = this.angleVers(e, voit), k = e.vague++;
     const tirer = (ang) => { const dx = Math.cos(ang), dy = Math.sin(ang);
-      this.livres.push({ genre: 'copie', traverse: true, droit: true, x: e.x + dx * 0.4, y: e.y + dy * 0.4, dx, dy, v: D.vitesse, degats: D.degats, rebonds: 0, t: 0, ph: Math.random() * 6 }); };
+      this.livres.push({ genre: 'copie', droit: true, x: e.x + dx * 0.4, y: e.y + dy * 0.4, dx, dy, v: D.vitesse, degats: D.degats, rebonds: 0, t: 0, ph: Math.random() * 6 }); };
     if (k % 3 === 2) for (let i = 0; i < D.cercle; i++) tirer(i / D.cercle * Math.PI * 2 + k * 0.37);
     else for (let i = 0; i < D.nombre; i++) tirer(a + (i - (D.nombre - 1) / 2) * D.ecart + (k % 2 ? D.ecart / 2 : 0));
     jouerSon(this, 'julien_papier', { rate: 1.4 + (k % 3) * 0.1, volume: 0.6 });
@@ -687,11 +687,10 @@ export class JulienClasse extends JulienManif {
     // toi (vu du dessus, de dos), avec ton ombre ; tu clignotes après un coup
     ombre(M.px, M.py + 17, 10, 3.5);
     const victoire = M.fin != null && M.touches === 0 && s.dessus_heros_victoire;
-    const bouge = M.bouge && s.dessus_heros_marche0;
     const ph = victoire ? s.dessus_heros_victoire : M.invT > 0.3 ? s.dessus_heros_touche : M.souffleT > 0 && s.dessus_heros_souffle ? s.dessus_heros_souffle
-      : Math.abs(M.dir || 0) > 0.3 ? s.dessus_heros_cote : bouge ? s[((t * 8) | 0) % 2 ? 'dessus_heros_marche1' : 'dessus_heros_marche0'] : s.dessus_heros;
+      : s.dessus_heros;   // (les poses « de côté » et « marche » le faisaient marcher en diagonale : retirées, demande de Fabien)
     if (ph && (M.invT <= 0 || ((t * 16) | 0) % 2)) {
-      const h = 40, w = h * ph.width / ph.height, rebond = Math.abs(M.dir || 0) > 0.3 ? Math.abs(Math.sin(t * 14)) * 1.5 : 0;
+      const h = 40, w = h * ph.width / ph.height, rebond = M.bouge ? Math.abs(Math.sin(t * 14)) * 1.5 : 0;
       g.save();
       if ((M.dir || 0) > 0.3 && ph === s.dessus_heros_cote) { g.translate(M.px * 2, 0); g.scale(-1, 1); }   // l'image vise à gauche : miroir vers la droite
       g.drawImage(ph, M.px - w / 2, M.py - h / 2 - rebond, w, h); g.restore();
@@ -770,8 +769,8 @@ export class JulienClasse extends JulienManif {
     if (e.etat === 'fuite') return;
     if (recul && e.etat !== 'dos') this.deplacer(e, recul[0] * 0.5, recul[1] * 0.5, 0.3);
     if (e.etat === 'pause') { if (!silencieux) jouerSon(this, 'julien_plonk'); return; }   // changement de phase : intouchable
-    if (e.etat === 'dos') {   // DE DOS : dégâts ×2 (sarbacane ×3)
-      const m = genre === 'boulette' ? RG.julien.multDosSarbacane : RG.julien.multDos;
+    if (e.etat === 'dos') {   // DE DOS : dégâts ×2
+      const m = RG.julien.multDos;
       degats *= m;
       if (!silencieux) this.bulle(`×${m}`);
     }
