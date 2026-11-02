@@ -22,7 +22,7 @@ STRICTEMENT DE PROFIL, tourné vers la DROITE, tee-shirt bleu, jean. 6 poses ali
 6 : chute (il passe par-dessus le guidon). Pas d'ombre au sol, pas de décor, aucun texte, cases bien séparées.
 ```
 
-## 3. Les bourrés — `remi_bourres_planche.jpg`
+## 3. Les bourrés — `remi_bourres_planche.jpg` ✅ REÇUE ET INTÉGRÉE
 ```
 Planche de sprites style manga/anime coloré et drôle, contours noirs nets, fond blanc uni. Des fêtards ivres la nuit, entiers, de profil
 ou de 3/4, même échelle, sur une ligne : 1 : debout qui titube, bouteille à la main, nez rouge ; 2 : le même qui sursaute et s'écarte

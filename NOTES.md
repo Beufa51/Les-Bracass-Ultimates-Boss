@@ -42,7 +42,9 @@
 - IMAGES REÇUES (V2) : planche du vélo → `remi_velo.png` (6 pédalages + saut + chute) et buste de Rémi →
   `remi_presentation.png` (présentation) ; planche 2x2 du beer pong → `remi_pong.png` (attend, lance, boit quand tu le
   touches, nargue quand il te touche) ; planche de la porte → `remi_porte.png` (Rémi puis toi : garde, coup, impact ;
-  cases alignées sur le pied arrière, le poing de l'impact arrive sur la porte : `POING` / `ECHELLE` en tête de RemiPorte.js) : `python3 outils/remi/preparer_images.py`.
+  cases alignées sur le pied arrière, le poing de l'impact arrive sur la porte : `POING` / `ECHELLE` en tête de RemiPorte.js) ;
+  planche des bourrés → `remi_bourres.png` (debout, sursaute, allongé, traverse de face ; teinte au hasard pour varier ;
+  `BOURRE` = taille en tête de RemiVelo.js ; allongé : collision 40 px de haut) : `python3 outils/remi/preparer_images.py`.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

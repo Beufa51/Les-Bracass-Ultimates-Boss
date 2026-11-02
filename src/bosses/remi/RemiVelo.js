@@ -21,7 +21,10 @@ const SOL = 440;                     // hauteur de la route à l'écran
 const DEMI_VELO = 40;                // demi-longueur du vélo (collisions)
 const ETIQUETTES_JEU = { gauche: '◀ Frein', droite: 'Pédale ▶', haut: '▲ Saut', bas: null, espace: null, z: 'DRING', x: null };
 // hauteur et demi-largeur de chaque obstacle (collisions)
-const TAILLE = { allonge: [30, 42], verre: [10, 28], debout: [130, 18], traverse: [130, 20], vomi: [4, 42] };
+const TAILLE = { allonge: [40, 55], verre: [10, 28], debout: [130, 18], traverse: [130, 20], vomi: [4, 42] };
+// illustration des bourrés (remi_bourres.png : debout, sursaute, allongé, traverse de face) et sa taille à l'écran
+const BOURRE = 0.25, IMAGE_BOURRE = { debout: 0, ecarte: 1, allonge: 2, marche: 3 };
+const TEINTES = [0xffffff, 0xffe2d8, 0xdfe6ff, 0xe4ffd9, 0xfff3c0];
 const AIDES = {
   allonge: () => '▲ SAUTE par-dessus !',
   verre: () => '▲ SAUTE le verre cassé !',
@@ -91,7 +94,7 @@ export class RemiVelo extends BossScene {
   }
 
   genererParcours() {
-    for (const o of this.obstacles) o.g.destroy();
+    for (const o of this.obstacles) { o.g.destroy(); if (o.spr) o.spr.destroy(); }
     this.obstacles = [];
     const poids = Object.entries(V.types), total = poids.reduce((s, [, p]) => s + p, 0);
     const tirer = () => { let r = Math.random() * total; for (const [n, p] of poids) { r -= p; if (r <= 0) return n; } return 'debout'; };
@@ -109,7 +112,9 @@ export class RemiVelo extends BossScene {
 
   ajouter(type, x) {
     const g = this.add.graphics().setDepth(type === 'traverse' ? 5 : 8);
-    this.obstacles.push({ type, x, etat: 'normal', t: Math.random() * 6, p: 0, touche: false, g, couleur: choisir(COULEURS.bourre) });
+    const spr = IMAGE_BOURRE[type === 'traverse' ? 'marche' : type] !== undefined && this.textures.exists('remi_bourres')
+      ? this.add.sprite(0, 0, 'remi_bourres', 0).setOrigin(0.5, 1).setDepth(g.depth).setTint(choisir(TEINTES)).setVisible(false) : null;
+    this.obstacles.push({ type, x, etat: 'normal', t: Math.random() * 6, p: 0, touche: false, g, spr, couleur: choisir(COULEURS.bourre) });
   }
 
   // ---------- décor : immeubles en 2 plans (textures faites une fois), lampadaires et route dessinés à chaque image ----------
@@ -292,22 +297,32 @@ export class RemiVelo extends BossScene {
     for (const o of this.obstacles) {
       const sx = o.x - cam;
       o.g.clear();
+      if (o.spr) o.spr.setVisible(false);
       if (sx < -200 || sx > LARGEUR + 200) continue;
       if (o.type === 'verre') { o.g.setPosition(sx, SOL); verreCasse(o.g); continue; }
       if (o.type === 'vomi') { o.g.setPosition(sx, SOL); flaque(o.g); continue; }
-      if (o.type === 'allonge') { o.g.setPosition(sx, SOL).setRotation(0); bourre(o.g, 'allonge', o.t, o.couleur); continue; }
+      if (o.type === 'allonge') {
+        if (o.spr) o.spr.setVisible(true).setFrame(IMAGE_BOURRE.allonge).setPosition(sx, SOL + 4).setScale(BOURRE);
+        else { o.g.setPosition(sx, SOL).setRotation(0); bourre(o.g, 'allonge', o.t, o.couleur); }
+        continue;
+      }
       if (o.type === 'traverse') {
         // il arrive du fond (petit, plus haut) et passe devant (plus grand, plus bas)
         const p = o.p, y = SOL - 46 + p * 96, k = 0.72 + p * 0.5;
         o.g.setPosition(sx, y).setScale(k).setDepth(p < 0.55 ? 5 : 15).setRotation(Math.sin(o.t * 3) * 0.12);
-        bourre(o.g, o.etat === 'marche' ? 'marche' : 'debout', o.t, o.couleur);
+        if (o.spr) {
+          o.spr.setVisible(true).setFrame(IMAGE_BOURRE[o.etat === 'marche' ? 'marche' : 'debout']).setPosition(sx, y)
+            .setScale(BOURRE * k).setDepth(p < 0.55 ? 5 : 15).setRotation(o.g.rotation).setFlipX(Math.sin(o.t * 3.5) > 0);
+        } else bourre(o.g, o.etat === 'marche' ? 'marche' : 'debout', o.t, o.couleur);
         if (o.etat === 'marche' && p < 0.36) { o.g.fillStyle(0xff3030, 1).fillTriangle(-12, -168, 12, -168, 0, -146); }
         continue;
       }
       // debout : titube ; s'il a entendu la sonnette, il fait un bond vers le fond
       const p = o.etat === 'ecarte' ? o.p : 0;
       o.g.setPosition(sx + p * 18, SOL - p * 52).setScale(1 - p * 0.25).setAlpha(1 - p * 0.35).setRotation(Math.sin(o.t * 2.1) * 0.14 - p * 0.3);
-      bourre(o.g, p > 0 ? 'ecarte' : 'debout', o.t, o.couleur);
+      if (o.spr) o.spr.setVisible(true).setFrame(IMAGE_BOURRE[p > 0 ? 'ecarte' : 'debout']).setPosition(o.g.x, o.g.y)
+        .setScale(BOURRE * o.g.scaleX).setAlpha(o.g.alpha).setRotation(o.g.rotation);
+      else bourre(o.g, p > 0 ? 'ecarte' : 'debout', o.t, o.couleur);
     }
     // toi
     const gv = this.gVelo.clear();

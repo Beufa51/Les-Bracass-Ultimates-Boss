@@ -14,6 +14,8 @@ export const MANIFESTE = {
     remi_pong: { fichier: 'sprites/remi/remi_pong.png', largeur: 403, hauteur: 577, images: 4, vitesse: 1 },
     // la porte, de profil : Rémi garde / coup / impact, toi garde / coup / impact (alignées sur le pied arrière)
     remi_porte: { fichier: 'sprites/remi/remi_porte.png', largeur: 345, hauteur: 562, images: 6, vitesse: 1 },
+    // les bourrés du vélo : debout (titube), sursaute (sonnette), allongé (bouteilles), traverse de face
+    remi_bourres: { fichier: 'sprites/remi/remi_bourres.png', largeur: 495, hauteur: 560, images: 4, vitesse: 1 },
     remi_presentation: { fichier: 'sprites/remi/remi_presentation.png', largeur: 832, hauteur: 1202, images: 1, vitesse: 1 },
   },
   sons: {

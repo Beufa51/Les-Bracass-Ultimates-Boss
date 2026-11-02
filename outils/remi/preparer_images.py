@@ -134,7 +134,38 @@ def planche_porte():
     bande.save(DST + 'remi_porte.png')
     print('remi_porte.png', W, H, len(poses))
 
+def planche_bourres():
+    # 4 bourrés sur une ligne : debout, sursaute, allongé (bouteilles), traverse de face.
+    # Les petits morceaux (gouttes, « Zzz », pointillés du zigzag, traits de mouvement) sont jetés ;
+    # les moyens (bouteilles par terre) rejoignent le bourré le plus proche. -> remi_bourres.png (posés en bas, centrés)
+    im = detourer(Image.open(SRC + 'remi_bourres_planche.jpg'), grand=300)
+    al = np.asarray(im)[:, :, 3] > 40
+    lab, n = ndimage.label(ndimage.binary_dilation(al, iterations=2))
+    boites = ndimage.find_objects(lab)
+    tailles = ndimage.sum(np.ones_like(lab), lab, range(1, n + 1))
+    grands = [i for i in range(n) if tailles[i] > 20000]
+    groupes = {i: list(boites[i]) for i in grands}
+    membres = {i: [i + 1] for i in grands}
+    for i in range(n):
+        if i in groupes or tailles[i] < 1500: continue
+        b = boites[i]; cy, cx = (b[0].start + b[0].stop) / 2, (b[1].start + b[1].stop) / 2
+        j = min(grands, key=lambda g: max(groupes[g][1].start - cx, 0, cx - groupes[g][1].stop) + max(groupes[g][0].start - cy, 0, cy - groupes[g][0].stop))
+        g = groupes[j]; membres[j].append(i + 1)
+        groupes[j] = [slice(min(g[0].start, b[0].start), max(g[0].stop, b[0].stop)), slice(min(g[1].start, b[1].start), max(g[1].stop, b[1].stop))]
+    ordre = sorted(groupes, key=lambda j: groupes[j][1].start)
+    rgba = np.asarray(im).copy(); poses = []
+    for j in ordre:
+        b = groupes[j]; r = rgba.copy(); r[:, :, 3] = np.where(np.isin(lab, membres[j]), r[:, :, 3], 0)
+        poses.append(Image.fromarray(r, 'RGBA').crop((b[1].start, b[0].start, b[1].stop, b[0].stop)))
+    print('bourrés : poses', [p.size for p in poses])
+    W = max(p.size[0] for p in poses); H = max(p.size[1] for p in poses)
+    bande = Image.new('RGBA', (W * len(poses), H), (0, 0, 0, 0))
+    for k, p in enumerate(poses): bande.paste(p, (k * W + (W - p.size[0]) // 2, H - p.size[1]))
+    bande.save(DST + 'remi_bourres.png')
+    print('remi_bourres.png', W, H, len(poses))
+
 planche_velo()
 presentation()
 planche_pong()
 planche_porte()
+planche_bourres()
