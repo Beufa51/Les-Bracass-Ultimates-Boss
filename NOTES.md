@@ -9,7 +9,7 @@
 - **Julien** : EN COURS — niveau 1 « la manif » jouable ; niveau 2 « la salle de classe » : COMBAT REFAIT (audit B :
   fenêtre de punition de dos, 8 attaques, phases noir / bureau renversé + alarme, élèves, sarbacane). RESTE : le
   MINI-NIVEAU « LE LYCÉE » (audit A) FAIT. Reste : faire jouer Fabien, équilibrer. Voir « JULIEN » plus bas.
-- **Rémi** : pas commencé (« Bientôt » au hub).
+- **Rémi** : V1 JOUABLE (3 jeux à la suite, dessins provisoires au code) : vélo → beer pong → porte. Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
 ## ⚠️ À RAPPELER À FABIEN quand les 6 boss seront finalisés (phase de FINITION)
@@ -22,6 +22,24 @@
   `beufa_buste.jpg` en pleine taille). Julien : au tout début (avant la difficulté), sauf « recommencer » et l'arrivée depuis la manif.
 - Avatar de Julien en HAUTE DÉFINITION : `assets/sprites/julien/julien_presentation.png` (détouré depuis
   `assets_inbox/julien/julien_reference.jpg`, coupé aux hanches avec un fondu) ; V93b : nouvelle image NON caricaturale, sans veste (`assets_inbox/julien/julien_presentation.jpg`). Textes provisoires (passe de FINITION).
+
+## RÉMI — V1 (la soirée au bar)
+- `src/bosses/remi/` : `RemiVelo.js`, `RemiPong.js`, `RemiPorte.js` (une scène par jeu, enchaînées avec la même difficulté
+  par `commun.js` → `jeuSuivant`), `reglages.js` (TOUT l'équilibrage + répliques provisoires), `dessins.js` (dessins au code,
+  Phaser Graphics), `difficulte.js` (copie de Kédric), `manifeste.js` (sons = bips provisoires). Menu F1 : soirée complète,
+  beer pong direct, porte direct. PERDU = « ESPACE rejouer ce jeu / X hub » (on ne recommence pas toute la soirée).
+- 1) VÉLO, vue de PROFIL (choix du propriétaire, différent de Kédric) : ▶ pédaler, ◀ freiner, ▲/ESPACE sauter, Z = sonnette
+  (DRING, recharge 1,5 s). Bourré allongé / verre cassé / flaque : sauter ; bourré debout : sonner (trop haut pour sauter) ;
+  bourré qui traverse (vient du fond, « ! » rouge) : freiner ou foncer. Chrono « fermeture du bar » ; textos de Rémi.
+  Les 3 premiers obstacles = allongé, debout, traverse (avec aide écrite, sauf CHAMPION).
+- 2) BEER PONG, vu de ton bout de table (projection 3D maison) : glisser le doigt/souris vers le haut (longueur = force,
+  côté = direction) ou ◀ ▶ + ESPACE maintenu (jauge). 6 verres (réglable : 10), 2 balles/tour, BALLS BACK, rebord = 1 chance
+  sur 2. Chaque verre que Rémi te met = tu bois : ta visée tangue (et l'écran penche). FACILE : point d'arrivée affiché.
+- 3) LA PORTE (WC du bar), façon borne « boxeur » : Rémi frappe, puis toi : ÉLAN (tapoter 2,6 s) puis VISÉE (zone verte).
+  Score /999 sur un afficheur rouge, fissures, 2 manches gagnées = la porte cède = BADGE.
+- Bot (test playwright, NORMAL) : bar atteint avec 26 s d'avance, 1 chute ; pong gagné 2 verres à 1 ; porte 2-0.
+- RESTE : faire jouer Fabien et équilibrer ; images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
+  musique ; textes perso (passe de FINITION).
 
 ## Décisions
 - Moteur : **Phaser 3.90** (gratuit, licence MIT), copié dans `lib/`. Aucune installation pour jouer.
