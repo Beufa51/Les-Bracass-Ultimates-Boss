@@ -129,6 +129,53 @@ detailed ink tattoo with color fills, wrapping naturally around the forearm (elb
 the skin shading. Show it on every view where that arm is visible (front, three-quarter and back views). Do not add anything else.
 ```
 
+## Étape 2 (NOUVELLE) : une pose par prompt, d'après `greg_reference_face.jpg`
+Image de référence validée par Fabien : `assets_inbox/greg_reference_face.jpg` (Greg de face, tatouages).
+Pour CHAQUE pose : joindre `greg_reference_face.jpg`, coller le prompt commun puis la ligne POSE.
+Si un tatouage change de bras : retoucher avec « Fix the tattoos: they must be exactly where they are in the
+reference image, nothing else changes » en joignant la pose + la référence.
+
+Prompt commun :
+```
+Use the attached image as the exact character reference: same face, curly hair, beard, skin tone, muscular body,
+same arm tattoos (each tattoo stays on the SAME arm and at the same place as in the reference), same red satin trunks
+with gold belt, red gloves with white wraps, red boots, same detailed 1990s boxing manga drawing style.
+Draw him FULL BODY, seen from the FRONT facing the viewer, feet visible, same scale as the reference,
+plain pure white background, no text, nothing touching the edges.
+POSE: <ligne POSE ci-dessous>
+```
+
+- **greg_garde_pied.png** — garde haute (pose de base du combat)
+  `classic high guard boxing stance, both gloves up protecting the face, elbows tucked, knees slightly bent, eyes focused over the gloves.`
+- **greg_garde_basse_pied.png** — garde basse (visage ouvert)
+  `low guard, both gloves at stomach level protecting the body, face open, chin up, cocky confident smile.`
+- **greg_arme.png** — il arme son coup (NOUVEAU)
+  `winding up a punch: torso turned, one glove pulled far back near his shoulder, the other glove forward, weight on the back leg, eyes locked on the viewer.`
+- **greg_pied_jab.png** — jab
+  `throwing a straight jab directly at the viewer, the punching glove huge in the foreground (strong foreshortening), other glove guarding the chin, motion lines.`
+- **greg_pied_crochet.png** — crochet
+  `throwing a wide hook toward the viewer from the side, torso strongly twisted, the punching arm bent at 90 degrees, motion lines.`
+- **greg_corps_pied.png** — coup au corps
+  `crouched low, driving an uppercut to the viewer's stomach from below, torso leaning forward, other glove guarding the chin.`
+- **greg_smash.png** — SMASH (coup final)
+  `huge overhand SMASH punch toward the viewer, whole body committed, furious shouting face, glove in the foreground, strong motion lines and wind.`
+- **greg_tape_gants.png** — tape ses gants avant le SMASH (NOUVEAU)
+  `banging his two gloves together in front of his chest, angry focused face, small impact sparks between the gloves.`
+- **greg_touche_pied.png** — touché au visage
+  `just got punched in the face: head snapped to the side, sweat drops and spit flying, one eye shut, body knocked off balance.`
+- **greg_etourdi.png** — étourdi / essoufflé
+  `stunned and exhausted: wobbly knees, gloves dropping, mouth open, unfocused eyes, heavy sweat, shoulders down.`
+- **greg_nargue.png** — il nargue (NOUVEAU)
+  `taunting the viewer: gloves dropped low, chin stuck out, provoking grin, one glove waving "come on".`
+- **greg_ko_debout.png** — il tombe K.O.
+  `falling backward knocked out, body tilted back about 20 degrees, eyes blank, arms limp, feet leaving the ground slightly.`
+- **greg_releve.png** — il se relève (NOUVEAU)
+  `getting up from one knee, one glove on the floor, shaking his head, determined angry face.`
+- **greg_pied_victoire.png** — victoire
+  `victory pose, both fists raised high, shouting proudly, chest out.`
+
+(L'ancienne étape 2 par planches reste ci-dessous, en secours.)
+
 ## Étape 2 : greg_planche_A.png et greg_planche_B.png (toutes les poses, même échelle)
 Joindre : `greg_reference.png` (étape 1). Générer les poses PAR PLANCHES (pas une par une) pour qu'elles restent
 cohérentes. Chaque pose = corps ENTIER, vu de FACE (il regarde le joueur), pieds sur la même ligne.
