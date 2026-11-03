@@ -46,3 +46,71 @@ A boxing referee in manga style (same style as the attached image), white shirt,
 seen from the front, full body, one arm stretched forward counting with fingers raised, mouth open shouting the
 count, serious face. Plain pure white background, full figure, nothing touching the edges, no text.
 ```
+
+---
+# REFONTE de Greg (nouvelle tête) — à faire DANS CET ORDRE
+
+## Étape 1 : greg_reference.png (fiche du personnage)
+Joindre : ta nouvelle tête de Greg + `assets/sprites/greg/greg_entier.png` (pour le corps et la tenue).
+```
+Character reference sheet of a boxer, manga / anime style with bold black outlines and cel shading.
+Use the HEAD and FACE from the first attached image exactly, and the body, shorts, gloves and colors from the
+second attached image. Show the same character 3 times, full body, standing on the same ground line, same scale:
+front view, three-quarter view, back view. Neutral standing pose, arms down, gloves on.
+Plain pure white background, no text, nothing touching the edges.
+```
+
+## Étape 2 : greg_planche_A.png et greg_planche_B.png (toutes les poses, même échelle)
+Joindre : `greg_reference.png` (étape 1). Générer les poses PAR PLANCHES (pas une par une) pour qu'elles restent
+cohérentes. Chaque pose = corps ENTIER, vu de FACE (il regarde le joueur), pieds sur la même ligne.
+Planche A :
+```
+Same boxer as the attached reference sheet (same head, face, body, colors, manga style). One sprite sheet,
+plain pure white background, 2 rows x 4 columns, each pose full body seen from the FRONT facing the viewer,
+all poses at the exact same scale with feet on the same ground line, generous white space between poses, no text:
+1. high guard, both gloves up protecting the face, light bounce stance
+2. low guard, gloves at stomach level, face open, cocky smile
+3. winding up a punch: torso turned, right glove pulled back near the shoulder, eyes locked on the viewer
+4. right jab thrown straight at the viewer, glove big in the foreground (foreshortening)
+5. left hook swinging toward the viewer from the side, torso twisted
+6. crouched low, winding up a body blow, left glove pulled back at hip level
+7. body uppercut thrown at the viewer's stomach, rising from below
+8. SMASH: huge overhand punch at the viewer, whole body committed, furious face, motion lines
+```
+Planche B :
+```
+Same boxer as the attached reference sheet (same head, face, body, colors, manga style). One sprite sheet,
+plain pure white background, 2 rows x 4 columns, each pose full body seen from the FRONT, same scale,
+feet on the same ground line, generous white space between poses, no text:
+1. getting hit in the face: head snapped back, sweat drops flying, one eye closed
+2. stunned: wobbly legs, crossed eyes, gloves dropping, mouth open
+3. out of breath: bent forward, hands on knees area, heavy breathing, sweating
+4. taunting: gloves low, sticking out chin, provoking grin
+5. tapping his gloves together in front of his chest, angry focused face (before a big attack)
+6. falling backward knocked out, body tilted, eyes blank
+7. getting up from one knee, shaking his head, one glove on the floor
+8. victory: both fists raised, shouting, proud
+```
+
+---
+# PHASE VESTIAIRE (pattes d'ours avec le coach)
+
+## vestiaire_fond.png (décor, format paysage 16:9)
+```
+Interior of an old boxing gym locker room at night, manga / anime background art style, warm dim lighting,
+metal lockers, wooden bench, a heavy bag in the corner, boxing posters on the wall, a door with light coming
+through. Seen from eye level, empty center space for characters. Landscape 16:9, no characters, no text.
+```
+
+## coach_pattes.png et coach_pattes_frappe.png
+Joindre : `assets/sprites/greg/coach_severe.jpg` (pour garder le même coach).
+```
+Same old boxing coach as the attached image, same manga style. Full body seen from the FRONT facing the viewer,
+wearing focus mitts (bear paw pads) on both hands, holding the RIGHT mitt up at face height as a target,
+left mitt low, strict focused expression, slightly crouched stance. Plain pure white background, no text.
+```
+Variante `coach_pattes_frappe.png` :
+```
+Same coach, same style, full body from the front, wearing focus mitts, swinging the left mitt toward the
+viewer like a punch (testing the student's dodge), shouting. Plain pure white background, no text.
+```
