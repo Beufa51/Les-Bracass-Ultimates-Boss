@@ -140,8 +140,11 @@ Prompt commun :
 Use the attached image as the exact character reference: same face, curly hair, beard, skin tone, muscular body,
 same arm tattoos (each tattoo stays on the SAME arm and at the same place as in the reference), same red satin trunks
 with gold belt, red gloves with white wraps, red boots, same detailed 1990s boxing manga drawing style.
-Draw him FULL BODY, seen from the FRONT facing the viewer, feet visible, same scale as the reference,
-plain pure white background, no text, nothing touching the edges.
+Draw him FULL BODY, seen from the FRONT facing the viewer, same scale as the reference.
+FRAMING (very important): the WHOLE character must be inside the image, never cropped: top of the hair, both
+gloves (even a glove punching toward the viewer or stretched out to the side), both arms, both feet and boots.
+Zoom out: the character is centered and small enough to leave a wide empty white margin on ALL four sides
+(at least 15% of the image width on the left and right). Plain pure white background, no text, no floor shadow.
 POSE: <ligne POSE ci-dessous>
 ```
 
