@@ -104,28 +104,28 @@ Passe 1 — bras droit, haut → `greg_ref_t1.png`
 ```
 Edit the attached image 1: keep EVERYTHING exactly the same (face, body, pose, outfit, colors, style, layout,
 background, any tattoo already there). Only ADD one tattoo: the design from attached image 2, redrawn as a
-detailed ink tattoo with color fills, wrapping naturally around the upper RIGHT arm (shoulder to elbow), following the muscles and
+detailed ink tattoo with color fills, wrapping naturally around the upper arm (shoulder to elbow) that is on the LEFT side of the image in the front view (= the character's own right arm; in the back view it is the arm on the RIGHT side of the image), following the muscles and
 the skin shading. Show it on every view where that arm is visible (front, three-quarter and back views). Do not add anything else.
 ```
 Passe 2 — avant-bras droit → `greg_ref_t2.png`
 ```
 Edit the attached image 1: keep EVERYTHING exactly the same (face, body, pose, outfit, colors, style, layout,
 background, any tattoo already there). Only ADD one tattoo: the design from attached image 2, redrawn as a
-detailed ink tattoo with color fills, wrapping naturally around the RIGHT forearm (elbow to wrist, just below the upper arm tattoo), following the muscles and
+detailed ink tattoo with color fills, wrapping naturally around the forearm (elbow to wrist) that is on the LEFT side of the image in the front view, just below the tattoo already on that arm (in the back view: the arm on the RIGHT side of the image), following the muscles and
 the skin shading. Show it on every view where that arm is visible (front, three-quarter and back views). Do not add anything else.
 ```
 Passe 3 — bras gauche, haut → `greg_ref_t3.png`
 ```
 Edit the attached image 1: keep EVERYTHING exactly the same (face, body, pose, outfit, colors, style, layout,
 background, any tattoo already there). Only ADD one tattoo: the design from attached image 2, redrawn as a
-detailed ink tattoo with color fills, wrapping naturally around the upper LEFT arm (shoulder to elbow), following the muscles and
+detailed ink tattoo with color fills, wrapping naturally around the upper arm (shoulder to elbow) that is on the RIGHT side of the image in the front view, the arm WITHOUT tattoos (= the character's own left arm; in the back view it is the arm on the LEFT side of the image), following the muscles and
 the skin shading. Show it on every view where that arm is visible (front, three-quarter and back views). Do not add anything else.
 ```
 Passe 4 — avant-bras gauche → `greg_ref_t4.png` (= `greg_reference.png`)
 ```
 Edit the attached image 1: keep EVERYTHING exactly the same (face, body, pose, outfit, colors, style, layout,
 background, any tattoo already there). Only ADD one tattoo: the design from attached image 2, redrawn as a
-detailed ink tattoo with color fills, wrapping naturally around the LEFT forearm (elbow to wrist, just below the upper arm tattoo), following the muscles and
+detailed ink tattoo with color fills, wrapping naturally around the forearm (elbow to wrist) that is on the RIGHT side of the image in the front view, just below the tattoo already on that arm (in the back view: the arm on the LEFT side of the image), following the muscles and
 the skin shading. Show it on every view where that arm is visible (front, three-quarter and back views). Do not add anything else.
 ```
 
