@@ -884,6 +884,7 @@ export class LionelMatch extends BossScene {
   //  ÉCRANS
   // =================================================================
   presentation(ensuite) {
+    if (this.donnees.rejouer) { ensuite(); return; }   // V18 : rejouer = pas de présentation
     this.etiquettes(ETIQUETTES_OK);
     const el = [];
     el.push(this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0b0b14, 0.96).setDepth(100));

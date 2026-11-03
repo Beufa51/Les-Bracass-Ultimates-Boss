@@ -67,7 +67,9 @@ export const MANIFESTE = {
     kedric_toi_frime_bas: { fichier: 'sprites/kedric/kedric_toi_frime_bas.png', largeur: 256, hauteur: 232, images: 1, vitesse: 1, provisoire: { forme: 'coureurDos', pose: 'victoire' } },
     // décor du battle de danse : la scène de concert (assets_inbox/kedric_scene.jpg recadré en 16/9, affiché en 960 x 540)
     kedric_scene: { fichier: 'sprites/kedric/kedric_scene.jpg', largeur: 1365, hauteur: 768, images: 1, vitesse: 1 },
-    kedric_trophee:  { fichier: null, largeur: 220, hauteur: 260, images: 1, vitesse: 1, provisoire: { forme: 'trophee' } },
+    // V18 : trophée et stade illustrés (outils/kedric/preparer_decors.py ; le dessin reste en secours)
+    kedric_trophee:  { fichier: 'sprites/kedric/kedric_trophee.png', largeur: 247, hauteur: 450, images: 1, vitesse: 1, provisoire: { forme: 'trophee' } },
+    kedric_stade:    { fichier: 'sprites/kedric/kedric_stade.jpg', largeur: 960, hauteur: 172, images: 1, vitesse: 1 },
     kedric_ballon:   { fichier: null, largeur: 40, hauteur: 40, images: 8, vitesse: 16, provisoire: { forme: 'ballon' } },
   },
 

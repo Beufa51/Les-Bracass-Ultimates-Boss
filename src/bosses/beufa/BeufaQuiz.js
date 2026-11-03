@@ -11,7 +11,8 @@ import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique, arreterMusique } from '../../core/musique.js';
 import { Sauvegarde } from '../../core/sauvegarde.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
-import { IDENTITE, REGLAGES as R } from './reglages.js';
+import { IDENTITE, REGLAGES as R, appliquerDifficulte } from './reglages.js';
+import { cleRecord } from './difficulte.js';
 import { QUESTIONS, LECTURE_DEBUT, LECTURES, MASQUE_CHAUD, DEBUT_QUIZ, MOQUERIES, TROP_TARD, BRAVOS, VICTOIRE, GAME_OVER, RANGS, RANG_PARFAIT } from '../../../data/beufa_quiz.js';
 
 const VERT = 0x38fc8c, VERT_TXT = '#7dffb0';
@@ -25,6 +26,7 @@ export class BeufaQuiz extends BossScene {
     // les images de Fabien (fond blanc retiré, taille du jeu) : même préparation que l'infiltration — une seule
     // fois par image, quelle que soit la scène qui passe en premier (on peut lancer le quiz directement)
     BeufaInfiltration.prototype.preparerImages.call(this);
+    this.nomDiff = Sauvegarde.difficulte('beufa') || 'normal'; appliquerDifficulte(this.nomDiff);   // V18 : erreurs / temps selon la difficulté
     const Q = R.quiz;
     this.etape = 'intro';
     this.erreurs = 0; this.bons = 0; this.numero = 0;
@@ -48,9 +50,9 @@ export class BeufaQuiz extends BossScene {
     if (this.donnees.reprise) lancer();
     else this.afficherIntro('BEUFA — LE QUIZ', [
       'Beufa t\'attend dans son bureau…',
-      '10 questions de culture JEU VIDÉO, 1 minute chacune',
+      `${Q.questions} questions de culture JEU VIDÉO, ${Q.temps} s chacune`,
       `Réponds avec ${estTactile() ? 'le doigt' : '1 2 3 4, ou ◀ ▶ ▲ ▼ puis ESPACE'}`,
-      '3 erreurs = GAME OVER',
+      `${Q.erreursMax} erreurs = GAME OVER`,
       `${estTactile() ? 'OK' : 'ESPACE'} : faire avancer le dialogue`,
     ], lancer);
   }
@@ -124,9 +126,10 @@ export class BeufaQuiz extends BossScene {
   // ---------- en haut : question, croix, chrono ----------
   creerHud() {
     this.hudNumero = texte(this, 20, 22, '', 18, '#ffd84a').setOrigin(0, 0.5).setDepth(60);
-    texte(this, LARGEUR - 186, 22, 'ERREURS', 14, '#aaaaaa').setOrigin(1, 0.5).setDepth(60);
-    this.croix = [0, 1, 2].map((i) => {
-      const x = LARGEUR - 160 + i * 50;
+    texte(this, LARGEUR - 86 - (R.quiz.erreursMax - 1) * 50, 22, 'ERREURS', 14, '#aaaaaa').setOrigin(1, 0.5).setDepth(60);
+    const n = R.quiz.erreursMax;   // V18 : 2 à 5 cases selon la difficulté
+    this.croix = [...Array(n).keys()].map((i) => {
+      const x = LARGEUR - 60 - (n - 1 - i) * 50;
       this.add.rectangle(x, 24, 38, 34, 0x000000, 0.6).setStrokeStyle(2, 0x888888).setDepth(60);
       return texte(this, x, 24, '✕', 30, '#ff3838').setDepth(61).setVisible(false);
     });
@@ -379,8 +382,9 @@ export class BeufaQuiz extends BossScene {
     const P = 1000, d = this.donnees, rang = this.calculerRang();
     // V92 : le MEILLEUR RANG est gardé (affiché au hub sous la porte) — seulement si l'infiltration a été jouée
     const ordre = [RANG_PARFAIT.nom, ...RANGS.map((r) => r.nom)];
-    const avant = Sauvegarde.record('beufa');
-    const record = d.alertes !== undefined ? Sauvegarde.proposerRecord('beufa', rang.nom, d.temps ?? 5999, ordre) : avant;
+    const cle = cleRecord('beufa', this.nomDiff);   // V18 : un record par difficulté (comme les autres boss)
+    const avant = Sauvegarde.record(cle);
+    const record = d.alertes !== undefined ? Sauvegarde.proposerRecord(cle, rang.nom, d.temps ?? 5999, ordre) : avant;
     const nouveau = d.alertes !== undefined && (!avant || avant.rang !== record.rang || avant.temps !== record.temps);
     const minutes = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
     this.add.rectangle(0, 0, LARGEUR, HAUTEUR, 0x000000).setOrigin(0).setDepth(P);

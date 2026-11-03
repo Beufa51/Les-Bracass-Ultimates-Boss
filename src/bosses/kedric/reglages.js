@@ -68,16 +68,16 @@ export const REGLAGES = {
   rotation: { duree: 0.45, recharge: 0.12 },   // ▼ : se baisse en tournant sous les bras tendus
   // ---------- Les défenseurs ----------
   chargeAvant: 1.5,      // un défenseur en place fonce sur toi quand tu es à moins de 1,5 s de lui
-  poursuite: { depart: 6, abandon: 11, max: 1 },   // UN poursuivant au plus : il part 6 yards derrière toi, abandonne à 11
-  // ---------- Sprint (Z) : tape vite pour accélérer, surtout quand on te poursuit ----------
+  poursuite: { depart: 6, abandon: 11, max: 1, parEsquive: 3, parParfait: 4.5, rattrape: 0.6 },   // V18 : 2 esquives le sèment ; rattrape x0,6   // UN poursuivant au plus : il part 6 yards derrière toi, abandonne à 11
+  // ---------- Sprint : V18, plus de bouton Z : chaque esquive donne de la vitesse (parEsquive / parParfait) ----------
   //  chaque appui ajoute de la vitesse, qui retombe toute seule : 6 appuis / s ≈ +3,5 (le maximum)
-  sprint: { parAppui: 0.5, max: 3.5, baisse: 0.8 },
+  sprint: { parAppui: 0.5, max: 3.5, baisse: 0.8, parEsquive: 1.2, parParfait: 2 },   // V18 : plus de bouton, la vitesse vient des esquives
   // ---------- Devil Bat Ghost ----------
   // Espace quand la jauge est pleine : pendant 'duree' s, vitesse maximale et TOUS les défenseurs sont passés à coup sûr
   // (gel : petit arrêt sur image au premier).
   // La jauge se garde d'une course à l'autre. parEsquive / parParfait : ce que rapporte une esquive (ou une bonne
   // réception) / une esquive PARFAITE (ou une réception parfaite) ; la taille de la jauge dépend de la difficulté (ghost)
-  ghost: { duree: 4, gel: 0.35, parEsquive: 1, parParfait: 2 },
+  ghost: { duree: 4, gel: 0.35, parEsquive: 1, parParfait: 2, auto: 6 },   // V18 : auto = part tout seul quand un défenseur est à moins de 6 yards
   // ---------- SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (showtime.js) ----------
   //  Une SEULE SESSION CONTINUE : Kédric danse AVEC toi du début à la fin (plus de questions / réponses), et la musique
   //  n'est JAMAIS replacée pendant le battle (elle démarre sur le refrain à l'annonce, puis file sans coupure).

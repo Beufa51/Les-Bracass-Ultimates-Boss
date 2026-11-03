@@ -66,6 +66,31 @@ export const REGLAGES = {
 // 4. LE QG         : tout ensemble, une seule fois chaque chose (4 gardes, 1 projecteur)
 // Aucune pièce n'exige la pierre. Sorties compatibles avec le code actuel :
 // 'haut' = porte x 445-515 en haut (pièces 960 de large), 'est'/'qg' = x > 1396, y 330-400 (pièces 1440 de large).
+// V18 (audit global) : 4 DIFFICULTÉS façon Metal Gear. NORMAL = le jeu tel qu'il a été réglé (rien ne change).
+//  portee / angle : vue des gardes (x) ; reperage : temps pour te repérer (x, + grand = + lent) ; poursuite : vitesse
+//  quand ils te courent après (x) ; projecteur : temps de repérage sous un halo (x) ; quiz : erreurs permises, s par question
+export const DIFFICULTES = {
+  entrainement: { nom: 'VERY EASY', couleur: '#9fe0ff', portee: 0.7, angle: 0.8, reperage: 2, poursuite: 0.75, projecteur: 2, erreurs: 5, temps: 90,
+    texte: 'Gardes myopes et lents à réagir. Quiz : 5 erreurs permises, 90 s par question.' },
+  facile: { nom: 'EASY', couleur: '#7fff7f', portee: 0.85, angle: 0.9, reperage: 1.4, poursuite: 0.88, projecteur: 1.4, erreurs: 4, temps: 75,
+    texte: 'Les gardes voient moins loin. Quiz : 4 erreurs permises.' },
+  normal: { nom: 'NORMAL', couleur: '#ffd84a', portee: 1, angle: 1, reperage: 1, poursuite: 1, projecteur: 1, erreurs: 3, temps: 60,
+    texte: 'La vraie mission.' },
+  champion: { nom: 'EXTREME', couleur: '#ff5a6e', portee: 1.12, angle: 1.1, reperage: 0.75, poursuite: 1.06, projecteur: 0.75, erreurs: 2, temps: 45,
+    texte: 'Ils voient tout, tout de suite. Quiz : 2 erreurs, 45 s. Pour les vrais.' },
+};
+// applique une difficulté aux réglages (à partir des valeurs d'origine, gardées la première fois)
+let BASE = null;
+export function appliquerDifficulte(nom) {
+  const D = DIFFICULTES[nom] || DIFFICULTES.normal, R = REGLAGES;
+  if (!BASE) BASE = { portee: R.garde.portee, angle: R.garde.angle, reperage: R.garde.reperage, poursuite: R.garde.vitessePoursuite,
+    projecteur: R.projecteur.reperage, erreurs: R.quiz.erreursMax, temps: R.quiz.temps };
+  R.garde.portee = BASE.portee * D.portee; R.garde.angle = BASE.angle * D.angle; R.garde.reperage = BASE.reperage * D.reperage;
+  R.garde.vitessePoursuite = BASE.poursuite * D.poursuite; R.projecteur.reperage = BASE.projecteur * D.projecteur;
+  R.quiz.erreursMax = D.erreurs; R.quiz.temps = D.temps;
+  return D;
+}
+
 export const PIECES = [
   { // ----- PIÈCE 1 : LA COUR DU PORTAIL — 960×720 — « le cône, l'ombre, le dos » -----
     nom: 'PIÈCE 1/4 · LA COUR DU PORTAIL',

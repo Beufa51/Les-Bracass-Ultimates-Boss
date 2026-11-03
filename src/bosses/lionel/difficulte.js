@@ -12,6 +12,8 @@ export function cleRecord(idBoss, nomDiff) { return nomDiff === 'normal' ? idBos
 
 // ensuite(nom, reglagesDeLaDifficulte) est appelé une fois le choix validé
 export function choisirDifficulte(scene, idBoss, difficultes, ensuite, son = 'ui_valider') {
+  // V18 : REJOUER après une défaite = même difficulté, sans repasser par cet écran
+  if (scene.donnees && scene.donnees.rejouer && scene.donnees.diffObjet) { scene.time.delayedCall(0, () => ensuite(scene.donnees.nomDiff, scene.donnees.diffObjet)); return; }
   const noms = Object.keys(difficultes);
   let i = Math.max(0, noms.indexOf(Sauvegarde.difficulte(idBoss)));
   etiquettesTactiles({ haut: null, bas: null, z: null, x: null, espace: 'OK' });
@@ -19,10 +21,11 @@ export function choisirDifficulte(scene, idBoss, difficultes, ensuite, son = 'ui
   el.push(scene.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0b0b14, 0.95).setDepth(100));
   el.push(texte(scene, LARGEUR / 2, 70, 'DIFFICULTÉ', 44, '#ffd84a').setDepth(101));
   const cartes = noms.map((n, k) => {
-    const D = difficultes[n], x = LARGEUR / 2 + (k - (noms.length - 1) / 2) * 228;
-    const fond = scene.add.rectangle(x, 260, 212, 220, 0x1d1d30).setDepth(101).setStrokeStyle(4, 0x555566);
-    const titre = texte(scene, x, 190, D.nom, 28, D.couleur).setDepth(102);
-    const desc = texte(scene, x, 275, D.texte, 15, '#dddddd', { wordWrap: { width: 190 } }).setDepth(102);
+    const espace = Math.min(228, 930 / noms.length), taille = espace - 12;   // V18 : 5 cartes (ENTRAÎNEMENT ... PERSO)
+    const D = difficultes[n], x = LARGEUR / 2 + (k - (noms.length - 1) / 2) * espace;
+    const fond = scene.add.rectangle(x, 260, taille, 220, 0x1d1d30).setDepth(101).setStrokeStyle(4, 0x555566);
+    const titre = texte(scene, x, 190, D.nom, noms.length > 4 ? 20 : 28, D.couleur).setDepth(102);
+    const desc = texte(scene, x, 275, D.texte, noms.length > 4 ? 14 : 15, '#dddddd', { wordWrap: { width: taille - 18 } }).setDepth(102);
     const rec = Sauvegarde.record(cleRecord(idBoss, n));
     const r = texte(scene, x, 350, rec ? `Record : ${rec.rang} ${formatTemps(rec.temps)}` : 'Pas encore de record', 13, '#aaaaaa').setDepth(102);
     el.push(fond, titre, desc, r);

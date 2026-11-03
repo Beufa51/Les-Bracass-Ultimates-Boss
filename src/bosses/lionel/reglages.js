@@ -28,6 +28,10 @@ export const TERRAIN = {
 //  surprises : une surprise (mouette, château de sable, ballon) toutes les X à Y secondes
 //  biaisApres : ses N premiers lancers de l'échange sont droits (pas de rebond)
 export const DIFFICULTES = {
+  // V18 (audit global) : ENTRAÎNEMENT, encore plus doux que FACILE
+  entrainement: { nom: 'ENTRAÎNEMENT', couleur: '#9fe0ff', vitesse: 0.62, reaction: 0.45, erreur: 95, disque: 0.62, superHasard: 0, lentLob: 2.8, surprises: [22, 30], fenetreParfait: 0.25, publicLionel: 0.35,
+    aides: 'tot', choix: { droit: 76, biais: 14, lob: 10 }, attrape: { x: 76, haut: 105, bas: 48 }, ralenti: 0.6, superSurLob: false, biaisApres: 5,
+    texte: 'Lionel joue au ralenti et rate souvent. Pour apprendre.' },
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', vitesse: 0.78, reaction: 0.34, erreur: 70, disque: 0.72, superHasard: 0.03, lentLob: 2.2, surprises: [16, 24], fenetreParfait: 0.2, publicLionel: 0.5,
     aides: 'tot', choix: { droit: 64, biais: 24, lob: 12 }, attrape: { x: 62, haut: 90, bas: 40 }, ralenti: 0.7, superSurLob: false, biaisApres: 3,
     texte: 'Lionel court moins vite et rate plus souvent. Idéal pour apprendre.' },

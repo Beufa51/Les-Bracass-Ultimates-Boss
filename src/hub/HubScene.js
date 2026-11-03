@@ -56,6 +56,18 @@ export class HubScene extends Phaser.Scene {
     this.aide = texte(this, LARGEUR / 2, R.limiteBas + 20, '', 18, '#ffffff');
     this.touches = creerTouches(this);
     this.cameras.main.fadeIn(250);
+    this.finSiComplet(nb);
+  }
+
+  // V18 (audit global) : les 6 badges = LA FIN (montrée une fois tout de suite, puis à revoir : F ou « ★ La fin »)
+  finSiComplet(nb) {
+    if (nb < BOSS.length) return;
+    const voir = () => { if (this.entree) return; this.entree = true; this.scene.start('Finale'); };
+    const b = texte(this, 690, HAUTEUR - R.hauteurBarre / 2, `★ LA FIN ★\n${estTactile() ? '(touche ici)' : '(touche F)'}`, 15, '#ffd84a', { backgroundColor: '#000000aa', padding: { x: 10, y: 3 } })
+      .setInteractive().on('pointerdown', voir);
+    this.tweens.add({ targets: b, scale: 1.08, yoyo: true, repeat: -1, duration: 600 });
+    this.input.keyboard.on('keydown-F', voir);
+    if (!Sauvegarde.fait('finale_vue')) { Sauvegarde.marquerFait('finale_vue'); this.time.delayedCall(700, voir); }
   }
 
   // Accès caché aux RÉGLAGES DÉVELOPPEUR : 5 appuis rapides sur « Badges » (en bas à gauche), ou la touche D

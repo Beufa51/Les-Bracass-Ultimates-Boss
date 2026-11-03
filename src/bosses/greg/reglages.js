@@ -7,6 +7,9 @@ export const IDENTITE = { id: 'greg', nom: 'Greg' };
 //  degatsGreg : x dégâts des coups de Greg ; vitesse : x durée de préparation de ses coups (plus petit = plus rapide)
 //  esquive : durée pendant laquelle ton esquive protège ; aides : flèche + cible d'aide
 export const DIFFICULTES = {
+  // V18 (audit global) : ENTRAÎNEMENT comme Kédric et Rémi, pour découvrir le combat sans pression
+  entrainement: { nom: 'ENTRAÎNEMENT', couleur: '#9fe0ff', degatsGreg: 0.4, vitesse: 1.5, esquive: 0.65, aides: true,
+    texte: 'Greg tape doucement et prévient longtemps. Pour apprendre les esquives et les contres.' },
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', degatsGreg: 0.65, vitesse: 1.25, esquive: 0.55, aides: true,
     texte: 'Greg frappe moins fort et plus lentement. Idéal pour apprendre.' },
   normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 1,    vitesse: 1,    esquive: 0.45, aides: true,

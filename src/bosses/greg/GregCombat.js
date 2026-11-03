@@ -1019,6 +1019,7 @@ export class GregCombat extends BossScene {
 
   // Écran de présentation de Greg (son illustration), avant le premier round
   presentation(ensuite) {
+    if (this.donnees.rejouer) { ensuite(); return; }   // V18 : rejouer = pas de présentation
     this.etat = 'coin';
     etiquettesTactiles(ETIQUETTES_OK);
     const el = [];

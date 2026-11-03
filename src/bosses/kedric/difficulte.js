@@ -11,6 +11,8 @@ export function cleRecord(idBoss, nomDiff) { return nomDiff === 'normal' ? idBos
 
 // ensuite(nom, reglagesDeLaDifficulte) est appelé une fois le choix validé
 export function choisirDifficulte(scene, idBoss, difficultes, ensuite, son = 'ui_valider') {
+  // V18 : REJOUER après une défaite = même difficulté, sans repasser par cet écran
+  if (scene.donnees && scene.donnees.rejouer && scene.donnees.diffObjet) { scene.time.delayedCall(0, () => ensuite(scene.donnees.nomDiff, scene.donnees.diffObjet)); return; }
   const noms = Object.keys(difficultes);
   const espace = noms.length > 3 ? 236 : 260, taille = noms.length > 3 ? 230 : 236;   // 4 cartes (ENTRAÎNEMENT !) : on resserre pour tenir dans l'écran
   let i = Math.max(0, noms.indexOf(Sauvegarde.difficulte(idBoss)));

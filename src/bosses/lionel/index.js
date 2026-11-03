@@ -15,7 +15,7 @@ export default {
   manifeste: MANIFESTE,   // ses visuels et sons (rien de partagé avec les autres boss)
   scenes: [LionelMatch],
   // réglages développeur (écran caché du hub : 5 appuis sur « Badges ») ; voir src/core/reglagesDev.js
-  reglagesDev: ['facile', 'normal', 'champion'].flatMap(n => [
+  reglagesDev: ['entrainement', 'facile', 'normal', 'champion'].flatMap(n => [
     { groupe: D[n].nom, nom: 'Vitesse de course de Lionel (x)', objet: D[n], champ: 'vitesse', pas: 0.02, min: 0.4, max: 2 },
     { groupe: D[n].nom, nom: 'Temps de réaction de Lionel (s)', objet: D[n], champ: 'reaction', pas: 0.01, min: 0.05, max: 0.8 },
     { groupe: D[n].nom, nom: 'Ses erreurs de placement (pixels)', objet: D[n], champ: 'erreur', pas: 2, min: 0, max: 150 },

@@ -42,6 +42,8 @@ export class BossScene extends Phaser.Scene {
 
   // Affiche le titre et la liste des commandes, puis attend Espace
   afficherIntro(titre, commandes, quandPret) {
+    // V18 : REJOUER après une défaite → on saute l'écran des commandes (déjà lu)
+    if (this.donnees.rejouer) { this.time.delayedCall(0, quandPret); return; }
     const liste = texte(this, LARGEUR / 2, 220, commandes.join('\n'), 20, '#ffffff', { lineSpacing: 6 }).setOrigin(0.5, 0).setDepth(1001);
     // le texte vert se place SOUS les commandes, à la hauteur MESURÉE de la liste :
     // plus jamais par-dessus (Kédric et ses 9 lignes de règles du match chevauchaient l'invite !)
@@ -64,6 +66,7 @@ export class BossScene extends Phaser.Scene {
   // Écran de PRÉSENTATION du boss (comme Greg, Kédric, Lionel) : son avatar glisse depuis la droite,
   // son nom, son surnom et quelques infos à gauche. o = { image, nom, surnom, infos: [...], couleur, fond, invite, son }
   afficherPresentation(o, ensuite) {
+    if (this.donnees.rejouer) { this.time.delayedCall(0, ensuite); return; }   // V18 : rejouer = pas de présentation
     const avant = etiquettesActuelles();   // boutons du jeu (ex. Sprint de Beufa) : remis après la présentation
     etiquettesTactiles({ espace: 'OK', z: null, x: null });
     const el = [];
@@ -112,6 +115,12 @@ export class BossScene extends Phaser.Scene {
     this.ecranFin('PERDU', message, '#ff6b6b', false);
   }
 
+  // V18 (audit global) : REJOUER pour tous les boss. La scène repart avec les mêmes données (phase, round...) et la même
+  // difficulté ; l'intro, la présentation et le choix de difficulté sont sautés (donnees.rejouer).
+  rejouer() {
+    this.scene.restart({ ...this.donnees, rejouer: true, nomDiff: this.nomDiff, diffObjet: this.diff });
+  }
+
   ecranFin(titre, message, couleur, gagne) {
     etiquettesTactiles({ espace: 'OK', z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
     if (gagne && this.ecranVictoire) { this.ecranVictoire(message); this.attendreRetour(1200); return; }
@@ -119,14 +128,32 @@ export class BossScene extends Phaser.Scene {
     texte(this, LARGEUR / 2, 170, titre, 56, couleur).setDepth(1001);
     texte(this, LARGEUR / 2, 270, message, 24, '#ffffff', { wordWrap: { width: 800 } }).setDepth(1001);
     if (gagne) this.add.image(LARGEUR / 2, 400, 'badge_' + this.identite.id).setScale(2).setDepth(1001);
-    texte(this, LARGEUR / 2, HAUTEUR - 60, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, 20, '#aaaaaa').setDepth(1001);
+    if (!gagne) {
+      // V18 : PERDU → REJOUER tout de suite (ESPACE / clic / OK) ou X / bouton Hub
+      const t = estTactile();
+      etiquettesTactiles({ espace: 'Rejouer', x: 'Hub', z: null, haut: null, bas: null, gauche: null, droite: null });
+      texte(this, LARGEUR / 2, HAUTEUR - 60, `${t ? 'Rejouer' : 'ESPACE ou clic'} : rejouer     ${t ? 'Hub' : 'X'} : retour au hub`, 22, '#7fff7f').setDepth(1001);
+      this.time.delayedCall(700, () => {
+        let fait = false;
+        const une = (f) => () => { if (fait) return; fait = true; f(); };
+        const rejouer = une(() => this.rejouer()), hub = une(() => this.retourHub());
+        this.input.keyboard.once('keydown-SPACE', rejouer);
+        this.input.keyboard.once('keydown-X', hub);
+        this.input.once('pointerdown', (p) => { if (!t) rejouer(); });   // (téléphone : les boutons Rejouer / Hub)
+      });
+      return;
+    }
+    texte(this, LARGEUR / 2, HAUTEUR - 60, `${estTactile() ? 'OK' : 'ESPACE ou clic'} : retour au hub`, 20, '#aaaaaa').setDepth(1001);
     this.attendreRetour(600);
   }
 
-  // ESPACE : retour au hub (petit délai pour ne pas sauter l'écran par accident)
+  // ESPACE (ou un clic, V18) : retour au hub (petit délai pour ne pas sauter l'écran par accident)
   attendreRetour(delai) {
     this.time.delayedCall(delai, () => {
-      this.input.keyboard.once('keydown-SPACE', () => this.retourHub());
+      let fait = false;
+      const retour = () => { if (fait) return; fait = true; this.retourHub(); };
+      this.input.keyboard.once('keydown-SPACE', retour);
+      if (!estTactile()) this.input.once('pointerdown', retour);
     });
   }
 

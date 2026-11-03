@@ -31,8 +31,9 @@ const ASTUCES = [
   'Le veilleur tourne la tête : file quand il regarde ailleurs',
   'Tout ce que tu as appris… La CAMÉRA ne voit pas juste SOUS elle !',
 ];
-import { formatTemps } from '../../core/sauvegarde.js';
-import { IDENTITE, REGLAGES as R, PIECES } from './reglages.js';
+import { formatTemps, Sauvegarde } from '../../core/sauvegarde.js';
+import { IDENTITE, REGLAGES as R, PIECES, DIFFICULTES, appliquerDifficulte } from './reglages.js';
+import { choisirDifficulte } from './difficulte.js';
 import { manifesteDe } from '../../core/manifestes.js';
 import { jouerMusique } from '../../core/musique.js';
 
@@ -147,6 +148,7 @@ export class BeufaInfiltration extends BossScene {
     this.hintBas = texte(this, LARGEUR / 2, HAUTEUR - 12, (estTactile() ? 'Sprint : bruyant !   une pièce, puis l\'autre — jusqu\'au QG' : 'Z : sprint (bruyant)   une pièce, puis l\'autre — jusqu\'au QG'), 13, '#8a94a4').setDepth(900);
     this.message = texte(this, LARGEUR / 2, 150, '', 40, '#ffffff', { fontStyle: 'bold', strokeThickness: 8 }).setOrigin(0.5).setDepth(950).setAlpha(0);
 
+    this.nomDiff = Sauvegarde.difficulte('beufa') || 'normal'; this.diff = appliquerDifficulte(this.nomDiff);   // V18
     this.chargerPiece(0);
 
     this.afficherIntro('BEUFA - L\'INFILTRATION', [
@@ -168,7 +170,9 @@ export class BeufaInfiltration extends BossScene {
         'Conseil : reste dans l\'ombre…',
       ],
       invite: 'infiltration !',
-    }, () => this.cinema()));
+    }, () => choisirDifficulte(this, 'beufa', DIFFICULTES, (nom, D) => {   // V18 : 4 difficultés façon Metal Gear
+      this.nomDiff = nom; this.diff = appliquerDifficulte(nom); this.cinema();
+    })));
   }
 
   // ---------- les IMAGES DE FABIEN : fond retiré, recadrées, à la taille du jeu ----------

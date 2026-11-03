@@ -2,11 +2,11 @@
 // KÉDRIC : match de football américain façon Eyeshield 21, vu de DOS.
 // 3 COURSES : chacune commence par un COUP D'ENVOI (le ballon arrive du fond du terrain, ▲ au bon moment = super
 // réception), puis tu remontes TOUT le terrain d'une traite face à la défense de Kédric, rang après rang.
-// Plaqué = la course s'arrête là ; personne ne t'arrête = TOUCHDOWN. Z (tapé vite) = SPRINT, pour semer ceux qui te poursuivent.
+// Plaqué = la course s'arrête là ; personne ne t'arrête = TOUCHDOWN. V18 : plus de bouton sprint : chaque esquive accélère et sème les poursuivants.
 //  - ◀ ▶ : changer de couloir (plaqueur debout, mur de 2 défenseurs)
 //  - ▲ : sauter (plaquage aux jambes)      ▼ : se baisser en tournant (bras tendus)
 //  - chaque esquive d'affilée te fait accélérer ; les défenseurs esquivés de côté peuvent te POURSUIVRE ;
-//  - esquives PARFAITES = jauge du DEVIL BAT GHOST (Espace : le prochain défenseur est passé à coup sûr).
+//  - esquives PARFAITES = jauge du DEVIL BAT GHOST (V18 : il part TOUT SEUL au défenseur suivant, plus de bouton).
 // Après les 3 courses : le BATTLE DE DANSE contre Kédric (showtime.js), le boss de fin ; tes touchdowns mettent le public de ton côté.
 // Toute la logique avance dans pas() (pas de minuteries Phaser) : les bots de test
 // peuvent jouer en accéléré.
@@ -59,7 +59,8 @@ const HAUTEUR_POSE = { course: 215, garde: 200, bas: 165, plonge: 120, bras: 240
 // les illustrations sont enregistrées 1,5 fois plus grandes que leur taille à l'écran (plus nettes)
 const ZOOM_ILLUSTRE = 1 / 1.5;
 
-const ETIQUETTES_JEU = { haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'Ghost', z: 'Sprint', x: null };
+// V18 (audit global, « une seule règle ») : plus de boutons Ghost ni Sprint : le Ghost part tout seul, le sprint vient des esquives
+const ETIQUETTES_JEU = { haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: null, z: null, x: null };
 const ETIQUETTES_OK = { haut: null, bas: null, gauche: null, droite: null, espace: 'OK', z: null, x: null };
 
 export class KedricCourse extends BossScene {
@@ -110,7 +111,7 @@ export class KedricCourse extends BossScene {
     this.alertePoursuite = texte(this, LARGEUR / 2, 470, '', 24, '#ff5a5a', { fontStyle: 'bold' }).setDepth(905).setVisible(false);
 
     this.creerHud();
-    // téléphone : ◀ ▶ sous le pouce gauche, ▲ ▼ (et Ghost, Sprint) sous le pouce droit, comme au battle de danse
+    // téléphone : ◀ ▶ sous le pouce gauche, ▲ ▼ sous le pouce droit, comme au battle de danse
     disposition('separee');
     this.events.once('shutdown', () => disposition('normale'));
     this.touches = creerTouches(this);
@@ -138,9 +139,9 @@ export class KedricCourse extends BossScene {
       'Un seul plaquage et la course s\'arrête ; personne ne t\'arrête = TOUCHDOWN',
       '◀ ▶ : change de couloir      ▲ : saute      ▼ : baisse-toi en tournant',
       'Le symbole au-dessus du prochain défenseur te dit quoi faire.',
-      (tactile ? 'Sprint' : 'Z') + ' tapé vite = SPRINT (pour semer ceux qui te poursuivent)',
+      'Quelqu\'un te poursuit ? ESQUIVE les suivants : chaque esquive te fait accélérer et le sème',
       'Esquive au DERNIER moment = PARFAIT : remplit la jauge GHOST',
-      'Jauge pleine : ' + (tactile ? 'Ghost' : 'ESPACE') + ' = DEVIL BAT GHOST (passe le défenseur suivant)',
+      'Jauge pleine = DEVIL BAT GHOST automatique : les défenseurs suivants sont passés !',
       tactile ? '(Tu peux aussi glisser le doigt sur l\'écran.)' : '',
     ].filter(Boolean), () => this.presentation(() => this.choixDifficulte()));
   }
@@ -419,15 +420,16 @@ export class KedricCourse extends BossScene {
     if (libre && this.aAppuye('haut')) { j.saut = R.saut.duree; j.sautDebut = this.horloge; jouerSon(this, 'kedric_saut'); }
     else if (libre && this.aAppuye('bas')) { j.rotation = R.rotation.duree; j.rotationDebut = this.horloge; jouerSon(this, 'kedric_esquive', { rate: 0.8 }); }
     j.x += borne(j.voie - j.x, -dt / R.changementCouloir, dt / R.changementCouloir);
-    // sprint : chaque appui sur Z ajoute de la vitesse, qui retombe toute seule
-    if (this.aAppuye('z', 0.05)) { this.boost = Math.min(R.sprint.max, this.boost + R.sprint.parAppui); this.flashSprint = 0.15; }
+    // sprint (V18) : il n'y a plus de bouton : chaque ESQUIVE donne de la vitesse (voir esquive()), qui retombe toute seule
     this.boost = Math.max(0, this.boost - this.boost * R.sprint.baisse * dt);
   }
 
   majJeu(dt) {
     this.tempsTotal += dt;
     this.majJoueur(dt);
-    if (this.aAppuye('espace', 0.05) && this.jauge >= this.diff.ghost && this.ghostArme <= 0) this.armerGhost();
+    // V18 : DEVIL BAT GHOST AUTOMATIQUE : jauge pleine + un défenseur (pas Kédric) arrive → il part tout seul
+    if (this.jauge >= this.diff.ghost && this.ghostArme <= 0 && !(this.duel && this.duel.vies > 0)
+      && this.defs.some(o => !o.star && o.etat === 'approche' && o.pos - this.pos > 0 && o.pos - this.pos < R.ghost.auto)) this.armerGhost();
     if (this.ghostArme > 0) {
       this.ghostArme -= dt;
       if (this.ghostArme <= 0) this.messageCentre(this.ghostPasses ? `GHOST : ${this.ghostPasses} défenseur(s) passé(s) !` : 'Ghost dans le vide...', '#9fe0ff', 24, 0.9);
@@ -596,6 +598,9 @@ export class KedricCourse extends BossScene {
       this.serie++;
       // chaque esquive remplit la jauge du Ghost ; une PARFAITE la remplit plus
       this.remplirGhost(parfait ? R.ghost.parParfait : R.ghost.parEsquive);
+      // V18 : chaque esquive = un coup d'accélérateur (remplace le sprint au bouton) ; poursuivi : tu gagnes du terrain
+      this.boost = Math.min(R.sprint.max, this.boost + (parfait ? R.sprint.parParfait : R.sprint.parEsquive)); this.flashSprint = 0.25;
+      if (this.poursuivants.length) this.poursuivants[0].ecart += parfait ? R.poursuite.parParfait : R.poursuite.parEsquive;
       if (parfait) {
         this.stats.parfaits++;
         jouerSon(this, 'kedric_parfait');
@@ -625,7 +630,7 @@ export class KedricCourse extends BossScene {
     if (this.jauge >= this.diff.ghost && !this.ghostAnnonce) {
       this.ghostAnnonce = true;
       jouerSon(this, 'kedric_niveau', { rate: 1.3 });
-      this.messageCentre(`DEVIL BAT GHOST PRÊT : ${estTactile() ? 'Ghost' : 'ESPACE'} !`, '#9fe0ff', 28, 1.3);
+      this.messageCentre('DEVIL BAT GHOST PRÊT : il part au prochain défenseur !', '#9fe0ff', 28, 1.3);
     }
   }
 
@@ -687,8 +692,8 @@ export class KedricCourse extends BossScene {
   majPoursuivants(dt, v) {
     if (!this.poursuivants.length) { this.alertePoursuite.setVisible(false); return; }
     const p = this.poursuivants[0];
-    p.ecart += (v - p.vitesse) * dt;
-    if (p.ecart <= 0) { this.plaque(null, 'Rattrapé par derrière ! Sprinte (Z) !'); return; }
+    p.ecart += (v - p.vitesse) * R.poursuite.rattrape * dt;   // V18 : il rattrape moins vite (laisse le temps d'esquiver)
+    if (p.ecart <= 0) { this.plaque(null, 'Rattrapé par derrière ! Esquive les défenseurs pour le semer !'); return; }
     if (p.ecart >= R.poursuite.abandon) {
       this.viderPoursuivants();
       this.messageCentre('SEMÉ !', '#7fff7f', 30, 0.6);
@@ -696,9 +701,8 @@ export class KedricCourse extends BossScene {
       return;
     }
     // jauge « LUI ▮▮▮▯ TOI » : plus il y a de cases, plus il est loin
-    const z = estTactile() ? 'Sprint' : 'Z';
     const cases = Math.round(10 * p.ecart / R.poursuite.abandon);
-    this.alertePoursuite.setVisible(true).setText(`POURSUIVANT  ${'▮'.repeat(cases)}${'▯'.repeat(10 - cases)}  ${z} ${z} ${z} !`)
+    this.alertePoursuite.setVisible(true).setText(`POURSUIVANT  ${'▮'.repeat(cases)}${'▯'.repeat(10 - cases)}  ESQUIVE pour le semer !`)
       .setColor(p.ecart < 2 ? '#ff5a5a' : '#ffd84a');
     if (p.ecart < 2.5 && Math.floor(this.horloge * 4) !== Math.floor((this.horloge - dt) * 4)) jouerSon(this, 'kedric_pas', { volume: 0.5, rate: 0.7 });
   }
@@ -965,7 +969,7 @@ export class KedricCourse extends BossScene {
         : bd.rates >= 5 ? 'Conseil du coach : vise le PARFAIT pile sur le temps : c\'est lui qui fait basculer le public.'
         : 'Conseil du coach : enchaîne 5 PARFAITS d\'affilée : la foule est à toi (COMBO x1,5).')
       : (this.stats.plaquages >= 3 ? 'Conseil du coach : esquive les plaqueurs PLUS TÔT, le symbole s\'affiche avant le contact.'
-        : 'Conseil du coach : les esquives PARFAITES remplissent le Devil Bat Ghost — garde-le pour les murs.');
+        : 'Conseil du coach : les esquives PARFAITES remplissent le Devil Bat Ghost — il part tout seul au défenseur suivant.');
     return `Kédric est battu au battle de danse !  Touchdowns : ${this.stats.touchdowns} / ${R.courses}\nRANG ${rang}   -   temps ${formatTemps(this.tempsTotal)}` +
       `\nPlaquages subis : ${this.stats.plaquages}   esquives : ${this.stats.esquives}` +
       `\nEsquives parfaites : ${this.stats.parfaits}` +
@@ -976,7 +980,6 @@ export class KedricCourse extends BossScene {
       (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '') +
       '\n' + lignesDefis('kedric', [
         { id: 'parfait40', nom: '40 esquives PARFAITES (courses + battle)', test: () => this.stats.parfaits >= 40 },
-        { id: 'sansGhost', nom: 'Gagner sans JAMAIS utiliser le Devil Bat Ghost', test: () => this.stats.ghosts === 0 },
         { id: 'public80', nom: 'Battle gagné avec 80 % du public pour toi', test: () => publicPourToi !== null && publicPourToi >= 80 },
       ]).join('\n') +
       `\n${conseil}`;
@@ -1009,6 +1012,7 @@ export class KedricCourse extends BossScene {
   //  ÉCRANS
   // =================================================================
   presentation(ensuite) {
+    if (this.donnees.rejouer) { ensuite(); return; }   // V18 : rejouer = pas de présentation
     etiquettesTactiles(ETIQUETTES_OK);
     const el = [];
     el.push(this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0b0b14, 0.96).setDepth(1100));
@@ -1082,7 +1086,7 @@ export class KedricCourse extends BossScene {
     ked.setScale(300 / ked.height);
     this.tweens.add({ targets: ked, x: 760, duration: 500, ease: 'Cubic.Out' });
     const trophee = this.add.image(300, 300, 'kedric_trophee').setDepth(P + 3).setScale(0).setAngle(-30);
-    this.tweens.add({ targets: trophee, scale: 1.15, angle: 0, delay: 350, duration: 600, ease: 'Back.Out' });
+    this.tweens.add({ targets: trophee, scale: 300 / trophee.height, angle: 0, delay: 350, duration: 600, ease: 'Back.Out' });
     this.tweens.add({ targets: trophee, y: 290, delay: 1000, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
     this.time.addEvent({ delay: 180, repeat: -1, callback: () => {
       const e = this.add.star(300 + Phaser.Math.Between(-130, 130), 300 + Phaser.Math.Between(-150, 120), 4, 3, 9, 0xfff3a8).setDepth(P + 4);
@@ -1112,6 +1116,11 @@ export class KedricCourse extends BossScene {
   // Le stade (fixe) : ciel de nuit, projecteurs, tribunes pleines, écran géant
   // (dessiné une seule fois dans une image : des milliers de petits ronds redessinés à chaque image ralentiraient le jeu)
   dessinerStade() {
+    // V18 : l'illustration du stade (tribunes, projecteurs, écran géant) si elle est là
+    if (this.textures.exists('kedric_stade')) {
+      this.add.image(0, 0, 'kedric_stade').setOrigin(0).setDisplaySize(LARGEUR, VUE.horizon).setDepth(0);
+      return;
+    }
     const g = this.make.graphics({ x: 0, y: 0 }, false);
     const H = VUE.horizon;
     g.fillGradientStyle(0x07081a, 0x07081a, 0x1b2350, 0x1b2350, 1); g.fillRect(0, 0, LARGEUR, H);
@@ -1438,7 +1447,7 @@ export class KedricCourse extends BossScene {
     g.fillStyle(0x000000, 0.5); g.fillRect(LARGEUR - 48, 194, 28, 220);
     g.fillStyle(plein && Math.floor(this.horloge * 6) % 2 ? 0xffffff : 0x9fe0ff, 1); g.fillRect(LARGEUR - 48, 194 + 220 * (1 - fj), 28, 220 * fj);
     g.lineStyle(2, 0xffffff, 0.8); g.strokeRect(LARGEUR - 48, 194, 28, 220);
-    const t5 = plein && this.ghostArme <= 0 ? (estTactile() ? 'Ghost !' : 'ESPACE !') : '';
+    const t5 = plein && this.ghostArme <= 0 ? 'PRÊT !' : '';
     if (this.hudPret.text !== t5) this.hudPret.setText(t5);
   }
 }

@@ -18,6 +18,24 @@
   dessinés au code (prompts : `propositions/kedric_prompts_images.md`). Propositions (en attente de Fabien) : REJOUER pour
   tous les boss, passe « une seule règle » sur Kédric, difficultés harmonisées, récompense des 6 badges.
 
+## V18 — CORRECTIONS DE L'AUDIT GLOBAL (toutes faites, demande de Fabien)
+- REJOUER pour tous : `BossScene.defaite` → « ESPACE ou clic : rejouer / X : hub » ; `rejouer()` relance la scène avec
+  `donnees.rejouer` (+ `nomDiff`, `diffObjet`) : `afficherIntro`, `afficherPresentation`, les `presentation()` de Greg /
+  Lionel / Kédric et leurs `choisirDifficulte` sont sautés. Écran de fin : le clic souris ramène aussi au hub (B1).
+- Julien manif : une seule entrée dans l'historique du navigateur (B2).
+- Kédric : `kedric_stade.jpg` (bande 960 x 172 au-dessus de l'horizon) et `kedric_trophee.png` intégrés
+  (`outils/kedric/preparer_decors.py`, originaux dans `assets_inbox/kedric/`) (B3).
+- DIFFICULTÉS : ENTRAÎNEMENT ajouté à Greg et Lionel (Lionel : 5 cartes avec PERSO) ; BEUFA : 4 niveaux façon MGS
+  (VERY EASY / EASY / NORMAL / EXTREME, `DIFFICULTES` + `appliquerDifficulte` dans beufa/reglages.js, `beufa/difficulte.js`) :
+  vue / repérage / poursuite des gardes, projecteurs, erreurs et temps du quiz ; NORMAL = inchangé ; record par difficulté.
+- KÉDRIC « une seule règle » : plus de bouton SPRINT (chaque esquive accélère, `sprint.parEsquive` ; poursuivi : 2 esquives
+  le sèment, `poursuite.parEsquive`, il rattrape x0,6) ni de bouton GHOST (part tout seul quand la jauge est pleine et
+  qu'un défenseur, pas Kédric, est à moins de `ghost.auto` 6 yards). Défi « sans Ghost » retiré. Pas de bot Kédric :
+  à juger en main.
+- LA FIN : `src/hub/FinaleScene.js` (« LES BRACASS' AU COMPLET ! », 6 portraits + badges, confettis), montrée une fois
+  quand les 6 badges sont gagnés (`Sauvegarde.fait('finale_vue')`), à revoir depuis le hub (F ou « ★ LA FIN ★ »).
+  BOSS RUSH : pas fait (idée facultative de l'audit).
+
 ## ⚠️ À RAPPELER À FABIEN quand les 6 boss seront finalisés (phase de FINITION)
 - Repasser sur CHAQUE jeu pour PERSONNALISER LES TEXTES (répliques, intros, moqueries, victoires, questions…) avec lui.
   Pour Beufa, tout est dans `data/beufa_quiz.js` (quiz) et en tête de `BeufaInfiltration.js` (conseils, messages).

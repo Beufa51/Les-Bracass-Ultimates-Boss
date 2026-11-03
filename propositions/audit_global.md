@@ -57,3 +57,6 @@ Petits défauts trouvés (non bloquants) :
 1. Rémi : beer pong (pichenette) et porte (poing caché, tu commences).
 2. Kédric : un match complet en NORMAL, pour décider du point 2.
 3. Julien : la classe (équilibrage).
+
+## 5. Fait en V18 (demande de Fabien : « toutes les corrections »)
+B1, B2, B3, points 1 à 5 faits (voir NOTES.md, « V18 — CORRECTIONS DE L'AUDIT GLOBAL »). Seul le BOSS RUSH (facultatif) n'est pas fait.

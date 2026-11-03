@@ -364,11 +364,14 @@ export class JulienManif extends BossScene {
       if (e.altKey && e.key && e.key.startsWith('Arrow')) e.preventDefault();
       if (e.key === 'Alt') e.preventDefault();   // Alt seul : pas de menu du navigateur
     };
-    const retour = () => history.pushState({ manif: true }, '');
+    // V18 (audit global) : une seule entrée dans l'historique, même après plusieurs parties (avant : une de plus à chaque
+    // visite → le bouton Retour du téléphone devait être pressé plusieurs fois pour quitter le site)
+    const pousser = () => { if (!(history.state && history.state.manif)) history.pushState({ manif: true }, ''); };
+    const retour = () => pousser();
     // APRÈS Phaser (il ignore les touches déjà « bloquées ») : on s'inscrit en dernier, sans « capture »
     window.addEventListener('keydown', touche);
     window.addEventListener('keyup', touche);
-    history.pushState({ manif: true }, '');
+    pousser();
     window.addEventListener('popstate', retour);
     this.events.once('shutdown', () => {
       window.removeEventListener('keydown', touche);

@@ -6,6 +6,7 @@ import { MenuTestScene, basculerMenuTest } from './core/MenuTestScene.js';
 import { ReglagesDevScene } from './core/ReglagesDevScene.js';
 import { appliquerReglagesDev } from './core/reglagesDev.js';
 import { HubScene } from './hub/HubScene.js';
+import { FinaleScene } from './hub/FinaleScene.js';
 import { BOSS, MODELE } from './bosses/liste.js';
 import { installerTactile, installerBoutonPause } from './core/tactile.js';
 import { PauseScene, basculerPause } from './core/PauseScene.js';
@@ -35,7 +36,7 @@ const jeu = new Phaser.Game({
   pixelArt: false,
   antialias: true,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-  scene: [ChargementScene, HubScene, BientotScene, MenuTestScene, PauseScene, ReglagesDevScene, ...scenesDesBoss],
+  scene: [ChargementScene, HubScene, FinaleScene, BientotScene, MenuTestScene, PauseScene, ReglagesDevScene, ...scenesDesBoss],
 });
 
 // Touche F1 : menu de test caché
