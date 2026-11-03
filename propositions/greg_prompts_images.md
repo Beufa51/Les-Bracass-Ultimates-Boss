@@ -93,6 +93,42 @@ front view, three-quarter view, back view. Neutral boxing stance, gloves at ches
 Plain pure white background, no text, no logo, nothing touching the edges.
 ```
 
+## Étape 1 bis : ajouter les tatouages UN PAR UN (si l'étape 1 les rate)
+1. Relancer l'étape 1 SANS les tatouages : joindre seulement la photo, et supprimer tout le paragraphe « TATTOOS: ».
+   → `greg_reference.png` (sans tatouage).
+2. Puis 4 passes de retouche, une par tatouage. À chaque passe, joindre ① la DERNIÈRE image obtenue,
+   ② le tatouage. Garder l'image de chaque passe (`greg_ref_t1.png`, `_t2`, `_t3`, `_t4`) ; la dernière
+   devient `greg_reference.png`. Si une passe abîme le visage : la relancer depuis l'image précédente.
+
+Passe 1 — bras droit, haut → `greg_ref_t1.png`
+```
+Edit the attached image 1: keep EVERYTHING exactly the same (face, body, pose, outfit, colors, style, layout,
+background, any tattoo already there). Only ADD one tattoo: the design from attached image 2, redrawn as a
+detailed ink tattoo with color fills, wrapping naturally around the upper RIGHT arm (shoulder to elbow), following the muscles and
+the skin shading. Show it on every view where that arm is visible (front, three-quarter and back views). Do not add anything else.
+```
+Passe 2 — avant-bras droit → `greg_ref_t2.png`
+```
+Edit the attached image 1: keep EVERYTHING exactly the same (face, body, pose, outfit, colors, style, layout,
+background, any tattoo already there). Only ADD one tattoo: the design from attached image 2, redrawn as a
+detailed ink tattoo with color fills, wrapping naturally around the RIGHT forearm (elbow to wrist, just below the upper arm tattoo), following the muscles and
+the skin shading. Show it on every view where that arm is visible (front, three-quarter and back views). Do not add anything else.
+```
+Passe 3 — bras gauche, haut → `greg_ref_t3.png`
+```
+Edit the attached image 1: keep EVERYTHING exactly the same (face, body, pose, outfit, colors, style, layout,
+background, any tattoo already there). Only ADD one tattoo: the design from attached image 2, redrawn as a
+detailed ink tattoo with color fills, wrapping naturally around the upper LEFT arm (shoulder to elbow), following the muscles and
+the skin shading. Show it on every view where that arm is visible (front, three-quarter and back views). Do not add anything else.
+```
+Passe 4 — avant-bras gauche → `greg_ref_t4.png` (= `greg_reference.png`)
+```
+Edit the attached image 1: keep EVERYTHING exactly the same (face, body, pose, outfit, colors, style, layout,
+background, any tattoo already there). Only ADD one tattoo: the design from attached image 2, redrawn as a
+detailed ink tattoo with color fills, wrapping naturally around the LEFT forearm (elbow to wrist, just below the upper arm tattoo), following the muscles and
+the skin shading. Show it on every view where that arm is visible (front, three-quarter and back views). Do not add anything else.
+```
+
 ## Étape 2 : greg_planche_A.png et greg_planche_B.png (toutes les poses, même échelle)
 Joindre : `greg_reference.png` (étape 1). Générer les poses PAR PLANCHES (pas une par une) pour qu'elles restent
 cohérentes. Chaque pose = corps ENTIER, vu de FACE (il regarde le joueur), pieds sur la même ligne.
