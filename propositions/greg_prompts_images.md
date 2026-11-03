@@ -63,19 +63,33 @@ three separate original tattoo designs side by side, no text:
    a roaring tiger spirit coiling around him, blue lightning sparks
 ```
 
-## Étape 1 : greg_reference.png (fiche du personnage)
-Joindre DANS CET ORDRE : ① la photo de la tête de Greg, ② `assets/sprites/greg/greg_entier.png` (corps et tenue),
-③ ④ ⑤ ⑥ les 4 tatouages (bras droit haut, avant-bras droit, bras gauche, avant-bras gauche).
+## Étape 1 : greg_reference.png (fiche du personnage) — version détaillée « boxeur de manga de boxe années 90 »
+Joindre DANS CET ORDRE : ① la photo de la tête de Greg, ②③④⑤ les 4 tatouages
+(bras droit haut, avant-bras droit, bras gauche haut, avant-bras gauche). Plus besoin de joindre greg_entier.png.
+Couleurs de la tenue : à changer dans le prompt si tu veux (ici rouge et or).
 ```
-Character reference sheet of a boxer, manga / anime style with bold black outlines and cel shading.
-Use the HEAD and FACE from attached image 1 (a real photo, redraw it in manga style but keep the likeness),
-and the body, shorts, gloves and colors from attached image 2. The arms are covered with tattoos taken from
-attached images 3 to 6, redrawn as ink tattoos with color fills on the skin:
-image 3 on the upper RIGHT arm, image 4 on the RIGHT forearm just below it, image 5 on the upper LEFT arm,
-image 6 on the LEFT forearm just below it. Tattoos clearly visible and identical in every view.
-Show the same character 3 times, full body, standing on the same ground line, same scale:
-front view, three-quarter view, back view. Neutral standing pose, arms down, gloves on.
-Plain pure white background, no text, nothing touching the edges.
+Highly detailed character reference sheet of a professional boxer, drawn in classic 1990s Japanese boxing manga
+style: realistic anatomy, bold confident ink lines, dense cross-hatching in the shadows, dramatic cel shading,
+gritty and powerful, very cool and charismatic, not cartoony, not chibi.
+
+FACE: use the face from attached image 1 (a real photo). Keep the likeness (face shape, nose, eyes, hairstyle,
+beard if any) but redraw it as a tough manga boxer: sharp intense eyes, strong jaw, slight confident smirk,
+a small scar on the eyebrow.
+
+BODY: middleweight build, lean and very muscular, broad shoulders, thick neck, defined chest and six-pack abs,
+visible veins on the forearms, a little sweat shine on the skin.
+
+TATTOOS: tattoos from attached images 2 to 5, redrawn as detailed ink tattoos with color fills on the skin:
+image 2 on the upper RIGHT arm, image 3 on the RIGHT forearm just below it, image 4 on the upper LEFT arm,
+image 5 on the LEFT forearm just below it. Clearly visible and identical in every view.
+
+OUTFIT: glossy red satin boxing trunks with a wide gold waistband and gold trim, white hand wraps showing at the
+wrists, shiny red leather boxing gloves with white laces and a visible stitching, red and white high-top boxing
+boots with white socks, a mouthguard optional.
+
+LAYOUT: the same character 3 times side by side, full body, same scale, feet on the same ground line:
+front view, three-quarter view, back view. Neutral boxing stance, gloves at chest height.
+Plain pure white background, no text, no logo, nothing touching the edges.
 ```
 
 ## Étape 2 : greg_planche_A.png et greg_planche_B.png (toutes les poses, même échelle)
