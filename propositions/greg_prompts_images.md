@@ -72,9 +72,10 @@ Highly detailed character reference sheet of a professional boxer, drawn in clas
 style: realistic anatomy, bold confident ink lines, dense cross-hatching in the shadows, dramatic cel shading,
 gritty and powerful, very cool and charismatic, not cartoony, not chibi.
 
-FACE: use the face from attached image 1 (a real photo). Keep the likeness (face shape, nose, eyes, hairstyle,
-beard if any) but redraw it as a tough manga boxer: sharp intense eyes, strong jaw, slight confident smirk,
-a small scar on the eyebrow.
+FACE: use the face from attached image 1 (a real photo) and keep the likeness: warm tan skin, voluminous dark
+curly hair on top with a high skin fade on the sides, thick dark eyebrows, deep-set dark brown eyes, strong nose,
+full thick well-groomed dark beard and mustache. Redraw it as a tough, charismatic manga boxer: sharp intense
+eyes, strong jaw, slight confident smirk.
 
 BODY: middleweight build, lean and very muscular, broad shoulders, thick neck, defined chest and six-pack abs,
 visible veins on the forearms, a little sweat shine on the skin.
