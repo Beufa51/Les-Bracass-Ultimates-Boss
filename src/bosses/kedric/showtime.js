@@ -690,7 +690,10 @@ export class Showtime {
   afficherCouloirs(boum) {
     const g = this.couloirsG; g.clear();
     const actif = ['annonce', 'jeu', 'fin'].includes(this.phase);
-    for (const n of DIRS) this.touchesC[n].setVisible(actif);
+    // sur TÉLÉPHONE, les gros boutons ◀ ▶ ▲ ▼ (qui s'allument) SONT les touches : on ne redessine pas de ronds
+    // fléchés par-dessus (ils faisaient doublon, décalés des boutons — retour de Fabien V93)
+    const surTel = estTactile();
+    for (const n of DIRS) this.touchesC[n].setVisible(actif && !surTel);
     if (!actif) { this.notes.forEach(n => n.objet.setVisible(false)); this.fumeeG.clear(); this.avisPiege.setVisible(false); return; }
     const C = this.c, d = this.duree, w = C.largeur, v = (C.cibleY - C.haut) / PISTE.chute;   // la vitesse suit la hauteur des couloirs : même temps de chute partout
     const TL = this.T - this.debutManche;
@@ -709,8 +712,10 @@ export class Showtime {
       g.fillStyle(0x000000, 0.45); g.fillRoundedRect(x - w / 2, C.haut, w, C.cibleY - C.haut + w / 2, 14);
       const allume = cible && cible.nom === n;
       const coul = allume ? Phaser.Display.Color.HexStringToColor(cible.couleur).color : Phaser.Display.Color.HexStringToColor(COULEURS[n]).color;
-      g.fillStyle(coul, allume ? 0.25 + 0.35 * cible.force : 0.1 + 0.15 * boum); g.fillCircle(x, C.cibleY, w * 0.45);
-      g.lineStyle(allume ? 6 : 4, coul, allume ? 1 : 0.8); g.strokeCircle(x, C.cibleY, w * 0.45 + 3 * boum);
+      if (!surTel) {
+        g.fillStyle(coul, allume ? 0.25 + 0.35 * cible.force : 0.1 + 0.15 * boum); g.fillCircle(x, C.cibleY, w * 0.45);
+        g.lineStyle(allume ? 6 : 4, coul, allume ? 1 : 0.8); g.strokeCircle(x, C.cibleY, w * 0.45 + 3 * boum);
+      }
       this.touchesC[n].setPosition(x, C.cibleY).setAlpha(allume ? 0.9 : 0.45);
     }
     // des petits traits en travers des couloirs, un par temps de musique (on voit venir le rythme)
