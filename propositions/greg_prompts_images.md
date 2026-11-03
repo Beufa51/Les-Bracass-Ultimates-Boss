@@ -50,12 +50,28 @@ count, serious face. Plain pure white background, full figure, nothing touching 
 ---
 # REFONTE de Greg (nouvelle tête) — à faire DANS CET ORDRE
 
+## Étape 0 : greg_tatouages.png (les tatouages seuls, pour les garder identiques partout)
+Tatouages ORIGINAUX dans l'esprit manga « guerriers » (pas de personnages existants).
+```
+Tattoo flash sheet, black ink with bold color fills, anime / shonen manga style, plain pure white background,
+three separate original tattoo designs side by side, no text:
+1. (for the upper right arm) a huge muscular berserker warrior screaming with rage, wild spiky hair,
+   bursting out of broken iron chains, surrounded by a raging orange and gold fire aura
+2. (for the right forearm, below the first) a lone young swordsman seen from three-quarter, hooded cloak
+   flowing in the wind, katana on his back, determined eyes, ruined futuristic city behind him at sunset
+3. (for the left arm) a primal martial artist in a fighting stance, crimson tiger stripes painted on his body,
+   a roaring tiger spirit coiling around him, blue lightning sparks
+```
+
 ## Étape 1 : greg_reference.png (fiche du personnage)
-Joindre : ta nouvelle tête de Greg + `assets/sprites/greg/greg_entier.png` (pour le corps et la tenue).
+Joindre : la photo de la tête de Greg + `assets/sprites/greg/greg_entier.png` (corps et tenue) +
+`greg_tatouages.png` (étape 0).
 ```
 Character reference sheet of a boxer, manga / anime style with bold black outlines and cel shading.
-Use the HEAD and FACE from the first attached image exactly, and the body, shorts, gloves and colors from the
-second attached image. Show the same character 3 times, full body, standing on the same ground line, same scale:
+Use the HEAD and FACE from the first attached image (a real photo, redraw it in manga style but keep the
+likeness), and the body, shorts, gloves and colors from the second attached image. Tattoos from the third attached
+image: design 1 on the upper RIGHT arm, design 2 on the RIGHT forearm just below it, design 3 on the LEFT arm,
+clearly visible and identical in every view. Show the same character 3 times, full body, standing on the same ground line, same scale:
 front view, three-quarter view, back view. Neutral standing pose, arms down, gloves on.
 Plain pure white background, no text, nothing touching the edges.
 ```
@@ -65,7 +81,8 @@ Joindre : `greg_reference.png` (étape 1). Générer les poses PAR PLANCHES (pas
 cohérentes. Chaque pose = corps ENTIER, vu de FACE (il regarde le joueur), pieds sur la même ligne.
 Planche A :
 ```
-Same boxer as the attached reference sheet (same head, face, body, colors, manga style). One sprite sheet,
+Same boxer as the attached reference sheet (same head, face, body, colors, manga style, SAME arm tattoos at the same
+places: right upper arm, right forearm, left arm). One sprite sheet,
 plain pure white background, 2 rows x 4 columns, each pose full body seen from the FRONT facing the viewer,
 all poses at the exact same scale with feet on the same ground line, generous white space between poses, no text:
 1. high guard, both gloves up protecting the face, light bounce stance
@@ -79,7 +96,8 @@ all poses at the exact same scale with feet on the same ground line, generous wh
 ```
 Planche B :
 ```
-Same boxer as the attached reference sheet (same head, face, body, colors, manga style). One sprite sheet,
+Same boxer as the attached reference sheet (same head, face, body, colors, manga style, SAME arm tattoos at the same
+places: right upper arm, right forearm, left arm). One sprite sheet,
 plain pure white background, 2 rows x 4 columns, each pose full body seen from the FRONT, same scale,
 feet on the same ground line, generous white space between poses, no text:
 1. getting hit in the face: head snapped back, sweat drops flying, one eye closed
