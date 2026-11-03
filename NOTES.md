@@ -31,6 +31,7 @@
 - KÉDRIC « une seule règle » : plus de bouton SPRINT (chaque esquive accélère, `sprint.parEsquive` ; poursuivi : 2 esquives
   le sèment, `poursuite.parEsquive`, il rattrape x0,6) ni de bouton GHOST (part tout seul quand la jauge est pleine et
   qu'un défenseur, pas Kédric, est à moins de `ghost.auto` 6 yards). Défi « sans Ghost » retiré. Pas de bot Kédric :
+  Ghost rendu plus rare (V93, « se déclenche trop vite, trop facile ») : jauge 8 / 8 / 10 / 14 (au lieu de 5 / 5 / 6 / 9), durée 3 s (au lieu de 4).
   à juger en main.
 - LA FIN : `src/hub/FinaleScene.js` (« LES BRACASS' AU COMPLET ! », 6 portraits + badges, confettis), montrée une fois
   quand les 6 badges sont gagnés (`Sauvegarde.fait('finale_vue')`), à revoir depuis le hub (F ou « ★ LA FIN ★ »).

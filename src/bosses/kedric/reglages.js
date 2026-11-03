@@ -16,16 +16,16 @@ export const IDENTITE = { id: 'kedric', nom: 'Kédric' };
 //  poursuiteEcart : il court ce nombre de yards / s plus vite que toi au moment où il part (le sprint le sème)
 //  fenetreShow : largeur des fenêtres de timing du SHOWTIME (x)
 export const DIFFICULTES = {
-  entrainement: { nom: 'ENTRAÎNEMENT', couleur: '#9fe0ff', alerte: 1.8, parfait: 0.22, aide: true, feintes: 0, ghost: 5, vitesse: 0.9, murTardif: false,
+  entrainement: { nom: 'ENTRAÎNEMENT', couleur: '#9fe0ff', alerte: 1.8, parfait: 0.22, aide: true, feintes: 0, ghost: 8, vitesse: 0.9, murTardif: false,
     charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, fenetreShow: 1.35, flechesRouges: false,
     texte: 'Idéal pour apprendre : FACILE + le panneau d\'aide + un RALENTI à chaque nouveau plaquage.' },
-  facile:   { nom: 'FACILE',   couleur: '#7fff7f', alerte: 1.8, parfait: 0.22, aide: false, feintes: 0, ghost: 5, vitesse: 0.9, murTardif: false,
+  facile:   { nom: 'FACILE',   couleur: '#7fff7f', alerte: 1.8, parfait: 0.22, aide: false, feintes: 0, ghost: 8, vitesse: 0.9, murTardif: false,
     charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, fenetreShow: 1.35, flechesRouges: false,
     texte: 'Les défenseurs préviennent tôt, Kédric danse lentement. Sans explications.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', alerte: 1.45, parfait: 0.17, aide: false, feintes: 0.3, ghost: 6, vitesse: 1, murTardif: false,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', alerte: 1.45, parfait: 0.17, aide: false, feintes: 0.3, ghost: 10, vitesse: 1, murTardif: false,
     charge: 1.5, poursuite: 0.12, poursuiteEcart: 1.2, fenetreShow: 1, flechesRouges: false,
     texte: 'Le vrai match, et un vrai duel de frime contre Kédric.' },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', alerte: 0.95, parfait: 0.12, aide: false, feintes: 0.45, ghost: 9, vitesse: 1.06, murTardif: true,
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', alerte: 0.95, parfait: 0.12, aide: false, feintes: 0.45, ghost: 14, vitesse: 1.06, murTardif: true,
     charge: 3.0, poursuite: 0.2, poursuiteEcart: 1.5, fenetreShow: 0.8, flechesRouges: true,
     texte: 'Pas d\'aide, défense rapide, timing serré au SHOWTIME. Pour les vrais.' },
 };
@@ -77,7 +77,7 @@ export const REGLAGES = {
   // (gel : petit arrêt sur image au premier).
   // La jauge se garde d'une course à l'autre. parEsquive / parParfait : ce que rapporte une esquive (ou une bonne
   // réception) / une esquive PARFAITE (ou une réception parfaite) ; la taille de la jauge dépend de la difficulté (ghost)
-  ghost: { duree: 4, gel: 0.35, parEsquive: 1, parParfait: 2, auto: 6 },   // V18 : auto = part tout seul quand un défenseur est à moins de 6 yards
+  ghost: { duree: 3, gel: 0.35, parEsquive: 1, parParfait: 2, auto: 6 },   // V18 : auto = part tout seul quand un défenseur est à moins de 6 yards
   // ---------- SHOWTIME : le BATTLE DE DANSE contre Kédric, le boss de fin (showtime.js) ----------
   //  Une SEULE SESSION CONTINUE : Kédric danse AVEC toi du début à la fin (plus de questions / réponses), et la musique
   //  n'est JAMAIS replacée pendant le battle (elle démarre sur le refrain à l'annonce, puis file sans coupure).
