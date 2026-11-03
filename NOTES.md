@@ -12,6 +12,12 @@
 - **Rémi** : V1 JOUABLE (3 jeux à la suite, dessins provisoires au code) : vélo → beer pong → porte. Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
+## AUDIT GLOBAL V18 (6 boss, version économe) : `propositions/audit_global.md`
+- 0 plantage (14 lancements + « rejouer »), 0 erreur aux outils. Petits défauts : B1 clic souris inactif sur l'écran de fin
+  (BossScene.attendreRetour), B2 historique du navigateur qui s'accumule (manif de Julien), B3 trophée / stade de Kédric
+  dessinés au code (prompts : `propositions/kedric_prompts_images.md`). Propositions (en attente de Fabien) : REJOUER pour
+  tous les boss, passe « une seule règle » sur Kédric, difficultés harmonisées, récompense des 6 badges.
+
 ## ⚠️ À RAPPELER À FABIEN quand les 6 boss seront finalisés (phase de FINITION)
 - Repasser sur CHAQUE jeu pour PERSONNALISER LES TEXTES (répliques, intros, moqueries, victoires, questions…) avec lui.
   Pour Beufa, tout est dans `data/beufa_quiz.js` (quiz) et en tête de `BeufaInfiltration.js` (conseils, messages).
