@@ -309,7 +309,7 @@
   (reglages.js, toutes « pied », taille 0.78). Nouvelles poses utilisées : `nargue` (moment secret, garde basse) et
   `tapeGants` (préparation du SMASH). PROVISOIRE : chute K.O. = image étourdi, victoire = image nargue, présentation /
   annonce SMASH / case K.O. = anciennes images. RESTE à générer : ko_debout, victoire, arme, releve (prompts dans
-  `propositions/greg_prompts_images.md`) ; `greg_corps_a_refaire.jpg` non utilisée.
+  `propositions/greg_prompts_images.md`) ; `greg_corps_a_refaire.jpg` non utilisée ; CROCHET à refaire (en attendant : image du jab).
 - Combat de Greg inspiré de Super Punch-Out (SNES) : bandeau avec portraits et « VS », public dense,
   tapis bleu avec logo, ton boxeur de dos = illustrations (heros_garde / heros_coup / heros_uppercut,
   réglages `herosIllustre`), sinon dessin façon Little Mac (dos large, touffe, gants verts, contour cyan,

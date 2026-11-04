@@ -235,3 +235,13 @@ Variante `coach_pattes_frappe.png` :
 Same coach, same style, full body from the front, wearing focus mitts, swinging the left mitt toward the
 viewer like a punch (testing the student's dodge), shouting. Plain pure white background, no text.
 ```
+
+## greg_crochet.png — À REFAIRE (V93 : la 1re version était ratée)
+Joindre `greg_reference_face.jpg`, prompt commun, puis cette ligne POSE :
+```
+POSE: throwing a powerful LEFT HOOK at the viewer's head. Seen from the front: his torso rotated, the hooking arm
+bent at 90 degrees and horizontal at shoulder height, the glove coming from the LEFT side of the image toward
+the center, elbow up, fist turned, the other glove tight against his chin, chin tucked, eyes locked on the viewer,
+knees bent, weight on the front foot. Only a few short curved motion lines behind the glove, the arm and glove
+must be clearly drawn and not blurred. The belt has a plain gold buckle with NO text.
+```
