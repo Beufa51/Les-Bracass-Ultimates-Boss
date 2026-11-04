@@ -1383,7 +1383,7 @@ export class GregCombat extends BossScene {
     }
     g.sprite.setVisible(true).setAlpha(1);
     if (g.etat === 'etourdi') { pose = ou('etourdi', repos); dx = Math.sin(t / 160) * 22; angle = Math.sin(t / 160) * 6; dy = 8; teinte = 0xfff3c0; }
-    else if (g.etat === 'nargue') { pose = repos; dy = Math.sin(t / 110) * 5; dx = Math.sin(t / 220) * 8; }
+    else if (g.etat === 'nargue') { pose = ou('nargue', repos); dy = Math.sin(t / 110) * 5; dx = Math.sin(t / 220) * 8; }
     else if (forcee === 'touche' || g.etat === 'touche' || (g.etat === 'garde' && t - (g.toucheDepuis || -9999) < 550)) {
       // il prend un coup : la tête part en arrière, puis il a l'air sonné une demi-seconde
       const e = t - (g.toucheDepuis || t);
@@ -1397,7 +1397,7 @@ export class GregCombat extends BossScene {
       const c = g.attaque.cible, avance = g.t / g.prepa, sens = g.attaque.cote === 'g' ? -1 : (g.attaque.cote === 'd' ? 1 : 0);
       const debut = c === 'corps' ? I.debutElanCorps : I.debutElan;
       if (avance < debut) {             // il arme son coup
-        if (c === 'smash') { dy = 34; echelle = 0.93; angle = -3; }
+        if (c === 'smash') { dy = 34; echelle = 0.93; angle = -3; if (existe('tapeGants')) { pose = 'tapeGants'; dy = 0; angle = 0; } }
         else if (c === 'corps') { dy = 46; echelle = 0.9; dx = sens * 20; angle = sens * 4; }   // il plonge bas
         else { dx = sens * 34; angle = sens * 6; echelle = 0.96; }
       } else {                          // le coup part : l'image du coup grossit vers toi, du bon côté
