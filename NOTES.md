@@ -291,6 +291,10 @@
   durée du bonus TIR ÉCLAIR (anneau jaune qui se vide autour de TIR) : balle x `eclairVitesse` 1,35 et son gardien
   réagit `eclairReflexe` 0,08 s plus tard (la ligne verte en tient compte). Poignée du bas retirée ; message de visée
   en bas (y 524), répliques au milieu (y 300).
+- V19h (retours : un peu dur à arrêter ; défenseurs de Rémi peu lisibles ; idée : gardien transparent comme le boxeur de
+  Greg) : TON GARDIEN plus large (zone d'arrêt `priseToi` 0,06 au lieu de 0,045 ; dessiné `largeurGardien` 0,07 m) et à
+  moitié TRANSPARENT (`transparenceGardien` 0,5, contour blanc) : on voit la balle et ses joueurs à travers. Joueurs de
+  Rémi : rouge plus vif, contour blanc, OMBRE au sol (on voit leur place même levés). Réglage développeur : largeur d'arrêt.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

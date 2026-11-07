@@ -87,6 +87,9 @@ export const BABY = {
   buts: 5,                // premier à ce nombre de buts
   largeur: 0.68, longueur: 1.0, balle: 0.02, but: 0.24,
   course: 0.13,           // débattement de ton gardien (m de chaque côté)
+  priseToi: 0.06,         // V19h : TON gardien arrête la balle à moins de ça de son centre (plus large que ceux de Rémi)
+  largeurGardien: 0.07,   // ... et il est dessiné de cette largeur (m)
+  transparenceGardien: 0.5, // ... à moitié transparent : on voit la balle et ses joueurs derrière lui
   prise: 0.045,           // la balle est arrêtée à moins de ça du centre d'un joueur
   vitesseBoutons: 1.1,    // V19d BOUTONS ◀ ▶ : vitesse du gardien quand on maintient (m/s ; tout le but en ~0,25 s)
   depart: 0.45,           // ... il part à cette part de la vitesse...

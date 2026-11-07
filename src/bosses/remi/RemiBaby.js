@@ -231,7 +231,7 @@ export class RemiBaby extends BossScene {
       // ta barre : la balle passe-t-elle sur ton gardien ?
       const zg = BARRES.toi.z;
       if (zAvant > zg && b.z <= zg) {
-        if (Math.abs(xA(zg) - this.pos.toi) < B.prise) { this.arret(); return; }
+        if (Math.abs(xA(zg) - this.pos.toi) < B.priseToi) { this.arret(); return; }   // (V19h : ton gardien, plus large)
       }
       if (b.z <= 0) {
         if (Math.abs(b.x) < B.but / 2) this.butRemi(Math.abs(b.x) > B.but / 2 * B.gamelleBord && Math.random() < B.gamelle);
@@ -456,7 +456,7 @@ export class RemiBaby extends BossScene {
     }
     const g = this.g.clear(), ga = this.gAvant.clear();
     // de loin à près : barres de Rémi, balle, puis ton gardien devant (dans gAvant)
-    const ordre = [['gar', 0xc0392b], ['def', 0xc0392b], ['att', 0xc0392b]];
+    const ordre = [['gar', 0xe53935], ['def', 0xe53935], ['att', 0xe53935]];
     const bz = this.balle ? this.balle.z : -1;
     let balleDessinee = false;
     for (const [nom, coul] of ordre) {
@@ -528,9 +528,13 @@ export class RemiBaby extends BossScene {
     if (deDos) {   // la poignée sur le côté
       g.fillStyle(0x222222, 1).fillRect(b.x - 6, b.y - 8, 40, 16);
     }
+    // V19h : TON gardien est plus large et TRANSPARENT (on voit la balle et ses joueurs à travers, comme le boxeur de Greg) ;
+    // ceux de Rémi ont un contour blanc et une ombre au sol (on voit où ils sont sur le terrain)
+    const al = deDos ? B.transparenceGardien : 1;
     for (const x of hommes(br, pos)) {
       const pied = proj(x, 0.005, br.z), tete = proj(x, hT + 0.035, br.z), k = pied.k;
-      const largeur = 0.035 * k;
+      const largeur = (deDos ? B.largeurGardien : 0.035) * k;
+      if (!deDos) g.fillStyle(0x000000, 0.4).fillEllipse(pied.x, pied.y, largeur * 2.2, largeur * 0.6);
       if (roulette) {   // la barre tourbillonne : le joueur tourne à toute vitesse
         const s = Math.sin(this.horloge * 40);
         g.fillStyle(coul, 0.9).fillRect(pied.x - largeur / 2, tete.y + (pied.y - tete.y) * (0.5 - 0.5 * Math.abs(s)), largeur, Math.max(3, (pied.y - tete.y) * Math.abs(s)));
@@ -539,10 +543,12 @@ export class RemiBaby extends BossScene {
       }
       // armé : le joueur se lève vers l'arrière (les pieds remontent)
       const yPied = pied.y - arme * (pied.y - tete.y) * 0.55;
-      g.fillStyle(coul, 1).fillRoundedRect(pied.x - largeur / 2, tete.y + 0.02 * k, largeur, yPied - tete.y - 0.02 * k, 3);
-      g.fillStyle(0x111111, 1).fillRect(pied.x - largeur / 2, yPied - 0.012 * k, largeur, 0.012 * k);
-      g.fillStyle(deDos ? 0x3a2a1a : 0xf0c8a0, 1).fillCircle(tete.x, tete.y + 0.012 * k, 0.017 * k);
-      if (deDos) g.fillStyle(0xffffff, 1).fillRect(pied.x - largeur * 0.15, tete.y + 0.045 * k, largeur * 0.3, 0.03 * k);   // numéro dans le dos
+      const corpsY = tete.y + 0.02 * k, corpsH = yPied - tete.y - 0.02 * k;
+      g.fillStyle(coul, al).fillRoundedRect(pied.x - largeur / 2, corpsY, largeur, corpsH, 3);
+      g.lineStyle(deDos ? 3 : 2, 0xffffff, deDos ? 0.9 : 0.85).strokeRoundedRect(pied.x - largeur / 2, corpsY, largeur, corpsH, 3);
+      g.fillStyle(0x111111, al).fillRect(pied.x - largeur / 2, yPied - 0.012 * k, largeur, 0.012 * k);
+      g.fillStyle(deDos ? 0x3a2a1a : 0xf0c8a0, al).fillCircle(tete.x, tete.y + 0.012 * k, 0.017 * k);
+      if (deDos) g.fillStyle(0xffffff, al).fillRect(pied.x - largeur * 0.1, tete.y + 0.045 * k, largeur * 0.2, 0.03 * k);   // numéro dans le dos
     }
   }
 
