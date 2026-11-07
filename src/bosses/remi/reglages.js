@@ -18,19 +18,19 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 export const DIFFICULTES = {
   entrainement: { nom: 'DIABOLO', couleur: '#9fe0ff', texte: 'Pour apprendre : large, lent, Rémi est déjà pompette et le videur ne feinte jamais.',
     temps: 110, densite: 0.65, traverse: 0.7, sonnette: 800,
-    babyVitesse: 0.6, babyLecture: 1.3, babyFeinte: 0, babyBande: 0, babyRoulette: 0.08, babyRate: 0.2, babyFenetre: 1.2, babyReflexe: 0.4, babyGardienRemi: 0.2, babyDefense: 0.15, babyGuide: true, babyAide: 0.5,
+    babyVitesse: 0.6, babyLecture: 1.3, babyFeinte: 0, babyBande: 0, babyRoulette: 0.08, babyRate: 0.2, babyFenetre: 1.2, babyReflexe: 0.4, babyGardienRemi: 0.2, babyDefense: 0.13, babyGuide: true, babyAide: 0.5,
     remiCharge: 0.45, remiPrudent: 0.2, videur: 1.6, feintes: 0, zone: 0.28, visee: 0.65 },
   facile: { nom: 'PANACHÉ', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et ton gardien est un peu aidé.',
     temps: 88, densite: 0.8, traverse: 0.8, sonnette: 730,
-    babyVitesse: 0.75, babyLecture: 1.15, babyFeinte: 0.2, babyBande: 0.1, babyRoulette: 0.12, babyRate: 0.12, babyFenetre: 1.0, babyReflexe: 0.32, babyGardienRemi: 0.25, babyDefense: 0.22, babyGuide: true, babyAide: 0.3,
+    babyVitesse: 0.75, babyLecture: 1.15, babyFeinte: 0.2, babyBande: 0.1, babyRoulette: 0.12, babyRate: 0.12, babyFenetre: 1.0, babyReflexe: 0.32, babyGardienRemi: 0.25, babyDefense: 0.19, babyGuide: true, babyAide: 0.3,
     remiCharge: 0.55, remiPrudent: 0.3, videur: 1.3, feintes: 0.25, zone: 0.22, visee: 0.8 },
   normal: { nom: 'PRESSION', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 70, densite: 1, traverse: 1, sonnette: 650,
-    babyVitesse: 0.95, babyLecture: 1, babyFeinte: 0.35, babyBande: 0.2, babyRoulette: 0.15, babyRate: 0.07, babyFenetre: 0.8, babyReflexe: 0.24, babyGardienRemi: 0.3, babyDefense: 0.3, babyGuide: false, babyAide: 0.1,
+    babyVitesse: 0.95, babyLecture: 1, babyFeinte: 0.35, babyBande: 0.2, babyRoulette: 0.15, babyRate: 0.07, babyFenetre: 0.8, babyReflexe: 0.24, babyGardienRemi: 0.3, babyDefense: 0.26, babyGuide: false, babyAide: 0.1,
     remiCharge: 0.68, remiPrudent: 0.35, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
   champion: { nom: 'CUL SEC', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
-    babyVitesse: 1.15, babyLecture: 0.85, babyFeinte: 0.5, babyBande: 0.3, babyRoulette: 0.2, babyRate: 0.04, babyFenetre: 0.6, babyReflexe: 0.2, babyGardienRemi: 0.27, babyDefense: 0.38, babyGuide: false, babyAide: 0,
+    babyVitesse: 1.15, babyLecture: 0.85, babyFeinte: 0.5, babyBande: 0.3, babyRoulette: 0.2, babyRate: 0.04, babyFenetre: 0.6, babyReflexe: 0.2, babyGardienRemi: 0.27, babyDefense: 0.33, babyGuide: false, babyAide: 0,
     remiCharge: 0.84, remiPrudent: 0.85, videur: 0.75, feintes: 0.65, zone: 0.1, visee: 1.3 },
 };
 
@@ -114,6 +114,9 @@ export const BABY = {
   gamelleBord: 0.6,       // un but à plus de cette part du demi-but depuis le centre peut faire GAMELLE...
   gamelle: 0.35,          // ... avec cette chance
   appelDuree: 1.6,        // temps pour crier « ROULETTE ! » après son but (s)
+  // V19n : chaque but que TU marques (une pinte pour Rémi) ralentit sa défense et son gardien de cette part (mini 50 %)
+  defBue: 0.12, garBue: 0.1,
+  ralenti: 0.25, ralentiDuree: 0.45, // RALENTI quand tu marques : vitesse du jeu et durée (s)
   // V19m EFFET BOURRÉ (chaque but encaissé = une pinte ; les effets plafonnent à ivresseMax pintes)
   ivresseMax: 5,
   titubeVisee: 0.035,     // ta visée ondule de ± ce nombre de rad par pinte

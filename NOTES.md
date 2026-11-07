@@ -329,6 +329,12 @@
   `ivresseRond` 3), HOQUETS dès 2 pintes (toutes les 5-9 s, plus souvent ivre : son « hips », secousse, gardien et visée qui
   sautent : `hoquetGardien`, `hoquetVisee`), bords de l'écran assombris (vignette WebGL `vignetteBue`, ignorée sans WebGL),
   écran qui penche plus. Dénoncer une roulette rend une pinte.
+- V19n (retours : pas de sensation de tir ni de but ; dur de marquer au début quand Rémi n'a pas bu) : TIR = éclat au
+  pied du gardien, petit coup de zoom, TRAÎNÉE derrière la balle (jaune en ÉCLAIR). BUT (`celebrer()`, état `filet`) :
+  la balle file au fond du filet qui se creuse et vibre, RALENTI (`ralenti` 0,25 pendant `ralentiDuree` 0,45 s), flash,
+  zoom x1,3 vers la cage puis retour, 46 confettis, foule ; but de Rémi : grosse secousse, balle au fond de ton but.
+  RÉMI BOURRÉ : chaque but que tu marques ralentit sa défense (`defBue` 12 %) et son gardien (`garBue` 10 %), mini 50 %.
+  Début plus doux : `babyDefense` 0,13 / 0,19 / 0,26 / 0,33. (Caméra : eases « Quad.easeOut », pas « Quad.Out ».)
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
