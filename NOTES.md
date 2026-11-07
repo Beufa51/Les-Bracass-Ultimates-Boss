@@ -308,6 +308,14 @@
   vert, et sans limite de temps on restait bloqué). CUL SEC : son gardien 0,2 m/s, réflexe 0,2 s. Vert plus sûr : +1 cm
   autour de ses défenseurs, +0,12 s de marge sur son gardien. Bot qui suit le guide : 5-0 en ~20 s dans les 3 difficultés,
   aucun tir vert arrêté.
+- V19k (demande : but de Rémi plus lisible ; visée « façon billard », la visée est le plus important pour le fun) :
+  CAGE dessinée au bout de la table (fond sombre, filet, poteaux et barre blancs ; lueur verte quand ton tir est bon).
+  VISÉE BILLARD : balle arrêtée = ton gardien ne bouge plus, ◀ ▶ TOURNENT la visée (`viseeMax` 0,55 rad, `vitesseVisee`
+  0,45 rad/s, départ doux). La ligne suit le vrai trajet AVEC REBONDS sur les bandes (`plier` / `xSur`), points qui
+  défilent, rond d'arrivée sur la ligne de but (vert = but, jaune = son gardien peut l'avoir, rouge = contré / à côté).
+  Guide : « ◀ TOURNE LA VISÉE / TOURNE LA VISÉE ▶ » (flèche jaune). Toucher TIR / ESPACE = tir dans la visée ; glisser
+  vers le haut = tir à l'angle du geste. Bot-guide : 5-0 en ~22 s dans les 3 difficultés (angles petits : tirer vite
+  passe souvent avant que la défense se replace ; à durcir si trop facile au doigt).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

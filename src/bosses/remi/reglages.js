@@ -106,6 +106,8 @@ export const BABY = {
   eclairReflexe: 0.08,    // ... et son gardien réagit ce temps plus tard (s)
   riposteVitesse: 2.2,    // ta riposte (m/s)
   priseGardienRemi: 0.75, // son gardien arrête la balle à moins de B.prise x ce chiffre (ses joueurs : x 0,85)
+  viseeMax: 0.55,         // V19k BILLARD : angle max de la visée (rad ; assez pour un tir en bande)
+  vitesseVisee: 0.45,     // vitesse à laquelle ◀ ▶ tournent la visée (rad/s, avec le même départ doux que le gardien)
   biais: 0.12,            // angle max de la riposte en glissant en biais (rad)
   vitesseBarresRemi: 0.2, // ses barres d'attaque et de défense se replacent devant ta balle à cette vitesse (m/s)
   retardRemi: 3,          // vitesse à laquelle Rémi « voit » où est ta balle (plus petit = il réagit plus en retard)
