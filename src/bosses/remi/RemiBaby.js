@@ -29,6 +29,9 @@ function proj(x, y, z) {
   const p = F / (z - CAM_Z);
   return { x: CX + x * p, y: HORIZON + (CAM_H - y) * p, k: p };
 }
+// les 2 gros boutons (dessinés) et leurs zones de toucher, bien plus grandes (tout le bas de l'écran, sur les côtés)
+const BOUTON_G = { x: 92, y: 446, r: 72 }, BOUTON_D = { x: LARGEUR - 92, y: 446, r: 72 };
+const ZONE_BOUTONS = { y: 300, g: 250, d: LARGEUR - 250 };
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 // les barres : z (m depuis ton but), nombre de joueurs, écart, débattement, à qui
 const BARRES = {
@@ -49,7 +52,7 @@ export class RemiBaby extends BossScene {
     this.pos = { toi: 0, att: 0, def: 0, gar: 0 };      // position de chaque barre (m)
     this.cible = 0;                                     // où ton doigt veut le gardien
     this.balle = null; this.tir = null; this.roulette = null; this.appelPossible = 0;
-    this.pose = 'face'; this.poseFin = 0; this.penche = 0;
+    this.pose = 'face'; this.poseFin = 0; this.penche = 0; this.dir = 0; this.tenu = 0;
     this.decor();
     this.gRemi = this.add.graphics().setDepth(3);
     this.g = this.add.graphics().setDepth(5);
@@ -63,9 +66,9 @@ export class RemiBaby extends BossScene {
     const t = estTactile();
     this.afficherIntro('RÉMI - Le babyfoot', [
       `Premier à ${B.buts} buts. Tu tiens le GARDIEN (vu de dos), Rémi attaque.`,
-      `${t ? 'Pose le doigt N\'IMPORTE OÙ et glisse' : '◀ ▶'} à gauche / droite : ton gardien suit (comme un pavé tactile)`,
+      `${t ? 'GROS BOUTONS ◀ ▶ en bas (maintiens)' : '◀ ▶'} : ton gardien glisse à gauche / à droite`,
       'Rémi se PENCHE du côté où il va tirer... sauf quand il feinte !',
-      `Balle arrêtée : RIPOSTE vite (${t ? 'toucher bref ou glisser vers le haut' : 'ESPACE'}) entre ses joueurs`,
+      `Balle arrêtée : RIPOSTE vite (${t ? 'toucher le milieu de l\'écran' : 'ESPACE'}) entre ses joueurs (en biais : garde ◀ ou ▶)`,
       'GAMELLE (rentre et ressort) = but + un point retiré à l\'autre',
       `ROULETTE interdite : si sa barre tourbillonne et marque, ${t ? 'touche RÉMI' : 'appuie sur Z'} = but annulé`,
       'Chaque but encaissé, tu bois : ça tangue...',
@@ -110,30 +113,47 @@ export class RemiBaby extends BossScene {
   }
 
   // ---------- commandes ----------
-  // V19c MANIABILITÉ (retour : « je n'arrive pas à bien diriger le gardien sur mobile ») : le doigt est un PAVÉ TACTILE.
-  // Pose-le où tu veux (sous Rémi) et glisse à gauche / droite : le gardien bouge d'autant (B.glisse m par pixel),
-  // sans jamais sauter sous le doigt ni être caché par lui. La poignée en bas de l'écran montre où il va.
+  // V19d MANIABILITÉ (retour : le glissé « pavé tactile » n'allait pas, choix de Fabien) : DEUX GROS BOUTONS ◀ ▶ en bas,
+  // sous les pouces : on MAINTIENT, le gardien glisse (il accélère un peu si on garde appuyé). Plusieurs doigts à la fois.
+  // Le reste de l'écran : toucher bref = TIR droit (ou en biais du côté du bouton tenu), glisser vers le haut = tir en biais ;
+  // toucher Rémi = « ROULETTE ! ».
+  dansBouton(p) { return p.y > ZONE_BOUTONS.y && (p.x < ZONE_BOUTONS.g ? -1 : p.x > ZONE_BOUTONS.d ? 1 : 0); }
+
   installerDoigt() {
+    this.input.addPointer(2);   // les deux pouces (+ un doigt pour tirer)
     this.input.on('pointerdown', (p) => {
       if (this.termine) return;
+      if (this.dansBouton(p)) return;   // les boutons sont lus à chaque image (pasGardien)
       if (this.etat !== 'intro' && p.y < proj(0, 0, L).y - 20) { this.appelRoulette(); return; }   // toucher Rémi = « ROULETTE ! »
-      this.doigt = { x: p.x, y: p.y, t: this.horloge, dernierX: p.x };
+      this.doigt = { x: p.x, y: p.y, t: this.horloge, id: p.id };
     });
     this.input.on('pointermove', (p) => {
       const d = this.doigt;
-      if (!p.isDown || !d) return;
-      this.cible = Phaser.Math.Clamp(this.cible + (p.x - d.dernierX) * B.glisse, -B.course, B.course);
-      d.dernierX = p.x;
+      if (!p.isDown || !d || p.id !== d.id) return;
       if (this.etat === 'riposte' && d.y - p.y > 45) {   // glissé vers le haut : tir (un peu en biais selon le geste)
         const dx = p.x - d.x, dy = d.y - p.y;
         this.riposter(Phaser.Math.Clamp(dx / dy, -1, 1) * B.biais); this.doigt = null;
       }
     });
     this.input.on('pointerup', (p) => {
-      const d = this.doigt; this.doigt = null;
-      if (!d || this.etat !== 'riposte') return;
-      if (this.horloge - d.t < 0.25 && Math.hypot(p.x - d.x, p.y - d.y) < 22) this.riposter(0);   // toucher bref : tir droit
+      const d = this.doigt;
+      if (!d || p.id !== d.id) return;
+      this.doigt = null;
+      if (this.etat !== 'riposte') return;
+      if (this.horloge - d.t < 0.35 && Math.hypot(p.x - d.x, p.y - d.y) < 30) this.riposter(this.dir * B.biais * 0.7);   // toucher bref : tir
     });
+  }
+
+  // direction tenue : boutons à l'écran (tous les doigts posés) ou flèches du clavier
+  lireDirection() {
+    let g = this.touches.gauche.isDown, d = this.touches.droite.isDown;
+    for (const p of this.input.manager.pointers) {
+      if (!p.isDown) continue;
+      const c = this.dansBouton(p);
+      if (c < 0) g = true; else if (c > 0) d = true;
+    }
+    this.tenuG = g; this.tenuD = d;
+    return (d ? 1 : 0) - (g ? 1 : 0);
   }
 
   // ---------- Rémi : engagement, préparation (lecture), tir ----------
@@ -353,7 +373,7 @@ export class RemiBaby extends BossScene {
       if (this.etat === 'riposte') {
         this.balle.x = this.pos.toi + 0.03; this.balle.z = BARRES.toi.z + 0.05;   // un peu de côté : visible derrière ton gardien
         this.fenetre -= dt;
-        if (vientDAppuyer(this.touches.espace)) this.riposter(0);
+        if (vientDAppuyer(this.touches.espace)) this.riposter(this.dir * B.biais * 0.7);
         else if (this.fenetre <= 0) { bulle(this, 'Trop lent ! Rémi récupère.', '#ff6b6b', 1.2, 488); this.suivant(0.5); }
       }
       if (vientDAppuyer(this.touches.z)) this.appelRoulette();
@@ -362,9 +382,12 @@ export class RemiBaby extends BossScene {
   }
 
   pasGardien(dt) {
-    const T = this.touches;
-    if (T.gauche.isDown) this.cible = Math.max(-B.course, this.cible - B.vitesseGardien * dt);
-    if (T.droite.isDown) this.cible = Math.min(B.course, this.cible + B.vitesseGardien * dt);
+    // les boutons (ou les flèches) : le gardien glisse, un peu plus vite si on garde appuyé
+    this.dir = this.lireDirection();
+    this.tenu = this.dir ? (this.tenu || 0) + dt : 0;
+    const v = B.vitesseBoutons * Math.min(1, B.depart + this.tenu / B.montee * (1 - B.depart));
+    this.cible = Phaser.Math.Clamp(this.cible + this.dir * v * dt, -B.course, B.course);
+    if (!this.dir) this.cible = Phaser.Math.Clamp(this.cible, this.pos.toi - 0.01, this.pos.toi + 0.01);   // lâché : il s'arrête net
     // l'alcool : le gardien tremble et traîne un peu
     const tremble = this.ivresse * B.trembleBu * Math.sin(this.horloge * 7.3);
     const vmax = B.vitesseGardien * (1 - Math.min(0.4, this.ivresse * 0.05));
@@ -445,10 +468,15 @@ export class RemiBaby extends BossScene {
     ga.lineStyle(4, 0xcfd3d8, 0.9).lineBetween(CX - RAIL, yR, CX + RAIL, yR);
     ga.fillStyle(0x2f6fd6, 0.5).fillCircle(xG, yR, 7);
     ga.fillStyle(this.doigt ? 0xffd84a : 0xffffff, 1).fillRoundedRect(xP - 22, yR - 9, 44, 18, 9);
-    if (this.horloge < (this.aideDoigt ?? 0)) {
-      const a = 0.6 + 0.4 * Math.sin(this.horloge * 6);
-      ga.fillStyle(0xffd84a, a);
-      ga.fillTriangle(CX - RAIL - 40, yR, CX - RAIL - 26, yR - 9, CX - RAIL - 26, yR + 9).fillTriangle(CX + RAIL + 40, yR, CX + RAIL + 26, yR - 9, CX + RAIL + 26, yR + 9);
+    // les 2 gros boutons ◀ ▶ (ils s'allument quand on appuie ; ils clignotent les premières secondes)
+    if (this.etat !== 'intro') {
+      const clign = this.horloge < (this.aideDoigt ?? 0) && Math.floor(this.horloge * 4) % 2 === 0;
+      for (const [bt, tenu, s] of [[BOUTON_G, this.tenuG, -1], [BOUTON_D, this.tenuD, 1]]) {
+        ga.fillStyle(0x000000, tenu ? 0.5 : 0.28).fillCircle(bt.x, bt.y, bt.r);
+        ga.fillStyle(0x2f6fd6, tenu ? 0.55 : clign ? 0.35 : 0.12).fillCircle(bt.x, bt.y, bt.r - 6);
+        ga.lineStyle(4, 0x9fc4ff, tenu ? 1 : 0.7).strokeCircle(bt.x, bt.y, bt.r);
+        ga.fillStyle(0xffffff, tenu ? 1 : 0.85).fillTriangle(bt.x + s * 30, bt.y, bt.x - s * 18, bt.y - 30, bt.x - s * 18, bt.y + 30);
+      }
     }
     // fenêtre de riposte
     if (this.etat === 'riposte') {

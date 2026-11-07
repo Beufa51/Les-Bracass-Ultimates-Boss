@@ -269,6 +269,12 @@
   poignée jaune = où va le gardien, rond bleu = où il est ; flèches qui clignotent les 6 premières secondes), AIDE par
   difficulté `babyAide` (0,5 / 0,3 / 0,1 / 0 : le gardien est attiré vers l'endroit où passe la balle). Répliques en
   bas (y 488). Réglages développeur : buts, sensibilité, vitesse du gardien, vitesse des tirs, feintes, aide.
+- V19d (retour : « la maniabilité n'est pas bonne comme ça » ; choix de Fabien : gros boutons) : le pavé tactile est
+  RETIRÉ. DEUX GROS BOUTONS ◀ ▶ dessinés en bas à gauche / à droite (zones de toucher : tout le bas de l'écran au-delà
+  de 250 px des bords, sous y 300 ; plusieurs doigts : `addPointer(2)`) : on MAINTIENT, le gardien glisse
+  (`BABY.vitesseBoutons` 1,1 m/s, part à 45 % et atteint la pleine vitesse en 0,25 s : petites touches = petits pas),
+  lâché = il s'arrête net. Ils clignotent les 6 premières secondes. TIR : toucher bref au milieu de l'écran (en biais si
+  ◀ ou ▶ est tenu) ou glisser vers le haut ; ESPACE au clavier. La poignée du bas reste (où est le gardien).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

@@ -25,7 +25,7 @@ export default {
     { groupe: 'VÉLO', nom: 'Recharge de la sonnette (s)', objet: VELO, champ: 'sonnette', pas: 0.1, min: 0.1, max: 3 },
     { groupe: 'VÉLO', nom: 'Hauteur du saut (vitesse de départ)', objet: VELO, champ: 'saut', pas: 20, min: 300, max: 900 },
     { groupe: 'BABYFOOT', nom: 'Buts pour gagner', objet: BABY, champ: 'buts', pas: 1, min: 1, max: 9 },
-    { groupe: 'BABYFOOT', nom: 'Sensibilité du doigt (m par px)', objet: BABY, champ: 'glisse', pas: 0.0001, min: 0.0003, max: 0.002 },
+    { groupe: 'BABYFOOT', nom: 'Vitesse des boutons ◀ ▶ (m/s)', objet: BABY, champ: 'vitesseBoutons', pas: 0.1, min: 0.3, max: 3 },
     { groupe: 'BABYFOOT', nom: 'Vitesse de ton gardien (m/s)', objet: BABY, champ: 'vitesseGardien', pas: 0.1, min: 0.6, max: 4 },
     { groupe: 'PORTE', nom: 'Solidité de la porte', objet: PORTE, champ: 'solidite', pas: 250, min: 1000, max: 10000 },
     { groupe: 'PORTE', nom: 'Vitesse de charge', objet: PORTE, champ: 'charge', pas: 0.05, min: 0.1, max: 1.5 },

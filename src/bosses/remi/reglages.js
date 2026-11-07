@@ -88,7 +88,9 @@ export const BABY = {
   largeur: 0.68, longueur: 1.0, balle: 0.02, but: 0.24,
   course: 0.13,           // débattement de ton gardien (m de chaque côté)
   prise: 0.045,           // la balle est arrêtée à moins de ça du centre d'un joueur
-  glisse: 0.0008,         // V19c : PAVÉ TACTILE : le gardien bouge de ce nombre de m par pixel glissé (0,0008 : tout le but en ~325 px)
+  vitesseBoutons: 1.1,    // V19d BOUTONS ◀ ▶ : vitesse du gardien quand on maintient (m/s ; tout le but en ~0,25 s)
+  depart: 0.45,           // ... il part à cette part de la vitesse...
+  montee: 0.25,           // ... et atteint la pleine vitesse en ce temps (s) : petites touches = petits pas précis
   vitesseGardien: 2.2,    // vitesse max de ton gardien (m/s) (V19c : 1,2 → 2,2 : il colle mieux au doigt)
   prep: [0.9, 1.4],       // durée de la préparation de Rémi (s), x babyLecture de la difficulté
   feinteBascule: 0.65,    // feinte : il change de côté à cette part de la préparation
