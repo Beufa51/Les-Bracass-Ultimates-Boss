@@ -129,6 +129,8 @@ export class RemiPorte extends BossScene {
     etiquettesTactiles(VIDES);
     if (qui === 'toi') {
       this.doigt = false;
+      // V19z (bug : le toucher qui ferme les règles lançait un coup) : on attend que le doigt / ESPACE soit levé avant de charger
+      this.attendreRelache = true;
       this.consigne.setVisible(true);
       annonce(this, 'À TOI !', '#7fff7f', 0.6);
     } else {

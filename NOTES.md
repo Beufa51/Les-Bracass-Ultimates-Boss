@@ -409,6 +409,9 @@
   10 SECONDES (compte à rebours dès 5 s, `regle10`) ; B5 BILLARD (but en bande : Rémi boit 2 pintes) et CULOT (but sur
   le jaune), `POINTS.babyBeauCoup` ; B6 intro en 3 lignes + 1re roulette / 1re balle folle expliquées. Bot :
   0 problème ; bot humain PRESSION : 5-2 en ~2 min, Rémi marque 5 tirs sur 18.
+- V19z : BUG PORTE corrigé (le toucher qui ferme les règles lançait un coup : au début de ton tour, on attend que le
+  doigt / ESPACE soit levé, `attendreRelache`). Retour « trop complexe pour pas grand-chose » : AUDIT DE COMPLEXITÉ
+  `propositions/remi_audit_complexite.md` (porte 14 règles → 5, babyfoot 16 → 4 ; en attente de validation de Fabien).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
