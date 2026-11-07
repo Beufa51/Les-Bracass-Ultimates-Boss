@@ -30,7 +30,7 @@ import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { texte } from '../../core/ui.js';
 import { jouerSon, couperSons } from '../../core/ressources.js';
 import { jouerMusique, arreterMusique, placerMusique, tempsMusique } from '../../core/musique.js';
-import { disposition, allumerBouton, eteindreBoutons, estTactile, rectBouton, voileNoirTactile } from '../../core/tactile.js';
+import { disposition, allumerBouton, eteindreBoutons, estTactile, rectBouton, voileNoirTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { onomatopee, lignesImpact } from './effets.js';
 import { REGLAGES as R } from './reglages.js';
 
@@ -44,8 +44,14 @@ const P = 600;   // profondeur d'affichage (au-dessus du terrain et du HUD, sous
 // sur scène : Kédric en grand, debout sur l'estrade (entre les couloirs) ; toi de dos, au premier plan, en bas au milieu
 const KED = { x: 480, pieds: 392, hauteur: 335 };
 const TOI = { x: 480, pieds: HAUTEUR + 34, zoom: 0.85 };
-// les couloirs sans écran tactile (sur téléphone : au-dessus des boutons, voir calculerCouloirs)
+// les couloirs : les flèches tombent PILE sur les ronds fléchés en bas (les touches à presser)
 const COULOIRS = { x: { gauche: 105, droite: 215, haut: 745, bas: 855 }, cibleY: 455, largeur: 96, haut: 84 };
+// sur TÉLÉPHONE : les mêmes, en plus gros ; on TAPE directement sur l'écran (les boutons de la page sont cachés :
+// ils débordaient sur les bandes noires, pas de la même taille, et les flèches tombaient à côté — retour de Fabien)
+const COULOIRS_TEL = { x: { gauche: 85, droite: 235, haut: 725, bas: 875 }, cibleY: 440, largeur: 128, haut: 84 };
+const CACHER_BOUTONS = { gauche: null, droite: null, haut: null, bas: null, espace: null, z: null, x: null };
+// les cadres (invisibles) des boutons de la page restent posés sur le jeu : on les rend « traversables » pendant le battle
+function traverser(actif) { document.querySelectorAll('.tactile.gauche, .tactile.droite').forEach(el => { el.style.pointerEvents = actif ? 'none' : ''; }); }
 // le KAMÉHAMÉHA du public : un RAIL fin avec une GRANDE AIGUILLE pointée sur la boule du point
 // de choc (elle glisse d'un côté ou de l'autre au fil des réussites). Position : this.yJauge —
 // tout en bas s'il y a la place, sinon EN HAUT (sur téléphone les boutons occupent le bas) :
@@ -113,13 +119,26 @@ export class Showtime {
     // la musique part du début du fichier pendant le décompte : silence pendant l'annonce,
     // et le silence du fichier (Cha-La : 8 s) fait l'attente — comme un vrai show
     disposition('danse');
-    this.surPause = () => { eteindreBoutons(); disposition('normale'); couperSons(false); voileNoirTactile(false); this.s.cameras.main.resetFX(); };
-    this.surReprise = () => { disposition('danse'); this.calculerCouloirs(); };
+    this.tapes = {};
+    if (estTactile()) {
+      etiquettesTactiles(CACHER_BOUTONS); traverser(true);
+      scene.input.addPointer(2);   // jusqu'à 3 doigts (flèches doublées)
+      this.surToucher = (p) => {
+        if (this.termine || scene.scene.isPaused()) return;
+        // le couloir le plus proche du doigt (tout l'écran compte : gauche ◀ ▶, droite ▲ ▼)
+        let mieux = null, dmin = 1e9;
+        for (const n of DIRS) { const d = Math.abs(p.x - this.c.x[n]); if (d < dmin) { dmin = d; mieux = n; } }
+        this.tapes[mieux] = true;
+      };
+      scene.input.on('pointerdown', this.surToucher);
+    }
+    this.surPause = () => { eteindreBoutons(); traverser(false); disposition('normale'); couperSons(false); voileNoirTactile(false); this.s.cameras.main.resetFX(); };
+    this.surReprise = () => { disposition('danse'); if (estTactile()) { etiquettesTactiles(CACHER_BOUTONS); traverser(true); } this.calculerCouloirs(); };
     scene.events.on('pause', this.surPause); scene.events.on('resume', this.surReprise);
     // ABANDON depuis la pause pendant le battle : detruire() ne sera jamais appelé (seule la fin l'appelle).
     // Au shutdown de la scène, on éteint au moins les boutons (sinon ils restent allumés au hub) —
     // sans relancer la musique du match : le shutdown s'en occupe déjà, lui.
-    scene.events.once('shutdown', () => { eteindreBoutons(); couperSons(false); voileNoirTactile(false); });
+    scene.events.once('shutdown', () => { traverser(false); eteindreBoutons(); couperSons(false); voileNoirTactile(false); });
     this.annonce();
   }
 
@@ -128,6 +147,8 @@ export class Showtime {
   detruire() {
     this.el.forEach(o => o.destroy()); this.viderNotes(); this.viderAnnonce(); this.el = [];
     this.s.events.off('pause', this.surPause); this.s.events.off('resume', this.surReprise);
+    if (this.surToucher) this.s.input.off('pointerdown', this.surToucher);
+    traverser(false);
     couperSons(false); voileNoirTactile(false);   // par sécurité : sons ET boutons reviennent toujours à la fin du battle
     eteindreBoutons();
     disposition('separee');   // la disposition du match de Kédric
@@ -315,23 +336,9 @@ export class Showtime {
 
   // Les couloirs : sur téléphone, juste au-dessus des boutons ◀ ▶ ▲ ▼ (la flèche tombe jusqu'à la touche à presser)
   calculerCouloirs() {
-    this.c = COULOIRS;
-    const ecran = this.s.game.canvas.getBoundingClientRect();
-    const rects = DIRS.map(n => rectBouton(n));
-    if (!ecran.width || !rects.every(r => r)) return;
-    const kx = LARGEUR / ecran.width, ky = HAUTEUR / ecran.height;
-    const largeur = Math.min(110, Math.min(...rects.map(r => r.width * kx)) * 0.8);
-    const x = {};
-    DIRS.forEach((n, i) => { x[n] = Phaser.Math.Clamp((rects[i].left + rects[i].width / 2 - ecran.left) * kx, largeur / 2 + 4, LARGEUR - largeur / 2 - 4); });
-    const hautBoutons = Math.min(...rects.map(r => (r.top - ecran.top) * ky));
-    // la cible est AU MILIEU du bouton : la flèche tombe jusque SUR la touche à presser (couloirs plus longs = on la voit venir)
-    const milieuBoutons = Math.min(...rects.map(r => (r.top + r.height / 2 - ecran.top) * ky));
-    this.c = { x, cibleY: Phaser.Math.Clamp(milieuBoutons, 240, HAUTEUR - 30), largeur, haut: 84 };
-    // sur téléphone, les boutons occupent le bas de l'écran : la jauge remonte EN HAUT (elle ne
-    // doit jamais recouvrir les flèches, les touches à presser ni les boutons)
-    // sur TÉLÉPHONE les boutons occupent le bas : SEULEMENT LÀ la jauge remonte en haut.
-    // Sur ORDINATEUR (pas d'écran tactile), le rail reste TOUT EN BAS, bien petit, sous les flèches.
-    this.yJauge = estTactile() && hautBoutons > HAUTEUR * 0.5 ? 40 : HAUTEUR - 12;
+    this.c = estTactile() ? COULOIRS_TEL : COULOIRS;
+    for (const n of DIRS) this.touchesC[n].setFontSize(estTactile() ? 56 : 40);
+    this.yJauge = HAUTEUR - 12;   // le rail du public tout en bas, sous les ronds fléchés
     this.etiquettesJauge[0].setPosition(24, this.yJauge);
     this.etiquettesJauge[1].setPosition(LARGEUR - 24, this.yJauge);
     this.etiquettesJauge[2].setPosition(LARGEUR / 2, this.yJauge - 16);
@@ -460,6 +467,8 @@ export class Showtime {
   // ---------- la boucle ----------
   maj(dt, e) {
     if (this.termine) { this.afficher(); return; }
+    for (const n of DIRS) if (this.tapes[n]) { e = { ...e, [n]: true }; }
+    this.tapes = {};
     this.horloge(dt);
     if (this.phase === 'intro') {
       if (this.T >= S.introMini && this.invite.alpha === 0) this.s.tweens.add({ targets: this.invite, alpha: { from: 1, to: 0.35 }, duration: 500, yoyo: true, repeat: -1 });
@@ -704,8 +713,7 @@ export class Showtime {
     const actif = ['annonce', 'jeu', 'fin'].includes(this.phase);
     // sur TÉLÉPHONE, les gros boutons ◀ ▶ ▲ ▼ (qui s'allument) SONT les touches : on ne redessine pas de ronds
     // fléchés par-dessus (ils faisaient doublon, décalés des boutons — retour de Fabien V93)
-    const surTel = estTactile();
-    for (const n of DIRS) this.touchesC[n].setVisible(actif && !surTel);
+    for (const n of DIRS) this.touchesC[n].setVisible(actif);
     if (!actif) { this.notes.forEach(n => n.objet.setVisible(false)); this.fumeeG.clear(); this.avisPiege.setVisible(false); return; }
     const C = this.c, d = this.duree, w = C.largeur, v = (C.cibleY - C.haut) / PISTE.chute;   // la vitesse suit la hauteur des couloirs : même temps de chute partout
     const TL = this.T - this.debutManche;
@@ -724,7 +732,7 @@ export class Showtime {
       g.fillStyle(0x000000, 0.45); g.fillRoundedRect(x - w / 2, C.haut, w, C.cibleY - C.haut + w / 2, 14);
       const allume = cible && cible.nom === n;
       const coul = allume ? Phaser.Display.Color.HexStringToColor(cible.couleur).color : Phaser.Display.Color.HexStringToColor(COULEURS[n]).color;
-      if (!surTel) {
+      {
         g.fillStyle(coul, allume ? 0.25 + 0.35 * cible.force : 0.1 + 0.15 * boum); g.fillCircle(x, C.cibleY, w * 0.45);
         g.lineStyle(allume ? 6 : 4, coul, allume ? 1 : 0.8); g.strokeCircle(x, C.cibleY, w * 0.45 + 3 * boum);
       }

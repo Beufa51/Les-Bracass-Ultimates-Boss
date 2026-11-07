@@ -54,7 +54,9 @@ export const REGLAGES = {
   //  vol : durée du vol ; hauteur : en yards ; choix : à ce moment du vol (fraction) le vent décide du couloir final ;
   //  parfait / bien : écart (s) entre ton ▲ et l'arrivée du ballon pour une réception PARFAITE (vitesse 3 + Ghost) / BIEN (vitesse 2) ;
   //  rebond : temps perdu à ramasser un ballon raté
-  envoi: { depart: 5, vol: 2.8, hauteur: 4, choix: 0.6, parfait: 0.12, bien: 0.3, rebond: 0.9 },
+  //  hauteurMains : hauteur (yards) où le ballon finit son vol = tes mains bras levés ; mains : la pose « bras levés »
+  //  (le ballon dans les mains) s'affiche quand le ballon est à moins de 'mains' s de toi
+  envoi: { depart: 5, vol: 2.8, hauteur: 4, choix: 0.6, parfait: 0.12, bien: 0.3, rebond: 0.9, hauteurMains: 2.7, mains: 0.2 },
   points: 7,             // touchdown (transformation comprise)
   apresAction: 1.4,      // pause après un plaquage
   // ---------- Course ----------

@@ -1253,7 +1253,10 @@ export class KedricCourse extends BossScene {
     const enShow = !!this.show;
     this.sprJ.setVisible(!enShow); this.ombreJ.setVisible(!enShow);
     // au coup d'envoi, le saut devient la RÉCEPTION (bras levés vers le ballon)
-    const saut = this.etat === 'envoi' && this.estIllustre('kedric_toi_reception') ? 'reception' : 'saut';
+    // (seulement quand le ballon ARRIVE dans ton couloir : l'image a déjà le ballon dans les mains, sinon on en verrait deux)
+    const E0 = this.envoi;
+    const saut = this.etat === 'envoi' && E0 && E0.rebond <= 0 && E0.t >= E0.vol - R.envoi.mains && Math.abs(j.x - E0.voie) < 0.5
+      && this.estIllustre('kedric_toi_reception') ? 'reception' : 'saut';
     let pose = j.poseTemps > 0 && j.pose ? j.pose : (j.saut > 0 ? saut : j.rotation > 0 ? 'rotation' : 'course');
     const hauteur = j.saut > 0 ? Math.sin(Math.PI * (1 - j.saut / R.saut.duree)) * 80 : 0;
     const cle = 'kedric_toi_' + pose;
@@ -1311,10 +1314,10 @@ export class KedricCourse extends BossScene {
     const E = this.envoi;
     if (E && E.rebond <= 0 && this.etat === 'envoi') {
       const k = Math.min(1, E.t / E.vol), d = E.loin * (1 - k);
-      const z = 4 * E.hauteur * k * (1 - k) + 1.4 * k;
+      const z = 4 * E.hauteur * k * (1 - k) + R.envoi.hauteurMains * k;   // il finit sa course À HAUTEUR DES MAINS (bras levés)
       const e = echelle(d);
-      this.ballon.setVisible(true).setPosition(ecranX(E.voie, d), ecranY(d) - z * 107 * e).setScale(Math.max(0.9, e * 2.2));
-      this.ombreBallon.setVisible(true).setPosition(ecranX(E.voie, d), ecranY(d)).setScale(Math.max(0.2, e * 1.5));
+      this.ballon.setVisible(this.sprJ.texture.key !== 'kedric_toi_reception').setPosition(ecranX(E.voie, d), ecranY(d) - z * 107 * e).setScale(Math.max(0.9, e * 2.2));
+      this.ombreBallon.setVisible(this.ballon.visible).setPosition(ecranX(E.voie, d), ecranY(d)).setScale(Math.max(0.2, e * 1.5));
       // cercle de timing : il se resserre sur la cible ; BLEU quand il faut appuyer sur ▲ (blanc pile au bon moment)
       const reste = E.vol - E.t;
       const bleu = reste <= R.envoi.bien, pile = Math.abs(reste) <= R.envoi.parfait;

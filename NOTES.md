@@ -7,6 +7,10 @@
   touchdown), battle calé de justesse (rappel élastique `showtime.rappel`), nouveau rang et défis, courses 2-3 plus dures,
   ENTRAÎNEMENT sans record ni défis. Images n°3 (défenseur qui court, 4 images) et n°4 (ta réception au coup d'envoi)
   REÇUES : `outils/kedric/preparer_nouvelles.py` → `kedric_def_course4.png`, `kedric_toi_reception.png`.
+  Ballon du coup d'envoi : finit à hauteur des mains (`envoi.hauteurMains`), pose bras levés seulement les dernières
+  0,2 s (`envoi.mains`, l'image a déjà le ballon : on cache le vrai). BATTLE SUR TÉLÉPHONE : les boutons de la page sont
+  CACHÉS (ils débordaient sur les bandes noires, flèches à côté) : ronds fléchés dans le jeu (`COULOIRS_TEL`), on TAPE
+  l'écran (couloir le plus proche du doigt, 3 doigts max) ; cadres des boutons rendus traversables (`traverser`).
 - **Beufa** : TERMINÉ — infiltration façon Metal Gear (4 pièces) puis QUIZ dans son bureau (codec, Psycho Mantis,
   rideau, 60 questions, GAME OVER façon MGS, classement BIG BOSS → CHICKEN, médaille = badge du hub, meilleur rang
   sauvegardé). Audit final : `propositions/beufa_audit_final.md`.
