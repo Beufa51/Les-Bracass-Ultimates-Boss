@@ -74,6 +74,12 @@ export const MANIFESTE = {
     remi_boit: son('boit', 200, 0.3),
     remi_foule: son('foule', 300, 0.4),
     remi_tape: son('tape', 400, 0.03),
+    // V19p : sons du BABYFOOT (outils/remi/generer_sons.py)
+    remi_baby_clac: son('baby_clac', 950, 0.04),
+    remi_baby_frappe: son('baby_frappe', 620, 0.05),
+    remi_baby_but: son('baby_but', 140, 0.4),
+    remi_baby_roulette: son('baby_roulette', 200, 0.5),
+    remi_baby_engage: son('baby_engage', 1000, 0.1),
     remi_porte: son('porte', 120, 0.18),
     remi_porte_fort: son('porte_fort', 70, 0.4),
     remi_scratch: son('scratch', 300, 0.2),

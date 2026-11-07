@@ -31,6 +31,7 @@ function proj(x, y, z) {
 }
 // les 2 gros boutons (dessinés) et leurs zones de toucher, bien plus grandes (tout le bas de l'écran, sur les côtés)
 const BOUTON_G = { x: 92, y: 446, r: 72 }, BOUTON_D = { x: LARGEUR - 92, y: 446, r: 72 };
+const BOUTON_ROULETTE = { x: LARGEUR / 2 + 250, y: 225, r: 62 };   // à droite : pas sous l'annonce « BUT DE RÉMI »
 const BOUTON_TIR = { x: LARGEUR / 2, y: 462, r: 46 };
 const ZONE_BOUTONS = { y: 300, g: 250, d: LARGEUR - 250 };
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
@@ -73,6 +74,7 @@ export class RemiBaby extends BossScene {
       this.figs[nom] = Array.from({ length: BARRES[nom].n }, () => this.add.sprite(0, 0, toi ? 'remi_baby_toi' : 'remi_baby_rouges', 0)
         .setDepth(profondeur(BARRES[nom].z) + (toi ? 0.02 : 0.01)).setAlpha(toi ? B.transparenceGardien : 1));
     }
+    this.txtRoulette = texte(this, BOUTON_ROULETTE.x, BOUTON_ROULETTE.y, 'ROULETTE !', 17, '#ffffff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 5 }).setDepth(901).setVisible(false);
     this.txtTir = texte(this, LARGEUR / 2, 462, 'TIR', 24, '#ffffff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 }).setDepth(901).setVisible(false);
     this.txtVise = texte(this, LARGEUR / 2, 524, '', 22, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 10, y: 3 } }).setDepth(901).setVisible(false);
     this.hud = texte(this, LARGEUR / 2, 22, '', 26, '#ffffff', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 3 } }).setDepth(900);
@@ -154,6 +156,8 @@ export class RemiBaby extends BossScene {
     this.input.addPointer(2);   // les deux pouces (+ un doigt pour tirer)
     this.input.on('pointerdown', (p) => {
       if (this.termine) return;
+      // V19p : le bouton « ROULETTE ! » (seulement pendant le temps où l'on peut crier)
+      if (this.horloge < this.appelPossible && Math.hypot(p.x - BOUTON_ROULETTE.x, p.y - BOUTON_ROULETTE.y) < BOUTON_ROULETTE.r + 20) { this.appelRoulette(); return; }
       if (this.dansBouton(p)) return;   // les boutons sont lus à chaque image (pasGardien)
       if (this.etat !== 'intro' && p.y < proj(0, 0, L).y - 20) { this.appelRoulette(); return; }   // toucher Rémi = « ROULETTE ! »
       this.doigt = { x: p.x, y: p.y, t: this.horloge, id: p.id };
@@ -187,11 +191,24 @@ export class RemiBaby extends BossScene {
     return (d ? 1 : 0) - (g ? 1 : 0);
   }
 
+  // V19p (audit n°1) : après TON but, c'est TOI qui engages : la balle est à ton gardien, Rémi défend, tu vises et tu tires
+  engagementToi() {
+    if (this.termine) return;
+    this.aToiDEngager = false;
+    if (this.butsRemi === B.buts - 1 || this.butsToi === B.buts - 1) annonce(this, 'BALLE DE MATCH', this.butsToi === B.buts - 1 ? '#7fff7f' : '#ff6b6b', 0.9);
+    else annonce(this, 'À TOI D\'ENGAGER', '#7fff7f', 0.9);
+    this.tir = null; this.penche = 0;
+    this.balle = { x: Phaser.Math.Clamp(this.pos.toi + 0.03, -B.but / 2 + 0.01, B.but / 2 - 0.01), z: BARRES.toi.z + 0.05, vx: 0, vz: 0 };
+    this.etat = 'riposte'; this.fenetre = this.diff.babyFenetre; this.memoire = this.balle.x; this.visee = 0;
+    this.astuce();
+  }
+
   // ---------- Rémi : engagement, préparation (lecture), tir ----------
   engagement() {
     if (this.termine) return;
     const balleMatch = this.butsRemi === B.buts - 1;
     if (balleMatch || this.butsToi === B.buts - 1) annonce(this, 'BALLE DE MATCH', balleMatch ? '#ff6b6b' : '#7fff7f', 0.9);
+    jouerSon(this, 'remi_baby_engage');
     const D = this.diff;
     // côté visé (-1 à 1 dans le but) ; feinte : il penche d'abord de l'autre côté
     const vise = choisir([-1, 1]) * hasard(0.35, 0.95);
@@ -223,7 +240,7 @@ export class RemiBaby extends BossScene {
     const faux = T.feinte && a < B.feinteBascule;
     this.penche = Phaser.Math.Linear(this.penche, (faux ? -cote : cote) * Math.min(1, a * 1.6), Math.min(1, dt * 8));
     if (a > 0.82) this.arme = (a - 0.82) / 0.18; else this.arme = 0;   // la barre s'arme (le joueur se lève)
-    if (T.roulette && a > 0.7) this.roulette = { t: this.horloge };
+    if (T.roulette && a > 0.7 && !this.roulette) { this.roulette = { t: this.horloge }; jouerSon(this, 'remi_baby_roulette'); }
     if (a >= 1) this.tirer();
   }
 
@@ -244,7 +261,7 @@ export class RemiBaby extends BossScene {
     b.vx = dx / n * v; b.vz = dz / n * v;
     this.etat = 'tir';
     // V19o : SON tir se sent aussi : éclat rouge à son pied, la caméra « encaisse » vers toi, gros claquement
-    jouerSon(this, 'remi_tape', { volume: 1, rate: 0.85 });
+    jouerSon(this, 'remi_baby_frappe', { volume: 1, rate: 0.9 });
     this.eclats.push({ x: b.x, z: b.z, t: 0, c: 0xff5a5a });
     this.tweens.add({ targets: this.cameras.main, zoom: 1.03, duration: 70, yoyo: true, ease: 'Quad.easeOut' });
     if (v > D.babyVitesse * 1.05) annonce(this, T.roulette ? 'ROULETTE !?' : 'PATATE !', '#ff6b6b', 0.35);
@@ -258,8 +275,8 @@ export class RemiBaby extends BossScene {
     // (V19o : même calcul que la ligne de visée, rebonds compris : un tir en bande est jugé comme il est montré)
     const aAvant = Math.atan2(b.vx, b.vz || 1e-6), xA = (z) => b.vz ? xSur(xAvant, zAvant, aAvant, z) : xAvant;
     b.x += b.vx * dt; b.z += b.vz * dt;
-    if (b.x > W / 2 - R) { b.x = W - 2 * R - b.x; b.vx = -Math.abs(b.vx); jouerSon(this, 'remi_rebond', { volume: 0.4 }); }
-    if (b.x < -W / 2 + R) { b.x = -W + 2 * R - b.x; b.vx = Math.abs(b.vx); jouerSon(this, 'remi_rebond', { volume: 0.4 }); }
+    if (b.x > W / 2 - R) { b.x = W - 2 * R - b.x; b.vx = -Math.abs(b.vx); jouerSon(this, 'remi_baby_clac', { volume: 0.6 }); }
+    if (b.x < -W / 2 + R) { b.x = -W + 2 * R - b.x; b.vx = Math.abs(b.vx); jouerSon(this, 'remi_baby_clac', { volume: 0.6 }); }
     if (this.etat === 'tir') {
       // ta barre : la balle passe-t-elle sur ton gardien ?
       const zg = BARRES.toi.z;
@@ -289,7 +306,7 @@ export class RemiBaby extends BossScene {
   // ---------- issues ----------
   arret() {
     this.arrets++;
-    jouerSon(this, 'remi_atterrit', { volume: 0.9 }); jouerSon(this, 'remi_tape', { volume: 0.7, rate: 1.4 });
+    jouerSon(this, 'remi_baby_frappe', { volume: 0.9, rate: 0.75 }); jouerSon(this, 'remi_baby_clac', { volume: 0.7 });
     this.cameras.main.shake(140, 0.008);
     this.ralentiFin = this.horloge + B.arretFige;   // V19o : petit arrêt sur image au moment de l'arrêt (on sent le choc)
     this.eclats.push({ x: this.pos.toi, z: BARRES.toi.z + 0.03, t: 0, c: 0x7fc4ff });
@@ -297,7 +314,14 @@ export class RemiBaby extends BossScene {
     annonce(this, 'ARRÊT !', '#7fff7f', 0.5);
     this.balle.vx = 0; this.balle.vz = 0;
     this.etat = 'riposte'; this.fenetre = this.diff.babyFenetre; this.memoire = this.balle.x; this.visee = 0;   // fenetre = temps du bonus ÉCLAIR
+    this.astuce();
     if (Math.random() < 0.5) { this.poseTemp('rale', 1.2); bulle(this, `Rémi : « ${choisir(REPLIQUES.babyArret)} »`, '#ffd84a', 1.4, 300); }
+  }
+
+  // V19p : aux 2 premières ripostes d'une partie, on explique la feinte
+  astuce() {
+    this.nbAstuces = (this.nbAstuces || 0) + 1;
+    if (this.nbAstuces <= 2) this.time.delayedCall(500, () => bulle(this, 'Ses défenseurs SUIVENT ta visée (zones rouges) : tourne d\'un côté, puis repars vite de l\'autre !', '#ffd84a', 3, 150));
   }
 
   riposter(biais) {
@@ -309,7 +333,7 @@ export class RemiBaby extends BossScene {
     b.vz = v * Math.cos(biais); b.vx = v * Math.sin(biais);
     this.etat = 'riposte_vol'; this.eclairTir = eclair; this.frappeToi = this.horloge + 0.3;
     this.reflexe = this.diff.babyReflexe + this.remiBu * 0.04 + (eclair ? B.eclairReflexe : 0);   // son gardien réagit avec un temps de retard
-    jouerSon(this, 'remi_tape', eclair ? { rate: 1.3 } : undefined);
+    jouerSon(this, 'remi_baby_frappe', eclair ? { rate: 1.25 } : undefined);
     if (eclair) { annonce(this, 'TIR ÉCLAIR !', '#ffd84a', 0.5); this.cameras.main.shake(90, 0.003); }
     // V19n : le tir se SENT : éclat au pied du gardien, petit coup de zoom
     this.eclats.push({ x: b.x, z: b.z, t: 0, c: eclair ? 0xffd84a : 0xffffff });
@@ -319,7 +343,7 @@ export class RemiBaby extends BossScene {
 
   contre(nom) {
     this.dernierContre = nom;
-    jouerSon(this, 'remi_rebond');
+    jouerSon(this, 'remi_baby_clac');
     bulle(this, nom === 'gar' ? 'Rémi : « Arrêté ! »' : 'Contré !', '#ffd84a', 1.0, 300);
     this.balle.vz = -this.balle.vz * 0.3;
     this.suivant(0.7);
@@ -328,6 +352,7 @@ export class RemiBaby extends BossScene {
   sortie(msg) { bulle(this, msg, '#ffffff', 1.0, 300); this.suivant(0.8); }
 
   butRemi(gamelle) {
+    this.aToiDEngager = false;
     const T = this.tir;
     this.butsRemi++;
     if (gamelle) this.gamelleAnim(false);
@@ -346,6 +371,7 @@ export class RemiBaby extends BossScene {
   }
 
   butToi(gamelle) {
+    this.aToiDEngager = true;
     this.butsToi++;
     this.remiBu++;
     if (gamelle) this.gamelleAnim(true);
@@ -371,10 +397,10 @@ export class RemiBaby extends BossScene {
       cam.zoomTo(1.3, 260, 'Quad.easeOut');
       this.time.delayedCall(1100, () => { cam.pan(CX, HAUTEUR / 2, 400, 'Quad.easeInOut'); cam.zoomTo(1, 400, 'Quad.easeInOut'); });
       for (let i = 0; i < 46; i++) this.confettis.push({ x: c.x + hasard(-30, 30), y: c.y - hasard(0, 30), vx: hasard(-260, 260), vy: hasard(-420, -120), c: choisir([0xffd84a, 0x7fff7f, 0x4fe8ff, 0xff5a8a, 0xffffff]), r: hasard(2, 4.5), vie: hasard(1.2, 2) });
-      jouerSon(this, 'remi_foule'); jouerSon(this, 'remi_porte', { volume: 0.5 });
+      jouerSon(this, 'remi_foule'); jouerSon(this, 'remi_baby_but');
     } else {
       cam.shake(260, 0.012);
-      jouerSon(this, 'remi_porte', { volume: 0.4 });
+      jouerSon(this, 'remi_baby_but', { volume: 0.7 });
     }
   }
 
@@ -440,7 +466,8 @@ export class RemiBaby extends BossScene {
       else if (this.butsRemi >= B.buts) {
         if (this.horloge < this.appelPossible) { this.time.delayedCall(300, () => this.verifierFin(0)); return; }
         ecranPerdu(this, 'PERDU', REPLIQUES.babyPerdu, this.nomDiff);
-      } else this.engagement();
+      } else if (this.aToiDEngager) this.engagementToi();
+      else this.engagement();
     });
   }
 
@@ -608,6 +635,15 @@ export class RemiBaby extends BossScene {
         ga.fillStyle(0xffffff, tenu ? 1 : 0.85).fillTriangle(bt.x + s * 30, bt.y, bt.x - s * 18, bt.y - 30, bt.x - s * 18, bt.y + 30);
       }
     }
+    // V19p FEINTE LISIBLE : pendant que tu vises, des zones rouges au sol montrent ce que couvre chaque défenseur
+    // (elles suivent ta visée, avec retard : feinte-les)
+    if (this.etat === 'riposte') {
+      const br = BARRES.def, demi = B.prise * 0.85;
+      for (const h of hommes(br, this.pos.def)) {
+        const a = proj(h - demi, 0, br.z), b = proj(h + demi, 0, br.z);
+        g.fillStyle(0xff3b3b, 0.35).fillEllipse((a.x + b.x) / 2, a.y, b.x - a.x, 0.035 * a.k);
+      }
+    }
     // V19e LIGNE DE VISÉE pendant la riposte : VERTE si ta balle passe sa défense, ROUGE à partir du joueur qui bloque
     if (this.etat === 'riposte' && this.balle) {
       const lib = this.cheminLibre(), coul = (z) => lib.cote || z >= lib.bloque ? 0xff5a5a : lib.enFace ? 0xffd84a : 0x7fff7f;
@@ -642,8 +678,15 @@ export class RemiBaby extends BossScene {
       if (f > 0) ga.lineStyle(9, 0xffd84a, 1).beginPath().arc(bt.x, bt.y, bt.r + 7, -Math.PI / 2, -Math.PI / 2 + f * Math.PI * 2).strokePath();
       this.txtTir.setText(f > 0 ? '⚡TIR' : 'TIR');
     }
-    if (this.horloge < this.appelPossible) {
-      const a = 0.5 + 0.5 * Math.sin(this.horloge * 14);
+    // le bouton « ROULETTE ! » clignote pendant le temps où l'on peut crier (après un but de Rémi en roulette)
+    const appel = this.horloge < this.appelPossible;
+    this.txtRoulette.setVisible(appel);
+    if (appel) {
+      const a = 0.55 + 0.45 * Math.sin(this.horloge * 14), bt = BOUTON_ROULETTE;
+      const reste = (this.appelPossible - this.horloge) / B.appelDuree;
+      ga.fillStyle(0x000000, 0.55).fillCircle(bt.x, bt.y, bt.r);
+      ga.fillStyle(0xff5a5a, 0.35 + 0.3 * a).fillCircle(bt.x, bt.y, bt.r - 6);
+      ga.lineStyle(9, 0xffd84a, 1).beginPath().arc(bt.x, bt.y, bt.r + 6, -Math.PI / 2, -Math.PI / 2 + reste * Math.PI * 2).strokePath();
       ga.lineStyle(4, 0xffd84a, a).strokeCircle(px, yBord - 60, 70);
     }
   }

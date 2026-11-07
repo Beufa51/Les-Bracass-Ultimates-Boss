@@ -344,6 +344,13 @@
   Caméra remise à zéro et vignette non empilée à chaque partie. AUDIT joueur + développeur :
   `propositions/remi_audit_babyfoot.md` (priorités : engagement après TON but, sons de babyfoot, feinte expliquée,
   bouton ROULETTE, découper RemiBaby.js + bot de test dans le dépôt).
+- V19p (« fais tout dans l'ordre » de l'audit) : 1) ENGAGEMENT après TON but (`engagementToi()`, `aToiDEngager`) : la balle
+  revient à ton gardien, « À TOI D'ENGAGER », tu vises et tu tires. 2) SONS DE BABYFOOT générés (`generer_sons.py`,
+  section BABYFOOT ; les anciens sons ressortent identiques) : `remi_baby_clac` (bandes, contres), `remi_baby_frappe`
+  (tirs, arrêts), `remi_baby_but` (balle au fond du but), `remi_baby_roulette`, `remi_baby_engage` (balle lâchée).
+  3) FEINTE LISIBLE : zones rouges au sol sous ses défenseurs pendant que tu vises + astuce aux 2 premières ripostes ;
+  BOUTON « ROULETTE ! » (à droite, `BOUTON_ROULETTE`) qui clignote avec un anneau de temps après un but de Rémi en
+  roulette (toucher Rémi marche toujours).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

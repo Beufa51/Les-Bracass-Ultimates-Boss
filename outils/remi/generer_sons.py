@@ -110,3 +110,24 @@ siff = balayage(d, 300, 900, 10) * np.exp(-((x - 0.12) / 0.07) ** 2) * 0.25
 pneu = passe_haut(bruit(d), 3500) * env(d, 0.01, 0.06) * 0.35
 ecrire('remi_esquive', souffle + siff + pneu, 0.55)
 print('esquive ajoutée')
+
+# ---------- BABYFOOT (V19p) ----------
+# balle sur le bois (bande, contre) : « clac » sec et boisé
+d = 0.12; x = t(d)
+ecrire('remi_baby_clac', note(d, 950, 0.018, (1, 2.1, 3.3)) + 0.5 * passe_haut(passe_bas(bruit(d), 4000), 800) * env(d, 0.0003, 0.008), 0.55)
+# frappe d'une figurine : « TCHAK » de plastique dur + petit choc sourd
+d = 0.16; x = t(d)
+ecrire('remi_baby_frappe', np.tanh(2 * (passe_haut(bruit(d), 1500) * env(d, 0.0002, 0.006) + 0.7 * note(d, 620, 0.02, (1, 1.5)) + 0.8 * note(d, 120, 0.04))), 0.75)
+# balle au fond du but : « KLONG » creux du bac + la balle qui roule et cliquette
+d = 1.0; s = np.zeros(int(SR * d))
+place(s, np.tanh(1.8 * sum(a * np.sin(2 * np.pi * f * t(0.7)) * np.exp(-t(0.7) / dec) for f, a, dec in ((140, 1, 0.25), (285, 0.6, 0.15), (520, 0.35, 0.08)))), 0)
+for k in range(7): place(s, (0.5 - 0.06 * k) * note(0.03, 1400 + 120 * k, 0.006), 0.18 + k * (0.07 - 0.006 * k))
+ecrire('remi_baby_but', s, 0.85)
+# roulette : la barre qui tourne à toute vitesse « vrrrr » (souffle modulé)
+d = 0.8; x = t(d)
+ecrire('remi_baby_roulette', passe_bas(bruit(d), 1800) * (0.55 + 0.45 * np.sin(2 * np.pi * (28 + 10 * x) * x)) * np.sin(np.pi * np.clip(x / d, 0, 1)) ** 0.5, 0.55)
+# engagement : la balle lâchée sur la table, 3 petits rebonds
+d = 0.6; s = np.zeros(int(SR * d))
+for k, (debut, a) in enumerate(((0, 1), (0.2, 0.6), (0.33, 0.35))): place(s, a * note(0.08, 1000, 0.012, (1, 2.1)), debut)
+ecrire('remi_baby_engage', s, 0.5)
+print('sons du babyfoot ajoutés')
