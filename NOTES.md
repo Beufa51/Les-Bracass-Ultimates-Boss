@@ -437,6 +437,11 @@
   (mesure : p 0,57 et 0,41 à ton passage, zone dangereuse 0,36-0,74). L'ALLONGÉ devient une RANGÉE de 3 bourrés
   (`ALLONGE_ECART` 112 px, demi-largeur de choc 175, +240 px d'espace après) trop longue pour un saut ; et il devient
   SAUTABLE si on passe VRAIMENT au-dessus (avant : même un saut haut faisait tomber = règle invisible).
+- V20c VÉLO (retour : « sauts / esquives impossibles à la suite ; une pinte puis un ennemi juste après ») : écarts
+  comptés de BORD À BORD (avant : de centre à centre) et TEMPS LIBRE minimum (`libreMini` 0,95 s, `libreApresSaut` 1,15 s,
+  `librePinte` 2 s avec la pinte au sommet du saut : `reaction` 0,35 + `tempsSaut` 0,9 / 2). Mesure sur 10 parcours x 4 :
+  plus petit temps libre 0,95 s, après un saut 1,15 s, pinte → obstacle suivant 1,19 s (~0,75 s après l'atterrissage).
+  Chrono inchangé : PRESSION grande route +1,3 s sans pinte, raccourcis +12 s ; CUL SEC grande route = il faut des pintes.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

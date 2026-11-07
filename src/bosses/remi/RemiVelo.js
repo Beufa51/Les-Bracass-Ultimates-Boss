@@ -202,16 +202,26 @@ export class RemiVelo extends BossScene {
       if (sp === 'poubelle' && this.avantPoubelle) sp = null;   // jamais deux poubelles de suite
       this.avantPoubelle = sp === 'poubelle';
       // une poubelle a de la place AVANT elle aussi (le temps de remonter après l'obstacle d'avant, puis de redescendre)
-      if (sp === 'poubelle') { x += (V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, x / V.longueur)) * 0.6; type = 'poubelle'; this.ajouter('poubelle', x); }
+      // V20c : l'écart se compte de BORD à BORD (avant : de centre à centre, la rangée d'allongés mangeait la place)
+      const demi = (t) => (TAILLE[t] ? TAILLE[t][1] : 30);
+      if (sp === 'poubelle') { x += (V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, x / V.longueur)) * 0.6 + demi('poubelle'); type = 'poubelle'; this.ajouter('poubelle', x); }
       else if (sp === 'pecheur') { type = 'debout'; this.ajouter('debout', x); this.obstacles[this.obstacles.length - 1].peche = true; }
       else if (sp === 'chorale') { type = 'debout'; for (let n = 0; n < 3; n++) { this.ajouter('debout', x + n * 85); const o = this.obstacles[this.obstacles.length - 1]; o.chante = true; o.centreChorale = n === 1; } x += 170; }
-      else this.ajouter(type, x);
+      else { x += demi(type); this.ajouter(type, x); }
       // l'écart se compte en TEMPS, à la vitesse prévue à cet endroit : jamais deux obstacles collés
       const vit = V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, x / V.longueur);
-      // jamais moins de 0,85 s entre deux obstacles (même dans un raccourci bondé) ; après une POUBELLE (grand saut), 0,5 s de plus
-      const ecart = vit * Math.max(0.85, hasard(V.ecart[0], V.ecart[1]) / (this.diff.densite * route.densite)) + (type === 'traverse' ? 120 : type === 'allonge' ? 240 : 0) + (type === 'poubelle' ? vit * 0.7 : 0);
-      if (k > 2 && Math.random() < V.pintes * route.pintes) this.pintes.push({ x: x + ecart / 2, h: HAUT_PINTE, prise: false, t: Math.random() * 6 });
-      x += ecart;
+      // V20c (retour : « des sauts / esquives impossibles à la suite ; on prend une pinte et on se prend un ennemi juste
+      // après ») : TEMPS LIBRE minimum entre le bord arrière d'un obstacle et le bord avant du suivant :
+      //  - toujours V.libreMini (0,85 s) ; après un obstacle qu'on SAUTE (on retombe plus tard) : V.libreApresSaut ;
+      //  - s'il y a une PINTE dans l'écart : réaction + un saut entier + réaction (V.librePinte), pinte au sommet du saut.
+      const saute = type === 'verre' || type === 'vomi' || type === 'poubelle';
+      const pinte = k > 2 && Math.random() < V.pintes * route.pintes;
+      let libre = Math.max(V.libreMini, hasard(V.ecart[0], V.ecart[1]) / (this.diff.densite * route.densite));
+      if (saute) libre = Math.max(libre, V.libreApresSaut);
+      if (pinte) libre = Math.max(libre, V.librePinte);
+      const fin = x + demi(type) + (type === 'chorale' ? 170 : 0);   // bord arrière de l'obstacle
+      if (pinte) this.pintes.push({ x: fin + vit * (V.reaction + V.tempsSaut / 2), h: HAUT_PINTE, prise: false, t: Math.random() * 6 });
+      x = fin + vit * libre + (type === 'traverse' ? 120 : 0);
     }
   }
 

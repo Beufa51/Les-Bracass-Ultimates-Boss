@@ -75,6 +75,12 @@ export const VELO = {
   ralenti: 1.5,           // verre cassé (crevaison) ou flaque non sautés : vitesse x 0,55 pendant ce temps (s)
   ecart: [1.1, 1.9],       // temps entre deux obstacles (s, à la vitesse du moment), divisé par la densité
   types: { allonge: 3, verre: 2, debout: 3, traverse: 2, vomi: 2 },
+  // V20c : TEMPS LIBRE entre deux obstacles (bord à bord, en secondes à la vitesse du moment)
+  libreMini: 0.95,        // jamais moins
+  libreApresSaut: 1.15,   // après un obstacle qu'on saute (verre, flaque, poubelle) : on retombe d'abord
+  reaction: 0.35,         // temps de réaction compté avant et après une pinte
+  tempsSaut: 0.9,         // durée d'un saut tenu (s) : la pinte est placée au sommet
+  librePinte: 2.0,        // écart avec une PINTE dedans : réaction + saut entier + réaction (jamais d'ennemi à l'atterrissage)
   pintes: 0.45,           // chance d'une PINTE à attraper en sautant entre deux obstacles
   bonusPinte: 0.5,        // secondes gagnées par pinte (V20 : 1 → 0,5 : les bonus rendaient le chrono inutile)
   bonusSerie: 1,          // secondes gagnées par SÉRIE (V20 : 2 → 1)
