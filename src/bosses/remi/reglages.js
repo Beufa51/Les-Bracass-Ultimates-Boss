@@ -87,6 +87,13 @@ export const BABY = {
   buts: 5,                // premier à ce nombre de buts
   largeur: 0.68, longueur: 1.0, balle: 0.02, but: 0.24,
   course: 0.13,           // débattement de ton gardien (m de chaque côté)
+  // V19p : chiffres sortis du code
+  balleTenue: 0.03,       // la balle tenue est un peu à côté de ton gardien (visible derrière lui) (m)
+  priseDefense: 0.85,     // ses défenseurs arrêtent la balle à moins de B.prise x ce chiffre
+  margeDefense: 0.01,     // marge du VERT autour de ses défenseurs (m : ils bougent encore un peu)
+  margeGardien: 0.12,     // marge du VERT sur le temps de son gardien (s)
+  pinteReflexe: 0.04,     // chaque pinte de Rémi : son gardien réagit ce temps plus tard (s)...
+  pinteTir: 0.04,         // ... et ses tirs perdent cette part de vitesse
   priseToi: 0.06,         // V19h : TON gardien arrête la balle à moins de ça de son centre (plus large que ceux de Rémi)
   largeurGardien: 0.07,   // ... et il est dessiné de cette largeur (m)
   balancier: 1.6,         // V19j : pendant que tu vises, son gardien se balance devant son but (vitesse du balancement)

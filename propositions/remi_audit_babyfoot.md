@@ -55,6 +55,10 @@ Déjà corrigé en V19o (même commit que cet audit) : tirs en bande impossibles
 7. **Effets de caméra** : un zoom de but est maintenant remis à zéro au démarrage d'une partie (V19o), et la vignette
    n'est plus empilée à chaque partie. À surveiller si on ajoute d'autres effets de caméra.
 
+## Fait en V19p
+Priorités 1 à 4 faites (engagement après ton but, sons de babyfoot, feinte lisible + bouton ROULETTE, code découpé
++ bot `outils/remi_baby_bot.mjs` + chiffres sortis du code). Restent : joueur 4 et 6 à 10, dév 4 à 6.
+
 ## Ma proposition de priorités
 1. Engagement après TON but (joueur 1) : le plus gros gain de plaisir.
 2. Sons de babyfoot (joueur 3) : peu de travail, gros effet sur la sensation.

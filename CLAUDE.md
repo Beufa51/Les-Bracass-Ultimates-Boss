@@ -20,6 +20,8 @@ Après tout changement de `src/bosses/julien/` (plans, réglages, images) : `nod
 ## Rémi
 Après tout passage de `outils/remi/preparer_images.py` ou changement de `src/bosses/remi/manifeste.js` :
 `node outils/remi_verif.mjs` doit finir à 0 erreur (sinon une planche s'affiche en entier au lieu d'une case).
+Après tout changement du babyfoot (`src/bosses/remi/RemiBaby.js`, `src/bosses/remi/babyfoot/`, réglages `BABY` / `baby*`) :
+`node outils/remi_baby_bot.mjs` (≈ 2 min) doit finir par « Babyfoot : 0 problème » (tout tir VERT doit marquer).
 
 ## Images (demande du propriétaire)
 Dès qu'une image manque ou qu'une nouvelle image améliorerait le jeu, DONNE DIRECTEMENT le prompt prêt à copier

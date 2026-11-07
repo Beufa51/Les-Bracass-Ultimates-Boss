@@ -351,6 +351,13 @@
   3) FEINTE LISIBLE : zones rouges au sol sous ses défenseurs pendant que tu vises + astuce aux 2 premières ripostes ;
   BOUTON « ROULETTE ! » (à droite, `BOUTON_ROULETTE`) qui clignote avec un anneau de temps après un but de Rémi en
   roulette (toucher Rémi marche toujours).
+  4) CODE DÉCOUPÉ : `RemiBaby.js` (scène : création, arrêt, tirs, buts, fin ; 259 lignes) + dossier `babyfoot/` :
+  `outils.js` (projection, barres, boutons, `plier`/`xSur`), `dessin.js`, `commandes.js`, `remi_ia.js`, `physique.js`,
+  `effets.js` (méthodes ajoutées à la scène par `Object.assign`). Chiffres sortis du code vers `BABY` (`balleTenue`,
+  `priseDefense`, `margeDefense`, `margeGardien`, `pinteReflexe`, `pinteTir`). BOT DANS LE DÉPÔT :
+  `node outils/remi_baby_bot.mjs` (4 difficultés x tirs droits / en bande ; sortie 1 si un tir vert est arrêté ;
+  consigne ajoutée à CLAUDE.md). Résultat V19p : 8/8, 0 tir vert arrêté ; à surveiller : une bande est verte dès l'arrêt
+  (sa défense attend au centre ; le bot y met sa visée d'un coup, un joueur doit tourner ~1 s).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
