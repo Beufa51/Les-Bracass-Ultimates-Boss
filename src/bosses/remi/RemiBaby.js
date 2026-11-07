@@ -41,6 +41,8 @@ const BARRES = {
   def: { z: 0.78, n: 2, ecart: 0.25, course: 0.15 },
   gar: { z: 0.93, n: 1, ecart: 0, course: 0.17 },
 };
+// calque d'un objet à la distance z (plus près = devant) : les figurines et la balle se rangent entre elles
+const profondeur = (z) => 5.1 + (L - z) * 0.5;
 const hommes = (b, pos) => Array.from({ length: b.n }, (_, i) => pos + (i - (b.n - 1) / 2) * b.ecart);
 
 export class RemiBaby extends BossScene {
@@ -58,6 +60,15 @@ export class RemiBaby extends BossScene {
     this.gRemi = this.add.graphics().setDepth(3);
     this.g = this.add.graphics().setDepth(5);
     this.gAvant = this.add.graphics().setDepth(7);
+    this.gBalle = this.add.graphics();
+    // V19i FIGURINES (images) : une par joueur, rangées selon leur barre ; sinon elles restent dessinées au code
+    this.figures = this.textures.exists('remi_baby_rouges') && this.textures.exists('remi_baby_toi');
+    this.figs = {};
+    if (this.figures) for (const nom of Object.keys(BARRES)) {
+      const toi = nom === 'toi';
+      this.figs[nom] = Array.from({ length: BARRES[nom].n }, () => this.add.sprite(0, 0, toi ? 'remi_baby_toi' : 'remi_baby_rouges', 0)
+        .setDepth(profondeur(BARRES[nom].z) + (toi ? 0.02 : 0.01)).setAlpha(toi ? B.transparenceGardien : 1));
+    }
     this.txtTir = texte(this, LARGEUR / 2, 462, 'TIR', 24, '#ffffff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 }).setDepth(901).setVisible(false);
     this.txtVise = texte(this, LARGEUR / 2, 524, '', 22, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 10, y: 3 } }).setDepth(901).setVisible(false);
     this.hud = texte(this, LARGEUR / 2, 22, '', 26, '#ffffff', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 3 } }).setDepth(900);
@@ -272,7 +283,7 @@ export class RemiBaby extends BossScene {
     const eclair = this.fenetre > 0;
     const v = B.riposteVitesse * (eclair ? B.eclairVitesse : 1);
     b.vz = v * Math.cos(biais); b.vx = v * Math.sin(biais);
-    this.etat = 'riposte_vol'; this.eclairTir = eclair;
+    this.etat = 'riposte_vol'; this.eclairTir = eclair; this.frappeToi = this.horloge + 0.3;
     this.reflexe = this.diff.babyReflexe + this.remiBu * 0.04 + (eclair ? B.eclairReflexe : 0);   // son gardien réagit avec un temps de retard
     jouerSon(this, 'remi_tape', eclair ? { rate: 1.3 } : undefined);
     if (eclair) { annonce(this, 'TIR ÉCLAIR !', '#ffd84a', 0.5); this.cameras.main.shake(90, 0.003); }
@@ -458,15 +469,13 @@ export class RemiBaby extends BossScene {
     // de loin à près : barres de Rémi, balle, puis ton gardien devant (dans gAvant)
     const ordre = [['gar', 0xe53935], ['def', 0xe53935], ['att', 0xe53935]];
     const bz = this.balle ? this.balle.z : -1;
-    let balleDessinee = false;
+    // V19i : la balle a son propre calque, rangé selon sa distance (devant / derrière chaque barre et ses figurines)
+    this.gBalle.clear().setDepth(profondeur(bz));
+    this.dessinerBalle(this.gBalle);
     for (const [nom, coul] of ordre) {
-      const br = BARRES[nom];
-      if (!balleDessinee && bz > br.z) { this.dessinerBalle(g); balleDessinee = true; }
-      this.barre(g, br, this.pos[nom], coul, nom === 'att' ? (this.etat.startsWith('riposte') ? 1 : this.arme) : 0, nom === 'att' && this.roulette);
+      this.barre(g, BARRES[nom], this.pos[nom], coul, nom === 'att' ? (this.etat.startsWith('riposte') ? 1 : this.arme) : 0, nom === 'att' && this.roulette, false, nom);
     }
-    if (!balleDessinee) this.dessinerBalle(bz > BARRES.toi.z ? g : ga);
-    this.barre(ga, BARRES.toi, this.pos.toi, 0x2f6fd6, 0, false, true);
-    if (this.balle && bz <= BARRES.toi.z) this.dessinerBalle(ga);
+    this.barre(this.figures ? g : ga, BARRES.toi, this.pos.toi, 0x2f6fd6, 0, false, true, 'toi');
     // les 2 gros boutons ◀ ▶ (ils s'allument quand on appuie ; ils clignotent les premières secondes)
     if (this.etat !== 'intro') {
       const clign = this.horloge < (this.aideDoigt ?? 0) && Math.floor(this.horloge * 4) % 2 === 0;
@@ -521,7 +530,7 @@ export class RemiBaby extends BossScene {
   }
 
   // une barre : la tige d'un bord à l'autre et ses joueurs (vus de dos pour toi, de face pour Rémi)
-  barre(g, br, pos, coul, arme, roulette, deDos = false) {
+  barre(g, br, pos, coul, arme, roulette, deDos = false, nom = null) {
     const hT = 0.1;   // hauteur de la tige au-dessus du terrain
     const a = proj(-W / 2 - 0.08, hT, br.z), b = proj(W / 2 + 0.08, hT, br.z);
     g.lineStyle(Math.max(2, 0.012 * a.k), 0xcfd3d8, 1).lineBetween(a.x, a.y, b.x, b.y);
@@ -531,15 +540,26 @@ export class RemiBaby extends BossScene {
     // V19h : TON gardien est plus large et TRANSPARENT (on voit la balle et ses joueurs à travers, comme le boxeur de Greg) ;
     // ceux de Rémi ont un contour blanc et une ombre au sol (on voit où ils sont sur le terrain)
     const al = deDos ? B.transparenceGardien : 1;
-    for (const x of hommes(br, pos)) {
+    hommes(br, pos).forEach((x, i) => {
       const pied = proj(x, 0.005, br.z), tete = proj(x, hT + 0.035, br.z), k = pied.k;
+      if (this.figures && nom) {   // l'image de la figurine (socle posé sur le terrain)
+        const s = this.figs[nom][i];
+        if (!deDos) g.fillStyle(0x000000, 0.4).fillEllipse(pied.x, pied.y, 0.07 * k, 0.02 * k);
+        const tireur = nom !== 'att' || !this.tir || this.etat !== 'prep' || i === this.tir.qui;   // seul celui qui a la balle arme
+        const f = deDos ? (this.horloge < (this.frappeToi ?? 0) ? 1 : 0) : roulette ? 3 : arme >= 0.99 ? 2 : arme > 0 && tireur ? 1 : 0;
+        const h = B.hauteurFigurine * k * (deDos ? B.tailleGardien : 1) / s.height;
+        s.setFrame(f).setScale(h);
+        if (f === 2 && !deDos) s.setOrigin(0.5, 0.5).setPosition(pied.x, proj(x, hT, br.z).y);   // barre levée : à plat, à hauteur de la tige
+        else s.setOrigin(0.5, 1).setPosition(pied.x, pied.y);
+        return;
+      }
       const largeur = (deDos ? B.largeurGardien : 0.035) * k;
       if (!deDos) g.fillStyle(0x000000, 0.4).fillEllipse(pied.x, pied.y, largeur * 2.2, largeur * 0.6);
       if (roulette) {   // la barre tourbillonne : le joueur tourne à toute vitesse
         const s = Math.sin(this.horloge * 40);
         g.fillStyle(coul, 0.9).fillRect(pied.x - largeur / 2, tete.y + (pied.y - tete.y) * (0.5 - 0.5 * Math.abs(s)), largeur, Math.max(3, (pied.y - tete.y) * Math.abs(s)));
         g.lineStyle(2, 0xffffff, 0.6).strokeEllipse(pied.x, (pied.y + tete.y) / 2, largeur * 2.4, (pied.y - tete.y) * 1.1);
-        continue;
+        return;
       }
       // armé : le joueur se lève vers l'arrière (les pieds remontent)
       const yPied = pied.y - arme * (pied.y - tete.y) * 0.55;
@@ -549,7 +569,7 @@ export class RemiBaby extends BossScene {
       g.fillStyle(0x111111, al).fillRect(pied.x - largeur / 2, yPied - 0.012 * k, largeur, 0.012 * k);
       g.fillStyle(deDos ? 0x3a2a1a : 0xf0c8a0, al).fillCircle(tete.x, tete.y + 0.012 * k, 0.017 * k);
       if (deDos) g.fillStyle(0xffffff, al).fillRect(pied.x - largeur * 0.1, tete.y + 0.045 * k, largeur * 0.2, 0.03 * k);   // numéro dans le dos
-    }
+    });
   }
 
   dessinerBalle(g) {

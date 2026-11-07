@@ -31,6 +31,10 @@ export const MANIFESTE = {
     // V19 babyfoot : Rémi de face derrière la table (attend, penché à gauche de l'écran, à droite, roulette, marque, boit, râle),
     // cases alignées en haut (casquette) ; et le bar avec le néon BABYFOOT
     remi_baby: { fichier: 'sprites/remi/remi_baby.png', largeur: 403, hauteur: 436, images: 7, vitesse: 1 },
+    // V19i figurines (outils/remi/preparer_images.py, figurines_baby) : ton gardien de dos (immobile, frappe) ;
+    // joueur de Rémi de face (immobile, armé, barre levée, roulette) ; cases alignées en bas (socle)
+    remi_baby_toi: { fichier: 'sprites/remi/remi_baby_toi.png', largeur: 152, hauteur: 247, images: 2, vitesse: 1 },
+    remi_baby_rouges: { fichier: 'sprites/remi/remi_baby_rouges.png', largeur: 228, hauteur: 248, images: 4, vitesse: 1 },
     remi_bar_babyfoot: { fichier: 'sprites/remi/remi_bar_babyfoot.jpg', largeur: 960, hauteur: 536, images: 1, vitesse: 1 },
     remi_bar_interieur: { fichier: 'sprites/remi/remi_bar_interieur.jpg', largeur: 960, hauteur: 536, images: 1, vitesse: 1 },
     // le videur de la porte : distrait, furieux (coupé à la taille)

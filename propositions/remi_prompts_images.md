@@ -205,7 +205,7 @@ Reprends exactement l'image jointe (même bar, même style, même cadrage), mais
 « BABYFOOT » de la même couleur, et ajoute au mur, à côté, une petite affiche « GAMELLE = -1 / ROULETTE INTERDITE ».
 ```
 
-## 26. Les figurines du babyfoot — `remi_babyfoot_joueurs.jpg` (À FAIRE)
+## 26. Les figurines du babyfoot — `remi_babyfoot_joueurs.jpg` ✅ REÇUE ET INTÉGRÉE (2e essai, « vraies figurines » ; case 3 doublon, case 4 vide)
 À joindre : **une capture d'écran du babyfoot dans le jeu** (pour l'angle de vue). La tige reste dessinée au code.
 ```
 Planche de figurines de BABYFOOT (joueurs en bois/plastique peint, comme sur un vrai babyfoot de bar : tête ronde, corps

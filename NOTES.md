@@ -295,6 +295,11 @@
   Greg) : TON GARDIEN plus large (zone d'arrêt `priseToi` 0,06 au lieu de 0,045 ; dessiné `largeurGardien` 0,07 m) et à
   moitié TRANSPARENT (`transparenceGardien` 0,5, contour blanc) : on voit la balle et ses joueurs à travers. Joueurs de
   Rémi : rouge plus vif, contour blanc, OMBRE au sol (on voit leur place même levés). Réglage développeur : largeur d'arrêt.
+- V19i : FIGURINES en images (`figurines_baby()` dans preparer_images.py, planche `remi_babyfoot_joueurs.jpg`) :
+  `remi_baby_toi.png` (ton gardien de dos : immobile, frappe 0,3 s au tir) et `remi_baby_rouges.png` (Rémi : immobile,
+  armé = seulement celui qui a la balle, barre levée = à plat à hauteur de tige, roulette), cases alignées sur le socle.
+  Une image par joueur, rangée par distance (`profondeur(z)`) ; la balle a son calque (`gBalle`) rangé de même.
+  `hauteurFigurine` 0,15 m, `tailleGardien` 1,15, `transparenceGardien` 0,62. Sans les images : dessin au code (V19h).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

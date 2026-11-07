@@ -337,6 +337,28 @@ def planche_baby():
     fond = fond.resize((960, round(fond.size[1] * 960 / fond.size[0])), Image.LANCZOS); fond.save(DST + 'remi_bar_babyfoot.jpg', quality=88)
     print('remi_bar_babyfoot.jpg', fond.size)
 
+def figurines_baby():
+    # V19i : planche des figurines (2 x 4 cases encadrées de noir) -> 2 bandes de cases égales, ALIGNÉES EN BAS (le socle) :
+    #  remi_baby_toi.png : ton gardien de dos (0 immobile, 1 frappe) ; remi_baby_rouges.png : joueur de Rémi de face
+    #  (0 immobile, 1 armé, 2 barre levée (à plat), 3 roulette). (case 3 = doublon, case 4 vide : non utilisées)
+    im = Image.open(SRC + 'remi_babyfoot_joueurs.jpg').convert('RGB')
+    X = [(16, 242), (264, 500), (523, 759), (781, 1007)]; Y = [(13, 268), (290, 546)]
+    def case(c, l, tout=False):
+        p = detourer(im.crop((X[c][0], Y[l][0], X[c][1], Y[l][1])), grand=1500)
+        a = np.asarray(p).copy(); al = a[:, :, 3] > 40
+        lab, n = ndimage.label(ndimage.binary_dilation(al, iterations=2))
+        t = ndimage.sum(np.ones_like(lab), lab, range(1, n + 1))
+        garde = [i + 1 for i in range(n) if tout and t[i] > 150] or [int(np.argmax(t)) + 1]
+        a[:, :, 3] = np.where(np.isin(lab, garde), a[:, :, 3], 0)
+        q = Image.fromarray(a, 'RGBA'); return q.crop(q.getbbox())
+    def bande(poses, nom):
+        W = max(p.size[0] for p in poses); H = max(p.size[1] for p in poses)
+        b = Image.new('RGBA', (W * len(poses), H), (0, 0, 0, 0))
+        for k, p in enumerate(poses): b.paste(p, (k * W + (W - p.size[0]) // 2, H - p.size[1]), p)
+        b.save(DST + nom); print(nom, W, H, [p.size for p in poses])
+    bande([case(0, 0), case(1, 0)], 'remi_baby_toi.png')
+    bande([case(0, 1), case(1, 1), case(2, 1), case(3, 1, tout=True)], 'remi_baby_rouges.png')
+
 planche_velo()
 presentation()
 planche_porte()
@@ -351,3 +373,4 @@ videur()
 planches_velo_v15()
 decor_porte()
 planche_baby()
+figurines_baby()
