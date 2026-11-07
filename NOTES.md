@@ -363,6 +363,9 @@
   Bot : 8/8, 0 tir vert arrêté.
 - V19r : nouvelle MUSIQUE du babyfoot (Captain Tsubasa OST 1983, piste 11, donnée par le propriétaire : l'ancienne
   « bouclait trop vite ») : `remi_musique_baby.mp3`, 1 min 40, silence de fin coupé ; elle reprend toujours où elle en était.
+- V19s (« les buts rentrent un peu facilement ») : attaque plus dure : `babyDefense` 0,16 / 0,24 / 0,33 / 0,38,
+  `babyGardienRemi` 0,231 / 0,289 / 0,347 / 0,29, `retardRemi` 5 → 6. (CUL SEC à 0,41 / 0,312 : le bot qui tourne sa
+  visée ne trouvait plus JAMAIS de vert → repris plus bas.) Bot : 8/8 ; attente avant le vert ~3,5 s en PRESSION / CUL SEC.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
