@@ -316,6 +316,12 @@
   Guide : « ◀ TOURNE LA VISÉE / TOURNE LA VISÉE ▶ » (flèche jaune). Toucher TIR / ESPACE = tir dans la visée ; glisser
   vers le haut = tir à l'angle du geste. Bot-guide : 5-0 en ~22 s dans les 3 difficultés (angles petits : tirer vite
   passe souvent avant que la défense se replace ; à durcir si trop facile au doigt).
+- V19l (retour : « bien mieux mais trop facile ») : sa DÉFENSE LIT TA VISÉE (vise l'endroit où ton tir croisera sa ligne,
+  `retardRemi` 5) à la vitesse `babyDefense` (0,15 / 0,22 / 0,3 / 0,38 m/s) : il faut la FEINTER (tourner puis repartir de
+  l'autre côté) ou jouer une bande. GUIDE (flèche jaune) seulement en DIABOLO / PANACHÉ (`babyGuide`) ; en PRESSION / CUL SEC
+  seule la couleur de la ligne aide. Plus dur aussi : ses tirs 0,6 / 0,75 / 0,95 / 1,15 m/s, bonus ÉCLAIR 1,2 / 1 / 0,8 /
+  0,6 s, son gardien 0,2 / 0,25 / 0,3 / 0,27, `vitesseBarresRemi` 0,4. Bot-guide (parfait) : 5-0 en 23 à 30 s, jusqu'à 3 s
+  de visée par but, angles jusqu'à 0,19.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

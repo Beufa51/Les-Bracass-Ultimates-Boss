@@ -401,7 +401,7 @@ export class RemiBaby extends BossScene {
       if (this.etat === 'riposte') {
         this.balle.x = Phaser.Math.Clamp(this.pos.toi + 0.03, -B.but / 2 + 0.01, B.but / 2 - 0.01); this.balle.z = BARRES.toi.z + 0.05;   // un peu de côté : visible derrière ton gardien
         this.fenetre -= dt;   // V19g : pas de limite de temps pour viser ; seul le bonus ÉCLAIR s'éteint
-        this.indice = this.chercherVert();
+        this.indice = this.diff.babyGuide ? this.chercherVert() : undefined;   // V19l : pas de guide en PRESSION / CUL SEC
         if (vientDAppuyer(this.touches.espace)) this.riposter(this.visee);
       }
       if (vientDAppuyer(this.touches.z)) this.appelRoulette();
@@ -440,7 +440,8 @@ export class RemiBaby extends BossScene {
     // pendant que tu tiens la balle, ses barres d'attaque et de défense visent l'endroit où ta balle ÉTAIT (Rémi réagit
     // en retard) : une feinte rapide ouvre un trou. Une fois ta balle partie, elles sont figées (trop rapide pour lui).
     const tiens = this.etat === 'riposte' && b, vole = this.etat === 'riposte_vol' && b;
-    if (tiens) this.memoire += (b.x - this.memoire) * Math.min(1, dt * B.retardRemi);
+    // V19l : sa défense lit TA VISÉE (là où ton tir passera sur sa ligne), avec un temps de retard : feinte-la ou joue les bandes
+    if (tiens) this.memoire += (xSur(b.x, b.z, this.visee, BARRES.def.z) - this.memoire) * Math.min(1, dt * B.retardRemi);
     for (const nom of ['def', 'gar', ...(this.etat === 'prep' ? [] : ['att'])]) {
       const br = BARRES[nom];
       let but = Math.sin(this.horloge * (nom === 'def' ? 1.3 : 1.7)) * br.course * (nom === 'gar' ? 0.25 : 0.6);   // son gardien attend plutôt au centre
@@ -454,7 +455,7 @@ export class RemiBaby extends BossScene {
         if (vole) continue;
         if (tiens) but = devant(this.memoire);
       }
-      vers(nom, but, nom === 'gar' ? D.babyGardienRemi : B.vitesseBarresRemi);
+      vers(nom, but, nom === 'gar' ? D.babyGardienRemi : tiens ? D.babyDefense : B.vitesseBarresRemi);
     }
   }
 
@@ -521,6 +522,7 @@ export class RemiBaby extends BossScene {
       const pourquoi = lib.cote ? 'À CÔTÉ' : !lib.libre ? 'BLOQUÉ' : 'SON GARDIEN EST EN FACE';
       const [m, c] = vert ? ['LIBRE : TOUCHE TIR !', '#7fff7f']
         : this.indice === -1 ? [`${pourquoi} : ◀ TOURNE LA VISÉE`, '#ffd84a'] : this.indice === 1 ? [`${pourquoi} : TOURNE LA VISÉE ▶`, '#ffd84a']
+        : this.indice === undefined ? [`${pourquoi} : tourne ta visée ◀ ▶`, '#ff7a7a']
         : [`${pourquoi} : attends qu'un trou s'ouvre`, '#ff7a7a'];
       this.txtVise.setText(m).setColor(c).setVisible(true);
     } else this.txtVise.setVisible(false);
