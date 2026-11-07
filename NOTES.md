@@ -275,6 +275,13 @@
   (`BABY.vitesseBoutons` 1,1 m/s, part à 45 % et atteint la pleine vitesse en 0,25 s : petites touches = petits pas),
   lâché = il s'arrête net. Ils clignotent les 6 premières secondes. TIR : toucher bref au milieu de l'écran (en biais si
   ◀ ou ▶ est tenu) ou glisser vers le haut ; ESPACE au clavier. La poignée du bas reste (où est le gardien).
+- V19e (retour : « je n'arrive pas à marquer, trop d'obstacles ? ») : en riposte, Rémi LÈVE SA BARRE D'ATTAQUE (dessinée
+  levée, ne bloque plus) : restent sa défense et son gardien. LIGNE DE VISÉE + message : ROUGE « BLOQUÉ » (un défenseur sur
+  la ligne) ou « À CÔTÉ », JAUNE « SON GARDIEN EST EN FACE » (il pourra l'atteindre : prise x `priseGardienRemi` 0,75 +
+  sa vitesse x (trajet + 0,08 s - réflexe)), VERTE « LIBRE : TIRE ! » = but sûr (`cheminLibre()`). Balle tenue gardée dans
+  le but. Plus de temps pour riposter (`babyFenetre` 2 / 1,7 / 1,4 / 1,1), défense plus lente (`vitesseBarresRemi` 0,2),
+  son gardien plus lent en PRESSION / CUL SEC (0,22 / 0,28) et réflexes +0,03 à 0,05 s. Bot « tire sur le vert » :
+  PANACHÉ 5-0, PRESSION 5-0 (8 arrêts), CUL SEC 2-0 en 60 s ; tout tir vert a marqué.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
