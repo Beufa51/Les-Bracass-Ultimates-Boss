@@ -446,6 +446,11 @@
   (`videurSurRemi` 0,5) ; à chaque passage Rémi décide (`remiDecision`) : PRUDENT (`remiPrudent` de la difficulté) ou
   GOURMAND : il insiste et vise plus fort (`remiInsiste` +0,25, bulle « Il me voit pas, lui... »). Bot humain : Rémi
   attrapé 2 / 2 / 2 / 1 fois (PANACHÉ, PRESSION x2, CUL SEC).
+- V20e IMAGES : « L'AIR DE RIEN » (`remi_air_de_rien_planche.jpg`, prompt 28) → `remi_dos_rien.png` / `remi_toi_dos_rien.png`
+  (`air_de_rien()` dans preparer_images.py : mêmes cases que remi_dos / remi_toi_dos ; pose coupée à mi-cuisse mise à
+  l'échelle réelle, tête à la place de la garde, JAMBES de la garde recollées dessous) ; poing caché = une des 2 poses
+  (sifflote / se gratte la nuque, `poseRien`), bulle assortie. Nouveau fond du babyfoot `remi_bar_babyfoot.jpg` (prompt 29 :
+  le néon dit « LE PERDANT PAIE SA TOURNÉE », plus d'affiche gamelle / roulette).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

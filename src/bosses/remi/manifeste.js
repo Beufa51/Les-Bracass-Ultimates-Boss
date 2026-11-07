@@ -21,6 +21,9 @@ export const MANIFESTE = {
     remi_porte_decor: { fichier: 'sprites/remi/remi_porte_decor.jpg', largeur: 960, hauteur: 536, images: 1, vitesse: 1 },
     // la porte VUE DE DOS : Rémi (garde, coup, impact) et toi (garde, élan, coup, impact), cases alignées à gauche
     remi_dos: { fichier: 'sprites/remi/remi_dos.png', largeur: 344, hauteur: 535, images: 3, vitesse: 1 },
+    // V20e : « l'air de rien » (sifflote, se gratte la nuque), mêmes cases que remi_dos / remi_toi_dos (air_de_rien())
+    remi_dos_rien: { fichier: 'sprites/remi/remi_dos_rien.png', largeur: 344, hauteur: 535, images: 2, vitesse: 1 },
+    remi_toi_dos_rien: { fichier: 'sprites/remi/remi_toi_dos_rien.png', largeur: 335, hauteur: 557, images: 2, vitesse: 1 },
     remi_toi_dos: { fichier: 'sprites/remi/remi_toi_dos.png', largeur: 335, hauteur: 557, images: 3, vitesse: 1 },
     // V7 : décors et objets du vélo(outils/remi/preparer_images.py)
     remi_rue2: { fichier: 'sprites/remi/remi_rue2.jpg', largeur: 1702, hauteur: 575, images: 1, vitesse: 1 },   // les quais

@@ -231,7 +231,7 @@ tendus, et ces deux doigts DÉSIGNENT SES DEUX YEUX : l'index pointe vers son œ
 (le bout de chaque doigt juste sous l'œil, sans le toucher), les autres doigts repliés. Fond transparent, 1 seule pose, même taille que l'image jointe.
 ```
 
-## 28. « L'air de rien » à la porte (Rémi et toi, de dos) — `remi_air_de_rien_planche.jpg` (À FAIRE)
+## 28. « L'air de rien » à la porte (Rémi et toi, de dos) — `remi_air_de_rien_planche.jpg` ✅ REÇUE ET INTÉGRÉE (V20e)
 À joindre : **`remi_coups_planche.jpg`** (mêmes personnages, même cadrage que les coups dans la porte).
 ```
 Même style et mêmes personnages que l'image jointe (manga/anime, contours noirs nets), fond BLANC uni, aucun texte.
@@ -243,7 +243,7 @@ Ligne du haut : le personnage barbu à casquette ; ligne du bas : le jeune homme
 sur le côté, petit sourire gêné.
 ```
 
-## 29. (facultatif) L'affiche du bar, à jour — `remi_bar_babyfoot.jpg` (nouvelle version)
+## 29. (facultatif) L'affiche du bar, à jour — `remi_bar_babyfoot.jpg` (nouvelle version) ✅ REÇUE ET INTÉGRÉE (le néon dit « LE PERDANT PAIE SA TOURNÉE »)
 À joindre : **`remi_bar_babyfoot.jpg`** (l'actuel). L'affiche « GAMELLE = -1 / ROULETTE INTERDITE » annonce des règles retirées (V19z).
 ```
 Reprends exactement l'image jointe (même bar, même style, même cadrage, même néon BABYFOOT). Change seulement le texte

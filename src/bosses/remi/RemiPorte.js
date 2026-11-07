@@ -250,8 +250,11 @@ export class RemiPorte extends BossScene {
   faireGenre(qui) {
     this.charge = false; this.poingCache = true; this.pose[qui] = 'garde';
     this.puissance *= R.cacheGarde;   // V19y : cacher son poing coûte (on ne garde que R.cacheGarde de la charge)
-    if (qui === 'toi') bulle(this, choisir(['*sifflote*', '*regarde ses chaussures*', '*se recoiffe*', '*fait genre de rien*']), '#cccccc', 0.9, 330);
-    else bulle(this, 'Rémi : *sifflote innocemment*', '#ffd84a', 0.9, 80);
+    // V20e : une des 2 poses « l'air de rien » (images), la bulle va avec
+    this.poseRien = Math.random() < 0.5 ? 0 : 1;
+    const geste = this.poseRien === 0 ? '*sifflote*' : '*se gratte la nuque*';
+    if (qui === 'toi') bulle(this, geste, '#cccccc', 0.9, 330);
+    else bulle(this, `Rémi : ${geste}`, '#ffd84a', 0.9, 80);
   }
 
   // ---------- le videur ----------
@@ -573,7 +576,11 @@ export class RemiPorte extends BossScene {
       const x = IMPACT.x - c.poing * c.echelle - 400 * this.entree * this.entree - ch * 40;
       // au moment du coup : il plonge vers la porte (élan) et grossit un peu (il se rapproche de nous)
       const pl = pose === 'frappe' ? Math.min(1, this.elan / 0.18) : 0;
-      spr.setFrame(c.cases[pose] ?? 0).setPosition(x + bal + pl * 30, c.haut + ch * 10 - pl * 8).setRotation(-0.08 * ch + pl * 0.05)
+      // V20e : poing caché = la pose « l'air de rien » (si les images sont là)
+      const rien = this.poingCache && this.textures.exists(c.tex + '_rien');
+      if (rien) spr.setTexture(c.tex + '_rien', this.poseRien || 0); else if (spr.texture.key !== c.tex) spr.setTexture(c.tex, 0);
+      if (!rien) spr.setFrame(c.cases[pose] ?? 0);
+      spr.setPosition(x + bal + pl * 30, c.haut + ch * 10 - pl * 8).setRotation(-0.08 * ch + pl * 0.05)
         .setScale(c.echelle * (1 + pl * 0.06));
     }
   }

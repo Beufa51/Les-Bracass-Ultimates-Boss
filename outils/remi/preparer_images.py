@@ -388,6 +388,51 @@ def videur_mefiant():
     for k, x in enumerate(poses): bande.paste(x, (k * W + (W - x.size[0]) // 2, H - x.size[1]), x)
     bande.save(DST + 'remi_videur_mefiant.png'); print('remi_videur_mefiant.png', W, H, [x.size for x in poses])
 
+def air_de_rien():
+    # V20e : planche « l'air de rien » (2 x 2 : Rémi en haut, toi en bas ; 1 sifflote, 2 se gratte la nuque) -> deux bandes
+    # remi_dos_rien.png / remi_toi_dos_rien.png aux MÊMES dimensions de case que remi_dos / remi_toi_dos, chaque pose mise
+    # à la hauteur et à la place (bas, milieu) du personnage en garde (case 0), pour qu'il ne saute pas en changeant de pose
+    src = Image.open(SRC + 'remi_air_de_rien_planche.jpg').convert('RGB')
+    W, H = src.size
+    for ligne, (nom, ref) in enumerate((('remi_dos_rien', 'remi_dos'), ('remi_toi_dos_rien', 'remi_toi_dos'))):
+        bande_ref = Image.open(DST + ref + '.png')
+        cw = bande_ref.size[0] // 3; ch = bande_ref.size[1]
+        garde = bande_ref.crop((0, 0, cw, ch)); gb = garde.getbbox()
+        sortie = Image.new('RGBA', (cw * 2, ch), (0, 0, 0, 0))
+        for col in range(2):
+            p = detourer(src.crop((col * W // 2, ligne * H // 2, (col + 1) * W // 2, (ligne + 1) * H // 2)), grand=1500)
+            a = np.asarray(p).copy(); al = a[:, :, 3] > 40
+            lab, n = ndimage.label(ndimage.binary_dilation(al, iterations=2))
+            t = ndimage.sum(np.ones_like(lab), lab, range(1, n + 1))
+            grand = int(np.argmax(t)) + 1
+            # le corps + les NOTES de musique (petits morceaux dans le haut, près de la tête) ; pas les miettes ailleurs
+            ys = ndimage.center_of_mass(np.ones_like(lab), lab, range(1, n + 1)); cyc = np.nonzero(lab == grand)[0]
+            haut = cyc.min() + 0.3 * (cyc.max() - cyc.min())
+            garde_ids = [grand] + [i + 1 for i in range(n) if i + 1 != grand and t[i] > 300 and ys[i][0] < haut]
+            a[:, :, 3] = np.where(np.isin(lab, garde_ids), a[:, :, 3], 0)
+            corps = np.where(lab == grand)
+            q = Image.fromarray(a, 'RGBA')
+            cy0, cy1 = corps[0].min(), corps[0].max()
+            # échelle réelle : de la tête à mi-cuisse ≈ 62 % de la hauteur du personnage en pied (case de garde)
+            k = (gb[3] - gb[1]) * 0.62 / (cy1 - cy0)
+            q = q.resize((round(q.size[0] * k), round(q.size[1] * k)), Image.LANCZOS)
+            coupe = round(gb[1] + (cy1 - cy0) * k)        # où la pose s'arrête (mi-cuisse), dans la case
+            # les hanches : milieu des pixels pleins juste au-dessus de la coupe, dans la garde et dans la pose
+            def milieu(img, y):
+                r = np.nonzero(np.asarray(img)[max(0, y - 6):y, :, 3].max(axis=0) > 100)[0]
+                return (r.min() + r.max()) / 2 if len(r) else img.size[0] / 2
+            hq = milieu(q, round(cy1 * k)); hg = milieu(garde, coupe)
+            case = Image.new('RGBA', (cw, ch), (0, 0, 0, 0))
+            # les JAMBES de la garde sous la coupe (même jean) : pas de trou au-dessus du bas de l'écran
+            x0j, x1j = max(0, round(hg - 95)), min(cw, round(hg + 95))   # seulement autour des hanches (pas un bout de bras)
+            case.paste(garde.crop((x0j, coupe - 8, x1j, ch)), (x0j, coupe - 8))
+            couche = Image.new('RGBA', (cw, ch), (0, 0, 0, 0)); couche.paste(q, (round(hg - hq), round(gb[1] - cy0 * k)), q)
+            case.alpha_composite(couche)
+            sortie.paste(case, (col * cw, 0), case)
+        sortie.save(DST + nom + '.png'); print(nom + '.png', cw, ch)
+    fond = Image.open(SRC + 'remi_bar_babyfoot.jpg').convert('RGB')
+    fond.resize((960, round(fond.size[1] * 960 / fond.size[0])), Image.LANCZOS).save(DST + 'remi_bar_babyfoot.jpg', quality=88)
+
 planche_velo()
 presentation()
 planche_porte()
@@ -404,3 +449,4 @@ decor_porte()
 planche_baby()
 figurines_baby()
 videur_mefiant()
+air_de_rien()
