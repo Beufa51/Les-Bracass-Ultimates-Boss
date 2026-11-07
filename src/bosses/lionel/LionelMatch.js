@@ -169,7 +169,8 @@ export class LionelMatch extends BossScene {
     this.etiquettes(ETIQUETTES_OK);
     const tactile = estTactile();
     this.afficherIntro('LIONEL - Le Chambreur', [
-      `BUT : vise le mur derrière Lionel (jaune = 3 points, rouge = 5). Set à ${R.pointsSet} points ou ${R.dureeSet} s`,
+      'BUT : vise le mur derrière Lionel (jaune = 3 points, rouge = 5)',
+      `Set gagné à ${R.pointsSet} points, ou le meilleur au bout de ${R.dureeSet} s`,
       'Flèches : cours vers le CERCLE VERT pour attraper',
       (tactile ? 'Lancer' : 'ESPACE') + ' : lancer (▲ ▼ = en biais)   ' + (tactile ? 'Lob' : 'Z') + ' : lob',
       'Le reste (super, plongeon, contre parfait) : l\'entraînement te le montre !',
@@ -886,7 +887,7 @@ export class LionelMatch extends BossScene {
     const s = this.stats;
     if (s.concedes === 0) return 'Conseil : relance tout de suite après une réception = lancer PUISSANT.';
     const pire = Math.max(s.encLob, s.encMilieu, s.encCote);
-    if (pire === s.encLob) return 'Conseil : sur un lob, file dans le cercle au sol : sous le lob = SUPER LANCER !';
+    if (pire === s.encLob) return 'Conseil : sur un lob, file dans le cercle au sol : dessous = SUPER LANCER !';
     if (pire === s.encMilieu) return 'Conseil : reste au MILIEU de ton but : les tirs au centre valent 5 points.';
     return 'Conseil : suis les POINTS BLANCS des tirs en biais, et PLONGE (lancer en courant) s\'il est loin.';
   }
@@ -985,10 +986,10 @@ export class LionelMatch extends BossScene {
     this.tweens.add({ targets: rayons, angle: 360, duration: 20000, repeat: -1 });
     const lionel = this.add.image(LARGEUR + 200, HAUTEUR - 30, 'lionel_defaite').setOrigin(0.5, 1).setDepth(P + 2);
     lionel.setScale(330 / lionel.height).setFlipX(!this.estIllustre('lionel_defaite'));
-    this.tweens.add({ targets: lionel, x: 810, duration: 500, ease: 'Cubic.Out' });
-    const trophee = this.add.image(300, 300, 'lionel_trophee').setDepth(P + 3).setScale(0).setAngle(-30);
-    this.tweens.add({ targets: trophee, scale: 1.15, angle: 0, delay: 350, duration: 600, ease: 'Back.Out' });
-    this.tweens.add({ targets: trophee, y: 290, delay: 1000, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
+    this.tweens.add({ targets: lionel, x: 830, duration: 500, ease: 'Cubic.Out' });
+    const trophee = this.add.image(280, 310, 'lionel_trophee').setDepth(P + 3).setScale(0).setAngle(-30);
+    this.tweens.add({ targets: trophee, scale: 0.95, angle: 0, delay: 350, duration: 600, ease: 'Back.Out' });
+    this.tweens.add({ targets: trophee, y: 300, delay: 1000, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
     this.time.addEvent({ delay: 180, repeat: -1, callback: () => {
       const e = this.add.star(300 + Phaser.Math.Between(-130, 130), 300 + Phaser.Math.Between(-150, 120), 4, 3, 9, 0xfff3a8).setDepth(P + 4);
       this.tweens.add({ targets: e, scale: 0, angle: 180, duration: 700, onComplete: () => e.destroy() });
@@ -1002,11 +1003,16 @@ export class LionelMatch extends BossScene {
       this.tweens.add({ targets: r, scale: 1, delay: 900, duration: 300, ease: 'Back.Out' });
       texte(this, 140, 375, 'RANG', 22, '#ffd84a').setDepth(P + 5);
     }
-    texte(this, 300, 135, lignes[0], 22, '#ffffff').setDepth(P + 5);
+    texte(this, 280, 135, lignes[0], 22, '#ffffff').setDepth(P + 5);
     // colonne entre le trophée et Lionel, avec retour à la ligne (sinon le conseil sort de l'écran)
-    const bloc = texte(this, 400, 178, lignes.slice(1).join('\n').replace(/RANG \w\s+-\s+/, ''), 15, '#ffffff',
-      { align: 'left', lineSpacing: 3, wordWrap: { width: 290 } }).setDepth(P + 5);
-    if (bloc.height > 320) bloc.setScale(320 / bloc.height);
+    // (défis en version courte : ★ nouveau, ✓ déjà réussi, ☐ à débloquer)
+    const corps = lignes.slice(1).join('\n').replace(/RANG \w\s+-\s+/, '')
+      .replace(/★ DÉFI RÉUSSI : /g, '★ ').replace(/Défi déjà réussi : /g, '✓ ').replace(/Défi à débloquer : /g, '☐ ')
+      .replace(/   points marqués : (\d+)   encaissés : (\d+)/, '\nPoints : $1 - $2');
+    const bloc = texte(this, 410, 165, corps, 14, '#ffffff',
+      { align: 'left', lineSpacing: 3, wordWrap: { width: 236 }, backgroundColor: '#000000aa', padding: { x: 8, y: 6 } })
+      .setOrigin(0, 0).setDepth(P + 5);
+    if (bloc.height > 330) bloc.setScale(330 / bloc.height);
     bulle(this, 760, 140, `Lionel : « ${REPLIQUES.victoire} »`, 99999).setDepth(P + 5);
     const badge = this.add.image(140, 210, 'badge_' + this.identite.id).setDepth(P + 5).setScale(0);
     this.tweens.add({ targets: badge, scale: 2, delay: 1200, duration: 300, ease: 'Back.Out' });

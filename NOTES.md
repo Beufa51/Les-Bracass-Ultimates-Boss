@@ -631,7 +631,8 @@
     bout (« DERNIER LANCER ! ») ; tic sonore des 5 dernières secondes ; « ding » quand le cercle devient bleu ; contre
     parfait : le lancer attend la fin du ralenti et ▲ ▼ se lisent même tenus depuis la course ; fenêtre du contre parfait
     0,3 s à l'entraînement ; REJOUER ne relance plus l'entraînement ; écran des commandes réduit à 4 lignes ; classement :
-    `rangParPoint` 0,5, temps de référence 90 s, défi `defiHermetique` < 14 points.
+    `rangParPoint` 0,5, temps de référence 90 s, défi `defiHermetique` < 14 points. Bot après audit : FACILE 43-3,
+    NORMAL 2-0 (15-6, 15-8, sets joués jusqu au chrono), CHAMPION 0-2 (3-5, 6-10) : serré. FACILE reste très facile.
   - Musique de fond : `assets/audio/lionel/lionel_musique.mp3` (Windjammers, « Lawn Court », 64 kbit/s, 2,3 Mo, en boucle,
     volume 0,4 dans le manifeste de Lionel).
   - Pas de voix (annonceur) dans le match de Lionel, à la demande du propriétaire (Greg garde les siennes).
