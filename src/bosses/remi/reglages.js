@@ -106,7 +106,7 @@ export const BABY = {
   eclairReflexe: 0.08,    // ... et son gardien réagit ce temps plus tard (s)
   riposteVitesse: 2.2,    // ta riposte (m/s)
   priseGardienRemi: 0.75, // son gardien arrête la balle à moins de B.prise x ce chiffre (ses joueurs : x 0,85)
-  viseeMax: 0.55,         // V19k BILLARD : angle max de la visée (rad ; assez pour un tir en bande)
+  viseeMax: 0.85,         // V19k BILLARD : angle max de la visée (rad) (V19o : 0,55 → 0,85 : les tirs en BANDE peuvent enfin entrer)
   vitesseVisee: 0.45,     // vitesse à laquelle ◀ ▶ tournent la visée (rad/s, avec le même départ doux que le gardien)
   biais: 0.12,            // angle max de la riposte en glissant en biais (rad)
   vitesseBarresRemi: 0.4, // ses barres d'attaque et de défense se replacent devant ta balle à cette vitesse (m/s)
@@ -116,7 +116,7 @@ export const BABY = {
   appelDuree: 1.6,        // temps pour crier « ROULETTE ! » après son but (s)
   // V19n : chaque but que TU marques (une pinte pour Rémi) ralentit sa défense et son gardien de cette part (mini 50 %)
   defBue: 0.12, garBue: 0.1,
-  ralenti: 0.25, ralentiDuree: 0.45, // RALENTI quand tu marques : vitesse du jeu et durée (s)
+  ralenti: 0.25, ralentiDuree: 0.45, arretFige: 0.12, // RALENTI quand tu marques (vitesse du jeu, durée en s) ; arretFige : petit ralenti à TON arrêt
   // V19m EFFET BOURRÉ (chaque but encaissé = une pinte ; les effets plafonnent à ivresseMax pintes)
   ivresseMax: 5,
   titubeVisee: 0.035,     // ta visée ondule de ± ce nombre de rad par pinte

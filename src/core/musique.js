@@ -39,12 +39,13 @@ export function installerMusiques() {
   });
 }
 
-// Joue une musique en boucle tant que la scène est active
-export function jouerMusique(scene, cle) {
+// Joue une musique en boucle tant que la scène est active.
+// options.reprendre : repart là où elle s'était arrêtée (au lieu du début) — pour un morceau court rejoué souvent.
+export function jouerMusique(scene, cle, options = {}) {
   const p = piste(cle);
   if (!p) return;
   p.voulue = true;
-  p.audio.currentTime = 0;
+  if (!options.reprendre) p.audio.currentTime = 0;
   p.audio.play().catch(() => { /* bloquée : relancée au prochain appui */ });
   scene.events.once('shutdown', () => { p.voulue = false; p.audio.pause(); });
   // jeu en pause => musique en pause

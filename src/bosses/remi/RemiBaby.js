@@ -78,11 +78,13 @@ export class RemiBaby extends BossScene {
     this.hud = texte(this, LARGEUR / 2, 22, '', 26, '#ffffff', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 3 } }).setDepth(900);
     this.touches = creerTouches(this);
     laisserPasserTactile(this);
-    jouerMusique(this, 'remi_musique_baby');   // Captain Tsubasa (donnée par le propriétaire)
+    jouerMusique(this, 'remi_musique_baby', { reprendre: true });   // Captain Tsubasa (donnée par le propriétaire)
     this.installerDoigt();
     // vue qui se trouble (bords sombres) avec l'alcool : effet du moteur (WebGL), ignoré s'il n'existe pas
     this.vignette = null;
-    try { if (this.cameras.main.postFX) this.vignette = this.cameras.main.postFX.addVignette(0.5, 0.5, 0.75, 0); } catch (e) { this.vignette = null; }
+    const cam0 = this.cameras.main;
+    cam0.setZoom(1).centerOn(CX, HAUTEUR / 2);   // (V19o : une partie quittée pendant le zoom du but ne le garde pas)
+    try { if (cam0.postFX) { cam0.postFX.clear(); this.vignette = cam0.postFX.addVignette(0.5, 0.5, 0.75, 0); } } catch (e) { this.vignette = null; }
     etiquettesTactiles({ ...VIDES, espace: 'OK' });
     const t = estTactile();
     this.afficherIntro('RÉMI - Le babyfoot', [
@@ -241,7 +243,11 @@ export class RemiBaby extends BossScene {
     const dx = tx - x0, dz = zg - z0, n = Math.hypot(dx, dz);
     b.vx = dx / n * v; b.vz = dz / n * v;
     this.etat = 'tir';
-    jouerSon(this, 'remi_tape', { volume: 0.6 });
+    // V19o : SON tir se sent aussi : éclat rouge à son pied, la caméra « encaisse » vers toi, gros claquement
+    jouerSon(this, 'remi_tape', { volume: 1, rate: 0.85 });
+    this.eclats.push({ x: b.x, z: b.z, t: 0, c: 0xff5a5a });
+    this.tweens.add({ targets: this.cameras.main, zoom: 1.03, duration: 70, yoyo: true, ease: 'Quad.easeOut' });
+    if (v > D.babyVitesse * 1.05) annonce(this, T.roulette ? 'ROULETTE !?' : 'PATATE !', '#ff6b6b', 0.35);
   }
 
   // ---------- mouvement de la balle (bandes, barres, buts) ----------
@@ -249,7 +255,8 @@ export class RemiBaby extends BossScene {
     const b = this.balle; if (!b) return;
     const zAvant = b.z, xAvant = b.x;
     // x de la balle à l'instant exact où elle croise la ligne z (sinon une balle en biais « traverse » un joueur entre 2 images)
-    const xA = (z) => xAvant + (b.x - xAvant) * (z - zAvant) / ((b.z - zAvant) || 1);
+    // (V19o : même calcul que la ligne de visée, rebonds compris : un tir en bande est jugé comme il est montré)
+    const aAvant = Math.atan2(b.vx, b.vz || 1e-6), xA = (z) => b.vz ? xSur(xAvant, zAvant, aAvant, z) : xAvant;
     b.x += b.vx * dt; b.z += b.vz * dt;
     if (b.x > W / 2 - R) { b.x = W - 2 * R - b.x; b.vx = -Math.abs(b.vx); jouerSon(this, 'remi_rebond', { volume: 0.4 }); }
     if (b.x < -W / 2 + R) { b.x = -W + 2 * R - b.x; b.vx = Math.abs(b.vx); jouerSon(this, 'remi_rebond', { volume: 0.4 }); }
@@ -282,8 +289,10 @@ export class RemiBaby extends BossScene {
   // ---------- issues ----------
   arret() {
     this.arrets++;
-    jouerSon(this, 'remi_atterrit', { volume: 0.7 });
-    this.cameras.main.shake(80, 0.004);
+    jouerSon(this, 'remi_atterrit', { volume: 0.9 }); jouerSon(this, 'remi_tape', { volume: 0.7, rate: 1.4 });
+    this.cameras.main.shake(140, 0.008);
+    this.ralentiFin = this.horloge + B.arretFige;   // V19o : petit arrêt sur image au moment de l'arrêt (on sent le choc)
+    this.eclats.push({ x: this.pos.toi, z: BARRES.toi.z + 0.03, t: 0, c: 0x7fc4ff });
     this.roulette = null;
     annonce(this, 'ARRÊT !', '#7fff7f', 0.5);
     this.balle.vx = 0; this.balle.vz = 0;

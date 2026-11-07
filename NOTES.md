@@ -335,6 +335,15 @@
   zoom x1,3 vers la cage puis retour, 46 confettis, foule ; but de Rémi : grosse secousse, balle au fond de ton but.
   RÉMI BOURRÉ : chaque but que tu marques ralentit sa défense (`defBue` 12 %) et son gardien (`garBue` 10 %), mini 50 %.
   Début plus doux : `babyDefense` 0,13 / 0,19 / 0,26 / 0,33. (Caméra : eases « Quad.easeOut », pas « Quad.Out ».)
+- V19o (retours : tirs en bande inutiles, pas de sensation sur les tirs de Rémi, musique qui boucle vite ; demande
+  d'AUDIT) : `viseeMax` 0,55 → 0,85 (un tir en bande demande 0,5 à 0,63 : il ne pouvait presque jamais entrer ; bot :
+  10 tirs en bande verts sur 11 marquent). Croisements des barres calculés avec les rebonds (`xSur`, comme la ligne).
+  TIR DE RÉMI : éclat rouge, coup de caméra, claquement, « PATATE ! » sur ses tirs rapides ; TON ARRÊT : secousse,
+  éclat bleu, mini-ralenti `arretFige` 0,12 s. MUSIQUE : blancs coupés (109 s), et elle REPREND où elle en était
+  (`jouerMusique(scene, cle, { reprendre: true })`, nouvelle option dans `core/musique.js`, défaut inchangé).
+  Caméra remise à zéro et vignette non empilée à chaque partie. AUDIT joueur + développeur :
+  `propositions/remi_audit_babyfoot.md` (priorités : engagement après TON but, sons de babyfoot, feinte expliquée,
+  bouton ROULETTE, découper RemiBaby.js + bot de test dans le dépôt).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
