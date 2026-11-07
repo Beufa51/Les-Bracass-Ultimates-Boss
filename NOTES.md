@@ -300,6 +300,14 @@
   armé = seulement celui qui a la balle, barre levée = à plat à hauteur de tige, roulette), cases alignées sur le socle.
   Une image par joueur, rangée par distance (`profondeur(z)`) ; la balle a son calque (`gBalle`) rangé de même.
   `hauteurFigurine` 0,15 m, `tailleGardien` 1,15, `transparenceGardien` 0,62. Sans les images : dessin au code (V19h).
+- V19j (retours : les joueurs levés de Rémi « pas crédibles » ; « je comprends pas comment marquer ») : barre levée =
+  figurine debout ÉCRASÉE sous la tige (`leveEcrase` 0,3, transparence 0,7) au lieu d'à plat. GUIDE : `chercherVert()`
+  cherche la position la plus proche où la ligne serait VERTE ; la flèche ◀ ou ▶ à presser clignote en JAUNE et le message
+  dit « BLOQUÉ / À CÔTÉ / SON GARDIEN EST EN FACE : ◀ VA À GAUCHE / VA À DROITE ▶ », puis « LIBRE : TOUCHE TIR ! ».
+  Pendant que tu vises, son gardien SE BALANCE (`balancier` 1,6) : des trous s'ouvrent (sinon CUL SEC n'avait jamais de
+  vert, et sans limite de temps on restait bloqué). CUL SEC : son gardien 0,2 m/s, réflexe 0,2 s. Vert plus sûr : +1 cm
+  autour de ses défenseurs, +0,12 s de marge sur son gardien. Bot qui suit le guide : 5-0 en ~20 s dans les 3 difficultés,
+  aucun tir vert arrêté.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

@@ -30,7 +30,7 @@ export const DIFFICULTES = {
     remiCharge: 0.68, remiPrudent: 0.35, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
   champion: { nom: 'CUL SEC', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
-    babyVitesse: 1.05, babyLecture: 0.85, babyFeinte: 0.5, babyBande: 0.3, babyRoulette: 0.2, babyRate: 0.04, babyFenetre: 0.9, babyReflexe: 0.17, babyGardienRemi: 0.28, babyAide: 0,
+    babyVitesse: 1.05, babyLecture: 0.85, babyFeinte: 0.5, babyBande: 0.3, babyRoulette: 0.2, babyRate: 0.04, babyFenetre: 0.9, babyReflexe: 0.2, babyGardienRemi: 0.2, babyAide: 0,
     remiCharge: 0.84, remiPrudent: 0.85, videur: 0.75, feintes: 0.65, zone: 0.1, visee: 1.3 },
 };
 
@@ -89,6 +89,8 @@ export const BABY = {
   course: 0.13,           // débattement de ton gardien (m de chaque côté)
   priseToi: 0.06,         // V19h : TON gardien arrête la balle à moins de ça de son centre (plus large que ceux de Rémi)
   largeurGardien: 0.07,   // ... et il est dessiné de cette largeur (m)
+  balancier: 1.6,         // V19j : pendant que tu vises, son gardien se balance devant son but (vitesse du balancement)
+  leveEcrase: 0.3,        // V19j : barre levée : la figurine (pieds vers Rémi) vue écrasée à cette part de sa hauteur
   hauteurFigurine: 0.15,  // V19i : hauteur d'une figurine (image) du socle à la tête (m)
   tailleGardien: 1.15,    // ... ton gardien, un peu plus grand (il est plus large aussi)
   transparenceGardien: 0.62, // ... à moitié transparent : on voit la balle et ses joueurs derrière lui
