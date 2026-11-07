@@ -51,11 +51,13 @@ const VOIT_IMG = [{ l: 394, h: 175 }, { l: 434, h: 179 }, { l: 382, h: 213 }], E
 const TREMPLIN_IMG = { l: 1114, h: 459, haut: 0.81 };
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 // hauteur et demi-largeur de chaque obstacle (chocs) ; debout et traverse sont plus hauts que le plus grand saut
-const TAILLE = { allonge: [52, 58], verre: [13, 36], debout: [210, 23], traverse: [210, 26], vomi: [5, 55], poubelle: [95, 32] };
+// V20b : l'ALLONGÉ est une RANGÉE de 3 bourrés (trop longue pour un saut) : on passe DEVANT (en bas), ou vraiment par-dessus
+const TAILLE = { allonge: [52, 175], verre: [13, 36], debout: [210, 23], traverse: [210, 26], vomi: [5, 55], poubelle: [95, 32] };
 const SONNER = { debout: true, traverse: true };    // les obstacles qui demandent la sonnette
 // V17 : ceux qu'on évite en descendant (les autres : sauter). La POUBELLE : en descendant OU par un grand saut.
-const ESQUIVER = { allonge: true, poubelle: true }, SAUTABLE = { poubelle: true };
+const ESQUIVER = { allonge: true, poubelle: true }, SAUTABLE = { poubelle: true, allonge: true };   // (V20b : sauter VRAIMENT par-dessus la rangée compte)
 // illustration des bourrés (remi_bourres.png : debout, sursaute, allongé, traverse de face) et sa taille à l'écran
+const ALLONGE_ECART = 112;   // V20b : écart entre les 3 bourrés de la rangée (px)
 const BOURRE = 0.33, IMAGE_BOURRE = { debout: 0, ecarte: 1, allonge: 2, marche: 3 };
 const TEINTES = [0xffffff, 0xffe2d8, 0xdfe6ff, 0xe4ffd9, 0xfff3c0];
 
@@ -158,7 +160,7 @@ export class RemiVelo extends BossScene {
   demanderDring() { this.appuiG = 0.15; if (this.recharge <= 0 && this.chute <= 0) this.sonner(); }
 
   genererParcours() {
-    for (const o of [...this.obstacles, ...(this.voitures || []), ...(this.tremplins || []), ...(this.pintes || [])]) { if (o.g) o.g.destroy(); if (o.spr) o.spr.destroy(); if (o.img) o.img.destroy(); }
+    for (const o of [...this.obstacles, ...(this.voitures || []), ...(this.tremplins || []), ...(this.pintes || [])]) { if (o.g) o.g.destroy(); if (o.spr) o.spr.destroy(); if (o.img) o.img.destroy(); for (const e of o.extra || []) e.destroy(); }
     this.obstacles = []; this.pintes = []; this.voitures = []; this.tremplins = []; this.avantPoubelle = false;
     this.troncon = V.longueur / 3;                 // longueur d'un tronçon « normal »
     this.route = DEPART_ROUTE; this.numCarrefour = 0; this.choix = null;
@@ -207,7 +209,7 @@ export class RemiVelo extends BossScene {
       // l'écart se compte en TEMPS, à la vitesse prévue à cet endroit : jamais deux obstacles collés
       const vit = V.vitesseDepart + (V.vitesseFin - V.vitesseDepart) * Math.min(1, x / V.longueur);
       // jamais moins de 0,85 s entre deux obstacles (même dans un raccourci bondé) ; après une POUBELLE (grand saut), 0,5 s de plus
-      const ecart = vit * Math.max(0.85, hasard(V.ecart[0], V.ecart[1]) / (this.diff.densite * route.densite)) + (type === 'traverse' ? 120 : 0) + (type === 'poubelle' ? vit * 0.7 : 0);
+      const ecart = vit * Math.max(0.85, hasard(V.ecart[0], V.ecart[1]) / (this.diff.densite * route.densite)) + (type === 'traverse' ? 120 : type === 'allonge' ? 240 : 0) + (type === 'poubelle' ? vit * 0.7 : 0);
       if (k > 2 && Math.random() < V.pintes * route.pintes) this.pintes.push({ x: x + ecart / 2, h: HAUT_PINTE, prise: false, t: Math.random() * 6 });
       x += ecart;
     }
@@ -217,7 +219,9 @@ export class RemiVelo extends BossScene {
     const g = this.add.graphics().setDepth(type === 'traverse' ? 5 : 8);
     const spr = IMAGE_BOURRE[type === 'traverse' ? 'marche' : type] !== undefined && this.textures.exists('remi_bourres')
       ? this.add.sprite(0, 0, 'remi_bourres', 0).setOrigin(0.5, 1).setDepth(g.depth).setTint(choisir(TEINTES)).setVisible(false) : null;
-    this.obstacles.push({ type, x, etat: 'normal', t: Math.random() * 6, p: 0, touche: false, passe: false, g, spr, couleur: choisir(COULEURS.bourre) });
+    // la rangée d'allongés : 2 bourrés de plus à côté du premier
+    const extra = type === 'allonge' && spr ? [0, 1].map(() => this.add.sprite(0, 0, 'remi_bourres', 0).setOrigin(0.5, 1).setDepth(g.depth).setTint(choisir(TEINTES)).setVisible(false).setFlipX(Math.random() < 0.5)) : [];
+    this.obstacles.push({ type, x, etat: 'normal', t: Math.random() * 6, p: 0, touche: false, passe: false, g, spr, extra, couleur: choisir(COULEURS.bourre) });
   }
 
   // ---------- décor : la rue illustrée (sinon des immeubles dessinés), la route dessinée à chaque image ----------
@@ -501,7 +505,9 @@ export class RemiVelo extends BossScene {
       if (o.etat === 'ecarte') o.p = Math.min(1, o.p + dt / 0.4);
       if (o.type === 'traverse') {
         // il part quand tu arrives (il te couperait la route ~0,9 s plus tard)
-        if (o.etat === 'normal' && d < this.v * 1.7) o.etat = 'marche';
+        // V20b (retour : « ceux qui traversent ne servent à rien » : il partait trop tôt et était passé avant toi) : il part pour être
+        // AU MILIEU de la route (p ≈ 0,55) quand tu arrives : il faut sonner
+        if (o.etat === 'normal' && d < this.v * (0.55 * 1.8 / this.diff.traverse)) o.etat = 'marche';
         if (o.etat === 'marche') o.p = Math.min(1, o.p + dt * this.diff.traverse / 1.8);
         if (o.etat === 'recule') o.p = Math.max(0, o.p - dt * 0.8);
       }
@@ -711,6 +717,7 @@ export class RemiVelo extends BossScene {
       const sx = o.x - cam;
       o.g.clear();
       if (o.spr) o.spr.setVisible(false);
+      for (const e of o.extra || []) e.setVisible(false);
       if (o.img) o.img.setVisible(false);
       if (sx < -200 || sx > LARGEUR + 200) continue;
       // icône : quoi faire (▲ = saute, 🔔 = sonne), tant qu'on ne l'a pas encore passé
@@ -738,8 +745,10 @@ export class RemiVelo extends BossScene {
       }
       if (o.type === 'vomi') { o.g.setPosition(sx, SOL); flaque(o.g); continue; }
       if (o.type === 'allonge') {
-        if (o.spr) o.spr.setVisible(true).setFrame(IMAGE_BOURRE.allonge).setPosition(sx, SOL + 4).setScale(BOURRE);
-        else { o.g.setPosition(sx, SOL).setRotation(0); bourre(o.g, 'allonge', o.t, o.couleur); }
+        if (o.spr) {
+          o.spr.setVisible(true).setFrame(IMAGE_BOURRE.allonge).setPosition(sx, SOL + 4).setScale(BOURRE);
+          o.extra.forEach((e, k) => e.setVisible(true).setFrame(IMAGE_BOURRE.allonge).setPosition(sx + (k ? 1 : -1) * ALLONGE_ECART, SOL + 4 - (k ? 2 : 5)).setScale(BOURRE * 0.97));
+        } else { o.g.setPosition(sx, SOL).setRotation(0); for (const dx of [-ALLONGE_ECART, 0, ALLONGE_ECART]) { o.g.save(); o.g.translateCanvas(dx, 0); bourre(o.g, 'allonge', o.t, o.couleur); o.g.restore(); } }
         continue;
       }
       if (o.type === 'traverse') {

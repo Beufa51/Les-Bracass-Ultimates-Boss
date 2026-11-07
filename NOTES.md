@@ -432,6 +432,11 @@
   37 s. Mesure (bot sans chute, sans pinte, sans ralenti) : PRESSION grande route +3,3 s, raccourcis +11 s ; CUL SEC grande
   route perdue (il faut des pintes), raccourcis +7 s. Audit : `propositions/remi_audit_velo.md` (16 choses, rien à retirer :
   le vélo était trop FACILE, pas trop compliqué).
+- V20b VÉLO (retours : « ceux qui traversent ne servent à rien » ; « on a l'impression qu'on peut sauter les allongés ») :
+  le TRAVERSEUR part pour être au milieu de la route (p ≈ 0,55) quand tu arrives (avant : déjà passé) → il faut sonner
+  (mesure : p 0,57 et 0,41 à ton passage, zone dangereuse 0,36-0,74). L'ALLONGÉ devient une RANGÉE de 3 bourrés
+  (`ALLONGE_ECART` 112 px, demi-largeur de choc 175, +240 px d'espace après) trop longue pour un saut ; et il devient
+  SAUTABLE si on passe VRAIMENT au-dessus (avant : même un saut haut faisait tomber = règle invisible).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
