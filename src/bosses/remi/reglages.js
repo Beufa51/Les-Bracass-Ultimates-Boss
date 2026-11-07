@@ -7,7 +7,7 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 //  VÉLO : temps = secondes avant la fermeture du bar ; densite = obstacles (x) ; traverse = vitesse des bourrés qui traversent (x)
 //         sonnette = portée (px) de la sonnette (les bourrés debout ou qui traversent s'écartent / s'arrêtent)
 //  BABY : babyVitesse = vitesse de ses tirs (m/s) ; babyLecture = durée de sa préparation (x) ; babyFeinte / babyBande /
-//         babyRoulette / babyRate = chances (feinte, tir en bande, roulette, tir à côté) ; babyFenetre = temps pour riposter (s) ;
+//         babyRoulette / babyRate = chances (feinte, tir en bande, roulette, tir à côté) ; babyFenetre = durée du bonus TIR ÉCLAIR après un arrêt (s ; viser n'a pas de limite) ;
 //         babyReflexe = retard de son gardien (s) ; babyGardienRemi = vitesse de son gardien ; babyAide = ton gardien est
 //         attiré vers la balle quand elle arrive (0 = pas d'aide, 1 = il va tout seul au bon endroit)
 //  PORTE : remiCharge = jusqu'où Rémi charge (0 à 1) ; remiPrudent = chance qu'il lâche quand le videur arrive ;
@@ -18,19 +18,19 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 export const DIFFICULTES = {
   entrainement: { nom: 'DIABOLO', couleur: '#9fe0ff', texte: 'Pour apprendre : large, lent, Rémi est déjà pompette et le videur ne feinte jamais.',
     temps: 110, densite: 0.65, traverse: 0.7, sonnette: 800,
-    babyVitesse: 0.7, babyLecture: 1.3, babyFeinte: 0, babyBande: 0, babyRoulette: 0.08, babyRate: 0.2, babyFenetre: 2.0, babyReflexe: 0.4, babyGardienRemi: 0.15, babyAide: 0.5,
+    babyVitesse: 0.55, babyLecture: 1.3, babyFeinte: 0, babyBande: 0, babyRoulette: 0.08, babyRate: 0.2, babyFenetre: 1.6, babyReflexe: 0.4, babyGardienRemi: 0.15, babyAide: 0.5,
     remiCharge: 0.45, remiPrudent: 0.2, videur: 1.6, feintes: 0, zone: 0.28, visee: 0.65 },
   facile: { nom: 'PANACHÉ', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et ton gardien est un peu aidé.',
     temps: 88, densite: 0.8, traverse: 0.8, sonnette: 730,
-    babyVitesse: 0.85, babyLecture: 1.15, babyFeinte: 0.2, babyBande: 0.1, babyRoulette: 0.12, babyRate: 0.12, babyFenetre: 1.7, babyReflexe: 0.32, babyGardienRemi: 0.2, babyAide: 0.3,
+    babyVitesse: 0.68, babyLecture: 1.15, babyFeinte: 0.2, babyBande: 0.1, babyRoulette: 0.12, babyRate: 0.12, babyFenetre: 1.3, babyReflexe: 0.32, babyGardienRemi: 0.2, babyAide: 0.3,
     remiCharge: 0.55, remiPrudent: 0.3, videur: 1.3, feintes: 0.25, zone: 0.22, visee: 0.8 },
   normal: { nom: 'PRESSION', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 70, densite: 1, traverse: 1, sonnette: 650,
-    babyVitesse: 1.05, babyLecture: 1, babyFeinte: 0.35, babyBande: 0.2, babyRoulette: 0.15, babyRate: 0.07, babyFenetre: 1.4, babyReflexe: 0.24, babyGardienRemi: 0.22, babyAide: 0.1,
+    babyVitesse: 0.85, babyLecture: 1, babyFeinte: 0.35, babyBande: 0.2, babyRoulette: 0.15, babyRate: 0.07, babyFenetre: 1.1, babyReflexe: 0.24, babyGardienRemi: 0.22, babyAide: 0.1,
     remiCharge: 0.68, remiPrudent: 0.35, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
   champion: { nom: 'CUL SEC', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
-    babyVitesse: 1.3, babyLecture: 0.85, babyFeinte: 0.5, babyBande: 0.3, babyRoulette: 0.2, babyRate: 0.04, babyFenetre: 1.1, babyReflexe: 0.17, babyGardienRemi: 0.28, babyAide: 0,
+    babyVitesse: 1.05, babyLecture: 0.85, babyFeinte: 0.5, babyBande: 0.3, babyRoulette: 0.2, babyRate: 0.04, babyFenetre: 0.9, babyReflexe: 0.17, babyGardienRemi: 0.28, babyAide: 0,
     remiCharge: 0.84, remiPrudent: 0.85, videur: 0.75, feintes: 0.65, zone: 0.1, visee: 1.3 },
 };
 
@@ -95,6 +95,8 @@ export const BABY = {
   prep: [0.9, 1.4],       // durée de la préparation de Rémi (s), x babyLecture de la difficulté
   feinteBascule: 0.65,    // feinte : il change de côté à cette part de la préparation
   rouletteVitesse: 1.35,  // une roulette part plus vite
+  eclairVitesse: 1.35,    // V19g TIR ÉCLAIR (tiré pendant babyFenetre) : balle x ce chiffre...
+  eclairReflexe: 0.08,    // ... et son gardien réagit ce temps plus tard (s)
   riposteVitesse: 2.2,    // ta riposte (m/s)
   priseGardienRemi: 0.75, // son gardien arrête la balle à moins de B.prise x ce chiffre (ses joueurs : x 0,85)
   biais: 0.12,            // angle max de la riposte en glissant en biais (rad)

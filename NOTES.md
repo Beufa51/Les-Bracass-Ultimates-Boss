@@ -284,6 +284,13 @@
   PANACHÉ 5-0, PRESSION 5-0 (8 arrêts), CUL SEC 2-0 en 60 s ; tout tir vert a marqué.
 - V19f : MUSIQUE du babyfoot = `remi_musique_baby.mp3` (Captain Tsubasa, thème principal en 3 versions, 1 min 50, donnée
   par le propriétaire). `remi_musique_bar` (Cantina Band) n'est plus chargée (fichier gardé).
+- V19g (retours : tirs de Rémi trop rapides ; le bouton TIR du téléphone tombait sur ▶ ; viser sans limite comme au vrai
+  babyfoot, avec un bonus si on tire vite) : `babyVitesse` -20 % (0,55 / 0,68 / 0,85 / 1,05). Plus AUCUN bouton HTML du
+  téléphone pendant le jeu (roulette = toucher Rémi) : bouton TIR dessiné au milieu en bas (`BOUTON_TIR`), toucher bref
+  hors des flèches = tir. VISER SANS LIMITE DE TEMPS (plus de « Trop lent ») ; `babyFenetre` (1,6 / 1,3 / 1,1 / 0,9 s) =
+  durée du bonus TIR ÉCLAIR (anneau jaune qui se vide autour de TIR) : balle x `eclairVitesse` 1,35 et son gardien
+  réagit `eclairReflexe` 0,08 s plus tard (la ligne verte en tient compte). Poignée du bas retirée ; message de visée
+  en bas (y 524), répliques au milieu (y 300).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

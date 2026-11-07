@@ -31,6 +31,7 @@ function proj(x, y, z) {
 }
 // les 2 gros boutons (dessinés) et leurs zones de toucher, bien plus grandes (tout le bas de l'écran, sur les côtés)
 const BOUTON_G = { x: 92, y: 446, r: 72 }, BOUTON_D = { x: LARGEUR - 92, y: 446, r: 72 };
+const BOUTON_TIR = { x: LARGEUR / 2, y: 462, r: 46 };
 const ZONE_BOUTONS = { y: 300, g: 250, d: LARGEUR - 250 };
 const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 // les barres : z (m depuis ton but), nombre de joueurs, écart, débattement, à qui
@@ -57,7 +58,8 @@ export class RemiBaby extends BossScene {
     this.gRemi = this.add.graphics().setDepth(3);
     this.g = this.add.graphics().setDepth(5);
     this.gAvant = this.add.graphics().setDepth(7);
-    this.txtVise = texte(this, LARGEUR / 2, 432, '', 22, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 10, y: 3 } }).setDepth(901).setVisible(false);
+    this.txtTir = texte(this, LARGEUR / 2, 462, 'TIR', 24, '#ffffff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 }).setDepth(901).setVisible(false);
+    this.txtVise = texte(this, LARGEUR / 2, 524, '', 22, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 10, y: 3 } }).setDepth(901).setVisible(false);
     this.hud = texte(this, LARGEUR / 2, 22, '', 26, '#ffffff', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 3 } }).setDepth(900);
     this.touches = creerTouches(this);
     laisserPasserTactile(this);
@@ -69,7 +71,7 @@ export class RemiBaby extends BossScene {
       `Premier à ${B.buts} buts. Tu tiens le GARDIEN (vu de dos), Rémi attaque.`,
       `${t ? 'GROS BOUTONS ◀ ▶ en bas (maintiens)' : '◀ ▶'} : ton gardien glisse à gauche / à droite`,
       'Rémi se PENCHE du côté où il va tirer... sauf quand il feinte !',
-      `Balle arrêtée : RIPOSTE quand la ligne est VERTE (jaune = son gardien en face) (${t ? 'toucher le milieu de l\'écran' : 'ESPACE'}) entre ses joueurs (en biais : garde ◀ ou ▶)`,
+      `Balle arrêtée : vise sans te presser, TIR quand la ligne est VERTE ; vite (anneau jaune) = TIR ÉCLAIR (${t ? 'toucher le milieu de l\'écran' : 'ESPACE'}) entre ses joueurs (en biais : garde ◀ ou ▶)`,
       'GAMELLE (rentre et ressort) = but + un point retiré à l\'autre',
       `ROULETTE interdite : si sa barre tourbillonne et marque, ${t ? 'touche RÉMI' : 'appuie sur Z'} = but annulé`,
       'Chaque but encaissé, tu bois : ça tangue...',
@@ -78,7 +80,7 @@ export class RemiBaby extends BossScene {
 
   demarrer() {
     this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.aideDoigt = this.horloge + 6;   // flèches qui clignotent au début
-    etiquettesTactiles({ ...VIDES, z: 'ROULETTE !' });
+    etiquettesTactiles(VIDES);   // V19g : plus de boutons du téléphone (TIR tombait sur ▶) : tout est dessiné dans le jeu
     bulle(this, `Rémi : « ${REPLIQUES.babyIntro} »`, '#ffd84a', 2.4, 250);
     this.time.delayedCall(1200, () => this.engagement());
   }
@@ -259,31 +261,32 @@ export class RemiBaby extends BossScene {
     this.roulette = null;
     annonce(this, 'ARRÊT !', '#7fff7f', 0.5);
     this.balle.vx = 0; this.balle.vz = 0;
-    this.etat = 'riposte'; this.fenetre = this.diff.babyFenetre; this.memoire = this.balle.x;
-    if (Math.random() < 0.5) { this.poseTemp('rale', 1.2); bulle(this, `Rémi : « ${choisir(REPLIQUES.babyArret)} »`, '#ffd84a', 1.4, 488); }
-    etiquettesTactiles({ ...VIDES, espace: 'TIR' });
+    this.etat = 'riposte'; this.fenetre = this.diff.babyFenetre; this.memoire = this.balle.x;   // fenetre = temps du bonus ÉCLAIR
+    if (Math.random() < 0.5) { this.poseTemp('rale', 1.2); bulle(this, `Rémi : « ${choisir(REPLIQUES.babyArret)} »`, '#ffd84a', 1.4, 300); }
   }
 
   riposter(biais) {
     if (this.etat !== 'riposte') return;
     const b = this.balle;
-    const v = B.riposteVitesse;
+    // V19g TIR ÉCLAIR : tirer pendant le bonus (anneau jaune autour de TIR) = balle plus rapide, son gardien surpris
+    const eclair = this.fenetre > 0;
+    const v = B.riposteVitesse * (eclair ? B.eclairVitesse : 1);
     b.vz = v * Math.cos(biais); b.vx = v * Math.sin(biais);
-    this.etat = 'riposte_vol';
-    this.reflexe = this.diff.babyReflexe + this.remiBu * 0.04;   // son gardien réagit avec un temps de retard
-    jouerSon(this, 'remi_tape');
-    etiquettesTactiles({ ...VIDES, z: 'ROULETTE !' });
+    this.etat = 'riposte_vol'; this.eclairTir = eclair;
+    this.reflexe = this.diff.babyReflexe + this.remiBu * 0.04 + (eclair ? B.eclairReflexe : 0);   // son gardien réagit avec un temps de retard
+    jouerSon(this, 'remi_tape', eclair ? { rate: 1.3 } : undefined);
+    if (eclair) { annonce(this, 'TIR ÉCLAIR !', '#ffd84a', 0.5); this.cameras.main.shake(90, 0.003); }
   }
 
   contre(nom) {
     this.dernierContre = nom;
     jouerSon(this, 'remi_rebond');
-    bulle(this, nom === 'gar' ? 'Rémi : « Arrêté ! »' : 'Contré !', '#ffd84a', 1.0, 488);
+    bulle(this, nom === 'gar' ? 'Rémi : « Arrêté ! »' : 'Contré !', '#ffd84a', 1.0, 300);
     this.balle.vz = -this.balle.vz * 0.3;
     this.suivant(0.7);
   }
 
-  sortie(msg) { bulle(this, msg, '#ffffff', 1.0, 488); this.suivant(0.8); }
+  sortie(msg) { bulle(this, msg, '#ffffff', 1.0, 300); this.suivant(0.8); }
 
   butRemi(gamelle) {
     const T = this.tir;
@@ -296,7 +299,7 @@ export class RemiBaby extends BossScene {
     jouerSon(this, 'remi_boit');
     this.cameras.main.flash(200, 230, 160, 40);
     annonce(this, gamelle ? 'GAMELLE !' : 'BUT DE RÉMI', '#ff6b6b', 0.8);
-    if (!gamelle) bulle(this, `Rémi : « ${choisir(REPLIQUES.babyBut)} »`, '#ffd84a', 1.6, 488);
+    if (!gamelle) bulle(this, `Rémi : « ${choisir(REPLIQUES.babyBut)} »`, '#ffd84a', 1.6, 300);
     this.verifierFin(1.6);
   }
 
@@ -307,7 +310,7 @@ export class RemiBaby extends BossScene {
     this.poseTemp('boit', 1.6);
     jouerSon(this, 'remi_pinte');
     annonce(this, gamelle ? 'GAMELLE !' : 'BUUUT !', '#7fff7f', 0.8);
-    if (!gamelle) bulle(this, `Rémi : « ${choisir(REPLIQUES.babyEncaisse)} »`, '#ffd84a', 1.6, 488);
+    if (!gamelle) bulle(this, `Rémi : « ${choisir(REPLIQUES.babyEncaisse)} »`, '#ffd84a', 1.6, 300);
     this.verifierFin(1.4);
   }
 
@@ -327,7 +330,7 @@ export class RemiBaby extends BossScene {
       this.ivresse = Math.max(0, this.ivresse - 1);
       annonce(this, 'ROULETTE ! BUT ANNULÉ', '#7fff7f', 1.0);
       this.poseTemp('rale', 1.6);
-      bulle(this, `Rémi : « ${choisir(REPLIQUES.babyRouletteVue)} »`, '#ffd84a', 1.6, 488);
+      bulle(this, `Rémi : « ${choisir(REPLIQUES.babyRouletteVue)} »`, '#ffd84a', 1.6, 300);
       return;
     }
     if (this.etat === 'prep' || this.etat === 'tir' || this.horloge < this.appelPossible) return;   // trop tôt : on ignore
@@ -335,7 +338,7 @@ export class RemiBaby extends BossScene {
     this.fauxAppelDepuis = this.horloge;
     this.ivresse++;
     jouerSon(this, 'remi_hips');
-    bulle(this, 'Faux appel ! Tu bois.', '#ff6b6b', 1.2, 488);
+    bulle(this, 'Faux appel ! Tu bois.', '#ff6b6b', 1.2, 300);
   }
 
   verifierFin(d) {
@@ -375,9 +378,8 @@ export class RemiBaby extends BossScene {
       if (this.etat === 'tir' || this.etat === 'riposte_vol') this.pasBalle(dt);
       if (this.etat === 'riposte') {
         this.balle.x = Phaser.Math.Clamp(this.pos.toi + 0.03, -B.but / 2 + 0.01, B.but / 2 - 0.01); this.balle.z = BARRES.toi.z + 0.05;   // un peu de côté : visible derrière ton gardien
-        this.fenetre -= dt;
+        this.fenetre -= dt;   // V19g : pas de limite de temps pour viser ; seul le bonus ÉCLAIR s'éteint
         if (vientDAppuyer(this.touches.espace)) this.riposter(this.dir * B.biais * 0.7);
-        else if (this.fenetre <= 0) { bulle(this, 'Trop lent ! Rémi récupère.', '#ff6b6b', 1.2, 488); this.suivant(0.5); }
       }
       if (vientDAppuyer(this.touches.z)) this.appelRoulette();
     }
@@ -465,12 +467,6 @@ export class RemiBaby extends BossScene {
     if (!balleDessinee) this.dessinerBalle(bz > BARRES.toi.z ? g : ga);
     this.barre(ga, BARRES.toi, this.pos.toi, 0x2f6fd6, 0, false, true);
     if (this.balle && bz <= BARRES.toi.z) this.dessinerBalle(ga);
-    // la POIGNÉE (en bas) : la tige de ton gardien et sa poignée, à la position voulue par ton doigt
-    const RAIL = 190, yR = 527, xP = CX + this.cible / B.course * RAIL, xG = CX + this.pos.toi / B.course * RAIL;
-    ga.fillStyle(0x000000, 0.45).fillRoundedRect(CX - RAIL - 26, yR - 11, RAIL * 2 + 52, 22, 11);
-    ga.lineStyle(4, 0xcfd3d8, 0.9).lineBetween(CX - RAIL, yR, CX + RAIL, yR);
-    ga.fillStyle(0x2f6fd6, 0.5).fillCircle(xG, yR, 7);
-    ga.fillStyle(this.doigt ? 0xffd84a : 0xffffff, 1).fillRoundedRect(xP - 22, yR - 9, 44, 18, 9);
     // les 2 gros boutons ◀ ▶ (ils s'allument quand on appuie ; ils clignotent les premières secondes)
     if (this.etat !== 'intro') {
       const clign = this.horloge < (this.aideDoigt ?? 0) && Math.floor(this.horloge * 4) % 2 === 0;
@@ -491,11 +487,16 @@ export class RemiBaby extends BossScene {
       const [m, c] = lib.cote ? ['À CÔTÉ : bouge ◀ ▶', '#ff7a7a'] : !lib.libre ? ['BLOQUÉ : bouge ◀ ▶', '#ff7a7a'] : lib.enFace ? ['SON GARDIEN EST EN FACE', '#ffd84a'] : ['LIBRE : TIRE !', '#7fff7f'];
       this.txtVise.setText(m).setColor(c).setVisible(true);
     } else this.txtVise.setVisible(false);
-    // fenêtre de riposte
-    if (this.etat === 'riposte') {
-      const f = Math.max(0, this.fenetre / this.diff.babyFenetre);
-      ga.fillStyle(0x000000, 0.6).fillRect(CX - 152, 456, 304, 16);
-      ga.fillStyle(f > 0.4 ? 0x7fff7f : 0xff6b6b, 1).fillRect(CX - 150, 458, 300 * f, 12);
+    // le bouton TIR (au milieu, loin des flèches) ; l'anneau jaune qui se vide = le bonus ÉCLAIR
+    const tir = this.etat === 'riposte';
+    this.txtTir.setVisible(tir);
+    if (tir) {
+      const f = Math.max(0, this.fenetre / this.diff.babyFenetre), bt = BOUTON_TIR;
+      ga.fillStyle(0x000000, 0.45).fillCircle(bt.x, bt.y, bt.r);
+      ga.fillStyle(f > 0 ? 0xffd84a : 0x7fff7f, f > 0 ? 0.35 : 0.25).fillCircle(bt.x, bt.y, bt.r - 6);
+      ga.lineStyle(4, 0xffffff, 0.8).strokeCircle(bt.x, bt.y, bt.r);
+      if (f > 0) ga.lineStyle(9, 0xffd84a, 1).beginPath().arc(bt.x, bt.y, bt.r + 7, -Math.PI / 2, -Math.PI / 2 + f * Math.PI * 2).strokePath();
+      this.txtTir.setText(f > 0 ? '⚡TIR' : 'TIR');
     }
     if (this.horloge < this.appelPossible) {
       const a = 0.5 + 0.5 * Math.sin(this.horloge * 14);
@@ -511,8 +512,9 @@ export class RemiBaby extends BossScene {
     // son gardien est-il EN FACE de ta ligne ? (il plonge quand même : vise loin de lui, dans un coin)
     const xg = b.x + Math.tan(biais) * (BARRES.gar.z - b.z);
     // il n'arrête que ce qu'il peut atteindre : sa prise + ce qu'il parcourt entre son réflexe et l'arrivée de la balle
-    const t = (BARRES.gar.z - b.z) / B.riposteVitesse;
-    const portee = B.prise * B.priseGardienRemi + this.diff.babyGardienRemi * Math.max(0, t + 0.08 - this.diff.babyReflexe - this.remiBu * 0.04);   // (+0,08 s de marge : le VERT est sûr)
+    const eclair = this.fenetre > 0;
+    const t = (BARRES.gar.z - b.z) / (B.riposteVitesse * (eclair ? B.eclairVitesse : 1));
+    const portee = B.prise * B.priseGardienRemi + this.diff.babyGardienRemi * Math.max(0, t + 0.08 - this.diff.babyReflexe - this.remiBu * 0.04 - (eclair ? B.eclairReflexe : 0));   // (+0,08 s de marge : le VERT est sûr)
     const enFace = Math.abs(xg - this.pos.gar) < portee;
     const xBut = b.x + Math.tan(biais) * (L - b.z), cote = Math.abs(xBut) > B.but / 2 - R;
     return { biais, bloque: cote ? Math.min(bloque, L - 0.02) : bloque, libre: bloque > L && !cote, enFace, cote };
