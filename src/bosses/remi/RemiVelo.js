@@ -2,13 +2,15 @@
 // RÉMI — JEU 1 : LE VÉLO (V5, vue de PROFIL, la ville défile vers la gauche)
 // Le vélo roule TOUT SEUL (de plus en plus vite). Deux gestes seulement :
 //   SAUTER : bouton en HAUT à droite (moitié droite, partie haute) (ou ▲ / ESPACE) — garder appuyé = saut plus haut et plus long
-//            → verre cassé, flaque, poubelle, tremplins ; et les PINTES en l'air (+1 s chacune)
+//            → verre cassé, flaque, poubelle, tremplins ; et les PINTES en l'air (+ VELO.bonusPinte chacune)
 //   ESQUIVE (V17) : bouton en BAS à droite, sous SAUTE (ou ▼) — le vélo descend vers le bas de l'écran et passe DEVANT
 //            → le bourré ALLONGÉ (on ne peut plus le sauter)
 //   DRING  : moitié GAUCHE de l'écran (ou Z / ◀) — la sonnette, dans la zone jaune devant toi
 //            → un bourré DEBOUT s'écarte, un bourré qui TRAVERSE s'arrête et recule
 // Une icône au-dessus de chaque obstacle dit quoi faire (sauf en CHAMPION). Obstacles passés proprement à la suite = SÉRIE
-// (tous les 5 : +2 s). Chute = temps perdu ; si le bar ferme avant ton arrivée : perdu.
+// (tous les 5 : + VELO.bonusSerie). Chute = temps perdu ; si le bar ferme avant ton arrivée : perdu.
+// V20 : trajet raccourci (21 000 px) et chrono serré : la grande route est juste en temps, le RACCOURCI fait gagner
+// ~8 s mais il est bondé (chutes).
 // =====================================================================
 import { BossScene } from '../../core/BossScene.js';
 import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
@@ -37,9 +39,9 @@ const LIGNE_BAS = (318 + 462) / 2;
 const DEPART_ROUTE = { nom: 'LA RUE DES BARS', image: 'remi_rue', teinte: 0xffffff, longueur: 1, densite: 1, pintes: 1, voitures: 1 };
 const CARREFOURS = [
   [{ nom: 'LES QUAIS', texte: 'tranquille, plein de pintes', image: 'remi_rue2', teinte: 0x9fb8ff, longueur: 1, densite: 0.75, pintes: 1.6, voitures: 1, special: 'pecheur' },
-    { nom: 'LA RUELLE', texte: 'RACCOURCI, mais plein de bourrés et de poubelles', image: '', teinte: 0x9a80c0, longueur: 0.65, densite: 1.9, pintes: 0.6, voitures: 0, special: 'poubelle' }],
+    { nom: 'LA RUELLE', texte: 'RACCOURCI (~6 s de gagnées), mais plein de bourrés et de poubelles', image: '', teinte: 0x9a80c0, longueur: 0.55, densite: 1.9, pintes: 0.6, voitures: 0, special: 'poubelle' }],
   [{ nom: 'LE CENTRE-VILLE', texte: 'la fête : tremplins et pintes', image: 'remi_rue3', teinte: 0xffc8a0, longueur: 1, densite: 1, pintes: 1.5, voitures: 2, special: 'chorale' },
-    { nom: 'LES PETITES RUES', texte: 'RACCOURCI, mais plein de bourrés et de poubelles', image: '', teinte: 0x80a8c0, longueur: 0.65, densite: 1.9, pintes: 0.6, voitures: 0, special: 'poubelle' }],
+    { nom: 'LES PETITES RUES', texte: 'RACCOURCI (~6 s de gagnées), mais plein de bourrés et de poubelles', image: '', teinte: 0x80a8c0, longueur: 0.55, densite: 1.9, pintes: 0.6, voitures: 0, special: 'poubelle' }],
 // obstacles propres aux routes : PÊCHEUR (quais : sa canne barre la route → DRING), POUBELLE (ruelles : haute → grand saut),
 // CHORALE (centre-ville : 3 fêtards qui chantent → un DRING les écarte tous)
 ];
@@ -101,11 +103,11 @@ export class RemiVelo extends BossScene {
     this.afficherIntro('RÉMI - Direction le bar', [
       'Rémi t\'attend au bar... et le bar ferme bientôt ! Le vélo roule tout seul.',
       `SAUTE : ${t ? 'touche à DROITE, en HAUT' : '▲ ou ESPACE'} (garde appuyé = plus haut)`,
-      '   → verre cassé, flaque, tremplins... et attrape les PINTES (+1 s)',
+      `   → verre cassé, flaque, tremplins... et attrape les PINTES (+${V.bonusPinte} s)`,
       `EN BAS : ${t ? 'touche à DROITE, en BAS' : '▼'} → tu passes DEVANT le bourré ALLONGÉ et les POUBELLES (garde appuyé = tu restes en bas)`,
       `DRING : ${t ? 'touche à GAUCHE' : 'Z ou ◀'} quand le bourré est dans la zone jaune`,
       '   → le bourré DEBOUT s\'écarte, celui qui TRAVERSE s\'arrête',
-      'L\'icône au-dessus de chaque obstacle te dit quoi faire. Série de 5 = +2 s.',
+      `L'icône au-dessus de chaque obstacle te dit quoi faire. Série de 5 = +${V.bonusSerie} s.`,
     ], () => this.presentation(() => this.choixDifficulte()));
   }
 
@@ -341,7 +343,7 @@ export class RemiVelo extends BossScene {
         this.y = sol2; this.vy = 0; this.auSol = true; jouerSon(this, 'remi_atterrit');
         if (this.salto) {
           const fini = this.salto.t >= this.salto.d; this.salto = null;
-          if (fini) { this.tempsRestant += 3; this.score += 50; annonce(this, 'SALTO ! +3 s', '#ffd84a', 0.9); jouerSon(this, 'remi_foule'); }
+          if (fini) { this.tempsRestant += V.bonusSalto; this.score += 50; annonce(this, `SALTO ! +${V.bonusSalto} s`, '#ffd84a', 0.9); jouerSon(this, 'remi_foule'); }
           else if (this.invincible <= 0) this.tomber({ type: 'salto', etat: '', p: 0 });
         }
       }
@@ -528,8 +530,8 @@ export class RemiVelo extends BossScene {
     this.serie++;
     this.score += 10 * Math.min(3, 1 + Math.floor(this.serie / 5));
     if (this.serie % V.serie === 0) {
-      this.tempsRestant += 2;
-      bulle(this, `SÉRIE x${this.serie} !  +2 s`, '#7fff7f', 1, 140);
+      this.tempsRestant += V.bonusSerie;
+      bulle(this, `SÉRIE x${this.serie} !  +${V.bonusSerie} s`, '#7fff7f', 1, 140);
       jouerSon(this, 'remi_arrivee', { rate: 1.5 });
     }
   }

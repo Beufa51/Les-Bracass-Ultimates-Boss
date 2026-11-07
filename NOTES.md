@@ -9,7 +9,7 @@
 - **Julien** : EN COURS — niveau 1 « la manif » jouable ; niveau 2 « la salle de classe » : COMBAT REFAIT (audit B :
   fenêtre de punition de dos, 8 attaques, phases noir / bureau renversé + alarme, élèves, sarbacane). RESTE : le
   MINI-NIVEAU « LE LYCÉE » (audit A) FAIT. Reste : faire jouer Fabien, équilibrer. Voir « JULIEN » plus bas.
-- **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo → BABYFOOT (V19, le beer pong est SUPPRIMÉ) → porte. Voir « RÉMI » plus bas.
+- **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo (~45 s, V20) → BABYFOOT (V19, le beer pong est SUPPRIMÉ) → porte (simplifiée V19z). Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
 ## AUDIT GLOBAL V18 (6 boss, version économe) : `propositions/audit_global.md`
@@ -426,6 +426,12 @@
   traits gris « moches »). PORTE : bulle périmée « L'AIR DE RIEN (ou lâche) » corrigée, en-tête du fichier à jour,
   réplique de la mamie (morte) retirée. Prompts n°28 (« l'air de rien » de dos, Rémi et toi) et n°29 (affiche du bar :
   « LE PERDANT PAIE SA TOURNÉE », l'ancienne annonce gamelle / roulette, retirées).
+- V20 VÉLO (retour : « trop simple, on ne voit pas l'intérêt des chemins ; je gagne toujours avec 30 s » ; demande :
+  raccourcir + audit) : trajet 30 000 → 21 000 px ; bonus pinte 1 → 0,5 s (`bonusPinte`), série 2 → 1 s (`bonusSerie`),
+  salto 3 → 2 s (`bonusSalto`) ; raccourcis 0,65 → 0,55 d'un tronçon (panneau « ~6 s de gagnées ») ; chrono 58 / 50 / 43 /
+  37 s. Mesure (bot sans chute, sans pinte, sans ralenti) : PRESSION grande route +3,3 s, raccourcis +11 s ; CUL SEC grande
+  route perdue (il faut des pintes), raccourcis +7 s. Audit : `propositions/remi_audit_velo.md` (16 choses, rien à retirer :
+  le vélo était trop FACILE, pas trop compliqué).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
