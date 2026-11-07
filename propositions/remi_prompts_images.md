@@ -204,3 +204,20 @@ Ligne 2 : 5 ROULETTE : il fait tourner la poignée à toute vitesse, traits de v
 Reprends exactement l'image jointe (même bar, même style, même cadrage), mais remplace le néon « BEER PONG » par un néon
 « BABYFOOT » de la même couleur, et ajoute au mur, à côté, une petite affiche « GAMELLE = -1 / ROULETTE INTERDITE ».
 ```
+
+## 26. Les figurines du babyfoot — `remi_babyfoot_joueurs.jpg` (À FAIRE)
+À joindre : **une capture d'écran du babyfoot dans le jeu** (pour l'angle de vue). La tige reste dessinée au code.
+```
+Planche de figurines de BABYFOOT (joueurs en bois/plastique peint, comme sur un vrai babyfoot de bar : tête ronde, corps
+d'une seule pièce, maillot, short, les deux pieds soudés en un bloc), style manga/anime coloré, contours noirs nets,
+fond BLANC uni, AUCUNE tige métallique (je la dessine moi-même), cases bien séparées, même échelle partout.
+Vue légèrement plongeante, comme vue de l'image jointe (caméra basse derrière un but).
+LIGNE 1 — joueur BLEU vu DE DOS (c'est le gardien du joueur) : maillot bleu avec un grand numéro 1 blanc dans le dos,
+short blanc, cheveux bruns courts. 3 cases : 1 debout, immobile ; 2 il frappe : le bloc des pieds part vers l'avant
+(vers le fond de l'image), le corps bascule ; 3 il plonge sur le côté (corps incliné à 30°).
+LIGNE 2 — joueur ROUGE vu DE FACE (l'équipe adverse) : maillot rouge vif, short noir, visage concentré, petite barbe.
+4 cases : 1 debout, immobile, face à nous ; 2 il arme sa frappe : les pieds partent vers l'arrière, le corps penche vers
+nous ; 3 barre LEVÉE : la figurine a tourné à l'horizontale, on voit le dessus de la tête et les pieds en l'air
+(fortement raccourcie) ; 4 il tourne sur lui-même à toute vitesse (roulette) : figurine floue, traits de vitesse
+circulaires autour.
+```
