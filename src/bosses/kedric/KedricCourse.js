@@ -86,6 +86,7 @@ export class KedricCourse extends BossScene {
     this.defs = []; this.groupe = 0; this.poursuivants = [];
     this.duel = null; this.kedricVu = false;
     this.tutoVus = {}; this.tuto = null;
+    this.ghostAnnonce = false; this.rang = null; this.dernierBilanDanse = null;   // remis à zéro à chaque partie (REJOUER)
     this.j = { voie: 0, x: 0, saut: 0, sautDebut: -9, rotation: 0, rotationDebut: -9, recharge: 0, changeT: -9, ancienneVoie: 0, pose: null, poseTemps: 0 };
 
     // ---------- le décor ----------
@@ -223,7 +224,7 @@ export class KedricCourse extends BossScene {
     this.tempsTotal += dt;
     this.majJoueur(dt);
     // l'équipe du coup d'envoi descend
-    for (const d of this.defs) if (d.etat === 'approche') d.pos -= this.diff.charge * dt;
+    for (const d of this.defs) if (d.etat === 'approche') d.pos -= this.charge() * dt;
     if (E.rebond > 0) {
       // ballon raté : tu le ramasses
       E.rebond -= dt;
@@ -296,7 +297,7 @@ export class KedricCourse extends BossScene {
         if (pos >= EN_BUT - R.defense.finAvant) return;
         // au premier rang d'une formation, Kédric crie son nom
         this.file.push({ pos, type, couloir, nom: k === 0 ? F.nom : null });
-        pos += R.defense.espace;
+        pos += A.espace || R.defense.espace;   // une course peut serrer ses rangs (plus de défenseurs)
       });
       pos += R.defense.souffle;   // un petit répit entre deux formations
     }
@@ -368,7 +369,7 @@ export class KedricCourse extends BossScene {
       if (this.attente <= 0 && this.apresAttente) { const f = this.apresAttente; this.apresAttente = null; f(); }
     }
     if (this.etat === 'envoi') { this.majEnvoi(dt); return; }
-    if (this.etat === 'showtime') { this.show.maj(dt, e); return; }
+    if (this.etat === 'showtime') { this.tempsTotal += dt; this.show.maj(dt, e); return; }   // le battle compte dans le temps
     if (this.etat !== 'jeu') return;
     if (this.gel > 0) { this.gel -= dt; if (this.gel <= 0 && this.apresGel) { const f = this.apresGel; this.apresGel = null; f(); } return; }
     // le ralenti dramatique se décompte en temps RÉEL (dt), pas au ralenti
@@ -378,7 +379,7 @@ export class KedricCourse extends BossScene {
 
   lireTouches() {
     const t = this.touches, jd = Phaser.Input.Keyboard.JustDown;
-    const e = { gauche: jd(t.gauche), droite: jd(t.droite), haut: jd(t.haut), bas: jd(t.bas), espace: jd(t.espace), z: jd(t.z) };
+    const e = { gauche: jd(t.gauche), droite: jd(t.droite), haut: jd(t.haut), bas: jd(t.bas), espace: jd(t.espace), z: jd(t.z), x: jd(t.x) };
     // glissements du doigt (téléphone)
     if (this.balaye) { e[this.balaye] = true; this.balaye = null; }
     return e;
@@ -405,7 +406,8 @@ export class KedricCourse extends BossScene {
   vitesse() {
     return (R.vitesseBase + this.niveau * R.pasVitesse) * this.diff.vitesse + this.boost;
   }
-  alerte() { return this.diff.alerte * (1 - R.alerteParNiveau * this.niveau); }
+  alerte() { return this.diff.alerte * (this.attaque.alerte || 1) * (1 - R.alerteParNiveau * this.niveau); }
+  charge() { return this.diff.charge * (this.attaque.charge || 1); }
 
   // Toi : couloirs, saut, rotation, sprint (aussi pendant les réceptions)
   majJoueur(dt) {
@@ -500,7 +502,7 @@ export class KedricCourse extends BossScene {
   // vitesse à laquelle le défenseur se rapproche de toi
   vitesseRelative(d, v) {
     if (d.star) return (this.duel && this.duel.vies > 0 ? 0 : v) + (this.duel && this.duel.phase === 'charge' ? R.duel.charge : 0);
-    return v + (d.charge ? this.diff.charge : 0);
+    return v + (d.charge ? this.charge() : 0);
   }
 
   majDefenseur(d, dt, v) {
@@ -512,7 +514,7 @@ export class KedricCourse extends BossScene {
     if (d.etat !== 'approche' || d.star) return;   // Kédric : géré par majDuel
     // en place, puis il fonce sur toi (sauf la ligne, occupée avec tes bloqueurs)
     if (!d.charge && !d.ligne && (d.pos - this.pos) / v < R.chargeAvant) d.charge = true;
-    if (d.charge) d.pos -= this.diff.charge * dt;
+    if (d.charge) d.pos -= this.charge() * dt;
     const ttc = (d.pos - this.pos) / this.vitesseRelative(d, v);
     // un mur de 2 défenseurs choisit son trou au dernier moment : jamais dans ton couloir
     if (d.mur && ttc < this.alerte() + 0.5) {
@@ -894,7 +896,8 @@ export class KedricCourse extends BossScene {
     this.etat = 'pause';
     const td = this.stats.touchdowns;
     const depart = Math.max(-R.showtime.avanceMax, Math.min(R.showtime.avanceMax, (td - 1) * R.showtime.parTouchdown));
-    const avance = depart > 0 ? `${td} touchdowns : le public est déjà un peu pour toi !` : depart < 0 ? 'Aucun touchdown : le public est pour lui...' : `${td} touchdown : le public attend de voir...`;
+    const jok = td * R.showtime.jokerParTouchdown;
+    const avance = (jok ? `${jok} JOKER${jok > 1 ? 'S' : ''} (1 par touchdown) : ${jok > 1 ? 'tes' : 'ton'} ${jok > 1 ? 'premiers ratés sont pardonnés' : 'premier raté est pardonné'} !\n` : '') + (depart > 0 ? `${td} touchdowns : le public est déjà un peu pour toi !` : depart < 0 ? 'Aucun touchdown : le public est pour lui...' : `${td} touchdown : le public attend de voir...`);
     // la transition : le stade s'éteint (fondu au noir), puis Kédric apparaît sur scène et lance le défi (showtime.js)
     jouerSon(this, 'kedric_sifflet');
     const noir = this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x000000).setDepth(928).setAlpha(0);   // sous le « SHOWTIME ! » (930)
@@ -909,7 +912,7 @@ export class KedricCourse extends BossScene {
     this.attendre(3.6, () => {
       recap.fermer();
       this.tweens.add({ targets: noir, alpha: 0, duration: 500, onComplete: () => noir.destroy() });
-      this.lancerShowtime({ jauge: depart,
+      this.lancerShowtime({ jauge: depart, jokers: td * R.showtime.jokerParTouchdown,
         replique: td > 0 ? REPLIQUES.finale : REPLIQUES.finaleZero, sousTitre: avance }, (gagne, bilan) => {
         this.dernierBilanDanse = bilan;   // parfaits, biens, ratés, part du public : pour le bilan de victoire
         this.stats.parfaits += bilan.parfaits;
@@ -949,39 +952,42 @@ export class KedricCourse extends BossScene {
 
   cleRecord() { return cleRecord('kedric', this.nomDiff); }
 
-  // Rang S / A / B / C : les touchdowns, les plaquages, les esquives parfaites, le temps
+  // Rang S / A / B / C : les TOUCHDOWNS, la part du PUBLIC gagnée au battle, ses ratés, les esquives parfaites des courses.
+  // (le temps ne compte pas : une course plaquée est plus COURTE, ce serait récompenser le plaquage)
   classement() {
-    let score = 80;
-    score += (this.stats.touchdowns - 1) * 7;
-    score -= this.stats.plaquages * 1.2;
-    score += Math.min(10, this.stats.parfaits * 0.4);
-    score -= Math.max(0, this.tempsTotal - R.tempsReference) * 0.1;
-    score += Math.min(25, (this.points || 0) * 0.05);   // le SCORE DE SHOW (vitesse + esquives) compte pour le rang
+    const bd = this.dernierBilanDanse || { parfaits: 0, bien: 0, rates: 0, jauge: 0, pieges: 0 };
+    const parfaitsCourses = this.stats.parfaits - (bd.parfaits || 0);
+    const publicPourToi = Math.max(0, Math.min(100, Math.round(bd.jauge || 0)));
+    let score = R.rang.base;
+    score += this.stats.touchdowns * R.rang.parTouchdown;
+    score += publicPourToi * R.rang.parPublic;
+    score -= (bd.rates || 0) * R.rang.parRate;
+    score += Math.min(R.rang.parfaitsMax, parfaitsCourses * R.rang.parParfait);
     const rang = R.rangs.find(r => score >= r.seuil).rang;
     const complet = this.phase === 'action1';
-    const record = complet ? Sauvegarde.proposerRecord(this.cleRecord(), rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record(this.cleRecord());
+    // ENTRAÎNEMENT (comme le PERSO de Lionel) : ni record ni défis
+    const sansRecord = !!this.diff.aide;
+    const record = sansRecord ? null : complet ? Sauvegarde.proposerRecord(this.cleRecord(), rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record(this.cleRecord());
     this.rang = rang;
     // LE BILAN DU COACH : réussites, erreurs, part du public gagnée (battle) + UN conseil pour progresser
-    const bd = this.dernierBilanDanse;
-    const publicPourToi = bd ? Math.max(0, Math.min(100, Math.round(bd.jauge || 0))) : null;
-    const conseil = bd
-      ? (bd.rates >= 10 ? 'Conseil du coach : au battle, garde le rythme même piégé — chaque raté rend le public à Kédric.'
-        : bd.rates >= 5 ? 'Conseil du coach : vise le PARFAIT pile sur le temps : c\'est lui qui fait basculer le public.'
-        : 'Conseil du coach : enchaîne 5 PARFAITS d\'affilée : la foule est à toi (COMBO x1,5).')
-      : (this.stats.plaquages >= 3 ? 'Conseil du coach : esquive les plaqueurs PLUS TÔT, le symbole s\'affiche avant le contact.'
-        : 'Conseil du coach : les esquives PARFAITES remplissent le Devil Bat Ghost — il part tout seul au défenseur suivant.');
-    return `Kédric est battu au battle de danse !  Touchdowns : ${this.stats.touchdowns} / ${R.courses}\nRANG ${rang}   -   temps ${formatTemps(this.tempsTotal)}` +
-      `\nPlaquages subis : ${this.stats.plaquages}   esquives : ${this.stats.esquives}` +
-      `\nEsquives parfaites : ${this.stats.parfaits}` +
-      `\nScore de course : ${this.points || 0} points` +
-      (this.stats.ghosts ? `   Devil Bat Ghost : ${this.stats.ghosts}` : '') +
-      (publicPourToi !== null ? `\nBattle : ${bd.parfaits} parfaits, ${bd.bien} biens, ${bd.rates} ratés   -   public gagné : ${publicPourToi} %` : '') +
+    const conseil = this.stats.touchdowns < R.courses && this.stats.plaquages >= 2
+      ? 'Conseil : chaque TOUCHDOWN = 1 JOKER au battle. Lis le symbole du prochain défenseur, puis agis.'
+      : (bd.pieges || 0) >= 2 ? 'Conseil : les flèches DORÉES sont des pièges : laisse-les tomber sans rien toucher.'
+      : (bd.rates || 0) >= 15 ? 'Conseil : au battle, appuie quand la flèche est SUR la touche, pas avant.'
+      : 'Conseil : enchaîne 5 PARFAITS d\'affilée : la foule est à toi (COMBO x1,5).';
+    return `Kédric est battu au battle de danse !\nRANG ${rang}   -   temps ${formatTemps(this.tempsTotal)}` +
+      `\nTouchdowns : ${this.stats.touchdowns} / ${R.courses}   plaqué : ${this.stats.plaquages}` +
+      `\nEsquives : ${this.stats.esquives} (${parfaitsCourses} parfaites)   score de course : ${this.points || 0}` +
+      (this.stats.ghosts ? `\nDevil Bat Ghost : ${this.stats.ghosts}` : '') +
+      `\nBattle : ${bd.parfaits} parfaits, ${bd.bien} biens, ${bd.rates} ratés` + (bd.jokers ? `, ${bd.jokers} joker(s) utilisé(s)` : '') +
+      `\nPublic gagné : ${publicPourToi} %` +
       (record ? `\nRecord : rang ${record.rang} en ${formatTemps(record.temps)}` : '') +
       (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '') +
-      '\n' + lignesDefis('kedric', [
-        { id: 'parfait40', nom: '40 esquives PARFAITES (courses + battle)', test: () => this.stats.parfaits >= 40 },
-        { id: 'public80', nom: 'Battle gagné avec 80 % du public pour toi', test: () => publicPourToi !== null && publicPourToi >= 80 },
-      ]).join('\n') +
+      (sansRecord ? '' : '\n' + lignesDefis('kedric', [
+        { id: 'troisTD', nom: '3 TOUCHDOWNS sur 3', test: () => this.stats.touchdowns >= R.courses },
+        { id: 'public80', nom: 'Battle gagné avec 80 % du public pour toi', test: () => publicPourToi >= 80 },
+        { id: 'sansPiege', nom: 'Battle sans toucher une flèche DORÉE', test: () => (bd.pieges || 0) === 0 },
+      ]).join('\n')) +
       `\n${conseil}`;
   }
 
@@ -1084,7 +1090,7 @@ export class KedricCourse extends BossScene {
     this.tweens.add({ targets: rayons, angle: 360, duration: 20000, repeat: -1 });
     const ked = this.add.image(LARGEUR + 200, HAUTEUR - 30, 'kedric_defaite').setOrigin(0.5, 1).setDepth(P + 2);
     ked.setScale(300 / ked.height);
-    this.tweens.add({ targets: ked, x: 760, duration: 500, ease: 'Cubic.Out' });
+    this.tweens.add({ targets: ked, x: 835, duration: 500, ease: 'Cubic.Out' });
     const trophee = this.add.image(300, 300, 'kedric_trophee').setDepth(P + 3).setScale(0).setAngle(-30);
     this.tweens.add({ targets: trophee, scale: 300 / trophee.height, angle: 0, delay: 350, duration: 600, ease: 'Back.Out' });
     this.tweens.add({ targets: trophee, y: 290, delay: 1000, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
@@ -1101,9 +1107,16 @@ export class KedricCourse extends BossScene {
       this.tweens.add({ targets: r, scale: 1, delay: 900, duration: 300, ease: 'Back.Out' });
       texte(this, 140, 375, 'RANG', 22, '#ffd84a').setDepth(P + 5);
     }
-    texte(this, 300, 135, lignes[0], 22, '#ffffff').setDepth(P + 5);
-    texte(this, 380, 440, lignes.slice(1).join('\n').replace(/RANG \w\s+-\s+/, ''), 17, '#ffffff', { align: 'left', lineSpacing: 5 }).setOrigin(0, 0.5).setDepth(P + 5);
-    bulle(this, 760, 150, `Kédric : « ${REPLIQUES.victoire} »`, 99999).setDepth(P + 5);
+    texte(this, 300, 135, lignes[0], 20, '#ffffff', { wordWrap: { width: 520 } }).setDepth(P + 5);
+    // colonne entre le trophée et Kédric, avec retour à la ligne (sinon le conseil sort de l'écran)
+    // (défis en version courte : ★ nouveau, ✓ déjà réussi, ☐ à débloquer)
+    const corps = lignes.slice(1).join('\n').replace(/RANG \w\s+-\s+/, '')
+      .replace(/★ DÉFI RÉUSSI : /g, '★ ').replace(/Défi déjà réussi : /g, '✓ ').replace(/Défi à débloquer : /g, '☐ ');
+    const bloc = texte(this, 440, 170, corps, 14, '#ffffff',
+      { align: 'left', lineSpacing: 3, wordWrap: { width: 295 }, backgroundColor: '#000000aa', padding: { x: 8, y: 6 } })
+      .setOrigin(0, 0).setDepth(P + 5);
+    if (bloc.height > 330) bloc.setScale(330 / bloc.height);
+    bulle(this, 790, 140, `Kédric : « ${REPLIQUES.victoire} »`, 99999).setDepth(P + 5);
     const badge = this.add.image(140, 210, 'badge_' + this.identite.id).setDepth(P + 5).setScale(0);
     this.tweens.add({ targets: badge, scale: 2, delay: 1200, duration: 300, ease: 'Back.Out' });
     texte(this, 140, 260, 'Badge Kédric !', 18, '#ffd84a').setDepth(P + 5);

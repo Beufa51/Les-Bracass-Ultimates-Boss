@@ -113,14 +113,19 @@ export const REGLAGES = {
     ecartTech: 12,   // écart MINIMUM (s) entre deux techniques de Kédric : pas la mitraille
     double: { duree: 12 },
     combo: { nombre: 5, duree: 10, mult: 1.5 },
-    drain: { seuil: 40, force: 0.12 },   // tu mènes trop : son public se rappelle à lui (jauge/s, adouci : les pièges suffisent déjà)
-    parfait: 0.12, bien: 0.28, gain: { parfait: 2.1, bien: 1.4, rate: 6.5 },   // réussites généreuses, RATÉ punitif (-6,5) : le public rend VITE à Kédric quand on rate une flèche
-    parTouchdown: 15, avanceMax: 30 },
+    rappel: 0.06,   // AUDIT : la jauge revient vers le milieu de 6 % par seconde (des deux côtés) : fini les +100 / -100 d'avance
+    // AUDIT (calé au bot, 36 matchs) : NORMAL joueur moyen gagne de justesse (19 à 51 % du public), joueur enfant
+    // gagne en FACILE (5 à 40 %) et perd en NORMAL ; CHAMPION joueur moyen : une chance sur deux. (Avant : ±0,12 / ±0,28 s, +100 pour tous.)
+    parfait: 0.07, bien: 0.16, gain: { parfait: 2.1, bien: 1.2, rate: 8 },
+    parTouchdown: 15, avanceMax: 30,
+    jokerParTouchdown: 1 },   // AUDIT : chaque touchdown = 1 JOKER au battle (un raté pardonné : le public ne bouge pas)
   // ---------- Kédric en personne sur le terrain (option : course avec kedric: true) ----------
   //  il garde l'en-but et prévient toujours pareil : danse → POSE (son attaque s'affiche) → CHARGE
   duel: { vies: 2, distance: 7, charge: 6, danse: 1.0, pose: 0.7, feinteAvant: 0.6 },
   // ---------- Classement ----------
-  tempsReference: 300,   // au-delà de ce temps de jeu, le rang baisse
+  // AUDIT : le rang = touchdowns + part du public gagnée au battle - ratés du battle + esquives parfaites des courses
+  // (plus le temps : une course plaquée est plus courte, ce serait récompenser le plaquage)
+  rang: { base: 30, parTouchdown: 12, parPublic: 0.4, parRate: 0.5, parParfait: 0.6, parfaitsMax: 10 },
   rangs: [
     { rang: 'S', seuil: 88 },
     { rang: 'A', seuil: 72 },
@@ -130,12 +135,14 @@ export const REGLAGES = {
 };
 
 // Les 3 COURSES : la défense de chaque course enchaîne ces FORMATIONS, dans l'ordre (et recommence), jusqu'à l'en-but.
+// charge / alerte (x, facultatifs) : défenseurs plus rapides / symbole plus tard ; espace : rangs plus serrés (yards) :
+// la difficulté MONTE d'une course à l'autre.
 // Kédric ne plaque jamais lui-même (une star ne se salit pas les mains) : on l'affronte au BATTLE DE DANSE.
 // (kedric: true sur une course = il garde l'en-but, en duel d'esquive.)
 export const COURSES = [
   { nom: 'COURSE', titre: 'L\'échauffement', formations: ['base', 'faux', 'corde', 'zone'] },
-  { nom: 'COURSE', titre: 'Le grand show', formations: ['blitz', 'zone', 'corde', 'piege', 'faux'] },
-  { nom: 'COURSE', titre: 'La défense de fer', formations: ['piege', 'blitz', 'zone', 'faux', 'corde'] },
+  { nom: 'COURSE', titre: 'Le grand show', formations: ['blitz', 'zone', 'corde', 'piege', 'faux'], charge: 1.15, alerte: 0.95, espace: 9 },
+  { nom: 'COURSE', titre: 'La défense de fer', formations: ['piege', 'blitz', 'zone', 'faux', 'corde'], charge: 1.35, alerte: 0.88, espace: 8 },
 ];
 
 // L'équipe du coup d'envoi qui descend sur toi (elle court déjà quand tu réceptionnes)

@@ -68,3 +68,34 @@ matchs COMPLETS (3 courses + battle) en accéléré : 35 matchs, 3 difficultés 
 - Battle : tu veux qu'un joueur moyen le gagne « de justesse » (proposition 2) ou qu'il reste facile ?
 - Jokers des touchdowns (proposition 3) : oui / non ?
 - ENTRAÎNEMENT : sans badge ni record (comme Lionel PERSO) ?
+
+## C. Animations et images (vérification ajoutée à la demande de Fabien)
+Tout est illustré (toi, défenseurs, Kédric coach / danse / frime / défaite, scène, stade, trophée). À améliorer :
+1. **Les défenseurs qui courent** : UNE seule image qui sautille (`kedric_def_course`) → cycle de course en 4 images
+   (prompt n°3 de `kedric_prompts_images.md`).
+2. **Ta réception au coup d'envoi** : on voit l'image du SAUT → vraie pose « j'attrape le ballon » (prompt n°4).
+3. Sans nouvelle image (code) : le ballon et le kaméhaméha du public sont dessinés au code, c'est voulu et lisible.
+   `kedric_star` (Kédric en joueur, une seule image penchée) ne sert plus (duel retiré) : rien à faire.
+
+## FAIT (choix de Fabien : battle de justesse mais pas injuste, jokers oui, entraînement comme Lionel)
+- A1 touche X lue (entraînement du battle) ; sur téléphone la phrase « X = ENTRAÎNEMENT » n'est plus affichée.
+- A2 écran de victoire en colonne (comme Lionel), A3 annonce du Ghost remise à zéro, A4 le battle compte dans le temps.
+- A5 ENTRAÎNEMENT : ni record ni défis (badge gardé, comme le PERSO de Lionel).
+- Battle : PARFAIT ±0,07 s, BIEN ±0,16 s, raté -8, et le « drain » remplacé par un RAPPEL ÉLASTIQUE (6 %/s vers
+  le milieu, des deux côtés). Sans lui, la jauge finissait toujours à +100 ou -100 ; avec lui elle montre comment tu
+  danses en ce moment, et celui qui est mené peut remonter.
+- JOKERS : 1 par touchdown, un raté pardonné (« JOKER ! LE PUBLIC TE PARDONNE »), annoncés avant le battle.
+- Rang : touchdowns x12 + public x0,4 - ratés du battle x0,5 + parfaites des courses (max 10) ; plus le temps.
+  Défis : 3 touchdowns sur 3 ; 80 % du public ; battle sans toucher une flèche DORÉE.
+- Courses 2 et 3 plus dures : défenseurs plus rapides (x1,15 / x1,35), symbole plus tard (x0,95 / x0,88), rangs plus
+  serrés (9 / 8 yards au lieu de 10).
+
+Bot après corrections (3 matchs par case) :
+
+| | bon | moyen | enfant |
+|---|---|---|---|
+| FACILE | gagne 3/3 (public 85-98) | 3/3 (58-83) | 2/3 (-16 à 20) |
+| NORMAL | 3/3 (83-97) | 3/3 (22-49) | 0/3 (-53 à -18) |
+| CHAMPION | 3/3 (63-70) | 3/3 (11-23) | 0/3 (-100 à -89) |
+
+Rangs en NORMAL : bon S, moyen A à C selon les touchdowns. La 2e chance par course n'a pas été faite (pas demandée).

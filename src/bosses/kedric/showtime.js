@@ -15,8 +15,8 @@
 //  (2 techniques par manche, chacune annoncée en grand, jamais deux à la fois)
 //  - les FLÈCHES DOUBLÉES : dans les dernières secondes de chaque manche, deux à la fois ;
 //  - le COMBO : 5 PARFAITS d'affilée et la foule est à toi (gains x1,5 pendant 10 s).
-// Et quand tu mènes trop large, son public à lui se rappelle à lui : la jauge glisse
-// doucement vers Kédric (drain passif) — il faut rester bon jusqu'au bout.
+// Et le public n'est jamais acquis : la jauge glisse toujours
+// vers le milieu (rappel élastique, des deux côtés) — il faut rester bon jusqu'au bout.
 // En CHAMPION (diff.flechesRouges) : flèches rouges bien plus fréquentes, gel plus long.
 // La jauge du public est un KAMÉHAMÉHA père-fils : ton faisceau BLEU à gauche, le DORÉ de
 // Kédric à droite ; la BOULE BLANCHE du point de CHOC désigne le gagnant (>0 à la fin = victoire).
@@ -68,7 +68,8 @@ export class Showtime {
   constructor(scene, options, fin) {
     this.s = scene; this.o = options; this.fin = fin;
     this.jauge = options.jauge || 0;
-    this.bilan = { parfaits: 0, bien: 0, rates: 0 };
+    this.bilan = { parfaits: 0, bien: 0, rates: 0, pieges: 0, jokers: 0 };
+    this.jokers = options.jokers || 0;   // 1 par touchdown : un raté pardonné (le public ne bouge pas)
     this.el = []; this.notes = [];
     this.musique = S.manches[0].musique;   // la musique de la manche en cours
     this.numManche = 0;
@@ -165,7 +166,7 @@ export class Showtime {
         (this.s.diff.flechesRouges ? '\nFLÈCHE ROUGE = fais l\'INVERSE !' : '');
     const regles = texte(s, LARGEUR / 2, HAUTEUR - 104, texteRegles, 17, '#ffffff',
       { align: 'center', lineSpacing: 6, backgroundColor: '#000000c8', padding: { x: 16, y: 10 } }).setDepth(P + 10);
-    this.invite = texte(s, LARGEUR / 2, HAUTEUR - 22, 'Appuie sur une flèche quand tu es prêt !      X = ENTRAÎNEMENT (aucune défaite)', 18, '#7fff7f', { fontStyle: 'bold' }).setDepth(P + 10).setAlpha(0);
+    this.invite = texte(s, LARGEUR / 2, HAUTEUR - 22, estTactile() ? 'Appuie sur une flèche quand tu es prêt !' : 'Appuie sur une flèche quand tu es prêt !      X = ENTRAÎNEMENT (aucune défaite)', 18, '#7fff7f', { fontStyle: 'bold' }).setDepth(P + 10).setAlpha(0);
     this.elAnnonce = [voile, titre, sous, bulle, regles, this.invite];
     // PLUS JAMAIS DE TEXTES SUPERPOSÉS : on place tout à partir des HAUTEURS MESURÉES —
     // l'invite SOUS les règles (jamais dessous... jamais DESSUS !), la bulle JAMAIS sur
@@ -463,7 +464,7 @@ export class Showtime {
     if (this.phase === 'intro') {
       if (this.T >= S.introMini && this.invite.alpha === 0) this.s.tweens.add({ targets: this.invite, alpha: { from: 1, to: 0.35 }, duration: 500, yoyo: true, repeat: -1 });
       const appui = DIRS.some(k => e[k]);
-      // X au moment de partir = ENTRAÎNEMENT : pas de drain, la jauge ne peut pas passer sous zéro
+      // X au moment de partir = ENTRAÎNEMENT : pas de rappel, la jauge ne peut pas passer sous zéro
       if ((appui && this.T >= S.introMini) || this.T >= S.intro) { this.entrainement = !!e.x; this.demarrer(); }
       this.afficher();
       return;
@@ -514,7 +515,9 @@ export class Showtime {
         this.superPouvoir(...ECRANS[tech.type]);
       }
       if (this.effet && this.T > this.effet.fin) this.effet = null;
-      if (!this.entrainement && this.jauge > S.drain.seuil) this.public(-S.drain.force * dt);   // tu mènes trop : son public se rappelle à lui
+      // AUDIT : RAPPEL ÉLASTIQUE vers le milieu (des deux côtés) : la jauge montre comment tu danses EN CE MOMENT,
+      // elle ne file plus à +100 / -100 ; celui qui est mené peut toujours remonter (de justesse, mais pas injuste)
+      if (!this.entrainement) this.public(-S.rappel * this.jauge * dt);
       for (const t of DIRS) if (e[t]) this.appui(t);
       for (let i = 0; i < this.pas.length; i++) {
         const p = this.pas[i];
@@ -574,6 +577,7 @@ export class Showtime {
     const xChoc = this.pointChoc();
     // la foule est à toi (combo) : tes réussites rapportent PLUS (x1,5)
     const mult = this.combo() ? S.combo.mult : 1;
+    let pardonne = false;   // raté effacé par un JOKER
     if (note === 'parfait') {
       this.bilan.parfaits++;
       this.public(S.gain.parfait * mult);
@@ -590,9 +594,17 @@ export class Showtime {
       this.bilan.bien++; this.public(S.gain.bien * mult);
       this.retour.setText('BIEN !').setColor('#7fff7f');
       this.consecParfaits = 0;   // un BIEN casse le combo (seuls les PARFAITS le montent)
+    } else if (this.jokers > 0) {
+      // un JOKER gagné au football : le raté est pardonné (le public ne bouge pas, le combo s'arrête quand même)
+      this.jokers--; this.bilan.jokers++; pardonne = true;
+      if (note === 'piege') this.bilan.pieges++;
+      this.retour.setText('JOKER !').setColor('#9fe0ff');
+      onomatopee(this.s, LARGEUR / 2, 150, `JOKER ! LE PUBLIC TE PARDONNE${this.jokers ? ` (encore ${this.jokers})` : ''}`, 40, '#9fe0ff');
+      this.consecParfaits = 0;
     } else {
       this.bilan.rates++; this.public(-S.gain.rate);
       const piege = note === 'piege';   // une flèche DORÉE touchée : Kédric t'a eu
+      if (piege) this.bilan.pieges++;
       this.retour.setText(piege ? 'PIÈGE DORÉ !' : p.rouge ? 'RATÉ ! (l\'inverse !)' : 'RATÉ !').setColor(piege ? OR : '#ff6b6b');
       onomatopee(this.s, LARGEUR / 2, 150, piege ? 'HA HA ! PIÉGÉ !' : 'RATÉ !', 54, piege ? OR : '#ff6b6b');   // le public le VOIT : gros RATÉ bien marqué au milieu de l'écran
       lignesImpact(this.s, xChoc, this.yJauge, 0xff6b6b, 12, 100);
@@ -607,7 +619,7 @@ export class Showtime {
     // ---------- le RETOUR FRAPPANT de l'appui ----------
     // ça se SENT (vibration, si le téléphone l'autorise) et ça se VOIT partout (même sur iPhone) :
     // flash plein écran + secousse de caméra + la touche qui éclate (raté : elle s'effondre)
-    const echec = note === 'rate' || note === 'piege';
+    const echec = (note === 'rate' || note === 'piege') && !pardonne;
     if (navigator.vibrate) navigator.vibrate(echec ? 80 : note === 'parfait' ? 45 : 20);
     const tc = this.touchesC[p.attendu || p.montre];
     this.s.tweens.killTweensOf(tc); tc.setScale(echec ? 0.55 : 1.8);

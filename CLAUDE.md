@@ -23,6 +23,12 @@ Après tout passage de `outils/remi/preparer_images.py` ou changement de `src/bo
 Après tout changement du babyfoot (`src/bosses/remi/RemiBaby.js`, `src/bosses/remi/babyfoot/`, réglages `BABY` / `baby*`) :
 `node outils/remi_baby_bot.mjs` (≈ 2 min) doit finir par « Babyfoot : 0 problème » (tout tir VERT doit marquer).
 
+## Audits (demande du propriétaire)
+Méthode « comme Lionel » : relecture du code (bugs) + bot qui joue des parties complètes (équilibrage, plaisir),
+rapport dans `propositions/<boss>_audit.md`, puis on attend les choix du propriétaire. TOUJOURS une section
+« Animations et images » : ce qui est dessiné au code, ce qui n'a qu'une image figée, les poses qui manquent, avec
+les prompts prêts (voir « Images » ci-dessous).
+
 ## Images (demande du propriétaire)
 Dès qu'une image manque ou qu'une nouvelle image améliorerait le jeu, DONNE DIRECTEMENT le prompt prêt à copier
 (dans la réponse, en bloc de code, avec le nom du fichier attendu et ce qu'il faut joindre), sans attendre qu'il le
