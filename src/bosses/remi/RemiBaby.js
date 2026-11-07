@@ -53,7 +53,7 @@ export class RemiBaby extends BossScene {
 
   create() {
     this.etat = 'intro';   // intro | prep | tir | tient | riposte | pause | fin
-    this.horloge = 0; this.ivresse = 0; this.remiBu = 0;
+    this.horloge = 0; this.ivresse = 0; this.remiBu = 0; this.prochainHoquet = 0; this.flou = 0;
     this.butsToi = 0; this.butsRemi = 0; this.arrets = 0; this.gamelles = 0;
     this.pos = { toi: 0, att: 0, def: 0, gar: 0 };      // position de chaque barre (m)
     this.cible = 0;                                     // où ton doigt veut le gardien
@@ -79,6 +79,9 @@ export class RemiBaby extends BossScene {
     laisserPasserTactile(this);
     jouerMusique(this, 'remi_musique_baby');   // Captain Tsubasa (donnée par le propriétaire)
     this.installerDoigt();
+    // vue qui se trouble (bords sombres) avec l'alcool : effet du moteur (WebGL), ignoré s'il n'existe pas
+    this.vignette = null;
+    try { if (this.cameras.main.postFX) this.vignette = this.cameras.main.postFX.addVignette(0.5, 0.5, 0.75, 0); } catch (e) { this.vignette = null; }
     etiquettesTactiles({ ...VIDES, espace: 'OK' });
     const t = estTactile();
     this.afficherIntro('RÉMI - Le babyfoot', [
@@ -88,7 +91,7 @@ export class RemiBaby extends BossScene {
       `Balle arrêtée : ◀ ▶ TOURNENT ta visée (rebonds sur les bandes comme au billard) ; ligne VERTE = TIR (${t ? 'toucher le milieu de l\'écran' : 'ESPACE'}) entre ses joueurs (en biais : garde ◀ ou ▶)`,
       'GAMELLE (rentre et ressort) = but + un point retiré à l\'autre',
       `ROULETTE interdite : si sa barre tourbillonne et marque, ${t ? 'touche RÉMI' : 'appuie sur Z'} = but annulé`,
-      'Chaque but encaissé, tu bois : ça tangue...',
+      'Chaque but encaissé, tu bois : ta visée titube, tu vois moins loin, hoquets...',
     ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.demarrer(); }));
   }
 
@@ -165,7 +168,7 @@ export class RemiBaby extends BossScene {
       if (!d || p.id !== d.id) return;
       this.doigt = null;
       if (this.etat !== 'riposte') return;
-      if (this.horloge - d.t < 0.35 && Math.hypot(p.x - d.x, p.y - d.y) < 30) this.riposter(this.visee);   // toucher bref : tir dans la visée
+      if (this.horloge - d.t < 0.35 && Math.hypot(p.x - d.x, p.y - d.y) < 30) this.riposter(this.viseeVraie());   // toucher bref : tir dans la visée (qui titube si tu as bu)
     });
   }
 
@@ -319,6 +322,8 @@ export class RemiBaby extends BossScene {
     this.poseTemp('nargue', 1.6);
     this.ivresse++;
     jouerSon(this, 'remi_boit');
+    this.time.delayedCall(900, () => bulle(this, `Tu bois ta pinte... (${this.ivresse})`, '#e8a52a', 1.4, 360));
+    if (this.ivresse >= 2 && !this.prochainHoquet) this.prochainHoquet = this.horloge + hasard(2, 4);
     this.cameras.main.flash(200, 230, 160, 40);
     annonce(this, gamelle ? 'GAMELLE !' : 'BUT DE RÉMI', '#ff6b6b', 0.8);
     if (!gamelle) bulle(this, `Rémi : « ${choisir(REPLIQUES.babyBut)} »`, '#ffd84a', 1.6, 300);
@@ -402,11 +407,25 @@ export class RemiBaby extends BossScene {
         this.balle.x = Phaser.Math.Clamp(this.pos.toi + 0.03, -B.but / 2 + 0.01, B.but / 2 - 0.01); this.balle.z = BARRES.toi.z + 0.05;   // un peu de côté : visible derrière ton gardien
         this.fenetre -= dt;   // V19g : pas de limite de temps pour viser ; seul le bonus ÉCLAIR s'éteint
         this.indice = this.diff.babyGuide ? this.chercherVert() : undefined;   // V19l : pas de guide en PRESSION / CUL SEC
-        if (vientDAppuyer(this.touches.espace)) this.riposter(this.visee);
+        if (vientDAppuyer(this.touches.espace)) this.riposter(this.viseeVraie());
       }
       if (vientDAppuyer(this.touches.z)) this.appelRoulette();
+      if (this.prochainHoquet && this.horloge > this.prochainHoquet && this.ivresse >= 2) this.hoquet();
     }
     this.dessiner();
+  }
+
+  // HOQUET (à partir de 2 pintes) : secousse, ton gardien et ta visée sautent d'un coup, la vue se trouble
+  hoquet() {
+    const i = Math.min(this.ivresse, B.ivresseMax);
+    this.prochainHoquet = this.horloge + hasard(5, 9) / (1 + 0.15 * i);
+    jouerSon(this, 'remi_hips');
+    this.cameras.main.shake(160, 0.006);
+    const saut = hasard(-1, 1) * B.hoquetGardien * (0.6 + 0.1 * i);
+    this.pos.toi = Phaser.Math.Clamp(this.pos.toi + saut, -B.course, B.course); this.cible = this.pos.toi;
+    if (this.etat === 'riposte') this.visee = Phaser.Math.Clamp(this.visee + hasard(-1, 1) * B.hoquetVisee, -B.viseeMax, B.viseeMax);
+    this.flou = 0.35;
+    bulle(this, 'HIPS !', '#e8a52a', 0.6, 360);
   }
 
   pasGardien(dt) {
@@ -464,8 +483,10 @@ export class RemiBaby extends BossScene {
   // ---------- dessin ----------
   dessiner() {
     const cam = this.cameras.main;
-    cam.setRotation(this.ivresse ? Math.sin(this.horloge * 0.9) * 0.006 * this.ivresse : 0);
-    this.hud.setText(`TOI  ${this.butsToi}  -  ${this.butsRemi}  RÉMI`);
+    cam.setRotation(this.ivresse ? Math.sin(this.horloge * 0.9) * 0.008 * Math.min(this.ivresse, B.ivresseMax) : 0);
+    this.hud.setText(`TOI  ${this.butsToi}  -  ${this.butsRemi}  RÉMI` + (this.ivresse ? `     PINTES BUES : ${this.ivresse}` : ''));
+    if (this.vignette) this.vignette.strength = Math.min(B.vignetteMax, this.ivresse * B.vignetteBue + (this.flou || 0));
+    this.flou = Math.max(0, (this.flou || 0) - 0.01);
     // Rémi derrière la table, penché du côté où il va tirer
     if (this.pose !== 'face' && this.horloge > this.poseFin) this.pose = 'face';
     if (this.etat !== 'prep') this.penche *= 0.92;
@@ -510,13 +531,15 @@ export class RemiBaby extends BossScene {
       const lib = this.cheminLibre(), coul = (z) => lib.cote || z >= lib.bloque ? 0xff5a5a : lib.enFace ? 0xffd84a : 0x7fff7f;
       // le trajet (avec ses rebonds sur les bandes) : des points qui défilent vers le but
       const pas = 0.04, dec = (this.horloge * 0.25) % pas;
-      for (let z = this.balle.z + 0.05 + dec; z < L; z += pas) {
+      // bourré, tu vois moins loin : la ligne raccourcit (et le rond d'arrivée disparaît à partir de B.ivresseRond pintes)
+      const zVu = this.balle.z + (L - this.balle.z) * Math.max(B.vueMini, 1 - B.vueBue * this.ivresse);
+      for (let z = this.balle.z + 0.05 + dec; z < Math.min(L, zVu); z += pas) {
         const q = proj(xSur(this.balle.x, this.balle.z, lib.biais, z), R, z);
         g.fillStyle(coul(z), 0.95).fillCircle(q.x, q.y, Math.max(2.5, 0.009 * q.k));
       }
       // le point d'arrivée sur la ligne de but : un rond (vert = BUT)
       const fin = proj(lib.xBut, R, L), cf = coul(L - 0.001);
-      g.lineStyle(4, cf, 1).strokeEllipse(fin.x, fin.y, 0.06 * fin.k, 0.03 * fin.k);
+      if (this.ivresse < B.ivresseRond) g.lineStyle(4, cf, 1).strokeEllipse(fin.x, fin.y, 0.06 * fin.k, 0.03 * fin.k);
       if (lib.libre && !lib.enFace) { const q = proj(0, 0, L); g.fillStyle(0x7fff7f, 0.18 + 0.12 * Math.sin(this.horloge * 10)).fillRect(proj(-B.but / 2, 0, L).x - 6, q.y - 0.09 * q.k, B.but * q.k + 12, 0.1 * q.k); }
       const vert = lib.libre && !lib.enFace;
       const pourquoi = lib.cote ? 'À CÔTÉ' : !lib.libre ? 'BLOQUÉ' : 'SON GARDIEN EST EN FACE';
@@ -544,8 +567,14 @@ export class RemiBaby extends BossScene {
   }
 
   // ta riposte passerait-elle sa défense ? (biais = celui du bouton tenu) ; bloque = z du joueur qui l'arrête
+  // V19m BOURRÉ : la visée réelle TITUBE (elle ondule toute seule, d'autant plus que tu as bu)
+  viseeVraie() {
+    const i = Math.min(this.ivresse, B.ivresseMax), h = this.horloge;
+    return Phaser.Math.Clamp(this.visee + i * B.titubeVisee * (Math.sin(h * 2.1) + 0.5 * Math.sin(h * 3.7)), -B.viseeMax, B.viseeMax);
+  }
+
   // ta riposte (balle en xb, angle a) passerait-elle ? Trajet avec rebonds. bloque = z du joueur qui l'arrête
-  cheminLibre(xb = this.balle.x, a = this.visee) {
+  cheminLibre(xb = this.balle.x, a = this.viseeVraie()) {
     const z0 = this.balle.z, br = BARRES.def, en = (z) => xSur(xb, z0, a, z);
     const bloque = hommes(br, this.pos.def).some(h => Math.abs(en(br.z) - h) < B.prise * 0.85 + 0.01) ? br.z : L + 1;   // (+1 cm de marge : sa défense bouge encore un peu)
     // son gardien : il n'arrête que ce qu'il peut atteindre (sa prise + ce qu'il parcourt entre son réflexe et l'arrivée)

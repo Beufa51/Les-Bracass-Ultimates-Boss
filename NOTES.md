@@ -322,6 +322,13 @@
   seule la couleur de la ligne aide. Plus dur aussi : ses tirs 0,6 / 0,75 / 0,95 / 1,15 m/s, bonus ÉCLAIR 1,2 / 1 / 0,8 /
   0,6 s, son gardien 0,2 / 0,25 / 0,3 / 0,27, `vitesseBarresRemi` 0,4. Bot-guide (parfait) : 5-0 en 23 à 30 s, jusqu'à 3 s
   de visée par but, angles jusqu'à 0,19.
+- V19m (demande : « complexifier en faisant un effet bourré si on prend un but ») : chaque but encaissé = une pinte
+  (compteur « PINTES BUES » à côté du score, bulle « Tu bois ta pinte... »), effets plafonnés à `ivresseMax` 5 :
+  VISÉE QUI TITUBE (`viseeVraie()` : ± `titubeVisee` 0,035 rad par pinte, deux sinus ; c'est elle qui part au tir et que
+  la ligne montre), VUE COURTE (ligne raccourcie de `vueBue` 11 % par pinte, mini 40 % ; plus de rond d'arrivée dès
+  `ivresseRond` 3), HOQUETS dès 2 pintes (toutes les 5-9 s, plus souvent ivre : son « hips », secousse, gardien et visée qui
+  sautent : `hoquetGardien`, `hoquetVisee`), bords de l'écran assombris (vignette WebGL `vignetteBue`, ignorée sans WebGL),
+  écran qui penche plus. Dénoncer une roulette rend une pinte.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

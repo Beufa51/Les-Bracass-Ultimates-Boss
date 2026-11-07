@@ -114,6 +114,13 @@ export const BABY = {
   gamelleBord: 0.6,       // un but à plus de cette part du demi-but depuis le centre peut faire GAMELLE...
   gamelle: 0.35,          // ... avec cette chance
   appelDuree: 1.6,        // temps pour crier « ROULETTE ! » après son but (s)
+  // V19m EFFET BOURRÉ (chaque but encaissé = une pinte ; les effets plafonnent à ivresseMax pintes)
+  ivresseMax: 5,
+  titubeVisee: 0.035,     // ta visée ondule de ± ce nombre de rad par pinte
+  vueBue: 0.11, vueMini: 0.4, // la ligne de visée raccourcit de 11 % par pinte (jamais moins de 40 % du trajet)
+  ivresseRond: 3,         // à partir de ce nombre de pintes, plus de rond d'arrivée
+  hoquetGardien: 0.05, hoquetVisee: 0.15, // un HOQUET (dès 2 pintes) fait sauter ton gardien (m) et ta visée (rad)
+  vignetteBue: 0.09, vignetteMax: 0.55,   // bords de l'écran qui s'assombrissent par pinte
   trembleBu: 0.006,       // tremblement de ton gardien par but encaissé (m)
 };
 
