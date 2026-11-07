@@ -1,9 +1,10 @@
 // Boss Rémi : la soirée au bar, 3 jeux à la suite (même difficulté) :
-// 1) le VÉLO pour aller au bar (vue de profil, éviter les bourrés)  2) le BEER PONG contre Rémi  3) la PORTE (qui tape le plus fort).
+// 1) le VÉLO pour aller au bar (vue de profil, éviter les bourrés)  2) le BABYFOOT contre Rémi (prototype ; l'ancien beer pong reste dans le menu F1)  3) la PORTE (qui tape le plus fort).
 // Le menu de test (F1) permet de commencer directement par le 2e ou le 3e jeu.
 import { IDENTITE, DIFFICULTES as D, VELO, PONG, PORTE } from './reglages.js';
 import { RemiVelo } from './RemiVelo.js';
 import { RemiPong } from './RemiPong.js';
+import { RemiBaby } from './RemiBaby.js';
 import { RemiPorte } from './RemiPorte.js';
 import { MANIFESTE } from './manifeste.js';
 
@@ -11,12 +12,13 @@ export default {
   ...IDENTITE,
   pret: true,
   phases: [
-    { id: 'velo', nom: 'Soirée complète (vélo, beer pong, porte)', scene: 'RemiVelo' },
-    { id: 'pong', nom: 'Beer pong direct', scene: 'RemiPong' },
+    { id: 'velo', nom: 'Soirée complète (vélo, babyfoot, porte)', scene: 'RemiVelo' },
+    { id: 'baby', nom: 'Babyfoot direct', scene: 'RemiBaby' },
+    { id: 'pong', nom: 'Ancien beer pong', scene: 'RemiPong' },
     { id: 'porte', nom: 'La porte direct', scene: 'RemiPorte' },
   ],
   manifeste: MANIFESTE,
-  scenes: [RemiVelo, RemiPong, RemiPorte],
+  scenes: [RemiVelo, RemiBaby, RemiPong, RemiPorte],
   // réglages développeur (écran caché du hub : 5 appuis sur « Badges ») ; voir src/core/reglagesDev.js
   reglagesDev: [
     { groupe: 'VÉLO', nom: 'Longueur du trajet (px)', objet: VELO, champ: 'longueur', pas: 1000, min: 4000, max: 40000 },

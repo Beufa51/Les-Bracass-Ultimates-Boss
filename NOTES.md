@@ -9,7 +9,7 @@
 - **Julien** : EN COURS — niveau 1 « la manif » jouable ; niveau 2 « la salle de classe » : COMBAT REFAIT (audit B :
   fenêtre de punition de dos, 8 attaques, phases noir / bureau renversé + alarme, élèves, sarbacane). RESTE : le
   MINI-NIVEAU « LE LYCÉE » (audit A) FAIT. Reste : faire jouer Fabien, équilibrer. Voir « JULIEN » plus bas.
-- **Rémi** : V1 JOUABLE (3 jeux à la suite, dessins provisoires au code) : vélo → beer pong → porte. Voir « RÉMI » plus bas.
+- **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo → BABYFOOT (prototype V19, remplace le beer pong) → porte. Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
 ## AUDIT GLOBAL V18 (6 boss, version économe) : `propositions/audit_global.md`
@@ -245,6 +245,18 @@
     « Faire genre » → POING CACHÉ : lâcher pendant une arrivée garde la charge (jauge cerclée de bleu, consigne
     « POING CACHÉ (x % gardés) » puis « VOIE LIBRE ! remaintiens : tu repars de x % ») ; bords de l'écran ROUGES dès le
     premier pas. Annonce jamais sous `annonceMini` 0,85 s (avant : surprise 0,3 s, 2e coup d'œil 0,4 s).
+- V19 (retour : « je n'aime pas le beer pong, je veux un jeu qui rappelle les bars ») : BABYFOOT, PROTOTYPE dessiné au code
+  (`RemiBaby.js`, réglages `BABY` + `baby*` par difficulté dans reglages.js). Vue à la 1re personne : ton gardien de dos,
+  Rémi en face. Boucle LIRE → ARRÊTER → RIPOSTER : Rémi promène la balle puis tire ; il SE PENCHE du côté où la balle
+  passera devant ton gardien (feinte : l'autre côté puis il change à 65 %). Arrêt = balle collée au gardien, fenêtre
+  `babyFenetre` pour riposter (toucher bref = droit, glisser vers le haut = en biais) ; ses barres visent où ta balle
+  ÉTAIT (`retardRemi`) puis se figent quand tu tires ; son gardien plonge après `babyReflexe`. GAMELLE (but près du
+  poteau, 35 %) = but + 1 point retiré à l'autre. ROULETTE (sa barre tourbillonne) : toucher Rémi / Z dans les 1,6 s
+  après son but = annulé ; faux appel = tu bois. But encaissé = tu bois (tangage, vision double, gardien qui tremble).
+  Premier à 5. Bilan : `baby` (`babyEcart`, `babyArret`, `babyGamelle`). L'ancien beer pong reste au menu F1 (« Ancien beer
+  pong »), hors de la soirée. Croisements calculés au point exact (sinon un tir en biais traversait le gardien).
+  Bot de test (headless) : gagne en PANACHÉ, perd en PRESSION / CUL SEC. Images : prompts 24 et 25. À FAIRE : faire jouer
+  Fabien, puis décider (garder / régler / supprimer RemiPong.js et ses images).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

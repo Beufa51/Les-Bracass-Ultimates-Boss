@@ -184,3 +184,23 @@ de la porte, de haut en bas). Ligne du haut : le personnage barbu à casquette ;
 3 poses par ligne, même échelle : 1 : poing armé en arrière, tout le corps tendu ; 2 : le coup part, l'épaule en avant ;
 3 : le poing ÉCRASÉ contre la porte, le bois qui se fend autour, éclats qui volent, traits d'impact.
 ```
+
+## 24. Le babyfoot : Rémi en face, derrière la table — `remi_babyfoot_planche.jpg` (À FAIRE, remplace le beer pong)
+À joindre : **`remi_presentation.jpg`** (pour garder le même Rémi).
+```
+Dessine le personnage de l'image jointe (même visage, barbe, casquette, veste), style manga/anime coloré, contours noirs nets,
+fond BLANC uni. Planche de 8 cases (2 lignes de 4), même échelle, même cadrage : Rémi DE FACE, buste coupé à la taille,
+les deux mains posées sur les poignées d'un babyfoot qu'on ne voit pas (poings serrés à hauteur de taille, coudes écartés).
+Ligne 1 : 1 attend, concentré, sourire en coin ; 2 penché franchement vers SA DROITE (épaules inclinées, regard du même
+côté) ; 3 penché franchement vers SA GAUCHE ; 4 le coup part : épaule qui pousse, grimace d'effort.
+Ligne 2 : 5 ROULETTE : il fait tourner la poignée à toute vitesse, traits de vitesse, air faussement innocent ;
+6 il vient de marquer : bras levé, il nargue ; 7 il encaisse un but : il boit sa pinte d'un coup ; 8 il râle, les bras
+écartés, « mais elle était dedans ! ».
+```
+
+## 25. Le bar avec un néon BABYFOOT (fond, derrière Rémi) — `remi_bar_babyfoot.jpg` (facultatif)
+À joindre : **`remi_bar_interieur.jpg`** (l'actuel).
+```
+Reprends exactement l'image jointe (même bar, même style, même cadrage), mais remplace le néon « BEER PONG » par un néon
+« BABYFOOT » de la même couleur, et ajoute au mur, à côté, une petite affiche « GAMELLE = -1 / ROULETTE INTERDITE ».
+```

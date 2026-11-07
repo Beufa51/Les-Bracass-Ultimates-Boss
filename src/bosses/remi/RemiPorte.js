@@ -418,8 +418,8 @@ export class RemiPorte extends BossScene {
   // ---------- fin de la soirée (V17) : points des 3 jeux, RANG et record (soirée complète seulement) ----------
   ecranVictoire(message) {
     const P = 1000, b = this.bilan || { temps: 0 }, cx = LARGEUR / 2;
-    const complet = b.velo !== undefined && b.pong !== undefined && b.porte !== undefined;
-    const total = (b.velo || 0) + (b.pong || 0) + (b.porte || 0);
+    const complet = b.velo !== undefined && b.baby !== undefined && b.porte !== undefined;
+    const total = (b.velo || 0) + (b.baby || 0) + (b.porte || 0);
     voile(this, 0.9).setDepth(P);
     const titre = texte(this, cx, 52, 'VICTOIRE !', 54, '#ffd84a', { fontStyle: 'bold italic', strokeThickness: 8 }).setDepth(P + 1).setScale(2.5).setAlpha(0);
     this.tweens.add({ targets: titre, scale: 1, alpha: 1, duration: 300, ease: 'Back.Out' });
@@ -428,7 +428,7 @@ export class RemiPorte extends BossScene {
     this.tweens.add({ targets: badge, scale: 2, delay: 300, duration: 300, ease: 'Back.Out' });
     texte(this, 150, 310, 'Badge Rémi !', 18, '#ffd84a').setDepth(P + 1);
     // les points, ligne par ligne
-    const lignes = [['VÉLO', b.velo], ['BEER PONG', b.pong], ['PORTE', b.porte], ['TOTAL', complet ? total : undefined]];
+    const lignes = [['VÉLO', b.velo], ['BABYFOOT', b.baby], ['PORTE', b.porte], ['TOTAL', complet ? total : undefined]];
     lignes.forEach(([nom, pts], n) => this.time.delayedCall(400 + n * 350, () => {
       const y = 160 + n * 44, fort = nom === 'TOTAL';
       texte(this, cx + 40, y, nom, fort ? 28 : 24, fort ? '#ffd84a' : '#ff9a5a').setOrigin(1, 0.5).setDepth(P + 1);
@@ -437,7 +437,7 @@ export class RemiPorte extends BossScene {
     }));
     this.time.delayedCall(400 + lignes.length * 350, () => {
       if (!complet) {
-        texte(this, cx + 60, 360, 'Joue la SOIRÉE COMPLÈTE (vélo, pong, porte)\npour avoir un RANG et un record.', 18, '#aaaaaa', { align: 'center' }).setDepth(P + 1);
+        texte(this, cx + 60, 360, 'Joue la SOIRÉE COMPLÈTE (vélo, babyfoot, porte)\npour avoir un RANG et un record.', 18, '#aaaaaa', { align: 'center' }).setDepth(P + 1);
         return;
       }
       const r = RANGS.find(x => total >= x.seuil);

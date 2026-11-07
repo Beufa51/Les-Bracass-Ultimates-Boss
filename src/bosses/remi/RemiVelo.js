@@ -112,7 +112,7 @@ export class RemiVelo extends BossScene {
   presentation(ensuite) {
     this.afficherPresentation({
       image: 'remi_presentation', nom: 'RÉMI', surnom: 'Le Roi du Comptoir', couleur: '#e8742a',
-      infos: ['Spécialité : la sortie au bar', 'Arme : le beer pong', 'Signe distinctif : tape dans les portes',
+      infos: ['Spécialité : la sortie au bar', 'Arme : le babyfoot', 'Signe distinctif : tape dans les portes',
         'Devise : « Allez, une dernière ! »'],
       invite: 'en selle !',
     }, ensuite);
