@@ -381,6 +381,13 @@
   CUL SEC = bot bloqué 70 s). Bot : CUL SEC ≈ 8 s de visée avant un passage. Avis de l'habitué (fait par Claude, sans
   agent) : `propositions/remi_avis_habitue_babyfoot.md` (A balle folle après un contre, D moins de temps morts,
   C puissance du tir, B passe à ton attaque, E amorti à l'arrêt).
+- V19w : AVIS PLAISIR par un agent (bots « humains », 4 parties de baby, 3 de porte) :
+  `propositions/remi_avis_plaisir_baby_porte.md`. Babyfoot 6/10 (Rémi ne fait jamais peur : 2 buts sur 48 tirs en
+  PRESSION ; le vert dure trop peu pour un pouce). Porte 4,5/10 : BUG CONFIRMÉ dans `impact()` de RemiPorte.js (le coup
+  qui CASSE la porte ne compte que la solidité restante, le dernier coup de l'autre compte en entier → le joueur perd
+  presque toujours), aucun risque réel (0 attrapé sur 30), on regarde sans jouer pendant le tour de Rémi. Top 5 dans le
+  rapport. Prompt facultatif n°27 (videur méfiant) rangé. Scripts des bots humains : dossier temporaire de la session
+  (pas dans le dépôt).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

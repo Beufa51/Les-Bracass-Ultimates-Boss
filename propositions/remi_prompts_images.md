@@ -221,3 +221,11 @@ nous ; 3 barre LEVÉE : la figurine a tourné à l'horizontale, on voit le dessu
 (fortement raccourcie) ; 4 il tourne sur lui-même à toute vitesse (roulette) : figurine floue, traits de vitesse
 circulaires autour.
 ```
+
+## 27. (facultatif) Le videur méfiant (porte, idée « siffle le videur ») — `remi_videur_mefiant.png` (À FAIRE)
+À joindre : **`remi_videur.png`** (pour garder le même personnage). Proposé par l'avis plaisir (V19w).
+```
+Même videur que l'image jointe (même style dessin, mêmes vêtements, même cadrage : il passe la tête au coin d'un mur,
+à gauche), nouvelle pose : yeux plissés, sourcil levé, il pointe deux doigts vers ses yeux puis vers le spectateur
+(« je te surveille »). Fond transparent, 1 seule pose, même taille que l'image jointe.
+```
