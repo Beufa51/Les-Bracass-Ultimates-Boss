@@ -81,10 +81,10 @@ export class RemiVelo extends BossScene {
     this.gRemi = this.add.graphics().setDepth(6);
     this.facade = this.textures.exists('remi_bar_facade') ? this.add.image(0, 0, 'remi_bar_facade').setOrigin(0.5, 1).setScale(340 / 917).setDepth(3).setVisible(false) : null;
     // Rémi t'attend devant le bar, détendu : son illustration « remi_accueil » (en pied) si elle existe, sinon la pose
-    // « attend » du beer pong (coupée à la taille), derrière une table haute de terrasse dessinée qui cache le bas
+    // « attend » du babyfoot (coupée à la taille), derrière une table haute de terrasse dessinée qui cache le bas
     this.remiAccueil = this.textures.exists('remi_accueil');
     this.sprRemi = this.remiAccueil ? this.add.image(0, 0, 'remi_accueil').setOrigin(0.5, 1).setDepth(6).setVisible(false)
-      : this.textures.exists('remi_pong') ? this.add.sprite(0, 0, 'remi_pong', 0).setOrigin(0.5, 1).setScale(0.3).setDepth(6).setVisible(false) : null;
+      : this.textures.exists('remi_baby') ? this.add.sprite(0, 0, 'remi_baby', 0).setOrigin(0.5, 1).setScale(0.36).setDepth(6).setVisible(false) : null;
     if (this.sprRemi && this.remiAccueil) this.sprRemi.setScale(230 / this.sprRemi.height);
     this.gTable = this.add.graphics().setDepth(6.5);
     this.enseigne = texte(this, 0, 0, 'BAR', 54, '#ff4fd8', { fontStyle: 'bold', stroke: '#5a0a4a', strokeThickness: 6 }).setDepth(4).setVisible(false);

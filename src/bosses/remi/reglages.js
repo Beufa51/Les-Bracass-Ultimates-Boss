@@ -1,15 +1,15 @@
 // Réglages du boss Rémi (la soirée au bar). Tous les chiffres d'équilibrage sont ici : on peut les modifier sans risque.
-// 3 jeux à la suite : 1) LE VÉLO (aller au bar, vue de profil)  2) LE BEER PONG contre Rémi  3) LA PORTE (qui tape le plus fort).
-// Temps en secondes ; vélo : distances en pixels du jeu ; beer pong : distances en mètres (table, verres).
+// 3 jeux à la suite : 1) LE VÉLO (aller au bar, vue de profil)  2) LE BABYFOOT contre Rémi  3) LA PORTE (qui tape le plus fort).
+// Temps en secondes ; vélo : distances en pixels du jeu ; babyfoot : distances en mètres.
 export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 
 // Niveaux de difficulté (choisis avant le vélo, gardés pour les 3 jeux)
 //  VÉLO : temps = secondes avant la fermeture du bar ; densite = obstacles (x) ; traverse = vitesse des bourrés qui traversent (x)
 //         sonnette = portée (px) de la sonnette (les bourrés debout ou qui traversent s'écartent / s'arrêtent)
-//  PONG : erreur = imprécision de TES lancers (m) ; apercu = part de la courbe d'aide montrée (1 = toute + point d'arrivée ;
-//         0,65 = jusqu'un peu après le sommet ; l'alcool en efface encore : voir PONG.courbeBue) ;
-//         distrait = (plus utilisé depuis V18) ;
-//         remi = chance que Rémi mette un verre ; aide = (non utilisé au pong depuis le lance-pierre)
+//  BABY : babyVitesse = vitesse de ses tirs (m/s) ; babyLecture = durée de sa préparation (x) ; babyFeinte / babyBande /
+//         babyRoulette / babyRate = chances (feinte, tir en bande, roulette, tir à côté) ; babyFenetre = temps pour riposter (s) ;
+//         babyReflexe = retard de son gardien (s) ; babyGardienRemi = vitesse de son gardien ; babyAide = ton gardien est
+//         attiré vers la balle quand elle arrive (0 = pas d'aide, 1 = il va tout seul au bon endroit)
 //  PORTE : remiCharge = jusqu'où Rémi charge (0 à 1) ; remiPrudent = chance qu'il lâche quand le videur arrive ;
 //          videur = temps d'annonce du videur (x, + petit = moins prévenu) ; feintes = part de passages piégés
 //          (fausse alerte, surgit sans prévenir, revient aussitôt) ; zone = rayon de la cible parfaite ; visee = vitesse de la cible
@@ -18,23 +18,19 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 export const DIFFICULTES = {
   entrainement: { nom: 'DIABOLO', couleur: '#9fe0ff', texte: 'Pour apprendre : large, lent, Rémi est déjà pompette et le videur ne feinte jamais.',
     temps: 110, densite: 0.65, traverse: 0.7, sonnette: 800,
-    babyVitesse: 0.7, babyLecture: 1.3, babyFeinte: 0, babyBande: 0, babyRoulette: 0.08, babyRate: 0.2, babyFenetre: 1.6, babyReflexe: 0.35, babyGardienRemi: 0.2,
-    erreur: 0.006, apercu: 1, distrait: 0, remi: 0.22, aide: true,
+    babyVitesse: 0.7, babyLecture: 1.3, babyFeinte: 0, babyBande: 0, babyRoulette: 0.08, babyRate: 0.2, babyFenetre: 1.6, babyReflexe: 0.35, babyGardienRemi: 0.2, babyAide: 0.5,
     remiCharge: 0.45, remiPrudent: 0.2, videur: 1.6, feintes: 0, zone: 0.28, visee: 0.65 },
-  facile: { nom: 'PANACHÉ', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et on te montre où tombe la balle.',
+  facile: { nom: 'PANACHÉ', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et ton gardien est un peu aidé.',
     temps: 88, densite: 0.8, traverse: 0.8, sonnette: 730,
-    babyVitesse: 0.85, babyLecture: 1.15, babyFeinte: 0.2, babyBande: 0.1, babyRoulette: 0.12, babyRate: 0.12, babyFenetre: 1.3, babyReflexe: 0.28, babyGardienRemi: 0.25,
-    erreur: 0.012, apercu: 1, distrait: 0.15, remi: 0.38, aide: true,
+    babyVitesse: 0.85, babyLecture: 1.15, babyFeinte: 0.2, babyBande: 0.1, babyRoulette: 0.12, babyRate: 0.12, babyFenetre: 1.3, babyReflexe: 0.28, babyGardienRemi: 0.25, babyAide: 0.3,
     remiCharge: 0.55, remiPrudent: 0.3, videur: 1.3, feintes: 0.25, zone: 0.22, visee: 0.8 },
   normal: { nom: 'PRESSION', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 70, densite: 1, traverse: 1, sonnette: 650,
-    babyVitesse: 1.05, babyLecture: 1, babyFeinte: 0.35, babyBande: 0.2, babyRoulette: 0.15, babyRate: 0.07, babyFenetre: 1.0, babyReflexe: 0.2, babyGardienRemi: 0.32,
-    erreur: 0.021, apercu: 0.72, distrait: 0.45, remi: 0.5, aide: false,
+    babyVitesse: 1.05, babyLecture: 1, babyFeinte: 0.35, babyBande: 0.2, babyRoulette: 0.15, babyRate: 0.07, babyFenetre: 1.0, babyReflexe: 0.2, babyGardienRemi: 0.32, babyAide: 0.1,
     remiCharge: 0.68, remiPrudent: 0.35, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
   champion: { nom: 'CUL SEC', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
-    babyVitesse: 1.3, babyLecture: 0.85, babyFeinte: 0.5, babyBande: 0.3, babyRoulette: 0.2, babyRate: 0.04, babyFenetre: 0.8, babyReflexe: 0.14, babyGardienRemi: 0.4,
-    erreur: 0.03, apercu: 0.5, distrait: 0.65, remi: 0.6, aide: false,
+    babyVitesse: 1.3, babyLecture: 0.85, babyFeinte: 0.5, babyBande: 0.3, babyRoulette: 0.2, babyRate: 0.04, babyFenetre: 0.8, babyReflexe: 0.14, babyGardienRemi: 0.4, babyAide: 0,
     remiCharge: 0.84, remiPrudent: 0.85, videur: 0.75, feintes: 0.65, zone: 0.1, visee: 1.3 },
 };
 
@@ -42,8 +38,6 @@ export const DIFFICULTES = {
 export const POINTS = {
   veloSeconde: 10,        // vélo : par seconde d'avance à l'arrivée (+ le score du vélo : obstacles, série, pintes, saltos)
   veloChute: 50,          // vélo : par chute
-  pongVerre: 80,          // pong : par verre qu'il te reste à la fin (Rémi en a mis peu)
-  pongBallsBack: 40,      // pong : par BALLS BACK réussi
   babyEcart: 80,          // babyfoot : par but d'écart à la fin
   babyArret: 10,          // babyfoot : par arrêt
   babyGamelle: 40,        // babyfoot : par gamelle mise
@@ -88,33 +82,14 @@ export const VELO = {
   longueurVoiture: 330,
 };
 
-export const PONG = {
-  verres: 6,              // verres par joueur (6 = pyramide 3-2-1 ; 10 = 4-3-2-1)
-  table: { largeur: 1.2, longueur: 1.8 },   // table raccourcie (caméra proche : les verres de Rémi bien visibles)
-  rayon: 0.085,           // rayon d'un verre (m)
-  dedans: 0.62,           // (V17 : 0,7 → 0,62, pong trop facile) la balle tombe à moins de rayon x ce chiffre du centre : DEDANS
-  rebord: 1.2,            // entre « dedans » et rayon x ce chiffre : sur le REBORD (une chance sur deux)
-  dureeVol: 0.65,         // durée du vol de la balle (s)
-  // V18 PICHENETTE : glisser VERS LE HAUT ; longueur du geste = force, côté = direction
-  geste: 200,             // longueur du geste (px) pour la force maximale (+ grand = geste plus précis)
-  cote: 0.9,              // un geste de « geste » px sur le côté envoie la balle à ce nombre de mètres du milieu
-  zMin: 1.1, zMax: 1.9,   // où tombe la balle (m depuis ton bord) avec une force nulle / maximale (verres de Rémi : 1,37 à 1,67)
-  serieFeu: 3,            // verres de suite pour être EN FEU (trajectoire entière montrée, lancer plus précis)
-  erreurBue: 0.25,        // chaque verre BU ajoute cette part d'imprécision du bras (ton bras tremble)
-  aimantMini: 0.05,       // l'aimant ne descend jamais sous ce chiffre, même ivre
-  courbeMini: 0.55,       // part de la courbe d'aide toujours visible, même ivre
-  aimant: 0.15,           // aimant invisible : la balle est attirée vers le verre le plus proche (part du chemin) ; -0,05 par verre bu
-  courbeBue: 0.13,        // chaque verre bu efface cette part de la fin de la courbe d'aide (la retombée disparaît d'abord)
-};
-
 // BABYFOOT (prototype) : mètres et secondes. Vue depuis ton but (z = 0), celui de Rémi à z = longueur.
 export const BABY = {
   buts: 5,                // premier à ce nombre de buts
   largeur: 0.68, longueur: 1.0, balle: 0.02, but: 0.24,
   course: 0.13,           // débattement de ton gardien (m de chaque côté)
   prise: 0.045,           // la balle est arrêtée à moins de ça du centre d'un joueur
-  doigt: 2,               // ton doigt bouge ce nombre de fois plus que le gardien (moins de chemin à faire)
-  vitesseGardien: 1.2,    // vitesse max de ton gardien (m/s)
+  glisse: 0.0008,         // V19c : PAVÉ TACTILE : le gardien bouge de ce nombre de m par pixel glissé (0,0008 : tout le but en ~325 px)
+  vitesseGardien: 2.2,    // vitesse max de ton gardien (m/s) (V19c : 1,2 → 2,2 : il colle mieux au doigt)
   prep: [0.9, 1.4],       // durée de la préparation de Rémi (s), x babyLecture de la difficulté
   feinteBascule: 0.65,    // feinte : il change de côté à cette part de la préparation
   rouletteVitesse: 1.35,  // une roulette part plus vite
@@ -148,9 +123,6 @@ export const REPLIQUES = {
   textos: ['Rémi : t\'es où ??', 'Rémi : je t\'ai commandé une pinte', 'Rémi : ça ferme bientôt hein',
     'Rémi : la pinte se réchauffe...', 'Rémi : magne-toi !!', 'Rémi : le barman me regarde mal'],
   arrivee: 'Enfin ! Allez, une partie de babyfoot. Le perdant paie sa tournée.',
-  pongToucheRemi: ['Bois, bois, bois !', 'Trop facile.', 'Tu tiens déjà plus debout ?', 'Et un de plus !'],
-  pongRateRemi: ['Elle était faite exprès.', 'Le rebord, c\'est de la triche.', 'Je m\'échauffe.'],
-  pongToucheToi: ['Coup de bol.', 'Ok... ok.', 'Il me reste de la place.'],
   babyIntro: 'Une pièce, une partie. Le perdant paie sa tournée.',
   babyArret: ['Coup de bol.', 'Il dort pas, lui.', 'Pff, gardien de handball.'],
   babyBut: ['Dans ta lucarne !', 'Bois, bois, bois !', 'Trop facile.', 'T\'as vu passer ?'],
@@ -158,8 +130,6 @@ export const REPLIQUES = {
   babyRouletteVue: ['Quoi ? J\'ai rien tourné !', 'Pfff... rabat-joie.', 'Elle a glissé, la barre.'],
   babyGagne: 'Bon... t\'as gagné. Mais qui tape le plus fort dans la porte, hein ?',
   babyPerdu: 'Rémi : « Tournée pour toi ! Reviens quand tu sais garder. »',
-  pongGagne: 'Bon... t\'as gagné. Mais qui tape le plus fort dans la porte, hein ?',
-  pongPerdu: 'Rémi : « Tournée pour toi ! Reviens quand tu sais viser. »',
   porteIntro: 'Rémi parie que tu ne défonceras pas la porte des WC avant lui. Mais le videur fait sa ronde...',
   porteAttrape: ['HÉ ! Toi là ! On se calme !', 'Encore un coup et c\'est dehors !', 'Je t\'ai vu !'],
   porteAttrapePisseur: ['Oh ! Vous faites quoi là ?! ... hips', 'Je vais le dire au videur... après avoir fait pipi.', 'Ça va les gars ? Vous bloquez les WC !'],

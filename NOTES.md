@@ -9,7 +9,7 @@
 - **Julien** : EN COURS — niveau 1 « la manif » jouable ; niveau 2 « la salle de classe » : COMBAT REFAIT (audit B :
   fenêtre de punition de dos, 8 attaques, phases noir / bureau renversé + alarme, élèves, sarbacane). RESTE : le
   MINI-NIVEAU « LE LYCÉE » (audit A) FAIT. Reste : faire jouer Fabien, équilibrer. Voir « JULIEN » plus bas.
-- **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo → BABYFOOT (prototype V19, remplace le beer pong) → porte. Voir « RÉMI » plus bas.
+- **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo → BABYFOOT (V19, le beer pong est SUPPRIMÉ) → porte. Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
 ## AUDIT GLOBAL V18 (6 boss, version économe) : `propositions/audit_global.md`
@@ -262,6 +262,13 @@
   `remi_baby.png` (7 cases alignées sur la casquette, bas caché par la table : attend, penché à gauche de l'écran, à
   droite, roulette, marque, boit, râle ; échelle 0,42, haut à yBord - 130) et le fond `remi_bar_babyfoot.jpg` (néon
   BABYFOOT, affiche gamelle / roulette). Rémi RÂLE quand tu arrêtes (1 fois sur 2) ou quand sa roulette est dénoncée.
+- V19c : BEER PONG SUPPRIMÉ (demande de Fabien) : RemiPong.js, `remi_pong.png`, `PONG`, points / répliques / clés de
+  difficulté du pong, `planche_pong()` (la planche reste dans assets_inbox). MANIABILITÉ (retour : « je n'arrive pas à bien
+  diriger le gardien sur mobile ») : le doigt est un PAVÉ TACTILE (pose-le n'importe où sous Rémi, glisse : `BABY.glisse`
+  m/px, plus de saut sous le doigt), gardien plus vif (`vitesseGardien` 2,2), POIGNÉE dessinée en bas de l'écran (tige +
+  poignée jaune = où va le gardien, rond bleu = où il est ; flèches qui clignotent les 6 premières secondes), AIDE par
+  difficulté `babyAide` (0,5 / 0,3 / 0,1 / 0 : le gardien est attiré vers l'endroit où passe la balle). Répliques en
+  bas (y 488). Réglages développeur : buts, sensibilité, vitesse du gardien, vitesse des tirs, feintes, aide.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

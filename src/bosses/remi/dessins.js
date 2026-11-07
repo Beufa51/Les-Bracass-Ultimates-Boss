@@ -1,6 +1,6 @@
 // =====================================================================
 // DESSINS PROVISOIRES DE RÉMI (tracés au code avec Phaser Graphics, redessinés à chaque image) :
-// toi à vélo (de profil), les bourrés, Rémi, les verres de beer pong, la porte.
+// toi à vélo (de profil), les bourrés, Rémi, la porte.
 // Chaque fonction dessine autour de (0, 0) = les PIEDS (ou le point au sol) : on place / tourne l'objet Graphics.
 // À remplacer par les vraies illustrations (voir propositions/remi_prompts_images.md).
 // =====================================================================
@@ -106,7 +106,7 @@ export function flaque(g) {
 }
 
 // ---------- RÉMI ----------
-// pose : 'face' (de face, buste, pour le beer pong), 'lance' (bras levé), 'garde' / 'elan' / 'frappe' (de profil, vers la droite)
+// pose : 'face' (de face, buste, pour le babyfoot), 'lance' (bras levé), 'garde' / 'elan' / 'frappe' (de profil, vers la droite)
 export function remi(g, pose, t = 0) {
   personne(g, pose, t, { tee: COULEURS.remi, casquette: true, barbe: true });
 }

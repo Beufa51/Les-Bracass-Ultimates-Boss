@@ -9,8 +9,6 @@ export const MANIFESTE = {
     // outils/remi/preparer_images.py : planche de assets_inbox/remi/ détourée et découpée
     // vélo de profil : 6 poses de pédalage, saut, chute (posées en bas, centrées)
     remi_velo: { fichier: 'sprites/remi/remi_velo.png', largeur: 266, hauteur: 296, images: 8, vitesse: 10 },
-    // Rémi de face au beer pong : attend, lance, boit, nargue
-    remi_pong: { fichier: 'sprites/remi/remi_pong.png', largeur: 403, hauteur: 577, images: 4, vitesse: 1 },
     // la porte, de profil : Rémi garde / coup / impact, toi garde / coup / impact (alignées sur le pied arrière)
     remi_porte: { fichier: 'sprites/remi/remi_porte.png', largeur: 344, hauteur: 562, images: 6, vitesse: 1 },
     // les bourrés du vélo : debout (titube), sursaute (sonnette), allongé (bouteilles), traverse de face
@@ -24,7 +22,7 @@ export const MANIFESTE = {
     // la porte VUE DE DOS : Rémi (garde, coup, impact) et toi (garde, élan, coup, impact), cases alignées à gauche
     remi_dos: { fichier: 'sprites/remi/remi_dos.png', largeur: 344, hauteur: 535, images: 3, vitesse: 1 },
     remi_toi_dos: { fichier: 'sprites/remi/remi_toi_dos.png', largeur: 335, hauteur: 557, images: 3, vitesse: 1 },
-    // V7 : décors et objets du vélo, fond du beer pong (outils/remi/preparer_images.py)
+    // V7 : décors et objets du vélo(outils/remi/preparer_images.py)
     remi_rue2: { fichier: 'sprites/remi/remi_rue2.jpg', largeur: 1702, hauteur: 575, images: 1, vitesse: 1 },   // les quais
     remi_rue3: { fichier: 'sprites/remi/remi_rue3.jpg', largeur: 1132, hauteur: 575, images: 1, vitesse: 1 },   // le centre-ville
     remi_tremplin: { fichier: 'sprites/remi/remi_tremplin.png', largeur: 1114, hauteur: 459, images: 1, vitesse: 1 },
@@ -47,7 +45,7 @@ export const MANIFESTE = {
     remi_presentation: { fichier: 'sprites/remi/remi_presentation.png', largeur: 832, hauteur: 1202, images: 1, vitesse: 1 },
   },
   sons: {
-    // musique du bar (Star Wars, « Cantina Band », donnée par le propriétaire) : beer pong et porte
+    // musique du bar (Star Wars, « Cantina Band », donnée par le propriétaire) : babyfoot et porte
     // musique du vélo (F-Zero, « Big Blue », donnée par le propriétaire)
     remi_musique_velo: { fichier: 'audio/remi/remi_musique_velo.mp3', musique: true, volume: 0.4 },
     // musique de la porte (Street Fighter II, thème de Ken, donnée par le propriétaire) : se coupe quand le videur regarde

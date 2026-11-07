@@ -44,7 +44,7 @@ export function noterJeu(scene, id, points) {
 // Jeu suivant (même difficulté, le bilan suit)
 export function jeuSuivant(scene, idActuel, nomDiff) {
   const i = ORDRE.findIndex(o => o.id === idActuel);
-  const s = i < 0 ? ORDRE[ORDRE.length - 1] : ORDRE[i + 1];   // (l'ancien beer pong, hors de la soirée : on file à la porte)
+  const s = ORDRE[i + 1];
   scene.scene.start(s.scene, { phase: s.id, diff: nomDiff, enchaine: true, bilan: scene.bilan });
 }
 
