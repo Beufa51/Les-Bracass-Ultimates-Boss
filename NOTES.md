@@ -5,7 +5,8 @@
   de danse), manquent le décor illustré (stade, pelouse) et le trophée.
   AUDIT Kédric FAIT (`propositions/kedric_audit.md`, sections « FAIT » et « Animations et images ») : jokers (1 par
   touchdown), battle calé de justesse (rappel élastique `showtime.rappel`), nouveau rang et défis, courses 2-3 plus dures,
-  ENTRAÎNEMENT sans record ni défis. Images demandées : prompts n°3 (défenseur qui court) et n°4 (ta réception).
+  ENTRAÎNEMENT sans record ni défis. Images n°3 (défenseur qui court, 4 images) et n°4 (ta réception au coup d'envoi)
+  REÇUES : `outils/kedric/preparer_nouvelles.py` → `kedric_def_course4.png`, `kedric_toi_reception.png`.
 - **Beufa** : TERMINÉ — infiltration façon Metal Gear (4 pièces) puis QUIZ dans son bureau (codec, Psycho Mantis,
   rideau, 60 questions, GAME OVER façon MGS, classement BIG BOSS → CHICKEN, médaille = badge du hub, meilleur rang
   sauvegardé). Audit final : `propositions/beufa_audit_final.md`.

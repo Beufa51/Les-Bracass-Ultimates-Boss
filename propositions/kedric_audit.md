@@ -74,6 +74,9 @@ Tout est illustré (toi, défenseurs, Kédric coach / danse / frime / défaite, 
 1. **Les défenseurs qui courent** : UNE seule image qui sautille (`kedric_def_course`) → cycle de course en 4 images
    (prompt n°3 de `kedric_prompts_images.md`).
 2. **Ta réception au coup d'envoi** : on voit l'image du SAUT → vraie pose « j'attrape le ballon » (prompt n°4).
+→ 1 et 2 REÇUES et branchées (`outils/kedric/preparer_nouvelles.py`) : les défenseurs courent en 4 images, et tu
+   lèves les bras pour attraper le ballon au coup d'envoi. Corrigé au passage : les messages du centre (« DÉPART TURBO ! »...)
+   sortaient de l'écran : ils passent maintenant à la ligne.
 3. Sans nouvelle image (code) : le ballon et le kaméhaméha du public sont dessinés au code, c'est voulu et lisible.
    `kedric_star` (Kédric en joueur, une seule image penchée) ne sert plus (duel retiré) : rien à faire.
 

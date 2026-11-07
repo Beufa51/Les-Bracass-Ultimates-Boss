@@ -22,7 +22,7 @@ projecteurs allumés, un écran géant en haut, ciel bleu nuit. SEULEMENT la moi
 Aucun texte lisible, aucun joueur.
 ```
 
-## 3. Les défenseurs qui COURENT (4 images) — `kedric_def_course_planche.jpg` (audit : aujourd'hui UNE seule image qui sautille)
+## 3. Les défenseurs qui COURENT (4 images) — `kedric_def_course_planche.jpg` ✅ REÇU, branché (`kedric_def_course4.png`)
 À joindre : `assets/sprites/kedric/kedric_def_garde.png` (le même défenseur, mêmes couleurs).
 ```
 Illustration style manga/anime coloré (façon Eyeshield 21), contours noirs nets, fond BLANC uni. Planche de 4 cases
@@ -34,7 +34,7 @@ Penché vers l'avant, bras qui balancent, même taille et même cadrage dans les
 (pieds compris). Aucun texte, aucun logo, aucun numéro d'une équipe existante, pas d'ombre au sol.
 ```
 
-## 4. TOI qui attrapes le ballon (coup d'envoi) — `kedric_toi_reception.png` (audit : aujourd'hui l'image du saut)
+## 4. TOI qui attrapes le ballon (coup d'envoi) — `kedric_toi_reception.jpg` ✅ REÇU, branché
 À joindre : `assets/sprites/kedric/kedric_toi_saut.png` (ton joueur vu de dos, mêmes couleurs, n°21).
 ```
 Illustration style manga/anime coloré (façon Eyeshield 21), contours noirs nets, fond BLANC uni. Le MÊME joueur de

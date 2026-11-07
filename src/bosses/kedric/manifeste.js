@@ -28,11 +28,12 @@ export const MANIFESTE = {
     // course en 8 images tirées de la VIDÉO du propriétaire (outils/kedric/course_video.py) : une foulée complète
     kedric_toi_course:   { ...toi('course', 4, 12), fichier: 'sprites/kedric/kedric_toi_course6.png', largeur: 197, hauteur: 326, images: 8, vitesse: 12 },
     kedric_toi_saut:     ill('toi_saut', 277, 300, toi('saut')),
+    kedric_toi_reception: ill('toi_reception', 112, 450, toi('saut')),   // coup d'envoi : tu attrapes le ballon (outils/kedric/preparer_nouvelles.py)
     kedric_toi_rotation: ill('toi_rotation', 282, 240, toi('rotation')),
     kedric_toi_plaque:   ill('toi_plaque', 265, 368, toi('plaque')),       // le plaqueur est déjà sur l'image
     kedric_toi_victoire: ill('toi_victoire', 188, 375, toi('victoire')),
     // ---------- LES DÉFENSEURS (de face) ----------
-    kedric_def_course: ill('def_course', 221, 308, def('course', 4, 10)),
+    kedric_def_course: { ...ill('def_course4', 160, 308, def('course', 4, 10)), images: 4, vitesse: 10 },   // 4 images de course (preparer_nouvelles.py)
     kedric_def_garde:  ill('def_garde', 172, 292, def('garde', 2, 4)),
     kedric_def_bas:    ill('def_bas', 236, 240, def('bas')),
     kedric_def_plonge: ill('def_plonge', 394, 188, def('plonge')),        // plonge vers la GAUCHE (retourné au besoin)

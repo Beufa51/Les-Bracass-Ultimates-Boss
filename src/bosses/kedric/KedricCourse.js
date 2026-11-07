@@ -243,6 +243,7 @@ export class KedricCourse extends BossScene {
     if (E.dansCouloir) {
       const ecart = Math.abs(j.sautDebut - (this.horloge - (E.t - E.vol)));
       const x = ecranX(j.x, 0), y = VUE.pieds - 230;
+      j.pose = 'reception'; j.poseTemps = 0.4;   // on te VOIT attraper le ballon, bras levés
       if (ecart <= R.envoi.parfait) {
         this.stats.parfaits++; this.remplirGhost(R.ghost.parParfait);
         this.points += 30;   // la RÉCEPTION PARFAITE du coup d'envoi paie aussi
@@ -345,7 +346,7 @@ export class KedricCourse extends BossScene {
   // Un seul message au centre de l'écran à la fois (le nouveau remplace l'ancien)
   messageCentre(contenu, couleur = '#ffd84a', taille = 28, duree = 1.2) {
     if (this.msgCentre && this.msgCentre.active) this.msgCentre.destroy();
-    const t = this.msgCentre = texte(this, LARGEUR / 2, 300, contenu, taille, couleur, { fontStyle: 'bold' }).setDepth(910);
+    const t = this.msgCentre = texte(this, LARGEUR / 2, 300, contenu, taille, couleur, { fontStyle: 'bold', align: 'center', wordWrap: { width: 860 } }).setDepth(910);   // retour à la ligne : jamais hors de l'écran
     this.tweens.add({ targets: t, alpha: 0, delay: duree * 1000, duration: 300, onComplete: () => t.destroy() });
     return t;
   }
@@ -686,6 +687,7 @@ export class KedricCourse extends BossScene {
   ajouterPoursuivant() {
     if (this.poursuivants.length >= R.poursuite.max) return;
     const s = this.add.sprite(0, HAUTEUR + 300, 'kedric_def_course').setOrigin(0.5, 1).setDepth(520);
+    if (this.anims.exists('kedric_def_course')) s.play('kedric_def_course');
     // il court un peu plus vite que toi au moment où il part : sans sprint il te rattrape, avec le sprint tu le sèmes
     this.poursuivants.push({ ecart: R.poursuite.depart, vitesse: this.vitesse() + this.diff.poursuiteEcart, cote: auHasard([-1, 1]), sprite: s });
     if (Math.random() < 0.3) this.direCoach(auHasard(REPLIQUES.poursuite));
@@ -1250,7 +1252,9 @@ export class KedricCourse extends BossScene {
     const xJ = ecranX(j.x, 0);
     const enShow = !!this.show;
     this.sprJ.setVisible(!enShow); this.ombreJ.setVisible(!enShow);
-    let pose = j.poseTemps > 0 && j.pose ? j.pose : (j.saut > 0 ? 'saut' : j.rotation > 0 ? 'rotation' : 'course');
+    // au coup d'envoi, le saut devient la RÉCEPTION (bras levés vers le ballon)
+    const saut = this.etat === 'envoi' && this.estIllustre('kedric_toi_reception') ? 'reception' : 'saut';
+    let pose = j.poseTemps > 0 && j.pose ? j.pose : (j.saut > 0 ? saut : j.rotation > 0 ? 'rotation' : 'course');
     const hauteur = j.saut > 0 ? Math.sin(Math.PI * (1 - j.saut / R.saut.duree)) * 80 : 0;
     const cle = 'kedric_toi_' + pose;
     const enCourse = pose === 'course' && this.etat === 'jeu' && this.gel <= 0;
@@ -1349,7 +1353,9 @@ export class KedricCourse extends BossScene {
     const montee = pose === 'bras' && d.etat === 'approche' ? 20 * k : 0;
     const illustre = this.estIllustre(cle);
     // course illustrée (une seule image) : petits rebonds ; Kédric en joueur n'a qu'une image : on la penche selon la pose
-    const pas = illustre && (pose === 'course' || (d.star && pose === 'garde')) && d.etat !== 'plaqueur' ? Math.sin(this.horloge * 12 + d.groupe) : 0;
+    // (la course en 4 images s'anime toute seule : plus de sautillement)
+    const anime = pose === 'course' && this.textures.get(cle).frameTotal > 2;
+    const pas = illustre && !anime && (pose === 'course' || (d.star && pose === 'garde')) && d.etat !== 'plaqueur' ? Math.sin(this.horloge * 12 + d.groupe) : 0;
     let angle = d.etat === 'rate' ? d.angle * 0.25 : pas * 3, ecrase = 1;
     if (d.star && illustre) {
       if (pose === 'plonge') angle = (d.x >= this.j.x ? -1 : 1) * 60;
