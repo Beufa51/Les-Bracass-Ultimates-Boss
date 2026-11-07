@@ -442,6 +442,10 @@
   `librePinte` 2 s avec la pinte au sommet du saut : `reaction` 0,35 + `tempsSaut` 0,9 / 2). Mesure sur 10 parcours x 4 :
   plus petit temps libre 0,95 s, après un saut 1,15 s, pinte → obstacle suivant 1,19 s (~0,75 s après l'atterrissage).
   Chrono inchangé : PRESSION grande route +1,3 s sans pinte, raccourcis +12 s ; CUL SEC grande route = il faut des pintes.
+- V20d PORTE (retour : « Rémi ne se fait jamais prendre ») : le videur passe PENDANT le tour de Rémi une fois sur deux
+  (`videurSurRemi` 0,5) ; à chaque passage Rémi décide (`remiDecision`) : PRUDENT (`remiPrudent` de la difficulté) ou
+  GOURMAND : il insiste et vise plus fort (`remiInsiste` +0,25, bulle « Il me voit pas, lui... »). Bot humain : Rémi
+  attrapé 2 / 2 / 2 / 1 fois (PANACHÉ, PRESSION x2, CUL SEC).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

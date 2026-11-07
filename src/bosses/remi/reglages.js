@@ -180,7 +180,9 @@ export const PORTE = {
   sifflet: false,         // SIFFLE LE VIDEUR pendant le tour de Rémi (+ videur méfiant)
   feintesToutes: false,   // le videur surgit / revient (sinon seulement la fausse alerte)
   rageExpliquee: false,   // bulle d'explication de la RAGE (sinon la jauge rouge parle d'elle-même)
-  remiVitesse: 2,         // Rémi charge et se prépare x plus vite (on regarde moins longtemps)
+  remiVitesse: 2,
+  videurSurRemi: 0.5,     // V20d : chance que le videur passe pendant le tour de Rémi
+  remiInsiste: 0.25,      // Rémi GOURMAND (il n'est pas prudent) : il vise encore plus fort quand le videur arrive         // Rémi charge et se prépare x plus vite (on regarde moins longtemps)
   rageMax: 1.3,           // la jauge monte jusqu'à 130 % (RAGE) : plus de dégâts...
   rageLente: 0.55,        // ... elle monte moins vite dans la rage...
   rageBruit: 3,           // ... et le BRUIT fait venir l'intrus jusqu'à (1 + ce chiffre) fois plus vite...

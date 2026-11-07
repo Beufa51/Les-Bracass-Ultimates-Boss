@@ -143,6 +143,9 @@ export class RemiPorte extends BossScene {
       this.siffleUtilise = false; this.mefiant = false;
       if (R.sifflet && !this.vuSiffle) { this.vuSiffle = true; this.time.delayedCall(1300, () => bulle(this, 'Psst : SIFFLE LE VIDEUR pendant que Rémi charge... (1 fois par tour)', '#9fe0ff', 2.4, 330)); }
       this.remiAttend = hasard(0.4, 0.9) / R.remiVitesse;   // il se met en place (V19z : Rémi joue plus vite : on attend moins)
+      // V20d : une fois sur deux, le videur passe PENDANT le tour de Rémi (sinon, Rémi jouant vite, il ne le croisait jamais)
+      this.remiDecision = undefined; this.remiReaction = undefined;
+      if (this.videur.etat === 'absent' && Math.random() < R.videurSurRemi) this.videur.t = this.remiAttend + hasard(0.1, 0.5);
       this.remiPrudence = undefined; this.remiReaction = undefined;
       bulle(this, `Rémi : « ${choisir(REPLIQUES.porteRemiFrappe)} »`, '#ffd84a', 1.2, 80);
     }
@@ -207,15 +210,23 @@ export class RemiPorte extends BossScene {
 
   pasRemi(dt) {
     if (this.remiAttend > 0) { this.remiAttend -= dt; return; }
-    // Rémi ne commence pas à charger quand le videur arrive ; s'il charge déjà, il lâche (selon sa prudence)... ou il insiste
-    if (this.videur.etat !== 'absent' && (this.puissance === 0 || this.poingCache)) return;
-    this.poingCache = false;
-    if (this.videur.etat === 'annonce' && this.remiPrudence === undefined) {
-      // il lui faut un moment pour réagir (et il est parfois trop sûr de lui)
-      this.remiReaction = (this.remiReaction ?? hasard(0.25, 0.7)) - dt;
-      if (this.remiReaction <= 0) { this.remiPrudence = Math.random() < this.diff.remiPrudent; this.remiReaction = undefined; }
+    // V20d (retour : « Rémi ne se fait jamais prendre ») : à chaque passage pendant son tour, Rémi décide (après un temps
+    // de réaction) : PRUDENT (il cache son poing / n'ose pas commencer) ou GOURMAND (il insiste ET charge encore plus fort)
+    const present = this.videur.etat !== 'absent';
+    if (!present) this.remiDecision = undefined;
+    if (present && this.remiDecision === undefined) {
+      this.remiReaction = (this.remiReaction ?? hasard(0.25, 0.6)) - dt;
+      if (this.remiReaction <= 0) {
+        this.remiReaction = undefined;
+        this.remiDecision = Math.random() < this.diff.remiPrudent ? 'prudent' : 'gourmand';
+        if (this.remiDecision === 'gourmand') {
+          this.remiVise = Math.min(this.diff.remiRage ? R.rageMax : 1.15, this.remiVise + R.remiInsiste);
+          bulle(this, choisir(['Rémi : « Il me voit pas, lui... »', 'Rémi : « Encore un peu... »', 'Rémi : « Tranquille, il regarde ailleurs. »']), '#ffd84a', 1.2, 80);
+        }
+      } else if (this.puissance === 0) return;   // (il hésite : il ne commence pas pendant qu'il réfléchit)
     }
-    if (this.remiPrudence) { this.faireGenre('remi'); this.remiPrudence = undefined; return; }
+    if (this.remiDecision === 'prudent') { if (this.charge) this.faireGenre('remi'); return; }
+    this.poingCache = false;
     this.charger(dt * 0.8 * R.remiVitesse);
     // il lâche quand la cible passe près de son poing, une fois assez chargé
     const d = Math.hypot(this.cible.x - IMPACT.x, this.cible.y - IMPACT.y);
