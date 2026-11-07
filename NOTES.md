@@ -633,6 +633,10 @@
     0,3 s à l'entraînement ; REJOUER ne relance plus l'entraînement ; écran des commandes réduit à 4 lignes ; classement :
     `rangParPoint` 0,5, temps de référence 90 s, défi `defiHermetique` < 14 points. Bot après audit : FACILE 43-3,
     NORMAL 2-0 (15-6, 15-8, sets joués jusqu au chrono), CHAMPION 0-2 (3-5, 6-10) : serré. FACILE reste très facile.
+  - COMPTEUR D'ÉCHANGE (`compteurEchange`) : « ⇄ n » entre les jauges à partir du 3e lancer (blanc, jaune dès 6 avec
+    « ÇA CHAUFFE ! » + foule, rouge dès 10 avec « ÉCHANGE DE FOU ! » + secousse) ; Lionel chambre au 8e lancer.
+  - LIONEL CHAMBRE selon la situation (`REPLIQUES`) : `plongeonRate` (il marque pendant ton plongeon), `serie` (3e point
+    d'affilée pour lui), `serieJ` (3e d'affilée pour toi), `superArrete` (il attrape ta tornade), `echange`.
   - Musique de fond : `assets/audio/lionel/lionel_musique.mp3` (Windjammers, « Lawn Court », 64 kbit/s, 2,3 Mo, en boucle,
     volume 0,4 dans le manifeste de Lionel).
   - Pas de voix (annonceur) dans le match de Lionel, à la demande du propriétaire (Greg garde les siennes).

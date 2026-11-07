@@ -112,6 +112,9 @@ export const REGLAGES = {
     ecartVise: 110,               // ses lancers droits arrivent à 110 px de toi (il faut bouger)
   },
 
+  // ---------- Compteur d'échange (affiché à partir de 'des' lancers) ----------
+  compteurEchange: { des: 3, chaud: 6, fou: 10, chambre: 8 },   // 6 = « ÇA CHAUFFE ! », 10 = « ÉCHANGE DE FOU ! », 8 = Lionel chambre
+
   // ---------- Classement ----------
   rangParPoint: 0.5,      // chaque point encaissé retire 0,5 au score du classement (sur 100)
   defiHermetique: 14,     // défi : encaisser moins de 14 points sur le match
@@ -133,6 +136,12 @@ export const REPLIQUES = {
   super: ['Celle-là, tu la sens pas venir !', 'Regarde bien... trop tard !', 'Tu peux toujours courir !', 'Attention les yeux !'],
   lob: ['Oups, il tombe !', 'Cours, cours !'],
   lobRate: ['Aïe ! Sur la tête !', 'Hé ! Il était où, celui-là ?', 'Bon... joli lob.', 'Je regardais les mouettes !'],
+  // (AUDIT 3) répliques selon ce qui vient de se passer
+  plongeonRate: ['Joli plongeon... dans le sable !', 'Le sable, il est bon ?', 'Tu nages ou tu joues ?'],
+  serie: ['Et de trois ! Tu veux une pause ?', 'Je pourrais jouer les yeux fermés.', 'On compte encore les points pour toi ?'],
+  serieJ: ['Bon... ça suffit, là !', 'Hé ! Doucement !', 'Tu triches, c\'est sûr.'],
+  superArrete: ['Ta tornade ? Une petite brise !', 'C\'est ça, ton super ?', 'Même pas chaud aux mains !'],
+  echange: ['Tu tiens encore ?', 'Allez, craque !', 'Hé, tu t\'accroches, toi !'],
   setGagne: ['Un set à zéro, tranquille.', 'On continue, ou t\'abandonnes ?'],
   setPerdu: ['Bon... on arrête de rigoler.', 'Ok. Là, je me fâche.'],
   defaite: 'Reviens quand tu sauras attraper un frisbee !',

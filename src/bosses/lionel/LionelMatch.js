@@ -341,7 +341,7 @@ export class LionelMatch extends BossScene {
         this.tempsSet = 0;
         if (!this.dernierLancer) {
           this.dernierLancer = true;
-          const t = texte(this, LARGEUR / 2, 70, 'DERNIER LANCER !', 30, '#ff5a5a', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 6 }).setDepth(95);
+          const t = texte(this, LARGEUR / 2, 140, 'DERNIER LANCER !', 30, '#ff5a5a', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 6 }).setDepth(95);
           this.tweens.add({ targets: t, alpha: 0, delay: 900, duration: 300, onComplete: () => t.destroy() });
         }
       } else if (this.tempsSet <= 0) {
@@ -575,6 +575,7 @@ export class LionelMatch extends BossScene {
     p.parfait = false;
     p.tient = false; p.rapideDispo = false;
     this.echange++;
+    this.majEchange();
     const x0 = p.x + p.sens * 30, y0 = p.y;
     const d = { x: x0, y: y0, z: 0, vx: p.sens * v, vy: 0, ay: 0, t: 0, type, lanceur: p.cote, arret: 0, vitesse: v };
     if (type === 'droit' && p === this.l) {
@@ -734,7 +735,7 @@ export class LionelMatch extends BossScene {
   zonePoints(y) { return y >= ZONE5[0] && y <= ZONE5[1] ? 5 : 3; }
 
   attraper(p, sousLeLob) {
-    const plongeon = p.glisse > 0;
+    const plongeon = p.glisse > 0, superArrete = !!this.d && this.d.type === 'superJ';
     p.tient = true; p.tenue = 0; p.glisse = 0; p.relever = 0; p.vx = p.vy = 0;
     p.rapideDispo = !plongeon;
     this.d = null; this.porteur = p;
@@ -752,6 +753,7 @@ export class LionelMatch extends BossScene {
       p.nargue = !sousLeLob && !this.tuto && Math.random() < R.ia.nargue;
       p.tenueVoulue = p.nargue ? R.ia.tenueNargue : entre(a, b) + (plongeon ? 0.2 : 0);
       if (p.nargue) bulleLionel(this, auHasard(REPLIQUES.nargue));
+      else if (superArrete && !this.tuto) bulleLionel(this, auHasard(REPLIQUES.superArrete));
       // le public aime aussi les beaux gestes de Lionel
       if (plongeon) this.ajouterPublic('l', R.public.plongeon, 'plongeon');
       else if (this.echange >= 3) this.ajouterPublic('l', R.public.attrape, 'bel échange');
@@ -802,7 +804,7 @@ export class LionelMatch extends BossScene {
     }
     // (pas de « PUBLIC EN FEU » sur le point qui termine le set : il cacherait « SET GAGNÉ »)
     if (this.score[qui] < R.pointsSet && !this.pointEnOr) this.ajouterPublic(qui, R.public.marque, 'point marqué');
-    this.d = null; this.etat = 'point'; this.echange = 0;
+    this.d = null; this.etat = 'point'; this.echange = 0; this.majEchange();
     const x = raison === 'lob' ? d.x : (qui === 'j' ? T.x1 - 40 : T.x0 + 40);
     const y = d.y;
     jouerSon(this, raison === 'lob' ? 'frisbee_sol' : 'frisbee_but');
@@ -813,7 +815,12 @@ export class LionelMatch extends BossScene {
     this.tweens.add({ targets: t, alpha: 0, y: y - 90, delay: 900, duration: 400, onComplete: () => t.destroy() });
     this.poser(perdant, 'touche', 0.9);
     this.poser(qui === 'j' ? this.j : this.l, 'victoire', 0.9);
-    bulleLionel(this, auHasard(qui === 'l' ? REPLIQUES.marque : raison === 'lob' ? REPLIQUES.lobRate : REPLIQUES.encaisse));
+    // série de points d'affilée (pour le chambrage)
+    this.serie = this.serie && this.serie.qui === qui ? { qui, n: this.serie.n + 1 } : { qui, n: 1 };
+    const plongeonRate = qui === 'l' && (this.j.glisse > 0 || this.j.relever > 0);
+    bulleLionel(this, auHasard(
+      qui === 'l' ? (plongeonRate ? REPLIQUES.plongeonRate : this.serie.n === 3 ? REPLIQUES.serie : REPLIQUES.marque)
+        : raison === 'lob' ? REPLIQUES.lobRate : this.serie.n === 3 ? REPLIQUES.serieJ : REPLIQUES.encaisse));
     this.majHud();
     this.attendre(R.pauseApresPoint, () => {
       if (this.score[qui] >= R.pointsSet || this.pointEnOr) return this.finSet(qui);
@@ -850,6 +857,7 @@ export class LionelMatch extends BossScene {
   debutSet(serveur = 'j') {
     if (this.surprises) this.surprises.vider();
     this.surprises = new Surprises(this);
+    this.serie = null;
     this.score = { j: 0, l: 0 }; this.tempsSet = R.dureeSet; this.pointEnOr = false; this.dernierLancer = false;
     this.j.poseTemps = 0; this.l.poseTemps = 0;
     this.placerPourService(serveur);
@@ -870,7 +878,7 @@ export class LionelMatch extends BossScene {
     if (this.finCinematique) { const f = this.finCinematique; this.finCinematique = null; f(); }
     const s = serveur === 'j' ? this.j : this.l;
     s.tient = true; s.tenue = 0;
-    this.d = null; this.porteur = s; this.echange = 0; this.trainee = [];
+    this.d = null; this.porteur = s; this.echange = 0; this.trainee = []; this.majEchange();
     this.l.plan = null; this.l.nargue = false;
     this.l.tenueVoulue = entre(1.2, 1.6);   // il prend son temps pour servir
   }
@@ -1290,6 +1298,8 @@ export class LionelMatch extends BossScene {
     this.hudChrono = texte(this, LARGEUR / 2, 38, '45', 30, '#ffd84a', { fontStyle: 'bold' }).setDepth(P + 1);
     this.hudSet = texte(this, LARGEUR / 2, 12, 'SET 1', 13, '#dddddd').setDepth(P + 1);
     this.hudSets = this.add.graphics().setDepth(P + 1);
+    // compteur d'échange (entre les deux jauges du public)
+    this.hudEchange = texte(this, LARGEUR / 2, 73, '', 18, '#ffffff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 }).setDepth(P + 2).setVisible(false);
     // jauge du public (sous ton score)
     this.hudPublicTexte = texte(this, 226, 72, 'PUBLIC', 14, '#ffb070', { fontStyle: 'bold' }).setDepth(P + 1);
     this.hudPublicTexteL = texte(this, 734, 72, 'PUBLIC', 14, '#a8ffc0', { fontStyle: 'bold' }).setDepth(P + 1);
@@ -1331,6 +1341,26 @@ export class LionelMatch extends BossScene {
     }
   }
 
+  // COMPTEUR D'ÉCHANGE : visible à partir du 3e lancer, il chauffe (jaune, puis rouge) et Lionel s'en mêle
+  majEchange() {
+    const h = this.hudEchange, C = R.compteurEchange, n = this.echange;
+    if (!h) return;
+    if (this.tuto || n < C.des) { if (h.visible) h.setVisible(false); return; }
+    h.setText(`⇄ ${n}`).setColor(n >= C.fou ? '#ff5a5a' : n >= C.chaud ? '#ffd84a' : '#ffffff').setVisible(true);
+    this.tweens.killTweensOf(h); h.setScale(1.6);
+    this.tweens.add({ targets: h, scale: 1, duration: 220, ease: 'Back.Out' });
+    if (n === C.chaud || n === C.fou) {
+      const fou = n === C.fou;
+      const t = texte(this, LARGEUR / 2, 112, fou ? 'ÉCHANGE DE FOU !' : 'ÇA CHAUFFE !', fou ? 30 : 24, fou ? '#ff5a5a' : '#ffd84a',
+        { fontStyle: 'bold italic', stroke: '#000000', strokeThickness: 6 }).setDepth(95).setScale(0.4);
+      this.tweens.add({ targets: t, scale: 1, duration: 180, ease: 'Back.Out' });
+      this.tweens.add({ targets: t, alpha: 0, y: 95, delay: 800, duration: 300, onComplete: () => t.destroy() });
+      jouerSon(this, 'lionel_foule', { volume: fou ? 0.8 : 0.45 });
+      if (fou) this.cameras.main.shake(150, 0.004);
+    }
+    if (n === C.chambre) bulleLionel(this, auHasard(REPLIQUES.echange));
+  }
+
   majChrono() {
     if (!this.hudChrono) return;
     if (Math.max(this.public.j, this.public.l) / R.public.max >= 0.75) this.majJauge();
@@ -1347,7 +1377,7 @@ export class LionelMatch extends BossScene {
     this.hudSuper.setVisible(!!msg).setPosition(borne(j.x, 120, LARGEUR - 120), enHaut ? j.y + 30 : j.y - 160);
     const alpha = j.y < T.y0 + 70 ? 0.4 : 1;
     if (this.hudFond && this.hudFond.alpha !== alpha) {
-      for (const o of [this.hudFond, this.hudScoreJ, this.hudScoreL, this.hudChrono, this.hudSet, this.hudSets, this.hudPublic, this.hudPublicTexte, this.hudPublicTexteL, ...(this.hudEtiquettes || [])]) o.setAlpha(alpha);
+      for (const o of [this.hudFond, this.hudEchange, this.hudScoreJ, this.hudScoreL, this.hudChrono, this.hudSet, this.hudSets, this.hudPublic, this.hudPublicTexte, this.hudPublicTexteL, ...(this.hudEtiquettes || [])]) o.setAlpha(alpha);
       if (this.tuto) this.tuto.banniere.setAlpha(alpha);
     }
   }
