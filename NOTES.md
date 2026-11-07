@@ -376,6 +376,11 @@
   (`gamelleVisee` 0,6 pour tes tirs près du poteau, message « GAMELLE POSSIBLE »). `ivresseMax` 4, `vueMini` 0,5. TON BUT
   dessiné (poteaux, barre, filet, profondeur 6,95). Signes ✓ / ! / ✗ au bout de la ligne (daltoniens). Réglages
   développeur complétés. Audit mis à jour (`propositions/remi_audit_babyfoot.md`). Bot : 0 problème.
+- V19v (« encore un peu facile » ; avis d'un joueur habitué) : son GARDIEN LIT AUSSI TA VISÉE pendant que tu vises
+  (`babyGardienLit` 0 / 0,2 / 0,4 / 0,3 : mélange de son balancement et de l'endroit où ton tir arriverait ; 0,5 en
+  CUL SEC = bot bloqué 70 s). Bot : CUL SEC ≈ 8 s de visée avant un passage. Avis de l'habitué (fait par Claude, sans
+  agent) : `propositions/remi_avis_habitue_babyfoot.md` (A balle folle après un contre, D moins de temps morts,
+  C puissance du tir, B passe à ton attaque, E amorti à l'arrêt).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

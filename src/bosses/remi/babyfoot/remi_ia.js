@@ -97,7 +97,13 @@ export const RemiIA = {
       const devant = (x) => hommes(br, 0).map(h => x - h).reduce((a, c) => Math.abs(c) < Math.abs(a) ? c : a);
       if (nom === 'gar') {
         // son GARDIEN ne bouge qu'une fois ta balle partie, avec un temps de retard
-        if (tiens) but = Math.sin(this.horloge * B.balancier) * br.course * 0.6;   // V19j : il se balance devant son but : des trous s'ouvrent
+        // V19j : il se balance devant son but (des trous s'ouvrent) ; V19v : il LIT AUSSI ta visée (part babyGardienLit) :
+        // il glisse vers l'endroit où ton tir arriverait, comme sa défense (il faut feinter les deux)
+        if (tiens) {
+          const balance = Math.sin(this.horloge * B.balancier) * br.course * 0.6;
+          const lit = Phaser.Math.Clamp(xSur(b.x, b.z, this.visee, br.z), -br.course, br.course);
+          but = Phaser.Math.Linear(balance, lit, this.diff.babyGardienLit || 0);
+        }
         else if (!vole) but = Math.sin(this.horloge * 1.7) * br.course * 0.25;
         if (vole) { this.reflexe -= dt; if (this.reflexe > 0) continue; but = devant(b.x); }
       } else {
