@@ -188,8 +188,13 @@ export const Dessin = {
   // une barre : la tige d'un bord à l'autre et ses joueurs (vus de dos pour toi, de face pour Rémi)
   barre(g, br, pos, coul, arme, roulette, deDos = false, nom = null) {
     const hT = 0.1;   // hauteur de la tige au-dessus du terrain
-    const a = proj(-W / 2 - 0.08, hT, br.z), b = proj(W / 2 + 0.08, hT, br.z);
-    g.lineStyle(Math.max(2, 0.012 * a.k), 0xcfd3d8, 1).lineBetween(a.x, a.y, b.x, b.y);
+    // V19z : TIGE CHROMÉE (avant : un gros trait gris) : un cylindre sombre, son reflet clair, des butées noires au ras
+    // des bandes ; elle s'arrête au bord de la table (sauf la poignée de ton gardien)
+    const a = proj(-W / 2 - 0.04, hT, br.z), b = proj(W / 2 + 0.04, hT, br.z), e = Math.max(2, 0.009 * a.k);
+    g.lineStyle(e, 0x2e333a, 0.95).lineBetween(a.x, a.y, b.x, b.y);
+    g.lineStyle(e * 0.55, 0x8d97a2, 1).lineBetween(a.x, a.y - e * 0.1, b.x, b.y - e * 0.1);
+    g.lineStyle(Math.max(1, e * 0.2), 0xf4f8fb, 0.9).lineBetween(a.x, a.y - e * 0.28, b.x, b.y - e * 0.28);
+    for (const bout of [proj(-W / 2 + 0.01, hT, br.z), proj(W / 2 - 0.01, hT, br.z)]) g.fillStyle(0x15171a, 1).fillRoundedRect(bout.x - e * 0.6, bout.y - e * 0.9, e * 1.2, e * 1.8, 2);
     if (deDos) {   // la poignée sur le côté
       g.fillStyle(0x222222, 1).fillRect(b.x - 6, b.y - 8, 40, 16);
     }

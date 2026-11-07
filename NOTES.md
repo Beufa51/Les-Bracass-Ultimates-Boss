@@ -422,6 +422,10 @@
   45-58 s), attente avant de pouvoir frapper ~2 s par tour (avant 5-12 s), résultats inchangés (PANACHÉ / PRESSION
   gagnés, CUL SEC perdu). BABYFOOT PRESSION : 3-5 perdu en ~2 min (sans les gamelles qui retiraient des points :
   avant 5-2). Baby bot : 0 problème.
+- V19z-b : BABYFOOT tiges CHROMÉES (cylindre sombre + reflet + butées noires, arrêtées au bord de la table ; avant : gros
+  traits gris « moches »). PORTE : bulle périmée « L'AIR DE RIEN (ou lâche) » corrigée, en-tête du fichier à jour,
+  réplique de la mamie (morte) retirée. Prompts n°28 (« l'air de rien » de dos, Rémi et toi) et n°29 (affiche du bar :
+  « LE PERDANT PAIE SA TOURNÉE », l'ancienne annonce gamelle / roulette, retirées).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

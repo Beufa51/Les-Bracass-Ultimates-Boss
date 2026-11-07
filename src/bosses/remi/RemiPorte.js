@@ -4,10 +4,12 @@
 //   MAINTENIR (le doigt n'importe où, ou ESPACE) = tu armes ton poing, la puissance monte de plus en plus vite ;
 //   LÂCHER = le coup part. Dégâts = puissance x précision (la cible qui se promène sur la porte doit être sur ton poing +).
 // LE VIDEUR fait sa ronde : on entend ses pas, son ombre s'allonge dans le couloir, puis il passe la tête (à gauche).
-//   S'il te voit en train de charger (ou au moment du coup) : ATTRAPÉ — coup perdu, la porte est rafistolée.
+//   S'il te voit en train de charger (ou au moment du coup) : ATTRAPÉ — coup perdu.
 // Une seule règle (V17) : la porte a une SOLIDITÉ commune ; quand elle CÈDE, celui qui a fait le PLUS DE DÉGÂTS gagne
 // (chacun le même nombre de tours : celui qui la casse a eu un tour de plus → DERNIER COUP pour l'autre).
-// V18 : TU COMMENCES (avant : toujours Rémi). Lâcher quand quelqu'un arrive = POING CACHÉ, la charge est GARDÉE (bords
+// V19z SIMPLE : seul le bouton L'AIR DE RIEN cache le poing (lâcher frappe TOUJOURS) ; RAGE au-delà de 100 % (bruit) ;
+//   plus de pisseur, de sifflet, de culot ni de rafistolage (interrupteurs dans PORTE, reglages.js).
+// V18 : TU COMMENCES (avant : toujours Rémi). (Lâcher quand quelqu'un arrive = POING CACHÉ, la charge est GARDÉE (bords
 //   rouges + consigne) ; on reprend en remaintenant. Une arrivée est toujours annoncée au moins PORTE.annonceMini s.
 // =====================================================================
 import { BossScene } from '../../core/BossScene.js';
@@ -267,7 +269,7 @@ export class RemiPorte extends BossScene {
         const court = (this.frappeur === 'toi' && this.mefiant ? R.mefiantAnnonce : 1) * (1 - 0.5 * this.rage());
         if (court < 1) v.duree = Math.max(R.annonceRage, v.duree * court);
       }
-      if (this.frappeur === 'toi' && !this.vuAnnonce) { this.vuAnnonce = true; bulle(this, 'Quelqu\'un arrive ! L\'AIR DE RIEN (ou lâche) : poing caché', '#ff9a9a', 2, 150); }
+      if (this.frappeur === 'toi' && !this.vuAnnonce) { this.vuAnnonce = true; bulle(this, 'Quelqu\'un arrive ! Vite : L\'AIR DE RIEN !', '#ff9a9a', 2, 150); }
       v.etat = 'annonce'; v.t = v.duree; v.pas = 0;
       v.rythme = v.mode === 'surprise' || v.mode === 'retour' ? 0.12 : hasard(I.rythme[0], I.rythme[1]) * (v.qui === 'pisseur' ? R.pisseurTraine : 1);   // (V19y : le pisseur traîne les pieds)
       v.hips = v.qui === 'pisseur' && Math.random() < 0.5;   // ... et parfois il a le hoquet en arrivant : un indice à écouter   // pressé : pas rapides   // ses pas plus ou moins rapides

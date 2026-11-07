@@ -200,7 +200,6 @@ export const REPLIQUES = {
   porteIntro: 'Rémi parie que tu ne défonceras pas la porte des WC avant lui. Mais le videur fait sa ronde...',
   porteAttrape: ['HÉ ! Toi là ! On se calme !', 'Encore un coup et c\'est dehors !', 'Je t\'ai vu !'],
   porteAttrapePisseur: ['Oh ! Vous faites quoi là ?! ... hips', 'Je vais le dire au videur... après avoir fait pipi.', 'Ça va les gars ? Vous bloquez les WC !'],
-  porteAttrapeMamie: ['Jeune homme ! Ça ne va pas, non ?!', 'De mon temps, on frappait AVANT d\'entrer !', 'Je préviens le patron !'],
   porteRemiFrappe: ['Prends ça !', 'Regarde et apprends.', 'Celle-là elle a fait mal à la porte.'],
   porteGagne: 'Rémi : « OK... t\'es le patron de la soirée. La prochaine tournée est pour moi ! »',
   portePerdu: 'Rémi : « Faut manger de la soupe, mon grand. »',
