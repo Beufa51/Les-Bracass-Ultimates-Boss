@@ -222,7 +222,7 @@ nous ; 3 barre LEVÉE : la figurine a tourné à l'horizontale, on voit le dessu
 circulaires autour.
 ```
 
-## 27. (facultatif) Le videur méfiant (porte, idée « siffle le videur ») — `remi_videur_mefiant.png` (À FAIRE)
+## 27. (facultatif) Le videur méfiant (porte, idée « siffle le videur ») — `remi_videur_mefiant.png` ✅ REÇUE ET INTÉGRÉE (pose méfiante seulement ; la pose « il pointe » existait déjà)
 À joindre : **`remi_videur.png`** (pour garder le même personnage). Proposé par l'avis plaisir (V19w).
 ```
 Même videur que l'image jointe (même style dessin, mêmes vêtements, même cadrage : il passe la tête au coin d'un mur,
