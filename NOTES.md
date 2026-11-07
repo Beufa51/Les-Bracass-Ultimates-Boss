@@ -358,6 +358,9 @@
   `node outils/remi_baby_bot.mjs` (4 difficultés x tirs droits / en bande ; sortie 1 si un tir vert est arrêté ;
   consigne ajoutée à CLAUDE.md). Résultat V19p : 8/8, 0 tir vert arrêté ; à surveiller : une bande est verte dès l'arrêt
   (sa défense attend au centre ; le bot y met sa visée d'un coup, un joueur doit tourner ~1 s).
+- V19q (« augmente un tout petit peu la difficulté ») : `babyVitesse` x1,05 (0,63 / 0,79 / 1 / 1,21), `babyDefense` x1,1
+  (0,14 / 0,21 / 0,29 / 0,36), `babyGardienRemi` x1,05, bonus ÉCLAIR `babyFenetre` x0,92 (1,1 / 0,92 / 0,74 / 0,55).
+  Bot : 8/8, 0 tir vert arrêté.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 
