@@ -388,6 +388,11 @@
   presque toujours), aucun risque réel (0 attrapé sur 30), on regarde sans jouer pendant le tour de Rémi. Top 5 dans le
   rapport. Prompt facultatif n°27 (videur méfiant) rangé. Scripts des bots humains : dossier temporaire de la session
   (pas dans le dépôt).
+- V19x PORTE (retour : « je n'arrivais pas à faire semblant de rien une fois la charge commencée » : lâcher avait 2 sens,
+  frapper OU cacher selon que l'arrivée était annoncée) : bouton « L'AIR DE RIEN » sous le pouce gauche (`BOUTON_RIEN`,
+  ton tour seulement ; clavier Z), utilisable à TOUT moment pendant la charge : poing caché, charge gardée, et lever le
+  doigt de charge ne frappe pas (`attendreRelache`). Plusieurs doigts (`addPointer`, `doigtId`). BUG CORRIGÉ dans
+  `impact()` : le coup qui casse la porte compte EN ENTIER. Prompt n°27 précisé (V index + majeur vers SES yeux).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

@@ -11,7 +11,7 @@
 //   rouges + consigne) ; on reprend en remaintenant. Une arrivée est toujours annoncée au moins PORTE.annonceMini s.
 // =====================================================================
 import { BossScene } from '../../core/BossScene.js';
-import { creerTouches } from '../../core/clavier.js';
+import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { texte, voile } from '../../core/ui.js';
 import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
 import { cleRecord } from './difficulte.js';
@@ -20,6 +20,8 @@ import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique, facteurMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, PORTE as R, REPLIQUES, POINTS, RANGS } from './reglages.js';
+// V19x : bouton « L'AIR DE RIEN » sous le pouce gauche
+const BOUTON_RIEN = { x: 86, y: 446, r: 66 };
 import { bulle, annonce, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile, bilanDe, noterJeu } from './commun.js';
 
 // la porte du décor illustré (remi_porte_decor.jpg, 960 x 536), zoomé x1,5 sur la porte (à droite)
@@ -78,15 +80,24 @@ export class RemiPorte extends BossScene {
     this.hud = texte(this, 190, 28, '', 20, '#ffffff', { fontStyle: 'bold' }).setDepth(900);
     this.consigne = texte(this, LARGEUR / 2, 505, '', 24, '#ffd84a', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 4 } }).setDepth(900).setVisible(false);
     this.touches = creerTouches(this);
+    this.txtRien = texte(this, BOUTON_RIEN.x, BOUTON_RIEN.y, 'L\'AIR\nDE RIEN', 17, '#ffffff', { fontStyle: 'bold', align: 'center', stroke: '#000000', strokeThickness: 4 }).setDepth(901).setVisible(false);
     laisserPasserTactile(this);
     // la musique (Street Fighter II, Ken) : on la BAISSE quand le videur approche, on la COUPE net quand il regarde
     // (« on fait genre de rien »), elle repart quand il s'en va
     jouerMusique(this, 'remi_musique_porte'); this.volMusique = 1;
     this.events.once('shutdown', () => facteurMusique('remi_musique_porte', 1));
     // MAINTENIR = le doigt posé n'importe où (ou ESPACE)
-    this.input.on('pointerdown', () => { this.doigt = true; });
-    this.input.on('pointerup', () => { this.doigt = false; });
-    this.input.on('pointerupoutside', () => { this.doigt = false; });   // doigt lâché hors de l'écran : la charge ne reste plus bloquée
+    // V19x (retour : « je n'arrivais pas à faire semblant de rien une fois la charge commencée ») : bouton « L'AIR DE RIEN »
+    // sous le pouce GAUCHE, à tout moment pendant que tu charges : poing caché, charge gardée, et tu peux lever ton doigt
+    // de charge SANS frapper (avant, lâcher frappait sauf si l'arrivée était déjà annoncée). Clavier : Z.
+    this.input.addPointer(1);
+    this.input.on('pointerdown', (p) => {
+      if (this.frappeur === 'toi' && Math.hypot(p.x - BOUTON_RIEN.x, p.y - BOUTON_RIEN.y) < BOUTON_RIEN.r + 25) { this.rienDemande = true; return; }
+      this.doigt = true; this.doigtId = p.id;
+    });
+    const lever = (p) => { if (p.id === this.doigtId) this.doigt = false; };
+    this.input.on('pointerup', lever);
+    this.input.on('pointerupoutside', lever);   // doigt lâché hors de l'écran : la charge ne reste plus bloquée
 
     etiquettesTactiles({ ...VIDES, espace: 'OK' });
     const t = estTactile();
@@ -95,7 +106,7 @@ export class RemiPorte extends BossScene {
       `MAINTIENS ${t ? 'le doigt sur l\'écran' : 'ESPACE'} : tu armes ton poing (ça monte de plus en plus vite)`,
       'LÂCHE : le coup part. Lâche quand la cible passe sur ton poing (+) = coup parfait.',
       'Des pas, une ombre, le « ! »... QUELQU\'UN ARRIVE. S\'il te voit charger : ATTRAPÉ !',
-      'Quelqu\'un arrive ? LÂCHE : tu CACHES TON POING (pas de coup, ta charge est GARDÉE). Il repart ? Remaintiens et continue !',
+      `Quelqu'un arrive ? ${t ? 'Bouton L\'AIR DE RIEN (pouce gauche)' : 'Z'} à tout moment, ou LÂCHE : tu CACHES TON POING (charge GARDÉE). Il repart ? Remaintiens !`,
       'Mais qui ? Le VIDEUR ne rate rien... mais si c\'est juste le GARS QUI VIENT PISSER, il s\'en fiche !',
       'Et il FEINTE : fausse alerte, il arrive plus vite, il revient jeter un 2e coup d\'œil...',
       'Quand la porte CÈDE, celui qui a fait le PLUS DE DÉGÂTS gagne. Taper fort ET juste, pas juste le dernier !',
@@ -165,15 +176,18 @@ export class RemiPorte extends BossScene {
     const tenu = this.doigt || this.touches.espace.isDown;
     const danger = this.videur.etat === 'annonce' || this.videur.etat === 'regarde';
     const maintiens = estTactile() ? 'REMETS le doigt' : 'REMAINTIENS ESPACE';
-    if (tenu) { this.poingCache = false; this.charger(dt); }
+    if (vientDAppuyer(this.touches.z)) this.rienDemande = true;
+    if (this.rienDemande) { this.rienDemande = false; if (this.charge) { this.faireGenre('toi'); this.attendreRelache = true; } }
+    if (this.attendreRelache) { if (!tenu) this.attendreRelache = false; }   // poing caché : lever le doigt ne frappe pas
+    else if (tenu) { this.poingCache = false; this.charger(dt); }
     else if (this.charge && danger) { this.faireGenre('toi'); }   // V18 : lâcher quand quelqu'un arrive = poing CACHÉ, charge gardée
     else if (this.charge) { this.frapper('toi'); return; }
     const pc = Math.round(this.puissance * 100);
     this.consigne.setColor(this.charge && danger ? '#ff5a5a' : this.poingCache ? '#9fe0ff' : '#ffd84a');
-    this.consigne.setText(this.charge && danger ? 'QUELQU\'UN ARRIVE !  LÂCHE = tu caches ton poing (charge gardée)'
+    this.consigne.setText(this.charge && danger ? 'QUELQU\'UN ARRIVE !  L\'AIR DE RIEN (ou lâche) = poing caché'
       : this.poingCache && danger ? `POING CACHÉ (${pc} % gardés)  -  attends qu'il reparte...`
       : this.poingCache ? `VOIE LIBRE !  ${maintiens} : tu repars de ${pc} %`
-      : this.charge ? `PUISSANCE ${pc} %  -  LÂCHE quand la cible est sur le + !`
+      : this.charge ? `PUISSANCE ${pc} %  -  LÂCHE sur le +   (L'AIR DE RIEN = cacher)`
       : `${estTactile() ? 'MAINTIENS le doigt' : 'MAINTIENS ESPACE'} pour charger... gare à qui arrive !`);
   }
 
@@ -313,7 +327,9 @@ export class RemiPorte extends BossScene {
     // LE COUP SE VOIT (V15) : le frappeur plonge en avant, une bulle de BD « BAM ! » éclate sur la porte, le bois garde un CREUX
     this.elan = 0.18;
     this.bulleBD(score);
-    const effectif = this.dernierTour ? score : Math.min(score, this.solidite);   // (au dernier coup, la porte est déjà par terre)
+    // V19x (bug trouvé par l'avis plaisir) : le coup qui CASSE la porte compte EN ENTIER, comme le dernier coup de l'autre
+    // (avant : seulement la solidité restante, parfois 19 points → celui qui cassait la porte perdait presque toujours)
+    const effectif = score;
     if (this.coupEnCours && this.coupEnCours.qui === qui) this.coupEnCours.score = effectif;
     this.total[qui] += effectif;
     this.solidite = Math.max(0, this.solidite - score);
@@ -533,6 +549,16 @@ export class RemiPorte extends BossScene {
   dessinerJauges() {
     const j = this.gJauges.clear();
     if (this.etat === 'intro') return;
+    // le bouton « L'AIR DE RIEN » (ton tour seulement ; il s'allume quand tu charges)
+    const rien = this.frappeur === 'toi' && this.etat !== 'fin' && this.etat !== 'pause';
+    this.txtRien.setVisible(rien);
+    if (rien) {
+      const b = BOUTON_RIEN, actif = this.charge, cache = this.poingCache;
+      j.fillStyle(0x000000, 0.5).fillCircle(b.x, b.y, b.r);
+      j.fillStyle(cache ? 0x9fe0ff : 0x7fc4ff, actif ? 0.45 + 0.2 * Math.sin(this.horloge * 8) : cache ? 0.35 : 0.12).fillCircle(b.x, b.y, b.r - 6);
+      j.lineStyle(4, 0x9fe0ff, actif ? 1 : 0.5).strokeCircle(b.x, b.y, b.r);
+      this.txtRien.setAlpha(actif || cache ? 1 : 0.5);
+    }
     // SOLIDITÉ de la porte (en haut)
     const x0 = 400, L = 300, v = this.solidite / R.solidite;
     j.fillStyle(0x000000, 0.6).fillRect(x0 - 6, 12, L + 12, 30);
