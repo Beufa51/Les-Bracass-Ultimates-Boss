@@ -227,5 +227,6 @@ circulaires autour.
 ```
 Même videur que l'image jointe (même style dessin, mêmes vêtements, même cadrage : il passe la tête au coin d'un mur,
 à gauche), nouvelle pose : yeux plissés, sourcil levé, le geste « je te surveille » : sa main fait un V avec l'INDEX et le MAJEUR
-tendus, le bout des deux doigts pointé vers SES PROPRES YEUX (un doigt sous chaque œil), les autres doigts repliés. Fond transparent, 1 seule pose, même taille que l'image jointe.
+tendus, et ces deux doigts DÉSIGNENT SES DEUX YEUX : l'index pointe vers son œil gauche, le majeur vers son œil droit
+(le bout de chaque doigt juste sous l'œil, sans le toucher), les autres doigts repliés. Fond transparent, 1 seule pose, même taille que l'image jointe.
 ```
