@@ -10,9 +10,10 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 //         babyRoulette / babyRate = chances (feinte, tir en bande, roulette, tir à côté) ; babyFenetre = durée du bonus TIR ÉCLAIR après un arrêt (s ; viser n'a pas de limite) ;
 //         babyReflexe = retard de son gardien (s) ; babyGardienRemi = vitesse de son gardien ; babyDefense = vitesse à laquelle sa défense suit ta visée (m/s) ; babyPissette / babyPiege = part de ses tirs PISSETTE (éclair) et PIÈGE (feintes multiples) ;
 //         babyGardienLit = part de sa position que son gardien prend sur TA visée (0 = il se balance au hasard) ;
-//         babyGuide = la flèche jaune montre où tourner la visée ; babyAide = ton gardien est
+//         babyGuide = la flèche jaune montre où tourner la visée ; babyPriseToi = zone d'arrêt de ton gardien (m) ; babyAide = ton gardien est
 //         attiré vers la balle quand elle arrive (0 = pas d'aide, 1 = il va tout seul au bon endroit)
-//  PORTE : remiCharge = jusqu'où Rémi charge (0 à 1) ; remiPrudent = chance qu'il lâche quand le videur arrive ;
+//  PORTE : remiAttend = Rémi attend la cible avant de frapper (sinon il frappe dès remiCharge) ; remiRage = il fait de
+//          la RAGE (charge au-delà de 100 %) ; remiPrecis = sa précision mini ; remiCharge = jusqu'où Rémi charge (0 à 1) ; remiPrudent = chance qu'il lâche quand le videur arrive ;
 //          videur = temps d'annonce du videur (x, + petit = moins prévenu) ; feintes = part de passages piégés
 //          (fausse alerte, surgit sans prévenir, revient aussitôt) ; zone = rayon de la cible parfaite ; visee = vitesse de la cible
 // V17 : 4 niveaux comme Kédric (ENTRAÎNEMENT, FACILE, NORMAL, CHAMPION), avec des noms de boissons
@@ -20,20 +21,20 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 export const DIFFICULTES = {
   entrainement: { nom: 'DIABOLO', couleur: '#9fe0ff', texte: 'Pour apprendre : large, lent, Rémi est déjà pompette et le videur ne feinte jamais.',
     temps: 110, densite: 0.65, traverse: 0.7, sonnette: 800,
-    babyVitesse: 0.63, babyLecture: 1.3, babyFeinte: 0, babyBande: 0, babyRoulette: 0.08, babyRate: 0.2, babyFenetre: 1.1, babyReflexe: 0.4, babyGardienRemi: 0.231, babyDefense: 0.16, babyPissette: 0, babyPiege: 0, babyGardienLit: 0, babyGuide: true, babyAide: 0.5,
-    remiCharge: 0.45, remiPrudent: 0.2, videur: 1.6, feintes: 0, zone: 0.28, visee: 0.65 },
+    babyVitesse: 0.63, babyLecture: 1.3, babyFeinte: 0, babyBande: 0, babyRoulette: 0.08, babyRate: 0.2, babyFenetre: 1.1, babyReflexe: 0.4, babyGardienRemi: 0.231, babyDefense: 0.16, babyPissette: 0, babyPiege: 0, babyGardienLit: 0, babyGuide: true, babyPriseToi: 0.06, babyAide: 0.5,
+    remiAttend: false, remiRage: false, remiPrecis: 0.5, remiCharge: 0.45, remiPrudent: 0.2, videur: 1.6, feintes: 0, zone: 0.28, visee: 0.65 },
   facile: { nom: 'PANACHÉ', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et ton gardien est un peu aidé.',
     temps: 88, densite: 0.8, traverse: 0.8, sonnette: 730,
-    babyVitesse: 0.79, babyLecture: 1.15, babyFeinte: 0.2, babyBande: 0.1, babyRoulette: 0.12, babyRate: 0.12, babyFenetre: 0.92, babyReflexe: 0.32, babyGardienRemi: 0.289, babyDefense: 0.24, babyPissette: 0.1, babyPiege: 0.1, babyGardienLit: 0.2, babyGuide: true, babyAide: 0.3,
-    remiCharge: 0.55, remiPrudent: 0.3, videur: 1.3, feintes: 0.25, zone: 0.22, visee: 0.8 },
+    babyVitesse: 0.79, babyLecture: 1.15, babyFeinte: 0.2, babyBande: 0.1, babyRoulette: 0.12, babyRate: 0.12, babyFenetre: 0.92, babyReflexe: 0.32, babyGardienRemi: 0.289, babyDefense: 0.24, babyPissette: 0.1, babyPiege: 0.1, babyGardienLit: 0.2, babyGuide: true, babyPriseToi: 0.055, babyAide: 0.3,
+    remiAttend: false, remiRage: false, remiPrecis: 0.5, remiCharge: 0.55, remiPrudent: 0.3, videur: 1.3, feintes: 0.25, zone: 0.22, visee: 0.8 },
   normal: { nom: 'PRESSION', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 70, densite: 1, traverse: 1, sonnette: 650,
-    babyVitesse: 1.0, babyLecture: 1, babyFeinte: 0.35, babyBande: 0.2, babyRoulette: 0.15, babyRate: 0.07, babyFenetre: 0.74, babyReflexe: 0.24, babyGardienRemi: 0.347, babyDefense: 0.33, babyPissette: 0.2, babyPiege: 0.2, babyGardienLit: 0.4, babyGuide: false, babyAide: 0.1,
-    remiCharge: 0.68, remiPrudent: 0.35, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
+    babyVitesse: 1.0, babyLecture: 1, babyFeinte: 0.35, babyBande: 0.2, babyRoulette: 0.15, babyRate: 0.07, babyFenetre: 0.74, babyReflexe: 0.24, babyGardienRemi: 0.347, babyDefense: 0.33, babyPissette: 0.2, babyPiege: 0.2, babyGardienLit: 0.2, babyGuide: false, babyPriseToi: 0.048, babyAide: 0,
+    remiAttend: true, remiRage: false, remiPrecis: 0.55, remiCharge: 0.68, remiPrudent: 0.35, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
   champion: { nom: 'CUL SEC', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
-    babyVitesse: 1.21, babyLecture: 0.85, babyFeinte: 0.5, babyBande: 0.3, babyRoulette: 0.2, babyRate: 0.04, babyFenetre: 0.55, babyReflexe: 0.2, babyGardienRemi: 0.29, babyDefense: 0.38, babyPissette: 0.28, babyPiege: 0.25, babyGardienLit: 0.3, babyGuide: false, babyAide: 0,
-    remiCharge: 0.84, remiPrudent: 0.85, videur: 0.75, feintes: 0.65, zone: 0.1, visee: 1.3 },
+    babyVitesse: 1.21, babyLecture: 0.85, babyFeinte: 0.5, babyBande: 0.3, babyRoulette: 0.2, babyRate: 0.04, babyFenetre: 0.55, babyReflexe: 0.2, babyGardienRemi: 0.29, babyDefense: 0.38, babyPissette: 0.28, babyPiege: 0.25, babyGardienLit: 0.25, babyGuide: false, babyPriseToi: 0.045, babyAide: 0,
+    remiAttend: true, remiRage: true, remiPrecis: 0.7, remiCharge: 1.08, remiPrudent: 0.85, videur: 0.75, feintes: 0.65, zone: 0.1, visee: 1.3 },
 };
 
 // V17 : POINTS de la soirée (affichés à la fin) et RANGS S / A / B / C (seulement pour la soirée complète)
@@ -43,6 +44,7 @@ export const POINTS = {
   babyEcart: 80,          // babyfoot : par but d'écart à la fin
   babyArret: 10,          // babyfoot : par arrêt
   babyGamelle: 40,        // babyfoot : par gamelle mise
+  babyBeauCoup: 40,       // babyfoot : par but en BANDE (« BILLARD ») ou sur le JAUNE (« CULOT »)
   porteGagne: 300,        // porte : pour avoir gagné (plus de dégâts que Rémi)
   porteParfait: 60,       // porte : par COUP PARFAIT
   porteAttrape: 60,       // porte : par fois où tu t'es fait attraper
@@ -96,7 +98,11 @@ export const BABY = {
   margeGardien: 0.12,     // marge du VERT sur le temps de son gardien (s)
   pinteReflexe: 0.04,     // chaque pinte de Rémi : son gardien réagit ce temps plus tard (s)...
   pinteTir: 0.04,         // ... et ses tirs perdent cette part de vitesse
-  priseToi: 0.06,         // V19h : TON gardien arrête la balle à moins de ça de son centre (plus large que ceux de Rémi)
+  // V19y (avis plaisir) : vert collant, balle folle, règle des 10 secondes
+  vertCollant: 0.2,       // un tir tapé moins de ce temps (s) après la fin du vert part avec l'angle vert (et il est sûr)
+  folle: 0.6, folleMax: 1.0, folleAngle: 0.35, // BALLE FOLLE : un contre renvoie la balle vers toi (x vitesse, plafond m/s, angle au hasard)
+  regle10: 10, regle10Debut: 5, // règle du bar : 10 s pour tirer ; compte à rebours affiché après 5 s
+  priseToi: 0.06,         // (remplacé par babyPriseToi de la difficulté, V19y)         // V19h : TON gardien arrête la balle à moins de ça de son centre (plus large que ceux de Rémi)
   largeurGardien: 0.07,   // ... et il est dessiné de cette largeur (m)
   balancier: 1.6,         // V19j : pendant que tu vises, son gardien se balance devant son but (vitesse du balancement)
   leveEcrase: 0.3,        // V19j : barre levée : la figurine (pieds vers Rémi) vue écrasée à cette part de sa hauteur
@@ -152,6 +158,17 @@ export const PORTE = {
   // le videur : attente avant de revenir (s), annonce (ses pas, son ombre : s), regard (s)
   videurAttente: [1.4, 3.6], videurAnnonce: 1.1, videurRegard: [1.0, 1.5],
   annonceMini: 0.85,      // V18 : une arrivée est TOUJOURS annoncée au moins ce temps (s), même ses feintes (temps de réagir)
+  // V19y (avis plaisir) : RAGE, poing caché qui coûte, sifflet, précision, pisseur, culot
+  rageMax: 1.3,           // la jauge monte jusqu'à 130 % (RAGE) : plus de dégâts...
+  rageLente: 0.55,        // ... elle monte moins vite dans la rage...
+  rageBruit: 3,           // ... et le BRUIT fait venir l'intrus jusqu'à (1 + ce chiffre) fois plus vite...
+  annonceRage: 0.5,       // ... et s'annoncer moins longtemps, mais jamais moins que ça (s)
+  cacheGarde: 0.6,        // cacher son poing (L'AIR DE RIEN) ne garde que cette part de la charge
+  siffleAnnonce: 0.9,     // tu SIFFLES le videur pendant le tour de Rémi : il arrive après ce temps d'annonce (s)...
+  mefiantAnnonce: 0.65,   // ... mais à ton tour suivant, il se méfie : ses annonces durent x ce chiffre
+  precisionBase: 0.35,    // dégâts x (precisionBase + (1 - precisionBase) x précision) : la précision compte (avant 0,55)
+  pisseurTraine: 1.5,     // le gars qui vient pisser traîne les pieds (pas plus lents) et a parfois le hoquet
+  culot: 1.15,            // continuer de charger devant le gars qui vient pisser = CULOT : ce coup x ce chiffre
 };
 
 // Répliques de Rémi (provisoires : à personnaliser à la passe de FINITION)

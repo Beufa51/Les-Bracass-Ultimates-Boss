@@ -114,9 +114,16 @@ export const Dessin = {
     // (elles suivent ta visée, avec retard : feinte-les)
     if (this.etat === 'riposte') {
       const br = BARRES.def, demi = B.prise * B.priseDefense;
+      // V19y (B2) : une FLÈCHE montre où ils vont (vers ta visée, avec retard)
+      const va = Phaser.Math.Clamp(hommes(br, 0).map(h => this.memoire - h).reduce((p, c) => Math.abs(c) < Math.abs(p) ? c : p) - this.pos.def, -0.15, 0.15);
       for (const h of hommes(br, this.pos.def)) {
-        const a = proj(h - demi, 0, br.z), b = proj(h + demi, 0, br.z);
-        g.fillStyle(0xff3b3b, 0.35).fillEllipse((a.x + b.x) / 2, a.y, b.x - a.x, 0.035 * a.k);
+        const a = proj(h - demi, 0, br.z), b = proj(h + demi, 0, br.z), m = (a.x + b.x) / 2;
+        g.fillStyle(0xff3b3b, 0.35).fillEllipse(m, a.y, b.x - a.x, 0.035 * a.k);
+        if (Math.abs(va) > 0.01) {
+          const bout = proj(h + va, 0, br.z).x, s = Math.sign(va);
+          g.lineStyle(3, 0xff6b6b, 0.9).lineBetween(m, a.y, bout, a.y);
+          g.fillStyle(0xff6b6b, 0.9).fillTriangle(bout + s * 8, a.y, bout - s * 2, a.y - 6, bout - s * 2, a.y + 6);
+        }
       }
     }
     // V19e LIGNE DE VISÉE pendant la riposte : VERTE si ta balle passe sa défense, ROUGE à partir du joueur qui bloque

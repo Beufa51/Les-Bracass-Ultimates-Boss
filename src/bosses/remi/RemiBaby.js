@@ -54,6 +54,7 @@ export class RemiBaby extends BossScene {
         .setDepth(profondeur(BARRES[nom].z) + (toi ? 0.02 : 0.01)).setAlpha(toi ? B.transparenceGardien : 1));
     }
     this.txtRoulette = texte(this, BOUTON_ROULETTE.x, BOUTON_ROULETTE.y, 'ROULETTE !', 17, '#ffffff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 5 }).setDepth(901).setVisible(false);
+    this.txtDix = texte(this, 0, 0, '', 34, '#ff6b6b', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 6 }).setDepth(902).setVisible(false);
     this.txtTir = texte(this, BOUTON_TIR.x, BOUTON_TIR.y, 'TIR', 30, '#ffffff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 }).setDepth(901).setVisible(false);
     this.txtVise = texte(this, LARGEUR / 2, 524, '', 22, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 10, y: 3 } }).setDepth(901).setVisible(false);
     this.hud = texte(this, LARGEUR / 2, 22, '', 26, '#ffffff', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 3 } }).setDepth(900);
@@ -69,13 +70,9 @@ export class RemiBaby extends BossScene {
     etiquettesTactiles({ ...VIDES, espace: 'OK' });
     const t = estTactile();
     this.afficherIntro('RÉMI - Le babyfoot', [
-      `Premier à ${B.buts} buts. Tu tiens le GARDIEN (vu de dos), Rémi attaque.`,
-      `${t ? 'Pouce GAUCHE : ◀ ▶ (maintiens)' : '◀ ▶'} : ton gardien glisse à gauche / à droite`,
-      'Rémi se PENCHE du côté où il va tirer... sauf quand il feinte !',
-      `Balle arrêtée : ◀ ▶ TOURNENT ta visée (rebonds sur les bandes comme au billard) ; ligne VERTE = ${t ? 'gros bouton TIR sous le pouce DROIT' : 'ESPACE'}`,
-      'GAMELLE (rentre et ressort) = but + un point retiré à l\'autre',
-      `ROULETTE interdite : si sa barre tourbillonne et marque, ${t ? 'touche RÉMI' : 'appuie sur Z'} = but annulé`,
-      'Chaque but encaissé, tu bois : ta visée titube, tu vois moins loin, hoquets...',
+      `Premier à ${B.buts} buts. Rémi se PENCHE du côté où il va tirer : place ton gardien (${t ? 'pouce gauche ◀ ▶' : '◀ ▶'}).`,
+      `Balle arrêtée : ◀ ▶ tournent ta visée (rebonds sur les bandes). Ligne VERTE = ${t ? 'gros bouton TIR (pouce droit)' : 'ESPACE'} !`,
+      'Le reste (gamelle, roulette, pintes, 10 secondes...) s\'explique quand ça arrive.',
     ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.demarrer(); }));
   }
 
@@ -94,7 +91,7 @@ export class RemiBaby extends BossScene {
     else annonce(this, 'À TOI D\'ENGAGER', '#7fff7f', 0.9);
     this.tir = null; this.penche = 0;
     this.balle = { x: Phaser.Math.Clamp(this.pos.toi + B.balleTenue, -B.but / 2 + 0.01, B.but / 2 - 0.01), z: BARRES.toi.z + 0.05, vx: 0, vz: 0 };
-    this.etat = 'riposte'; this.fenetre = this.diff.babyFenetre; this.memoire = this.balle.x; this.visee = 0;
+    this.etat = 'riposte'; this.fenetre = this.diff.babyFenetre; this.memoire = this.balle.x; this.visee = 0; this.tempsVise = 0; this.dernierVert = null;
     this.astuce();
   }
 
@@ -108,7 +105,7 @@ export class RemiBaby extends BossScene {
     this.roulette = null;
     annonce(this, 'ARRÊT !', '#7fff7f', 0.5);
     this.balle.vx = 0; this.balle.vz = 0;
-    this.etat = 'riposte'; this.fenetre = this.diff.babyFenetre; this.memoire = this.balle.x; this.visee = 0;   // fenetre = temps du bonus ÉCLAIR
+    this.etat = 'riposte'; this.fenetre = this.diff.babyFenetre; this.memoire = this.balle.x; this.visee = 0; this.tempsVise = 0; this.dernierVert = null;   // fenetre = temps du bonus ÉCLAIR
     this.astuce();
     if (Math.random() < 0.5) { this.poseTemp('rale', 1.2); bulle(this, `Rémi : « ${choisir(REPLIQUES.babyArret)} »`, '#ffd84a', 1.4, 300); }
   }
@@ -122,10 +119,19 @@ export class RemiBaby extends BossScene {
   riposter(biais) {
     if (this.etat !== 'riposte') return;
     const b = this.balle;
+    // V19y (avis plaisir B2) : VERT COLLANT : un tir tapé moins de B.vertCollant s après la fin du vert part avec l'angle
+    // vert, et il est SÛR (le vert est une promesse : ni sa défense ni son gardien ne l'arrêtent)
+    const lib = this.cheminLibre(b.x, biais), vert = lib.libre && !lib.enFace;
+    this.balleSure = false;
+    if (!vert && this.dernierVert && this.horloge - this.dernierVert.t < B.vertCollant) { biais = this.dernierVert.a; this.balleSure = true; }
+    // B5 : le beau coup paye : but EN BANDE = « BILLARD ! », but sur le JAUNE (son gardien pouvait l'avoir) = « CULOT ! »
+    const l2 = this.cheminLibre(b.x, biais);
+    this.tirInfo = { bande: Math.abs(b.x + Math.tan(biais) * (L - b.z)) > W / 2 - R, jaune: l2.libre && l2.enFace && !this.balleSure };
     // V19g TIR ÉCLAIR : tirer pendant le bonus (anneau jaune autour de TIR) = balle plus rapide, son gardien surpris
     const eclair = this.fenetre > 0;
     const v = B.riposteVitesse * (eclair ? B.eclairVitesse : 1);
     b.vz = v * Math.cos(biais); b.vx = v * Math.sin(biais);
+    this.txtDix.setVisible(false);
     this.etat = 'riposte_vol'; this.eclairTir = eclair; this.frappeToi = this.horloge + 0.3;
     this.reflexe = this.diff.babyReflexe + this.remiBu * B.pinteReflexe + (eclair ? B.eclairReflexe : 0);   // son gardien réagit avec un temps de retard
     jouerSon(this, 'remi_baby_frappe', eclair ? { rate: 1.25 } : undefined);
@@ -139,9 +145,14 @@ export class RemiBaby extends BossScene {
   contre(nom) {
     this.dernierContre = nom;
     jouerSon(this, 'remi_baby_clac');
-    bulle(this, nom === 'gar' ? 'Rémi : « Arrêté ! »' : 'Contré !', '#ffd84a', 1.0, 300);
-    this.balle.vz = -this.balle.vz * 0.3;
-    this.suivant(0.7);
+    // V19y (avis plaisir B3) : BALLE FOLLE : le contre renvoie la balle vers TON but : rattrape-la (comme un tir),
+    // arrêtée = tu rejoues ; ratée = il peut y avoir but. Un mauvais tir se paie, les échanges s'enchaînent.
+    const b = this.balle, v = Math.min(B.folleMax, Math.abs(b.vz) * B.folle), a = hasard(-B.folleAngle, B.folleAngle);
+    b.vz = -v * Math.cos(a); b.vx = v * Math.sin(a);
+    this.tir = { type: 'folle', roulette: false, vise: 0 };
+    this.etat = 'tir'; this.balleSure = false;
+    annonce(this, nom === 'gar' ? 'ARRÊTÉ... BALLE FOLLE !' : 'CONTRÉ ! BALLE FOLLE !', '#ffd84a', 0.6);
+    if (!this.vuFolle) { this.vuFolle = true; bulle(this, 'Le contre te revient dessus : rattrape-la !', '#ffd84a', 1.6, 300); }
   }
 
   sortie(msg) { bulle(this, msg, '#ffffff', 1.0, 300); this.suivant(0.8); }
@@ -172,7 +183,12 @@ export class RemiBaby extends BossScene {
     if (gamelle) this.gamelleAnim(true);
     this.poseTemp('boit', 2.2);
     this.celebrer(true);
-    annonce(this, gamelle ? 'GAMELLE !' : 'BUUUT !', '#7fff7f', 1.1);
+    const info = this.tirInfo || {};
+    if (info.bande) { this.billards = (this.billards || 0) + 1; this.remiBu++; }   // BILLARD : Rémi boit 2 pintes
+    if (info.jaune) this.culots = (this.culots || 0) + 1;
+    annonce(this, gamelle ? 'GAMELLE !' : info.bande ? 'BILLARD !!' : info.jaune ? 'CULOT !' : 'BUUUT !', '#7fff7f', 1.1);
+    if (info.bande) this.time.delayedCall(600, () => bulle(this, 'BILLARD : Rémi boit DEUX pintes !', '#7fff7f', 1.6, 360));
+    this.tirInfo = null;
     this.time.delayedCall(700, () => jouerSon(this, 'remi_pinte'));
     if (!gamelle) this.time.delayedCall(900, () => bulle(this, `Rémi : « ${choisir(REPLIQUES.babyEncaisse)} »`, '#ffd84a', 1.6, 300));
     this.time.delayedCall(1500, () => this.verifierFin(0.5));
@@ -212,13 +228,14 @@ export class RemiBaby extends BossScene {
   }
 
   suivant(d) {
+    this.txtDix.setVisible(false);
     this.etat = 'pause';
     this.time.delayedCall(d * 1000, () => { this.balle = null; if (!this.termine) this.engagement(); });
   }
 
   gagne() {
     this.etat = 'fin';
-    noterJeu(this, 'baby', (this.butsToi - this.butsRemi) * POINTS.babyEcart + this.arrets * POINTS.babyArret + this.gamelles * POINTS.babyGamelle);
+    noterJeu(this, 'baby', (this.butsToi - this.butsRemi) * POINTS.babyEcart + this.arrets * POINTS.babyArret + this.gamelles * POINTS.babyGamelle + ((this.billards || 0) + (this.culots || 0)) * POINTS.babyBeauCoup);
     annonce(this, 'GAGNÉ !', '#7fff7f', 1.4);
     jouerSon(this, 'remi_arrivee');
     this.time.delayedCall(900, () => bulle(this, `Rémi : « ${REPLIQUES.babyGagne} »`, '#ffd84a', 2.8, 90));
@@ -244,6 +261,15 @@ export class RemiBaby extends BossScene {
         this.balle.x = Phaser.Math.Clamp(this.pos.toi + B.balleTenue, -B.but / 2 + 0.01, B.but / 2 - 0.01); this.balle.z = BARRES.toi.z + 0.05;   // un peu de côté : visible derrière ton gardien
         this.fenetre -= dt;   // V19g : pas de limite de temps pour viser ; seul le bonus ÉCLAIR s'éteint
         this.indice = this.diff.babyGuide ? this.chercherVert() : undefined;   // V19l : pas de guide en PRESSION / CUL SEC
+        const l = this.cheminLibre(); if (l.libre && !l.enFace) this.dernierVert = { t: this.horloge, a: this.viseeVraie() };
+        // V19y (avis plaisir B4) : RÈGLE DU BAR « 10 SECONDES » : compte à rebours au-dessus de la balle après 5 s, à 0 Rémi récupère
+        this.tempsVise = (this.tempsVise || 0) + dt;
+        const reste = B.regle10 - this.tempsVise;
+        if (reste <= B.regle10 - B.regle10Debut) {
+          const q = proj(this.balle.x, 0.12, this.balle.z);
+          this.txtDix.setPosition(q.x, q.y - 40).setText(String(Math.max(0, Math.ceil(reste)))).setVisible(true).setScale(1 + 0.25 * (Math.ceil(reste) - reste));
+        }
+        if (reste <= 0) { this.txtDix.setVisible(false); annonce(this, '10 SECONDES !', '#ff6b6b', 0.8); bulle(this, 'Règle du bar : 10 s pour tirer. Balle à Rémi !', '#ff9a9a', 1.4, 300); this.suivant(0.6); }
         if (vientDAppuyer(this.touches.espace)) this.riposter(this.viseeVraie());
       }
       if (vientDAppuyer(this.touches.z)) this.appelRoulette();

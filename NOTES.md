@@ -393,6 +393,22 @@
   ton tour seulement ; clavier Z), utilisable à TOUT moment pendant la charge : poing caché, charge gardée, et lever le
   doigt de charge ne frappe pas (`attendreRelache`). Plusieurs doigts (`addPointer`, `doigtId`). BUG CORRIGÉ dans
   `impact()` : le coup qui casse la porte compte EN ENTIER. Prompt n°27 précisé (V index + majeur vers SES yeux).
+- V19y (« fais toutes les corrections » de l'avis plaisir, sauf B7 passe à l'attaque, C puissance, E amorti) :
+  PORTE : P2 RAGE jusqu'à 130 % (`rageMax`, 3 paliers rouges sur la jauge, dégâts > 999 ; le BRUIT fait venir l'intrus
+  plus vite `rageBruit` et l'annonce raccourcit, jamais sous `annonceRage` 0,5 s) ; P3 poing caché ne garde que 60 %
+  (`cacheGarde`) ; P4 SIFFLE LE VIDEUR pendant le tour de Rémi (même bouton à gauche, 1 fois par tour, clavier Z) : il
+  arrive (`siffleAnnonce`), Rémi attrapé s'il charge, mais il est MÉFIANT à ton tour suivant (`mefiantAnnonce` x0,65)
+  avec la nouvelle pose « je te surveille » (`remi_videur_mefiant.png`, case 0 ; `videur_mefiant()` dans
+  preparer_images.py efface le mur) ; P5 précision (`precisionBase` 0,35) et PILE DESSUS plus fort ; P6 Rémi selon la
+  difficulté (`remiAttend`, `remiRage` en CUL SEC, `remiPrecis`, CUL SEC `remiCharge` 1,08) ; P7 pisseur qui traîne les
+  pieds (`pisseurTraine`) et a parfois le hoquet, CULOT +15 % si tu continues de charger devant lui ; P8 intro en 3 lignes
+  + explications à la 1re fois. Bot humain : PANACHÉ gagné, PRESSION gagné (Rémi attrapé 4 fois), CUL SEC perdu.
+  BABYFOOT : B1 zone d'arrêt par difficulté (`babyPriseToi` 0,06 / 0,055 / 0,048 / 0,045), aide 0 dès PRESSION,
+  `babyGardienLit` 0 / 0,2 / 0,2 / 0,25 ; B2 VERT COLLANT (`vertCollant` 0,2 s, tir sûr : `balleSure`) + flèches sur ses
+  défenseurs ; B3 BALLE FOLLE (un contre renvoie la balle vers toi : `folle`, `folleMax`, `folleAngle`) ; B4 règle des
+  10 SECONDES (compte à rebours dès 5 s, `regle10`) ; B5 BILLARD (but en bande : Rémi boit 2 pintes) et CULOT (but sur
+  le jaune), `POINTS.babyBeauCoup` ; B6 intro en 3 lignes + 1re roulette / 1re balle folle expliquées. Bot :
+  0 problème ; bot humain PRESSION : 5-2 en ~2 min, Rémi marque 5 tirs sur 18.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

@@ -38,6 +38,8 @@ export const MANIFESTE = {
     remi_bar_babyfoot: { fichier: 'sprites/remi/remi_bar_babyfoot.jpg', largeur: 960, hauteur: 536, images: 1, vitesse: 1 },
     remi_bar_interieur: { fichier: 'sprites/remi/remi_bar_interieur.jpg', largeur: 960, hauteur: 536, images: 1, vitesse: 1 },
     // le videur de la porte : distrait, furieux (coupé à la taille)
+    // V19y : le videur MÉFIANT (geste « je te surveille »), case 0 ; case 1 = il pointe (non utilisée : remi_videur l'a déjà)
+    remi_videur_mefiant: { fichier: 'sprites/remi/remi_videur_mefiant.png', largeur: 671, hauteur: 740, images: 2, vitesse: 1 },
     remi_videur: { fichier: 'sprites/remi/remi_videur.png', largeur: 672, hauteur: 743, images: 2, vitesse: 1 },
     // l'autre intrus de la porte : le gars qui vient pisser (distrait / furieux, coupé à la taille)
     // (V17 : la mamie n'est plus chargée — 1,2 Mo pour rien ; son image reste dans assets/ si on la remet)

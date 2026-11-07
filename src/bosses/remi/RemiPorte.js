@@ -92,7 +92,7 @@ export class RemiPorte extends BossScene {
     // de charge SANS frapper (avant, lâcher frappait sauf si l'arrivée était déjà annoncée). Clavier : Z.
     this.input.addPointer(1);
     this.input.on('pointerdown', (p) => {
-      if (this.frappeur === 'toi' && Math.hypot(p.x - BOUTON_RIEN.x, p.y - BOUTON_RIEN.y) < BOUTON_RIEN.r + 25) { this.rienDemande = true; return; }
+      if (Math.hypot(p.x - BOUTON_RIEN.x, p.y - BOUTON_RIEN.y) < BOUTON_RIEN.r + 25) { if (this.frappeur === 'toi') this.rienDemande = true; else this.siffler(); return; }
       this.doigt = true; this.doigtId = p.id;
     });
     const lever = (p) => { if (p.id === this.doigtId) this.doigt = false; };
@@ -103,13 +103,9 @@ export class RemiPorte extends BossScene {
     const t = estTactile();
     this.afficherIntro('RÉMI - La porte et le videur', [
       REPLIQUES.porteIntro,
-      `MAINTIENS ${t ? 'le doigt sur l\'écran' : 'ESPACE'} : tu armes ton poing (ça monte de plus en plus vite)`,
-      'LÂCHE : le coup part. Lâche quand la cible passe sur ton poing (+) = coup parfait.',
-      'Des pas, une ombre, le « ! »... QUELQU\'UN ARRIVE. S\'il te voit charger : ATTRAPÉ !',
-      `Quelqu'un arrive ? ${t ? 'Bouton L\'AIR DE RIEN (pouce gauche)' : 'Z'} à tout moment, ou LÂCHE : tu CACHES TON POING (charge GARDÉE). Il repart ? Remaintiens !`,
-      'Mais qui ? Le VIDEUR ne rate rien... mais si c\'est juste le GARS QUI VIENT PISSER, il s\'en fiche !',
-      'Et il FEINTE : fausse alerte, il arrive plus vite, il revient jeter un 2e coup d\'œil...',
-      'Quand la porte CÈDE, celui qui a fait le PLUS DE DÉGÂTS gagne. Taper fort ET juste, pas juste le dernier !',
+      `MAINTIENS ${t ? 'le doigt' : 'ESPACE'} pour armer ton poing, LÂCHE quand la cible est sur le + : celui qui fait le PLUS DE DÉGÂTS gagne.`,
+      `Quelqu'un arrive (pas, ombre, bords rouges) ? ${t ? 'L\'AIR DE RIEN (pouce gauche)' : 'Z'} ou lâche : tu caches ton poing. S'il te voit charger : ATTRAPÉ !`,
+      'Le reste (la RAGE, le sifflet, le gars qui vient pisser...) s\'explique quand ça arrive.',
     ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.tour('toi'); }));
   }
 
@@ -127,7 +123,7 @@ export class RemiPorte extends BossScene {
   tour(qui) {
     if (this.termine || (this.solidite <= 0 && !this.dernierTour)) return;
     this.tours[qui]++;
-    this.frappeur = qui; this.puissance = 0; this.charge = false; this.poingCache = false; this.tCible = Math.random() * 3;
+    this.frappeur = qui; this.puissance = 0; this.charge = false; this.poingCache = false; this.tCible = Math.random() * 3; this.culot = false;
     this.pose[qui] = 'garde';
     this.etat = qui;
     etiquettesTactiles(VIDES);
@@ -138,7 +134,9 @@ export class RemiPorte extends BossScene {
     } else {
       this.consigne.setVisible(false);
       // jusqu'où Rémi va charger cette fois (un peu au hasard autour de sa « gourmandise »)
-      this.remiVise = Phaser.Math.Clamp(this.diff.remiCharge + hasard(-0.12, 0.12), 0.25, 1);
+      this.remiVise = Phaser.Math.Clamp(this.diff.remiCharge + hasard(-0.12, 0.12), 0.25, this.diff.remiRage ? R.rageMax : 1);   // (CUL SEC : il fait de la RAGE)
+      this.siffleUtilise = false; this.mefiant = false;
+      if (!this.vuSiffle) { this.vuSiffle = true; this.time.delayedCall(1300, () => bulle(this, 'Psst : SIFFLE LE VIDEUR pendant que Rémi charge... (1 fois par tour)', '#9fe0ff', 2.4, 330)); }
       this.remiAttend = hasard(0.4, 0.9);   // il se met en place
       this.remiPrudence = undefined; this.remiReaction = undefined;
       bulle(this, `Rémi : « ${choisir(REPLIQUES.porteRemiFrappe)} »`, '#ffd84a', 1.2, 80);
@@ -153,7 +151,7 @@ export class RemiPorte extends BossScene {
       this.tCible += dt;
       this.bougerCible();
       this.pasVideur(dt);
-      if (this.etat === 'toi') this.pasToi(dt); else if (this.etat === 'remi') this.pasRemi(dt);
+      if (this.etat === 'toi') this.pasToi(dt); else if (this.etat === 'remi') { if (vientDAppuyer(this.touches.z)) this.siffler(); this.pasRemi(dt); }
     } else if (this.etat === 'coup' || this.etat === 'pause') this.pasVideur(dt);
     this.dessiner(dt);
   }
@@ -166,17 +164,27 @@ export class RemiPorte extends BossScene {
 
   charger(dt) {
     const avant = this.puissance;
-    this.puissance = Math.min(1, this.puissance + (R.charge + this.puissance * R.accel) * dt);
+    // V19y RAGE : la jauge continue au-delà de 100 % (jusqu'à R.rageMax) : plus de dégâts, mais le BRUIT attire l'intrus
+    const max = this.frappeur === 'toi' || this.diff.remiRage ? R.rageMax : 1;
+    this.puissance = Math.min(max, this.puissance + (R.charge + Math.min(1, this.puissance) * R.accel) * (this.puissance >= 1 ? R.rageLente : 1) * dt);
+    if (avant < 1 && this.puissance >= 1 && max > 1) {
+      if (this.frappeur === 'toi' && !this.vuRage) { this.vuRage = true; bulle(this, 'RAGE ! Encore plus fort... mais ça fait du BRUIT : on va t\'entendre !', '#ff6a3a', 2.2, 150); }
+      jouerSon(this, 'remi_porte', { rate: 0.5, volume: 0.4 });
+    }
+    if (this.puissance > 1) this.cameras.main.shake(40, 0.0012 * this.rage());
     this.charge = true;
     this.pose[this.frappeur] = 'charge';
     if (Math.floor(this.puissance * 10) !== Math.floor(avant * 10)) jouerSon(this, 'remi_tape', { rate: 0.7 + this.puissance });
   }
 
+  // part de RAGE du frappeur qui charge (0 = pas de rage, 1 = au maximum)
+  rage() { return this.charge || this.poingCache ? Math.max(0, (this.puissance - 1) / (R.rageMax - 1)) : 0; }
+
   pasToi(dt) {
     const tenu = this.doigt || this.touches.espace.isDown;
     const danger = this.videur.etat === 'annonce' || this.videur.etat === 'regarde';
     const maintiens = estTactile() ? 'REMETS le doigt' : 'REMAINTIENS ESPACE';
-    if (vientDAppuyer(this.touches.z)) this.rienDemande = true;
+    if (vientDAppuyer(this.touches.z)) this.rienDemande = true;   // (pendant le tour de Rémi, Z = SIFFLE : voir update)
     if (this.rienDemande) { this.rienDemande = false; if (this.charge) { this.faireGenre('toi'); this.attendreRelache = true; } }
     if (this.attendreRelache) { if (!tenu) this.attendreRelache = false; }   // poing caché : lever le doigt ne frappe pas
     else if (tenu) { this.poingCache = false; this.charger(dt); }
@@ -187,6 +195,7 @@ export class RemiPorte extends BossScene {
     this.consigne.setText(this.charge && danger ? 'QUELQU\'UN ARRIVE !  L\'AIR DE RIEN (ou lâche) = poing caché'
       : this.poingCache && danger ? `POING CACHÉ (${pc} % gardés)  -  attends qu'il reparte...`
       : this.poingCache ? `VOIE LIBRE !  ${maintiens} : tu repars de ${pc} %`
+      : this.charge && this.puissance > 1 ? `RAGE ${pc} % !  ça fait du BRUIT...  LÂCHE sur le +`
       : this.charge ? `PUISSANCE ${pc} %  -  LÂCHE sur le +   (L'AIR DE RIEN = cacher)`
       : `${estTactile() ? 'MAINTIENS le doigt' : 'MAINTIENS ESPACE'} pour charger... gare à qui arrive !`);
   }
@@ -205,13 +214,26 @@ export class RemiPorte extends BossScene {
     this.charger(dt * 0.8);
     // il lâche quand la cible passe près de son poing, une fois assez chargé
     const d = Math.hypot(this.cible.x - IMPACT.x, this.cible.y - IMPACT.y);
-    if (this.puissance >= this.remiVise && (d < 40 || this.puissance >= 1)) this.frapper('remi');
+    // V19y : en DIABOLO / PANACHÉ, il frappe dès sa gourmandise atteinte (sans attendre la cible) ; sinon il attend la cible
+    if (this.puissance >= this.remiVise && (!this.diff.remiAttend || d < 40 || this.puissance >= Math.max(1, this.remiVise))) this.frapper('remi');
+  }
+
+  // V19y SIFFLE LE VIDEUR (pendant le tour de Rémi, 1 fois par tour) : le videur arrive tout de suite. Si Rémi charge
+  // quand il regarde : RÉMI ATTRAPÉ. Mais il se MÉFIE de toi : à ton tour suivant, il s'annonce moins longtemps.
+  siffler() {
+    const v = this.videur;
+    if (this.frappeur !== 'remi' || this.etat !== 'remi' || this.siffleUtilise || v.etat !== 'absent') return;
+    this.siffleUtilise = true; this.mefiant = true;
+    v.siffle = true; v.t = 0; v.retourPrevu = false;
+    jouerSon(this, 'remi_sonnette', { rate: 1.6, volume: 0.6 });
+    bulle(this, '*siffle le videur*  « Psssst ! Par ici ! »', '#9fe0ff', 1.2, 330);
   }
 
   // FAIRE GENRE DE RIEN (V17, choix de Fabien) : on baisse le poing sans frapper, le tour continue
   // V18 (retour : « pas clair ») : le poing est CACHÉ, la charge est GARDÉE ; on repart de là quand la voie est libre
   faireGenre(qui) {
     this.charge = false; this.poingCache = true; this.pose[qui] = 'garde';
+    this.puissance *= R.cacheGarde;   // V19y : cacher son poing coûte (on ne garde que R.cacheGarde de la charge)
     if (qui === 'toi') bulle(this, choisir(['*sifflote*', '*regarde ses chaussures*', '*se recoiffe*', '*fait genre de rien*']), '#cccccc', 0.9, 330);
     else bulle(this, 'Rémi : *sifflote innocemment*', '#ffd84a', 0.9, 80);
   }
@@ -224,7 +246,7 @@ export class RemiPorte extends BossScene {
   //  retour   : après avoir regardé, il repart… et revient aussitôt jeter un 2e coup d'œil
   pasVideur(dt) {
     const v = this.videur;
-    v.t -= dt;
+    v.t -= dt * (v.etat === 'absent' ? 1 + R.rageBruit * this.rage() : 1);   // la RAGE fait du bruit : il arrive plus vite
     if (v.etat === 'absent' && v.t <= 0) {
       // QUI vient ? (sauf un 2e coup d'œil : c'est le même)
       if (!v.retourPrevu) { let r0 = Math.random(); v.qui = 'videur'; for (const [n, i] of Object.entries(INTRUS)) { r0 -= i.poids; if (r0 <= 0) { v.qui = n; break; } } }
@@ -235,14 +257,24 @@ export class RemiPorte extends BossScene {
       const base = R.videurAnnonce * this.diff.videur * I.lent;
       // V18 (retour : « pas le temps de réagir ») : jamais moins de R.annonceMini (avant : 0,3 s en surprise, 0,4 s au retour)
       v.duree = v.mode === 'surprise' || v.mode === 'retour' ? R.annonceMini : Math.max(R.annonceMini, base * hasard(0.7, 1.3));
+      // V19y : SIFFLÉ par toi : c'est le videur, il arrive tout de suite (annonce courte) ; MÉFIANT (ton tour après un
+      // coup de sifflet) ou RAGE : il s'annonce moins longtemps (jamais moins de R.annonceRage)
+      if (v.siffle) { v.qui = 'videur'; v.mode = 'normal'; v.duree = R.siffleAnnonce; }
+      else {
+        const court = (this.frappeur === 'toi' && this.mefiant ? R.mefiantAnnonce : 1) * (1 - 0.5 * this.rage());
+        if (court < 1) v.duree = Math.max(R.annonceRage, v.duree * court);
+      }
+      if (this.frappeur === 'toi' && !this.vuAnnonce) { this.vuAnnonce = true; bulle(this, 'Quelqu\'un arrive ! L\'AIR DE RIEN (ou lâche) : poing caché', '#ff9a9a', 2, 150); }
       v.etat = 'annonce'; v.t = v.duree; v.pas = 0;
-      v.rythme = v.mode === 'surprise' || v.mode === 'retour' ? 0.12 : hasard(I.rythme[0], I.rythme[1]);   // pressé : pas rapides   // ses pas plus ou moins rapides
+      v.rythme = v.mode === 'surprise' || v.mode === 'retour' ? 0.12 : hasard(I.rythme[0], I.rythme[1]) * (v.qui === 'pisseur' ? R.pisseurTraine : 1);   // (V19y : le pisseur traîne les pieds)
+      v.hips = v.qui === 'pisseur' && Math.random() < 0.5;   // ... et parfois il a le hoquet en arrivant : un indice à écouter   // pressé : pas rapides   // ses pas plus ou moins rapides
       v.demiTour = v.mode === 'fausse' ? v.duree * hasard(0.45, 0.8) : -1;
     } else if (v.etat === 'annonce') {
       v.pas -= dt;
       // FEINTE : tant qu'il n'est pas là, TOUT LE MONDE fait le même bruit et la même ombre : impossible de savoir
       // si c'est le videur... ou juste le gars qui vient pisser (qui, lui, s'en fiche)
       if (v.pas <= 0) { v.pas = v.rythme; jouerSon(this, 'remi_atterrit', { rate: 0.6 }); }
+      if (v.hips && v.duree - v.t > v.duree * 0.4) { v.hips = false; jouerSon(this, 'remi_hips', { volume: 0.6 }); }
       // fausse alerte : il fait demi-tour avant d'arriver
       if (v.demiTour > 0 && v.duree - v.t >= v.demiTour) { v.etat = 'repart'; v.t = 0.6; return; }
       if (v.t <= 0) {
@@ -260,10 +292,13 @@ export class RemiPorte extends BossScene {
       // il regarde : celui qui charge (ou qui vient juste de frapper) se fait ATTRAPER
       let fautif = (this.etat === 'toi' || this.etat === 'remi') && this.charge ? this.frappeur
         : this.etat === 'coup' && this.tCoup < 0.25 ? this.frappeur : null;
-      if (v.qui === 'pisseur') fautif = null;                                                  // trop pressé pour regarder
+      if (v.qui === 'pisseur') {                                                                // trop pressé pour regarder
+        if (fautif === 'toi' && this.charge && !this.culot) { this.culot = true; bulle(this, `CULOT ! +${Math.round((R.culot - 1) * 100)} % sur ce coup`, '#7fff7f', 1.2, 330); }
+        fautif = null;
+      }
       if (fautif && !v.vu) this.attraper(fautif);
       if (v.t <= 0) {
-        v.etat = 'absent'; v.pose = 0;
+        v.etat = 'absent'; v.pose = 0; v.siffle = false;
         // le coup du 2e coup d'œil : il revient tout de suite
         v.retourPrevu = v.mode !== 'retour' && Math.random() < this.diff.feintes * 0.5;
         v.t = v.retourPrevu ? hasard(0.4, 0.8) : hasard(R.videurAttente[0], R.videurAttente[1]) * this.diff.videur;
@@ -309,14 +344,16 @@ export class RemiPorte extends BossScene {
   // ---------- le coup ----------
   frapper(qui) {
     const d = Math.hypot(this.cible.x - IMPACT.x, this.cible.y - IMPACT.y), zr = this.diff.zone * 200;
-    const precision = qui === 'remi' ? hasard(0.5, 0.95) :   // (V17 : Rémi un peu moins précis, avant 0,65-1)
+    const precision = qui === 'remi' ? hasard(this.diff.remiPrecis ?? 0.5, 0.95) :   // (V17 : Rémi un peu moins précis, avant 0,65-1)
       d <= zr ? 1 : Math.max(0.2, 1 - (d - zr) / 130);
-    const score = Math.round(999 * (R.degatsMin + (1 - R.degatsMin) * this.puissance) * (0.55 + 0.45 * precision));
+    // V19y : la précision compte plus (R.precisionBase) ; la RAGE dépasse 999 ; CULOT devant le pisseur = bonus
+    const score = Math.round(999 * (R.degatsMin + (1 - R.degatsMin) * this.puissance) * (R.precisionBase + (1 - R.precisionBase) * precision) * (qui === 'toi' && this.culot ? R.culot : 1));
+    if (qui === 'toi') this.culot = false;
     this.etat = 'coup'; this.tCoup = 0; this.charge = false; this.consigne.setVisible(false);
     this.coups[qui]++;
     this.coupEnCours = { qui, score: 0, parfait: qui === 'toi' && precision === 1 && this.puissance > 0.9 };
     if (qui === 'toi' && precision === 1 && this.puissance > 0.9) { this.parfaits++; bulle(this, 'COUP PARFAIT !', '#ffd84a', 1, 150); jouerSon(this, 'remi_foule'); }
-    else if (qui === 'toi' && precision === 1) bulle(this, 'PILE DESSUS !', '#7fff7f', 0.8, 150);
+    else if (qui === 'toi' && precision === 1) { annonce(this, 'PILE DESSUS !', '#7fff7f', 0.6); jouerSon(this, 'remi_foule', { volume: 0.5 }); this.cameras.main.flash(120, 255, 255, 255); }
     this.pose[qui] = 'coup';
     // (V17 : attrapé avant que le poing touche → pas d'impact du tout)
     this.time.delayedCall(90, () => { if (this.etat !== 'coup') return; this.pose[qui] = 'frappe'; this.impact(qui, score); });
@@ -541,7 +578,10 @@ export class RemiPorte extends BossScene {
     const cible = v.etat === 'regarde' ? VIDEUR.x : -260;
     v.x += (cible - v.x) * Math.min(1, dt * 10);
     // seul l'intrus du moment est montré
-    this.sprVideur.setPosition(v.qui === 'videur' || !v.qui ? v.x : -400, HAUTEUR + 10).setFrame(v.pose);
+    // V19y : sifflé ou méfiant, il fait le geste « je te surveille » (V vers ses yeux) au lieu de son air distrait
+    const mef = v.pose === 0 && (v.siffle || (this.mefiant && this.frappeur === 'toi')) && this.textures.exists('remi_videur_mefiant');
+    if (mef) this.sprVideur.setTexture('remi_videur_mefiant', 0); else this.sprVideur.setTexture('remi_videur', v.pose);
+    this.sprVideur.setPosition(v.qui === 'videur' || !v.qui ? v.x : -400, HAUTEUR + 10);
     if (this.textures.exists('remi_pisseur')) this.sprPisseur.setPosition(v.qui === 'pisseur' ? v.x : -400, HAUTEUR + 10).setFrame(v.pose);
     else this.sprPisseur.setPosition(v.qui === 'pisseur' ? v.x + 30 : -400, HAUTEUR + 60).setFrame(v.pose ? 1 : 0).setFlipX(true).setRotation(Math.sin(this.horloge * 3) * 0.06);
   }
@@ -550,9 +590,16 @@ export class RemiPorte extends BossScene {
     const j = this.gJauges.clear();
     if (this.etat === 'intro') return;
     // le bouton « L'AIR DE RIEN » (ton tour seulement ; il s'allume quand tu charges)
-    const rien = this.frappeur === 'toi' && this.etat !== 'fin' && this.etat !== 'pause';
+    const rien = (this.frappeur === 'toi' || this.etat === 'remi') && this.etat !== 'fin' && this.etat !== 'pause';
     this.txtRien.setVisible(rien);
-    if (rien) {
+    if (rien && this.frappeur === 'remi') {   // pendant le tour de Rémi : SIFFLE ! (1 fois)
+      const b = BOUTON_RIEN, dispo = !this.siffleUtilise && this.videur.etat === 'absent';
+      j.fillStyle(0x000000, 0.5).fillCircle(b.x, b.y, b.r);
+      j.fillStyle(0xffd84a, dispo ? 0.35 + 0.15 * Math.sin(this.horloge * 6) : 0.08).fillCircle(b.x, b.y, b.r - 6);
+      j.lineStyle(4, 0xffd84a, dispo ? 1 : 0.3).strokeCircle(b.x, b.y, b.r);
+      this.txtRien.setText('SIFFLE\nLE VIDEUR').setAlpha(dispo ? 1 : 0.4);
+    } else if (rien) {
+      this.txtRien.setText('L\'AIR\nDE RIEN');
       const b = BOUTON_RIEN, actif = this.charge, cache = this.poingCache;
       j.fillStyle(0x000000, 0.5).fillCircle(b.x, b.y, b.r);
       j.fillStyle(cache ? 0x9fe0ff : 0x7fc4ff, actif ? 0.45 + 0.2 * Math.sin(this.horloge * 8) : cache ? 0.35 : 0.12).fillCircle(b.x, b.y, b.r - 6);
@@ -577,6 +624,10 @@ export class RemiPorte extends BossScene {
       const xj = LARGEUR - 46;
       j.fillStyle(0x000000, 0.65).fillRect(xj - 6, 136, 40, 288);
       for (let k = 0; k < 10; k++) j.fillStyle(COUL[k], this.puissance * 10 > k ? 1 : 0.18).fillRect(xj - 1, 416 - (k + 1) * 27.6 + 3, 30, 22);
+      // V19y : la RAGE (au-delà de 100 %) : 3 paliers rouges qui clignotent au-dessus
+      const nRage = Math.round((R.rageMax - 1) * 10);
+      j.fillStyle(0x000000, 0.65).fillRect(xj - 6, 136 - nRage * 27.6, 40, nRage * 27.6);
+      for (let k = 0; k < nRage; k++) j.fillStyle(0xff1030, this.puissance * 10 > 10 + k ? 0.6 + 0.4 * Math.sin(this.horloge * 20) : 0.12).fillRect(xj - 1, 136 - (k + 1) * 27.6 + 3, 30, 22);
     }
     // V18 : quelqu'un arrive = BORDS DE L'ÉCRAN ROUGES dès le premier pas (on le voit même sans le son)
     const va = this.videur.etat;

@@ -161,6 +161,10 @@ Même videur que l'image jointe (même style dessin, mêmes vêtements, même ca
 
 ---
 
+## FAIT (V19x / V19y)
+P1 à P8 et B1 à B6 faits. Restent : B7 (passe à ton attaque), et les propositions C (puissance) et E (amorti) de
+l'habitué, déconseillées ici.
+
 ## 3. TOP 5 GLOBAL (à faire dans cet ordre)
 1. **Porte P1** : le coup qui casse la porte compte en entier. 1 ligne, et le joueur arrête de perdre injustement.
 2. **Babyfoot B1 + B4** : Rémi plus dangereux (zone d'arrêt plus petite, sans aide dès PRESSION) et règle des

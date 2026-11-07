@@ -359,6 +359,35 @@ def figurines_baby():
     bande([case(0, 0), case(1, 0)], 'remi_baby_toi.png')
     bande([case(0, 1), case(1, 1), case(2, 1), case(3, 1, tout=True)], 'remi_baby_rouges.png')
 
+def videur_mefiant():
+    # V19y : planche du videur (2 poses) : 0 MÉFIANT (V index + majeur vers ses yeux, contre un mur à gauche : le mur gris
+    # est effacé), 1 il POINTE le joueur (« toi ! »). -> remi_videur_mefiant.png, cases égales posées en bas, centrées
+    im = np.asarray(Image.open(SRC + 'remi_videur_mefiant.jpg').convert('RGB')).astype(int).copy()
+    r, g, b = im[:, :, 0], im[:, :, 1], im[:, :, 2]
+    # le mur (gris, ses fissures gris foncé) : tout ce qui est gris à gauche de x 250 ; la peau (chaude) et le tee-shirt
+    # (noir profond) restent. Puis on ne garde que le grand morceau (le videur).
+    gris = (np.abs(r - g) < 16) & (np.abs(g - b) < 16) & (im.max(axis=2) > 52)
+    mur = gris.copy(); mur[:, 250:] = False
+    im[mur] = 255
+    im[:, :30] = 255   # le bord du mur, collé au cadre
+    im[650:, :90] = 255   # un reste de mur en bas à gauche (sous le coude)
+    src = Image.fromarray(im.astype(np.uint8))
+    poses = []
+    for x0, x1 in ((0, 704), (704, 1408)):
+        p = detourer(src.crop((x0, 0, x1, src.size[1])), grand=1500)
+        a = np.asarray(p).copy(); al = a[:, :, 3] > 40
+        if x0 == 0:   # le trait noir du coin du mur (fin) : effacé par une ouverture, seulement à gauche de x 260
+            ouvert = ndimage.binary_opening(al, structure=np.ones((5, 5)))
+            al[:, :260] = ouvert[:, :260]
+        lab, n = ndimage.label(al)
+        t = ndimage.sum(np.ones_like(lab), lab, range(1, n + 1))
+        a[:, :, 3] = np.where(lab == int(np.argmax(t)) + 1, a[:, :, 3], 0)
+        q = Image.fromarray(a, 'RGBA'); poses.append(q.crop(q.getbbox()))
+    W = max(x.size[0] for x in poses); H = max(x.size[1] for x in poses)
+    bande = Image.new('RGBA', (W * 2, H), (0, 0, 0, 0))
+    for k, x in enumerate(poses): bande.paste(x, (k * W + (W - x.size[0]) // 2, H - x.size[1]), x)
+    bande.save(DST + 'remi_videur_mefiant.png'); print('remi_videur_mefiant.png', W, H, [x.size for x in poses])
+
 planche_velo()
 presentation()
 planche_porte()
@@ -374,3 +403,4 @@ planches_velo_v15()
 decor_porte()
 planche_baby()
 figurines_baby()
+videur_mefiant()

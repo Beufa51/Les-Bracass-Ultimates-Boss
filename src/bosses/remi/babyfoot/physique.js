@@ -25,7 +25,7 @@ export const Physique = {
       // ta barre : la balle passe-t-elle sur ton gardien ?
       const zg = BARRES.toi.z;
       if (zAvant > zg && b.z <= zg) {
-        if (Math.abs(xA(zg) - this.pos.toi) < B.priseToi) { this.arret(); return; }   // (V19h : ton gardien, plus large)
+        if (Math.abs(xA(zg) - this.pos.toi) < (this.diff.babyPriseToi ?? B.priseToi)) { this.arret(); return; }   // (V19h : ton gardien, plus large)
       }
       if (b.z <= 0) {
         if (Math.abs(b.x) < B.but / 2) this.butRemi(Math.abs(b.x) > B.but / 2 * B.gamelleBord && Math.random() < B.gamelle);
@@ -36,7 +36,7 @@ export const Physique = {
       // et son gardien peuvent arrêter ta riposte
       for (const nom of ['def', 'gar']) {
         const br = BARRES[nom];
-        if (zAvant < br.z && b.z >= br.z && hommes(br, this.pos[nom]).some(x => Math.abs(xA(br.z) - x) < B.prise * (nom === 'gar' ? B.priseGardienRemi : B.priseDefense))) {
+        if (!this.balleSure && zAvant < br.z && b.z >= br.z && hommes(br, this.pos[nom]).some(x => Math.abs(xA(br.z) - x) < B.prise * (nom === 'gar' ? B.priseGardienRemi : B.priseDefense))) {
           this.contre(nom); return;
         }
       }

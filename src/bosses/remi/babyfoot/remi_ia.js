@@ -53,7 +53,10 @@ export const RemiIA = {
     const faux = T.type === 'piege' ? (a < 0.3 || (a > 0.52 && a < 0.74)) : T.feinte && a < B.feinteBascule;
     this.penche = Phaser.Math.Linear(this.penche, (faux ? -cote : cote) * Math.min(1, a * 1.6), Math.min(1, dt * 8));
     if (a > 0.82) this.arme = (a - 0.82) / 0.18; else this.arme = 0;   // la barre s'arme (le joueur se lève)
-    if (T.roulette && a > 0.7 && !this.roulette) { this.roulette = { t: this.horloge }; jouerSon(this, 'remi_baby_roulette'); }
+    if (T.roulette && a > 0.7 && !this.roulette) {
+      this.roulette = { t: this.horloge }; jouerSon(this, 'remi_baby_roulette');
+      if (!this.vuRoulette) { this.vuRoulette = true; bulle(this, 'ROULETTE = interdit ! S\'il marque comme ça, appuie sur ROULETTE pour annuler.', '#ff9a9a', 2.2, 360); }
+    }
     if (a >= 1) this.tirer();
   },
 
