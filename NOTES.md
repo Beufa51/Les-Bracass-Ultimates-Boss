@@ -366,6 +366,10 @@
 - V19s (« les buts rentrent un peu facilement ») : attaque plus dure : `babyDefense` 0,16 / 0,24 / 0,33 / 0,38,
   `babyGardienRemi` 0,231 / 0,289 / 0,347 / 0,29, `retardRemi` 5 → 6. (CUL SEC à 0,41 / 0,312 : le bot qui tourne sa
   visée ne trouvait plus JAMAIS de vert → repris plus bas.) Bot : 8/8 ; attente avant le vert ~3,5 s en PRESSION / CUL SEC.
+- V19t (retour : TIR mal placé sur mobile ; choix de Fabien) : ◀ ▶ CÔTE À CÔTE sous le pouce GAUCHE (`BOUTON_G` x 80,
+  `BOUTON_D` x 226), GROS TIR sous le pouce DROIT (`BOUTON_TIR` x 856, r 80 ; toujours visible, allumé quand tu as la
+  balle ; le tir part DÈS L'APPUI : `dansTir()`). Zones : `ZONE_BOUTONS` { y 300, g 153, d 320, tir LARGEUR - 270 }.
+  Toucher le milieu de l'écran tire toujours. Bot : 0 problème.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

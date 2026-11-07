@@ -25,7 +25,7 @@ import { Commandes } from './babyfoot/commandes.js';
 import { RemiIA } from './babyfoot/remi_ia.js';
 import { Physique } from './babyfoot/physique.js';
 import { Effets } from './babyfoot/effets.js';
-import { CX, L, W, R, proj, xSur, profondeur, hommes, BARRES, BOUTON_ROULETTE, VIDES } from './babyfoot/outils.js';
+import { CX, L, W, R, proj, xSur, profondeur, hommes, BARRES, BOUTON_ROULETTE, BOUTON_TIR, VIDES } from './babyfoot/outils.js';
 import { bulle, annonce, jeuSuivant, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile, bilanDe, noterJeu } from './commun.js';
 
 export class RemiBaby extends BossScene {
@@ -54,7 +54,7 @@ export class RemiBaby extends BossScene {
         .setDepth(profondeur(BARRES[nom].z) + (toi ? 0.02 : 0.01)).setAlpha(toi ? B.transparenceGardien : 1));
     }
     this.txtRoulette = texte(this, BOUTON_ROULETTE.x, BOUTON_ROULETTE.y, 'ROULETTE !', 17, '#ffffff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 5 }).setDepth(901).setVisible(false);
-    this.txtTir = texte(this, LARGEUR / 2, 462, 'TIR', 24, '#ffffff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 }).setDepth(901).setVisible(false);
+    this.txtTir = texte(this, BOUTON_TIR.x, BOUTON_TIR.y, 'TIR', 30, '#ffffff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 }).setDepth(901).setVisible(false);
     this.txtVise = texte(this, LARGEUR / 2, 524, '', 22, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 10, y: 3 } }).setDepth(901).setVisible(false);
     this.hud = texte(this, LARGEUR / 2, 22, '', 26, '#ffffff', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 3 } }).setDepth(900);
     this.touches = creerTouches(this);
@@ -70,9 +70,9 @@ export class RemiBaby extends BossScene {
     const t = estTactile();
     this.afficherIntro('RÉMI - Le babyfoot', [
       `Premier à ${B.buts} buts. Tu tiens le GARDIEN (vu de dos), Rémi attaque.`,
-      `${t ? 'GROS BOUTONS ◀ ▶ en bas (maintiens)' : '◀ ▶'} : ton gardien glisse à gauche / à droite`,
+      `${t ? 'Pouce GAUCHE : ◀ ▶ (maintiens)' : '◀ ▶'} : ton gardien glisse à gauche / à droite`,
       'Rémi se PENCHE du côté où il va tirer... sauf quand il feinte !',
-      `Balle arrêtée : ◀ ▶ TOURNENT ta visée (rebonds sur les bandes comme au billard) ; ligne VERTE = TIR (${t ? 'toucher le milieu de l\'écran' : 'ESPACE'}) entre ses joueurs (en biais : garde ◀ ou ▶)`,
+      `Balle arrêtée : ◀ ▶ TOURNENT ta visée (rebonds sur les bandes comme au billard) ; ligne VERTE = ${t ? 'gros bouton TIR sous le pouce DROIT' : 'ESPACE'}`,
       'GAMELLE (rentre et ressort) = but + un point retiré à l\'autre',
       `ROULETTE interdite : si sa barre tourbillonne et marque, ${t ? 'touche RÉMI' : 'appuie sur Z'} = but annulé`,
       'Chaque but encaissé, tu bois : ta visée titube, tu vois moins loin, hoquets...',

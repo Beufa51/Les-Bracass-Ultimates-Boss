@@ -18,6 +18,7 @@ export const Commandes = {
       // V19p : le bouton « ROULETTE ! » (seulement pendant le temps où l'on peut crier)
       if (this.horloge < this.appelPossible && Math.hypot(p.x - BOUTON_ROULETTE.x, p.y - BOUTON_ROULETTE.y) < BOUTON_ROULETTE.r + 20) { this.appelRoulette(); return; }
       if (this.dansBouton(p)) return;   // les boutons sont lus à chaque image (pasGardien)
+      if (this.dansTir(p)) { if (this.etat === 'riposte') this.riposter(this.viseeVraie()); return; }   // TIR : part dès l'appui
       if (this.etat !== 'intro' && p.y < proj(0, 0, L).y - 20) { this.appelRoulette(); return; }   // toucher Rémi = « ROULETTE ! »
       this.doigt = { x: p.x, y: p.y, t: this.horloge, id: p.id };
     });
@@ -44,7 +45,8 @@ export const Commandes = {
   // sous les pouces : on MAINTIENT, le gardien glisse (il accélère un peu si on garde appuyé). Plusieurs doigts à la fois.
   // Le reste de l'écran : toucher bref = TIR droit (ou en biais du côté du bouton tenu), glisser vers le haut = tir en biais ;
   // toucher Rémi = « ROULETTE ! ».
-  dansBouton(p) { return p.y > ZONE_BOUTONS.y && (p.x < ZONE_BOUTONS.g ? -1 : p.x > ZONE_BOUTONS.d ? 1 : 0); },
+  dansBouton(p) { return p.y > ZONE_BOUTONS.y && (p.x < ZONE_BOUTONS.g ? -1 : p.x < ZONE_BOUTONS.d ? 1 : 0); },
+  dansTir(p) { return p.y > ZONE_BOUTONS.y && p.x > ZONE_BOUTONS.tir; },
 
 
   // direction tenue : boutons à l'écran (tous les doigts posés) ou flèches du clavier

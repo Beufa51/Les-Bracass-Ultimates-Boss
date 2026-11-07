@@ -10,10 +10,12 @@ export function proj(x, y, z) {
   return { x: CX + x * p, y: HORIZON + (CAM_H - y) * p, k: p };
 }
 // les 2 gros boutons (dessinés) et leurs zones de toucher, bien plus grandes (tout le bas de l'écran, sur les côtés)
-export const BOUTON_G = { x: 92, y: 446, r: 72 }, BOUTON_D = { x: LARGEUR - 92, y: 446, r: 72 };
+// V19t (choix de Fabien) : ◀ ▶ CÔTE À CÔTE sous le pouce GAUCHE, gros TIR sous le pouce DROIT (viser et tirer sans bouger les mains)
+export const BOUTON_G = { x: 80, y: 452, r: 64 }, BOUTON_D = { x: 226, y: 452, r: 64 };
 export const BOUTON_ROULETTE = { x: LARGEUR / 2 + 250, y: 225, r: 62 };   // à droite : pas sous l'annonce « BUT DE RÉMI »
-export const BOUTON_TIR = { x: LARGEUR / 2, y: 462, r: 46 };
-export const ZONE_BOUTONS = { y: 300, g: 250, d: LARGEUR - 250 };
+export const BOUTON_TIR = { x: LARGEUR - 104, y: 440, r: 80 };
+// zones de toucher (plus grandes que les dessins) : sous y, ◀ à gauche de g, ▶ de g à d, TIR à droite de tir
+export const ZONE_BOUTONS = { y: 300, g: 153, d: 320, tir: LARGEUR - 270 };
 export const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 // les barres : z (m depuis ton but), nombre de joueurs, écart, débattement, à qui
 export const BARRES = {

@@ -136,9 +136,11 @@ export const Dessin = {
         : [`${pourquoi} : attends qu'un trou s'ouvre`, '#ff7a7a'];
       this.txtVise.setText(m).setColor(c).setVisible(true);
     } else this.txtVise.setVisible(false);
-    // le bouton TIR (au milieu, loin des flèches) ; l'anneau jaune qui se vide = le bonus ÉCLAIR
+    // le bouton TIR (sous le pouce droit, toujours là ; allumé seulement quand tu as la balle) ;
+    // l'anneau jaune qui se vide = le bonus ÉCLAIR
     const tir = this.etat === 'riposte';
-    this.txtTir.setVisible(tir);
+    this.txtTir.setVisible(this.etat !== 'intro').setAlpha(tir ? 1 : 0.35).setText('TIR');
+    if (!tir && this.etat !== 'intro') { const bt = BOUTON_TIR; ga.fillStyle(0x000000, 0.25).fillCircle(bt.x, bt.y, bt.r); ga.lineStyle(3, 0xffffff, 0.3).strokeCircle(bt.x, bt.y, bt.r); }
     if (tir) {
       const f = Math.max(0, this.fenetre / this.diff.babyFenetre), bt = BOUTON_TIR;
       ga.fillStyle(0x000000, 0.45).fillCircle(bt.x, bt.y, bt.r);
