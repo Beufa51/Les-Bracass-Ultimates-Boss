@@ -315,6 +315,40 @@ def decor_porte():
     im.save(DST + 'remi_porte_decor.jpg', quality=88)
     print('remi_porte_decor.jpg', im.size)
 
+def planche_baby():
+    # V19 BABYFOOT : planche de 7 cases encadrées de noir (étiquettes en haut à gauche, bout de table en bois en bas, retirés)
+    # -> remi_baby.png, 7 cases égales ALIGNÉES SUR LE HAUT DE LA CASQUETTE (le bas est caché par la table du jeu) :
+    # 0 attend, 1 penché vers SA droite (à gauche de l'écran), 2 penché vers SA gauche, 3 roulette, 4 marque, 5 boit, 6 râle
+    im = Image.open(SRC + 'remi_babyfoot_planche.jpg').convert('RGB')
+    cases = [(4, 4, 406, 586), (426, 4, 829, 281), (426, 327, 829, 601), (4, 648, 406, 921),
+             (426, 648, 829, 925), (4, 967, 406, 1240), (426, 967, 829, 1240)]
+    poses = []
+    for k, c in enumerate(cases):
+        p = detourer(im.crop(c), grand=1500)
+        a = np.asarray(p).copy()
+        al = a[:, :, 3] > 40
+        lab, n = ndimage.label(ndimage.binary_dilation(al, iterations=2))
+        tailles = ndimage.sum(np.ones_like(lab), lab, range(1, n + 1))
+        gros = int(np.argmax(tailles)) + 1
+        garde = [gros]
+        for i, b in enumerate(ndimage.find_objects(lab)):
+            if i + 1 == gros or tailles[i] < 400: continue
+            if b[0].stop < 62 and b[1].stop < 260: continue          # l'étiquette (texte en haut à gauche, 2 lignes)
+            if k == 6 and b[1].start > 230: continue                 # la bulle « Mais elle était dedans ! »
+            garde.append(i + 1)                                       # traits de vitesse de la roulette...
+        a[:, :, 3] = np.where(np.isin(lab, garde), a[:, :, 3], 0)
+        q = Image.fromarray(a, 'RGBA'); q = q.crop(q.getbbox())
+        if k == 0: q = q.resize((round(q.size[0] * 0.82), round(q.size[1] * 0.82)), Image.LANCZOS)   # dessiné plus grand
+        poses.append(q)
+    W = max(p.size[0] for p in poses); H = max(p.size[1] for p in poses)
+    bande = Image.new('RGBA', (W * len(poses), H), (0, 0, 0, 0))
+    for k, p in enumerate(poses): bande.paste(p, (k * W + (W - p.size[0]) // 2, 0), p)
+    bande.save(DST + 'remi_baby.png')
+    print('remi_baby.png', W, H, [p.size for p in poses])
+    fond = Image.open(SRC + 'remi_bar_babyfoot.jpg').convert('RGB')
+    fond = fond.resize((960, round(fond.size[1] * 960 / fond.size[0])), Image.LANCZOS); fond.save(DST + 'remi_bar_babyfoot.jpg', quality=88)
+    print('remi_bar_babyfoot.jpg', fond.size)
+
 planche_velo()
 presentation()
 planche_pong()
@@ -329,3 +363,4 @@ petites_images()
 videur()
 planches_velo_v15()
 decor_porte()
+planche_baby()

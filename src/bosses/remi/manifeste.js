@@ -30,6 +30,10 @@ export const MANIFESTE = {
     remi_tremplin: { fichier: 'sprites/remi/remi_tremplin.png', largeur: 1114, hauteur: 459, images: 1, vitesse: 1 },
     remi_voitures: { fichier: 'sprites/remi/remi_voitures.png', largeur: 434, hauteur: 213, images: 3, vitesse: 1 },  // citadine, berline, camionnette
     remi_accueil: { fichier: 'sprites/remi/remi_accueil.png', largeur: 501, hauteur: 1207, images: 1, vitesse: 1 },  // Rémi qui t'attend au bar
+    // V19 babyfoot : Rémi de face derrière la table (attend, penché à gauche de l'écran, à droite, roulette, marque, boit, râle),
+    // cases alignées en haut (casquette) ; et le bar avec le néon BABYFOOT
+    remi_baby: { fichier: 'sprites/remi/remi_baby.png', largeur: 403, hauteur: 436, images: 7, vitesse: 1 },
+    remi_bar_babyfoot: { fichier: 'sprites/remi/remi_bar_babyfoot.jpg', largeur: 960, hauteur: 536, images: 1, vitesse: 1 },
     remi_bar_interieur: { fichier: 'sprites/remi/remi_bar_interieur.jpg', largeur: 960, hauteur: 536, images: 1, vitesse: 1 },
     // le videur de la porte : distrait, furieux (coupé à la taille)
     remi_videur: { fichier: 'sprites/remi/remi_videur.png', largeur: 672, hauteur: 743, images: 2, vitesse: 1 },

@@ -257,6 +257,11 @@
   pong »), hors de la soirée. Croisements calculés au point exact (sinon un tir en biais traversait le gardien).
   Bot de test (headless) : gagne en PANACHÉ, perd en PRESSION / CUL SEC. Images : prompts 24 et 25. À FAIRE : faire jouer
   Fabien, puis décider (garder / régler / supprimer RemiPong.js et ses images).
+- V19b (retour : « les joueurs de Rémi sont trop près, pas le temps d'anticiper ») : son attaque recule (z 0,30 → 0,52 :
+  ~0,43 s de trajet en PRESSION au lieu de 0,18). IMAGES REÇUES ET INTÉGRÉES (`planche_baby()` dans preparer_images.py) :
+  `remi_baby.png` (7 cases alignées sur la casquette, bas caché par la table : attend, penché à gauche de l'écran, à
+  droite, roulette, marque, boit, râle ; échelle 0,42, haut à yBord - 130) et le fond `remi_bar_babyfoot.jpg` (néon
+  BABYFOOT, affiche gamelle / roulette). Rémi RÂLE quand tu arrêtes (1 fois sur 2) ou quand sa roulette est dénoncée.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

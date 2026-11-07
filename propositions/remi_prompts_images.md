@@ -185,7 +185,7 @@ de la porte, de haut en bas). Ligne du haut : le personnage barbu à casquette ;
 3 : le poing ÉCRASÉ contre la porte, le bois qui se fend autour, éclats qui volent, traits d'impact.
 ```
 
-## 24. Le babyfoot : Rémi en face, derrière la table — `remi_babyfoot_planche.jpg` (À FAIRE, remplace le beer pong)
+## 24. Le babyfoot : Rémi en face, derrière la table — `remi_babyfoot_planche.jpg` ✅ REÇUE ET INTÉGRÉE (7 cases : pas de case « le coup part »)
 À joindre : **`remi_presentation.jpg`** (pour garder le même Rémi).
 ```
 Dessine le personnage de l'image jointe (même visage, barbe, casquette, veste), style manga/anime coloré, contours noirs nets,
@@ -198,7 +198,7 @@ Ligne 2 : 5 ROULETTE : il fait tourner la poignée à toute vitesse, traits de v
 écartés, « mais elle était dedans ! ».
 ```
 
-## 25. Le bar avec un néon BABYFOOT (fond, derrière Rémi) — `remi_bar_babyfoot.jpg` (facultatif)
+## 25. Le bar avec un néon BABYFOOT (fond, derrière Rémi) — `remi_bar_babyfoot.jpg` ✅ REÇUE ET INTÉGRÉE
 À joindre : **`remi_bar_interieur.jpg`** (l'actuel).
 ```
 Reprends exactement l'image jointe (même bar, même style, même cadrage), mais remplace le néon « BEER PONG » par un néon

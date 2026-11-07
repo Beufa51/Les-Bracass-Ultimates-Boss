@@ -33,7 +33,7 @@ const VIDES = { haut: null, bas: null, gauche: null, droite: null, espace: null,
 // les barres : z (m depuis ton but), nombre de joueurs, écart, débattement, à qui
 const BARRES = {
   toi: { z: 0.07, n: 1, ecart: 0, course: B.course, moi: true },
-  att: { z: 0.30, n: 3, ecart: 0.2, course: 0.1 },
+  att: { z: 0.52, n: 3, ecart: 0.2, course: 0.1 },   // (V19b : 0,30 → 0,52 : le tir part de plus loin, le temps de lire)
   def: { z: 0.78, n: 2, ecart: 0.25, course: 0.15 },
   gar: { z: 0.93, n: 1, ecart: 0, course: 0.17 },
 };
@@ -84,8 +84,9 @@ export class RemiBaby extends BossScene {
     this.cameras.main.setBackgroundColor('#1a0f12');
     const g = this.add.graphics().setDepth(1);
     g.fillGradientStyle(0x2a1418, 0x2a1418, 0x120a0c, 0x120a0c, 1).fillRect(0, 0, LARGEUR, HAUTEUR);
-    if (this.textures.exists('remi_bar_interieur')) {
-      const im = this.add.image(LARGEUR / 2, 0, 'remi_bar_interieur').setOrigin(0.5, 0).setDepth(1.5);
+    const fondBar = ['remi_bar_babyfoot', 'remi_bar_interieur'].find(c => this.textures.exists(c));
+    if (fondBar) {
+      const im = this.add.image(LARGEUR / 2, 0, fondBar).setOrigin(0.5, 0).setDepth(1.5);
       im.setScale(Math.max(LARGEUR / im.width, 300 / im.height));
     } else {
       const neon = texte(this, 150, 34, 'BABYFOOT', 26, '#4fe8ff', { fontStyle: 'bold', stroke: '#06404a', strokeThickness: 5 }).setDepth(2).setAngle(-6);
@@ -233,7 +234,7 @@ export class RemiBaby extends BossScene {
     annonce(this, 'ARRÊT !', '#7fff7f', 0.5);
     this.balle.vx = 0; this.balle.vz = 0;
     this.etat = 'riposte'; this.fenetre = this.diff.babyFenetre; this.memoire = this.balle.x;
-    if (Math.random() < 0.5) bulle(this, `Rémi : « ${choisir(REPLIQUES.babyArret)} »`, '#ffd84a', 1.4, 515);
+    if (Math.random() < 0.5) { this.poseTemp('rale', 1.2); bulle(this, `Rémi : « ${choisir(REPLIQUES.babyArret)} »`, '#ffd84a', 1.4, 515); }
     etiquettesTactiles({ ...VIDES, espace: 'TIR' });
   }
 
@@ -299,6 +300,7 @@ export class RemiBaby extends BossScene {
       if (this.dernierBut.gamelle) this.butsToi++;
       this.ivresse = Math.max(0, this.ivresse - 1);
       annonce(this, 'ROULETTE ! BUT ANNULÉ', '#7fff7f', 1.0);
+      this.poseTemp('rale', 1.6);
       bulle(this, `Rémi : « ${choisir(REPLIQUES.babyRouletteVue)} »`, '#ffd84a', 1.6, 515);
       return;
     }
@@ -404,7 +406,13 @@ export class RemiBaby extends BossScene {
     const yBord = proj(0, 0, L + 0.06).y;
     const bal = Math.sin(this.horloge * 1.5) * (2 + this.remiBu * 2);
     const px = CX + bal + this.penche * 75, rot = this.penche * 0.32 + bal * 0.004;   // il se penche franchement : c'est ÇA qu'on lit
-    if (this.textures.exists('remi_pong')) {
+    if (this.textures.exists('remi_baby')) {
+      // la planche du babyfoot : cases alignées sur la casquette, le bas est caché par la table
+      if (!this.imgRemi || !this.imgRemi.scene) this.imgRemi = this.add.sprite(CX, 0, 'remi_baby', 0).setOrigin(0.5, 0).setDepth(3).setScale(0.42);
+      let f = { nargue: 4, boit: 5, rale: 6 }[this.pose];
+      if (f === undefined) f = this.roulette ? 3 : this.penche < -0.3 ? 1 : this.penche > 0.3 ? 2 : 0;
+      this.imgRemi.setFrame(f).setPosition(CX + bal + this.penche * 35, yBord - 130).setRotation(bal * 0.003);
+    } else if (this.textures.exists('remi_pong')) {
       if (!this.imgRemi || !this.imgRemi.scene) this.imgRemi = this.add.sprite(CX, 0, 'remi_pong', 0).setOrigin(0.5, 1).setDepth(3).setScale(0.3);
       this.imgRemi.setFrame({ face: 0, lance: 1, boit: 2, nargue: 3 }[this.pose] ?? 0);
       this.imgRemi.setPosition(px, yBord + 30).setRotation(rot);
