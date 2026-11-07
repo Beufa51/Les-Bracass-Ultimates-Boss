@@ -119,7 +119,7 @@ export const Dessin = {
       for (const h of hommes(br, this.pos.def)) {
         const a = proj(h - demi, 0, br.z), b = proj(h + demi, 0, br.z), m = (a.x + b.x) / 2;
         g.fillStyle(0xff3b3b, 0.35).fillEllipse(m, a.y, b.x - a.x, 0.035 * a.k);
-        if (Math.abs(va) > 0.01) {
+        if (B.flechesDefense && Math.abs(va) > 0.01) {
           const bout = proj(h + va, 0, br.z).x, s = Math.sign(va);
           g.lineStyle(3, 0xff6b6b, 0.9).lineBetween(m, a.y, bout, a.y);
           g.fillStyle(0xff6b6b, 0.9).fillTriangle(bout + s * 8, a.y, bout - s * 2, a.y - 6, bout - s * 2, a.y + 6);
@@ -156,7 +156,7 @@ export const Dessin = {
         : this.indice === -1 ? [`${pourquoi} : ◀ TOURNE LA VISÉE`, '#ffd84a'] : this.indice === 1 ? [`${pourquoi} : TOURNE LA VISÉE ▶`, '#ffd84a']
         : this.indice === undefined ? [`${pourquoi} : tourne ta visée ◀ ▶`, '#ff7a7a']
         : [`${pourquoi} : attends qu'un trou s'ouvre`, '#ff7a7a'];
-      this.txtVise.setText(m).setColor(c).setVisible(true);
+      this.txtVise.setText(m).setColor(c).setVisible(!!this.diff.babyGuide || vert);   // (V19z SIMPLE : en PRESSION / CUL SEC, message seulement quand c'est VERT)
     } else this.txtVise.setVisible(false);
     // le bouton TIR (sous le pouce droit, toujours là ; allumé seulement quand tu as la balle) ;
     // l'anneau jaune qui se vide = le bonus ÉCLAIR

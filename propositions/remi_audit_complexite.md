@@ -65,3 +65,8 @@ tire vite = ÉCLAIR ; chaque but encaissé, tu bois (ta visée titube).
 1. Appliquer les RETIRER et SIMPLIFIER ci-dessus (porte : 14 → 5 règles ; baby : 16 → 4 choses à savoir).
 2. Les réglages restent dans le code (désactivés) pour pouvoir remettre une règle si elle manque.
 3. Puis une partie complète de Fabien pour juger.
+
+## 5. Appliqué en V19z (interrupteurs dans reglages.js) — mesures
+- Porte : ~20 s par partie au lieu de 45-58 s ; ~2 s d'attente par tour au lieu de 5-12 s ; mêmes résultats par difficulté.
+- Babyfoot PRESSION (bot humain) : 3-5 en ~2 min (les gamelles ne retirent plus de points : un peu plus dur pour toi).
+- Un bot ne mesure pas le plaisir : c'est la partie de Fabien qui tranche. Si une règle manque, son interrupteur la remet.

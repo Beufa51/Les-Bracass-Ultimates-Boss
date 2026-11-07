@@ -55,7 +55,7 @@ export const RemiIA = {
     if (a > 0.82) this.arme = (a - 0.82) / 0.18; else this.arme = 0;   // la barre s'arme (le joueur se lève)
     if (T.roulette && a > 0.7 && !this.roulette) {
       this.roulette = { t: this.horloge }; jouerSon(this, 'remi_baby_roulette');
-      if (!this.vuRoulette) { this.vuRoulette = true; bulle(this, 'ROULETTE = interdit ! S\'il marque comme ça, appuie sur ROULETTE pour annuler.', '#ff9a9a', 2.2, 360); }
+      if (B.roulettePunie && !this.vuRoulette) { this.vuRoulette = true; bulle(this, 'ROULETTE = interdit ! S\'il marque comme ça, appuie sur ROULETTE pour annuler.', '#ff9a9a', 2.2, 360); }
     }
     if (a >= 1) this.tirer();
   },

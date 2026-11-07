@@ -412,6 +412,16 @@
 - V19z : BUG PORTE corrigé (le toucher qui ferme les règles lançait un coup : au début de ton tour, on attend que le
   doigt / ESPACE soit levé, `attendreRelache`). Retour « trop complexe pour pas grand-chose » : AUDIT DE COMPLEXITÉ
   `propositions/remi_audit_complexite.md` (porte 14 règles → 5, babyfoot 16 → 4 ; en attente de validation de Fabien).
+- V19z SIMPLE (« teste comme ça ») : simplification APPLIQUÉE par INTERRUPTEURS (true = la règle revient).
+  PORTE (`PORTE` dans reglages.js) : `lacherCache` false (seul L'AIR DE RIEN cache ; lâcher FRAPPE), `sifflet` false,
+  `feintesToutes` false (seule la fausse alerte), `rageExpliquee` false, `remiVitesse` 2, `cacheGarde` 1, `scotch` 0 ;
+  pisseur retiré (poids 0 dans INTRUS) ; le videur prend la pose MÉFIANTE quand celui qui charge est en RAGE ; intro
+  3 lignes. BABYFOOT (`BABY`) : `regle10Active`, `roulettePunie`, `gamelleRetire`, `beauxCoups`, `hoquets`,
+  `flechesDefense` à false, `astuces` 1, `vueBue` 0, `vignetteBue` 0, `ivresseRond` 99 ; message de visée seulement
+  sur le VERT en PRESSION / CUL SEC ; intro 3 lignes. MESURES (bots « humains ») : PORTE ~20 s par partie (avant
+  45-58 s), attente avant de pouvoir frapper ~2 s par tour (avant 5-12 s), résultats inchangés (PANACHÉ / PRESSION
+  gagnés, CUL SEC perdu). BABYFOOT PRESSION : 3-5 perdu en ~2 min (sans les gamelles qui retiraient des points :
+  avant 5-2). Baby bot : 0 problème.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

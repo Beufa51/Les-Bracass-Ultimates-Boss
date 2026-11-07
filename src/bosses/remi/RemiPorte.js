@@ -40,9 +40,10 @@ const VIDEUR = { x: 120, echelle: 0.42 };   // l'intrus passe la tête au coin d
 // LES INTRUS (V13) : pas que le videur ! Chacun a ses pas, son ombre, son rythme et ses feintes préférées.
 //  lent : x durée de l'annonce ; regard : x durée du regard ; ombre : taille ; feinte : mode préféré (en plus des autres)
 const INTRUS = {
-  videur: { poids: 0.62, nom: 'Le videur', lent: 1, regard: 1, ombre: 1, pas: ['remi_atterrit', 0.6], rythme: [0.18, 0.4], feinte: null,
+  videur: { poids: 1, nom: 'Le videur', lent: 1, regard: 1, ombre: 1, pas: ['remi_atterrit', 0.6], rythme: [0.18, 0.4], feinte: null,
     repliques: 'porteAttrape' },
-  pisseur: { poids: 0.38, nom: 'Le gars qui vient pisser', lent: 1, regard: 1.3, ombre: 1, pas: ['remi_atterrit', 0.8], rythme: [0.2, 0.65], feinte: 'fausse',
+  pisseur: { poids: 0,   // V19z SIMPLE : plus de pisseur (il fallait deviner QUI vient) ; remettre 0,38 pour le revoir
+    nom: 'Le gars qui vient pisser', lent: 1, regard: 1.3, ombre: 1, pas: ['remi_atterrit', 0.8], rythme: [0.2, 0.65], feinte: 'fausse',
     repliques: 'porteAttrapePisseur' },
   // (V17 : la mamie est retirée à la demande de Fabien : plus que le videur, et le gars qui vient pisser pour les feintes)
 };
@@ -104,8 +105,8 @@ export class RemiPorte extends BossScene {
     this.afficherIntro('RÉMI - La porte et le videur', [
       REPLIQUES.porteIntro,
       `MAINTIENS ${t ? 'le doigt' : 'ESPACE'} pour armer ton poing, LÂCHE quand la cible est sur le + : celui qui fait le PLUS DE DÉGÂTS gagne.`,
-      `Quelqu'un arrive (pas, ombre, bords rouges) ? ${t ? 'L\'AIR DE RIEN (pouce gauche)' : 'Z'} ou lâche : tu caches ton poing. S'il te voit charger : ATTRAPÉ !`,
-      'Le reste (la RAGE, le sifflet, le gars qui vient pisser...) s\'explique quand ça arrive.',
+      `Quelqu'un arrive (pas, ombre, bords rouges) ? ${t ? 'L\'AIR DE RIEN (pouce gauche)' : 'Z'} : tu caches ton poing. S'il te voit charger : ATTRAPÉ !`,
+      'Plus tu tiens, plus c\'est FORT... et plus ça fait de BRUIT.',
     ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.tour('toi'); }));
   }
 
@@ -138,8 +139,8 @@ export class RemiPorte extends BossScene {
       // jusqu'où Rémi va charger cette fois (un peu au hasard autour de sa « gourmandise »)
       this.remiVise = Phaser.Math.Clamp(this.diff.remiCharge + hasard(-0.12, 0.12), 0.25, this.diff.remiRage ? R.rageMax : 1);   // (CUL SEC : il fait de la RAGE)
       this.siffleUtilise = false; this.mefiant = false;
-      if (!this.vuSiffle) { this.vuSiffle = true; this.time.delayedCall(1300, () => bulle(this, 'Psst : SIFFLE LE VIDEUR pendant que Rémi charge... (1 fois par tour)', '#9fe0ff', 2.4, 330)); }
-      this.remiAttend = hasard(0.4, 0.9);   // il se met en place
+      if (R.sifflet && !this.vuSiffle) { this.vuSiffle = true; this.time.delayedCall(1300, () => bulle(this, 'Psst : SIFFLE LE VIDEUR pendant que Rémi charge... (1 fois par tour)', '#9fe0ff', 2.4, 330)); }
+      this.remiAttend = hasard(0.4, 0.9) / R.remiVitesse;   // il se met en place (V19z : Rémi joue plus vite : on attend moins)
       this.remiPrudence = undefined; this.remiReaction = undefined;
       bulle(this, `Rémi : « ${choisir(REPLIQUES.porteRemiFrappe)} »`, '#ffd84a', 1.2, 80);
     }
@@ -170,7 +171,7 @@ export class RemiPorte extends BossScene {
     const max = this.frappeur === 'toi' || this.diff.remiRage ? R.rageMax : 1;
     this.puissance = Math.min(max, this.puissance + (R.charge + Math.min(1, this.puissance) * R.accel) * (this.puissance >= 1 ? R.rageLente : 1) * dt);
     if (avant < 1 && this.puissance >= 1 && max > 1) {
-      if (this.frappeur === 'toi' && !this.vuRage) { this.vuRage = true; bulle(this, 'RAGE ! Encore plus fort... mais ça fait du BRUIT : on va t\'entendre !', '#ff6a3a', 2.2, 150); }
+      if (R.rageExpliquee && this.frappeur === 'toi' && !this.vuRage) { this.vuRage = true; bulle(this, 'RAGE ! Encore plus fort... mais ça fait du BRUIT : on va t\'entendre !', '#ff6a3a', 2.2, 150); }
       jouerSon(this, 'remi_porte', { rate: 0.5, volume: 0.4 });
     }
     if (this.puissance > 1) this.cameras.main.shake(40, 0.0012 * this.rage());
@@ -190,11 +191,11 @@ export class RemiPorte extends BossScene {
     if (this.rienDemande) { this.rienDemande = false; if (this.charge) { this.faireGenre('toi'); this.attendreRelache = true; } }
     if (this.attendreRelache) { if (!tenu) this.attendreRelache = false; }   // poing caché : lever le doigt ne frappe pas
     else if (tenu) { this.poingCache = false; this.charger(dt); }
-    else if (this.charge && danger) { this.faireGenre('toi'); }   // V18 : lâcher quand quelqu'un arrive = poing CACHÉ, charge gardée
+    else if (this.charge && danger && R.lacherCache) { this.faireGenre('toi'); }   // (V18 : lâcher = cacher ; V19z SIMPLE : non, seul L'AIR DE RIEN cache, lâcher FRAPPE toujours)
     else if (this.charge) { this.frapper('toi'); return; }
     const pc = Math.round(this.puissance * 100);
     this.consigne.setColor(this.charge && danger ? '#ff5a5a' : this.poingCache ? '#9fe0ff' : '#ffd84a');
-    this.consigne.setText(this.charge && danger ? 'QUELQU\'UN ARRIVE !  L\'AIR DE RIEN (ou lâche) = poing caché'
+    this.consigne.setText(this.charge && danger ? 'QUELQU\'UN ARRIVE !  L\'AIR DE RIEN !'
       : this.poingCache && danger ? `POING CACHÉ (${pc} % gardés)  -  attends qu'il reparte...`
       : this.poingCache ? `VOIE LIBRE !  ${maintiens} : tu repars de ${pc} %`
       : this.charge && this.puissance > 1 ? `RAGE ${pc} % !  ça fait du BRUIT...  LÂCHE sur le +`
@@ -213,7 +214,7 @@ export class RemiPorte extends BossScene {
       if (this.remiReaction <= 0) { this.remiPrudence = Math.random() < this.diff.remiPrudent; this.remiReaction = undefined; }
     }
     if (this.remiPrudence) { this.faireGenre('remi'); this.remiPrudence = undefined; return; }
-    this.charger(dt * 0.8);
+    this.charger(dt * 0.8 * R.remiVitesse);
     // il lâche quand la cible passe près de son poing, une fois assez chargé
     const d = Math.hypot(this.cible.x - IMPACT.x, this.cible.y - IMPACT.y);
     // V19y : en DIABOLO / PANACHÉ, il frappe dès sa gourmandise atteinte (sans attendre la cible) ; sinon il attend la cible
@@ -224,7 +225,7 @@ export class RemiPorte extends BossScene {
   // quand il regarde : RÉMI ATTRAPÉ. Mais il se MÉFIE de toi : à ton tour suivant, il s'annonce moins longtemps.
   siffler() {
     const v = this.videur;
-    if (this.frappeur !== 'remi' || this.etat !== 'remi' || this.siffleUtilise || v.etat !== 'absent') return;
+    if (!R.sifflet || this.frappeur !== 'remi' || this.etat !== 'remi' || this.siffleUtilise || v.etat !== 'absent') return;
     this.siffleUtilise = true; this.mefiant = true;
     v.siffle = true; v.t = 0; v.retourPrevu = false;
     jouerSon(this, 'remi_sonnette', { rate: 1.6, volume: 0.6 });
@@ -254,7 +255,7 @@ export class RemiPorte extends BossScene {
       if (!v.retourPrevu) { let r0 = Math.random(); v.qui = 'videur'; for (const [n, i] of Object.entries(INTRUS)) { r0 -= i.poids; if (r0 <= 0) { v.qui = n; break; } } }
       const I = INTRUS[v.qui];
       const f = this.diff.feintes, r = Math.random();
-      v.mode = v.retourPrevu ? 'retour' : I.feinte && Math.random() < f * 0.6 ? I.feinte : r < f * 0.45 ? 'fausse' : r < f * 0.8 ? 'surprise' : 'normal';
+      v.mode = v.retourPrevu ? 'retour' : I.feinte && Math.random() < f * 0.6 ? I.feinte : r < f * 0.45 ? 'fausse' : r < f * 0.8 && R.feintesToutes ? 'surprise' : 'normal';   // (V19z SIMPLE : seule la fausse alerte)
       v.retourPrevu = false;
       const base = R.videurAnnonce * this.diff.videur * I.lent;
       // V18 (retour : « pas le temps de réagir ») : jamais moins de R.annonceMini (avant : 0,3 s en surprise, 0,4 s au retour)
@@ -302,7 +303,7 @@ export class RemiPorte extends BossScene {
       if (v.t <= 0) {
         v.etat = 'absent'; v.pose = 0; v.siffle = false;
         // le coup du 2e coup d'œil : il revient tout de suite
-        v.retourPrevu = v.mode !== 'retour' && Math.random() < this.diff.feintes * 0.5;
+        v.retourPrevu = R.feintesToutes && v.mode !== 'retour' && Math.random() < this.diff.feintes * 0.5;
         v.t = v.retourPrevu ? hasard(0.4, 0.8) : hasard(R.videurAttente[0], R.videurAttente[1]) * this.diff.videur;
       }
     }
@@ -330,7 +331,7 @@ export class RemiPorte extends BossScene {
     annonce(this, qui === 'toi' ? 'ATTRAPÉ !' : 'RÉMI ATTRAPÉ !', qui === 'toi' ? '#ff5a5a' : '#7fff7f', 1);
     const I = INTRUS[v.qui] || INTRUS.videur;
     bulle(this, `${I.nom} : « ${choisir(REPLIQUES[I.repliques])} »`, '#ffb070', 1.8, 150);
-    this.time.delayedCall(500, () => bulle(this, `Coup ANNULÉ, et le barman rafistole la porte (+${R.scotch})`, '#ffffff', 1.4, 330));
+    this.time.delayedCall(500, () => bulle(this, R.scotch ? `Coup ANNULÉ, et le barman rafistole la porte (+${R.scotch})` : 'Coup ANNULÉ !', '#ffffff', 1.4, 330));
     if (qui === 'remi') this.time.delayedCall(900, () => bulle(this, 'Rémi : « Mais... j\'ai rien fait ! »', '#ffd84a', 1.2, 80));
     this.etat = 'pause'; this.puissance = 0; this.charge = false; this.pose[qui] = 'garde';
     this.consigne.setVisible(false);
@@ -581,7 +582,8 @@ export class RemiPorte extends BossScene {
     v.x += (cible - v.x) * Math.min(1, dt * 10);
     // seul l'intrus du moment est montré
     // V19y : sifflé ou méfiant, il fait le geste « je te surveille » (V vers ses yeux) au lieu de son air distrait
-    const mef = v.pose === 0 && (v.siffle || (this.mefiant && this.frappeur === 'toi')) && this.textures.exists('remi_videur_mefiant');
+    // (V19z : il prend aussi cette pose quand celui qui charge est en RAGE : il a entendu le bruit)
+    const mef = v.pose === 0 && (v.siffle || (this.mefiant && this.frappeur === 'toi') || (this.charge && this.puissance > 1)) && this.textures.exists('remi_videur_mefiant');
     if (mef) this.sprVideur.setTexture('remi_videur_mefiant', 0); else this.sprVideur.setTexture('remi_videur', v.pose);
     this.sprVideur.setPosition(v.qui === 'videur' || !v.qui ? v.x : -400, HAUTEUR + 10);
     if (this.textures.exists('remi_pisseur')) this.sprPisseur.setPosition(v.qui === 'pisseur' ? v.x : -400, HAUTEUR + 10).setFrame(v.pose);
@@ -592,7 +594,7 @@ export class RemiPorte extends BossScene {
     const j = this.gJauges.clear();
     if (this.etat === 'intro') return;
     // le bouton « L'AIR DE RIEN » (ton tour seulement ; il s'allume quand tu charges)
-    const rien = (this.frappeur === 'toi' || this.etat === 'remi') && this.etat !== 'fin' && this.etat !== 'pause';
+    const rien = (this.frappeur === 'toi' || (R.sifflet && this.etat === 'remi')) && this.etat !== 'fin' && this.etat !== 'pause';
     this.txtRien.setVisible(rien);
     if (rien && this.frappeur === 'remi') {   // pendant le tour de Rémi : SIFFLE ! (1 fois)
       const b = BOUTON_RIEN, dispo = !this.siffleUtilise && this.videur.etat === 'absent';

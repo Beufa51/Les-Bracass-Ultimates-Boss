@@ -64,6 +64,7 @@ export const Effets = {
 
   // HOQUET (à partir de 2 pintes) : secousse, ton gardien et ta visée sautent d'un coup, la vue se trouble
   hoquet() {
+    if (!B.hoquets) { this.prochainHoquet = 0; return; }   // (V19z SIMPLE : plus de hoquets)
     const i = Math.min(this.ivresse, B.ivresseMax);
     this.prochainHoquet = this.horloge + hasard(5, 9) / (1 + 0.15 * i);
     jouerSon(this, 'remi_hips');
@@ -79,6 +80,7 @@ export const Effets = {
   // GAMELLE : la balle rentre et ressort (but) + un point retiré à l'autre
   gamelleAnim(pourToi) {
     this.gamelles += pourToi ? 1 : 0;
+    if (!B.gamelleRetire) return;   // (V19z SIMPLE : la gamelle est juste un beau but, sans point retiré)
     if (pourToi) this.butsRemi = Math.max(0, this.butsRemi - 1); else this.butsToi = Math.max(0, this.butsToi - 1);
     this.time.delayedCall(700, () => bulle(this, pourToi ? 'GAMELLE : un point retiré à Rémi !' : 'GAMELLE : il te retire un point !', pourToi ? '#7fff7f' : '#ff6b6b', 1.6, 130));
   }

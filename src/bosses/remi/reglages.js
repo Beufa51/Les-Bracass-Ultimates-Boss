@@ -99,6 +99,14 @@ export const BABY = {
   pinteReflexe: 0.04,     // chaque pinte de Rémi : son gardien réagit ce temps plus tard (s)...
   pinteTir: 0.04,         // ... et ses tirs perdent cette part de vitesse
   // V19y (avis plaisir) : vert collant, balle folle, règle des 10 secondes
+  // V19z SIMPLE (audit de complexité) : interrupteurs (true = la règle revient)
+  regle10Active: false,   // règle des 10 secondes
+  roulettePunie: false,   // roulette interdite + bouton ROULETTE pour annuler son but (sinon : simple tir plus rapide)
+  gamelleRetire: false,   // la gamelle retire un point à l'autre (sinon : juste un beau but)
+  beauxCoups: false,      // BILLARD = Rémi boit 2 pintes, CULOT = points (sinon : « BILLARD !! » reste une simple annonce)
+  hoquets: false,         // hoquets quand tu as bu
+  flechesDefense: false,  // flèches sur ses défenseurs (les zones rouges restent)
+  astuces: 1,             // nombre de fois où l'astuce « ses défenseurs suivent ta visée » s'affiche
   vertCollant: 0.2,       // un tir tapé moins de ce temps (s) après la fin du vert part avec l'angle vert (et il est sûr)
   folle: 0.6, folleMax: 1.0, folleAngle: 0.35, // BALLE FOLLE : un contre renvoie la balle vers toi (x vitesse, plafond m/s, angle au hasard)
   regle10: 10, regle10Debut: 5, // règle du bar : 10 s pour tirer ; compte à rebours affiché après 5 s
@@ -138,10 +146,10 @@ export const BABY = {
   // V19m EFFET BOURRÉ (chaque but encaissé = une pinte ; les effets plafonnent à ivresseMax pintes)
   ivresseMax: 4,          // (V19u : 5 → 4 : à partir de là, les pintes ne gênent plus davantage)
   titubeVisee: 0.035,     // ta visée ondule de ± ce nombre de rad par pinte
-  vueBue: 0.11, vueMini: 0.5, // la ligne de visée raccourcit de 11 % par pinte (jamais moins de 50 % du trajet)
-  ivresseRond: 3,         // à partir de ce nombre de pintes, plus de rond d'arrivée
+  vueBue: 0, vueMini: 0.5,   // (V19z SIMPLE : 0,11 → 0 : la ligne ne raccourcit plus) // la ligne de visée raccourcit de 11 % par pinte (jamais moins de 50 % du trajet)
+  ivresseRond: 99,        // (V19z SIMPLE : 3 → 99 : le rond d'arrivée reste toujours)         // à partir de ce nombre de pintes, plus de rond d'arrivée
   hoquetGardien: 0.05, hoquetVisee: 0.15, // un HOQUET (dès 2 pintes) fait sauter ton gardien (m) et ta visée (rad)
-  vignetteBue: 0.09, vignetteMax: 0.55,   // bords de l'écran qui s'assombrissent par pinte
+  vignetteBue: 0, vignetteMax: 0.55,   // (V19z SIMPLE : 0,09 → 0 : plus de bords sombres)   // bords de l'écran qui s'assombrissent par pinte
   trembleBu: 0.006,       // tremblement de ton gardien par but encaissé (m)
 };
 
@@ -152,18 +160,24 @@ export const PORTE = {
   charge: 0.35,           // vitesse de charge au départ (puissance par seconde) ; elle accélère en chargeant
   accel: 1.3,             // accélération de la charge
   degatsMin: 0.15,        // (V17 : 0,25 → 0,15 : un coup mou rapporte moins) part des dégâts même avec une charge nulle
-  scotch: 300,            // solidité rendue à la porte quand quelqu'un se fait attraper (le barman la rafistole)
+  scotch: 0,              // (V19z SIMPLE : 300 → 0 : plus de porte rafistolée quand on est attrapé)
   periodeVisee: 1.1,      // vitesse de la cible sur la porte
   casse: 850,             // un coup à ce score ou plus : gros craquement, éclats, flash
   // le videur : attente avant de revenir (s), annonce (ses pas, son ombre : s), regard (s)
   videurAttente: [1.4, 3.6], videurAnnonce: 1.1, videurRegard: [1.0, 1.5],
   annonceMini: 0.85,      // V18 : une arrivée est TOUJOURS annoncée au moins ce temps (s), même ses feintes (temps de réagir)
   // V19y (avis plaisir) : RAGE, poing caché qui coûte, sifflet, précision, pisseur, culot
+  // V19z SIMPLE (audit de complexité) : interrupteurs (true = la règle revient)
+  lacherCache: false,     // lâcher quand quelqu'un arrive cache le poing (sinon seul L'AIR DE RIEN cache, lâcher frappe)
+  sifflet: false,         // SIFFLE LE VIDEUR pendant le tour de Rémi (+ videur méfiant)
+  feintesToutes: false,   // le videur surgit / revient (sinon seulement la fausse alerte)
+  rageExpliquee: false,   // bulle d'explication de la RAGE (sinon la jauge rouge parle d'elle-même)
+  remiVitesse: 2,         // Rémi charge et se prépare x plus vite (on regarde moins longtemps)
   rageMax: 1.3,           // la jauge monte jusqu'à 130 % (RAGE) : plus de dégâts...
   rageLente: 0.55,        // ... elle monte moins vite dans la rage...
   rageBruit: 3,           // ... et le BRUIT fait venir l'intrus jusqu'à (1 + ce chiffre) fois plus vite...
   annonceRage: 0.5,       // ... et s'annoncer moins longtemps, mais jamais moins que ça (s)
-  cacheGarde: 0.6,        // cacher son poing (L'AIR DE RIEN) ne garde que cette part de la charge
+  cacheGarde: 1,          // (V19z SIMPLE : 0,6 → 1 : se cacher garde toute la charge)
   siffleAnnonce: 0.9,     // tu SIFFLES le videur pendant le tour de Rémi : il arrive après ce temps d'annonce (s)...
   mefiantAnnonce: 0.65,   // ... mais à ton tour suivant, il se méfie : ses annonces durent x ce chiffre
   precisionBase: 0.35,    // dégâts x (precisionBase + (1 - precisionBase) x précision) : la précision compte (avant 0,55)

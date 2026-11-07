@@ -72,7 +72,7 @@ export class RemiBaby extends BossScene {
     this.afficherIntro('RÉMI - Le babyfoot', [
       `Premier à ${B.buts} buts. Rémi se PENCHE du côté où il va tirer : place ton gardien (${t ? 'pouce gauche ◀ ▶' : '◀ ▶'}).`,
       `Balle arrêtée : ◀ ▶ tournent ta visée (rebonds sur les bandes). Ligne VERTE = ${t ? 'gros bouton TIR (pouce droit)' : 'ESPACE'} !`,
-      'Le reste (gamelle, roulette, pintes, 10 secondes...) s\'explique quand ça arrive.',
+      'Chaque but encaissé, tu bois une pinte : ta visée TITUBE.',
     ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.demarrer(); }));
   }
 
@@ -113,7 +113,7 @@ export class RemiBaby extends BossScene {
   // V19p : aux 2 premières ripostes d'une partie, on explique la feinte
   astuce() {
     this.nbAstuces = (this.nbAstuces || 0) + 1;
-    if (this.nbAstuces <= 2) this.time.delayedCall(500, () => bulle(this, 'Ses défenseurs SUIVENT ta visée (zones rouges) : tourne d\'un côté, puis repars vite de l\'autre !', '#ffd84a', 3, 150));
+    if (this.nbAstuces <= B.astuces) this.time.delayedCall(500, () => bulle(this, 'Ses défenseurs SUIVENT ta visée (zones rouges) : tourne d\'un côté, puis repars vite de l\'autre !', '#ffd84a', 3, 150));
   }
 
   riposter(biais) {
@@ -162,7 +162,7 @@ export class RemiBaby extends BossScene {
     const T = this.tir;
     this.butsRemi++;
     if (gamelle) this.gamelleAnim(false);
-    this.appelPossible = T.roulette ? this.horloge + B.appelDuree : 0;
+    this.appelPossible = T.roulette && B.roulettePunie ? this.horloge + B.appelDuree : 0;   // (V19z SIMPLE : la roulette n'est plus une règle)
     this.dernierBut = { gamelle, roulette: T.roulette };
     this.poseTemp('nargue', 1.6);
     this.ivresse++;
@@ -184,10 +184,10 @@ export class RemiBaby extends BossScene {
     this.poseTemp('boit', 2.2);
     this.celebrer(true);
     const info = this.tirInfo || {};
-    if (info.bande) { this.billards = (this.billards || 0) + 1; this.remiBu++; }   // BILLARD : Rémi boit 2 pintes
-    if (info.jaune) this.culots = (this.culots || 0) + 1;
-    annonce(this, gamelle ? 'GAMELLE !' : info.bande ? 'BILLARD !!' : info.jaune ? 'CULOT !' : 'BUUUT !', '#7fff7f', 1.1);
-    if (info.bande) this.time.delayedCall(600, () => bulle(this, 'BILLARD : Rémi boit DEUX pintes !', '#7fff7f', 1.6, 360));
+    if (info.bande && B.beauxCoups) { this.billards = (this.billards || 0) + 1; this.remiBu++; }   // BILLARD : Rémi boit 2 pintes
+    if (info.jaune && B.beauxCoups) this.culots = (this.culots || 0) + 1;
+    annonce(this, gamelle ? 'GAMELLE !' : info.bande ? 'BILLARD !!' : info.jaune && B.beauxCoups ? 'CULOT !' : 'BUUUT !', '#7fff7f', 1.1);
+    if (info.bande && B.beauxCoups) this.time.delayedCall(600, () => bulle(this, 'BILLARD : Rémi boit DEUX pintes !', '#7fff7f', 1.6, 360));
     this.tirInfo = null;
     this.time.delayedCall(700, () => jouerSon(this, 'remi_pinte'));
     if (!gamelle) this.time.delayedCall(900, () => bulle(this, `Rémi : « ${choisir(REPLIQUES.babyEncaisse)} »`, '#ffd84a', 1.6, 300));
@@ -265,11 +265,11 @@ export class RemiBaby extends BossScene {
         // V19y (avis plaisir B4) : RÈGLE DU BAR « 10 SECONDES » : compte à rebours au-dessus de la balle après 5 s, à 0 Rémi récupère
         this.tempsVise = (this.tempsVise || 0) + dt;
         const reste = B.regle10 - this.tempsVise;
-        if (reste <= B.regle10 - B.regle10Debut) {
+        if (B.regle10Active && reste <= B.regle10 - B.regle10Debut) {
           const q = proj(this.balle.x, 0.12, this.balle.z);
           this.txtDix.setPosition(q.x, q.y - 40).setText(String(Math.max(0, Math.ceil(reste)))).setVisible(true).setScale(1 + 0.25 * (Math.ceil(reste) - reste));
         }
-        if (reste <= 0) { this.txtDix.setVisible(false); annonce(this, '10 SECONDES !', '#ff6b6b', 0.8); bulle(this, 'Règle du bar : 10 s pour tirer. Balle à Rémi !', '#ff9a9a', 1.4, 300); this.suivant(0.6); }
+        if (B.regle10Active && reste <= 0) { this.txtDix.setVisible(false); annonce(this, '10 SECONDES !', '#ff6b6b', 0.8); bulle(this, 'Règle du bar : 10 s pour tirer. Balle à Rémi !', '#ff9a9a', 1.4, 300); this.suivant(0.6); }
         if (vientDAppuyer(this.touches.espace)) this.riposter(this.viseeVraie());
       }
       if (vientDAppuyer(this.touches.z)) this.appelRoulette();
