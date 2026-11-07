@@ -61,7 +61,7 @@ export class RemiBaby extends BossScene {
     this.hud = texte(this, LARGEUR / 2, 22, '', 26, '#ffffff', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 12, y: 3 } }).setDepth(900);
     this.touches = creerTouches(this);
     laisserPasserTactile(this);
-    jouerMusique(this, 'remi_musique_bar');
+    jouerMusique(this, 'remi_musique_baby');   // Captain Tsubasa (donnée par le propriétaire)
     this.installerDoigt();
     etiquettesTactiles({ ...VIDES, espace: 'OK' });
     const t = estTactile();

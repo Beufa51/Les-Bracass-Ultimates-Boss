@@ -76,7 +76,7 @@
   porte est découpé du fond — `BATTANT` dans RemiPorte.js — : il tremble, se fissure et s'ouvre d'un coup à la victoire).
   TOUTES LES IMAGES DE RÉMI SONT INTÉGRÉES.
 - MUSIQUE : `assets/audio/remi/remi_musique_bar.mp3` (Star Wars « Cantina Band », donnée par le propriétaire), au beer pong
-  et à la porte (repart du début à chaque jeu). Vélo : `remi_musique_velo.mp3` (F-Zero « Big Blue », donnée par le propriétaire).
+  et à la porte (V19f : plus utilisée) (repart du début à chaque jeu). Vélo : `remi_musique_velo.mp3` (F-Zero « Big Blue », donnée par le propriétaire).
 - AUDIT V3 (retour : pong pas fun, porte pas crédible, vélo injouable + liseré blanc) : `propositions/remi_audit.md`
   (notes joueur 4/3/4 sur 10, améliorations A1-A7 vélo, B1-B6 pong, C1-C4 porte = vue de dos, prompts des planches de dos).
   Ordre validé par Fabien. FAIT (V4) :
@@ -282,6 +282,8 @@
   le but. Plus de temps pour riposter (`babyFenetre` 2 / 1,7 / 1,4 / 1,1), défense plus lente (`vitesseBarresRemi` 0,2),
   son gardien plus lent en PRESSION / CUL SEC (0,22 / 0,28) et réflexes +0,03 à 0,05 s. Bot « tire sur le vert » :
   PANACHÉ 5-0, PRESSION 5-0 (8 arrêts), CUL SEC 2-0 en 60 s ; tout tir vert a marqué.
+- V19f : MUSIQUE du babyfoot = `remi_musique_baby.mp3` (Captain Tsubasa, thème principal en 3 versions, 1 min 50, donnée
+  par le propriétaire). `remi_musique_bar` (Cantina Band) n'est plus chargée (fichier gardé).
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

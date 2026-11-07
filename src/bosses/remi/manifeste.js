@@ -45,12 +45,13 @@ export const MANIFESTE = {
     remi_presentation: { fichier: 'sprites/remi/remi_presentation.png', largeur: 832, hauteur: 1202, images: 1, vitesse: 1 },
   },
   sons: {
-    // musique du bar (Star Wars, « Cantina Band », donnée par le propriétaire) : babyfoot et porte
     // musique du vélo (F-Zero, « Big Blue », donnée par le propriétaire)
     remi_musique_velo: { fichier: 'audio/remi/remi_musique_velo.mp3', musique: true, volume: 0.4 },
     // musique de la porte (Street Fighter II, thème de Ken, donnée par le propriétaire) : se coupe quand le videur regarde
     remi_musique_porte: { fichier: 'audio/remi/remi_musique_porte.mp3', musique: true, volume: 0.45 },
-    remi_musique_bar: { fichier: 'audio/remi/remi_musique_bar.mp3', musique: true, volume: 0.4 },
+    // musique du babyfoot (Captain Tsubasa / Olive et Tom, thème principal, donnée par le propriétaire)
+    remi_musique_baby: { fichier: 'audio/remi/remi_musique_baby.mp3', musique: true, volume: 0.4 },
+    // (remi_musique_bar.mp3, Star Wars « Cantina Band », n'est plus jouée depuis le babyfoot : fichier gardé, plus chargé)
     // bruitages générés au code : python3 outils/remi/generer_sons.py assets/audio/remi (bip de secours si le fichier manque)
     remi_sonnette: son('sonnette', 1760, 0.18),
     remi_saut: son('saut', 520, 0.06),
