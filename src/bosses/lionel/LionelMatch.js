@@ -6,7 +6,7 @@
 //  - Lob qui tombe par terre : 2 points pour celui qui l'a lancé.
 //  - Rattraper un lob juste en dessous = SUPER LANCER.
 //  - Relancer tout de suite après avoir attrapé = lancer PUISSANT.
-//  - 12 points ou 30 s par set, 2 sets gagnants.
+//  - 21 points ou 30 s par set, 2 sets gagnants.
 // Toute la logique avance dans update() (pas de minuteries Phaser) : le jeu
 // peut donc être accéléré pour les tests avec des bots.
 // =====================================================================
@@ -103,7 +103,7 @@ export class LionelMatch extends BossScene {
     this.nomDiff = 'normal'; this.diff = DIFFICULTES.normal;
     this.score = { j: 0, l: 0 }; this.sets = { j: 0, l: 0 }; this.numSet = 1;
     this.tempsSet = R.dureeSet; this.pointEnOr = false;
-    this.tempsTotal = 0; this.stats = { concedes: 0, marques: 0, supers: 0, puissants: 0, plongeons: 0 };
+    this.tempsTotal = 0; this.stats = { concedes: 0, marques: 0, supers: 0, supersMarques: 0, puissants: 0, plongeons: 0, encLob: 0, encMilieu: 0, encCote: 0 };
     this.echange = 0;             // nombre de lancers dans l'échange (le frisbee accélère)
     this.memoire = {};            // appuis gardés un instant (relancer pile en attrapant)
     this.horloge = 0;
@@ -169,14 +169,10 @@ export class LionelMatch extends BossScene {
     this.etiquettes(ETIQUETTES_OK);
     const tactile = estTactile();
     this.afficherIntro('LIONEL - Le Chambreur', [
-      'BUT : vise le mur derrière Lionel (jaune = 3 points, rouge = 5)',
-      'Flèches : cours vers le cercle vert (suis les points blancs !)',
-      (tactile ? 'Lancer' : 'ESPACE') + ' : lancer (maintiens ▲ ou ▼ pour lancer en biais)',
-      (tactile ? 'Lob' : 'Z') + ' : lob, visé avec les flèches (▶ = profond : 3 points !)',
-      'Attrape un lob juste en dessous = SUPER LANCER, guidé avec ▲ ▼ !',
-      (tactile ? 'Lancer' : 'ESPACE') + ' en courant vers le frisbee = plongeon',
-      (tactile ? 'Lancer' : 'ESPACE') + ' juste avant d\'attraper = CONTRE PARFAIT !',
-      'Jauge PUBLIC pleine (plongeons, contres parfaits) = SUPER !',
+      `BUT : vise le mur derrière Lionel (jaune = 3 points, rouge = 5). Set à ${R.pointsSet} points ou ${R.dureeSet} s`,
+      'Flèches : cours vers le CERCLE VERT pour attraper',
+      (tactile ? 'Lancer' : 'ESPACE') + ' : lancer (▲ ▼ = en biais)   ' + (tactile ? 'Lob' : 'Z') + ' : lob',
+      'Le reste (super, plongeon, contre parfait) : l\'entraînement te le montre !',
     ], () => this.presentation(() => this.choixDifficulte()));
   }
 
@@ -197,7 +193,7 @@ export class LionelMatch extends BossScene {
   // Lancement du match (aussi appelé directement par les tests)
   demarrerMatch() {
     // la première fois (ou depuis le menu F1) : petit entraînement avant le match
-    if (this.phase === 'entrainement' || (this.phase === 'set1' && !Sauvegarde.fait('lionel_entrainement') && !this.sansEntrainement)) {
+    if ((this.phase === 'entrainement' && !this.donnees.rejouer) || (this.phase === 'set1' && !Sauvegarde.fait('lionel_entrainement') && !this.sansEntrainement && !this.donnees.rejouer)) {
       return this.debutEntrainement();
     }
     if (this.phase === 'decisif') { this.sets = { j: 1, l: 1 }; this.numSet = 3; }
@@ -266,7 +262,10 @@ export class LionelMatch extends BossScene {
       return;
     }
     if (action === 'guide') { if (but === 'superGuide') this.reussiTuto(1.0); return; }
-    if (but === 'superGuide') return;   // le lancer du super seul ne suffit pas : il faut le guider
+    if (but === 'superGuide') {   // le lancer du super seul ne suffit pas : il faut le guider
+      if (type !== 'super') this.rateTuto(`Le SUPER, c'est ${this.boutons.lancer} ! On recommence.`);
+      return;
+    }
     // un lancer
     const ok = (but === 'lance' && (type === 'droit' || type === 'biais')) || but === type
       || (but === 'lobProfond' && type === 'lob' && this.d && this.d.lob.points > R.pointsLob);
@@ -329,10 +328,23 @@ export class LionelMatch extends BossScene {
   majJeu(dt, e) {
     this.tempsTotal += dt;
     // chrono du set (arrêté pendant que quelqu'un tient le frisbee : service, Lionel qui nargue...)
-    if (!this.pointEnOr && !this.porteur && !this.tuto) {
-      this.tempsSet -= dt;
-      if (this.tempsSet <= 0) {
+    if (!this.pointEnOr && !this.tuto) {
+      if (!this.porteur && this.tempsSet > 0) {
+        const avant = Math.ceil(this.tempsSet);
+        this.tempsSet -= dt;
+        // tic-tac des 5 dernières secondes
+        if (this.tempsSet > 0 && avant <= 5 && Math.ceil(this.tempsSet) < avant) jouerSon(this, 'frisbee_rebond', { volume: 0.4 });
+      }
+      // à 0 s, un frisbee en vol va au bout : DERNIER LANCER (le set finit à l'attrape ou au point)
+      if (this.tempsSet <= 0 && this.d && !this.porteur) {
         this.tempsSet = 0;
+        if (!this.dernierLancer) {
+          this.dernierLancer = true;
+          const t = texte(this, LARGEUR / 2, 70, 'DERNIER LANCER !', 30, '#ff5a5a', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 6 }).setDepth(95);
+          this.tweens.add({ targets: t, alpha: 0, delay: 900, duration: 300, onComplete: () => t.destroy() });
+        }
+      } else if (this.tempsSet <= 0) {
+        this.tempsSet = 0; this.dernierLancer = false;
         if (this.score.j !== this.score.l) { this.finSet(this.score.j > this.score.l ? 'j' : 'l'); return; }
         this.pointEnOr = true;
         encartRapide(this, 'POINT EN OR !', 'Le prochain point gagne le set', '#ffd84a');
@@ -395,10 +407,11 @@ export class LionelMatch extends BossScene {
     if (p.tient) {
       if (p.tenue < R.ralentiTenue) return;
       // appui fait juste AVANT d'attraper : relancé tout droit (les flèches tenues en courant ne comptent pas)
-      if (p.lancerMemorise) {
+      if (p.lancerMemorise && !(p.parfait && this.ralentiReste > 0)) {
         const k = p.lancerMemorise; p.lancerMemorise = null;
-        // contre parfait : la direction ▲ ▼ est lue à la fin du ralenti (on peut donc le viser)
-        const dir = p.parfait ? dirY : 0;
+        // contre parfait : la direction ▲ ▼ est lue à la fin du ralenti (on peut donc le viser,
+        // même avec les flèches tenues depuis la course)
+        const dir = p.parfait ? (e.haut ? -1 : 0) + (e.bas ? 1 : 0) : 0;
         return this.lancer(p, k === 'z' ? 'lob' : (p.superPret ? 'super' : (dir ? 'biais' : 'droit')), dir);
       }
       if (this.aAppuye('espace')) return this.lancer(p, p.superPret ? 'super' : (dirY ? 'biais' : 'droit'), dirY);
@@ -520,6 +533,11 @@ export class LionelMatch extends BossScene {
     if (this.tuto) {
       const E = ETAPES[this.tuto.etape];
       // pendant l'entraînement, il ne relance pas tes lancers : il attend l'étape suivante
+      // il a rattrapé ton lancer alors que l'étape n'est pas réussie : on la recommence (sinon plus de frisbee)
+      if (!E.lionel && !this.tuto.enAttente) {
+        this.rateTuto(E.but === 'superGuide' ? 'Il l\'a eue ! GUIDE ta tornade avec ▲ ▼ pendant qu\'elle vole.' : 'Il l\'a eue ! On recommence.');
+        return null;
+      }
       return E.lionel && !this.tuto.enAttente ? this.lancer(p, E.lionel, dir) : null;
     }
     if (p.superPret || Math.random() < D.superHasard) return this.lancer(p, 'super', dir);
@@ -706,6 +724,8 @@ export class LionelMatch extends BossScene {
         bulleLionel(this, 'Merci, merci ! Et maintenant... le super !');
       }
       jouerSon(this, 'lionel_foule'); jouerSon(this, 'frisbee_pret');
+      // l'encart couvre le milieu du terrain : on fige le jeu le temps de le lire (sinon le frisbee devient invisible)
+      if (this.etat === 'jeu') this.gel = Math.max(this.gel, 1.0);
     }
     this.majJauge();
   }
@@ -738,7 +758,7 @@ export class LionelMatch extends BossScene {
       // CONTRE PARFAIT : Espace appuyé juste avant d'attraper (pas en plongeon) => ralenti + lancer très rapide
       const delai = this.memoire.espace !== undefined ? this.horloge - this.memoire.espace : 99;
       const etapeParfait = this.tuto && ETAPES[this.tuto.etape].but === 'parfait';
-      p.parfait = !plongeon && !sousLeLob && delai <= (this.diff.fenetreParfait || R.parfait.fenetre) && (!this.tuto || etapeParfait);
+      p.parfait = !plongeon && !sousLeLob && delai <= this.fenetreParfait() && (!this.tuto || etapeParfait);
       p.flechesBloquees = true;
       if (p.parfait) {
         this.ralentiReste = R.parfait.dureeRalenti;
@@ -751,7 +771,7 @@ export class LionelMatch extends BossScene {
       else if (p.parfait) this.ajouterPublic('j', R.public.parfait, 'contre parfait');
       else if (this.echange >= 3) this.ajouterPublic('j', R.public.attrape, 'bel échange');
       // appui fait juste avant d'attraper : on le garde pour relancer aussitôt (PUISSANT)
-      p.lancerMemorise = this.aAppuye('z') ? 'z' : this.aAppuye('espace', Math.max(0.15, this.diff.fenetreParfait || 0)) ? 'espace' : null;
+      p.lancerMemorise = this.aAppuye('z') ? 'z' : this.aAppuye('espace', Math.max(0.15, this.fenetreParfait())) ? 'espace' : null;
       this.actionTuto('attrape', sousLeLob, p.parfait);
     }
   }
@@ -764,13 +784,23 @@ export class LionelMatch extends BossScene {
     if (this.tuto) {
       this.d = null;
       if (qui === 'l') this.rateTuto(raison === 'lob' ? 'Raté ! Va dans le cercle, on recommence.' : 'Raté ! Suis le cercle vert, on recommence.');
+      // ton super a marqué sans être guidé : l'étape n'est pas réussie, on la recommence
+      else if (ETAPES[this.tuto.etape].but === 'superGuide') this.rateTuto('Joli ! Mais GUIDE-la avec ▲ ▼ pendant qu\'elle vole.');
       return;
     }
     const perdant = qui === 'j' ? this.l : this.j;
     this.score[qui] += points;
-    if (qui === 'j') this.stats.marques += points; else this.stats.concedes += points;
-    this.ajouterPublic(qui, R.public.marque, 'point marqué');
     const d = this.d;
+    if (qui === 'j') {
+      this.stats.marques += points;
+      if (d && d.type === 'superJ') this.stats.supersMarques++;
+    } else {
+      this.stats.concedes += points;
+      // pour le conseil de fin : comment tu as encaissé
+      if (raison === 'lob') this.stats.encLob++; else if (points === 5) this.stats.encMilieu++; else this.stats.encCote++;
+    }
+    // (pas de « PUBLIC EN FEU » sur le point qui termine le set : il cacherait « SET GAGNÉ »)
+    if (this.score[qui] < R.pointsSet && !this.pointEnOr) this.ajouterPublic(qui, R.public.marque, 'point marqué');
     this.d = null; this.etat = 'point'; this.echange = 0;
     const x = raison === 'lob' ? d.x : (qui === 'j' ? T.x1 - 40 : T.x0 + 40);
     const y = d.y;
@@ -786,6 +816,8 @@ export class LionelMatch extends BossScene {
     this.majHud();
     this.attendre(R.pauseApresPoint, () => {
       if (this.score[qui] >= R.pointsSet || this.pointEnOr) return this.finSet(qui);
+      // point marqué sur le DERNIER LANCER : le chrono est fini
+      if (this.tempsSet <= 0 && this.score.j !== this.score.l) return this.finSet(this.score.j > this.score.l ? 'j' : 'l');
       this.placerPourService(perdant.cote);   // celui qui a encaissé sert
       // petit « Prêt ? » avant de reprendre
       this.etat = 'pret';
@@ -817,7 +849,7 @@ export class LionelMatch extends BossScene {
   debutSet(serveur = 'j') {
     if (this.surprises) this.surprises.vider();
     this.surprises = new Surprises(this);
-    this.score = { j: 0, l: 0 }; this.tempsSet = R.dureeSet; this.pointEnOr = false;
+    this.score = { j: 0, l: 0 }; this.tempsSet = R.dureeSet; this.pointEnOr = false; this.dernierLancer = false;
     this.j.poseTemps = 0; this.l.poseTemps = 0;
     this.placerPourService(serveur);
     this.majHud();
@@ -846,7 +878,17 @@ export class LionelMatch extends BossScene {
     this.etiquettes(ETIQUETTES_OK);   // (cache aussi le joystick)
     this.etat = 'fin';
     if (gagnant === 'j') this.victoire(this.classement());
-    else this.defaite(`Lionel : « ${REPLIQUES.defaite} »\nSets ${this.sets.j} - ${this.sets.l}`);
+    else this.defaite(`Lionel : « ${REPLIQUES.defaite} »\nSets ${this.sets.j} - ${this.sets.l}   points ${this.stats.marques} - ${this.stats.concedes}\n${this.conseil()}`);
+  }
+
+  // UN conseil qui colle à ce qui s'est passé (comment tu as le plus encaissé)
+  conseil() {
+    const s = this.stats;
+    if (s.concedes === 0) return 'Conseil : relance tout de suite après une réception = lancer PUISSANT.';
+    const pire = Math.max(s.encLob, s.encMilieu, s.encCote);
+    if (pire === s.encLob) return 'Conseil : sur un lob, file dans le cercle au sol : sous le lob = SUPER LANCER !';
+    if (pire === s.encMilieu) return 'Conseil : reste au MILIEU de ton but : les tirs au centre valent 5 points.';
+    return 'Conseil : suis les POINTS BLANCS des tirs en biais, et PLONGE (lancer en courant) s\'il est loin.';
   }
 
   cleRecord() { return cleRecord('lionel', this.nomDiff); }
@@ -854,29 +896,29 @@ export class LionelMatch extends BossScene {
   // Rang S / A / B / C : points encaissés, sets perdus, temps
   classement() {
     let score = 100;
-    score -= this.stats.concedes * 0.9;
+    score -= this.stats.concedes * R.rangParPoint;
     score -= (this.stats.setsPerdus || 0) * 15;
-    score -= Math.max(0, this.tempsTotal - 70) * 0.12;
+    score -= Math.max(0, this.tempsTotal - 90) * 0.12;
     const rang = R.rangs.find(r => score >= r.seuil).rang;
     const complet = this.phase === 'set1';
-    const record = complet ? Sauvegarde.proposerRecord(this.cleRecord(), rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record(this.cleRecord());
+    const record = this.diff.perso ? null : complet ? Sauvegarde.proposerRecord(this.cleRecord(), rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record(this.cleRecord());
     this.rang = rang;
     // LE BILAN DU COACH : réussites, erreurs + UN conseil pour progresser (et les défis de maîtrise)
-    const conseil = (this.stats.setsPerdus || 0) > 0 ? 'Conseil : garde ta position au fond du terrain : un lob mal placé coûte un set.'
-      : this.stats.concedes >= 8 ? 'Conseil : rattrape les lobs juste au-dessus du sol = SUPER LANCER.'
-      : 'Conseil : relance tout de suite après une réception = lancer PUISSANT, Lionel ne suit plus.';
     return `Lionel est battu !\nRANG ${rang}   -   temps ${formatTemps(this.tempsTotal)}` +
       `\nSets ${this.sets.j} - ${this.sets.l}   points marqués : ${this.stats.marques}   encaissés : ${this.stats.concedes}` +
       (record ? `\nRecord : rang ${record.rang} en ${formatTemps(record.temps)}` : '') +
-      (this.stats.supers ? `\nSuper lancers : ${this.stats.supers}` : '') +
+      (this.stats.supers ? `\nSupers marqués : ${this.stats.supersMarques} / ${this.stats.supers}` : '') +
       (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '') +
-      '\n' + lignesDefis('lionel', [
+      (this.diff.perso ? '' : '\n' + lignesDefis('lionel', [
         { id: 'sec', nom: 'Gagner sans perdre un seul set', test: () => (this.stats.setsPerdus || 0) === 0 },
-        { id: 'troisSupers', nom: 'Marquer 3 SUPER LANCERS', test: () => this.stats.supers >= 3 },
-        { id: 'hermetique', nom: 'Encaisser moins de 8 points', test: () => this.stats.concedes < 8 },
-      ]).join('\n') +
-      `\n${conseil}`;
+        { id: 'troisSupers', nom: 'Marquer 3 SUPER LANCERS', test: () => this.stats.supersMarques >= 3 },
+        { id: 'hermetique', nom: `Encaisser moins de ${R.defiHermetique} points`, test: () => this.stats.concedes < R.defiHermetique },
+      ]).join('\n')) +
+      `\n${this.conseil()}`;
   }
+
+  // fenêtre du CONTRE PARFAIT (plus large pendant l'entraînement : on apprend le geste)
+  fenetreParfait() { return Math.max(this.diff.fenetreParfait || R.parfait.fenetre, this.tuto ? 0.3 : 0); }
 
   attendre(duree, ensuite) { this.attente = duree; this.apresAttente = ensuite; }
 
@@ -943,7 +985,7 @@ export class LionelMatch extends BossScene {
     this.tweens.add({ targets: rayons, angle: 360, duration: 20000, repeat: -1 });
     const lionel = this.add.image(LARGEUR + 200, HAUTEUR - 30, 'lionel_defaite').setOrigin(0.5, 1).setDepth(P + 2);
     lionel.setScale(330 / lionel.height).setFlipX(!this.estIllustre('lionel_defaite'));
-    this.tweens.add({ targets: lionel, x: 760, duration: 500, ease: 'Cubic.Out' });
+    this.tweens.add({ targets: lionel, x: 810, duration: 500, ease: 'Cubic.Out' });
     const trophee = this.add.image(300, 300, 'lionel_trophee').setDepth(P + 3).setScale(0).setAngle(-30);
     this.tweens.add({ targets: trophee, scale: 1.15, angle: 0, delay: 350, duration: 600, ease: 'Back.Out' });
     this.tweens.add({ targets: trophee, y: 290, delay: 1000, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
@@ -961,7 +1003,10 @@ export class LionelMatch extends BossScene {
       texte(this, 140, 375, 'RANG', 22, '#ffd84a').setDepth(P + 5);
     }
     texte(this, 300, 135, lignes[0], 22, '#ffffff').setDepth(P + 5);
-    texte(this, 380, 440, lignes.slice(1).join('\n').replace(/RANG \w\s+-\s+/, ''), 17, '#ffffff', { align: 'left', lineSpacing: 5 }).setOrigin(0, 0.5).setDepth(P + 5);
+    // colonne entre le trophée et Lionel, avec retour à la ligne (sinon le conseil sort de l'écran)
+    const bloc = texte(this, 400, 178, lignes.slice(1).join('\n').replace(/RANG \w\s+-\s+/, ''), 15, '#ffffff',
+      { align: 'left', lineSpacing: 3, wordWrap: { width: 290 } }).setDepth(P + 5);
+    if (bloc.height > 320) bloc.setScale(320 / bloc.height);
     bulle(this, 760, 140, `Lionel : « ${REPLIQUES.victoire} »`, 99999).setDepth(P + 5);
     const badge = this.add.image(140, 210, 'badge_' + this.identite.id).setDepth(P + 5).setScale(0);
     this.tweens.add({ targets: badge, scale: 2, delay: 1200, duration: 300, ease: 'Back.Out' });
@@ -1132,8 +1177,10 @@ export class LionelMatch extends BossScene {
         // (le frisbee est attrapé dès qu'il entre dans ta zone : à A.x pixels devant toi ; ralenti compris)
         const ralenti = this.diff.ralenti < 1 ? this.diff.ralenti : 1;
         const tArrivee = d.vx < 0 ? (d.x - this.j.x - A.x) / (-d.vx * ralenti) : 9;
-        const bleu = tArrivee <= (this.diff.fenetreParfait || R.parfait.fenetre) + 0.04 && Math.hypot(pr.x - this.j.x, pr.y - this.j.y) < 70;
+        const bleu = tArrivee <= this.fenetreParfait() + 0.04 && Math.hypot(pr.x - this.j.x, pr.y - this.j.y) < 70;
         const c = bleu ? 0x5ad1ff : 0x7fff7f;
+        // petit « ding » quand il devient bleu (une fois par lancer) : c'est le moment d'appuyer
+        if (bleu && !d.dingBleu) { d.dingBleu = true; jouerSon(this, 'frisbee_pret', { volume: 0.45 }); }
         g.fillStyle(c, bleu ? 0.4 : 0.18).fillEllipse(pr.x, pr.y, A.x * 2, 28);
         g.lineStyle(bleu ? 6 : 4, c, 0.95).strokeEllipse(pr.x, pr.y, A.x * 2, 28);
         // Dédoubleur : un 2e cercle (pointillé) pour le faux frisbee, jusqu'au « POF »

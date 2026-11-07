@@ -587,7 +587,7 @@
     déclenche le super quand il est prêt) ; Z = lob ; Espace en courant vers le frisbee qui arrive = plongeon.
     Le lancer courbe n'est plus que pour Lionel.
   - Points : frisbee derrière l'adversaire = 3 points (côtés, jaune) ou 5 points (milieu, rouge) ; lob qui touche le sable = 2 points.
-  - Set : 12 points ou 30 s (égalité = POINT EN OR) ; 2 sets gagnants. Celui qui encaisse sert.
+  - Set : 21 points ou 30 s (égalité = POINT EN OR) ; 2 sets gagnants. Celui qui encaisse sert.
   - Relancer tout de suite après avoir attrapé = lancer PUISSANT (+22 %). Le frisbee accélère à chaque lancer de l'échange.
   - Rattraper un lob juste en dessous (cercle au sol) = SUPER LANCER (Espace) : le tien = « TORNADE DE FEU »,
     TÉLÉGUIDÉE avec ▲ ▼ pendant tout son vol (`pilotage`, `reactivite` dans reglages.js).
@@ -623,6 +623,15 @@
     (pose « super » de la planche) avec images rémanentes, étincelles, gros titre, zoom, onde de choc ; puis traînée
     lumineuse et étincelles pendant le vol (orange pour toi, vert pour Lionel).
   - Ton joueur qui tient / rattrape le frisbee : pose de côté (course), frisbee dans le poing avant.
+  - AUDIT 3 (dev + joueur bot, choix de Fabien : set à 21, CHAMPION adouci) : entraînement qui ne bloque plus à l'étape
+    du super (tornade non guidée, lob ou frisbee rattrapé par Lionel = on recommence l'étape) ; écran de victoire en colonne
+    avec retour à la ligne (plus de débordement) ; défi « 3 SUPER LANCERS » = supers MARQUÉS ; conseil choisi selon la façon
+    dont tu as encaissé (lobs / milieu / côtés), aussi en défaite (avec les points) ; PERSO sans record ni défis ; jeu figé
+    1 s pendant « LE PUBLIC EST EN FEU / ACCLAME LIONEL » (pas sur le point qui finit le set) ; à 0 s le frisbee en vol va au
+    bout (« DERNIER LANCER ! ») ; tic sonore des 5 dernières secondes ; « ding » quand le cercle devient bleu ; contre
+    parfait : le lancer attend la fin du ralenti et ▲ ▼ se lisent même tenus depuis la course ; fenêtre du contre parfait
+    0,3 s à l'entraînement ; REJOUER ne relance plus l'entraînement ; écran des commandes réduit à 4 lignes ; classement :
+    `rangParPoint` 0,5, temps de référence 90 s, défi `defiHermetique` < 14 points.
   - Musique de fond : `assets/audio/lionel/lionel_musique.mp3` (Windjammers, « Lawn Court », 64 kbit/s, 2,3 Mo, en boucle,
     volume 0,4 dans le manifeste de Lionel).
   - Pas de voix (annonceur) dans le match de Lionel, à la demande du propriétaire (Greg garde les siennes).

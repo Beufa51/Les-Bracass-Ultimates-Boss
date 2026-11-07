@@ -38,8 +38,9 @@ export const DIFFICULTES = {
   normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 1.0, reaction: 0.21, erreur: 44, disque: 0.89, superHasard: 0.07, lentLob: 2.2, surprises: [12, 20], fenetreParfait: 0.15, publicLionel: 0.85,
     aides: 'tot', choix: { droit: 50, biais: 36, lob: 14 }, attrape: { x: 44, haut: 70, bas: 30 }, ralenti: 0.85, superSurLob: false, biaisApres: 1,
     texte: 'Le vrai match.' },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.14, reaction: 0.15, erreur: 22, disque: 1.14, superHasard: 0.08, lentLob: 1.3, surprises: [10, 16], fenetreParfait: 0.1, publicLionel: 1,
-    aides: 'filet', choix: { droit: 30, biais: 36, courbe: 22, lob: 12 }, attrape: { x: 38, haut: 55, bas: 26 }, ralenti: 1, superSurLob: true,
+  // AUDIT 3 : adouci (un joueur moyen prenait 0-16 sans marquer) : un peu moins rapide, se trompe un peu plus
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vitesse: 1.06, reaction: 0.18, erreur: 32, disque: 1.04, superHasard: 0.06, lentLob: 1.6, surprises: [10, 16], fenetreParfait: 0.12, publicLionel: 0.95,
+    aides: 'filet', choix: { droit: 34, biais: 36, courbe: 18, lob: 12 }, attrape: { x: 42, haut: 62, bas: 28 }, ralenti: 0.95, superSurLob: true,
     texte: 'Aide seulement après le filet, lancers rapides, supers fréquents. Pour les vrais.' },
   // PERSO : tu règles tout toi-même (écran de curseurs, voir perso.js) ; ces chiffres sont ceux de départ
   perso:    { nom: 'PERSO',    couleur: '#c77dff', perso: true, vitesse: 1.0, reaction: 0.21, erreur: 44, disque: 0.89, superHasard: 0.07, lentLob: 2.2, surprises: [12, 20], fenetreParfait: 0.15, publicLionel: 0.85,
@@ -49,7 +50,7 @@ export const DIFFICULTES = {
 
 export const REGLAGES = {
   // ---------- Match ----------
-  pointsSet: 12,          // premier à 12 points gagne le set
+  pointsSet: 21,          // premier à 21 points gagne le set (AUDIT 3 : 12 finissait le set en 10 s)
   dureeSet: 30,           // ... ou le meilleur au bout de 30 s, comme le vrai Windjammers (égalité = point en or)
   setsGagnants: 2,        // 2 sets gagnants (en 3 sets)
   pointsLob: 2,           // lob qui tombe par terre
@@ -112,6 +113,8 @@ export const REGLAGES = {
   },
 
   // ---------- Classement ----------
+  rangParPoint: 0.5,      // chaque point encaissé retire 0,5 au score du classement (sur 100)
+  defiHermetique: 14,     // défi : encaisser moins de 14 points sur le match
   rangs: [
     { rang: 'S', seuil: 85 },
     { rang: 'A', seuil: 68 },
