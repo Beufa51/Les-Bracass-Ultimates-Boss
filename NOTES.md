@@ -361,6 +361,8 @@
 - V19q (« augmente un tout petit peu la difficulté ») : `babyVitesse` x1,05 (0,63 / 0,79 / 1 / 1,21), `babyDefense` x1,1
   (0,14 / 0,21 / 0,29 / 0,36), `babyGardienRemi` x1,05, bonus ÉCLAIR `babyFenetre` x0,92 (1,1 / 0,92 / 0,74 / 0,55).
   Bot : 8/8, 0 tir vert arrêté.
+- V19r : nouvelle MUSIQUE du babyfoot (Captain Tsubasa OST 1983, piste 11, donnée par le propriétaire : l'ancienne
+  « bouclait trop vite ») : `remi_musique_baby.mp3`, 1 min 40, silence de fin coupé ; elle reprend toujours où elle en était.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

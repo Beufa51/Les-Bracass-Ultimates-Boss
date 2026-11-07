@@ -53,7 +53,7 @@ export const MANIFESTE = {
     remi_musique_velo: { fichier: 'audio/remi/remi_musique_velo.mp3', musique: true, volume: 0.4 },
     // musique de la porte (Street Fighter II, thème de Ken, donnée par le propriétaire) : se coupe quand le videur regarde
     remi_musique_porte: { fichier: 'audio/remi/remi_musique_porte.mp3', musique: true, volume: 0.45 },
-    // musique du babyfoot (Captain Tsubasa / Olive et Tom, thème principal, donnée par le propriétaire)
+    // musique du babyfoot (Captain Tsubasa / Olive et Tom, OST 1983 piste 11, donnée par le propriétaire ; V19r)
     remi_musique_baby: { fichier: 'audio/remi/remi_musique_baby.mp3', musique: true, volume: 0.4 },
     // (remi_musique_bar.mp3, Star Wars « Cantina Band », n'est plus jouée depuis le babyfoot : fichier gardé, plus chargé)
     // bruitages générés au code : python3 outils/remi/generer_sons.py assets/audio/remi (bip de secours si le fichier manque)
