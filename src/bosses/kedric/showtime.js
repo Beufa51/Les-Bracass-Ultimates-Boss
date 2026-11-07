@@ -29,7 +29,7 @@
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { texte } from '../../core/ui.js';
 import { jouerSon, couperSons } from '../../core/ressources.js';
-import { jouerMusique, arreterMusique, placerMusique, tempsMusique } from '../../core/musique.js';
+import { jouerMusique, arreterMusique, placerMusique, tempsMusique, deverrouillerMusiques } from '../../core/musique.js';
 import { disposition, allumerBouton, eteindreBoutons, estTactile, rectBouton, voileNoirTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { onomatopee, lignesImpact } from './effets.js';
 import { REGLAGES as R } from './reglages.js';
@@ -120,6 +120,11 @@ export class Showtime {
     // et le silence du fichier (Cha-La : 8 s) fait l'attente — comme un vrai show
     disposition('danse');
     this.tapes = {};
+    // TÉLÉPHONE : les musiques du battle démarrent pendant le décompte, SANS appui : le navigateur les bloquait.
+    // On les débloque au premier appui (sur l'écran d'annonce : « appuie quand tu es prêt »).
+    this.debloquer = () => deverrouillerMusiques(S.manches.map(M => M.musique));
+    for (const t of ['touchend', 'click', 'keydown', 'pointerup']) window.addEventListener(t, this.debloquer, { capture: true });
+    this.retirerDeblocage = () => { for (const t of ['touchend', 'click', 'keydown', 'pointerup']) window.removeEventListener(t, this.debloquer, { capture: true }); };
     if (estTactile()) {
       etiquettesTactiles(CACHER_BOUTONS); traverser(true);
       scene.input.addPointer(2);   // jusqu'à 3 doigts (flèches doublées)
@@ -138,7 +143,7 @@ export class Showtime {
     // ABANDON depuis la pause pendant le battle : detruire() ne sera jamais appelé (seule la fin l'appelle).
     // Au shutdown de la scène, on éteint au moins les boutons (sinon ils restent allumés au hub) —
     // sans relancer la musique du match : le shutdown s'en occupe déjà, lui.
-    scene.events.once('shutdown', () => { traverser(false); eteindreBoutons(); couperSons(false); voileNoirTactile(false); });
+    scene.events.once('shutdown', () => { traverser(false); this.retirerDeblocage(); eteindreBoutons(); couperSons(false); voileNoirTactile(false); });
     this.annonce();
   }
 
@@ -149,6 +154,7 @@ export class Showtime {
     this.s.events.off('pause', this.surPause); this.s.events.off('resume', this.surReprise);
     if (this.surToucher) this.s.input.off('pointerdown', this.surToucher);
     traverser(false);
+    this.retirerDeblocage();
     couperSons(false); voileNoirTactile(false);   // par sécurité : sons ET boutons reviennent toujours à la fin du battle
     eteindreBoutons();
     disposition('separee');   // la disposition du match de Kédric

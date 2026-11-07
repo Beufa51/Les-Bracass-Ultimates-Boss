@@ -11,6 +11,8 @@
   0,2 s (`envoi.mains`, l'image a déjà le ballon : on cache le vrai). BATTLE SUR TÉLÉPHONE : les boutons de la page sont
   CACHÉS (ils débordaient sur les bandes noires, flèches à côté) : ronds fléchés dans le jeu (`COULOIRS_TEL`), on TAPE
   l'écran (couloir le plus proche du doigt, 3 doigts max) ; cadres des boutons rendus traversables (`traverser`).
+  Musique du battle muette sur téléphone (lancée sans appui = bloquée) : ajout optionnel `deverrouillerMusiques()` dans
+  `src/core/musique.js`, appelé par le battle au premier appui (joue les 2 morceaux en muet un instant).
 - **Beufa** : TERMINÉ — infiltration façon Metal Gear (4 pièces) puis QUIZ dans son bureau (codec, Psycho Mantis,
   rideau, 60 questions, GAME OVER façon MGS, classement BIG BOSS → CHICKEN, médaille = badge du hub, meilleur rang
   sauvegardé). Audit final : `propositions/beufa_audit_final.md`.

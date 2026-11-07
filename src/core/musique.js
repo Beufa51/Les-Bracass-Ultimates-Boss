@@ -60,6 +60,23 @@ export function majVolumeMusique() {
 }
 
 // ---------- Ajouts optionnels (utilisés par le battle de danse de Kédric) ----------
+// DÉBLOQUE des musiques (téléphone) : à appeler PENDANT un appui (toucher / clic / touche). Les navigateurs des
+// téléphones refusent une musique lancée plus tard sans appui ; une musique déjà jouée une fois pendant un appui,
+// elle, peut repartir quand on veut. On la joue donc en MUET un instant puis on l'arrête (si elle n'est pas voulue).
+export function deverrouillerMusiques(cles) {
+  for (const cle of cles) {
+    const p = piste(cle);
+    if (!p || p.debloquee) continue;
+    if (p.voulue) { p.audio.play().then(() => { p.debloquee = true; }).catch(() => {}); continue; }
+    const a = p.audio;
+    a.muted = true;
+    a.play().then(() => {
+      if (!p.voulue) { a.pause(); a.currentTime = 0; }
+      a.muted = false; p.debloquee = true;
+    }).catch(() => { a.muted = false; });
+  }
+}
+
 // Arrête une musique (elle ne repart plus toute seule au prochain appui)
 export function arreterMusique(cle) {
   const p = pistes[cle];
