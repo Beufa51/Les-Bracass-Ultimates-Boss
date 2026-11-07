@@ -41,7 +41,7 @@ export const Physique = {
         }
       }
       if (b.z >= L) {
-        if (Math.abs(b.x) < B.but / 2) this.butToi(Math.abs(b.x) > B.but / 2 * B.gamelleBord && Math.random() < B.gamelle);
+        if (Math.abs(b.x) < B.but / 2) this.butToi(Math.abs(b.x) > B.but / 2 * B.gamelleBord && Math.random() < B.gamelleVisee);   // V19u : ta gamelle VISÉE (près du poteau) passe plus souvent
         else this.sortie('Dehors !');
       }
     }

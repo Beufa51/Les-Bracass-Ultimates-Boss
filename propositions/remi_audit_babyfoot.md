@@ -59,6 +59,18 @@ Déjà corrigé en V19o (même commit que cet audit) : tirs en bande impossibles
 Priorités 1 à 4 faites (engagement après ton but, sons de babyfoot, feinte lisible + bouton ROULETTE, code découpé
 + bot `outils/remi_baby_bot.mjs` + chiffres sortis du code). Restent : joueur 4 et 6 à 10, dév 4 à 6.
 
+## Fait en V19u (suite de l'audit)
+- Joueur 4 : 3 tirs de Rémi reconnaissables : PISSETTE (préparation éclair, très rapide, annoncée), PIÈGE (lent, il
+  change de côté 3 fois), normal (avec ou sans feinte). Part par difficulté (`babyPissette`, `babyPiege`).
+- Joueur 6 : gamelle VISÉE : ta balle près du poteau = « GAMELLE POSSIBLE » sur la ligne, 60 % de chances.
+- Joueur 7 : effets bourrés plafonnés à 4 pintes (au lieu de 5), ligne jamais sous 50 % du trajet.
+- Joueur 9 : TON but dessiné (poteaux, barre, filet) au premier plan.
+- Joueur 10 : signe au bout de la ligne en plus de la couleur (✓ but, ! gardien, ✗ contré / à côté).
+- Dév 6 : réglages développeur complétés (défense, pissettes, pièges, titube, pintes max).
+- Gardé tel quel, après vérification : dév 4 (fluidité : la marge du vert couvre un téléphone à 20 images/s) et
+  dév 5 (points : écart x80 + arrêts x10 + gamelles x40 ≈ 400 à 600 pour une bonne partie, comme l'ancien beer pong).
+- Joueur 8 (musique) : nouveau morceau donné par Fabien (V19r).
+
 ## Ma proposition de priorités
 1. Engagement après TON but (joueur 1) : le plus gros gain de plaisir.
 2. Sons de babyfoot (joueur 3) : peu de travail, gros effet sur la sensation.

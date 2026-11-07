@@ -370,6 +370,12 @@
   `BOUTON_D` x 226), GROS TIR sous le pouce DROIT (`BOUTON_TIR` x 856, r 80 ; toujours visible, allumé quand tu as la
   balle ; le tir part DÈS L'APPUI : `dansTir()`). Zones : `ZONE_BOUTONS` { y 300, g 153, d 320, tir LARGEUR - 270 }.
   Toucher le milieu de l'écran tire toujours. Bot : 0 problème.
+- V19u (« continue l'audit objectivement ») : 3 TIRS DE RÉMI (`tir.type`) : PISSETTE (`B.pissette` prép x0,55, vitesse
+  x1,3, annoncée), PIÈGE (`B.piege` prép x1,35, vitesse x0,8, penche faux / vrai / faux / vrai ; toujours à la balle de
+  match), normal ; part par difficulté `babyPissette` / `babyPiege` (0/0, 0,1/0,1, 0,2/0,2, 0,28/0,25). GAMELLE VISÉE
+  (`gamelleVisee` 0,6 pour tes tirs près du poteau, message « GAMELLE POSSIBLE »). `ivresseMax` 4, `vueMini` 0,5. TON BUT
+  dessiné (poteaux, barre, filet, profondeur 6,95). Signes ✓ / ! / ✗ au bout de la ligne (daltoniens). Réglages
+  développeur complétés. Audit mis à jour (`propositions/remi_audit_babyfoot.md`). Bot : 0 problème.
 - RESTE : faire jouer Fabien et équilibrer ; autres images (prompts prêts : `propositions/remi_prompts_images.md`) ; vrais sons ;
   musique ; textes perso (passe de FINITION).
 

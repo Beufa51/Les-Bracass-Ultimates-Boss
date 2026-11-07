@@ -24,10 +24,14 @@ export const RemiIA = {
     const qui = Math.random() < 0.5 ? 1 : (vise > 0 ? 2 : 0);
     const derriere = this.butsRemi < this.butsToi;
     const roul = Math.random() < D.babyRoulette * (derriere ? 2 : 1) && this.butsRemi < B.buts - 1;
+    // V19u : 3 TIRS reconnaissables : normal ; PISSETTE (préparation éclair, très rapide, pas de feinte) ;
+    // PIÈGE (lent, il change de côté plusieurs fois : attends le dernier changement)
+    const de = Math.random(), type = balleMatch ? 'piege' : de < D.babyPissette ? 'pissette' : de < D.babyPissette + D.babyPiege ? 'piege' : 'normal';
+    const TYPES = { normal: { prep: 1, vit: 1 }, pissette: { prep: B.pissette.prep, vit: B.pissette.vitesse }, piege: { prep: B.piege.prep, vit: B.piege.vitesse } };
     this.tir = {
-      qui, vise, t: 0,
-      d: hasard(B.prep[0], B.prep[1]) * D.babyLecture,
-      feinte: balleMatch || Math.random() < D.babyFeinte,
+      qui, vise, t: 0, type, vit: TYPES[type].vit,
+      d: hasard(B.prep[0], B.prep[1]) * D.babyLecture * TYPES[type].prep,
+      feinte: type === 'normal' && Math.random() < D.babyFeinte,
       bande: Math.random() < D.babyBande,
       roulette: roul,
       promene: hasard(-1, 1),
@@ -46,7 +50,7 @@ export const RemiIA = {
     this.balle.x = xs[T.qui]; this.balle.z = BARRES.att.z - 0.04;
     // LECTURE : il se penche vers le côté visé (feinte : l'autre côté jusqu'à 65 %, puis il change)
     const cote = Math.sign(T.vise);
-    const faux = T.feinte && a < B.feinteBascule;
+    const faux = T.type === 'piege' ? (a < 0.3 || (a > 0.52 && a < 0.74)) : T.feinte && a < B.feinteBascule;
     this.penche = Phaser.Math.Linear(this.penche, (faux ? -cote : cote) * Math.min(1, a * 1.6), Math.min(1, dt * 8));
     if (a > 0.82) this.arme = (a - 0.82) / 0.18; else this.arme = 0;   // la barre s'arme (le joueur se lève)
     if (T.roulette && a > 0.7 && !this.roulette) { this.roulette = { t: this.horloge }; jouerSon(this, 'remi_baby_roulette'); }
@@ -57,7 +61,7 @@ export const RemiIA = {
   tirer() {
     const T = this.tir, b = this.balle, D = this.diff;
     this.arme = 0; this.poseTemp('lance', 0.6);
-    let v = D.babyVitesse * (T.roulette ? B.rouletteVitesse : 1) * (1 - this.remiBu * B.pinteTir);
+    let v = D.babyVitesse * T.vit * (T.roulette ? B.rouletteVitesse : 1) * (1 - this.remiBu * B.pinteTir);
     // cible : dans le but, du côté visé (rarement à côté)
     let tx = T.vise * (B.but / 2) * 0.9;
     if (Math.random() < D.babyRate) tx = Math.sign(T.vise) * (B.but / 2 + hasard(0.03, 0.08));
@@ -74,7 +78,8 @@ export const RemiIA = {
     jouerSon(this, 'remi_baby_frappe', { volume: 1, rate: 0.9 });
     this.eclats.push({ x: b.x, z: b.z, t: 0, c: 0xff5a5a });
     this.tweens.add({ targets: this.cameras.main, zoom: 1.03, duration: 70, yoyo: true, ease: 'Quad.easeOut' });
-    if (v > D.babyVitesse * 1.05) annonce(this, T.roulette ? 'ROULETTE !?' : 'PATATE !', '#ff6b6b', 0.35);
+    if (T.type === 'pissette') annonce(this, 'PISSETTE !', '#ff6b6b', 0.35);
+    else if (v > D.babyVitesse * 1.05) annonce(this, T.roulette ? 'ROULETTE !?' : 'PATATE !', '#ff6b6b', 0.35);
   },
 
 

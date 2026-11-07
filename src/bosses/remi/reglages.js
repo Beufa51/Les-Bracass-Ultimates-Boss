@@ -8,7 +8,8 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 //         sonnette = portée (px) de la sonnette (les bourrés debout ou qui traversent s'écartent / s'arrêtent)
 //  BABY : babyVitesse = vitesse de ses tirs (m/s) ; babyLecture = durée de sa préparation (x) ; babyFeinte / babyBande /
 //         babyRoulette / babyRate = chances (feinte, tir en bande, roulette, tir à côté) ; babyFenetre = durée du bonus TIR ÉCLAIR après un arrêt (s ; viser n'a pas de limite) ;
-//         babyReflexe = retard de son gardien (s) ; babyGardienRemi = vitesse de son gardien ; babyDefense = vitesse à laquelle sa défense suit ta visée (m/s) ; babyGuide = la flèche jaune montre où tourner la visée ; babyAide = ton gardien est
+//         babyReflexe = retard de son gardien (s) ; babyGardienRemi = vitesse de son gardien ; babyDefense = vitesse à laquelle sa défense suit ta visée (m/s) ; babyPissette / babyPiege = part de ses tirs PISSETTE (éclair) et PIÈGE (feintes multiples) ;
+//         babyGuide = la flèche jaune montre où tourner la visée ; babyAide = ton gardien est
 //         attiré vers la balle quand elle arrive (0 = pas d'aide, 1 = il va tout seul au bon endroit)
 //  PORTE : remiCharge = jusqu'où Rémi charge (0 à 1) ; remiPrudent = chance qu'il lâche quand le videur arrive ;
 //          videur = temps d'annonce du videur (x, + petit = moins prévenu) ; feintes = part de passages piégés
@@ -18,19 +19,19 @@ export const IDENTITE = { id: 'remi', nom: 'Rémi' };
 export const DIFFICULTES = {
   entrainement: { nom: 'DIABOLO', couleur: '#9fe0ff', texte: 'Pour apprendre : large, lent, Rémi est déjà pompette et le videur ne feinte jamais.',
     temps: 110, densite: 0.65, traverse: 0.7, sonnette: 800,
-    babyVitesse: 0.63, babyLecture: 1.3, babyFeinte: 0, babyBande: 0, babyRoulette: 0.08, babyRate: 0.2, babyFenetre: 1.1, babyReflexe: 0.4, babyGardienRemi: 0.231, babyDefense: 0.16, babyGuide: true, babyAide: 0.5,
+    babyVitesse: 0.63, babyLecture: 1.3, babyFeinte: 0, babyBande: 0, babyRoulette: 0.08, babyRate: 0.2, babyFenetre: 1.1, babyReflexe: 0.4, babyGardienRemi: 0.231, babyDefense: 0.16, babyPissette: 0, babyPiege: 0, babyGuide: true, babyAide: 0.5,
     remiCharge: 0.45, remiPrudent: 0.2, videur: 1.6, feintes: 0, zone: 0.28, visee: 0.65 },
   facile: { nom: 'PANACHÉ', couleur: '#7fff7f', texte: 'Le bar ferme tard, Rémi a déjà bu, et ton gardien est un peu aidé.',
     temps: 88, densite: 0.8, traverse: 0.8, sonnette: 730,
-    babyVitesse: 0.79, babyLecture: 1.15, babyFeinte: 0.2, babyBande: 0.1, babyRoulette: 0.12, babyRate: 0.12, babyFenetre: 0.92, babyReflexe: 0.32, babyGardienRemi: 0.289, babyDefense: 0.24, babyGuide: true, babyAide: 0.3,
+    babyVitesse: 0.79, babyLecture: 1.15, babyFeinte: 0.2, babyBande: 0.1, babyRoulette: 0.12, babyRate: 0.12, babyFenetre: 0.92, babyReflexe: 0.32, babyGardienRemi: 0.289, babyDefense: 0.24, babyPissette: 0.1, babyPiege: 0.1, babyGuide: true, babyAide: 0.3,
     remiCharge: 0.55, remiPrudent: 0.3, videur: 1.3, feintes: 0.25, zone: 0.22, visee: 0.8 },
   normal: { nom: 'PRESSION', couleur: '#ffd84a', texte: 'La vraie soirée : un trajet serré et un Rémi en forme.',
     temps: 70, densite: 1, traverse: 1, sonnette: 650,
-    babyVitesse: 1.0, babyLecture: 1, babyFeinte: 0.35, babyBande: 0.2, babyRoulette: 0.15, babyRate: 0.07, babyFenetre: 0.74, babyReflexe: 0.24, babyGardienRemi: 0.347, babyDefense: 0.33, babyGuide: false, babyAide: 0.1,
+    babyVitesse: 1.0, babyLecture: 1, babyFeinte: 0.35, babyBande: 0.2, babyRoulette: 0.15, babyRate: 0.07, babyFenetre: 0.74, babyReflexe: 0.24, babyGardienRemi: 0.347, babyDefense: 0.33, babyPissette: 0.2, babyPiege: 0.2, babyGuide: false, babyAide: 0.1,
     remiCharge: 0.68, remiPrudent: 0.35, videur: 1, feintes: 0.45, zone: 0.15, visee: 1 },
   champion: { nom: 'CUL SEC', couleur: '#ff5a6e', texte: 'Fermeture imminente, rues bondées, Rémi ne rate presque rien.',
     temps: 58, densite: 1.2, traverse: 1.25, sonnette: 570,
-    babyVitesse: 1.21, babyLecture: 0.85, babyFeinte: 0.5, babyBande: 0.3, babyRoulette: 0.2, babyRate: 0.04, babyFenetre: 0.55, babyReflexe: 0.2, babyGardienRemi: 0.29, babyDefense: 0.38, babyGuide: false, babyAide: 0,
+    babyVitesse: 1.21, babyLecture: 0.85, babyFeinte: 0.5, babyBande: 0.3, babyRoulette: 0.2, babyRate: 0.04, babyFenetre: 0.55, babyReflexe: 0.2, babyGardienRemi: 0.29, babyDefense: 0.38, babyPissette: 0.28, babyPiege: 0.25, babyGuide: false, babyAide: 0,
     remiCharge: 0.84, remiPrudent: 0.85, videur: 0.75, feintes: 0.65, zone: 0.1, visee: 1.3 },
 };
 
@@ -108,6 +109,8 @@ export const BABY = {
   vitesseGardien: 2.2,    // vitesse max de ton gardien (m/s) (V19c : 1,2 → 2,2 : il colle mieux au doigt)
   prep: [0.9, 1.4],       // durée de la préparation de Rémi (s), x babyLecture de la difficulté
   feinteBascule: 0.65,    // feinte : il change de côté à cette part de la préparation
+  pissette: { prep: 0.55, vitesse: 1.3 },  // V19u : tir PISSETTE : préparation x0,55, vitesse x1,3, jamais de feinte
+  piege: { prep: 1.35, vitesse: 0.8 },    // tir PIÈGE : préparation x1,35, vitesse x0,8, il change de côté 3 fois
   rouletteVitesse: 1.35,  // une roulette part plus vite
   eclairVitesse: 1.35,    // V19g TIR ÉCLAIR (tiré pendant babyFenetre) : balle x ce chiffre...
   eclairReflexe: 0.08,    // ... et son gardien réagit ce temps plus tard (s)
@@ -120,14 +123,15 @@ export const BABY = {
   retardRemi: 6,          // vitesse à laquelle Rémi « voit » où vise ta balle (plus petit = il réagit plus en retard)
   gamelleBord: 0.6,       // un but à plus de cette part du demi-but depuis le centre peut faire GAMELLE...
   gamelle: 0.35,          // ... avec cette chance
+  gamelleVisee: 0.6,      // V19u : TA balle près du poteau : GAMELLE avec cette chance (la ligne annonce « GAMELLE POSSIBLE »)
   appelDuree: 1.6,        // temps pour crier « ROULETTE ! » après son but (s)
   // V19n : chaque but que TU marques (une pinte pour Rémi) ralentit sa défense et son gardien de cette part (mini 50 %)
   defBue: 0.12, garBue: 0.1,
   ralenti: 0.25, ralentiDuree: 0.45, arretFige: 0.12, // RALENTI quand tu marques (vitesse du jeu, durée en s) ; arretFige : petit ralenti à TON arrêt
   // V19m EFFET BOURRÉ (chaque but encaissé = une pinte ; les effets plafonnent à ivresseMax pintes)
-  ivresseMax: 5,
+  ivresseMax: 4,          // (V19u : 5 → 4 : à partir de là, les pintes ne gênent plus davantage)
   titubeVisee: 0.035,     // ta visée ondule de ± ce nombre de rad par pinte
-  vueBue: 0.11, vueMini: 0.4, // la ligne de visée raccourcit de 11 % par pinte (jamais moins de 40 % du trajet)
+  vueBue: 0.11, vueMini: 0.5, // la ligne de visée raccourcit de 11 % par pinte (jamais moins de 50 % du trajet)
   ivresseRond: 3,         // à partir de ce nombre de pintes, plus de rond d'arrivée
   hoquetGardien: 0.05, hoquetVisee: 0.15, // un HOQUET (dès 2 pintes) fait sauter ton gardien (m) et ta visée (rad)
   vignetteBue: 0.09, vignetteMax: 0.55,   // bords de l'écran qui s'assombrissent par pinte

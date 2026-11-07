@@ -46,6 +46,12 @@ export const Dessin = {
     for (let i = 1; i < 4; i++) { const y = H * i / 4; t.lineBetween(q(-B.but / 2, y, L + P).x, q(0, y, L + P).y, q(B.but / 2, y, L + P).x, q(0, y, L + P).y); }
     t.lineStyle(1, 0xffffff, 0.3).lineBetween(fh0.x, fh0.y, h0.x, h0.y).lineBetween(fh1.x, fh1.y, h1.x, h1.y).lineBetween(f0.x, f0.y, g0.x, g0.y).lineBetween(f1.x, f1.y, g1.x, g1.y);
     t.lineStyle(Math.max(3, 0.008 * g0.k), 0xffffff, 1).lineBetween(g0.x, g0.y, h0.x, h0.y).lineBetween(g1.x, g1.y, h1.x, h1.y).lineBetween(h0.x, h0.y, h1.x, h1.y);
+    // V19u : TON but aussi se voit : poteaux et barre au premier plan (devant ton gardien), filet sombre derrière
+    const a0 = q(-B.but / 2, 0, 0), a1 = q(B.but / 2, 0, 0), b0 = q(-B.but / 2, H, 0), b1 = q(B.but / 2, H, 0);
+    const devant = this.add.graphics().setDepth(6.95);
+    devant.lineStyle(Math.max(4, 0.007 * a0.k), 0xffffff, 0.9).lineBetween(a0.x, a0.y, b0.x, b0.y).lineBetween(a1.x, a1.y, b1.x, b1.y).lineBetween(b0.x, b0.y, b1.x, b1.y);
+    devant.lineStyle(1, 0xffffff, 0.18);
+    for (let i = 1; i < 8; i++) { const x = -B.but / 2 + B.but * i / 8; devant.lineBetween(q(x, 0, 0).x, q(x, 0, 0).y, q(x, H, 0).x, q(x, H, 0).y); }
     this.solTable = t;
   },
 
@@ -126,11 +132,20 @@ export const Dessin = {
       }
       // le point d'arrivée sur la ligne de but : un rond (vert = BUT)
       const fin = proj(lib.xBut, R, L), cf = coul(L - 0.001);
-      if (this.ivresse < B.ivresseRond) g.lineStyle(4, cf, 1).strokeEllipse(fin.x, fin.y, 0.06 * fin.k, 0.03 * fin.k);
+      if (this.ivresse < B.ivresseRond) {
+        g.lineStyle(4, cf, 1).strokeEllipse(fin.x, fin.y, 0.06 * fin.k, 0.03 * fin.k);
+        // V19u (daltoniens) : un signe en plus de la couleur : ✓ but, ! son gardien, ✗ contré / à côté
+        const e = 0.012 * fin.k, sy = fin.y - 0.045 * fin.k;
+        g.lineStyle(4, cf, 1);
+        if (cf === 0x7fff7f) g.beginPath().moveTo(fin.x - e, sy).lineTo(fin.x - e * 0.2, sy + e * 0.8).lineTo(fin.x + e * 1.2, sy - e).strokePath();
+        else if (cf === 0xffd84a) { g.lineBetween(fin.x, sy - e, fin.x, sy + e * 0.3); g.fillStyle(cf, 1).fillCircle(fin.x, sy + e * 0.9, 2.5); }
+        else g.lineBetween(fin.x - e, sy - e, fin.x + e, sy + e).lineBetween(fin.x - e, sy + e, fin.x + e, sy - e);
+      }
       if (lib.libre && !lib.enFace) { const q = proj(0, 0, L); g.fillStyle(0x7fff7f, 0.18 + 0.12 * Math.sin(this.horloge * 10)).fillRect(proj(-B.but / 2, 0, L).x - 6, q.y - 0.09 * q.k, B.but * q.k + 12, 0.1 * q.k); }
       const vert = lib.libre && !lib.enFace;
       const pourquoi = lib.cote ? 'À CÔTÉ' : !lib.libre ? 'BLOQUÉ' : 'SON GARDIEN EST EN FACE';
-      const [m, c] = vert ? ['LIBRE : TOUCHE TIR !', '#7fff7f']
+      const gamellePossible = vert && Math.abs(lib.xBut) > B.but / 2 * B.gamelleBord;
+      const [m, c] = vert ? [gamellePossible ? 'LIBRE : TIR ! (GAMELLE POSSIBLE)' : 'LIBRE : TOUCHE TIR !', '#7fff7f']
         : this.indice === -1 ? [`${pourquoi} : ◀ TOURNE LA VISÉE`, '#ffd84a'] : this.indice === 1 ? [`${pourquoi} : TOURNE LA VISÉE ▶`, '#ffd84a']
         : this.indice === undefined ? [`${pourquoi} : tourne ta visée ◀ ▶`, '#ff7a7a']
         : [`${pourquoi} : attends qu'un trou s'ouvre`, '#ff7a7a'];
