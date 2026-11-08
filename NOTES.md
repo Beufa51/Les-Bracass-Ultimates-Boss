@@ -63,6 +63,12 @@
   Crochet DE FACE aussi (`greg2_crochet`, hauteur 545 ; ancien en `greg_crochet_cote.jpg`).
 - Portrait de présentation v2 (`greg_portrait.jpg`, original dans `assets_inbox/greg_v2/`) ; `greg_visage.jpg` (bandeau,
   annonce du SMASH) = sa tête recadrée.
+- Nov. 2026, dernier lot (outil `python3 outils/greg/preparer_heros.py`, originaux dans `assets_inbox/greg_heros/` et
+  `greg_v2/`) : ton boxeur ESQUIVE (penché, retourné selon le côté), BLOQUE (garde serrée), DEMPSEY (tourbillons),
+  VICTOIRE (bras levé), PORTRAIT du bandeau ; contour bleu ajouté comme les anciennes. Gardés : heros_garde, heros_coup
+  (le nouveau coup partait sur le côté : `heros_coup_cote.jpg` non utilisé), heros_touche, heros_sol, heros_uppercut.
+  Greg : visage du bandeau / SMASH (gros plan qui hurle), case K.O. (`greg_ko.jpg`), trophée, ARBITRE (glisse à gauche
+  pendant chaque compte et marque les chiffres). Gros plan vertical gardé en réserve (`greg_visage_vertical.jpg`).
 - `greg2_releve` branché : pose prise 1,1 s quand Greg se relève (il monte du tapis).
 - RESTE : poses du héros, portrait / visage / case K.O. / trophée / arbitre
   (prompts dans `propositions/greg_prompts_images.md`).

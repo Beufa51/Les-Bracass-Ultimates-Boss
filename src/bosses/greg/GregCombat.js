@@ -64,7 +64,7 @@ export class GregCombat extends BossScene {
     this.roundsJoues = 0;
     this.nomDiff = 'normal'; this.diff = DIFFICULTES.normal;
     // audit nov. 2026 : rien ne doit rester de la partie d'avant (REJOUER / retour du hub)
-    this.compte = null; this.caseKO = null; this.barreReleve = null; this.texteAideDempsey = null;
+    this.compte = null; this.caseKO = null; this.barreReleve = null; this.arbitre = null; this.texteAideDempsey = null;
     this.tempsRound = R.dureeRound; this.coupsRecents = []; this.serie = 0; this.serieJusqua = -1; this.smashR2Fait = false; this.dernierSeq = -1;
 
     this.add.image(0, 0, 'greg_ring').setOrigin(0);
@@ -949,6 +949,12 @@ export class GregCombat extends BossScene {
       const delai = R.illustre.dureeChute * 1000 + 150;
       this.time.delayedCall(delai, () => { if (this.compte && this.compte.qui === 'greg') this.caseKO = this.ouvrirCaseKO(); });
     }
+    // l'arbitre compte, à gauche du ring
+    if (this.textures.exists('greg_arbitre')) {
+      if (this.arbitre) this.arbitre.destroy();
+      this.arbitre = this.add.image(-100, HAUTEUR + 4, 'greg_arbitre').setOrigin(0.5, 1).setDepth(44);
+      this.tweens.add({ targets: this.arbitre, x: 95, duration: 250, ease: 'Back.Out' });
+    }
     if (qui === 'joueur') {
       this.barreReleve = this.add.graphics().setDepth(45);
       this.texteCompte2.setText('◀ ▶ ◀ ▶  RELÈVE-TOI !').setColor('#7fff7f');
@@ -983,6 +989,7 @@ export class GregCombat extends BossScene {
       // compte vocal désactivé (voix de synthèse pas assez naturelle) : le compte reste à l'écran
       if (R.compteVocal) this.parler(JAPONAIS[Math.min(c.n, 9) - 1], { japonais: true, vitesse: 1.1, hauteur: 0.9 });
       this.texteCompte.setText(c.n >= 10 ? 'K.O. !!' : String(c.n)).setScale(1.6);
+      if (this.arbitre) this.tweens.add({ targets: this.arbitre, angle: -4, scaleY: 1.03, duration: 90, yoyo: true });   // il marque chaque chiffre
       this.tweens.add({ targets: this.texteCompte, scale: 1, duration: 150 });
       if (c.qui === 'greg') {
         const releve = R.compteGregRelevee[this.g.downs - 1];
@@ -1024,6 +1031,7 @@ export class GregCombat extends BossScene {
     if (this.caseKO) { this.caseKO.destroy(); this.caseKO = null; }
     this.texteCompte.destroy(); this.texteCompte2.destroy();
     if (this.barreReleve) { this.barreReleve.destroy(); this.barreReleve = null; }
+    if (this.arbitre) { this.arbitre.destroy(); this.arbitre = null; }
     this.compte = null;
     this.etat = 'combat';
     onomatopee(this, LARGEUR / 2, 200, 'BOX !', 68, '#ffd84a');
@@ -1348,7 +1356,9 @@ export class GregCombat extends BossScene {
     j.sprite.setAlpha(this.g.etat === 'sol' ? R.transparenceJoueur * 0.5 : R.transparenceJoueur);
     j.sprite.setPosition(R.centreX + j.decalage + tremble, R.piedsJoueur + rebond + (pj === 'sol' ? -30 : 0));
     // illustrations de ton boxeur (si elles existent) : posées sur la ceinture, à la place du dessin
-    const H = R.herosIllustre, ill = H && H.poses[pj];
+    // esquive : la même image, retournée quand tu pars à droite
+    const poseIll = pj === 'esquive' && j.esquive && j.esquive.cote > 0 ? 'esquive_d' : pj;
+    const H = R.herosIllustre, ill = H && H.poses[poseIll];
     if (ill && this.textures.exists(ill.cle)) {
       const P = H.images[ill.cle];
       j.sprite.setTexture(ill.cle).setFlipX(!!ill.miroir)

@@ -71,19 +71,22 @@ export const REGLAGES = {
   herosIllustre: {
     ceintureY: 565, taille: 0.66,
     images: { heros_garde: [0.496, 0.801], heros_coup: [0.617, 0.807], heros_uppercut: [0.517, 0.851],
-      heros_touche: [0.499, 0.709], heros_sol: [0.485, 0.75] },
+      heros_touche: [0.499, 0.709], heros_sol: [0.485, 0.75],
+      // nov. 2026 (outils/greg/preparer_heros.py : même taille de short que heros_garde)
+      heros_esquive: [0.487, 0.450], heros_bloque: [0.494, 0.483], heros_dempsey: [0.492, 0.563], heros_victoire: [0.501, 0.759] },
     poses: {
       garde:     { cle: 'heros_garde' },
-      bloque:    { cle: 'heros_garde', echelle: 0.96, dy: 6 },
-      esquive:   { cle: 'heros_garde', dy: 40, echelle: 0.95 },
+      bloque:    { cle: 'heros_bloque' },
+      esquive:   { cle: 'heros_esquive', miroir: true },   // esquive vers la gauche (l'image penche à droite)
+      esquive_d: { cle: 'heros_esquive' },                 // ... et vers la droite
       touche:    { cle: 'heros_touche' },
       sol:       { cle: 'heros_sol', dy: -10 },
       jab:       { cle: 'heros_coup', miroir: true },
       crochet:   { cle: 'heros_coup' },
       corps:     { cle: 'heros_coup', dy: 30, angle: 8 },
-      dempsey_g: { cle: 'heros_coup', miroir: true, dy: 30 },
-      dempsey_d: { cle: 'heros_coup', dy: 30 },
-      victoire:  { cle: 'heros_uppercut' },
+      dempsey_g: { cle: 'heros_dempsey', miroir: true, echelle: 0.6, dy: -60 },
+      dempsey_d: { cle: 'heros_dempsey', echelle: 0.6, dy: -60 },
+      victoire:  { cle: 'heros_victoire' },
     },
   },
   transparenceJoueur: 0.75,

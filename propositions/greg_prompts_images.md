@@ -1,5 +1,6 @@
 # Greg — prompts d'images (proposés par l'audit fun / animation)
 
+> **TOUT EST REÇU (nov. 2026)** sauf `heros_corps`, `heros_coin` et `greg_arme` (facultatifs).
 > **Reçues et branchées (nov. 2026)** : greg_garde_basse, greg_nargue (nouvelle), greg_crochet (refait), greg_ko_debout,
 > greg_victoire, greg_releve. **Restent** : greg_arme (1re version retirée : bras tendu sur le côté, on croyait qu'il tapait à côté ; nouveau prompt en fin de fichier), poses du héros,
 > case K.O. / trophée / arbitre (portrait et visage FAITS).
