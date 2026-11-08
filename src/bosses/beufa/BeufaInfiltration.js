@@ -579,12 +579,17 @@ export class BeufaInfiltration extends BossScene {
     // V24 GRANDES SALLES : Beufa défile au MILIEU de la cour (qui déborde de
     // l'écran) — la caméra se POSE sur son axe, puis rendra la main au héros.
     this.cameras.main.centerOn(480, this.roomH / 2);
-    const beufa = this.add.sprite(480, this.roomH / 2 + 120, 'beufa_boss', 0).setDepth(40).setScale(0.8)
-      .setRotation(-Math.PI / 2 + ORIENT_BOSS);
+    // V95 : Beufa DEBOUT en 3/4, vu de dos (comme Snake et les gardes) ; l'ancienne planche vue du dessus en secours
+    const deDos = this.textures.exists('beufa_boss_dos');
+    const y0 = this.roomH / 2 + 120;
+    const beufa = deDos ? this.add.sprite(480, y0, 'beufa_boss_dos', 0).setDepth(profondeurY(y0 + 25))
+      : this.add.sprite(480, y0, 'beufa_boss', 0).setDepth(40).setScale(0.8).setRotation(-Math.PI / 2 + ORIENT_BOSS);
     const nbCases = Math.max(1, Object.keys(beufa.texture.frames).length - 1);   // moins le __BASE
     this.tweens.add({
       targets: beufa, x: 480, y: this.roomH / 2 - 150, duration: 2600, ease: 'Sine.InOut',
-      onUpdate: (tw) => beufa.setFrame(Math.floor(tw.elapsed / 130) % nbCases),   // le cycle de marche
+      onUpdate: (tw) => deDos   // V95 : les jambes suivent la distance parcourue (un cycle de 8 images = 2 pas / R.garde.pas px)
+        ? beufa.setFrame(Math.floor((y0 - beufa.y) / R.garde.pas * 8) % nbCases).setDepth(profondeurY(beufa.y + 25))
+        : beufa.setFrame(Math.floor(tw.elapsed / 130) % nbCases),
     });
     this.dans(0.6, () => {
       this.cineTexte = texte(this, LARGEUR / 2, HAUTEUR - 60, 'BEUFA : « La cour est à moi… et MON QG est au fond. Bouge pas ! »', 19, '#ffd84a', { backgroundColor: '#000000cc', padding: { x: 14, y: 8 } }).setDepth(960);
@@ -633,6 +638,7 @@ export class BeufaInfiltration extends BossScene {
     this.programme = this.programme.filter(a => a.t > 0);
     this.majHudCamera();   // le HUD reste PUNTO à l'écran, même zoomé et suivi
     this.majNuit();        // la nuit et ses poches de lumière
+    if (this.phase === 'attrape') { this.tAttrape = (this.tAttrape || 0) + dt; this.afficher(); return; }   // V95 : on voit Snake se rendre
     if (this.phase !== 'jeu') return;
     this.temps += dt;
     this.pasJoueur(dt);
@@ -807,6 +813,7 @@ export class BeufaInfiltration extends BossScene {
         }
       }
     } else if (g.etat === 'poursuite') {
+      if (this.temps < (g.surpris || 0)) { this.viser(g, Math.atan2(this.joueur.y - g.y, this.joueur.x - g.x), dt); return; }   // V95 : le sursaut
       if (this.vuPar(g)) { g.vuX = this.joueur.x; g.vuY = this.joueur.y; g.perdu = 0; }
       else {
         g.perdu += dt;
@@ -947,6 +954,7 @@ export class BeufaInfiltration extends BossScene {
     } else jouerSon(this, 'beufa_alerte');
     this.cameras.main.shake(160, 0.005);
     g.etat = 'poursuite'; g.jauge = 1; g.perdu = 0; g.vuX = this.joueur.x; g.vuY = this.joueur.y;
+    g.surpris = this.temps + R.garde.surpris;   // V95 : il sursaute (pose « ! ») et ne court qu'après
     this.messageCentre('!', '#ff5a5a', 0.7);
     // l'alerte est COLLECTIVE : les gardes pas loin se joignent à la course
     for (const o of this.gardes) {
@@ -965,7 +973,7 @@ export class BeufaInfiltration extends BossScene {
 
   attraper() {
     if (this.phase !== 'jeu') return;
-    this.phase = 'attrape';
+    this.phase = 'attrape'; this.tAttrape = 0;
     jouerSon(this, 'beufa_attrape');
     this.cameras.main.shake(280, 0.012);
     this.messageCentre('RENVOYÉ !', '#ff6b6b', 1.4);
@@ -979,7 +987,8 @@ export class BeufaInfiltration extends BossScene {
     this.pierres = R.joueur.pierres;
     for (const g of this.gardes) {
       g.etat = 'ronde'; g.jauge = 0; g.bouge = false; g.pauseT = 0;
-      g.x = g.chemin[0][0]; g.y = g.chemin[0][1]; g.point = 1;
+      g.x = g.chemin[0][0]; g.y = g.chemin[0][1]; g.point = 1; g.surpris = 0;
+      g.angle = g.scan ? g.scanBase : Math.atan2(g.chemin[1][1] - g.y, g.chemin[1][0] - g.x);   // V95 : il regarde vers sa ronde (avant : l'angle d'avant le renvoi)
       g.alerte.setText('');
     }
     for (const pr of this.projecteurs) { pr.jauge = 0; pr.alerte.setText(''); }
@@ -1063,6 +1072,11 @@ export class BeufaInfiltration extends BossScene {
       .setRotation(appui * R.joueur.penche)
       .setDepth(profondeurY(this.joueur.y + 25))   // V56 : tri par les pieds (vue 3/4)
       .setScale(1, 1 + (this.heroBouge ? 0 : Math.sin(this.temps * 2.2) * 0.015));
+    // V95 : RATTRAPÉ : mains levées, puis à genoux (pendant « RENVOYÉ ! »)
+    if (this.phase === 'attrape' && this.textures.exists('beufa_heros_attrape')) {
+      this.sprJoueur.setTexture('beufa_heros_attrape').setFrame(this.tAttrape < 0.55 ? 0 : 1)
+        .setPosition(this.joueur.x, this.joueur.y - 4).setRotation(0).setFlipX(false).setScale(1);
+    }
     const gg = this.conesG;
     gg.clear();
     // LES HALOS : le faisceau de la tour vers son halo, puis le halo lui-même —
@@ -1092,20 +1106,35 @@ export class BeufaInfiltration extends BossScene {
       if (this.textures.exists('beufa_garde_face')) {
         // V75 : le garde est DEBOUT en 3/4 comme Snake : on choisit la planche selon sa direction (plus de rotation)
         const cg = Math.cos(g.angle), sg = Math.sin(g.angle);
+        const horizontal = Math.abs(cg) > Math.abs(sg) + 0.01;
+        const sens = horizontal ? 'profil' : sg < 0 ? 'dos' : 'face';
         let cleG = 'beufa_garde_face', arret = 2;
-        if (Math.abs(cg) > Math.abs(sg) + 0.01) {
-          if (this.textures.exists('beufa_garde_profil_pas')) { cleG = 'beufa_garde_profil_pas'; arret = 2; }   // V89 : arrêt = jambes serrées
+        if (horizontal) {
+          if (this.textures.exists('beufa_garde_profil4')) { cleG = 'beufa_garde_profil4'; arret = 2; }   // V95 : vrai pas en 4 poses (arrêt = passage)
+          else if (this.textures.exists('beufa_garde_profil_pas')) { cleG = 'beufa_garde_profil_pas'; arret = 2; }   // V89 : arrêt = jambes serrées
           else { cleG = 'beufa_garde_profil'; arret = 3; }
         }
         else if (sg < 0) cleG = 'beufa_garde_dos';
+        // V88 : de profil, pas plus court + petit rebond
+        let profil = cleG.startsWith('beufa_garde_profil');
+        let imageG = this.cyclePas(g, profil ? R.garde.pasProfil : R.garde.pasVue, 8);
+        if (cleG === 'beufa_garde_profil4') imageG %= 4;   // V95 : 4 poses = un pas, joué 2 fois par cycle
+        let image = g.bouge ? imageG : arret, miroir = profil && cg < 0;
+        // V95 : les nouvelles poses (si les planches sont là)
+        const cleCourse = 'beufa_garde_course_' + sens;
+        if (this.temps < (g.surpris || 0) && this.textures.exists('beufa_garde_surpris')) {   // le sursaut du « ! »
+          cleG = 'beufa_garde_surpris'; image = sens === 'face' ? 0 : sens === 'dos' ? 1 : 2; profil = false; miroir = horizontal && cg < 0;
+        } else if (g.etat === 'poursuite' && g.bouge && this.textures.exists(cleCourse)) {   // il te COURT après
+          cleG = cleCourse; image = this.cyclePas(g, R.garde.pasCourse, 8); profil = false; miroir = horizontal && cg < 0;
+        } else if (!g.bouge && sg > -0.35 && this.textures.exists('beufa_garde_tete')) {   // planté : il tourne la TÊTE
+          const a = Phaser.Math.Clamp(Math.atan2(Math.max(0, sg), cg), 0, Math.PI);   // 0 = à droite, π/2 = face, π = à gauche
+          cleG = 'beufa_garde_tete'; image = 4 - Math.round(a / Math.PI * 4); profil = false; miroir = false;
+        }
         if (g.sprite.texture.key !== cleG) g.sprite.setTexture(cleG);
-        // V88 : de profil, pas plus court + petit rebond (la planche n'a pas de pose « jambes serrées » : il glissait)
-        const profil = cleG.startsWith('beufa_garde_profil');
-        const imageG = this.cyclePas(g, profil ? R.garde.pasProfil : R.garde.pasVue, 8);
         const rebondG = profil && g.bouge ? R.garde.rebond * Math.abs(Math.sin((g.distPas || 0) / (R.garde.pasProfil / 2) * Math.PI)) : 0;   // V89 : 2 pas par cycle, il monte au passage
         g.sprite.setPosition(g.x, g.y - 4 - rebondG).setDepth(profondeurY(g.y + 25))
-          .setRotation(0).setFlipX(profil && cg < 0)
-          .setFrame(g.bouge ? imageG : arret);
+          .setRotation(0).setFlipX(miroir)
+          .setFrame(image);
         g.alerte.setPosition(g.x, g.y - 40).setScale(1 + Math.sin(this.temps * 18) * 0.12);
       } else {
         const imageG = this.cyclePas(g, R.garde.pas, this.nbFramesGarde);   // V33 : cycle lié à la distance parcourue

@@ -28,6 +28,8 @@ export const REGLAGES = {
     vitessePoursuite: 185, // V32 : 165 en V31, 150 avant — presque aussi rapide que ton sprint
     rayon: 14,
     pas: 64,           // V33 : px pour un cycle de marche complet du garde
+    pasCourse: 150,    // V95 : px pour un cycle de COURSE (8 images) quand il te poursuit
+    surpris: 0.45,     // V95 : s de SURSAUT au « ! » (pose surprise, il ne bouge pas) avant de te courir après
     pasProfil: 56,     // V89 : de profil, px pour 2 pas (8 images fabriquées, 4 par pas) — calé sur l'écart réel des pieds (~25 px)
     profilHanche: 0.58, // V89 : hauteur du haut des jambes (0 = tête, 1 = semelles) pour fabriquer les poses « jambes serrées »
     profilSerrage: 0.36, // V89 : au passage, chaque pied se rapproche de cette part de l'écart des pieds

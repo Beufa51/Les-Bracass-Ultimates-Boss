@@ -1449,6 +1449,22 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   Fabien trouve le quiz facile (il est gamer) : difficulté du quiz inchangée.
 - Images : prompts n°1 à 7 dans `propositions/beufa_prompts_images.md` (en attente des images de Fabien).
 
+## BEUFA — V95 : IMAGES DE L'AUDIT BRANCHÉES (prompts n°1, 2, 3, 4, 6, 7)
+- Originaux dans `assets_inbox/beufa/` ; `python3 outils/beufa_preparer_v95.py` les découpe (taches d'encre, fusils
+  qui débordent OK) en planches d'une rangée dans `assets/sprites/beufa/` ; échelle vérifiée par la largeur du casque
+  (écart 1 % avec les anciens gardes → pas de réglage `echelle`).
+- Cinématique : `beufa_boss_dos` (Beufa debout de dos, 8 images, jambes calées sur la distance / `R.garde.pas`) ;
+  l'ancienne planche vue du dessus reste en secours.
+- Gardes : course en poursuite `beufa_garde_course_face/dos/profil` (`R.garde.pasCourse` 150) ; SURSAUT au « ! »
+  `beufa_garde_surpris` pendant `R.garde.surpris` 0,45 s (il se tourne vers toi sans avancer, puis court ; seul le
+  garde qui t'a vu sursaute, les autres alertés courent tout de suite) ; profil en 4 vraies poses `beufa_garde_profil4`
+  (remplace les poses fabriquées V89, arrêt = passage) ; immobile et pas tourné vers le haut : `beufa_garde_tete`
+  (5 poses de tête selon l'angle : veilleur, garde du sas, pauses au bout des rondes).
+- Snake RATTRAPÉ : `beufa_heros_attrape` (mains levées 0,55 s puis à genoux) ; la scène est redessinée pendant le renvoi.
+- Renvoi : l'angle des gardes est remis vers leur ronde (bug de l'audit).
+- Reste : prompt n°5 (Snake qui court de FACE et de DOS) pas encore livré : la 2e planche Snake de Fabien
+  (`assets_inbox/beufa/beufa_heros_planche2.jpg`) n'a que la course de profil, gardée sans servir.
+
 ## JULIEN — FPS FAÇON WOLFENSTEIN (décidé avec Fabien)
 Histoire : tu es un étudiant en pleine manif, tu dois rejoindre le lycée (niveau 1), puis affronter Julien, prof, qui
 lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : collisions en grille (simples) et peu d'images
