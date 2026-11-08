@@ -13,7 +13,7 @@
 // Objets : 'o' boîte d'œufs, 's' sandwich, 'b' barrière, 'p' poubelle, 'm' manifestant, 'T' statue,
 //          'C' camion de CRS, 'k' colonne Morris (tous bloquent sauf œufs et sandwich).
 // Armes (la 1re trouvée donne l'arme, les suivantes des munitions) : 't' cagette de tomates, 'w' pistolet à eau,
-//          'f' fumigènes (1 seul, au fond du secret du passage), 'Y' la SONO (grand secret de la ruelle : fait fuir
+//          'f' fumigènes (RETIRÉS : l'image de la main est coupée en haut, prompt 23a), 'Y' la SONO (grand secret de la ruelle : fait fuir
 //          tous les policiers en vue).
 // Ennemis en plus : 'N' BAC en civil (rapide, t'attrape au corps à corps), 'L' tireur de LBD (balle rapide en ligne droite).
 // 'q' CARTE DE CANTINE → ouvre 'D', la PORTE DE SERVICE : couloir de la place au parvis (contourne le cordon).
@@ -54,7 +54,7 @@ export const PLAN_MANIF = [
   '111.Y4.B.42215.C.C.512PR..a3221112',
   '111soX...42215.....51223w..8q.1112',
   '222K.4..t41125bbbbb521BR...Zoo2221',
-  '222114...41125.....52113.o.8.f2221',
+  '222114...41125.....52113.o.8..2221',
   '222114.o.41125.m.m.52118.e.3112221',
   '222114...41125.....52113...8112221',
   '4................................4',

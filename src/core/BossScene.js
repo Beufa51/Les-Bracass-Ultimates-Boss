@@ -10,6 +10,8 @@ import { Sauvegarde } from './sauvegarde.js';
 import { texte, voile } from './ui.js';
 import { jouerSon, chargerFichiers, preparerVisuels } from './ressources.js';
 import { estTactile, etiquettesTactiles, etiquettesActuelles } from './tactile.js';
+// écrans de règles et de présentation : seul le bouton OK reste (les autres gênaient la lecture sur téléphone)
+const SEULEMENT_OK = { espace: 'OK', z: null, x: null, haut: null, bas: null, gauche: null, droite: null, hg: null, hd: null };
 
 export class BossScene extends Phaser.Scene {
   // cle : nom unique de la scène ; identite : { id, nom } du boss
@@ -44,6 +46,10 @@ export class BossScene extends Phaser.Scene {
   afficherIntro(titre, commandes, quandPret) {
     // V18 : REJOUER après une défaite → on saute l'écran des commandes (déjà lu)
     if (this.donnees.rejouer) { this.time.delayedCall(0, quandPret); return; }
+    // (Fabien) sur téléphone, les boutons du jeu gênaient la lecture des règles : on ne garde que OK pendant cet écran,
+    // et on remet EXACTEMENT les boutons du niveau quand on appuie sur OK
+    const avant = etiquettesActuelles();
+    etiquettesTactiles(SEULEMENT_OK);
     const liste = texte(this, LARGEUR / 2, 220, commandes.join('\n'), 20, '#ffffff', { lineSpacing: 6, wordWrap: { width: LARGEUR - 60, useAdvancedWrap: true } }).setOrigin(0.5, 0).setDepth(1001);
     // V100 : les longues règles sortaient de l'écran sur les côtés : elles passent à la ligne (ci-dessus),
     // et si la liste devient trop haute, le texte rapetisse jusqu'à tenir au-dessus de l'invite verte
@@ -61,6 +67,7 @@ export class BossScene extends Phaser.Scene {
     ];
     this.input.keyboard.once('keydown-SPACE', () => {
       elements.forEach(el => el.destroy());
+      etiquettesTactiles(avant);
       jouerSon(this, 'ui_valider');
       quandPret();
     });
@@ -71,7 +78,7 @@ export class BossScene extends Phaser.Scene {
   afficherPresentation(o, ensuite) {
     if (this.donnees.rejouer) { this.time.delayedCall(0, ensuite); return; }   // V18 : rejouer = pas de présentation
     const avant = etiquettesActuelles();   // boutons du jeu (ex. Sprint de Beufa) : remis après la présentation
-    etiquettesTactiles({ espace: 'OK', z: null, x: null });
+    etiquettesTactiles(SEULEMENT_OK);   // (la croix aussi est cachée : elle gênait la lecture)
     const el = [];
     el.push(this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, o.fond ?? 0x0b0b14, 1).setDepth(1000));
     const g = this.add.graphics().setDepth(1001);

@@ -1815,6 +1815,13 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   Bot BLOQUEUR : manif un peu plus dure qu'avant (8/9 victoires PC, 7/9 tél. ; le bot n'esquive pas les balles de LBD).
   Images : prompts 22a à 22d LIVRÉS (V106b) → `decouper_audit21.py` : `lbd_*`, `bac_*` (essoufflé = marche0, attrape =
   charge), `sono`, `carte`, `balle`, `main_sono(_tir)` (livrée en main gauche : retournée). Le dessin du code reste en secours.
+- V107 (retours de Fabien) : 2e secret (vitrine du passage) « jamais trouvé » : PAS un bug (testé : il s'ouvre en
+  poussant), mais trop discret → indice « →? » plus gros + fissures, et message « Ce mur a l'air CREUX… » à moins de
+  1,8 case (une fois par mur, `secretsSignales`). FUMIGÈNE retiré de nouveau (main coupée en haut, prompt 23a). LYCÉE :
+  carnet plus gros (hauteur 0,14 → 0,32) et repères sur la CARTE (`reperesCarte()` : CARNET, puis SALLE 12).
+  TOUS LES BOSS (`src/core/BossScene.js`) : pendant les RÈGLES (`afficherIntro`) et la PRÉSENTATION, seul le bouton OK
+  reste sur téléphone ; les boutons du niveau sont remis tels quels en validant (testé sur les 11 scènes : chacune
+  retrouve ses boutons de jeu).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,

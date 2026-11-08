@@ -69,6 +69,11 @@ export class JulienLycee extends JulienManif {
   planDepart() { return PLAN_LYCEE; }
   lancerMusique() { jouerMusique(this, 'julien_lycee_musique'); }   // thème de Duke Nukem 3D
   imageFin() { return 'julien_fin_attrape'; }
+  // carte : le CARNET (tant qu'il n'est pas pris), puis la porte de la salle 12
+  reperesCarte() {
+    if (!this.carnet) { const k = this.objets.find(o => o.type === 'carnet' && o.actif); return k ? [{ x: k.x, y: k.y, couleur: '#ffd84a', nom: 'CARNET' }] : []; }
+    return [{ x: PORTE_SALLE_12.x + 0.5, y: PORTE_SALLE_12.y + 0.5, couleur: '#7fff7f', nom: 'SALLE 12' }];
+  }
   messagesFuite() { return TXT.fuite; }   // surveillants et fayots : pas de « commissariat » au lycée
 
   create() {
@@ -115,7 +120,7 @@ export class JulienLycee extends JulienManif {
     this.j.armes = new Set(['sarbacane']); this.j.arme = 'sarbacane';   // les armes de la manif sont INTERDITES au lycée
     this.ennemis = []; this.objets = []; this.tirs = []; this.fumees = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.farines = []; this.rideaux = []; this.flaques = []; this.fourgonFait = true;
-    this.secrets = new Map(); this.secretsTrouves = 0;
+    this.secrets = new Map(); this.secretsTrouves = 0; this.secretsSignales = new Set();
     this.carnet = false; this.fini = false; this.porteT = 0;
     this.plan = this.plan.map((ligne, y) => [...ligne].map((c, x) => {
       const px = x + 0.5, py = y + 0.5;

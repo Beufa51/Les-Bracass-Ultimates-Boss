@@ -298,7 +298,7 @@ export class JulienManif extends BossScene {
     this.j = this.nouveauJoueur();
     this.ennemis = []; this.objets = []; this.tirs = []; this.fumees = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.sortie = null;
-    this.secrets = new Map(); this.secretsTrouves = 0;
+    this.secrets = new Map(); this.secretsTrouves = 0; this.secretsSignales = new Set();
     this.rideaux = []; this.farines = []; this.fourgonFait = false; this.fourgonT = FOURGON.attente;
     this.portes = new Map(); this.balles = []; this.porteMsgT = 0;   // porte de service (carte de cantine), balles de LBD
     let nm = 0;
@@ -528,6 +528,11 @@ export class JulienManif extends BossScene {
       if (this.secrets.get(k)) this.ouvrirSecret(k);
       if (this.portes && this.portes.get(k)) this.pousserPorte(k);
     }
+    // à côté d'un mur secret encore fermé : un petit message, une fois par mur (« ça sonne creux »)
+    for (const [ks, ferme] of this.secrets) if (ferme && !(this.secretsSignales || (this.secretsSignales = new Set())).has(ks)) {
+      const [sx, sy] = ks.split(',').map(Number);
+      if (Math.hypot(sx + 0.5 - j.x, sy + 0.5 - j.y) < 1.8) { this.secretsSignales.add(ks); this.message('Ce mur a l\'air CREUX… pousse dedans en avançant !', 3); }
+    }
     this.porteMsgT = Math.max(0, (this.porteMsgT || 0) - dt);
     // les policiers ne se traversent pas
     for (const e of this.ennemis) if (e.actif && e.etat !== 'fuite') {
@@ -589,8 +594,11 @@ export class JulienManif extends BossScene {
       const c = document.createElement('canvas'); c.width = base.width; c.height = base.height;
       const g = c.getContext('2d'); g.drawImage(base, 0, 0);
       const u = base.width / 64;
-      g.font = `bold ${14 * u}px monospace`; g.fillStyle = '#ffe14a'; g.textAlign = 'center';
-      g.fillText('↘?', 46 * u, 58 * u);
+      // (Fabien : 2e secret jamais trouvé) indice plus GROS et plus visible : tag jaune cerné de noir + fissures
+      g.strokeStyle = 'rgba(20,20,20,0.75)'; g.lineWidth = 1.5 * u;
+      g.beginPath(); g.moveTo(10 * u, 8 * u); g.lineTo(18 * u, 20 * u); g.lineTo(14 * u, 30 * u); g.moveTo(54 * u, 10 * u); g.lineTo(48 * u, 22 * u); g.stroke();
+      g.font = `bold ${24 * u}px monospace`; g.textAlign = 'center'; g.lineWidth = 4 * u; g.strokeStyle = '#111';
+      g.strokeText('→?', 32 * u, 46 * u); g.fillStyle = '#ffe14a'; g.fillText('→?', 32 * u, 46 * u);
       m.set(y * W + x, c);
     }
     return m;
@@ -857,6 +865,7 @@ export class JulienManif extends BossScene {
   pas60() { return Math.min(4, (this.game.loop.delta || 16.7) / 16.7); }
 
   imageFin() { return 'julien_fin_gaze'; }
+  reperesCarte() { return []; }   // repères sur la carte (le lycée : le carnet)
   donneesRejouer() { return { rejouer: true }; }   // (la classe ajoute le point de reprise)   // image de l'écran PERDU (le lycée et la classe ont la leur)
 
   // message quand un ennemi s'enfuit (le lycée a les siens)
@@ -1109,6 +1118,13 @@ export class JulienManif extends BossScene {
         if (!mur(x - 1, y)) g.fillRect(X, Y, 1, E + 1);
         if (!mur(x + 1, y)) g.fillRect(X + E, Y, 1, E + 1);
       }
+    }
+    // repères (le lycée : le CARNET, puis la porte de la salle 12) : carré qui clignote + nom
+    const clin = Math.sin(this.time.now / 160) > -0.3;
+    for (const r of this.reperesCarte()) {
+      const X = ox + r.x * E, Y = oy + r.y * E;
+      if (clin) { g.fillStyle = r.couleur; g.fillRect(X - 4, Y - 4, 9, 9); g.fillStyle = '#000'; g.fillRect(X - 1, Y - 1, 3, 3); }
+      g.font = 'bold 9px monospace'; g.textAlign = 'center'; g.fillStyle = r.couleur; g.fillText(r.nom, X, Y - 7);
     }
     const cx = L / 2, cy = VUE_H / 2, dx = Math.cos(j.a), dy = Math.sin(j.a);
     g.fillStyle = '#ffffff'; g.beginPath();

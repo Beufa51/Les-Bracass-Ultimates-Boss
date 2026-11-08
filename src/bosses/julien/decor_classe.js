@@ -124,7 +124,7 @@ export function spritesLycee() {
   return S;
 }
 export const HAUTEURS_LYCEE = { surveillant: 1.0, cantiniere: 0.95, fayot_bras: 1.0, fayot_crie: 1.0, fayot_saute: 1.05, fayot_fuite: 1.0,
-  canette: 0.16, extincteur: 0.5, carnet: 0.14, comptoir: 0.62, table: 0.72, puree: 0.1, flaque: 0.06,
+  canette: 0.16, extincteur: 0.5, carnet: 0.32,   /* carnet : (Fabien) plus gros, on le voyait mal */ comptoir: 0.62, table: 0.72, puree: 0.1, flaque: 0.06,
   etagere: 1.15, etagere_basse: 0.6, table_lecture: 0.62, ordinateur: 0.75 };
 
 export function construireDecorClasse(ctx, l, hVue) {

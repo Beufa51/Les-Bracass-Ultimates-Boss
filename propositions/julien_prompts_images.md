@@ -521,3 +521,17 @@ Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D item picku
 Plain solid pure white background (#FFFFFF), no ground shadow, no frame, no grid lines.
 IMPORTANT: every object is clearly SEPARATED from the others by a wide empty white gap on all sides.
 ```
+
+## 23. À refaire
+
+### 23a. Main au fumigène — `julien_main_fumigenes.jpg` (joindre `julien_main_sarbacane.jpg` : même main DROITE, même manche)
+L'image actuelle a la fumée COUPÉE en haut : le fumigène est retiré du niveau tant qu'elle n'est pas refaite.
+Fichiers découpés : `julien_main_fumigenes`, `julien_main_fumigenes_tir`.
+```
+Use the attached image as the exact style and the exact same RIGHT hand and navy blue hoodie sleeve, same size and position in the frame.
+First-person view (like the weapon hand of DOOM 1993), pixel art, visible chunky pixels, limited color palette.
+2 poses side by side, each in its own equal-size cell, the sleeve coming from the bottom-right edge of each cell:
+1) the hand holding a lit pink smoke flare (a pink cardboard tube), a SHORT puff of pink smoke rising from it — the whole smoke cloud must stay INSIDE the cell, with white space above it;
+2) the same hand, open, just after throwing the flare (empty hand, fingers spread).
+Plain solid pure white background (#FFFFFF), no text, no frame, no grid lines. Nothing touches the top edge of the image. The two poses are clearly separated by a wide white gap.
+```
