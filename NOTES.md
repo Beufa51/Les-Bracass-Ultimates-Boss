@@ -55,7 +55,11 @@
   aussi juste après avoir encaissé ; « X HITS » (+10 % par coup) ; esquive PARFAITE (≤ 0,12 s, flash bleu, +5 esprit) ;
   moment secret visible (« hé hé... », sifflement, éclat sur le ventre, conseil du coach au round 1) ; « ! » violet au
   milieu ; SMASH une fois au round 2 ; enchaînements au hasard aux rounds 2-3 (+ petites hésitations).
-- RESTE : images (prompts dans `propositions/greg_prompts_images.md`, section « AUDIT NOVEMBRE 2026 »).
+- Images reçues et branchées : `greg2_garde_basse`, `greg2_nargue` (nouvelle, langue tirée), `greg2_crochet` (refait),
+  `greg2_ko_debout` (chute), `greg2_victoire`, `greg2_arme` (il arme ses coups au visage). Anciennes versions gardées
+  dans `assets_inbox/greg_v2/` (`_ancien`, `_rate`). Outil : `python3 outils/greg/preparer_v2.py`.
+- RESTE : greg_releve (nouveau prompt), poses du héros, portrait / visage / case K.O. / trophée / arbitre
+  (prompts dans `propositions/greg_prompts_images.md`).
 
 ## AUDIT GLOBAL V18 (6 boss, version économe) : `propositions/audit_global.md`
 - 0 plantage (14 lancements + « rejouer »), 0 erreur aux outils. Petits défauts : B1 clic souris inactif sur l'écran de fin

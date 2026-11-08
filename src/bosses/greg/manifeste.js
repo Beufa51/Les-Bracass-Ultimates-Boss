@@ -26,7 +26,7 @@ export const MANIFESTE = {
     // Une image par pose. Le bas du corps touche le bas de la case.
     greg_ring:  { fichier: null, largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'ring', pixel: 2 } },
     // Greg v2 (nouvelle tête + tatouages, assets_inbox/greg_v2, détourées par outils/greg/preparer_v2.py)
-    // (audit nov. 2026 : les anciennes images v1 du combat ne sont plus chargées ni gardées ; le crochet v2 raté non plus)
+    // (audit nov. 2026 : les anciennes images v1 du combat ne sont plus chargées ni gardées)
     greg2_garde_haute: { fichier: 'sprites/greg/greg2_garde_haute.png', largeur: 402, hauteur: 560, images: 1, vitesse: 1 },
     greg2_nargue: { fichier: 'sprites/greg/greg2_nargue.png', largeur: 237, hauteur: 560, images: 1, vitesse: 1 },
     greg2_entier: { fichier: 'sprites/greg/greg2_entier.png', largeur: 398, hauteur: 560, images: 1, vitesse: 1 },
@@ -35,6 +35,11 @@ export const MANIFESTE = {
     greg2_smash: { fichier: 'sprites/greg/greg2_smash.png', largeur: 331, hauteur: 561, images: 1, vitesse: 1 },
     greg2_touche: { fichier: 'sprites/greg/greg2_touche.png', largeur: 360, hauteur: 545, images: 1, vitesse: 1 },
     greg2_etourdi: { fichier: 'sprites/greg/greg2_etourdi.png', largeur: 237, hauteur: 560, images: 1, vitesse: 1 },
+    greg2_crochet: { fichier: 'sprites/greg/greg2_crochet.png', largeur: 287, hauteur: 560, images: 1, vitesse: 1 },
+    greg2_garde_basse: { fichier: 'sprites/greg/greg2_garde_basse.png', largeur: 231, hauteur: 560, images: 1, vitesse: 1 },
+    greg2_ko_debout: { fichier: 'sprites/greg/greg2_ko_debout.png', largeur: 237, hauteur: 560, images: 1, vitesse: 1 },
+    greg2_victoire: { fichier: 'sprites/greg/greg2_victoire.png', largeur: 318, hauteur: 559, images: 1, vitesse: 1 },
+    greg2_arme: { fichier: 'sprites/greg/greg2_arme.png', largeur: 318, hauteur: 556, images: 1, vitesse: 1 },
     greg2_tape_gants: { fichier: 'sprites/greg/greg2_tape_gants.png', largeur: 258, hauteur: 560, images: 1, vitesse: 1 },
     greg_ko:          { fichier: 'sprites/greg/greg_ko.png', largeur: 341, hauteur: 410, images: 1, vitesse: 1 },
     greg_gant:     { fichier: null, largeur: 220, hauteur: 220, images: 1, vitesse: 1,

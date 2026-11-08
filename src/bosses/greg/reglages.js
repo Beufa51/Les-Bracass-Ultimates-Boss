@@ -48,18 +48,18 @@ export const REGLAGES = {
       // Greg v2 : toutes posées sur leurs pieds (solY), même taille ; origine x = la tête
       entier:     { cle: 'greg2_entier',      origine: [0.510, 1], taille: 0.78, pied: true },
       gardePied:  { cle: 'greg2_garde_haute', origine: [0.505, 1], taille: 0.78, pied: true },
-      gardeBasse: { cle: 'greg2_entier',      origine: [0.510, 1], taille: 0.78, pied: true },   // provisoire : image « greg_garde_basse » à générer (prompt n°1)
-      nargue:     { cle: 'greg2_nargue',      origine: [0.494, 1], taille: 0.78, pied: true },
+      gardeBasse: { cle: 'greg2_garde_basse', origine: [0.483, 1], taille: 0.78, pied: true },
+      nargue:     { cle: 'greg2_nargue',      origine: [0.418, 1], taille: 0.78, pied: true },   // langue tirée, bras ballants
       tapeGants:  { cle: 'greg2_tape_gants',  origine: [0.496, 1], taille: 0.78, pied: true },   // avant le SMASH
       jab:        { cle: 'greg2_jab',         origine: [0.427, 1], taille: 0.78, pied: true, cote: 'd' },
-      crochet:    { cle: 'greg2_jab',         origine: [0.427, 1], taille: 0.78, pied: true, cote: 'd' },   // provisoire : l'image crochet v2 est à refaire
+      crochet:    { cle: 'greg2_crochet',     origine: [0.582, 1], taille: 0.78, pied: true, cote: 'g' },
+      arme:       { cle: 'greg2_arme',        origine: [0.481, 1], taille: 0.78, pied: true, cote: 'd' },   // il arme son coup au visage
       corpsPied:  { cle: 'greg2_corps',       origine: [0.526, 1], taille: 0.78, pied: true, cote: 'g' },
       smash:      { cle: 'greg2_smash',       origine: [0.636, 1], taille: 0.78, pied: true },
       touche:     { cle: 'greg2_touche',      origine: [0.616, 1], taille: 0.78, pied: true },
       etourdi:    { cle: 'greg2_etourdi',     origine: [0.492, 1], taille: 0.78, pied: true },
-      // en attendant leurs images v2 : la chute utilise "étourdi", la victoire utilise "nargue"
-      koDebout:   { cle: 'greg2_etourdi',     origine: [0.492, 1], taille: 0.78, pied: true },
-      victoire:   { cle: 'greg2_nargue',      origine: [0.494, 1], taille: 0.78, pied: true },
+      koDebout:   { cle: 'greg2_ko_debout',   origine: [0.492, 1], taille: 0.78, pied: true },   // yeux blancs, il bascule
+      victoire:   { cle: 'greg2_victoire',    origine: [0.501, 1], taille: 0.78, pied: true },
     },
     dureeChute: 0.9,   // K.O. : durée de la chute sur le ring avant la case manga
     debutElan: 0.2,    // à partir de ce moment de la préparation, on voit le coup partir

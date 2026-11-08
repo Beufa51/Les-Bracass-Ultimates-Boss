@@ -1460,7 +1460,7 @@ export class GregCombat extends BossScene {
       if (avance < debut) {             // il arme son coup
         if (c === 'smash') { dy = 34; echelle = 0.93; angle = -3; if (existe('tapeGants')) { pose = 'tapeGants'; dy = 0; angle = 0; } }
         else if (c === 'corps') { dy = 46; echelle = 0.9; dx = sens * 20; angle = sens * 4; }   // il plonge bas
-        else { dx = sens * 34; angle = sens * 6; echelle = 0.96; }
+        else { dx = sens * 34; angle = sens * 6; echelle = 0.96; if (existe('arme')) { pose = 'arme'; dx = sens * 14; angle = 0; } }
       } else {                          // le coup part : l'image du coup grossit vers toi, du bon côté
         const elan = (avance - debut) / (1 - debut);
         pose = imageCoup(c); rapide = true;

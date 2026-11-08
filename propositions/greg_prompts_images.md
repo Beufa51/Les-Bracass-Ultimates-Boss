@@ -1,5 +1,9 @@
 # Greg — prompts d'images (proposés par l'audit fun / animation)
 
+> **Reçues et branchées (nov. 2026)** : greg_garde_basse, greg_nargue (nouvelle), greg_crochet (refait), greg_ko_debout,
+> greg_victoire, greg_arme. **Restent** : greg_releve (nouveau prompt plus simple en fin de fichier), poses du héros,
+> portrait / visage / case K.O. / trophée / arbitre.
+
 Pour chaque image : JOINDRE `assets/sprites/greg/heros_garde.png` (pour garder le même boxeur et le même style).
 Fond blanc uni (il sera retiré ensuite), personnage entier visible, rien qui touche les bords.
 Ranger les fichiers dans `assets_inbox/` ; ils seront détourés puis mis dans `assets/sprites/greg/`.
@@ -323,3 +327,12 @@ sideways, right glove launching a hook upward, left glove tucked at the chin, sp
 the weave, explosive power. Plain pure white background, full figure, nothing touching the edges, no text.
 ```
 
+
+
+## greg_releve.jpg — NOUVEAU PROMPT (le 1er ne marchait pas : « à genoux » + corps entier est trop dur)
+Joindre `assets_inbox/greg_reference_face.jpg`, coller le Prompt commun de l'Étape 2, puis :
+```
+POSE: standing up again after a knockdown, still standing on both feet but bent forward, both gloves pressed on his
+knees to push himself up, head raised toward the viewer, one eye half closed, sweat dripping, gritted teeth, angry and
+determined. Both feet flat on the ground. The belt has a plain gold buckle with NO text.
+```
