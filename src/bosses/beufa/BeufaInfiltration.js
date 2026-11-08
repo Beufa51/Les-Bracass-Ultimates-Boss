@@ -166,7 +166,7 @@ export class BeufaInfiltration extends BossScene {
       image: 'beufa_presentation', nom: 'BEUFA', surnom: '« LE COMMANDANT »', couleur: '#3d5a2a', fond: 0x0a120c,
       infos: [
         'Repaire : sa base militaire',
-        'Arme secrète : LE QUIZ (60 questions)',
+        'Arme secrète : LE QUIZ (44 questions)',
         'Signe distinctif : chemise impeccable',
         'Conseil : reste dans l\'ombre…',
       ],
@@ -1332,6 +1332,9 @@ export class BeufaInfiltration extends BossScene {
 
   messageCentre(txt, couleur, duree) {
     // (le scale du message est géré par majHudCamera : lisible sous n'importe quel zoom)
+    // V100 : les messages longs (astuces) sortaient de l'écran des deux côtés : plus petits, et à la ligne
+    const long = txt.split('\n').some((l) => l.length > 28);
+    this.message.setFontSize(long ? 26 : 40).setWordWrapWidth(LARGEUR - 80, true);
     this.message.setText(txt).setColor(couleur).setAlpha(1);
     this.tweens.add({ targets: this.message, alpha: 0, delay: duree * 1000, duration: 350 });
   }

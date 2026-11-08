@@ -75,7 +75,7 @@ export const MANIFESTE = {
     beufa_portrait:        { fichier: 'sprites/beufa/beufa_portrait.jpg', fond: 'blanc', largeur: 120, hauteur: 120, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#8c704c', pixel: 2 } },
     beufa_portrait_masque: { fichier: 'sprites/beufa/beufa_portrait_masque.jpg', fond: 'blanc', largeur: 120, hauteur: 120, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#383838', pixel: 2 } },
     beufa_buste:           { fichier: 'sprites/beufa/beufa_buste.jpg', fond: 'blanc', largeur: 172, hauteur: 198, images: 1, vitesse: 1, provisoire: { forme: 'conteneur_nes', couleur: '#a8c4e0', pixel: 2 } },
-    beufa_presentation:    { fichier: 'sprites/beufa/beufa_buste.jpg', fond: 'blanc', largeur: 459, hauteur: 528, images: 1, vitesse: 1 },   // écran de présentation (le buste en grand)
+    beufa_presentation:    { fichier: 'sprites/beufa/beufa_presentation.jpg', fond: 'blanc', largeur: 366, hauteur: 500, images: 1, vitesse: 1 },   // V100 : écran de présentation : Beufa en pied (image de Fabien, runes du fond effacées ; original assets_inbox/beufa/beufa_presentation_fabien.jpg)
     beufa_codec_masque: { fichier: 'sprites/beufa/beufa_codec_masque.jpg', fond: 'bord', largeur: 256, hauteur: 256, images: 1, vitesse: 1 },   // V84 : portraits codec de Fabien
     beufa_codec_souriant: { fichier: 'sprites/beufa/beufa_codec_souriant.jpg', fond: 'bord', largeur: 256, hauteur: 256, images: 1, vitesse: 1 },   // V84 : portraits codec de Fabien
     beufa_codec_surpris: { fichier: 'sprites/beufa/beufa_codec_surpris.jpg', fond: 'bord', largeur: 256, hauteur: 256, images: 1, vitesse: 1 },   // V84 : portraits codec de Fabien

@@ -1469,6 +1469,16 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   les autres étaient de biais). Course de dos tout droit : la planche reçue (`course_dos2`) n'a que 2 images vraiment de
   dos → pas utilisée, le sprint vers le haut garde la marche de dos accélérée.
 
+## V100 : QUIZ DE FABIEN + PRÉSENTATION DE BEUFA + TEXTES QUI SORTAIENT DE L'ÉCRAN
+- Quiz : les 44 questions de Fabien (`Quizz.docx`) dans `data/beufa_quiz.js` (Link's Awakening : 4 mauvaises
+  réponses proposées, « Zelda » retirée car l'écran a 4 cases). Présentation : « 44 questions ».
+- Présentation de Beufa : `beufa_presentation.jpg` = Beufa en pied (image de Fabien, runes grises du fond effacées
+  par script ; original `assets_inbox/beufa/beufa_presentation_fabien.jpg`).
+- TOUS LES BOSS : `afficherIntro` (BossScene) passe les règles à la ligne (largeur écran - 60) et rapetisse le texte
+  s'il est trop haut. Beufa : messages du centre longs (astuces) en 26 px et à la ligne. Vérifié par un test qui
+  parcourt 9 scènes (6 écrans chacune, ordinateur + téléphone) : 0 texte hors de l'écran (avant : Kédric, Rémi vélo /
+  babyfoot / porte, astuces de Beufa).
+
 ## BEUFA — V99 : BOUTON SPRINT DISPARU SUR TÉLÉPHONE
 - L'écran de DIFFICULTÉ (`beufa/difficulte.js`) cache Sprint et ne le remettait jamais : les boutons du jeu
   (`boutonsJeu` dans `create()`) sont remis après le choix. Vérifié en téléphone simulé : « Sprint | OK » + joystick.

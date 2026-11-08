@@ -44,7 +44,10 @@ export class BossScene extends Phaser.Scene {
   afficherIntro(titre, commandes, quandPret) {
     // V18 : REJOUER après une défaite → on saute l'écran des commandes (déjà lu)
     if (this.donnees.rejouer) { this.time.delayedCall(0, quandPret); return; }
-    const liste = texte(this, LARGEUR / 2, 220, commandes.join('\n'), 20, '#ffffff', { lineSpacing: 6 }).setOrigin(0.5, 0).setDepth(1001);
+    const liste = texte(this, LARGEUR / 2, 220, commandes.join('\n'), 20, '#ffffff', { lineSpacing: 6, wordWrap: { width: LARGEUR - 60, useAdvancedWrap: true } }).setOrigin(0.5, 0).setDepth(1001);
+    // V100 : les longues règles sortaient de l'écran sur les côtés : elles passent à la ligne (ci-dessus),
+    // et si la liste devient trop haute, le texte rapetisse jusqu'à tenir au-dessus de l'invite verte
+    for (let t = 19; liste.height > HAUTEUR - 220 - 50 && t >= 13; t--) liste.setFontSize(t);
     // le texte vert se place SOUS les commandes, à la hauteur MESURÉE de la liste :
     // plus jamais par-dessus (Kédric et ses 9 lignes de règles du match chevauchaient l'invite !)
     const vert = texte(this, LARGEUR / 2,
