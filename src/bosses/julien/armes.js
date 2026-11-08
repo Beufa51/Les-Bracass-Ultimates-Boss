@@ -17,6 +17,7 @@ export const ARMES = [
   { id: 'eau', nom: 'PISTOLET À EAU', mun: 'eau' },
   { id: 'fumigenes', nom: 'FUMIGÈNES', mun: 'fumigenes' },
   { id: 'sarbacane', nom: 'SARBACANE', mun: null },   // niveau 2 (la classe), touche 6
+  { id: 'sono', nom: 'LA SONO', mun: 'sono' },   // grand secret de la manif (ARME pour la choisir)
 ];
 export const armeDe = (id) => ARMES.find(a => a.id === id);
 
@@ -29,6 +30,8 @@ export const RECHARGES = {
     trouve: 'Un PISTOLET À EAU ! (touche 4 / ARME) : il ÉTEINT les lacrymos.' }),
   fumigenes: () => ({ n: RG.fumigenes.boite, maxi: RG.fumigenes.maxi, txt: `Des fumigènes ! (+${RG.fumigenes.boite})`,
     trouve: 'Des FUMIGÈNES ! (touche 5 / ARME) : caché dans la fumée, la police ne te voit plus.' }),
+  sono: () => ({ n: RG.sono.charges, maxi: RG.sono.maxi, txt: 'Des piles pour la sono !',
+    trouve: 'LA SONO ! (ARME pour la choisir) : un coup de basse, et TOUS les policiers en vue s\'enfuient. 2 charges.' }),
 };
 
 // Change d'arme (si on l'a) ; sens : +1 / -1 = la suivante / la précédente qui a des munitions
@@ -86,6 +89,9 @@ export function tirer(scene, dx, dy, appui, nouveau) {
     const e = (Math.random() - 0.5) * 0.06, base = Math.atan2(vy, vx);
     ajout('eau', Math.cos(base + e), Math.sin(base + e));
     if (nouveau || Math.random() < 0.25) jouerSon(scene, 'julien_eau');
+  } else if (j.arme === 'sono') {
+    j.recharge = RG.sono.cadence; j.lanceT = 0.5;
+    scene.sono();
   } else if (j.arme === 'fumigenes') {
     j.recharge = RG.fumigenes.cadence; j.lanceT = 0.3;
     // il retombe à « distance » cases devant, ou avant le premier mur
@@ -147,7 +153,7 @@ export function avancerTirs(scene, dt) {
       }
       continue;
     }
-    for (const b of scene.objets) if (b.actif && b.solide && Math.hypot(b.x - o.x, b.y - o.y) < b.rayon) {
+    for (const b of scene.objets) if (b.actif && b.solide && !(b.porteur && b.porteur.actif && b.porteur.etat !== 'fuite') && Math.hypot(b.x - o.x, b.y - o.y) < b.rayon) {   // (porteur : le policier sur le toit du fourgon)
       o.fini = true;
       if (!sec) scene.splats.push({ x: o.x, y: o.y, t: 1.2, rouge: o.genre === 'tomate' });
       if ((b.type === 'farine' || b.type === 'extincteur') && o.genre !== 'eau') scene.exploserFarine(b);   // extincteur : le lycée
@@ -158,7 +164,10 @@ export function avancerTirs(scene, dt) {
     if (o.fini) continue;
     for (const e of scene.ennemis) if (e.actif && e.etat !== 'fuite' && Math.hypot(e.x - o.x, e.y - o.y) < 0.35) {
       o.fini = true;
-      scene.toucherEnnemi(e, R.degats, { recul: [o.dx * R.recul, o.dy * R.recul], silencieux: o.genre === 'eau', genre: o.genre, tache: o.genre === 'oeuf' ? 'oeuf' : o.genre === 'tomate' ? 'tomate' : null });
+      // pistolet à eau : petit « plic » toutes les 3 gouttes et un SURSAUT toutes les 6 (audit nov. 2026 : il « ne faisait rien »)
+      const goutte = o.genre === 'eau' ? (e.eauN = (e.eauN || 0) + 1) : 0;
+      if (goutte % 3 === 1) jouerSon(scene, 'julien_eau', { rate: 1.7, volume: 0.35 });
+      scene.toucherEnnemi(e, R.degats, { recul: [o.dx * R.recul, o.dy * R.recul], silencieux: o.genre === 'eau' && goutte % 6 !== 0, genre: o.genre, tache: o.genre === 'oeuf' ? 'oeuf' : o.genre === 'tomate' ? 'tomate' : null });
       break;
     }
   }

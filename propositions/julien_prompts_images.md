@@ -469,3 +469,55 @@ Pixel art sprite in the style of DOOM (1993) and Wolfenstein 3D. Humorous, carto
 One single pose: bent forward, coughing into his fist, eyes watering behind the visor, shield lowered at his side, a little green tear-gas around his feet.
 Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
 ```
+
+## 22. Nouveautés de la manif (V106 : BAC, LBD, sono, carte de cantine) — à déposer dans `assets_inbox/julien/`
+En attendant : BAC = un manifestant avec un brassard orange dessiné par le code, LBD = le lanceur assombri, sono / carte /
+balle = petits dessins du code.
+
+### 22a. BAC en civil — `julien_bac.jpg` (joindre `julien_policier.jpg` pour l'échelle et le style)
+Fichiers découpés : `julien_bac_marche0/1`, `_cri`, `_charge`, `_touche`, `_fuite`.
+```
+Use the attached image only for the exact pixel art style, scale and proportions. New character.
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. Humorous, cartoonish French street-protest theme, no blood, no gore, no weapon.
+A French plainclothes police officer: hooded grey sweatshirt, jeans, sneakers, short beard, an orange "POLICE" armband on the left arm, a small radio on the belt.
+6 poses in one row, each in its own equal-size cell, same scale, feet aligned on the same bottom line, seen strictly from the FRONT, facing the viewer:
+1) walking, left foot forward; 2) walking, right foot forward; 3) shouting "Police!", one arm raised, showing the armband;
+4) running fast toward the viewer, arms forward to grab; 5) hit by an egg, egg yolk on his sweatshirt, flinching; 6) running away, seen from the back, yolk on the hood.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no part may touch another pose or the cell border.
+```
+
+### 22b. Tireur de LBD — `julien_lbd.jpg` (joindre `julien_policier.jpg` : même uniforme, même échelle)
+Fichiers découpés : `julien_lbd_marche0/1`, `_bras` (il épaule), `_lance` (il tire), `_touche`, `_fuite`.
+```
+Use the attached image as the exact uniform, helmet, colors, scale and pixel art style (same riot police officer), but he now holds a big rubber-bullet launcher (a thick black shoulder weapon with a wide barrel).
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D. Humorous, cartoonish, no blood, no gore. Full body, seen strictly from the FRONT, facing the viewer, no perspective tilt.
+6 poses in one row, each in its own equal-size cell, same scale, feet aligned on the same bottom line:
+1) walking with the launcher held across the chest; 2) walking, other foot forward; 3) aiming: launcher on the shoulder, pointed straight at the viewer;
+4) firing: small orange muzzle flash, recoil; 5) hit by an egg, yolk on the visor, flinching; 6) running away, seen from the back.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no part may touch another pose or the cell border.
+```
+
+### 22c. La sono en main + au sol — `julien_main_sono.jpg` (joindre `julien_main_sarbacane.jpg` : même main droite, même manche)
+Fichiers découpés : `julien_main_sono`, `julien_main_sono_tir`.
+```
+Use the attached image as the exact style and the exact same RIGHT hand and navy blue hoodie sleeve, same size and position in the frame.
+First-person view (like the weapon hand of DOOM 1993), pixel art, visible chunky pixels, limited color palette.
+2 poses side by side, each in its own equal-size cell, the sleeve coming from the bottom-right edge of each cell:
+1) the hand holding a big portable party loudspeaker (black box with a large round woofer and a small tweeter, yellow handle);
+2) the same, the loudspeaker blasting: woofer pushed forward, yellow sound waves and little music notes bursting out.
+Plain solid pure white background (#FFFFFF), no text, no frame, no grid lines. The two poses are clearly separated by a wide white gap.
+```
+
+### 22d. Objets : sono au sol, carte de cantine, balle de LBD — `julien_objets_v106.jpg`
+Fichiers découpés : `julien_sono`, `julien_carte`, `julien_balle`.
+```
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D item pickups: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading.
+3 separate objects in one row, each in its own equal-size cell, seen from the FRONT:
+1) a big black portable party loudspeaker standing on the ground (large round woofer, yellow handle);
+2) a French school canteen card: blue plastic card with a small photo, a barcode and the word "CANTINE";
+3) a rubber bullet of a riot police launcher: small black and orange foam projectile, with motion lines.
+Plain solid pure white background (#FFFFFF), no ground shadow, no frame, no grid lines.
+IMPORTANT: every object is clearly SEPARATED from the others by a wide empty white gap on all sides.
+```

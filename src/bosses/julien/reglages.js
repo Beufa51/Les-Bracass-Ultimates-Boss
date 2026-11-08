@@ -20,6 +20,14 @@ export const RANGS = [
   { mini: 0, nom: 'FAYOT', court: 'FAYOT' },
 ];
 
+// rang de fin de la CLASSE (vie restante 40, temps 25, coups de dos 20, notes 20/20 en vue du dessus 15)
+export const RANGS_CLASSE = [
+  { mini: 85, nom: 'MAJOR DE PROMO', court: 'MAJOR' },
+  { mini: 65, nom: 'TABLEAU D\'HONNEUR', court: 'HONNEUR' },
+  { mini: 40, nom: 'PEUT MIEUX FAIRE', court: 'MIEUX' },
+  { mini: 0, nom: 'CANCRE', court: 'CANCRE' },
+];
+
 export const REGLAGES = {
   joueur: {
     vie: 100,            // vie au départ (et maximum)
@@ -84,6 +92,17 @@ export const REGLAGES = {
     degats: 10,          // charge du CRS (18 → 14 → 10 : Fabien, trop dur)
     essouffle: 2.2,      // bouclier baissé ce temps-là après la charge : c'est le moment de lui lancer des œufs
   },
+  // audit nov. 2026 (restes de l'audit Doom) : BAC en civil, tireur de LBD, la SONO
+  bac: {                 // policier en civil : caché dans la foule, rapide ; pas de bouclier ; il fonce et t'attrape
+    vie: 2, vitesse: 2.3, vue: 8, porteeCharge: 4, preavis: 0.45, vitesseCharge: 6.5, dureeCharge: 0.9,
+    degats: 9, essouffle: 1.4, cri: '« POLICE ! Bouge pas, toi ! »',
+    attrape: { portee: 1.0, degats: 6, cadence: 0.9, replique: '« Je te tiens ! »' },
+  },
+  lbd: {                 // tireur de LBD : comme le lanceur, mais une BALLE rapide en ligne droite (pas de pas de côté = touché)
+    vie: 2, vitesse: 1.1, vue: 10, distance: 6, cadence: 4, preavis: 0.9, replique: '« Tir de LBD ! »',
+    balle: { vitesse: 9, degats: 9, rayon: 0.3 },
+  },
+  sono: { cadence: 1.5, portee: 10, charges: 2, maxi: 3 },   // la SONO (arme 7, le « BFG ») : tous les policiers EN VUE fuient
   lacrymo: {
     vol: 1.0,            // temps de vol de la grenade
     duree: 4.5,          // durée du nuage
@@ -127,6 +146,9 @@ export const REGLAGES = {
     confisque: { portee: 2.8, duree: 8, preavis: 0.7 },   // « CONFISQUÉ ! » : trop près, il prend ton arme
     regle: { portee: 1.9, degats: 18, recul: 1.3, preavis: 0.45 },   // règle géante au contact
     rafale: { nombre: 3, intervalle: 0.28 },
+    premierMur: 20,      // (Fabien) pas de vue du dessus avant 20 s de combat : on découvre d'abord Julien en 3D
+    descente: { chance: [0.25, 0.4, 0], duree: 5 },   // il DESCEND de l'estrade vers toi (chance à chaque nouveau but, par phase) : confisqué / règle
+    par: 150,            // rang de fin : temps de référence (s) du combat ; plein de points en dessous
     anarchiste: { vie: 1.3, vagues: 2 },   // ANARCHISTE : × la vie de Julien, vagues de copies en plus (+ rafale de murs à chaque phase)
     // DÉLUGE DE COPIES (bullet hell) : vagues par phase, s entre 2 vagues, copies par éventail, cercle d'une vague sur 3
     deluge: { vagues: [3, 5, 7], intervalle: [0.75, 0.6, 0.5], nombre: 9, ecart: 0.2, cercle: 18, vitesse: 3.3, degats: 7, preavis: 0.9 },

@@ -208,6 +208,10 @@ function manifestant(n) {
 
 export function texturesSprites() {
   const S = {};
+  // audit nov. 2026 : la sono (au sol), la carte de cantine, la balle de LBD (dessins provisoires, prompts 22)
+  S.sono = toile(48, 48, (g) => { R(g, '#1c1c1c', 6, 4, 36, 42); R(g, '#3a3a3a', 9, 7, 30, 36); ovale(g, '#111', 24, 30, 10, 10); ovale(g, '#666', 24, 30, 4, 4); ovale(g, '#111', 24, 14, 5, 5); R(g, '#ffd84a', 10, 8, 6, 2); });
+  S.carte = toile(40, 28, (g) => { R(g, '#2a7ad8', 2, 2, 36, 24); R(g, '#ffffff', 5, 6, 14, 2); R(g, '#ffffff', 5, 11, 20, 2); R(g, '#ffd84a', 26, 14, 9, 8); R(g, '#13427a', 2, 20, 36, 3); });
+  S.balle = toile(16, 16, (g) => { ovale(g, '#222', 8, 8, 6, 6); ovale(g, '#ff7a1a', 8, 8, 4, 4); ovale(g, '#ffd0a0', 6, 6, 1.5, 1.5); });
   for (const p of ['marche0', 'marche1', 'bras', 'lance', 'touche', 'fuite']) S['lanceur_' + p] = policier(p);
   for (const p of ['marche0', 'marche1', 'cri', 'charge', 'essouffle', 'touche', 'fuite']) S['bouclier_' + p] = crs(p);
   for (let i = 0; i < 4; i++) S['manifestant_' + i] = manifestant(i);
@@ -333,6 +337,9 @@ export function texturesMain() {
     eau_tir: arme((g) => { bras(g, 52, 78); R(g, '#ff8c1a', 30, 54, 56, 18); R(g, '#2a9cff', 46, 36, 26, 18); R(g, '#ffd84a', 22, 58, 10, 8); ovale(g, 'rgba(160,215,255,0.8)', 14, 58, 8, 5); R(g, '#ff8c1a', 62, 72, 12, 20); ovale(g, PEAU, 68, 82, 12, 10); }),
     fumigenes: arme((g) => { bras(g, 46, 72); ovale(g, PEAU, 60, 66, 15, 12); R(g, '#d02a8a', 52, 26, 14, 40); R(g, '#222', 52, 26, 14, 6); ovale(g, 'rgba(240,140,200,0.7)', 58, 18, 10, 8); }),
     fumigenes_tir: arme((g) => { bras(g, 40, 50); ovale(g, PEAU, 52, 46, 15, 11); }),
+    // la SONO (dessin provisoire, prompt 22c) : une enceinte portée à bout de bras
+    sono: arme((g) => { bras(g, 50, 82); R(g, '#1c1c1c', 22, 22, 64, 62); R(g, '#3a3a3a', 26, 26, 56, 54); ovale(g, '#111', 54, 62, 17, 17); ovale(g, '#555', 54, 62, 7, 7); ovale(g, '#111', 54, 36, 8, 8); R(g, '#ffd84a', 28, 28, 8, 3); ovale(g, PEAU, 66, 86, 13, 10); }),
+    sono_tir: arme((g) => { bras(g, 50, 86); R(g, '#1c1c1c', 18, 18, 70, 66); R(g, '#3a3a3a', 22, 22, 62, 58); ovale(g, '#111', 53, 60, 20, 20); ovale(g, '#777', 53, 60, 9, 9); ovale(g, '#111', 53, 33, 9, 9); g.strokeStyle = '#ffd84a'; g.lineWidth = 3; for (const r of [28, 36]) { g.beginPath(); g.arc(53, 50, r, Math.PI * 1.1, Math.PI * 1.9); g.stroke(); } ovale(g, PEAU, 66, 90, 13, 10); }),
   };
 }
 
@@ -353,10 +360,10 @@ const MAINS = { tient: 'main_tient', lance: 'main_lance', vide: 'main_vide',   /
  
   ...Object.fromEntries(['pancarte', 'tomates', 'eau', 'fumigenes'].flatMap(a => [[a, 'main_' + a], [a + '_tir', 'main_' + a + '_tir']])) };
 // hauteur dans le monde (1 = un mur) avec les vraies images : leur cadre inclut bras levés, pancartes, fumée…
-const HAUTEURS_IMAGES = { lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barriere: 0.45, poubelle: 0.5, oeufs: 0.2,
+const HAUTEURS_IMAGES = { lbd: 1.0, sono: 0.3, carte: 0.12, lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barriere: 0.45, poubelle: 0.5, oeufs: 0.2,
   sandwich: 0.1, oeuf: 0.08, splat: 0.12, grenade: 0.16, nuage: 1.0, statue: 2.0, camion: 1.05, colonne: 1.5,
   tomates: 0.26, eau: 0.2, fumigenes: 0.28, echarpe: 0.22, cafe: 0.2, kway: 0.24, farine: 0.45 };
-export const HAUTEURS_PROVISOIRES = { lanceur: 0.82, bouclier: 0.86, manifestant: 1.0, barriere: 0.42, poubelle: 0.5, oeufs: 0.18,
+export const HAUTEURS_PROVISOIRES = { lbd: 0.82, bac: 1.0, sono: 0.3, carte: 0.12, lanceur: 0.82, bouclier: 0.86, manifestant: 1.0, barriere: 0.42, poubelle: 0.5, oeufs: 0.18,
   sandwich: 0.14, oeuf: 0.08, splat: 0.1, grenade: 0.1, nuage: 0.9, statue: 1.7, camion: 0.95, colonne: 1.35,
   tomates: 0.22, eau: 0.2, fumigenes: 0.22, echarpe: 0.2, cafe: 0.22, kway: 0.22, farine: 0.42 };
 
@@ -395,6 +402,29 @@ export function variantesTaches(T) {
   }
 }
 
+// audit nov. 2026 : en attendant leurs images (prompts 22a / 22b), le BAC en civil = un manifestant avec un brassard
+// orange « POLICE », le tireur de LBD = le lanceur en uniforme sombre
+function deriver(T) {
+  const copie = (src, filtre = 'none', miroir = false, dessin = null) => {
+    const c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
+    const g = c.getContext('2d'); g.filter = filtre;
+    if (miroir) { g.translate(c.width, 0); g.scale(-1, 1); }
+    g.drawImage(src, 0, 0); g.setTransform(1, 0, 0, 1, 0, 0); g.filter = 'none';
+    if (dessin) dessin(g, c.width, c.height);
+    return c;
+  };
+  for (const p of ['marche0', 'marche1', 'bras', 'lance', 'touche', 'fuite', 'tousse', 'farine']) {
+    const src = T.spr['lanceur_' + p];
+    if (src && !T.spr['lbd_' + p]) T.spr['lbd_' + p] = copie(src, 'grayscale(0.85) brightness(0.6) contrast(1.2)');
+  }
+  const base = T.spr.manifestant_1 || T.spr.manifestant_0;
+  const brassard = (g, l, h) => { g.fillStyle = '#ff7a1a'; g.fillRect(l * 0.1, h * 0.36, l * 0.22, h * 0.05); g.fillStyle = '#fff'; g.fillRect(l * 0.13, h * 0.375, l * 0.16, h * 0.012); };
+  const marche = copie(base, 'none', false, brassard), marche1 = copie(base, 'none', true, brassard);
+  Object.assign(T.spr, { bac_marche0: marche, bac_marche1: marche1, bac_cri: marche, bac_charge: marche1, bac_essouffle: marche,
+    bac_touche: copie(base, 'brightness(1.5)', false, brassard), bac_fuite: marche1, bac_attrape: marche });
+  T.hauteurs.bac = T.hauteurs.manifestant; T.hauteurs.lbd = T.hauteurs.lanceur;
+}
+
 export function appliquerImages(scene, T) {
   const img = (n) => scene.textures.exists('julien_' + n) ? scene.textures.get('julien_' + n).getSourceImage() : null;
   T.hauteurs = { ...HAUTEURS_PROVISOIRES };
@@ -414,6 +444,7 @@ export function appliquerImages(scene, T) {
   for (const [pose, n] of Object.entries(MAINS)) { const i = img(n); if (i) T.main[pose] = i; }
   T.main.image = !!img('main_tient');
   T.nbManif = manif;
+  deriver(T);
   // tête du héros : planche de 20 cases sur une ligne → 20 images de la texture Phaser
   T.tetes = false;
   if (scene.textures.exists('julien_tetes')) {

@@ -16,7 +16,8 @@ import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { estTactile } from '../../core/tactile.js';
-import { REGLAGES as RG, DIFFICULTES } from './reglages.js';
+import { REGLAGES as RG, DIFFICULTES, RANGS_CLASSE } from './reglages.js';
+import { Sauvegarde } from '../../core/sauvegarde.js';
 import { armeDe } from './armes.js';
 import { murEn, vueLibre } from './raycaster.js';
 import { PLAN_CLASSE, OBJETS_CLASSE, RAYONS_CLASSE, ESTRADE, BUREAU_RENVERSE, REPLIQUES, ELEVES } from './niveau_classe.js';
@@ -162,6 +163,12 @@ export class JulienClasse extends JulienManif {
     super.demarrer();
     this.julien.etat = 'marche'; this.julien.t = 1.2;
     this.message(REPLIQUES.debut, 4);
+    const r = this.donnees.reprise;
+    if (r) {   // POINT DE REPRISE : début de la phase atteinte (pas de vue du dessus avant 20 s, comme au début)
+      this.donnees.reprise = null; this.repris = true;
+      const e = this.julien; e.vie = r.vie; e.phase = r.phase; e.premierMurFait = true; this.changerPhase(r.phase);
+      this.message(`Reprise : PHASE ${r.phase} / 3`, 3);
+    }
     if (this.anarchiste) { this.txtAnnonce.setText('ANARCHISTE : JULIEN EST FURIEUX !'); this.annonceT = 3; this.txtConseil.setText('Plus de vie, des interros en rafale à chaque phase… bon courage !'); }
   }
 
@@ -179,13 +186,15 @@ export class JulienClasse extends JulienManif {
   // victoire : écran illustré (la classe en fête), le message et le badge
   ecranVictoire(message) {
     if (this.textures.exists('julien_fin_victoire')) this.add.image(LARGEUR / 2, HAUTEUR / 2, 'julien_fin_victoire').setDisplaySize(LARGEUR, HAUTEUR).setDepth(1000);
-    this.add.rectangle(LARGEUR / 2, 95, LARGEUR, 170, 0x000000, 0.55).setDepth(1000);
+    this.add.rectangle(LARGEUR / 2, 110, LARGEUR, 210, 0x000000, 0.6).setDepth(1000);
     texte(this, LARGEUR / 2, 55, 'VICTOIRE', 56, '#ffd84a').setDepth(1001).setStroke('#000', 8);
-    texte(this, LARGEUR / 2, 130, message, 22, '#ffffff', { wordWrap: { width: 800 } }).setDepth(1001).setStroke('#000', 5);
+    texte(this, LARGEUR / 2, 150, message, 22, '#ffffff', { wordWrap: { width: 800 } }).setDepth(1001).setStroke('#000', 5);
     this.add.image(LARGEUR - 90, HAUTEUR - 90, 'badge_' + this.identite.id).setScale(2).setDepth(1001);
   }
 
-  perdu() { super.perdu('COLLÉ !', 'Deux heures de retenue avec Julien… Retente ta chance !'); }
+  perdu() { super.perdu('COLLÉ !', this.reprise ? `Deux heures de retenue… Tu reprends à la PHASE ${this.reprise.phase} / 3.` : 'Deux heures de retenue avec Julien… Retente ta chance !'); }
+  // POINT DE REPRISE : après une défaite, on reprend au début de la dernière phase atteinte (vie de Julien d'alors)
+  donneesRejouer() { return this.reprise ? { rejouer: true, reprise: this.reprise } : { rejouer: true }; }
 
   // ------------------------------------------------------------------ niveau
   lireNiveau() {
@@ -193,6 +202,7 @@ export class JulienClasse extends JulienManif {
     this.j.armes = new Set(['sarbacane']); this.j.arme = 'sarbacane';   // armes de la manif interdites au lycée
     this.ennemis = []; this.objets = []; this.tirs = []; this.fumees = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.farines = []; this.rideaux = []; this.secrets = new Map(); this.secretsTrouves = 0; this.fourgonFait = true;
+    this.stats = { rafales: 0, notes20: 0, dos: 0, total: 0 }; this.reprise = null; this.repris = false;   // rang de fin, point de reprise
     this.livres = []; this.finDemandee = false; this.dessus = null;
     this.eleves = []; this.alarme = false; this.confisque = null;
     this.vus = new Set(); this.bureau = null;
@@ -201,7 +211,7 @@ export class JulienClasse extends JulienManif {
       if (c === 'J') { this.j.x = px; this.j.y = py; return '.'; }
       if (c === 'U') {
         this.julien = { type: 'julien', x: px, y: py, vie: (this.vieMax = RG.julien.vie), etat: 'attente', t: 1, anim: 0, bouge: false,
-          vuX: px, vuY: py + 5, alerte: true, actif: true, phase: 1, cible: null, taches: [], flash: 0, reste: 0, forcer: 'mur' };   // 1re attaque : une rafale de murs (tout le monde voit la vue du dessus)
+          vuX: px, vuY: py + 5, alerte: true, actif: true, phase: 1, cible: null, taches: [], flash: 0, reste: 0, combatT: 0 };   // combatT : s de combat (pas de vue du dessus avant RG.julien.premierMur)
         this.ennemis.push(this.julien);
         return '.';
       }
@@ -241,6 +251,11 @@ export class JulienClasse extends JulienManif {
   phaseDe(e) { const p = e.vie / this.vieMax; return p > 0.5 ? 1 : p > 0.2 ? 2 : 3; }
 
   nouvelleCible(e) {
+    const D = RG.julien.descente;
+    if (e.phase < 3 && Math.random() < D.chance[e.phase - 1]) {   // il DESCEND de l'estrade vers toi (confisqué / règle)
+      e.descendT = D.duree; this.message(hasard(REPLIQUES.descente), 2);
+      return { x: this.j.x, y: this.j.y, descente: true };
+    }
     if (e.phase < 3) return { x: ESTRADE.x0 + Math.random() * (ESTRADE.x1 - ESTRADE.x0), y: ESTRADE.y0 + Math.random() * (ESTRADE.y1 - ESTRADE.y0) };
     // phase 3 : il reste planqué derrière son bureau renversé (il en dépasse un peu : contourne-le !)
     // (bug corrigé : il allait jusqu'à 1,6 case de chaque côté et dépassait du bureau)
@@ -265,6 +280,7 @@ export class JulienClasse extends JulienManif {
     let voit = j.vie > 0 && vueLibre(this.plan, e.x, e.y, j.x, j.y);
     if (voit) { e.vuX = j.x; e.vuY = j.y; }
     e.t -= dt; e.bouge = false; e.flash = Math.max(0, e.flash - dt);
+    if (e.etat !== 'attente') e.combatT += dt;
     const marcher = (vx, vy, v) => {
       const n = Math.hypot(vx, vy); if (n < 0.01) return true;
       e.bouge = true; e.anim += dt;
@@ -288,8 +304,16 @@ export class JulienClasse extends JulienManif {
         if (e.cible && Math.hypot(e.cible.x - e.x, e.cible.y - e.y) < 0.3) { e.cible = null; e.arret = J.arret[ph] * (0.6 + Math.random() * 0.8); }
         if (e.arret > 0) { e.arret -= dt; }   // il s'arrête un instant (c'est le moment de viser)
         if (!e.cible) e.cible = this.nouvelleCible(e);
+        if (e.cible && e.cible.descente) {   // il marche droit sur toi ; arrivé à portée (ou après 4 s), il attaque
+          e.descendT -= dt; e.cible.x = this.j.x; e.cible.y = this.j.y; e.arret = 0;
+          if (d < J.confisque.portee * 0.9 || e.descendT <= 0) {   // arrivé : il attaque (confisqué / règle) puis remonte
+            e.cible = null; e.t = Math.min(e.t, 0.2); e.attaqueProche = d < J.confisque.portee * 1.1;
+            if (e.t <= 0 && voit) this.preparer(e, d);
+            return;
+          }
+        }
         const bloque = e.arret > 0 ? false : marcher(e.cible.x - e.x, e.cible.y - e.y, e.phase === 3 ? J.vitesseRage : J.vitesse);
-        if (bloque) e.cible = null;
+        if (bloque && !(e.cible && e.cible.descente)) e.cible = null;   // (en descente il glisse le long des tables)
         // au contact : la règle, tout de suite
         if (voit && d < J.regle.portee && e.t < J.cadence[ph] * 0.6) e.t = 0;
         if (e.t <= 0 && voit) this.preparer(e, d);
@@ -335,13 +359,20 @@ export class JulienClasse extends JulienManif {
   }
 
   choisirMotif(e, d) {
-    if (e.forcer) { const m = e.forcer; e.forcer = null; return m; }   // (rafale de murs imposée au début de chaque phase)
     const J = RG.julien, j = this.j, r = Math.random();
+    if (e.attaqueProche) {   // il est descendu jusqu'à toi : la RÈGLE au contact, sinon il CONFISQUE
+      e.attaqueProche = false;
+      if (d < J.regle.portee * 1.2) return 'regle';
+      if (!this.confisque) return 'confisque';
+    }
+    const tot = e.combatT < J.premierMur;   // trop tôt pour la vue du dessus (on perdrait le joueur)
+    if (!tot && !e.premierMurFait) { e.premierMurFait = true; e.forcer = null; return 'mur'; }   // 1re rafale de murs, après 20 s
+    if (e.forcer && !tot) { const m = e.forcer; e.forcer = null; return m; }   // (rafale de murs au début de chaque phase)
     if (d < J.regle.portee) return 'regle';
     if (d < J.confisque.portee && !this.confisque && Math.random() < [0.5, 0.6, 0.85][e.phase - 1]) return 'confisque';
-    if (e.phase === 1) return r < 0.3 ? 'livre' : r < 0.5 ? 'eventail' : r < 0.68 ? 'craies' : r < 0.84 ? 'mur' : 'deluge';
-    if (e.phase === 2) return r < 0.25 ? 'deluge' : r < 0.5 ? 'murs' : r < 0.62 ? 'dico' : r < 0.72 ? 'eventail' : r < 0.86 ? 'aimant' : 'craies';
-    return r < 0.25 ? 'deluge' : r < 0.52 ? 'murs' : r < 0.6 ? 'rafale' : r < 0.68 ? 'dico' : r < 0.84 ? 'aimant' : r < 0.93 ? 'craies' : 'eventail';
+    if (e.phase === 1) return r < 0.3 ? 'livre' : r < 0.5 ? 'eventail' : r < 0.68 ? 'craies' : r < 0.84 ? (tot ? 'livre' : 'mur') : 'deluge';
+    if (e.phase === 2) return r < 0.25 ? 'deluge' : r < 0.5 ? (tot ? 'eventail' : 'murs') : r < 0.62 ? 'dico' : r < 0.72 ? 'eventail' : r < 0.86 ? 'aimant' : 'craies';
+    return r < 0.25 ? 'deluge' : r < 0.52 ? (tot ? 'rafale' : 'murs') : r < 0.6 ? 'rafale' : r < 0.68 ? 'dico' : r < 0.84 ? 'aimant' : r < 0.93 ? 'craies' : 'eventail';
   }
 
   // l'attaque part
@@ -418,10 +449,6 @@ export class JulienClasse extends JulienManif {
     e.reste = 0;
     if (e.motif === 'eventail') for (const k of [-1, 0, 1]) this.lancerLivre(e, 'livre', a + k * J.eventail);
     else if (e.motif === 'dico') this.lancerLivre(e, 'dico', a);
-    else if (e.motif === 'copies') {
-      const n = J.copies.nombre;
-      for (let k = 0; k < n; k++) this.lancerLivre(e, 'copie', a + (k - (n - 1) / 2) * J.copies.ecart);
-    }
     else if (e.motif === 'deluge') { e.vague = 0; this.vagueCopies(e, voit); e.reste = J.deluge.vagues[e.phase - 1] - 1 + (this.anarchiste ? J.anarchiste.vagues : 0); }
     else if (e.motif === 'craies') { this.lancerLivre(e, 'craie', a); e.reste = J.craies.nombre - 1; }
     else { this.lancerLivre(e, 'livre', a); if (e.motif === 'rafale') e.reste = J.rafale.nombre - 1; }
@@ -512,6 +539,7 @@ export class JulienClasse extends JulienManif {
 
   changerPhase(ph) {
     const e = this.julien;
+    this.reprise = { phase: ph, vie: e.vie };   // point de reprise
     e.forcer = this.anarchiste ? 'murs' : 'mur';   // chaque phase commence par une rafale de murs (ANARCHISTE : un mur de plus)
     if (ph === 2) {   // INTERRO SURPRISE : copies, dictionnaire, « au tableau ! »
       this.txtAnnonce.setText('INTERRO SURPRISE !'); this.annonceT = 3;
@@ -543,6 +571,7 @@ export class JulienClasse extends JulienManif {
       degats *= m;
       if (!silencieux) this.bulle(`×${m}`);
     } else degats *= RG.julien.multFace;   // de face, il se protège avec son livre : la fenêtre « de dos » compte vraiment
+    this.stats.total += degats; if (e.etat === 'dos') this.stats.dos += degats;
     e.vie = Math.max(0, e.vie - degats); e.flash = 0.15;
     if (genre === 'boulette') {   // petite explosion de papier sur lui (pas de jaune d'œuf : c'est une boulette)
       const j = this.j, d = Math.hypot(j.x - e.x, j.y - e.y) || 1;
@@ -586,8 +615,17 @@ export class JulienClasse extends JulienManif {
     if (this.joy) this.joy.activer(false);
     this.libererSouris();
     this.enJeu = false;
-    const t = this.temps, mmss = `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
-    this.victoire(`Julien est vaincu ! Pas d'interro pour cette fois.\nTemps : ${mmss}   (${this.diff.nom})`);
+    const t = this.temps, mmss = `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`, S = this.stats;
+    // RANG (comme la manif) : vie restante 40, temps 25 (plein sous le PAR), coups de dos 20, notes 20/20 15
+    const pdos = S.total ? S.dos / S.total : 0, notes = S.rafales ? S.notes20 / S.rafales : 1;
+    const score = 40 * Math.max(0, this.j.vie) / 100 + 25 * Math.min(1, RG.julien.par / Math.max(1, t)) + 20 * Math.min(1, pdos / 0.6) + 15 * notes;
+    const rang = RANGS_CLASSE.find(r => score >= r.mini);
+    let rec = '';
+    if (this.repris) rec = '   (reprise : pas de record)';
+    else { const r = Sauvegarde.proposerRecord('julien_classe', rang.court, t, RANGS_CLASSE.map(x => x.court)); if (r.rang === rang.court && Math.abs(r.temps - t) < 0.01) rec = '   ★ NOUVEAU RECORD ★'; }
+    this.victoire(`Julien est vaincu ! Temps : ${mmss}   (${this.diff.nom})\n`
+      + `Vie ${Math.round(Math.max(0, this.j.vie))} %  ·  Coups de dos ${Math.round(pdos * 100)} %  ·  20/20 : ${S.notes20} / ${S.rafales}\n`
+      + `RANG : ${rang.nom}${rec}`);
   }
 
   // ------------------------------------------------------------------ dessin

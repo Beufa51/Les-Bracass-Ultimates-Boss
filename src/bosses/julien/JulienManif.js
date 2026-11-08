@@ -14,7 +14,7 @@ import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, REGLAGES as RG, DIFFICULTES, RANGS } from './reglages.js';
 import { Sauvegarde } from '../../core/sauvegarde.js';
 const FINS = ['julien_fin_gaze', 'julien_fin_attrape', 'julien_fin_colle', 'julien_fin_victoire'];   // outils/julien/decouper_audit21.py
-import { PLAN_MANIF, OBJETS, SECRETS, ZONES, PARVIS, PAR, ABSENTS_FACILE, RENFORTS_ANARCHISTE, RIDEAUX, FOURGON } from './niveau_manif.js';
+import { PLAN_MANIF, OBJETS, SECRETS, ZONES, PARVIS, PAR, ABSENTS_FACILE, RENFORTS_ANARCHISTE, RIDEAUX, FOURGON, PORTES } from './niveau_manif.js';
 import { rendre, murEn, vueLibre } from './raycaster.js';
 import { texturesMurs, texturesSprites, texturesMain, chargerImages, appliquerImages, variantesTaches } from './textures.js';
 import { construireDecor } from './decor.js';
@@ -177,7 +177,7 @@ export class JulienManif extends BossScene {
     texte(this, LARGEUR / 2, 360, `${estTactile() ? 'REJOUER' : 'ESPACE'} : recommencer tout de suite`, 24, '#7fff7f').setDepth(1001).setStroke('#000', 5);
     texte(this, LARGEUR / 2, 400, `${estTactile() ? 'HUB' : 'X'} : retour au hub`, 18, '#dddddd').setDepth(1001).setStroke('#000', 4);
     this.time.delayedCall(600, () => {
-      this.input.keyboard.once('keydown-SPACE', () => this.scene.restart({ rejouer: true }));
+      this.input.keyboard.once('keydown-SPACE', () => this.scene.restart(this.donneesRejouer()));
     });
     // HUB seulement après 1,5 s : LANCER (= X) tapé en rafale au moment de mourir ne renvoie plus au hub par erreur
     this.time.delayedCall(1500, () => this.input.keyboard.once('keydown-X', () => this.retourHub()));
@@ -290,7 +290,7 @@ export class JulienManif extends BossScene {
   // ------------------------------------------------------------------ niveau
   nouveauJoueur() {
     return { x: 2.5, y: 2.5, a: -Math.PI / 2, vie: RG.joueur.vie, recharge: 0,
-      mun: { oeufs: RG.oeufs.depart, tomates: 0, eau: 0, fumigenes: 0 }, armes: new Set(['pancarte', 'oeufs']), arme: 'oeufs', armure: 0, echarpe: 0, cafe: 0, lanceT: 0, bob: 0,
+      mun: { oeufs: RG.oeufs.depart, tomates: 0, eau: 0, fumigenes: 0, sono: 0 }, carte: false, armes: new Set(['pancarte', 'oeufs']), arme: 'oeufs', armure: 0, echarpe: 0, cafe: 0, lanceT: 0, bob: 0,
       regard: 0, regardT: 1.2, expr: 'normal', exprT: 0, rouge: 0, gaz: 0 };
   }
 
@@ -300,6 +300,7 @@ export class JulienManif extends BossScene {
     this.sortie = null;
     this.secrets = new Map(); this.secretsTrouves = 0;
     this.rideaux = []; this.farines = []; this.fourgonFait = false; this.fourgonT = FOURGON.attente;
+    this.portes = new Map(); this.balles = []; this.porteMsgT = 0;   // porte de service (carte de cantine), balles de LBD
     let nm = 0;
     this.plan = this.plan.map((ligne, y) => [...ligne].map((c, x) => {
       const px = x + 0.5, py = y + 0.5;
@@ -307,12 +308,13 @@ export class JulienManif extends BossScene {
       if (c === 'S') return '.';
       if (SECRETS[c]) { this.secrets.set(`${x},${y}`, true); return SECRETS[c]; }
       if (RIDEAUX[c]) { this.rideaux.push([x, y]); return RIDEAUX[c]; }
+      if (PORTES[c]) { this.portes.set(`${x},${y}`, true); return PORTES[c]; }
       const type = OBJETS[c];
       if (!type) return c;
-      if (type === 'lanceur' || type === 'bouclier') {
+      if (type === 'lanceur' || type === 'bouclier' || type === 'bac' || type === 'lbd') {
         this.ajouterEnnemi(type, x, y);
       } else {
-        const solide = !RECHARGES[type] && !BONUS[type] && type !== 'sandwich';
+        const solide = !RECHARGES[type] && !BONUS[type] && type !== 'sandwich' && type !== 'carte';
         const rayon = { barriere: 0.45, statue: 0.75, camion: 0.6, colonne: 0.4 }[type] || 0.3;
         const o = { type, x: px, y: py, solide, rayon, actif: true, n: nm };
         if (type === 'manifestant') nm++;
@@ -524,7 +526,9 @@ export class JulienManif extends BossScene {
     if (avance > 0) {
       const k = `${(j.x + dx * 0.5) | 0},${(j.y + dy * 0.5) | 0}`;
       if (this.secrets.get(k)) this.ouvrirSecret(k);
+      if (this.portes && this.portes.get(k)) this.pousserPorte(k);
     }
+    this.porteMsgT = Math.max(0, (this.porteMsgT || 0) - dt);
     // les policiers ne se traversent pas
     for (const e of this.ennemis) if (e.actif && e.etat !== 'fuite') {
       const d = Math.hypot(j.x - e.x, j.y - e.y);
@@ -592,6 +596,33 @@ export class JulienManif extends BossScene {
     return m;
   }
 
+  // PORTE DE SERVICE (audit nov. 2026, « clé + porte ») : elle s'ouvre si on a la CARTE DE CANTINE
+  pousserPorte(k) {
+    if (!this.j.carte) {
+      if (this.porteMsgT <= 0) { this.message('Porte de service fermée : il faut une CARTE DE CANTINE (cherche bien les secrets !).', 3); jouerSon(this, 'julien_plonk', { rate: 0.6 }); }
+      this.porteMsgT = 3;
+      return;
+    }
+    this.portes.set(k, false);
+    const [x, y] = k.split(',').map(Number);
+    this.plan[y] = this.plan[y].slice(0, x) + '.' + this.plan[y].slice(x + 1);
+    jouerSon(this, 'julien_portail');
+    this.message('BIP ! La porte de service s\'ouvre : un couloir vers le PARVIS, sans passer par le cordon !', 4);
+  }
+
+  // LA SONO (arme 7, le « BFG ») : un coup de basse, et tous les policiers EN VUE (à portée) s'enfuient
+  sono() {
+    const j = this.j;
+    jouerSon(this, 'julien_fourgon', { rate: 0.6 }); jouerSon(this, 'julien_cri', { rate: 0.55 });
+    this.cameras.main.shake(600, 0.016); j.or = 1;
+    let n = 0;
+    for (const e of this.ennemis) if (e.actif && e.etat !== 'fuite' && Math.hypot(e.x - j.x, e.y - j.y) < RG.sono.portee && vueLibre(this.plan, j.x, j.y, e.x, e.y)) {
+      this.toucherEnnemi(e, 99, { perceBouclier: true }); n++;
+    }
+    this.nuages = [];   // la basse souffle aussi les lacrymos
+    this.message(n ? `LA SONO : « ON LÂCHE RIEN ! » (${n} en fuite)` : 'LA SONO : « ON LÂCHE RIEN ! »… mais personne en vue.', 2.5);
+  }
+
   ouvrirSecret(k) {
     this.secrets.set(k, false);
     const [x, y] = k.split(',').map(Number);
@@ -614,6 +645,14 @@ export class JulienManif extends BossScene {
       this.ajouterEnnemi(type, Math.floor(x), Math.floor(y));
       const e = this.ennemis[this.ennemis.length - 1];
       Object.assign(e, { x, y, parvis: true, ronde: false, alerte: true, vuX: j.x, vuY: j.y, etat: type === 'lanceur' ? 'chasse' : 'approche', t: 1.2 });
+      this.total++;
+    }
+    if (FOURGON.perche) {   // un policier SUR LE TOIT du fourgon : il ne bouge pas, il lance d'en haut
+      const [type, x, y, z] = FOURGON.perche;
+      this.ajouterEnnemi(type, Math.floor(x), Math.floor(y));
+      const e = this.ennemis[this.ennemis.length - 1];
+      Object.assign(e, { x, y, perche: z, vie: 1, parvis: true, ronde: false, alerte: true, vuX: j.x, vuY: j.y, etat: 'chasse', t: 2.5 });   // 1 œuf suffit
+      this.objets[this.objets.length - 1].porteur = e;   // le fourgon ne protège pas celui qui est dessus
       this.total++;
     }
     jouerSon(this, 'julien_fourgon');
@@ -680,6 +719,11 @@ export class JulienManif extends BossScene {
       return this.deplacer(e, vx / n * vitesse * dt, vy / n * vitesse * dt, 0.28);
     };
 
+    if (e.etat === 'fuite' && e.perche) {   // le policier du toit du fourgon saute et disparaît
+      e.fuiteT = (e.fuiteT || 0) + dt; e.perche = Math.max(0, e.perche - dt * 1.5);
+      if (e.fuiteT > 0.5) e.actif = false;
+      return;
+    }
     if (e.etat === 'fuite') {   // il s'enfuit par un chemin libre, et ne disparaît que quand tu ne le vois plus
       e.fuiteT = (e.fuiteT || 0) + dt;
       if (!e.fdx || e.t <= 0) this.directionFuite(e, -ox / (d || 1), -oy / (d || 1));
@@ -689,14 +733,23 @@ export class JulienManif extends BossScene {
     }
     if (e.etat === 'touche') { if (e.t <= 0) { e.etat = e.apres; e.t = e.tApres; } return; }
 
-    if (e.type === 'lanceur' || e.type === 'cantiniere') {   // (la dame de cantine du lycée : même IA, elle lance de la purée)
+    if (e.type === 'lanceur' || e.type === 'cantiniere' || e.type === 'lbd') {   // (la dame de cantine du lycée : même IA, elle lance de la purée)
       if (e.etat === 'attente') { if (e.alerte) e.etat = 'chasse'; else if (e.ronde) this.ronde(e, marcher, dt); return; }
       if (e.etat === 'chasse') {
         if (voit) {
-          if (d > R.distance + 0.6) marcher(ox, oy, R.vitesse);
+          if (e.perche) { /* sur le toit du fourgon : il ne bouge pas */ }
+          else if (d > R.distance + 0.6) marcher(ox, oy, R.vitesse);
           else if (d < R.distance - 1.2) marcher(-ox, -oy, R.vitesse);
           if (e.t <= 0) { e.etat = 'prepare'; e.t = R.preavis; }
-        } else if (Math.hypot(e.vuX - e.x, e.vuY - e.y) > 0.3) marcher(e.vuX - e.x, e.vuY - e.y, R.vitesse);
+        } else if (!e.perche && Math.hypot(e.vuX - e.x, e.vuY - e.y) > 0.3) marcher(e.vuX - e.x, e.vuY - e.y, R.vitesse);
+        return;
+      }
+      if (e.etat === 'prepare' && e.t <= 0 && e.type === 'lbd') {   // LBD : une balle rapide, droit sur toi (pas de côté !)
+        const [cx, cy] = voit ? [j.x, j.y] : [e.vuX, e.vuY], n = Math.hypot(cx - e.x, cy - e.y) || 1;
+        this.balles.push({ x: e.x, y: e.y, dx: (cx - e.x) / n, dy: (cy - e.y) / n, t: 0 });
+        jouerSon(this, 'julien_tir', { rate: 1.6 });
+        if (Math.random() < 0.35) this.message(R.replique, 1.5);
+        e.etat = 'lance'; e.t = 0.35;
         return;
       }
       if (e.etat === 'prepare' && e.t <= 0) {
@@ -707,7 +760,7 @@ export class JulienManif extends BossScene {
         e.etat = 'lance'; e.t = 0.35;
         return;
       }
-      if (e.etat === 'lance' && e.t <= 0) { e.etat = 'chasse'; e.t = R.cadence * this.diff.cadence * (0.8 + Math.random() * 0.4); }
+      if (e.etat === 'lance' && e.t <= 0) { e.etat = 'chasse'; e.t = R.cadence * this.diff.cadence * (0.8 + Math.random() * 0.4) * (e.perche ? 2.4 : 1); }   // (le policier du toit lance moins souvent)
       return;
     }
 
@@ -771,7 +824,7 @@ export class JulienManif extends BossScene {
   // degats : 1 = un œuf ; options : recul [dx, dy], perceBouclier (fumée), silencieux (eau, fumée : pas de son ni de sursaut)
   // tache : 'oeuf' (jaune), 'tomate' (rouge) ou null (pancarte, eau, fumée : pas de trace)
   toucherEnnemi(e, degats = 1, { recul = null, perceBouclier = false, silencieux = false, tache = null, genre = null } = {}) {
-    if (recul) this.deplacer(e, recul[0], recul[1], 0.28);
+    if (recul && !e.perche) this.deplacer(e, recul[0], recul[1], 0.28);
     if (e.type === 'bouclier' && !this.bouclierBaisse(e) && !perceBouclier) {
       if (!silencieux) jouerSon(this, 'julien_plonk');
       if (!e.alerte) { e.alerte = true; e.vuX = this.j.x; e.vuY = this.j.y; e.etat = 'approche'; }   // « plonk » : il t'a repéré
@@ -803,7 +856,8 @@ export class JulienManif extends BossScene {
   // durée de la dernière image en « images à 60 Hz » (les flashs durent pareil sur un téléphone à 120 Hz)
   pas60() { return Math.min(4, (this.game.loop.delta || 16.7) / 16.7); }
 
-  imageFin() { return 'julien_fin_gaze'; }   // image de l'écran PERDU (le lycée et la classe ont la leur)
+  imageFin() { return 'julien_fin_gaze'; }
+  donneesRejouer() { return { rejouer: true }; }   // (la classe ajoute le point de reprise)   // image de l'écran PERDU (le lycée et la classe ont la leur)
 
   // message quand un ennemi s'enfuit (le lycée a les siens)
   messagesFuite() { return ['Il s\'enfuit tout dégoulinant !', 'Omelette !', 'Un de moins !', 'Retour au commissariat !']; }
@@ -830,6 +884,15 @@ export class JulienManif extends BossScene {
       }
     }
     this.grenades = this.grenades.filter(g => !g.fini);
+    if (!this.balles) this.balles = [];   // (lycée, classe : pas de LBD)
+    for (const b of this.balles) {   // balles de LBD : droites et rapides ; un mur ou toi les arrêtent
+      b.t += dt; b.x += b.dx * RG.lbd.balle.vitesse * dt; b.y += b.dy * RG.lbd.balle.vitesse * dt;
+      if (murEn(this.plan, b.x, b.y) || b.t > 2.5) { b.fini = true; continue; }
+      if (j.vie > 0 && Math.hypot(b.x - j.x, b.y - j.y) < RG.lbd.balle.rayon) {
+        b.fini = true; this.degats(RG.lbd.balle.degats, b.x - b.dx, b.y - b.dy); this.cameras.main.shake(120, 0.01);
+      }
+    }
+    this.balles = this.balles.filter(b => !b.fini);
     j.gaz = Math.max(0, j.gaz - dt * 1.5);
     for (const n of this.nuages) {
       n.t -= dt;
@@ -869,6 +932,9 @@ export class JulienManif extends BossScene {
         if (o.type === 'kway') { if (j.armure >= RG.bonus.kwayMaxi) continue; j.armure = Math.min(RG.bonus.kwayMaxi, j.armure + RG.bonus.kway); }
         else j[o.type] = RG.bonus[o.type];
         this.message(BONUS[o.type](), 3);
+      } else if (o.type === 'carte') {
+        this.j.carte = true;
+        this.message('La CARTE DE CANTINE ! Elle ouvre la PORTE DE SERVICE de la place (le rideau de fer, à droite).', 4.5);
       } else if (o.type === 'sandwich') {
         if (j.vie >= RG.joueur.vie) continue;
         j.vie = Math.min(RG.joueur.vie, j.vie + RG.sandwich);
@@ -939,7 +1005,7 @@ export class JulienManif extends BossScene {
     if (e.aveugle > 0 && s[p + 'farine']) return s[p + 'farine'];   // enfariné : il se frotte les yeux
     if (e.tousseT > 0 && s[p + 'tousse']) return s[p + 'tousse'];   // dans la lacrymo : il tousse
     if (e.attrapePose > 0 && s[p + 'attrape']) return s[p + 'attrape'];   // le surveillant t'attrape
-    if (e.type === 'lanceur' || e.type === 'cantiniere') {
+    if (e.type === 'lanceur' || e.type === 'cantiniere' || e.type === 'lbd') {
       if (e.etat === 'prepare') return s[p + 'bras'];
       if (e.etat === 'lance') return s[p + 'lance'];
     } else {
@@ -962,7 +1028,7 @@ export class JulienManif extends BossScene {
     }
     const nP = Math.hypot(cam.px, cam.py), qx = cam.px / nP, qy = cam.py / nP;
     for (const e of this.ennemis) if (e.actif) {
-      liste.push({ x: e.x, y: e.y, toile: this.imageEnnemi(e), haut: T.hauteurs[e.type], z: 0 });
+      liste.push({ x: e.x, y: e.y, toile: this.imageEnnemi(e), haut: T.hauteurs[e.type], z: e.perche || 0 });
       if (e.etat !== 'fuite') for (const t of e.taches || []) {   // traces d'œuf / de tomate, un peu devant lui
         liste.push({ x: e.x + qx * t.o * 0.18 - dx * 0.06, y: e.y + qy * t.o * 0.18 - dy * 0.06, toile: t.rouge ? s.splat_rouge : s.splat, haut: 0.09, z: t.h });
       }
@@ -973,6 +1039,7 @@ export class JulienManif extends BossScene {
     }
     for (const f of this.farines) liste.push({ x: f.x, y: f.y, toile: f.mousse && s.mousse ? s.mousse : s.nuage_farine, haut: 1.0 + (1.6 - f.t) * 0.5, z: 0 });
     for (const f of this.fumees) liste.push({ x: f.x, y: f.y, toile: s.fumee, haut: 1.3 + 0.1 * Math.sin(f.t * 2), z: 0 });
+    for (const b of (this.balles || [])) liste.push({ x: b.x, y: b.y, toile: s.balle, haut: 0.07, z: 0.45 });
     for (const gr of this.grenades) liste.push({ x: gr.x, y: gr.y, toile: gr.puree ? s.puree : s.grenade, haut: gr.puree ? T.hauteurs.puree : T.hauteurs.grenade, z: gr.z });
     for (const sp of this.splats) liste.push({ x: sp.x, y: sp.y, toile: sp.papier && s.dessus_explosion ? s.dessus_explosion : sp.rouge ? s.splat_rouge : s.splat,
       haut: sp.papier ? 0.22 : T.hauteurs.splat, z: sp.papier ? 0.55 : 0.38 });   // papier : boulette sur Julien (la classe)

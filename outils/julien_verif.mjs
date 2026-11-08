@@ -6,7 +6,7 @@
 //  - les réglages : nombres positifs, une valeur par phase (3) là où il en faut
 import { existsSync, readFileSync } from 'fs';
 import { REGLAGES as RG, DIFFICULTES } from '../src/bosses/julien/reglages.js';
-import { PLAN_MANIF, OBJETS, SECRETS, RIDEAUX } from '../src/bosses/julien/niveau_manif.js';
+import { PLAN_MANIF, OBJETS, SECRETS, RIDEAUX, PORTES } from '../src/bosses/julien/niveau_manif.js';
 import { PLAN_LYCEE, OBJETS_LYCEE, SECRETS_LYCEE, PORTE_SALLE_12, RENFORTS_LYCEE } from '../src/bosses/julien/niveau_lycee.js';
 import { PLAN_CLASSE, OBJETS_CLASSE } from '../src/bosses/julien/niveau_classe.js';
 import { MANIFESTE } from '../src/bosses/julien/manifeste.js';
@@ -43,9 +43,13 @@ function atteignables(plan, bloque, passe = '') {
 const aCote = (vu, x, y) => [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => vu.has(`${x + dx},${y + dy}`));
 const position = (plan, c) => { for (let y = 0; y < plan.length; y++) { const x = plan[y].indexOf(c); if (x >= 0) return [x, y]; } return null; };
 
-verifierPlan('manif', PLAN_MANIF, new Set(['J', 'S', ...Object.keys(OBJETS), ...Object.keys(SECRETS), ...Object.keys(RIDEAUX)]));
-{ const vu = atteignables(PLAN_MANIF, 'XZbpTCmkRa', '7');   // le portail (7) s'ouvre à la fin
-  if (!PLAN_MANIF.some((l, y) => [...l].some((c, x) => c === 'S' && vu.has(`${x},${y}`)))) err('manif : la cour du lycée (S) n\'est pas atteignable'); }
+verifierPlan('manif', PLAN_MANIF, new Set(['J', 'S', ...Object.keys(OBJETS), ...Object.keys(SECRETS), ...Object.keys(RIDEAUX), ...Object.keys(PORTES)]));
+{ const vu = atteignables(PLAN_MANIF, 'XZbpTCmkRaD', '7');   // le portail (7) s'ouvre à la fin ; sans la carte, porte D fermée
+  if (!PLAN_MANIF.some((l, y) => [...l].some((c, x) => c === 'S' && vu.has(`${x},${y}`)))) err('manif : la cour du lycée (S) n\'est pas atteignable');
+  // la carte de cantine (q) doit être atteignable (secrets ouverts) et la porte D doit toucher une case atteignable
+  const vs = atteignables(PLAN_MANIF, 'bpTCmkRaD', '7XZ'), q = position(PLAN_MANIF, 'q'), d = position(PLAN_MANIF, 'D');
+  if (q && !vs.has(`${q[0]},${q[1]}`)) err('manif : la carte de cantine (q) n\'est pas atteignable');
+  if (d && !aCote(vs, d[0], d[1])) err('manif : la porte de service (D) n\'est pas atteignable'); }
 
 verifierPlan('lycée', PLAN_LYCEE, new Set(['J', ...Object.keys(OBJETS_LYCEE), ...Object.keys(SECRETS_LYCEE)]));
 { const vu = atteignables(PLAN_LYCEE, 'dqxFEBLO', 'X');   // le casier ouvert (X) s'ouvre en poussant

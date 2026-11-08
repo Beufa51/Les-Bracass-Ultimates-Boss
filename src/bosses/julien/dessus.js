@@ -138,6 +138,7 @@ export const VueDessus = {
     M.tirs = M.tirs.filter(b => !b.fini && b.y > 0);
     if (M.restants === 0 && M.murs.length === 0) {   // fini : la NOTE (20/20 sans être touché, sinon 0/20), puis retour en 3D
       M.fin = RG.julien.dessus.note + 0.35;
+      if (!M.compte) { M.compte = true; this.stats.rafales++; if (M.touches === 0) this.stats.notes20++; }   // (rang de fin)
       if (M.touches === 0) { jouerSon(this, 'julien_ramasse', { rate: 1.2 }); this.parlerEleves('touche'); }
       else jouerSon(this, 'julien_plonk', { rate: 0.6 });
     }

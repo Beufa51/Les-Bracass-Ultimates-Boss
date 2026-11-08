@@ -33,6 +33,9 @@ for y in range(28, 36):
 sol(3, 30, 4, 32); put(5, 31, 'X')       # derrière le mur tagué de la ruelle
 sol(28, 31, 29, 33); put(27, 32, 'Z')    # derrière une vitrine du passage
 # EMBUSCADE du passage : 2 boutiques fermées par un rideau de fer (R), un policier caché derrière chacun
+# COULOIR DE SERVICE (audit nov. 2026, « clé + porte + boucle ») : de la place (porte de service D, fermée sans la
+# CARTE DE CANTINE q) jusqu'au parvis, en contournant le cordon de la rue du lycée
+sol(28, 18, 30, 18); sol(30, 6, 30, 18); sol(24, 6, 29, 6); put(28, 18, 'D')
 sol(22, 30, 22, 30); put(23, 30, 'R'); sol(22, 32, 22, 32); put(23, 32, 'R')
 objets = {
     # parvis (vague finale)
@@ -64,13 +67,15 @@ objets = {
     (16, 39): 'J', (12, 37): 'm', (14, 40): 'm', (18, 38): 'm', (20, 40): 'm', (10, 39): 'm', (22, 37): 'm',
     (13, 38): 'm', (19, 37): 'm', (8, 40): 'm', (25, 39): 'm', (4, 38): 'm', (28, 37): 'm', (30, 40): 'm',
     (6, 41): 'p', (27, 41): 'p',
+    # audit nov. 2026 : BAC en civil (N), tireur de LBD (L), fumigènes (f), SONO (Y, grand secret), carte de cantine (q)
+    (22, 24): 'N', (18, 7): 'N', (20, 19): 'L', (30, 12): 'L', (29, 33): 'f', (4, 30): 'Y', (28, 31): 'q',
 }
 for (x, y), c in objets.items():
     assert g[y][x] == '.', (x, y, g[y][x]); g[y][x] = c
 for l in g: print("  '" + ''.join(l) + "',")
 # vérif : chemin du départ à S (en traversant les ennemis, sans les objets bloquants, secrets fermés)
 from collections import deque
-bloque = set('123456789XZbpTCmkRa')
+bloque = set('123456789XZbpTCmkRaD')
 dep = next((x, y) for y in range(H) for x in range(W) if g[y][x] == 'J')
 vu = {dep}; f = deque([dep])
 while f:

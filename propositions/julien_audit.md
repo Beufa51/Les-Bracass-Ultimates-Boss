@@ -3,6 +3,8 @@
 Méthode : relecture du code (bugs) + un BOT qui joue des parties complètes (`node outils/julien_bot.mjs`, ≈ 1 min)
 + avis de joueur + images. **Rien n'a été modifié dans le jeu** : on attend tes choix (liste à la fin).
 
+> **ÉTAT (V106)** : TOUS les choix A à J sont FAITS (A-C en V104, H en V105, D-G, I, J en V106 ; voir NOTES.md, section Julien).
+
 ## Résumé en 5 lignes
 1. Aucun plantage : **216 parties** jouées par le bot (3 niveaux × 4 difficultés × 3 profils × PC / téléphone × 3), 0 erreur JavaScript, `julien_verif` à 0 erreur.
 2. **La manif est bien réglée** : la difficulté monte proprement de LYCÉEN SAGE à ANARCHISTE, la lacrymo fait la moitié des dégâts (c'est elle qui tue les débutants).

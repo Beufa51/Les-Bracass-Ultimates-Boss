@@ -46,5 +46,6 @@ export const REPLIQUES = {
   phase2: '« INTERRO SURPRISE ! Sortez une feuille ! »',
   phase3: '« ÇA SUFFIT ! Tout le monde en RETENUE ! »',   // il renverse son bureau, l'alarme incendie sonne
   touche: ['« Ma veste ! »', '« Zéro de conduite ! »', '« Chez le proviseur ! »'],
+  descente: ['« Toi, au fond ! Viens par là… »', '« Qu\'est-ce que tu caches, toi ? »', '« Je descends, et ça va barder ! »'],   // il descend de l'estrade
   vaincu: '« Bon… d\'accord… pas d\'interro pour cette fois. »',
 };

@@ -1799,6 +1799,21 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   de PERDU, `ecranVictoire()` de la classe. 21c bis / 21d bis LIVRÉS ensuite : bureau renversé LARGE (`julien_bureau_renverse`,
   même largeur à l'écran que l'ancien dessin) et CRS noir qui tousse (`bouclier_tousse`). 21h LIVRÉ : `livre_0/1/2`,
   `dico_0/1/2` (en vol, `spritesEnPlus` : 10 et 7 images/s). SECTION 21 TERMINÉE.
+- V106 : TOUS LES POINTS DE L'AUDIT (D à J) FAITS (demande de Fabien) :
+  CLASSE : pas de vue du dessus avant 20 s de combat (`RG.julien.premierMur`, `e.combatT`, aussi après une reprise) ;
+  D Julien DESCEND de l'estrade vers toi (`RG.julien.descente`, phases 1-2) → règle au contact, sinon CONFISQUÉ
+  (`e.attaqueProche`) ; E RANG de fin (`RANGS_CLASSE` : vie 40, temps 25 sous `RG.julien.par` 150 s, coups de dos 20,
+  20/20 15) + record `julien_classe` (pas de record après une reprise) ; F POINT DE REPRISE : perdu → REJOUER repart au
+  début de la dernière phase (`this.reprise`, `donneesRejouer()`) ; ménage : motif « copies » retiré.
+  MANIF : G pistolet à eau : « plic » toutes les 3 gouttes, sursaut toutes les 6 ; I 1 FUMIGÈNE (fond du secret du
+  passage) ; J : BAC en civil 'N' (IA du CRS sans bouclier + t'attrape, `RG.bac`), tireur de LBD 'L' (balle droite
+  rapide, `RG.lbd`, `this.balles`), policier SUR LE TOIT du fourgon (`FOURGON.perche`, 1 œuf, lance 2,4× moins souvent,
+  le fourgon ne le protège pas : `porteur`), la SONO 'Y' (arme 7 dans le grand secret de la ruelle, 2 charges : tous
+  les policiers en vue fuient, `RG.sono`), CARTE DE CANTINE 'q' (secret du passage) → PORTE DE SERVICE 'D' (aspect
+  rideau de fer, `PORTES`) : couloir de la place au parvis (boucle qui contourne le cordon). `plan_manif.py` et
+  `julien_verif` mis à jour (carte et porte atteignables). Sage / Délégué : BAC du parvis et LBD du couloir absents.
+  Bot BLOQUEUR : manif un peu plus dure qu'avant (8/9 victoires PC, 7/9 tél. ; le bot n'esquive pas les balles de LBD).
+  Images provisoires (code) : prompts 22a à 22d de `julien_prompts_images.md`.
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,
