@@ -67,7 +67,7 @@ export class GregCombat extends BossScene {
     this.roundsJoues = 0;
     this.nomDiff = 'normal'; this.diff = DIFFICULTES.normal;
     // audit nov. 2026 : rien ne doit rester de la partie d'avant (REJOUER / retour du hub)
-    this.compte = null; this.caseKO = null; this.barreReleve = null; this.arbitre = null; this.texteAideDempsey = null;
+    this.compte = null; this.caseKO = null; this.barreReleve = null; this.arbitre = null; this.dempseyVu = false; this.dempseyLance = false; this.texteAideDempsey = null;
     this.tempsRound = R.dureeRound; this.coupsRecents = []; this.serie = 0; this.serieJusqua = -1; this.smashR2Fait = false; this.dernierSeq = -1;
 
     this.add.image(0, 0, 'greg_ring').setOrigin(0);
@@ -247,7 +247,8 @@ export class GregCombat extends BossScene {
       const c = R.coups[j.action.coup];
       j.action.t += dt;
       if (!j.action.fait && j.action.t >= c.impact) { j.action.fait = true; this.coupDuJoueur(j.action.coup); }
-      if (j.action && j.action.t >= c.duree) j.action = null;
+      const rush = this.g.etat === 'etourdi' ? R.etourdi.coupRapide : 1;   // Greg étourdi : on enchaîne plus vite
+      if (j.action && j.action.t >= c.duree * rush) j.action = null;
       // on peut couper la fin de son coup pour esquiver
       else if (j.action && j.action.fait && (this.memo('gauche') || this.memo('droite'))) j.action = null;   // on peut couper son coup dès l'impact
       else return;
@@ -288,8 +289,9 @@ export class GregCombat extends BossScene {
 
   frapper(coup, poing) {
     const j = this.j, c = R.coups[coup];
-    if (j.souffle < c.souffle) { this.essouffle(); return; }
-    j.souffle -= c.souffle; j.reposSouffle = 0.5;
+    const rush = this.g.etat === 'etourdi';   // Greg étourdi : tes coups ne coûtent pas de souffle
+    if (!rush && j.souffle < c.souffle) { this.essouffle(); return; }
+    if (!rush) { j.souffle -= c.souffle; j.reposSouffle = 0.5; }
     // poing GAUCHE / DROIT : imposé (contre après une esquive) ou chacun son tour (juste pour l'animation)
     if (!poing) { this.alterne = !this.alterne; poing = this.alterne ? 'g' : 'd'; } else this.alterne = poing === 'g';
     const pose = coup === 'corps' ? (poing === 'g' ? 'corps_g' : 'corps') : (poing === 'g' ? 'jab' : 'crochet');
@@ -357,6 +359,8 @@ export class GregCombat extends BossScene {
       onomatopee(this, xImpact, yImpact - 50, 'BIEN VU !!', 46, '#ffd84a');
       this.arreter(R.arretImpact.contre);
     }
+    if (titube) degats *= R.etourdi.multiplicateur;   // RUSH : Greg sans défense, chaque coup fait très mal
+    g.reculSens = null;
     if (contre) {
       // contre AU VISAGE quand il protège le ventre (garde basse) : encore plus fort
       const ouvert = c.cible === 'tete' && g.garde === 'basse';
@@ -436,7 +440,9 @@ export class GregCombat extends BossScene {
     const g = this.g;
     g.vertige = 0; g.etat = 'etourdi'; g.t = 0; g.attaque = null; g.couvert = 0; g.combo = 0;
     this.alerte.setVisible(false);
-    onomatopee(this, R.centreX, 230, 'ÉTOURDI !!', 54, '#ffd84a');
+    onomatopee(this, R.centreX, 210, 'ÉTOURDI !!', 54, '#ffd84a');
+    onomatopee(this, R.centreX, 270, 'TAPE ! TAPE ! TAPE !', 30, '#ff8a3d');
+    this.ralentir(0.5, 0.2);
     jouerSon(this, 'greg_foule');
     this.parler('Il est sonné !', { coupe: false });
   }
@@ -726,7 +732,13 @@ export class GregCombat extends BossScene {
     g.etat = 'touche'; g.t = 0; g.attaque = null; this.alerte.setVisible(false);
     jouerSon(this, 'greg_alerte');
     // Le clip (GIF / vidéo) s'il existe dans le manifeste, sinon l'animation dessinée par le code
-    const clip = jouerClip(this, 'greg_dempsey');
+    const clip = R.dempsey.clipUneFois && this.dempseyVu ? null : jouerClip(this, 'greg_dempsey');
+    this.dempseyVu = true;
+    if (!clip && R.dempsey.clipUneFois && this.dempseyLance) {   // lancement éclair (2e roll et suivants)
+      flash(this, 0.6, 0xffd84a); onomatopee(this, R.centreX, 220, 'DEMPSEY ROLL !!', 52, '#ffd84a');
+      this.figer(0.5, () => this.aideDempsey()); return;
+    }
+    this.dempseyLance = true;
     if (clip) { this.clipDempsey = clip; this.figer(clip.duree, () => { clip.fermer(); this.clipDempsey = null; this.aideDempsey(); }); return; }
     const e = encartDempsey(this);
     this.figer(1.8, () => { e.fermer(); this.aideDempsey(); });
@@ -827,10 +839,22 @@ export class GregCombat extends BossScene {
     this.cameras.main.shake(final ? 350 : 60 + d.coups * 15, final ? 0.025 : 0.004 + d.coups * 0.0012);
     jouerSon(this, 'greg_coup_fort', { rate: 0.9 + d.coups * 0.05 });   // de plus en plus aigu
     if (parfait) flash(this, 0.15 + d.coups * 0.03);
-    g.poseForcee = { nom: 'touche', t: 0.25 };
+    // la tête de Greg part du côté opposé au poing, à chaque coup
+    g.poseForcee = { nom: 'touche', t: 0.25 }; g.toucheDepuis = this.time.now; g.reculSens = appui === 'g' ? 1 : -1;
     g.secousse = 0.25;
+    // dégâts qui s'envolent
+    const chiffre = texte(this, xImpact + (appui === 'g' ? -40 : 40), yImpact - 30, '-' + Math.round(degats), 22 + d.coups, '#ff5a6e', { stroke: '#000000', strokeThickness: 4 }).setDepth(47);
+    this.tweens.add({ targets: chiffre, y: chiffre.y - 50, alpha: 0, duration: 600, onComplete: () => chiffre.destroy() });
+    // FINISH : s'il est déjà bien entamé, il part au tapis
+    if (final && g.vie - degats <= D.finishTapis) {
+      flash(this, 1, 0xffffff); this.arreter(0.35);
+      onomatopee(this, R.centreX, 230, 'FINISH !!', 72, '#ff8a3d');
+      this.delaiDown = 0.5; j.dempsey = null; this.finZoomDempsey();
+      this.blesserGreg(g.vie);
+      return;
+    }
     this.blesserGreg(degats);   // (le Dempsey Roll garde toute sa force à toutes les difficultés)
-    if (g.etat === 'sol') { j.dempsey = null; return; }
+    if (g.etat === 'sol') { j.dempsey = null; this.finZoomDempsey(); return; }
     if (final) {
       flash(this, 0.9);
       onomatopee(this, R.centreX, 230, 'FINISH !!', 64, '#ff8a3d');
@@ -870,9 +894,12 @@ export class GregCombat extends BossScene {
     this.blesserJoueur(R.dempsey.degatsContre * this.diff.degatsGreg);
   }
 
+  // le zoom du Dempsey Roll revient doucement
+  finZoomDempsey() { this.tweens.add({ targets: this.cameras.main, zoom: 1, duration: 300 }); }
+
   finDempsey() {
     const g = this.g;
-    this.j.dempsey = null;
+    this.j.dempsey = null; this.finZoomDempsey();
     this.alerte.setVisible(false);
     if (g.etat !== 'sol') { g.etat = 'touche'; g.t = -0.6; }
   }
@@ -882,7 +909,10 @@ export class GregCombat extends BossScene {
     const gr = this.grDempsey, fond = this.grVitesse, d = this.j.dempsey;
     gr.clear(); fond.clear();
     this.texteCombo.setVisible(false);
+    const cam = this.cameras.main;   // roll fini (quelle que soit la raison) : la caméra se recule doucement
+    if (!d && cam.zoom > 1.0005 && !this.tweens.isTweening(cam)) cam.setZoom(Math.max(1, cam.zoom - 0.01));
     if (!d || this.etat !== 'combat') return;
+    this.cameras.main.setZoom(1 + Math.min(0.08, d.coups * 0.009));   // la caméra se rapproche à chaque coup
     // lignes de vitesse de plus en plus intenses
     const intensite = Math.min(1, 0.25 + d.coups * 0.08);
     fond.lineStyle(3, 0xffffff, 0.12 + intensite * 0.25);
@@ -1483,7 +1513,8 @@ export class GregCombat extends BossScene {
       // il prend un coup : la tête part en arrière, puis il a l'air sonné une demi-seconde
       const e = t - (g.toucheDepuis || t);
       pose = e < 140 ? ou('touche', repos) : ou('etourdi', 'touche', repos);
-      dx = e < 140 ? -18 : Math.sin(t / 120) * 6; angle = g.secousse > 0 ? 7 : 3; rapide = e < 140;
+      const sens = g.reculSens || -1;
+      dx = e < 140 ? sens * (g.reculSens ? 30 : 18) : Math.sin(t / 120) * 6; angle = g.secousse > 0 ? -sens * 9 : 3; rapide = e < 140;
       if (e < 90) teinte = 0xffc0c0;
     }
     else if (forcee === 'releve') {   // il se relève : il monte du tapis, amoché et furieux, puis souffle

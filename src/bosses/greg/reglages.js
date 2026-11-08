@@ -125,17 +125,19 @@ export const REGLAGES = {
   // Chaque coup réussi accélère le rythme et frappe plus fort.
   dempsey: {
     coupsMax: 10,              // le 10e coup est le coup final
-    periodeDepart: 1.6,        // secondes pour un tour complet du "∞" au début
-    acceleration: 0.95,        // chaque coup réussi : le tour dure 5 % de moins
-    periodeMin: 0.75,
-    parfait: 0.35,             // tolérance (en "angle") pour un PARFAIT
-    bien: 0.9,                 // ... et pour un BIEN (au-delà : raté)
+    periodeDepart: 1.15,       // secondes pour un tour complet du "∞" au début (nov. 2026 : 1,6 -> 1,15, ça démarre fort)
+    acceleration: 0.93,        // chaque coup réussi : le tour dure 7 % de moins
+    periodeMin: 0.55,
+    parfait: 0.4,              // tolérance (en "angle") pour un PARFAIT
+    bien: 1.0,                 // ... et pour un BIEN (au-delà : raté)
     erreursPermises: 2,        // ratés pardonnés ; le suivant arrête le roll
     attenteMax: 6,             // secondes pour donner le 1er coup (▶) avant que le roll s'annule
     degatsParfait: 3,
     degatsBien: 2,
     bonusCombo: 0.05,          // +5 % de dégâts par coup déjà enchaîné
     degatsFinal: 12,
+    finishTapis: 50,           // FINISH (10e coup) : s'il reste à Greg moins que ça, il part AU TAPIS direct
+    clipUneFois: true,         // la vidéo de lancement seulement au 1er roll du combat (ensuite : lancement éclair)
     contreEntre: [3, 6],       // round 3 : Greg tente un contre entre ces coups-là
     degatsContre: 30,
   },
@@ -168,7 +170,7 @@ export const REGLAGES = {
   // ---------- Étourdissement (comme dans Super Punch-Out) ----------
   // Chaque coup qui TOUCHE remplit une jauge cachée (qui se vide toute seule). Pleine => Greg titube,
   // sans défense pendant 'duree' secondes : tous tes coups passent !
-  etourdi: { parCoup: 15, parContre: 35, baisse: 16, duree: 1.8 },   // baisse : 18 -> 16 (audit : il n'était jamais étourdi ; le visage étourdit 2x plus)
+  etourdi: { parCoup: 15, parContre: 35, baisse: 16, duree: 1.3, multiplicateur: 3, coupRapide: 0.6 },   // RUSH : plus court, chaque coup x3, sans souffle, coups 40 % plus rapides   // baisse : 18 -> 16 (audit : il n'était jamais étourdi ; le visage étourdit 2x plus)
   compteVocal: false,          // compte de l'arbitre à voix haute (japonais) ; false = seulement à l'écran
   annonceur: false,            // voix de synthèse retirées : pas assez punchy — tout passe par l'écran et les sons
 
