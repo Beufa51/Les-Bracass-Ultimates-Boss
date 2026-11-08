@@ -1,6 +1,6 @@
 // Commandes CLAVIER (PC) de la manif : préréglages + touches personnalisables, gardés dans le navigateur.
 // Chaque ACTION a une liste de touches (noms de Phaser.Input.Keyboard.KeyCodes). « inverser » est une touche à
-// maintenir qui échange pas de côté ↔ tourner (comme Alt dans Doom). Les touches 1 à 5 (armes) et Tab / M (carte)
+// maintenir qui échange pas de côté ↔ tourner (comme Alt dans Doom). Les touches 1 à 6 (armes) et Tab / M (carte)
 // sont fixes. La souris est une option à part (sourisActive).
 const CLE = 'bracass_julien_commandes_v1';
 

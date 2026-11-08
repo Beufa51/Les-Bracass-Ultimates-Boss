@@ -36,7 +36,6 @@ export const MANIFESTE = {
     julien_fourgon: son('fourgon'),   // le fourgon de CRS arrive
     julien_rideau: son('rideau'),     // rideau de fer qui se lève (embuscade)
     julien_eau: son('eau'),           // pistolet à eau
-    julien_fumigene: son('fumigene'), // un fumigène s'allume
     julien_craie: son('craie'),       // niveau 2 : la craie crisse (Julien écrit au tableau, craies en rafale)
     julien_papier: son('papier'),     // niveau 2 : « Sortez une feuille ! » (mur de copies)
     julien_alarme: son('alarme'),     // niveau 2 : alarme incendie (phase 3)

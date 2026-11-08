@@ -262,21 +262,12 @@ export function texturesSprites() {
   S.tomate = toile(12, 12, (g) => { ovale(g, '#d8281e', 6, 7, 5, 5); R(g, '#3f9a3a', 4, 1, 4, 3); R(g, '#ff8a7a', 3, 4, 2, 2); });
   S.splat_rouge = toile(22, 14, (g) => { ovale(g, '#c8241a', 11, 8, 10, 5); ovale(g, '#ff5a48', 12, 7, 4, 2); ovale(g, '#c8241a', 3, 4, 2, 2); ovale(g, '#e8d070', 16, 9, 1, 1); });
   S.eau = toile(8, 8, (g) => { ovale(g, 'rgba(140,200,255,0.85)', 4, 4, 3, 3); R(g, '#fff', 3, 2, 1, 1); });
-  S.fumi = toile(10, 14, (g) => { R(g, '#d02a8a', 2, 4, 6, 10); R(g, '#222', 2, 4, 6, 2); ovale(g, 'rgba(240,140,200,0.8)', 5, 2, 4, 3); });
-  S.fumee = toile(64, 56, (g) => {
-    const b = [[20, 36, 15], [38, 32, 17], [50, 40, 12], [28, 20, 13], [44, 18, 11], [12, 44, 9], [56, 46, 8], [32, 8, 9]];
-    for (const [x, y, r] of b) ovale(g, 'rgba(235,120,190,0.6)', x, y, r, r * 0.85);
-    for (const [x, y, r] of b) ovale(g, 'rgba(160,230,140,0.3)', x + 3, y + 2, r * 0.5, r * 0.4);
-  });
   S.tomates = toile(40, 24, (g) => {   // cagette de tomates
     for (let i = 0; i < 4; i++) ovale(g, '#d8281e', 8 + i * 8, 8, 4, 4);
     R(g, '#c8a060', 2, 10, 36, 13); for (let x = 4; x < 38; x += 6) R(g, '#a07a40', x, 12, 2, 9); R(g, '#8a6430', 2, 10, 36, 2);
   });
   S.eau_pistolet = toile(40, 24, (g) => {   // pistolet à eau au sol
     R(g, '#ff8c1a', 4, 8, 28, 8); R(g, '#2a9cff', 10, 2, 12, 7); R(g, '#ff8c1a', 22, 14, 6, 9); R(g, '#ffd84a', 32, 10, 6, 4);
-  });
-  S.fumigenes = toile(30, 26, (g) => {   // 3 fumigènes
-    for (let i = 0; i < 3; i++) { R(g, ['#d02a8a', '#2ac05a', '#e0c020'][i], 4 + i * 9, 6, 6, 18); R(g, '#222', 4 + i * 9, 6, 6, 3); }
   });
   // SAC DE FARINE (comme les barils de Doom) et son nuage blanc
   S.farine = toile(30, 34, (g) => {
@@ -335,8 +326,6 @@ export function texturesMain() {
     tomates_tir: arme((g) => { bras(g, 40, 50); ovale(g, PEAU, 52, 46, 15, 11); }),
     eau: arme((g) => { bras(g, 52, 78); R(g, '#ff8c1a', 30, 52, 56, 18); R(g, '#2a9cff', 46, 34, 26, 18); R(g, '#ffd84a', 22, 56, 10, 8); R(g, '#ff8c1a', 62, 70, 12, 20); ovale(g, PEAU, 68, 80, 12, 10); }),
     eau_tir: arme((g) => { bras(g, 52, 78); R(g, '#ff8c1a', 30, 54, 56, 18); R(g, '#2a9cff', 46, 36, 26, 18); R(g, '#ffd84a', 22, 58, 10, 8); ovale(g, 'rgba(160,215,255,0.8)', 14, 58, 8, 5); R(g, '#ff8c1a', 62, 72, 12, 20); ovale(g, PEAU, 68, 82, 12, 10); }),
-    fumigenes: arme((g) => { bras(g, 46, 72); ovale(g, PEAU, 60, 66, 15, 12); R(g, '#d02a8a', 52, 26, 14, 40); R(g, '#222', 52, 26, 14, 6); ovale(g, 'rgba(240,140,200,0.7)', 58, 18, 10, 8); }),
-    fumigenes_tir: arme((g) => { bras(g, 40, 50); ovale(g, PEAU, 52, 46, 15, 11); }),
     // la SONO (dessin provisoire, prompt 22c) : une enceinte portée à bout de bras
     sono: arme((g) => { bras(g, 50, 82); R(g, '#1c1c1c', 22, 22, 64, 62); R(g, '#3a3a3a', 26, 26, 56, 54); ovale(g, '#111', 54, 62, 17, 17); ovale(g, '#555', 54, 62, 7, 7); ovale(g, '#111', 54, 36, 8, 8); R(g, '#ffd84a', 28, 28, 8, 3); ovale(g, PEAU, 66, 86, 13, 10); }),
     sono_tir: arme((g) => { bras(g, 50, 86); R(g, '#1c1c1c', 18, 18, 70, 66); R(g, '#3a3a3a', 22, 22, 62, 58); ovale(g, '#111', 53, 60, 20, 20); ovale(g, '#777', 53, 60, 9, 9); ovale(g, '#111', 53, 33, 9, 9); g.strokeStyle = '#ffd84a'; g.lineWidth = 3; for (const r of [28, 36]) { g.beginPath(); g.arc(53, 50, r, Math.PI * 1.1, Math.PI * 1.9); g.stroke(); } ovale(g, PEAU, 66, 90, 13, 10); }),
@@ -351,8 +340,8 @@ const SPRITES = [
   ...['marche0', 'marche1', 'cri', 'charge', 'essouffle', 'touche', 'fuite', 'farine'].map(p => 'bouclier_' + p),   // (tousse, farine : section 21d)
   ...[0, 1, 2, 3, 4, 5, 6, 7].map(n => 'manifestant_' + n),
   'barriere', 'poubelle', 'oeufs', 'sandwich', 'oeuf', 'splat', 'grenade', 'nuage', 'statue', 'camion', 'colonne',
-  'tomates', 'eau_pistolet', 'fumigenes', 'tomate', 'splat_rouge', 'fumee',
-  'echarpe', 'cafe', 'kway', 'farine', 'nuage_farine', 'eau', 'fumi',
+  'tomates', 'eau_pistolet', 'tomate', 'splat_rouge',
+  'echarpe', 'cafe', 'kway', 'farine', 'nuage_farine', 'eau',
   // V106 (prompts 22) : tireur de LBD, BAC en civil, sono au sol, carte de cantine, balle de LBD
   ...['marche0', 'marche1', 'bras', 'lance', 'touche', 'fuite'].map(p => 'lbd_' + p),
   ...['marche0', 'marche1', 'cri', 'charge', 'touche', 'fuite'].map(p => 'bac_' + p),
@@ -362,14 +351,14 @@ const MURS = { 1: 'mur_briques', 2: 'mur_immeuble', 3: 'mur_boutique', 4: 'mur_t
   7: 'portail_lycee', 8: 'mur_boutique2', 9: 'mur_rideau' };   // 8 : 2e tabac (façade en pierre), pas de dessin provisoire (repli : briques)
 const MAINS = { tient: 'main_tient', lance: 'main_lance', vide: 'main_vide', sono: 'main_sono', sono_tir: 'main_sono_tir',   // vide : arme CONFISQUÉE (la classe)
  
-  ...Object.fromEntries(['pancarte', 'tomates', 'eau', 'fumigenes'].flatMap(a => [[a, 'main_' + a], [a + '_tir', 'main_' + a + '_tir']])) };
+  ...Object.fromEntries(['pancarte', 'tomates', 'eau'].flatMap(a => [[a, 'main_' + a], [a + '_tir', 'main_' + a + '_tir']])) };
 // hauteur dans le monde (1 = un mur) avec les vraies images : leur cadre inclut bras levés, pancartes, fumée…
 const HAUTEURS_IMAGES = { lbd: 1.0, bac: 1.0, sono: 0.4, carte: 0.12, lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barriere: 0.45, poubelle: 0.5, oeufs: 0.2,
   sandwich: 0.1, oeuf: 0.08, splat: 0.12, grenade: 0.16, nuage: 1.0, statue: 2.0, camion: 1.05, colonne: 1.5,
-  tomates: 0.26, eau: 0.2, fumigenes: 0.28, echarpe: 0.22, cafe: 0.2, kway: 0.24, farine: 0.45 };
+  tomates: 0.26, eau: 0.2, echarpe: 0.22, cafe: 0.2, kway: 0.24, farine: 0.45 };
 export const HAUTEURS_PROVISOIRES = { lbd: 0.82, bac: 1.0, sono: 0.3, carte: 0.12, lanceur: 0.82, bouclier: 0.86, manifestant: 1.0, barriere: 0.42, poubelle: 0.5, oeufs: 0.18,
   sandwich: 0.14, oeuf: 0.08, splat: 0.1, grenade: 0.1, nuage: 0.9, statue: 1.7, camion: 0.95, colonne: 1.35,
-  tomates: 0.22, eau: 0.2, fumigenes: 0.22, echarpe: 0.2, cafe: 0.22, kway: 0.22, farine: 0.42 };
+  tomates: 0.22, eau: 0.2, echarpe: 0.2, cafe: 0.22, kway: 0.22, farine: 0.42 };
 
 // murs qui ont aussi une version AVEC panneau (posée sur 1 case sur 6 : voir raycaster.js)
 const PANNEAUX = ['mur_briques', 'mur_immeuble', 'mur_tag', 'mur_lycee'];

@@ -1822,6 +1822,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   TOUS LES BOSS (`src/core/BossScene.js`) : pendant les RÈGLES (`afficherIntro`) et la PRÉSENTATION, seul le bouton OK
   reste sur téléphone ; les boutons du niveau sont remis tels quels en validant (testé sur les 11 scènes : chacune
   retrouve ses boutons de jeu).
+- V108 (Fabien) : FUMIGÈNES SUPPRIMÉS pour de bon (arme, objet, fumée, son, images, découpe, `RG.fumigenes`) : les armes
+  sont maintenant 1 pancarte, 2 œufs, 3 tomates, 4 eau, 5 sarbacane (lycée / classe), 6 la sono. Fin de la manif : plus
+  de ligne « OBJETS » (munitions et soins = consommables) ; rang = policiers 55 + secrets 25 + temps 20.
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,

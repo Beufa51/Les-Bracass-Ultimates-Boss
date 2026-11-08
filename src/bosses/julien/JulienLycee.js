@@ -118,7 +118,7 @@ export class JulienLycee extends JulienManif {
   lireNiveau() {
     this.j = this.nouveauJoueur();
     this.j.armes = new Set(['sarbacane']); this.j.arme = 'sarbacane';   // les armes de la manif sont INTERDITES au lycée
-    this.ennemis = []; this.objets = []; this.tirs = []; this.fumees = []; this.grenades = []; this.nuages = []; this.splats = [];
+    this.ennemis = []; this.objets = []; this.tirs = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.farines = []; this.rideaux = []; this.flaques = []; this.fourgonFait = true;
     this.secrets = new Map(); this.secretsTrouves = 0; this.secretsSignales = new Set();
     this.carnet = false; this.fini = false; this.porteT = 0;

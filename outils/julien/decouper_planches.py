@@ -30,7 +30,6 @@ GROUPES = {
     'main_pancarte': ('julien_main_pancarte.jpg', 240, [('main_pancarte', (330, 350)), ('main_pancarte_tir', (1150, 380))]),
     'main_tomates': ('julien_main_tomates.jpg', 240, [('main_tomates', (330, 330)), ('main_tomates_tir', (1060, 370))]),
     'main_eau': ('julien_main_eau.jpg', 240, [('main_eau', (340, 460)), ('main_eau_tir', (1130, 420))]),
-    'main_fumigenes': ('julien_main_fumigenes.jpg', 240, [('main_fumigenes', (360, 330)), ('main_fumigenes_tir', (1060, 500))]),
     # niveau 2 (la classe) ; pose de tir : la boulette et le souffle sont pris avec la main
     'main_sarbacane': ('julien_main_sarbacane.jpg', 240, [('main_sarbacane', (300, 450)), ('main_sarbacane_tir', (1010, 450))]),
     # MINI-NIVEAU « LE LYCÉE » : surveillant (le pion), dame de cantine, fayot
@@ -82,13 +81,13 @@ SEULS = {'statue': 240, 'camion': 140, 'colonne': 220,
          'julien_vaincu_papier': 240}   # Julien vaincu SANS œuf (19d) : un seul dessin, étoiles et feuilles comprises
 
 OBJETS_ARMES = ('julien_objets_armes.jpg', [
-    ('tomates', (245, 215), 90), ('eau_pistolet', (760, 240), 70), ('fumigenes', (1215, 215), 90),
-    ('tomate', (240, 585), 40), ('splat_rouge', (760, 580), 50), ('fumee', (1210, 570), 160)])
+    ('tomates', (245, 215), 90), ('eau_pistolet', (760, 240), 70), (None, (1215, 215), 90),
+    ('tomate', (240, 585), 40), ('splat_rouge', (760, 580), 50), (None, (1210, 570), 160)])
 
-# objets qui manquaient (bonus, sac et nuage de farine, goutte d'eau, fumigène en vol) ; 2e sac de farine ignoré
+# objets qui manquaient (bonus, sac et nuage de farine, goutte d'eau) ; 2e sac de farine et fumigènes (supprimés) ignorés
 OBJETS_BONUS = ('julien_objets_bonus.jpg', [
     ('echarpe', (176, 190), 60), ('cafe', (528, 200), 55), ('kway', (880, 180), 55), ('farine', (1232, 190), 90),
-    (None, (176, 576), 90), ('nuage_farine', (528, 570), 160), ('eau', (880, 570), 24), ('fumi', (1232, 560), 50)])
+    (None, (176, 576), 90), ('nuage_farine', (528, 570), 160), ('eau', (880, 570), 24), (None, (1232, 560), 50)])
 
 # objets de la CLASSE (niveau 2) ; la 2e copie est ignorée
 OBJETS_CLASSE = ('julien_objets_classe.jpg', [
@@ -259,7 +258,7 @@ def corriger_tableau(t):
 
 
 # mains dessinées en MAIN GAUCHE par Gemini (le bras entre par le bas à gauche) : retournées en miroir → main droite
-MAINS_MIROIR = {'main_lance', 'main_pancarte_tir', 'main_fumigenes', 'main_fumigenes_tir', 'main_sarbacane', 'main_sarbacane_tir'}
+MAINS_MIROIR = {'main_lance', 'main_pancarte_tir', 'main_sarbacane', 'main_sarbacane_tir'}
 
 
 def main():

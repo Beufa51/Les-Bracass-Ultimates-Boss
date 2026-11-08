@@ -98,11 +98,6 @@ ecrire('julien_pancarte', bande(bruit(d), 400, 2500) * np.sin(np.pi * np.clip(x 
 d = 0.12
 ecrire('julien_eau', bande(bruit(d), 2500, 8000) * env(d, 0.005, 0.04), 0.35)
 
-# fumigène qui s'allume : « pop » + chuintement
-d = 0.9; x = t(d)
-f = bande(bruit(d), 900, 5000) * np.clip(x / 0.08, 0, 1) * np.exp(-x / 0.5)
-f[:int(SR * 0.03)] += 0.9 * passe_bas(bruit(0.03), 1200)
-ecrire('julien_fumigene', f, 0.5)
 
 # policier qui te repère : « HÉ ! » bref et grave (deux syllabes grésillantes)
 def syllabe(d, f0, f1): return np.tanh(3 * bande(glisse(d, f0, f1, scie), 400, 1800)) * env(d, 0.01, d / 2.5)

@@ -20,7 +20,7 @@ import { texturesMurs, texturesSprites, texturesMain, chargerImages, appliquerIm
 import { construireDecor } from './decor.js';
 import { installerJoystick } from './joystick.js';
 import { ACTIONS, PRESETS, lireCommandes, ecrireCommandes, appliquerPreset, creerCommandes, nomsTouches, nomTouche, toucheDeEvenement } from './commandes.js';
-import { ARMES, armeDe, RECHARGES, choisirArme, armeSuivante, tirer, avancerTirs, dansFumee } from './armes.js';
+import { ARMES, armeDe, RECHARGES, choisirArme, armeSuivante, tirer, avancerTirs } from './armes.js';
 import { toileVisage, niveauVisage } from './visage.js';
 
 // Bonus : temps (s) ou armure gagnée, et message
@@ -146,7 +146,7 @@ export class JulienManif extends BossScene {
     return [
       `${PRESETS[this.reg.preset] ? PRESETS[this.reg.preset].nom : 'PERSONNALISÉ'} :  avancer ${n('avancer')}   reculer ${n('reculer')}`,
       `pas de côté ${n('coteG')} ${n('coteD')}   tourner ${n('tourneG')} ${n('tourneD')}${this.reg.souris ? '   souris (clic)' : ''}`,
-      `tirer ${n('tirer')}${this.reg.souris ? ' / clic' : ''}   arme ${n('arme')} ou 1-5   ${this.reg.toujoursCourir ? 'marcher' : 'courir'} ${n('marcher')}`,
+      `tirer ${n('tirer')}${this.reg.souris ? ' / clic' : ''}   arme ${n('arme')} ou 1-6   ${this.reg.toujoursCourir ? 'marcher' : 'courir'} ${n('marcher')}`,
     ];
   }
 
@@ -290,13 +290,13 @@ export class JulienManif extends BossScene {
   // ------------------------------------------------------------------ niveau
   nouveauJoueur() {
     return { x: 2.5, y: 2.5, a: -Math.PI / 2, vie: RG.joueur.vie, recharge: 0,
-      mun: { oeufs: RG.oeufs.depart, tomates: 0, eau: 0, fumigenes: 0, sono: 0 }, carte: false, armes: new Set(['pancarte', 'oeufs']), arme: 'oeufs', armure: 0, echarpe: 0, cafe: 0, lanceT: 0, bob: 0,
+      mun: { oeufs: RG.oeufs.depart, tomates: 0, eau: 0, sono: 0 }, carte: false, armes: new Set(['pancarte', 'oeufs']), arme: 'oeufs', armure: 0, echarpe: 0, cafe: 0, lanceT: 0, bob: 0,
       regard: 0, regardT: 1.2, expr: 'normal', exprT: 0, rouge: 0, gaz: 0 };
   }
 
   lireNiveau() {
     this.j = this.nouveauJoueur();
-    this.ennemis = []; this.objets = []; this.tirs = []; this.fumees = []; this.grenades = []; this.nuages = []; this.splats = [];
+    this.ennemis = []; this.objets = []; this.tirs = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.sortie = null;
     this.secrets = new Map(); this.secretsTrouves = 0; this.secretsSignales = new Set();
     this.rideaux = []; this.farines = []; this.fourgonFait = false; this.fourgonT = FOURGON.attente;
@@ -718,7 +718,7 @@ export class JulienManif extends BossScene {
     const ox = j.x - e.x, oy = j.y - e.y, d = Math.hypot(ox, oy);
     e.aveugle = Math.max(0, (e.aveugle || 0) - dt);   // farine dans les yeux
     e.tousseT = Math.max(0, (e.tousseT || 0) - dt); e.attrapePose = Math.max(0, (e.attrapePose || 0) - dt);   // (poses « tousse » et « attrape »)
-    const voit = j.vie > 0 && !e.aveugle && d < R.vue && vueLibre(this.plan, e.x, e.y, j.x, j.y) && !dansFumee(this, e.x, e.y) && !dansFumee(this, j.x, j.y);
+    const voit = j.vie > 0 && !e.aveugle && d < R.vue && vueLibre(this.plan, e.x, e.y, j.x, j.y);
     if (voit) { e.vuX = j.x; e.vuY = j.y; if (!e.alerte) { e.alerte = true; e.t = 0.6 + Math.random() * 0.6; this.alerter(e.x, e.y, 6); jouerSon(this, 'julien_halte', { rate: e.type === 'bouclier' ? 0.8 : 1 }); } }
     e.t -= dt; e.bouge = false;
     const marcher = (vx, vy, vitesse) => {
@@ -876,7 +876,7 @@ export class JulienManif extends BossScene {
 
   projectiles(dt) {
     const j = this.j;
-    avancerTirs(this, dt);   // œufs, tomates, eau, fumigènes (armes.js)
+    avancerTirs(this, dt);   // œufs, tomates, eau (armes.js)
     // grenades lacrymogènes : vol en cloche, puis nuage
     for (const g of this.grenades) {
       g.t += dt / RG.lacrymo.vol;
@@ -965,7 +965,7 @@ export class JulienManif extends BossScene {
     const mmss = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
     texte(this, LARGEUR / 2, 70, 'LA MANIF : TERMINÉ', 40, '#ffd84a').setDepth(1001);
     const lignes = [
-      ['POLICIERS', pc(this.repousses, this.total)], ['OBJETS', pc(this.ramasses, this.totalObjets)],
+      ['POLICIERS', pc(this.repousses, this.total)],   // (plus d'« OBJETS » : munitions et soins sont des consommables, demande de Fabien)
       ['SECRETS', pc(this.secretsTrouves, this.secrets.size)], ['TEMPS', mmss(this.temps)], ['PAR', mmss(PAR)],
     ];
     lignes.forEach(([nom, val], n) => {   // les lignes apparaissent une par une, comme dans Doom
@@ -975,9 +975,9 @@ export class JulienManif extends BossScene {
         jouerSon(this, 'julien_lancer');
       });
     });
-    // rang : policiers 50, secrets 20, objets 10, temps 20 (plein si sous le PAR)
+    // rang : policiers 55, secrets 25, temps 20 (plein si sous le PAR) ; les objets ne comptent plus (consommables)
     const f = (a, b) => b ? a / b : 1;
-    const score = 50 * f(this.repousses, this.total) + 20 * f(this.secretsTrouves, this.secrets.size) + 10 * f(this.ramasses, this.totalObjets)
+    const score = 55 * f(this.repousses, this.total) + 25 * f(this.secretsTrouves, this.secrets.size)
       + 20 * Math.min(1, PAR / Math.max(1, this.temps));
     const rang = RANGS.find(r => score >= r.mini);
     Sauvegarde.marquerFait('julien_manif');   // la porte du hub propose ensuite d'aller directement en classe
@@ -1043,11 +1043,9 @@ export class JulienManif extends BossScene {
       }
     }
     for (const o of this.tirs) {
-      if (o.genre === 'fumi') liste.push({ x: o.x, y: o.y, toile: s.fumi, haut: 0.14, z: o.z });
-      else if (o.genre !== 'eau' || o.t > 0.05) liste.push({ x: o.x, y: o.y, toile: s[o.genre], haut: o.genre === 'eau' ? 0.05 : T.hauteurs.oeuf, z: o.genre === 'eau' ? 0.4 : 0.42 });
+      if (o.genre !== 'eau' || o.t > 0.05) liste.push({ x: o.x, y: o.y, toile: s[o.genre], haut: o.genre === 'eau' ? 0.05 : T.hauteurs.oeuf, z: o.genre === 'eau' ? 0.4 : 0.42 });
     }
     for (const f of this.farines) liste.push({ x: f.x, y: f.y, toile: f.mousse && s.mousse ? s.mousse : s.nuage_farine, haut: 1.0 + (1.6 - f.t) * 0.5, z: 0 });
-    for (const f of this.fumees) liste.push({ x: f.x, y: f.y, toile: s.fumee, haut: 1.3 + 0.1 * Math.sin(f.t * 2), z: 0 });
     for (const b of (this.balles || [])) liste.push({ x: b.x, y: b.y, toile: s.balle, haut: 0.07, z: 0.45 });
     for (const gr of this.grenades) liste.push({ x: gr.x, y: gr.y, toile: gr.puree ? s.puree : s.grenade, haut: gr.puree ? T.hauteurs.puree : T.hauteurs.grenade, z: gr.z });
     for (const sp of this.splats) liste.push({ x: sp.x, y: sp.y, toile: sp.papier && s.dessus_explosion ? s.dessus_explosion : sp.rouge ? s.splat_rouge : s.splat,
@@ -1078,7 +1076,6 @@ export class JulienManif extends BossScene {
     g.fillStyle = 'rgba(255,255,255,0.85)'; g.fillRect(L / 2 - 3, VUE_H / 2, 7, 1); g.fillRect(L / 2, VUE_H / 2 - 3, 1, 7);
     // voile de gaz et flash rouge
     if (j.gaz > 0) { g.fillStyle = `rgba(190,205,160,${0.5 * j.gaz})`; g.fillRect(0, 0, L, VUE_H); }
-    if (j.rose > 0) { g.fillStyle = `rgba(230,120,190,${0.35 * j.rose})`; g.fillRect(0, 0, L, VUE_H); }
     if (j.rouge > 0) { g.fillStyle = `rgba(200,0,0,${j.rouge * 0.6})`; g.fillRect(0, 0, L, VUE_H); }
     if (j.blanc > 0) { g.fillStyle = `rgba(255,255,250,${j.blanc * 0.7})`; g.fillRect(0, 0, L, VUE_H); j.blanc = Math.max(0, j.blanc - 0.03 * this.pas60()); }
     if (j.or > 0) { g.fillStyle = `rgba(255,210,80,${j.or * 0.35})`; g.fillRect(0, 0, L, VUE_H); j.or = Math.max(0, j.or - 0.04 * this.pas60()); }

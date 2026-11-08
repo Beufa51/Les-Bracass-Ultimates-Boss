@@ -1,4 +1,4 @@
-// Les ARMES du héros (façon Doom : touches 1 à 5 ; bouton ARME sur téléphone qui passe à la suivante).
+// Les ARMES du héros (façon Doom : touches 1 à 6 ; bouton ARME sur téléphone qui passe à la suivante).
 //  1 PANCARTE  : corps à corps, infinie ; un CRS frappé baisse son bouclier (étourdi) → vite, un œuf !
 //  2 ŒUFS      : l'arme de base
 //  3 TOMATES   : une tomate vaut 2 œufs et fait bien reculer
@@ -15,8 +15,7 @@ export const ARMES = [
   { id: 'oeufs', nom: 'ŒUFS', mun: 'oeufs' },
   { id: 'tomates', nom: 'TOMATES', mun: 'tomates' },
   { id: 'eau', nom: 'PISTOLET À EAU', mun: 'eau' },
-  { id: 'fumigenes', nom: 'FUMIGÈNES', mun: 'fumigenes' },
-  { id: 'sarbacane', nom: 'SARBACANE', mun: null },   // niveau 2 (la classe), touche 6
+  { id: 'sarbacane', nom: 'SARBACANE', mun: null },   // lycée et classe, touche 5 (les FUMIGÈNES ont été supprimés : demande de Fabien)
   { id: 'sono', nom: 'LA SONO', mun: 'sono' },   // grand secret de la manif (ARME pour la choisir)
 ];
 export const armeDe = (id) => ARMES.find(a => a.id === id);
@@ -28,10 +27,8 @@ export const RECHARGES = {
     trouve: 'Des TOMATES ! (touche 3 / ARME) : une tomate vaut deux œufs.' }),
   eau: () => ({ n: RG.eau.bouteille, maxi: RG.eau.maxi, txt: 'De l\'eau pour le pistolet !',
     trouve: 'Un PISTOLET À EAU ! (touche 4 / ARME) : il ÉTEINT les lacrymos.' }),
-  fumigenes: () => ({ n: RG.fumigenes.boite, maxi: RG.fumigenes.maxi, txt: `Des fumigènes ! (+${RG.fumigenes.boite})`,
-    trouve: 'Des FUMIGÈNES ! (touche 5 / ARME) : caché dans la fumée, la police ne te voit plus.' }),
   sono: () => ({ n: RG.sono.charges, maxi: RG.sono.maxi, txt: 'Des piles pour la sono !',
-    trouve: 'LA SONO ! (ARME pour la choisir) : un coup de basse, et TOUS les policiers en vue s\'enfuient. 2 charges.' }),
+    trouve: 'LA SONO ! (touche 6 / ARME) : un coup de basse, et TOUS les policiers en vue s\'enfuient. 2 charges.' }),
 };
 
 // Change d'arme (si on l'a) ; sens : +1 / -1 = la suivante / la précédente qui a des munitions
@@ -92,14 +89,6 @@ export function tirer(scene, dx, dy, appui, nouveau) {
   } else if (j.arme === 'sono') {
     j.recharge = RG.sono.cadence; j.lanceT = 0.5;
     scene.sono();
-  } else if (j.arme === 'fumigenes') {
-    j.recharge = RG.fumigenes.cadence; j.lanceT = 0.3;
-    // il retombe à « distance » cases devant, ou avant le premier mur
-    let d = 0.5;
-    while (d < RG.fumigenes.distance && !murEn(scene.plan, j.x + dx * d, j.y + dy * d)) d += 0.25;
-    d = Math.max(0.6, d - 0.4);
-    ajout('fumi', dx, dy, { x0: j.x, y0: j.y, x1: j.x + dx * d, y1: j.y + dy * d, z: 0.5 });
-    jouerSon(scene, 'julien_lancer', { rate: 0.6 });
   }
   if (j.cafe > 0) j.recharge *= RG.bonus.cafeCadence;   // café serré : on tire plus vite
   scene.alerter(j.x, j.y, RG.bruitTir);   // le bruit alerte les policiers proches
@@ -128,18 +117,12 @@ function frapper(scene, dx, dy) {
   scene.toucherEnnemi(cible, P.degats, { recul, tache: null, genre: 'pancarte' });
 }
 
-// Fait avancer les tirs (œufs, tomates, eau, fumigènes) et les fumées colorées
+// Fait avancer les tirs (œufs, tomates, eau, boulettes)
 export function avancerTirs(scene, dt) {
   const j = scene.j;
   for (const o of scene.tirs) {
     if (o.fini) continue;
     o.t += dt;
-    if (o.genre === 'fumi') {   // vol en cloche jusqu'au point visé, puis la fumée
-      const t = Math.min(1, o.t / RG.fumigenes.vol);
-      o.x = o.x0 + (o.x1 - o.x0) * t; o.y = o.y0 + (o.y1 - o.y0) * t; o.z = 0.5 * (1 - t) + 1.2 * t * (1 - t);
-      if (t >= 1) { o.fini = true; scene.fumees.push({ x: o.x, y: o.y, t: RG.fumigenes.duree }); jouerSon(scene, 'julien_fumigene'); }
-      continue;
-    }
     const R = o.genre === 'oeuf' ? RG.oeufs : o.genre === 'tomate' ? RG.tomates : o.genre === 'boulette' ? RG.sarbacane : RG.eau;
     o.x += o.dx * R.vitesse * dt; o.y += o.dy * R.vitesse * dt;
     const vie = o.genre === 'oeuf' ? 2 : R.duree, sec = o.genre === 'eau' || o.genre === 'boulette';   // sec : pas de tache
@@ -172,19 +155,4 @@ export function avancerTirs(scene, dt) {
     }
   }
   scene.tirs = scene.tirs.filter(o => !o.fini);
-  // fumées colorées : les policiers dedans s'étouffent (même derrière le bouclier)
-  j.rose = Math.max(0, (j.rose || 0) - dt * 1.5);
-  for (const f of scene.fumees) {
-    f.t -= dt;
-    for (const e of scene.ennemis) if (e.actif && e.etat !== 'fuite' && Math.hypot(e.x - f.x, e.y - f.y) < RG.fumigenes.rayon) {
-      scene.toucherEnnemi(e, RG.fumigenes.degats * dt, { perceBouclier: true, silencieux: true });
-    }
-    if (Math.hypot(j.x - f.x, j.y - f.y) < RG.fumigenes.rayon) j.rose = Math.min(1, j.rose + dt * 3);
-  }
-  scene.fumees = scene.fumees.filter(f => f.t > 0);
-}
-
-// Vrai si (x, y) est dans une fumée colorée (on n'y voit rien : ni toi, ni les policiers)
-export function dansFumee(scene, x, y) {
-  return scene.fumees.some(f => Math.hypot(x - f.x, y - f.y) < RG.fumigenes.rayon * 0.9);
 }

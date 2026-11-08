@@ -13,7 +13,7 @@
 // Objets : 'o' boîte d'œufs, 's' sandwich, 'b' barrière, 'p' poubelle, 'm' manifestant, 'T' statue,
 //          'C' camion de CRS, 'k' colonne Morris (tous bloquent sauf œufs et sandwich).
 // Armes (la 1re trouvée donne l'arme, les suivantes des munitions) : 't' cagette de tomates, 'w' pistolet à eau,
-//          'f' fumigènes (RETIRÉS : l'image de la main est coupée en haut, prompt 23a), 'Y' la SONO (grand secret de la ruelle : fait fuir
+//          (fumigènes SUPPRIMÉS : demande de Fabien), 'Y' la SONO (grand secret de la ruelle : fait fuir
 //          tous les policiers en vue).
 // Ennemis en plus : 'N' BAC en civil (rapide, t'attrape au corps à corps), 'L' tireur de LBD (balle rapide en ligne droite).
 // 'q' CARTE DE CANTINE → ouvre 'D', la PORTE DE SERVICE : couloir de la place au parvis (contourne le cordon).
@@ -68,9 +68,9 @@ export const PLAN_MANIF = [
 
 export const OBJETS = {
   P: 'lanceur', B: 'bouclier', o: 'oeufs', s: 'sandwich', b: 'barriere', p: 'poubelle', m: 'manifestant',
-  T: 'statue', C: 'camion', k: 'colonne', t: 'tomates', w: 'eau', f: 'fumigenes',
+  T: 'statue', C: 'camion', k: 'colonne', t: 'tomates', w: 'eau',
   e: 'echarpe', c: 'cafe', K: 'kway', a: 'farine',
-  N: 'bac', L: 'lbd', Y: 'sono', q: 'carte',   // audit nov. 2026 : BAC en civil, tireur de LBD, la SONO (arme 7), carte de cantine
+  N: 'bac', L: 'lbd', Y: 'sono', q: 'carte',   // audit nov. 2026 : BAC en civil, tireur de LBD, la SONO (arme 6), carte de cantine
 };
 export const PORTES = { D: '9' };   // porte de service (aspect rideau de fer) : s'ouvre en poussant, avec la CARTE DE CANTINE
 export const RIDEAUX = { R: '9' };   // lettre du plan → mur « rideau de fer » (n°9)
