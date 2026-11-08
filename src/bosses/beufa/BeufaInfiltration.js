@@ -1055,8 +1055,13 @@ export class BeufaInfiltration extends BossScene {
       if (this.textures.exists('beufa_heros_profil')) { cle = 'beufa_heros_profil'; miroir = ca < 0; }   // la planche profil regarde à DROITE
       if (this.heroSprint && this.heroBouge && this.textures.exists('beufa_heros_course_profil')) cle = 'beufa_heros_course_profil';   // V51 : il COURT
     } else if (sa < 0 && this.textures.exists('beufa_heros_dos')) cle = 'beufa_heros_dos';
+    // V96 : SPRINT vers le haut / le bas : la course en 3/4 (dessinée vers la droite, retournée si on va à gauche)
+    const cleCourseH = 'beufa_heros_course_' + (sa < 0 ? 'dos' : 'face');
+    if (cle !== 'beufa_heros_profil' && cle !== 'beufa_heros_course_profil' && this.heroSprint && this.heroBouge && this.textures.exists(cleCourseH)) {
+      cle = cleCourseH; miroir = ca < -0.05;
+    }
     const nH = Math.max(1, Object.keys(this.textures.get(cle).frames).length - 1);
-    const pasH = cle === 'beufa_heros_course_profil' ? R.joueur.pasCourse : (cle === 'beufa_heros_profil' ? R.joueur.pas : R.joueur.pasFace);   // V51 : course plus longue — V71 : face/dos = 4 cycles par planche
+    const pasH = cle.startsWith('beufa_heros_course') ? R.joueur.pasCourse : (cle === 'beufa_heros_profil' ? R.joueur.pas : R.joueur.pasFace);   // V51 : course plus longue — V71 : face/dos = 4 cycles par planche
     const imageH = this.heroBouge ? Math.floor((this.joueur.distPas || 0) / pasH * nH) % nH
       : (cle === 'beufa_heros' ? 3 : cle === 'beufa_heros_dos' ? 4 : 0);   // V77 : à l'arrêt = la pose « debout » (pieds à plat) du cycle
     if (this.sprJoueur.texture.key !== cle) this.sprJoueur.setTexture(cle);

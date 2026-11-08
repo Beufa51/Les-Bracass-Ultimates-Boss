@@ -1,6 +1,6 @@
 # Beufa — prompts d'images (audit V94)
 
-V95 : n°1, 2, 3, 4, 6, 7 LIVRÉS et branchés. RESTE : n°5 (Snake qui court de face et de dos).
+V96 : TOUT est livré et branché (n°5 via le 5 bis, en 3/4).
 
 Rangés par ordre d'importance. Livrer dans `assets_inbox/beufa/` ; je découpe et branche ensuite.
 Les anciens prompts (décors, codec, marche) restent dans les autres fichiers `beufa_prompts_*.md`.

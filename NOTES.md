@@ -1462,8 +1462,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   (5 poses de tête selon l'angle : veilleur, garde du sas, pauses au bout des rondes).
 - Snake RATTRAPÉ : `beufa_heros_attrape` (mains levées 0,55 s puis à genoux) ; la scène est redessinée pendant le renvoi.
 - Renvoi : l'angle des gardes est remis vers leur ronde (bug de l'audit).
-- Reste : prompt n°5 (Snake qui court de FACE et de DOS) pas encore livré : la 2e planche Snake de Fabien
-  (`assets_inbox/beufa/beufa_heros_planche2.jpg`) n'a que la course de profil, gardée sans servir.
+- V96 : n°5 LIVRÉ (en 2 images, prompt 5 bis) : `beufa_heros_course_face/dos` (6 images, dessinées en 3/4 vers la
+  DROITE, retournées quand on va à gauche, `ancre: 'buste'`) : SPRINT vers le bas / le haut (et en diagonale), cycle
+  `R.joueur.pasCourse`. Toutes les images de l'audit sont branchées. (`beufa_heros_planche2.jpg` ne sert pas.)
 
 ## JULIEN — FPS FAÇON WOLFENSTEIN (décidé avec Fabien)
 Histoire : tu es un étudiant en pleine manif, tu dois rejoindre le lycée (niveau 1), puis affronter Julien, prof, qui

@@ -115,3 +115,8 @@ planche('beufa_garde_tete', [ImageOps.mirror(tete[0]), tete[1], tete[2], tete[3]
 # 6. Snake rattrapé : mains en l'air (rangée 1, image 1), puis à genoux (rangée 4, 2 dernières)
 snake = personnages('beufa_heros_planche_attrape.jpg')
 planche('beufa_heros_attrape', [snake[0], snake[-2], snake[-1]])
+
+# 7. Snake qui court (sprint vers le haut / le bas) : 6 images chacune, dessinées en 3/4 vers la DROITE
+#    (le jeu les retourne quand il va vers la gauche)
+for sens in ['face', 'dos']:
+    planche(f'beufa_heros_course_{sens}', personnages(f'beufa_heros_course_{sens}.jpg'))
