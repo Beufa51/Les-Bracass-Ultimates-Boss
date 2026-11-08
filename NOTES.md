@@ -1813,7 +1813,8 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   rideau de fer, `PORTES`) : couloir de la place au parvis (boucle qui contourne le cordon). `plan_manif.py` et
   `julien_verif` mis à jour (carte et porte atteignables). Sage / Délégué : BAC du parvis et LBD du couloir absents.
   Bot BLOQUEUR : manif un peu plus dure qu'avant (8/9 victoires PC, 7/9 tél. ; le bot n'esquive pas les balles de LBD).
-  Images provisoires (code) : prompts 22a à 22d de `julien_prompts_images.md`.
+  Images : prompts 22a à 22d LIVRÉS (V106b) → `decouper_audit21.py` : `lbd_*`, `bac_*` (essoufflé = marche0, attrape =
+  charge), `sono`, `carte`, `balle`, `main_sono(_tir)` (livrée en main gauche : retournée). Le dessin du code reste en secours.
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,

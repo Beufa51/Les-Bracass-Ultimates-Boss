@@ -28,13 +28,21 @@ PLANCHES = {
     'julien_bureau_renverse.jpg': [('bureau_renverse', (700, 480), 0.25, None)],
     # 21h : livre et dico en vol, 3 images chacun (même hauteur : le jeu leur donne la hauteur de RG / HAUTEURS)
     'julien_livres_vol.jpg': [(f'{n}_{k}', (x, y), 1, 60) for n, y in (('livre', 190), ('dico', 575)) for k, x in enumerate((250, 760, 1230))],
+    # 22 (V106) : main de la SONO (livrée en main gauche : retournée), objets, tireur de LBD, BAC en civil
+    'julien_main_sono.jpg': [('main_sono', (345, 470), 240 / 581, 240), ('main_sono_tir', (1060, 470), 240 / 581, 240)],
+    'julien_objets_v106.jpg': [('sono', (258, 367), 0.3, None), ('carte', (704, 384), 0.4, None), ('balle', (1194, 375), 0.4, None)],
+    'julien_lbd.jpg': [(f'lbd_{p}', (x, 460), 0.3, 200) for p, x in zip(['marche0', 'marche1', 'bras', 'lance', 'touche', 'fuite'],
+                                                                       [126, 364, 595, 827, 1050, 1276])],
+    'julien_bac.jpg': [(f'bac_{p}', (x, 460), 0.3, 200) for p, x in zip(['marche0', 'marche1', 'cri', 'charge', 'touche', 'fuite'],
+                                                                       [126, 361, 590, 821, 1050, 1279])],
     'julien_crs_tousse.jpg': [('bouclier_tousse', (740, 400), 0.235, 200)],
 }
 # les 2 dernières poses des policiers se touchent : on coupe entre elles (zones effacées en blanc avant la découpe)
-EFFACER = {'julien_livres_vol.jpg': [(0, 0, 1408, 6), (0, 762, 1408, 768), (0, 0, 6, 768), (1401, 0, 1408, 768),
+EFFACER = {'julien_objets_v106.jpg': [(990, 240, 1124, 520)],   # traits de vitesse de la balle
+           'julien_livres_vol.jpg': [(0, 0, 1408, 6), (0, 762, 1408, 768), (0, 0, 6, 768), (1401, 0, 1408, 768),
                                      (498, 0, 510, 768), (1050, 0, 1062, 768), (0, 378, 1408, 390)],
            'julien_police_effets.jpg': [(950, 0, 1182, 625), (950, 625, 1128, 768)]}
-MIROIR = {'main_vide'}   # livrée en main GAUCHE : retournée pour faire la main droite (comme les autres mains)
+MIROIR = {'main_vide', 'main_sono', 'main_sono_tir'}   # livrée en main GAUCHE : retournée pour faire la main droite (comme les autres mains)
 FINS = ['julien_fin_gaze', 'julien_fin_attrape', 'julien_fin_colle', 'julien_fin_victoire']
 
 

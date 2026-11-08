@@ -470,7 +470,7 @@ One single pose: bent forward, coughing into his fist, eyes watering behind the 
 Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
 ```
 
-## 22. Nouveautés de la manif (V106 : BAC, LBD, sono, carte de cantine) — à déposer dans `assets_inbox/julien/`
+## 22. Nouveautés de la manif (V106 : BAC, LBD, sono, carte de cantine) — LIVRÉES ET BRANCHÉES (V106b)
 En attendant : BAC = un manifestant avec un brassard orange dessiné par le code, LBD = le lanceur assombri, sono / carte /
 balle = petits dessins du code.
 

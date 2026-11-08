@@ -353,14 +353,18 @@ const SPRITES = [
   'barriere', 'poubelle', 'oeufs', 'sandwich', 'oeuf', 'splat', 'grenade', 'nuage', 'statue', 'camion', 'colonne',
   'tomates', 'eau_pistolet', 'fumigenes', 'tomate', 'splat_rouge', 'fumee',
   'echarpe', 'cafe', 'kway', 'farine', 'nuage_farine', 'eau', 'fumi',
+  // V106 (prompts 22) : tireur de LBD, BAC en civil, sono au sol, carte de cantine, balle de LBD
+  ...['marche0', 'marche1', 'bras', 'lance', 'touche', 'fuite'].map(p => 'lbd_' + p),
+  ...['marche0', 'marche1', 'cri', 'charge', 'touche', 'fuite'].map(p => 'bac_' + p),
+  'sono', 'carte', 'balle',
 ];
 const MURS = { 1: 'mur_briques', 2: 'mur_immeuble', 3: 'mur_boutique', 4: 'mur_tag', 5: 'mur_palissade', 6: 'mur_lycee',
   7: 'portail_lycee', 8: 'mur_boutique2', 9: 'mur_rideau' };   // 8 : 2e tabac (façade en pierre), pas de dessin provisoire (repli : briques)
-const MAINS = { tient: 'main_tient', lance: 'main_lance', vide: 'main_vide',   // vide : arme CONFISQUÉE (la classe)
+const MAINS = { tient: 'main_tient', lance: 'main_lance', vide: 'main_vide', sono: 'main_sono', sono_tir: 'main_sono_tir',   // vide : arme CONFISQUÉE (la classe)
  
   ...Object.fromEntries(['pancarte', 'tomates', 'eau', 'fumigenes'].flatMap(a => [[a, 'main_' + a], [a + '_tir', 'main_' + a + '_tir']])) };
 // hauteur dans le monde (1 = un mur) avec les vraies images : leur cadre inclut bras levés, pancartes, fumée…
-const HAUTEURS_IMAGES = { lbd: 1.0, sono: 0.3, carte: 0.12, lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barriere: 0.45, poubelle: 0.5, oeufs: 0.2,
+const HAUTEURS_IMAGES = { lbd: 1.0, bac: 1.0, sono: 0.4, carte: 0.12, lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barriere: 0.45, poubelle: 0.5, oeufs: 0.2,
   sandwich: 0.1, oeuf: 0.08, splat: 0.12, grenade: 0.16, nuage: 1.0, statue: 2.0, camion: 1.05, colonne: 1.5,
   tomates: 0.26, eau: 0.2, fumigenes: 0.28, echarpe: 0.22, cafe: 0.2, kway: 0.24, farine: 0.45 };
 export const HAUTEURS_PROVISOIRES = { lbd: 0.82, bac: 1.0, sono: 0.3, carte: 0.12, lanceur: 0.82, bouclier: 0.86, manifestant: 1.0, barriere: 0.42, poubelle: 0.5, oeufs: 0.18,
@@ -394,7 +398,7 @@ function recolorer(src, couleur) {
   return c;
 }
 export function variantesTaches(T) {
-  for (const [p, propre] of [['lanceur_', [40, 52, 96]], ['bouclier_', [34, 36, 42]]]) for (const pose of ['touche', 'fuite']) {
+  for (const [p, propre] of [['lanceur_', [40, 52, 96]], ['bouclier_', [34, 36, 42]], ['lbd_', [40, 52, 96]], ['bac_', [110, 110, 115]]]) for (const pose of ['touche', 'fuite']) {
     const s = T.spr[p + pose];
     if (!s) continue;
     T.spr[p + pose + '_rouge'] = recolorer(s, [235, 40, 30]);
@@ -416,6 +420,10 @@ function deriver(T) {
   for (const p of ['marche0', 'marche1', 'bras', 'lance', 'touche', 'fuite', 'tousse', 'farine']) {
     const src = T.spr['lanceur_' + p];
     if (src && !T.spr['lbd_' + p]) T.spr['lbd_' + p] = copie(src, 'grayscale(0.85) brightness(0.6) contrast(1.2)');
+  }
+  if (T.spr.bac_marche0) {   // vraies images (prompt 22a) : les poses qui manquent sur la planche
+    T.spr.bac_essouffle = T.spr.bac_essouffle || T.spr.bac_marche0; T.spr.bac_attrape = T.spr.bac_attrape || T.spr.bac_charge;
+    return;
   }
   const base = T.spr.manifestant_1 || T.spr.manifestant_0;
   const brassard = (g, l, h) => { g.fillStyle = '#ff7a1a'; g.fillRect(l * 0.1, h * 0.36, l * 0.22, h * 0.05); g.fillStyle = '#fff'; g.fillRect(l * 0.13, h * 0.375, l * 0.16, h * 0.012); };
