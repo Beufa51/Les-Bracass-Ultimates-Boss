@@ -1,16 +1,24 @@
 // =====================================================================
-// HUB : salle vue du dessus, 6 portes alignées (une par boss),
-// et la barre des 6 badges en bas.
+// HUB : écran de SÉLECTION DES BOSS, façon Mega Man (nov. 2026, remplace la salle aux 6 portes).
+// Grille 3 x 3 : les 6 boss autour, TOI au milieu, les BADGES et LA FIN en bas.
+// Un boss pas encore battu n'apparaît qu'en OMBRE ; battu, il apparaît en couleur avec son badge.
+// Flèches = déplacer le curseur, Espace = combattre ; au doigt : toucher une case la choisit, la retoucher = combattre.
+// Musique : hub_musique (assets/audio/hub/). Images : outils/hub/preparer_selection.py.
 // =====================================================================
 import { LARGEUR, HAUTEUR } from '../core/reglages.js';
 import { texte } from '../core/ui.js';
 import { creerTouches, vientDAppuyer } from '../core/clavier.js';
 import { Sauvegarde, formatTemps } from '../core/sauvegarde.js';
 import { jouerSon } from '../core/ressources.js';
+import { jouerMusique } from '../core/musique.js';
 import { BOSS } from '../bosses/liste.js';
 import { REGLAGES_HUB as R } from './reglages.js';
 import { estTactile, etiquettesTactiles } from '../core/tactile.js';
 import { ouvrirReglagesDev } from '../core/ReglagesDevScene.js';
+
+// place de chaque case dans la grille (colonne, ligne)
+const PLACES = { beufa: [0, 0], kedric: [1, 0], julien: [2, 0], greg: [0, 1], remi: [2, 1], lionel: [0, 2],
+  toi: [1, 1], badges: [1, 2], fin: [2, 2] };
 
 export class HubScene extends Phaser.Scene {
   constructor() { super('Hub'); }
@@ -19,105 +27,180 @@ export class HubScene extends Phaser.Scene {
 
   create() {
     this.entree = false;
-    etiquettesTactiles({ espace: 'Entrer', z: null, x: null });
-    // Sol et mur du fond
-    this.add.tileSprite(0, 0, LARGEUR, HAUTEUR, 'hub_sol', 0).setOrigin(0);
-    this.add.tileSprite(0, 0, LARGEUR, R.basDuMur, 'hub_mur', 0).setOrigin(0);
-
-    // Portes
-    this.portes = BOSS.map((boss, i) => {
-      const x = R.premierePorteX + i * R.ecartPortes;
-      const porte = this.add.image(x, R.basDuMur - 50, 'hub_porte');
-      texte(this, x, 30, boss.nom, 20, '#ffd84a');
-      if (!boss.pret) texte(this, x, R.basDuMur + 18, 'Bientôt', 16, '#ffb347');
-      else if (Sauvegarde.aLeBadge(boss.id)) texte(this, x, R.basDuMur + 18, 'Gagné !', 16, '#7fff7f');
-      const rec = boss.pret && Sauvegarde.record(boss.id);
-      if (rec) texte(this, x, R.basDuMur + 38, `Record ${rec.rang} ${formatTemps(rec.temps)}`, 12, '#ffd84a');
-      return { boss, x, porte };
-    });
-
-    // Barre des badges
-    this.add.rectangle(LARGEUR / 2, HAUTEUR - R.hauteurBarre / 2, LARGEUR, R.hauteurBarre, 0x000000, 0.75);
+    etiquettesTactiles({ espace: 'Combattre', z: null, x: null });
+    jouerMusique(this, 'hub_musique');
     const nb = BOSS.filter(b => Sauvegarde.aLeBadge(b.id)).length;
-    texte(this, 90, HAUTEUR - R.hauteurBarre / 2, `Badges\n${nb} / ${BOSS.length}`, 16, '#ffffff');
-    this.accesCacheReglages();
+    this.complet = nb >= BOSS.length;
+
+    // ---- fond : bleu nuit + bandes qui défilent ----
+    this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0a0e24);
+    this.bandes = this.add.graphics();
+    this.decalage = 0;
+    texte(this, LARGEUR / 2, 30, 'CHOISIS TON ADVERSAIRE', 30, '#ffd84a', { fontStyle: 'bold', stroke: '#b3202c', strokeThickness: 6 });
+
+    // ---- les cases ----
+    this.cases = [];
+    for (const boss of BOSS) {
+      const p = PLACES[boss.id]; if (!p) continue;
+      this.cases.push(this.caseBoss(boss, ...this.position(p)));
+    }
+    this.cases.push(this.caseToi(...this.position(PLACES.toi)));
+    this.cases.push(this.caseBadges(nb, ...this.position(PLACES.badges)));
+    this.cases.push(this.caseFin(...this.position(PLACES.fin)));
+
+    // curseur : sur le boss d'où l'on revient, sinon sur le premier pas encore battu
+    const retour = this.cases.find(c => c.boss && c.boss.id === this.depuis);
+    const aBattre = this.cases.find(c => c.boss && c.boss.pret && !Sauvegarde.aLeBadge(c.boss.id));
+    this.choix = retour || aBattre || this.cases[0];
+    this.cadreChoix = this.add.graphics().setDepth(5);
+
+    this.aide = texte(this, LARGEUR / 2, HAUTEUR - 16,
+      estTactile() ? 'Touche un boss, puis touche-le encore (ou « Combattre ») pour l\'affronter' : '◀ ▲ ▼ ▶ : choisir     ESPACE : combattre', 15, '#aaaaaa');
+    this.infos = texte(this, LARGEUR / 2, HAUTEUR - 40, '', 16, '#ffffff');
+    this.touches = creerTouches(this);
+    this.input.on('pointerdown', (p) => this.toucher(p.x, p.y));
+    this.input.keyboard.on('keydown-D', () => ouvrirReglagesDev(this.game));
+    this.input.keyboard.on('keydown-F', () => { if (this.complet) this.voirFin(); });
+    this.cameras.main.fadeIn(250);
+    this.majChoix();
+    if (this.complet && !Sauvegarde.fait('finale_vue')) { Sauvegarde.marquerFait('finale_vue'); this.time.delayedCall(700, () => this.voirFin()); }
+  }
+
+  position([col, ligne]) {
+    return [LARGEUR / 2 + (col - 1) * (R.caseL + R.ecart), R.grilleY + ligne * (R.caseH + R.ecart)];
+  }
+
+  // cadre « métal » d'une case
+  cadre(x, y, couleur = 0x3a5fcd) {
+    const g = this.add.graphics();
+    g.fillStyle(0x05070f, 1).fillRect(x - R.caseL / 2, y - R.caseH / 2, R.caseL, R.caseH);
+    g.lineStyle(4, couleur, 1).strokeRect(x - R.caseL / 2, y - R.caseH / 2, R.caseL, R.caseH);
+    g.lineStyle(1, 0xa8c4ff, 0.5).strokeRect(x - R.caseL / 2 + 5, y - R.caseH / 2 + 5, R.caseL - 10, R.caseH - 10);
+    return g;
+  }
+
+  caseBoss(boss, x, y) {
+    const battu = Sauvegarde.aLeBadge(boss.id);
+    this.cadre(x, y, battu ? 0xd4a52a : 0x3a5fcd);
+    const cle = battu ? 'select_' + boss.id : 'select_' + boss.id + '_ombre';
+    const img = this.textures.exists(cle) ? this.add.image(x, y + R.caseH / 2 - 26, cle).setOrigin(0.5, 1) : null;
+    if (img) img.setScale(Math.min((R.caseL - 16) / img.width, (R.caseH - 34) / img.height));
+    // bandeau du nom
+    this.add.rectangle(x, y + R.caseH / 2 - 13, R.caseL - 8, 22, 0x000000, 0.85);
+    texte(this, x, y + R.caseH / 2 - 13, boss.nom.toUpperCase(), 17, battu ? '#ffd84a' : '#ffffff', { fontStyle: 'bold' });
+    if (battu) this.add.image(x + R.caseL / 2 - 22, y - R.caseH / 2 + 22, 'badge_' + boss.id).setScale(0.75);
+    if (!boss.pret) texte(this, x, y - 10, 'BIENTÔT', 18, '#ffb347', { stroke: '#000000', strokeThickness: 4 });
+    else if (!battu) texte(this, x - R.caseL / 2 + 18, y - R.caseH / 2 + 18, '?', 22, '#5aa8ff', { fontStyle: 'bold' });
+    const rec = boss.pret && Sauvegarde.record(boss.id);
+    const info = !boss.pret ? `${boss.nom} : bientôt...` : battu
+      ? `${boss.nom} : battu !${rec ? `   Record ${rec.rang} en ${formatTemps(rec.temps)}` : ''}`
+      : `${boss.nom} : pas encore battu`;
+    return { boss, x, y, img, info, action: () => this.entrer(boss) };
+  }
+
+  caseToi(x, y) {
+    this.cadre(x, y, 0x7fe8ff);
+    const h = this.add.sprite(x, y - 8, 'hub_heros_immobile').setScale(1.4);
+    this.tweens.add({ targets: h, y: y - 12, yoyo: true, repeat: -1, duration: 500, ease: 'Sine.InOut' });
+    texte(this, x, y + R.caseH / 2 - 13, 'TOI', 17, '#7fe8ff', { fontStyle: 'bold' });
+    return { x, y, info: 'Bats les 6 Bracass\' et gagne leurs badges !', action: null };
+  }
+
+  // case des badges (+ accès caché aux réglages développeur : 5 appuis rapides)
+  caseBadges(nb, x, y) {
+    this.cadre(x, y, 0x3a5fcd);
     BOSS.forEach((boss, i) => {
       const cle = Sauvegarde.aLeBadge(boss.id) ? 'badge_' + boss.id : 'badge_vide';
-      this.add.image(260 + i * 64, HAUTEUR - R.hauteurBarre / 2, cle);
+      this.add.image(x + ((i % 3) - 1) * 52, y - 30 + Math.floor(i / 3) * 46, cle).setScale(0.8);
     });
-    texte(this, 820, HAUTEUR - R.hauteurBarre / 2, estTactile() ? 'Flèches : bouger\nEntrer : porte' : 'Flèches : bouger\nEspace : entrer', 14, '#aaaaaa');
-
-    // Héros : devant la porte du boss d'où l'on revient, sinon en bas au centre
-    const retour = this.portes.find(p => p.boss.id === this.depuis);
-    const departX = retour ? retour.x : LARGEUR / 2;
-    const departY = retour ? R.limiteHaut + 20 : R.limiteBas - 20;
-    this.heros = this.add.sprite(departX, departY, 'hub_heros_immobile');
-
-    this.aide = texte(this, LARGEUR / 2, R.limiteBas + 20, '', 18, '#ffffff');
-    this.touches = creerTouches(this);
-    this.cameras.main.fadeIn(250);
-    this.finSiComplet(nb);
-  }
-
-  // V18 (audit global) : les 6 badges = LA FIN (montrée une fois tout de suite, puis à revoir : F ou « ★ La fin »)
-  finSiComplet(nb) {
-    if (nb < BOSS.length) return;
-    const voir = () => { if (this.entree) return; this.entree = true; this.scene.start('Finale'); };
-    const b = texte(this, 690, HAUTEUR - R.hauteurBarre / 2, `★ LA FIN ★\n${estTactile() ? '(touche ici)' : '(touche F)'}`, 15, '#ffd84a', { backgroundColor: '#000000aa', padding: { x: 10, y: 3 } })
-      .setInteractive().on('pointerdown', voir);
-    this.tweens.add({ targets: b, scale: 1.08, yoyo: true, repeat: -1, duration: 600 });
-    this.input.keyboard.on('keydown-F', voir);
-    if (!Sauvegarde.fait('finale_vue')) { Sauvegarde.marquerFait('finale_vue'); this.time.delayedCall(700, voir); }
-  }
-
-  // Accès caché aux RÉGLAGES DÉVELOPPEUR : 5 appuis rapides sur « Badges » (en bas à gauche), ou la touche D
-  accesCacheReglages() {
+    texte(this, x, y + R.caseH / 2 - 13, `BADGES ${nb} / ${BOSS.length}`, 16, '#ffffff', { fontStyle: 'bold' });
     let appuis = [];
-    const zone = this.add.zone(90, HAUTEUR - R.hauteurBarre / 2, 170, R.hauteurBarre).setInteractive();
-    zone.on('pointerdown', () => {
+    return { x, y, info: `${nb} badge${nb > 1 ? 's' : ''} sur ${BOSS.length}`, action: null, secret: () => {
       const t = this.time.now;
       appuis = [...appuis.filter(a => t - a < 2500), t];
       if (appuis.length >= 5) { appuis = []; ouvrirReglagesDev(this.game); }
-    });
-    this.input.keyboard.on('keydown-D', () => ouvrirReglagesDev(this.game));
+    } };
+  }
+
+  caseFin(x, y) {
+    this.cadre(x, y, this.complet ? 0xd4a52a : 0x2a3350);
+    if (this.complet) {
+      const t = texte(this, x, y - 10, '★ LA FIN ★', 22, '#ffd84a', { fontStyle: 'bold' });
+      this.tweens.add({ targets: t, scale: 1.08, yoyo: true, repeat: -1, duration: 600 });
+    } else texte(this, x, y - 10, '?', 54, '#2f3a66', { fontStyle: 'bold' });
+    texte(this, x, y + R.caseH / 2 - 13, this.complet ? 'REVOIR LA FIN' : '???', 16, this.complet ? '#ffd84a' : '#55607f', { fontStyle: 'bold' });
+    return { x, y, info: this.complet ? 'La scène finale des 6 badges' : 'Gagne les 6 badges pour débloquer cette case...',
+      action: this.complet ? () => this.voirFin() : null };
+  }
+
+  majChoix() {
+    const c = this.choix, g = this.cadreChoix;
+    g.clear();
+    g.lineStyle(6, 0xffffff, 1).strokeRect(c.x - R.caseL / 2 - 4, c.y - R.caseH / 2 - 4, R.caseL + 8, R.caseH + 8);
+    this.infos.setText(c.info || '');
+    this.cases.forEach(k => { if (k.img) { this.tweens.killTweensOf(k.img); k.img.setY(k.y + R.caseH / 2 - 26); } });
+    if (c.img) this.tweens.add({ targets: c.img, y: c.img.y - 5, yoyo: true, repeat: -1, duration: 260 });
+  }
+
+  bouger(dc, dl) {
+    const [col, ligne] = [Math.round((this.choix.x - LARGEUR / 2) / (R.caseL + R.ecart)) + 1, Math.round((this.choix.y - R.grilleY) / (R.caseH + R.ecart))];
+    const [x, y] = this.position([(col + dc + 3) % 3, (ligne + dl + 3) % 3]);
+    const c = this.cases.find(k => Math.abs(k.x - x) < 2 && Math.abs(k.y - y) < 2);
+    if (c) { this.choix = c; jouerSon(this, 'ui_valider'); this.majChoix(); }
+  }
+
+  valider(c = this.choix) {
+    if (c.secret) c.secret();
+    if (c.action) c.action();
   }
 
   update(temps, delta) {
+    // bandes du fond qui défilent
+    this.decalage = (this.decalage + delta * 0.03) % 40;
+    const b = this.bandes; b.clear(); b.lineStyle(14, 0x121a3c, 1);
+    for (let y = -40 + this.decalage; y < HAUTEUR + 40; y += 40) b.lineBetween(0, y, LARGEUR, y - 60);
+    // cadre du choix qui clignote
+    this.cadreChoix.setAlpha(Math.floor(temps / 180) % 2 ? 1 : 0.45);
     if (this.entree) return;
     const t = this.touches;
-    const v = R.vitesseHeros * delta / 1000;
-    let dx = 0, dy = 0;
-    if (t.gauche.isDown) dx -= 1;
-    if (t.droite.isDown) dx += 1;
-    if (t.haut.isDown) dy -= 1;
-    if (t.bas.isDown) dy += 1;
-    if (dx && dy) { dx *= Math.SQRT1_2; dy *= Math.SQRT1_2; }
-
-    const h = this.heros;
-    h.x = Phaser.Math.Clamp(h.x + dx * v, 32, LARGEUR - 32);
-    h.y = Phaser.Math.Clamp(h.y + dy * v, R.limiteHaut, R.limiteBas);
-    if (dx || dy) { h.play('hub_heros_marche', true); if (dx) h.setFlipX(dx < 0); }
-    else h.play('hub_heros_immobile', true);
-
-    // Porte la plus proche
-    const proche = this.portes.find(p => Math.abs(p.x - h.x) < R.distanceEntree && h.y < R.limiteHaut + R.distanceEntree);
-    this.portes.forEach(p => p.porte.clearTint());
-    if (proche) {
-      proche.porte.setTint(0xffffaa);
-      this.aide.setText(`${estTactile() ? 'Entrer' : 'Espace'} : entrer chez ${proche.boss.nom}`);
-      if (vientDAppuyer(t.espace)) this.entrer(proche.boss);
-    } else {
-      this.aide.setText('');
-    }
+    if (vientDAppuyer(t.gauche)) this.bouger(-1, 0);
+    else if (vientDAppuyer(t.droite)) this.bouger(1, 0);
+    else if (vientDAppuyer(t.haut)) this.bouger(0, -1);
+    else if (vientDAppuyer(t.bas)) this.bouger(0, 1);
+    else if (vientDAppuyer(t.espace)) this.valider();
   }
 
+  // toucher une case : la choisir ; la retoucher : la valider
+  toucher(x, y) {
+    if (this.entree) return;
+    const c = this.cases.find(k => Math.abs(k.x - x) < R.caseL / 2 && Math.abs(k.y - y) < R.caseH / 2);
+    if (!c) return;
+    if (c === this.choix) this.valider(c);
+    else { this.choix = c; jouerSon(this, 'ui_valider'); this.majChoix(); if (c.secret) c.secret(); }
+  }
+
+  voirFin() { if (this.entree) return; this.entree = true; this.scene.start('Finale'); }
+
+  // façon Mega Man : la case s'illumine, le boss apparaît en grand dans une bande, puis on part chez lui
   entrer(boss) {
     this.entree = true;
     jouerSon(this, 'hub_porte');
-    this.cameras.main.fadeOut(250);
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-      if (boss.pret) this.scene.start(boss.phases[0].scene, { phase: boss.phases[0].id });
-      else this.scene.start('Bientot', { bossId: boss.id });
+    const bande = this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, 190, 0x101a4a, 0.97).setDepth(20).setScale(1, 0);
+    this.tweens.add({ targets: bande, scaleY: 1, duration: 220, ease: 'Cubic.Out' });
+    const cle = this.textures.exists('select_' + boss.id) ? 'select_' + boss.id : null;
+    if (cle) {
+      const img = this.add.image(-120, HAUTEUR / 2 + 92, cle).setOrigin(0.5, 1).setDepth(21).setScale(1.4);
+      this.tweens.add({ targets: img, x: 300, duration: 300, delay: 150, ease: 'Back.Out' });
+    }
+    const nom = texte(this, 640, HAUTEUR / 2, '', 52, '#ffd84a', { fontStyle: 'bold italic', stroke: '#b3202c', strokeThickness: 8 }).setDepth(21);
+    const lettres = boss.nom.toUpperCase();
+    for (let i = 1; i <= lettres.length; i++) this.time.delayedCall(250 + i * 70, () => { nom.setText(lettres.slice(0, i)); jouerSon(this, 'ui_valider'); });
+    this.time.delayedCall(250 + lettres.length * 70 + 700, () => {
+      this.cameras.main.fadeOut(250);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        if (boss.pret) this.scene.start(boss.phases[0].scene, { phase: boss.phases[0].id });
+        else this.scene.start('Bientot', { bossId: boss.id });
+      });
     });
   }
 }

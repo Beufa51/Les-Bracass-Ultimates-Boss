@@ -38,6 +38,15 @@
 - **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo (~45 s, V20) → BABYFOOT (V19, le beer pong est SUPPRIMÉ) → porte (simplifiée V19z). Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
+## HUB = ÉCRAN DE SÉLECTION DES BOSS façon Mega Man (nov. 2026, remplace la salle aux portes)
+- `src/hub/HubScene.js` : grille 3 x 3 (Beufa Kédric Julien / Greg TOI Rémi / Lionel BADGES LA FIN). Pas battu = OMBRE
+  (silhouette + liseré bleu, « ? »), battu = buste en couleur + badge + cadre doré. Flèches + Espace ; au doigt : toucher
+  une case la choisit, la retoucher = combattre. Entrée : bande façon Mega Man (buste qui glisse + nom lettre par lettre).
+  Case BADGES : 5 appuis rapides = réglages développeur (et touche D) ; case LA FIN (ou F) quand les 6 badges sont là.
+- Images : `python3 outils/hub/preparer_selection.py` (bustes tirés des images détourées de chaque boss -> `assets/sprites/hub/select_*`).
+- Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
+  allégée en 80 kbit/s ; original dans `assets_inbox/hub/`). Réglages de la grille : `src/hub/reglages.js`.
+
 ## GREG — CORRECTIONS DE L'AUDIT (nov. 2026, choix 1 à 17 acceptés par Fabien) : `propositions/greg_audit.md`
 - Bugs : boxeur plus couché après REJOUER, aide du Dempsey recréée, esquive ENTRAÎNEMENT / FACILE vraiment plus longue,
   cadre blanc de garde toujours dessiné (texte « Garde HAUTE / BASSE » à gauche, plus gros), garde basse = `greg2_entier`

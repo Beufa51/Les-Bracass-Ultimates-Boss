@@ -29,6 +29,19 @@ export const MANIFESTE = {
       provisoire: { forme: 'mur', couleur: '#5a4a6a' } },
 
     // ---------- BADGES (interface) ----------
+    // Écran de sélection des boss (nov. 2026) : buste en couleur (battu) et ombre (pas encore battu), outils/hub/preparer_selection.py
+    select_beufa:       { fichier: 'sprites/hub/select_beufa.png', largeur: 150, hauteur: 130, images: 1, vitesse: 1 },
+    select_beufa_ombre: { fichier: 'sprites/hub/select_beufa_ombre.png', largeur: 150, hauteur: 130, images: 1, vitesse: 1 },
+    select_kedric:       { fichier: 'sprites/hub/select_kedric.png', largeur: 150, hauteur: 130, images: 1, vitesse: 1 },
+    select_kedric_ombre: { fichier: 'sprites/hub/select_kedric_ombre.png', largeur: 150, hauteur: 130, images: 1, vitesse: 1 },
+    select_julien:       { fichier: 'sprites/hub/select_julien.png', largeur: 150, hauteur: 130, images: 1, vitesse: 1 },
+    select_julien_ombre: { fichier: 'sprites/hub/select_julien_ombre.png', largeur: 150, hauteur: 130, images: 1, vitesse: 1 },
+    select_greg:       { fichier: 'sprites/hub/select_greg.png', largeur: 150, hauteur: 130, images: 1, vitesse: 1 },
+    select_greg_ombre: { fichier: 'sprites/hub/select_greg_ombre.png', largeur: 150, hauteur: 130, images: 1, vitesse: 1 },
+    select_remi:       { fichier: 'sprites/hub/select_remi.png', largeur: 150, hauteur: 130, images: 1, vitesse: 1 },
+    select_remi_ombre: { fichier: 'sprites/hub/select_remi_ombre.png', largeur: 150, hauteur: 130, images: 1, vitesse: 1 },
+    select_lionel:       { fichier: 'sprites/hub/select_lionel.png', largeur: 150, hauteur: 130, images: 1, vitesse: 1 },
+    select_lionel_ombre: { fichier: 'sprites/hub/select_lionel_ombre.png', largeur: 150, hauteur: 130, images: 1, vitesse: 1 },
     badge_vide:   { fichier: null, largeur: 48, hauteur: 48, images: 1, vitesse: 1,
       provisoire: { forme: 'cercle', couleur: '#3a3a3a' } },
     badge_beufa:  { fichier: 'sprites/hub/badge_beufa.png', largeur: 48, hauteur: 48, images: 1, vitesse: 1,
@@ -53,5 +66,7 @@ export const MANIFESTE = {
     ui_badge:   { fichier: null, provisoire: { frequence: 990, duree: 0.25 } },
     ui_defaite: { fichier: null, provisoire: { frequence: 160, duree: 0.35 } },
     hub_porte:  { fichier: null, provisoire: { frequence: 440, duree: 0.12 } },
+    // musique de l'écran de sélection (fournie par le propriétaire : Street Fighter II, Character Select)
+    hub_musique: { fichier: 'audio/hub/hub_selection.mp3', musique: true, volume: 0.4 },
   },
 };
