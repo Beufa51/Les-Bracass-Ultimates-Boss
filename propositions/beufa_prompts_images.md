@@ -45,3 +45,11 @@ Aujourd'hui : l'écran tremble et Snake reste figé dans sa pose de marche. À j
 ```
 Pixel art sprite, detailed 16-bit SNES style, slightly high camera angle (3/4 view), the SAME character as the attached image (same bandana, suit, size and proportions), drawn 2 times in ONE ROW, front view: 1) caught by surprise, hands raised at shoulder height, leaning back; 2) kneeling on one knee, head down, hands behind his head. Same scale in both frames, clear white space between frames. Pure white background, no shadow, no text, no grid lines.
 ```
+
+## N°7 — LE VEILLEUR QUI TOURNE LA TÊTE (garde planté qui balaie)
+Le veilleur de la porte (quai) et le garde du sas balaient du regard sur place : le jeu bascule d'une planche
+entière face ↔ profil, il « saute » d'une pose à l'autre. 5 poses intermédiaires rendraient le balayage fluide.
+À joindre : `assets/sprites/beufa/beufa_garde_face.jpg`. À livrer : `assets_inbox/beufa/beufa_garde_tete.jpg`.
+```
+Pixel art sprite sheet, detailed 16-bit SNES style, slightly high camera angle (3/4 view), the SAME soldier as the attached image (same olive helmet, same olive uniform, same rifle, same size and proportions), standing still on guard, drawn 5 times in ONE ROW. Only the head and shoulders turn, the feet stay planted: 1) looking strictly to the LEFT (side view), 2) three-quarter left, 3) facing the camera, 4) three-quarter right, 5) looking strictly to the RIGHT (side view). Rifle held across the chest in both hands in every frame. Same scale, same position of the feet and same head height in every frame, evenly spaced with clear white space between frames. Pure white background, no shadow, no text, no grid lines.
+```

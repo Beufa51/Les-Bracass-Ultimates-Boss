@@ -31,6 +31,7 @@
 - **Beufa** : TERMINÉ — infiltration façon Metal Gear (4 pièces) puis QUIZ dans son bureau (codec, Psycho Mantis,
   rideau, 60 questions, GAME OVER façon MGS, classement BIG BOSS → CHICKEN, médaille = badge du hub, meilleur rang
   sauvegardé). Audit final : `propositions/beufa_audit_final.md`.
+  AUDIT Beufa FAIT (`propositions/beufa_audit.md`, bot `outils/beufa_bot.mjs`), en attente des choix de Fabien.
 - **Julien** : EN COURS — niveau 1 « la manif » jouable ; niveau 2 « la salle de classe » : COMBAT REFAIT (audit B :
   fenêtre de punition de dos, 8 attaques, phases noir / bureau renversé + alarme, élèves, sarbacane). RESTE : le
   MINI-NIVEAU « LE LYCÉE » (audit A) FAIT. Reste : faire jouer Fabien, équilibrer. Voir « JULIEN » plus bas.
