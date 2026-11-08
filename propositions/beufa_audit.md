@@ -25,7 +25,7 @@ L'audit précédent (`beufa_audit_final.md`, V91) est entièrement fait (V92).
   (« frôle ») ; en ENTRAÎNEMENT il passe proprement. Le joueur moyen y reste bloqué 61 s (54 fois « pas de chemin »)
   et l'enfant y prend 2-3 alertes. **En EXTREME, l'expert reste 105 s à l'arsenal** (183 fois « pas de chemin ») :
   il n'y passe qu'en attendant une rare fenêtre. En EXTREME le bot met plusieurs minutes de calcul par partie (il attend à
-  l'arsenal), et son navigateur s'est fermé pendant la 2e partie expert (souci du bot, pas du jeu) : moyen / enfant
+  l'arsenal), et la partie a été arrêtée exprès pendant la 2e partie expert (pour économiser) : moyen / enfant
   EXTREME pas joués (à relancer : `node outils/beufa_bot.mjs 1 champion moyen,enfant`, long). L'arsenal en EXTREME est presque bouché.
 
 ## Chiffres — quiz (10 questions tirées parmi 60)
