@@ -2,7 +2,7 @@
 
 > **Reçues et branchées (nov. 2026)** : greg_garde_basse, greg_nargue (nouvelle), greg_crochet (refait), greg_ko_debout,
 > greg_victoire, greg_releve. **Restent** : greg_arme (1re version retirée : bras tendu sur le côté, on croyait qu'il tapait à côté ; nouveau prompt en fin de fichier), poses du héros,
-> portrait / visage / case K.O. / trophée / arbitre.
+> case K.O. / trophée / arbitre (portrait et visage FAITS).
 
 Pour chaque image : JOINDRE `assets/sprites/greg/heros_garde.png` (pour garder le même boxeur et le même style).
 Fond blanc uni (il sera retiré ensuite), personnage entier visible, rien qui touche les bords.
