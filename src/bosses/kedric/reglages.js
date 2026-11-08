@@ -104,8 +104,8 @@ export const REGLAGES = {
   showtime: { rounds: 2, dureeRound: 47,   // durée de manche PAR DÉFAUT (chaque manche a maintenant SA 'duree' : les DEUX font 1 minute)
     pause: 2,
     manches: [
-      { musique: 'kedric_chala', duree: 60, tempo: { debut: 8.455, temps: 0.3895 }, tempsParPas: 2 },   // mesuré : 154 BPM, 1er temps fort à 8,455 s (le fichier commence par 8 s de silence)   // la manche 1 : Cha-La Head-Cha-La, l'ouverture japonaise ORIGINALE de DBZ (1989, remasterisée) — 154 BPM — UNE MINUTE, comme la chanson 2
-      { musique: 'kedric_dbz', duree: 60, tempo: { debut: 1.086, temps: 0.5293 }, tempsParPas: 1 },   // mesuré : 113 BPM (PAS le tempo de Cha-La !), 1er temps fort à 1,086 s ; une flèche par temps (~0,53 s) : la manche 2 accélère   // la chanson 2 : « We Gotta Power » (le générique VOSTFR de DBZ) — UNE MINUTE
+      { musique: 'kedric_chala', duree: 60, tempo: { debut: 8.455, temps: 0.3895 }, tempsParPas: 2, paroles: true },   // paroles : flèches calées sur le CHANT (outils/kedric/caler_paroles.py → paroles.js)   // mesuré : 154 BPM, 1er temps fort à 8,455 s (le fichier commence par 8 s de silence)   // la manche 1 : Cha-La Head-Cha-La, l'ouverture japonaise ORIGINALE de DBZ (1989, remasterisée) — 154 BPM — UNE MINUTE, comme la chanson 2
+      { musique: 'kedric_dbz', duree: 60, tempo: { debut: 1.086, temps: 0.5293 }, tempsParPas: 1, paroles: true },   // mesuré : 113 BPM (PAS le tempo de Cha-La !), 1er temps fort à 1,086 s ; une flèche par temps (~0,53 s) : la manche 2 accélère   // la chanson 2 : « We Gotta Power » (le générique VOSTFR de DBZ) — UNE MINUTE
     ],
     tempsParPas: 2, annonce: 0,   // zéro temps mort : le décompte 5-4-3-2-1 démarre PILE quand la manche (et SA musique) démarrent
     // (le DÉCOMPTE 5-4-3-2-1-GO est dans showtime.js : DECOMPTE = 5 secondes PILE, calées sur le tempo de chaque morceau)

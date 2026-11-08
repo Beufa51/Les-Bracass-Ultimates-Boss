@@ -33,6 +33,7 @@ import { jouerMusique, arreterMusique, placerMusique, tempsMusique, deverrouille
 import { disposition, allumerBouton, eteindreBoutons, estTactile, rectBouton, voileNoirTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { onomatopee, lignesImpact } from './effets.js';
 import { REGLAGES as R } from './reglages.js';
+import { PAROLES } from './paroles.js';
 
 const S = R.showtime;
 const PISTE = S.piste;
@@ -311,16 +312,19 @@ export class Showtime {
       const attente = S.annonce + compte;   // les flèches attendent le DÉCOMPTE : pas de flèche direct à l'écran
       const debutDoubles = (attente + n) * d - S.double.duree;
       let prec = null, prec2 = null;
-      for (let j = 0; j < n; j++) {
-        const t = debut + (attente + j) * d + (S.latence || 0);   // latence : le son arrive en retard (Bluetooth)
+      // les moments des flèches : sur les PAROLES (outils/kedric/caler_paroles.py) ou, sinon, une tous les 'd'
+      const moments = M.paroles && PAROLES[M.musique] ? PAROLES[M.musique].filter(x => x < n * d) : Array.from({ length: n }, (_, j) => j * d);
+      for (let j = 0; j < moments.length; j++) {
+        const t = debut + attente * d + moments[j] + (S.latence || 0);   // latence : le son arrive en retard (Bluetooth)
+        const slot = Math.round(moments[j] / d);   // le pas de musique (Kédric prend la pose de la flèche)
         const ajoute = (montre, double = false) => {
           const rougee = this.s.diff.flechesRouges && (r > 0 || j > 0) && Math.random() < rouge;
-          this.pas.push({ montre, rouge: rougee, attendu: rougee ? INVERSE[montre] : montre, note: null, t, slot: j, manche: r, double });
+          this.pas.push({ montre, rouge: rougee, attendu: rougee ? INVERSE[montre] : montre, note: null, t, slot, manche: r, double });
         };
         let dir;
         do { dir = DIRS[Math.floor(Math.random() * 4)]; } while (j >= 2 && dir === prec && dir === prec2);
         ajoute(dir);
-        if (t - debut >= debutDoubles && j % 2 === 0 && j < n - 1) {
+        if (t - debut >= debutDoubles && j % 2 === 0 && j < moments.length - 1) {
           let e;
           do { e = DIRS[Math.floor(Math.random() * 4)]; } while (e === dir);
           ajoute(e, true);

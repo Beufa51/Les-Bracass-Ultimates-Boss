@@ -20,6 +20,11 @@
   retard » et le bilan donne ton décalage moyen en ms.
   Boutons des COURSES sur téléphone minuscules : des commentaires « // » dans le CSS de `src/core/tactile.js` cassaient
   la règle `.separee` (corrigé en /* */) ; boutons agrandis (◀ ▶ 120 px, ▲ ▼ 130x96).
+  FLÈCHES SUR LES PAROLES (demande de Fabien) : `outils/kedric/caler_paroles.py` sépare la voix (REPET-SIM de librosa,
+  pas d'IA lourde : une guitare peut passer), repère les attaques du chant, les cale sur le demi-temps (écart mini
+  0,38 s / 0,50 s), quelques flèches sur les temps dans les longs blancs → `src/bosses/kedric/paroles.js` (généré) ;
+  manche avec `paroles: true` l'utilise. 72 + 69 flèches (avant 77 + 113). Bot : équilibre inchangé (NORMAL moyen 26-44 %).
+  Si un passage sonne faux : régler `delta` / `densite` / `ecart` en tête du script et le relancer.
 - **Beufa** : TERMINÉ — infiltration façon Metal Gear (4 pièces) puis QUIZ dans son bureau (codec, Psycho Mantis,
   rideau, 60 questions, GAME OVER façon MGS, classement BIG BOSS → CHICKEN, médaille = badge du hub, meilleur rang
   sauvegardé). Audit final : `propositions/beufa_audit_final.md`.
