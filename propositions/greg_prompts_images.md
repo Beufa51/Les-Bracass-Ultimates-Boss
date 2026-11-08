@@ -245,3 +245,81 @@ the center, elbow up, fist turned, the other glove tight against his chin, chin 
 knees bent, weight on the front foot. Only a few short curved motion lines behind the glove, the arm and glove
 must be clearly drawn and not blurred. The belt has a plain gold buckle with NO text.
 ```
+
+---
+
+## AUDIT NOVEMBRE 2026 — 8 nouveaux prompts (voir `propositions/greg_audit.md`, section 4)
+
+Correction : pour `greg_arbitre.png`, joindre `assets/sprites/greg/coach_severe.jpg` (le prompt dit « same style as the attached image »).
+Le n°1 remplace la ligne `greg_garde_basse_pied` de l’Étape 2 ; le n°2 remplace la provocation actuelle.
+
+l'Étape 2 : il faut qu'elle soit très différente de la provocation). Joindre `assets_inbox/greg_reference_face.jpg`,
+coller le Prompt commun de l'Étape 2, puis :
+```
+POSE: low boxing guard protecting the BODY: both gloves held tight in front of his stomach and ribs, elbows glued to
+his sides, slightly crouched, knees bent, weight forward, face fully open and unprotected, chin up, serious focused
+eyes (NOT smiling). The gloves must clearly cover the abs. The belt has a plain gold buckle with NO text.
+```
+
+**2. `assets_inbox/greg_v2/greg_nargue.jpg`** — provocation (REMPLACE l'actuelle, trop proche de `greg_entier`).
+Joindre `assets_inbox/greg_reference_face.jpg`, Prompt commun de l'Étape 2, puis :
+```
+POSE: arrogant taunt: both arms dropped completely, gloves hanging at his thighs, torso leaning back, chin pushed
+forward, tongue slightly out and a mocking wide grin, one eyebrow raised, head tilted, his stomach fully exposed.
+Clearly different from a neutral standing pose. The belt has a plain gold buckle with NO text.
+```
+
+**3. `assets_inbox/greg_v2/greg_portrait.jpg`** — présentation (remplace `greg_portrait.jpg`, format vertical 9:16).
+Joindre `assets_inbox/greg_reference_face.jpg` (le personnage) ET `assets/sprites/greg/greg_portrait.jpg` (la mise en page).
+```
+Use the first attached image as the exact character reference (same face, short curly hair, beard, skin tone, body,
+same arm tattoos on the same arms, red satin trunks with gold belt, red gloves with white wraps). Use the second
+attached image ONLY for the composition and mood: dramatic 1990s boxing manga splash page, vertical 9:16, the boxer
+standing in the ring facing the viewer, from the knees up, fists lowered and clenched, intense stare, sweat drops,
+steam from his shoulders, stadium lights behind him, blurred crowd, strong speed lines. No readable text, no logo,
+no letters on the belt.
+```
+
+**4. `assets_inbox/greg_v2/greg_visage.jpg`** — gros plan du bandeau et de l'annonce du SMASH (remplace `greg_visage.jpg`,
+format paysage environ 300×260). Joindre `assets_inbox/greg_reference_face.jpg`.
+```
+Same character as the attached image (same face, short curly hair, beard, skin tone), close-up of the head and
+shoulders, facing the viewer, furious shouting face, veins on the forehead, sweat, one red glove raised next to his
+cheek, 1990s boxing manga style, dark dramatic background with red speed lines. Head centered and fully visible,
+nothing cropped above the hair. No text.
+```
+
+**5. `assets_inbox/greg_v2/greg_ko.jpg`** — case manga du K.O. (remplace `greg_ko.png`, format portrait 4:5).
+Joindre `assets_inbox/greg_reference_face.jpg`.
+```
+Same character as the attached image (same face, short curly hair, beard, tattoos on the same arms, red trunks with
+gold belt, red gloves, red boots), knocked out lying flat on his back on a blue boxing ring canvas, seen from above,
+arms spread, eyes rolled back, mouth open, mouthguard flying out, sweat splashes around him, 1990s boxing manga
+style with heavy ink. Whole body visible, plain pure white background around the canvas area, no text.
+```
+
+**6. `assets/sprites/greg/greg_trophee.png`** — trophée de l'écran de victoire (aujourd'hui dessiné au code).
+Joindre `assets/sprites/greg/heros_garde.png` (pour le style de dessin).
+```
+A shiny golden boxing championship trophy in 1990s manga style (same drawing style as the attached image): a golden
+cup on a black marble base, a small pair of golden boxing gloves on top, a red ribbon around the handles, sparkles,
+front view, centered. Plain pure white background, nothing touching the edges, no text, no engraving.
+```
+
+**7. `assets/sprites/greg/heros_portrait.png`** — ton boxeur dans le bandeau (aujourd'hui petit dessin pixel).
+Joindre `assets/sprites/greg/heros_garde.png`.
+```
+Same young boxer as the attached image (same spiky brown hair, same green boxing gloves, same manga style), but seen
+from the FRONT this time: head and shoulders portrait, determined smile, a small bandage on the cheek, one green
+glove raised next to his face. Square image, head centered, plain pure white background, no text.
+```
+
+**8. `assets/sprites/greg/heros_dempsey.png`** — Dempsey Roll (aujourd'hui = image du coup penchée). Une seule image,
+retournée par le jeu pour l'autre côté. Joindre `assets/sprites/greg/heros_garde.png`.
+```
+Same boxer as the attached image, same manga style, colors and outfit, seen FROM BEHIND (back to the viewer).
+Performing the Dempsey Roll: body crouched very low and swinging to the RIGHT in a figure-eight weave, torso bent
+sideways, right glove launching a hook upward, left glove tucked at the chin, speed lines and motion blur following
+the weave, explosive power. Plain pure white background, full figure, nothing touching the edges, no text.
+```
+

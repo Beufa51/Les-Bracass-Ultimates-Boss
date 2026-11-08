@@ -38,6 +38,8 @@
 - **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo (~45 s, V20) → BABYFOOT (V19, le beer pong est SUPPRIMÉ) → porte (simplifiée V19z). Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
+## AUDIT GREG (nov. 2026) : `propositions/greg_audit.md` — bot `node outils/greg_bot.mjs` (≈ 1 min). EN ATTENTE des choix de Fabien (liste de 18 choix en section 5). Résumé : Greg K.O. au round 2 partout, étourdissement jamais déclenché, 6 gros bugs (boxeur couché après REJOUER, aide Dempsey, esquive facile bridée, cadre de garde, garde basse = nargue, écran de victoire), écrans annexes encore en Greg v1.
+
 ## AUDIT GLOBAL V18 (6 boss, version économe) : `propositions/audit_global.md`
 - 0 plantage (14 lancements + « rejouer »), 0 erreur aux outils. Petits défauts : B1 clic souris inactif sur l'écran de fin
   (BossScene.attendreRetour), B2 historique du navigateur qui s'accumule (manif de Julien), B3 trophée / stade de Kédric
