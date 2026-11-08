@@ -63,3 +63,11 @@ Deux images séparées, une seule rangée chacune. Ne joindre QUE l'image indiqu
 ```
 Use the attached character ONLY as a reference for his look. Draw a NEW image: ONE ROW of 6 frames of this same commando RUNNING [TOWARD THE CAMERA, we see his face / AWAY FROM THE CAMERA, we see his back and the bandana tails flying], detailed 16-bit SNES pixel art, slightly high camera angle (3/4 view). This is a fast RUN, not a walk: in every frame the body leans forward, the arms are bent at 90 degrees and pump strongly, one knee is raised high toward the camera axis, and in frames 3 and 6 BOTH feet are off the ground. Frames: 1 right foot lands, 2 body low, 3 flight, 4 left foot lands, 5 body low, 6 flight. Same size and proportions as the reference, same head height in every frame, clear white space between frames. Do NOT draw side views, walking poses or any other row. Pure white background, no shadow, no text, no grid lines.
 ```
+
+## N°5 TER — SNAKE QUI COURT TOUT DROIT (V97 : le 5 bis est arrivé en 3/4, gardé pour les diagonales)
+Une image par direction, joindre UNIQUEMENT la référence indiquée (de face : `assets/sprites/beufa/beufa_heros.jpg`
+→ `assets_inbox/beufa/beufa_heros_course_face2.jpg` ; de dos : `assets/sprites/beufa/beufa_heros_dos.jpg`
+→ `assets_inbox/beufa/beufa_heros_course_dos2.jpg`).
+```
+Use the attached character ONLY as a reference for his look and for the camera angle: keep EXACTLY the same straight-on angle as the attached image. Draw ONE ROW of 6 frames of this same commando RUNNING STRAIGHT [TOWARD / AWAY FROM] THE CAMERA. His body is NOT turned at all: shoulders and hips stay perfectly parallel to the bottom edge of the image, the head is centered above the body, the figure is left-right symmetrical like the reference, he does NOT run to the side. Fast run: arms bent at 90 degrees pumping up and down, knees lifted toward the camera, in frames 3 and 6 both feet off the ground. Frames: 1 right foot lands, 2 body low, 3 flight, 4 left foot lands, 5 body low, 6 flight. Same size and proportions as the reference, same head height in every frame, clear white space between frames. Pure white background, no shadow, no text, no grid lines.
+```

@@ -1055,9 +1055,10 @@ export class BeufaInfiltration extends BossScene {
       if (this.textures.exists('beufa_heros_profil')) { cle = 'beufa_heros_profil'; miroir = ca < 0; }   // la planche profil regarde à DROITE
       if (this.heroSprint && this.heroBouge && this.textures.exists('beufa_heros_course_profil')) cle = 'beufa_heros_course_profil';   // V51 : il COURT
     } else if (sa < 0 && this.textures.exists('beufa_heros_dos')) cle = 'beufa_heros_dos';
-    // V96 : SPRINT vers le haut / le bas : la course en 3/4 (dessinée vers la droite, retournée si on va à gauche)
+    // V96 : SPRINT en DIAGONALE : la course en 3/4 (dessinée vers la droite, retournée si on va à gauche).
+    // V97 : seulement en diagonale (Fabien : « tout droit, il court de biais ») ; tout droit en haut / en bas = la marche
     const cleCourseH = 'beufa_heros_course_' + (sa < 0 ? 'dos' : 'face');
-    if (cle !== 'beufa_heros_profil' && cle !== 'beufa_heros_course_profil' && this.heroSprint && this.heroBouge && this.textures.exists(cleCourseH)) {
+    if (cle !== 'beufa_heros_profil' && cle !== 'beufa_heros_course_profil' && Math.abs(ca) > 0.3 && this.heroSprint && this.heroBouge && this.textures.exists(cleCourseH)) {
       cle = cleCourseH; miroir = ca < -0.05;
     }
     const nH = Math.max(1, Object.keys(this.textures.get(cle).frames).length - 1);
