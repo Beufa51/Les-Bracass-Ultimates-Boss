@@ -254,7 +254,8 @@ export class Showtime {
     this.parRound = Math.floor((S.manches[this.numManche].duree || S.dureeRound) / this.duree);
     this.dernierPas = -1;
     this.effet = null; this.techT = -99; this.dernierCompte = 99; this.musiquePartee = false; this.goAffiche = false;   // techT : espacement mini ; la musique part du début du fichier à CHAQUE manche
-    const fen = this.s.diff.fenetreShow;
+    // téléphone : fenêtres PLUS LARGES (on vise avec le doigt, l'écran tactile a du retard) — retour de Fabien
+    const fen = this.s.diff.fenetreShow * (estTactile() ? S.fenetreTactile : 1);
     this.fenetre = { parfait: Math.min(S.parfait * fen, this.duree * 0.25), bien: Math.min(S.bien * fen, this.duree * 0.45) };
     if (premiere) {
       // on démarre PILE SUR UN TEMPS du morceau (peu importe quand l'écran d'annonce a été quitté)
