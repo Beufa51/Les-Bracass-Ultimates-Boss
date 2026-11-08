@@ -38,6 +38,9 @@
 - **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo (~45 s, V20) → BABYFOOT (V19, le beer pong est SUPPRIMÉ) → porte (simplifiée V19z). Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
+## ANALYSE COMPARÉE avec des jeux existants (nov. 2026) : `propositions/analyse_comparee_jeux.md` — 15 choix EN ATTENTE
+  (NB : le choix 3, arrêt sur image de Greg, existe déjà : `arretImpact` 0,06 / 0,12 s).
+
 ## AVIS JOUABILITÉ (tout le jeu, nov. 2026) : `propositions/avis_jouabilite_global.md` — FAIT sauf 3, 9, 12 (refusés)
 - Règles et présentations : seulement la 1re FOIS (`Sauvegarde.fait('regles_<boss>_<titre>')`) ; pause : « Revoir les règles
   (à la prochaine visite) » (`Sauvegarde.oublierFaits`). Écrans de texte : toucher N'IMPORTE OÙ = OK (`attendreOK` de
