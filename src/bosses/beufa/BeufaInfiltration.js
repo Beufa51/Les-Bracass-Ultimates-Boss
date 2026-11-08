@@ -55,7 +55,8 @@ export class BeufaInfiltration extends BossScene {
   create() {
     this.phase = 'intro';   // intro | cinema | jeu | transition | attrape | fin
     this.touches = creerTouches(this);
-    etiquettesTactiles({ haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'OK', z: 'Sprint', x: null, hg: '◤', hd: '◥' });
+    const boutonsJeu = { haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'OK', z: 'Sprint', x: null, hg: '◤', hd: '◥' };
+    etiquettesTactiles(boutonsJeu);
     this.joystick = installerJoystick(this);   // V29 : sur téléphone, joystick 8 directions (la croix est cachée)   // V28 : plus de pierre   // Espace valide l'intro (bouton OK sur téléphone)
     this.cameras.main.setBackgroundColor('#0a0e15');
     // V24 GRANDES SALLES : les bornes de la caméra sont posées PAR PIÈCE —
@@ -171,7 +172,9 @@ export class BeufaInfiltration extends BossScene {
       ],
       invite: 'infiltration !',
     }, () => choisirDifficulte(this, 'beufa', DIFFICULTES, (nom, D) => {   // V18 : 4 difficultés façon Metal Gear
-      this.nomDiff = nom; this.diff = appliquerDifficulte(nom); this.cinema();
+      this.nomDiff = nom; this.diff = appliquerDifficulte(nom);
+      etiquettesTactiles(boutonsJeu);   // V99 : l'écran de difficulté cachait le bouton SPRINT (jamais remis)
+      this.cinema();
     })));
   }
 

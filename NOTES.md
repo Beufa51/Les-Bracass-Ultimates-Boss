@@ -1469,6 +1469,10 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   les autres étaient de biais). Course de dos tout droit : la planche reçue (`course_dos2`) n'a que 2 images vraiment de
   dos → pas utilisée, le sprint vers le haut garde la marche de dos accélérée.
 
+## BEUFA — V99 : BOUTON SPRINT DISPARU SUR TÉLÉPHONE
+- L'écran de DIFFICULTÉ (`beufa/difficulte.js`) cache Sprint et ne le remettait jamais : les boutons du jeu
+  (`boutonsJeu` dans `create()`) sont remis après le choix. Vérifié en téléphone simulé : « Sprint | OK » + joystick.
+
 ## JULIEN — FPS FAÇON WOLFENSTEIN (décidé avec Fabien)
 Histoire : tu es un étudiant en pleine manif, tu dois rejoindre le lycée (niveau 1), puis affronter Julien, prof, qui
 lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : collisions en grille (simples) et peu d'images
