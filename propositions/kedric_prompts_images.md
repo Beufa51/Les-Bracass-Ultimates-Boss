@@ -43,3 +43,13 @@ américain au-dessus de sa tête : les deux bras tendus vers le haut, mains auto
 décollés du sol, tête levée vers le ballon. Image verticale, corps entier visible. Aucun texte, aucun logo,
 pas d'ombre au sol.
 ```
+
+## 5. TOI qui attends le coup d'envoi, SANS ballon — `kedric_toi_attente.jpg` (aujourd'hui : l'image de course, ballon déjà en main)
+À joindre : `assets/sprites/kedric/kedric_toi_reception.png` (même joueur, mêmes couleurs, n°21).
+```
+Illustration style manga/anime coloré (façon Eyeshield 21), contours noirs nets, fond BLANC uni. Le MÊME joueur de
+football américain que l'image jointe (même tenue rouge et blanche, même casque, même numéro 21), vu de DOS, qui
+ATTEND le coup d'envoi : MAINS VIDES (aucun ballon), genoux un peu fléchis, en appui sur l'avant des pieds, bras
+légèrement écartés devant lui prêts à attraper, tête levée vers le ciel pour suivre le ballon. Image verticale,
+corps entier visible (pieds compris). Aucun texte, aucun logo, pas d'ombre au sol.
+```
