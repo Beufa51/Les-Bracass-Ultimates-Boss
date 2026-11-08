@@ -55,3 +55,11 @@ entière face ↔ profil, il « saute » d'une pose à l'autre. 5 poses intermé
 ```
 Pixel art sprite sheet, detailed 16-bit SNES style, slightly high camera angle (3/4 view), the SAME soldier as the attached image (same olive helmet, same olive uniform, same rifle, same size and proportions), standing still on guard, drawn 5 times in ONE ROW. Only the head and shoulders turn, the feet stay planted: 1) looking strictly to the LEFT (side view), 2) three-quarter left, 3) facing the camera, 4) three-quarter right, 5) looking strictly to the RIGHT (side view). Rifle held across the chest in both hands in every frame. Same scale, same position of the feet and same head height in every frame, evenly spaced with clear white space between frames. Pure white background, no shadow, no text, no grid lines.
 ```
+
+## N°5 BIS — SNAKE QUI COURT, UNE DIRECTION PAR IMAGE (V95 : le générateur redonnait toute la planche)
+Deux images séparées, une seule rangée chacune. Ne joindre QUE l'image indiquée (sinon il recopie la planche jointe).
+- De face : joindre `assets/sprites/beufa/beufa_heros.jpg` ; à livrer `assets_inbox/beufa/beufa_heros_course_face.jpg`.
+- De dos : joindre `assets/sprites/beufa/beufa_heros_dos.jpg` ; à livrer `assets_inbox/beufa/beufa_heros_course_dos.jpg`.
+```
+Use the attached character ONLY as a reference for his look. Draw a NEW image: ONE ROW of 6 frames of this same commando RUNNING [TOWARD THE CAMERA, we see his face / AWAY FROM THE CAMERA, we see his back and the bandana tails flying], detailed 16-bit SNES pixel art, slightly high camera angle (3/4 view). This is a fast RUN, not a walk: in every frame the body leans forward, the arms are bent at 90 degrees and pump strongly, one knee is raised high toward the camera axis, and in frames 3 and 6 BOTH feet are off the ground. Frames: 1 right foot lands, 2 body low, 3 flight, 4 left foot lands, 5 body low, 6 flight. Same size and proportions as the reference, same head height in every frame, clear white space between frames. Do NOT draw side views, walking poses or any other row. Pure white background, no shadow, no text, no grid lines.
+```
