@@ -106,6 +106,9 @@ export const MANIFESTE = {
     // masquée, puis « Duel » (boss battle) après le rideau
     beufa_mantis:   { fichier: 'audio/beufa/beufa_mantis.mp3', musique: true, volume: 0.45 },
     beufa_duel:     { fichier: 'audio/beufa/beufa_duel.mp3', musique: true, volume: 0.4 },
+    // V94 : musique d'ALERTE (MGS « Alert », déposée par Fabien ; original dans assets_inbox/beufa/). Les 5,6 premières
+    // secondes = l'alarme, jouée UNE fois ; ensuite boucle de 5,6 s à 52,8 s (le morceau se répète à cet endroit)
+    beufa_alerte_musique: { fichier: 'audio/beufa/beufa_alerte_musique.mp3', musique: true, volume: 0.45, boucle: { debut: 5.6, fin: 52.8 } },
     beufa_soupcon: { fichier: null, provisoire: { frequence: 620, duree: 0.12 } },
     beufa_alerte:  { fichier: null, provisoire: { frequence: 880, duree: 0.3 } },
     beufa_attrape: { fichier: null, provisoire: { frequence: 150, duree: 0.4 } },

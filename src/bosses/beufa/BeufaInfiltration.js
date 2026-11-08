@@ -35,7 +35,7 @@ import { formatTemps, Sauvegarde } from '../../core/sauvegarde.js';
 import { IDENTITE, REGLAGES as R, PIECES, DIFFICULTES, appliquerDifficulte } from './reglages.js';
 import { choisirDifficulte } from './difficulte.js';
 import { manifesteDe } from '../../core/manifestes.js';
-import { jouerMusique } from '../../core/musique.js';
+import { jouerMusique, arreterMusique } from '../../core/musique.js';
 
 const normAngle = (a) => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) a += Math.PI * 2; return a; };
 const styleAlerte = { fontFamily: 'monospace', fontStyle: 'bold', fontSize: '26px', color: '#ffd84a', stroke: '#000000', strokeThickness: 5 };
@@ -136,7 +136,7 @@ export class BeufaInfiltration extends BossScene {
     this.lueurG = this.add.graphics().setDepth(802).setBlendMode(Phaser.BlendModes.ADD);
     this.lueurs = [];
 
-    this.alertes = 0; this.pierres = R.joueur.pierres; this.temps = 0; this.pierre = null;
+    this.alertes = 0; this.musAlerte = false; this.pierres = R.joueur.pierres; this.temps = 0; this.pierre = null;
     this.poussieres = []; this.prochPoussiere = 0;   // les petits nuages des pas (V10)
     this.ronds = [];   // V68 : les ronds dans l'eau quand Snake marche dans une flaque
 
@@ -647,6 +647,8 @@ export class BeufaInfiltration extends BossScene {
       pr.hy = pr.depart[1] + (pr.arrivee[1] - pr.depart[1]) * pr.t;
     }
     this.detection(dt);
+    // V94 : plus personne ne te poursuit → la musique d'infiltration reprend là où elle s'était arrêtée
+    if (this.musAlerte && !this.gardes.some((g) => g.etat === 'poursuite')) this.finAlerteMusique();
     this.afficher();
     this.majHud();
   }
@@ -913,7 +915,9 @@ export class BeufaInfiltration extends BossScene {
         if (pr.jauge >= 1) {   // V28 : seul un garde PAS LOIN accourt ; sinon il vient juste vérifier
           pr.jauge = 0;
           const g = this.gardeLePlusProche(pr.hx, pr.hy);
-          if (g && Math.hypot(g.x - pr.hx, g.y - pr.hy) < 400) this.declencherAlerte(g);
+          // V94 : un garde déjà à ta poursuite n'est pas « re-alerté » (avant : +1 alerte toutes les 0,4 s sous le halo)
+          if (g && g.etat === 'poursuite') { g.vuX = this.joueur.x; g.vuY = this.joueur.y; g.perdu = 0; }
+          else if (g && Math.hypot(g.x - pr.hx, g.y - pr.hy) < 400) this.declencherAlerte(g);
           else if (g && g.etat === 'ronde') {
             g.etat = 'verification'; g.verif = R.alerte.verification; g.vuX = this.joueur.x; g.vuY = this.joueur.y; g.angleVerif = g.angle;
             jouerSon(this, 'beufa_soupcon');
@@ -935,7 +939,12 @@ export class BeufaInfiltration extends BossScene {
 
   declencherAlerte(g) {
     this.alertes++;
-    jouerSon(this, 'beufa_alerte');
+    // V94 : la MUSIQUE D'ALERTE (son alarme au début remplace le bip) ; si elle joue déjà : juste le bip
+    if (!this.musAlerte) {
+      this.musAlerte = true;
+      arreterMusique('beufa_musique');
+      jouerMusique(this, 'beufa_alerte_musique');
+    } else jouerSon(this, 'beufa_alerte');
     this.cameras.main.shake(160, 0.005);
     g.etat = 'poursuite'; g.jauge = 1; g.perdu = 0; g.vuX = this.joueur.x; g.vuY = this.joueur.y;
     this.messageCentre('!', '#ff5a5a', 0.7);
@@ -945,6 +954,13 @@ export class BeufaInfiltration extends BossScene {
         o.etat = 'poursuite'; o.jauge = 1; o.perdu = 0; o.vuX = this.joueur.x; o.vuY = this.joueur.y;
       }
     }
+  }
+
+  finAlerteMusique() {
+    if (!this.musAlerte) return;
+    this.musAlerte = false;
+    arreterMusique('beufa_alerte_musique');
+    jouerMusique(this, 'beufa_musique', { reprendre: true });
   }
 
   attraper() {
@@ -967,6 +983,7 @@ export class BeufaInfiltration extends BossScene {
       g.alerte.setText('');
     }
     for (const pr of this.projecteurs) { pr.jauge = 0; pr.alerte.setText(''); }
+    this.finAlerteMusique();
     if (this.pierre) { this.pierre.sprite.destroy(); this.pierre = null; }
     this.cameras.main.centerOn(this.joueur.x, this.joueur.y);   // la caméra te REPOSE à l'entrée
     this.phase = 'jeu';
@@ -975,6 +992,7 @@ export class BeufaInfiltration extends BossScene {
   reussite() {
     if (this.phase !== 'jeu') return;
     this.phase = 'fin';
+    if (this.musAlerte) { this.musAlerte = false; arreterMusique('beufa_alerte_musique'); }
     // l'écran de VICTOIRE (core) est en coordonnées plein écran : caméra d'aplomb
     const cam = this.cameras.main;
     cam.stopFollow(); cam.setZoom(1); cam.centerOn(LARGEUR / 2, HAUTEUR / 2);

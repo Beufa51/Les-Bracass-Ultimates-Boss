@@ -17,6 +17,11 @@ function piste(cle) {
     a.preload = 'none';
     pistes[cle] = { audio: a, voulue: false, base: e.volume ?? 0.5 };
     a.volume = pistes[cle].base * Sauvegarde.volume('musique');
+    // Ajout optionnel (alerte de Beufa) : boucle: { debut, fin } en secondes. Le morceau est joué une fois depuis 0
+    // (l'intro n'est pas rejouée), puis de fin on revient à debut. Le fichier doit dépasser un peu « fin ».
+    if (e.boucle) setInterval(() => {
+      if (!a.paused && a.currentTime >= e.boucle.fin) a.currentTime = e.boucle.debut + (a.currentTime - e.boucle.fin);
+    }, 15);
   }
   return pistes[cle];
 }

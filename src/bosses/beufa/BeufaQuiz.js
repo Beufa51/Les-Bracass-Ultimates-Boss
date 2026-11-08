@@ -11,7 +11,7 @@ import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique, arreterMusique } from '../../core/musique.js';
 import { Sauvegarde } from '../../core/sauvegarde.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
-import { IDENTITE, REGLAGES as R, appliquerDifficulte } from './reglages.js';
+import { IDENTITE, REGLAGES as R, DIFFICULTES, appliquerDifficulte } from './reglages.js';
 import { cleRecord } from './difficulte.js';
 import { QUESTIONS, LECTURE_DEBUT, LECTURES, MASQUE_CHAUD, DEBUT_QUIZ, MOQUERIES, TROP_TARD, BRAVOS, VICTOIRE, GAME_OVER, RANGS, RANG_PARFAIT } from '../../../data/beufa_quiz.js';
 
@@ -29,7 +29,9 @@ export class BeufaQuiz extends BossScene {
     this.nomDiff = Sauvegarde.difficulte('beufa') || 'normal'; appliquerDifficulte(this.nomDiff);   // V18 : erreurs / temps selon la difficulté
     const Q = R.quiz;
     this.etape = 'intro';
-    this.erreurs = 0; this.bons = 0; this.numero = 0;
+    this.erreurs = 0; this.bons = 0; this.numero = 0; this.serie = 0;
+    // V94 : infiltration SANS ALERTE = un JOKER (la première erreur ne compte pas), à chaque tentative
+    this.joker = this.donnees.alertes === 0 ? R.quiz.joker : 0;
     this.masque = !this.donnees.reprise;   // une nouvelle tentative après un GAME OVER saute la lecture des pensées
     this.questions = melange(QUESTIONS).slice(0, Q.questions);
     etiquettesTactiles({ espace: 'OK', z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
@@ -137,6 +139,12 @@ export class BeufaQuiz extends BossScene {
     this.chronoFond = this.add.rectangle(170, 52, 304, 12, 0x000000, 0.7).setStrokeStyle(1, 0x888888).setDepth(60).setVisible(false);
     this.chronoBarre = this.add.rectangle(20, 52, 300, 8, VERT).setOrigin(0, 0.5).setDepth(61).setVisible(false);
     this.chronoTexte = texte(this, 332, 52, '', 16, '#ffffff').setOrigin(0, 0.5).setDepth(61);
+    this.hudJoker = texte(this, LARGEUR - 86 - (R.quiz.erreursMax - 1) * 50, 52, '', 14, '#ffd84a').setOrigin(1, 0.5).setDepth(60);
+    this.majJoker();
+  }
+
+  majJoker() {
+    this.hudJoker.setText(this.joker > 0 ? `★ JOKER x${this.joker} (infiltration sans alerte)` : '');
   }
 
   // ---------- le dialogue (machine à écrire) ----------
@@ -262,6 +270,13 @@ export class BeufaQuiz extends BossScene {
         this.serie = (this.serie || 0) + 1;
         this.visage(this.serie >= 3 ? 'choque' : this.serie === 2 ? 'surpris' : 'souriant');   // 3 d'affilée : il n'en revient pas
         this.dire([hasard(BRAVOS)], () => this.questionSuivante());
+      } else if (this.joker > 0) {   // V94 : le JOKER efface l'erreur
+        this.joker--; this.majJoker(); this.jokersUtilises = (this.jokersUtilises || 0) + 1;
+        jouerSon(this, 'beufa_faux');
+        this.serie = 0;
+        this.visage('surpris');
+        this.cameras.main.flash(200, 255, 216, 74);
+        this.dire([`JOKER ! Ton infiltration sans alerte te sauve : cette erreur ne compte pas.\n(La bonne réponse : ${this.reponse})`], () => this.questionSuivante());
       } else {
         this.erreurs++;
         jouerSon(this, 'beufa_faux');
@@ -371,9 +386,14 @@ export class BeufaQuiz extends BossScene {
   // ---------- V91 : l'écran de RÉSULTATS façon MGS (classement + médaille) ----------
   calculerRang() {
     // V92 : infiltration pas jouée (quiz lancé seul) = 0 point d'infiltration (avant : 50 « gratuits »)
-    const d = this.donnees, alertes = d.alertes ?? 0, continues = d.continues || 0;
-    const points = this.bons * 10 + (d.alertes === undefined ? 0 : Math.max(0, 50 - alertes * 10)) - continues * 15;
-    if (alertes === 0 && this.bons === this.questions.length && continues === 0 && d.alertes !== undefined) return { ...RANG_PARFAIT, points, parfait: true };
+    // V94 : + temps d'infiltration + difficulté (réglages : R.quiz.rang et bonusRang de DIFFICULTES)
+    const d = this.donnees, alertes = d.alertes ?? 0, continues = d.continues || 0, Q = R.quiz.rang;
+    const joue = d.alertes !== undefined, temps = d.temps ?? 9999;
+    this.ptsTemps = joue ? Math.round(Q.bonusTemps * Math.max(0, Math.min(1, (Q.tempsZero - temps) / (Q.tempsZero - Q.tempsPlein)))) : 0;
+    this.ptsDiff = (DIFFICULTES[this.nomDiff] || DIFFICULTES.normal).bonusRang || 0;
+    const points = this.bons * 10 + (joue ? Math.max(0, Q.alertes - alertes * Q.parAlerte) + this.ptsTemps : 0) + this.ptsDiff - continues * Q.parContinue;
+    // BIG BOSS : 0 alerte, 10/10, 0 continue, infiltration rapide, en NORMAL ou EXTREME
+    if (joue && alertes === 0 && this.bons === this.questions.length && continues === 0 && temps <= Q.tempsPlein && this.ptsDiff >= 0) return { ...RANG_PARFAIT, points, parfait: true };
     return { ...RANGS.find((r) => points >= r.min), points };
   }
 
@@ -384,8 +404,10 @@ export class BeufaQuiz extends BossScene {
     const ordre = [RANG_PARFAIT.nom, ...RANGS.map((r) => r.nom)];
     const cle = cleRecord('beufa', this.nomDiff);   // V18 : un record par difficulté (comme les autres boss)
     const avant = Sauvegarde.record(cle);
-    const record = d.alertes !== undefined ? Sauvegarde.proposerRecord(cle, rang.nom, d.temps ?? 5999, ordre) : avant;
-    const nouveau = d.alertes !== undefined && (!avant || avant.rang !== record.rang || avant.temps !== record.temps);
+    // V94 : ENTRAÎNEMENT = pas de record (comme Kédric et Lionel)
+    const entrainement = this.nomDiff === 'entrainement';
+    const record = d.alertes !== undefined && !entrainement ? Sauvegarde.proposerRecord(cle, rang.nom, d.temps ?? 5999, ordre) : avant;
+    const nouveau = d.alertes !== undefined && !entrainement && (!avant || avant.rang !== record.rang || avant.temps !== record.temps);
     const minutes = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
     this.add.rectangle(0, 0, LARGEUR, HAUTEUR, 0x000000).setOrigin(0).setDepth(P);
     // les lignes de balayage du codec
@@ -395,15 +417,16 @@ export class BeufaQuiz extends BossScene {
     this.add.text(60, 40, 'RÉSULTATS DE LA MISSION', st(26)).setDepth(P + 2);
     this.add.rectangle(60, 80, 520, 2, VERT).setOrigin(0).setDepth(P + 2);
     const lignes = [
-      ['TEMPS D\'INFILTRATION', d.temps !== undefined ? minutes(d.temps) : '—'],
+      ['DIFFICULTÉ', `${(DIFFICULTES[this.nomDiff] || DIFFICULTES.normal).nom} (${this.ptsDiff >= 0 ? '+' : ''}${this.ptsDiff})`],
+      ['TEMPS D\'INFILTRATION', d.temps !== undefined ? `${minutes(d.temps)} (+${this.ptsTemps})` : '—'],
       ['ALERTES', d.alertes !== undefined ? String(d.alertes) : '— (non jouée)'],
       ['BONNES RÉPONSES', `${this.bons} / ${this.questions.length}`],
-      ['ERREURS', String(this.erreurs)],
+      ['ERREURS', String(this.erreurs) + (this.jokersUtilises ? ` (+${this.jokersUtilises} effacée par le joker)` : '')],
       ['CONTINUES', String(d.continues || 0)],
       ['POINTS', String(rang.points)],
     ];
     lignes.forEach(([a, b], i) => {
-      const y = 104 + i * 36;
+      const y = 100 + i * 30;   // V94 : 8 lignes (30 px d'écart, avant 36)
       const ta = this.add.text(70, y, a, st(20, '#4fbf80')).setDepth(P + 2).setAlpha(0);
       const tb = this.add.text(570, y, b, st(20, '#e8fff0')).setOrigin(1, 0).setDepth(P + 2).setAlpha(0);
       this.tweens.add({ targets: [ta, tb], alpha: 1, delay: 300 + i * 250, duration: 150 });
@@ -420,7 +443,7 @@ export class BeufaQuiz extends BossScene {
       this.tweens.add({ targets: titre, alpha: 1, duration: 200 });
       this.tweens.add({ targets: nom, alpha: 1, scale: 1, duration: 450, ease: 'Back.Out' });
       this.tweens.add({ targets: phrase, alpha: 1, delay: 400, duration: 300 });
-      const txtRecord = nouveau ? '★ NOUVEAU RECORD ★' : record ? `MEILLEUR RANG : ${record.rang}` : '(joue l\'infiltration avant pour être classé)';
+      const txtRecord = entrainement ? 'ENTRAÎNEMENT : pas de record' : nouveau ? '★ NOUVEAU RECORD ★' : record ? `MEILLEUR RANG : ${record.rang}` : '(joue l\'infiltration avant pour être classé)';
       const tr = this.add.text(62, 486, txtRecord, st(18, nouveau ? '#ffd84a' : '#4fbf80')).setDepth(P + 2).setAlpha(0);
       this.tweens.add({ targets: tr, alpha: 1, delay: 800, duration: 300 });
       if (nouveau) this.tweens.add({ targets: tr, alpha: 0.4, delay: 1100, duration: 500, yoyo: true, repeat: -1 });

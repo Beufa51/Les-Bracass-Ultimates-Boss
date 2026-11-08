@@ -31,7 +31,7 @@
 - **Beufa** : TERMINÉ — infiltration façon Metal Gear (4 pièces) puis QUIZ dans son bureau (codec, Psycho Mantis,
   rideau, 60 questions, GAME OVER façon MGS, classement BIG BOSS → CHICKEN, médaille = badge du hub, meilleur rang
   sauvegardé). Audit final : `propositions/beufa_audit_final.md`.
-  AUDIT Beufa FAIT (`propositions/beufa_audit.md`, bot `outils/beufa_bot.mjs`), en attente des choix de Fabien.
+  AUDIT Beufa FAIT (`propositions/beufa_audit.md`, bot `outils/beufa_bot.mjs`), choix de Fabien FAITS en V94 (voir « BEUFA — V94 »), reste : ses images et ses questions.
 - **Julien** : EN COURS — niveau 1 « la manif » jouable ; niveau 2 « la salle de classe » : COMBAT REFAIT (audit B :
   fenêtre de punition de dos, 8 attaques, phases noir / bureau renversé + alarme, élèves, sarbacane). RESTE : le
   MINI-NIVEAU « LE LYCÉE » (audit A) FAIT. Reste : faire jouer Fabien, équilibrer. Voir « JULIEN » plus bas.
@@ -1431,6 +1431,23 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Le son de réussite ne joue plus 2 fois à la victoire (« bon » au dialogue, « réussi » au rang).
 - 60 questions (30 ajoutées en V92).
 - `beufa_musique.mp3` : 5 premières minutes en boucle, mono 56 kb/s (11 → 2,1 Mo ; original dans l'historique git).
+
+## BEUFA — V94 : CHOIX DE FABIEN APRÈS L'AUDIT (`propositions/beufa_audit.md`)
+- MUSIQUE D'ALERTE (« Alert » de MGS, original dans `assets_inbox/beufa/beufa_alerte_original.mp3`) :
+  `beufa_alerte_musique.mp3` (coupé à 53,5 s, mono 64 kb/s). Les 5,6 premières s = l'alarme, jouée UNE fois ; puis
+  boucle 5,6 → 52,8 s (le morceau se répète exactement là). Option générique `boucle: { debut, fin }` du manifeste,
+  gérée dans `src/core/musique.js`. Elle part à la 1re alerte (remplace le bip), s'arrête quand plus aucun garde ne
+  te poursuit (ou renvoi / sortie) → la musique d'infiltration reprend où elle était.
+- Bug du HALO corrigé : un garde déjà à ta poursuite n'est plus « re-alerté » (avant : +1 alerte / 0,4 s).
+- JOKER : infiltration SANS ALERTE = la 1re erreur du quiz est effacée (`quiz.joker`), à chaque tentative ; HUD
+  « ★ JOKER » sous les croix ; écran de résultats « (+1 effacée par le joker) ».
+- RANG : bons x10 + (30 - 10 par alerte) + bonus TEMPS (20 si ≤ 90 s, 0 à 210 s) + DIFFICULTÉ (VERY EASY -30,
+  EASY -15, NORMAL 0, EXTREME +15) - 15 par continue (`quiz.rang`, `bonusRang`). NORMAL parfait = 150 comme avant.
+  BIG BOSS : en plus, infiltration ≤ 90 s et NORMAL ou EXTREME. Résultats : lignes DIFFICULTÉ et (+points) du temps.
+- ENTRAÎNEMENT : pas de record (« ENTRAÎNEMENT : pas de record »), le badge reste donné.
+- Questions : `propositions/beufa_questions.md` (60, 1re réponse = bonne) donné à Fabien pour correction / ajouts.
+  Fabien trouve le quiz facile (il est gamer) : difficulté du quiz inchangée.
+- Images : prompts n°1 à 7 dans `propositions/beufa_prompts_images.md` (en attente des images de Fabien).
 
 ## JULIEN — FPS FAÇON WOLFENSTEIN (décidé avec Fabien)
 Histoire : tu es un étudiant en pleine manif, tu dois rejoindre le lycée (niveau 1), puis affronter Julien, prof, qui
