@@ -68,7 +68,7 @@ objets = {
     (13, 38): 'm', (19, 37): 'm', (8, 40): 'm', (25, 39): 'm', (4, 38): 'm', (28, 37): 'm', (30, 40): 'm',
     (6, 41): 'p', (27, 41): 'p',
     # audit nov. 2026 : BAC en civil (N), tireur de LBD (L), SONO (Y, grand secret), carte de cantine (q)
-    (22, 24): 'N', (18, 7): 'N', (20, 19): 'L', (30, 12): 'L', (4, 30): 'Y', (28, 31): 'q',
+    (22, 24): 'N', (18, 7): 'N', (20, 19): 'L', (30, 12): 'L', (4, 30): 'Y', (28, 31): 'q', (29, 31): 'g',   # g : ŒUFS POURRIS (trésor du secret du passage)
 }
 for (x, y), c in objets.items():
     assert g[y][x] == '.', (x, y, g[y][x]); g[y][x] = c

@@ -33,7 +33,7 @@ export function installerMusiques() {
       if (p.voulue && p.audio.paused) p.audio.play().catch(() => {});
     }
   };
-  for (const type of ['pointerdown', 'touchend', 'keydown', 'click']) {
+  for (const type of ['pointerdown', 'pointerup', 'touchend', 'keydown', 'click']) {   // (pointerup : un toucher sur téléphone)
     window.addEventListener(type, relancer, { capture: true });
   }
   // onglet caché => musique en pause

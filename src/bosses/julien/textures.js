@@ -422,6 +422,7 @@ function deriver(T) {
   T.hauteurs.bac = T.hauteurs.manifestant; T.hauteurs.lbd = T.hauteurs.lanceur;
 }
 
+
 export function appliquerImages(scene, T) {
   const img = (n) => scene.textures.exists('julien_' + n) ? scene.textures.get('julien_' + n).getSourceImage() : null;
   T.hauteurs = { ...HAUTEURS_PROVISOIRES };
@@ -442,6 +443,9 @@ export function appliquerImages(scene, T) {
   T.main.image = !!img('main_tient');
   T.nbManif = manif;
   deriver(T);
+  // trésors des secrets : boîte d'ŒUFS POURRIS (la boîte d'œufs, verdâtre)
+  if (T.spr.oeufs && !T.spr.pourris) { const c = document.createElement('canvas'); c.width = T.spr.oeufs.width; c.height = T.spr.oeufs.height; const g = c.getContext('2d'); g.filter = 'hue-rotate(70deg) saturate(1.8) brightness(0.85)'; g.drawImage(T.spr.oeufs, 0, 0); T.spr.pourris = c; }
+  T.hauteurs.pourris = T.hauteurs.oeufs;
   // tête du héros : planche de 20 cases sur une ligne → 20 images de la texture Phaser
   T.tetes = false;
   if (scene.textures.exists('julien_tetes')) {

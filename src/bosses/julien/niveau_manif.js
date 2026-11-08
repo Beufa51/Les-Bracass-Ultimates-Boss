@@ -52,7 +52,7 @@ export const PLAN_MANIF = [
   '111224p..42215.....51228...3221112',
   '111224...42215.....51223.P.8221112',
   '111.Y4.B.42215.C.C.512PR..a3221112',
-  '111soX...42215.....51223w..8q.1112',
+  '111soX...42215.....51223w..8qg1112',
   '222K.4..t41125bbbbb521BR...Zoo2221',
   '222114...41125.....52113.o.8..2221',
   '222114.o.41125.m.m.52118.e.3112221',
@@ -70,7 +70,7 @@ export const OBJETS = {
   P: 'lanceur', B: 'bouclier', o: 'oeufs', s: 'sandwich', b: 'barriere', p: 'poubelle', m: 'manifestant',
   T: 'statue', C: 'camion', k: 'colonne', t: 'tomates', w: 'eau',
   e: 'echarpe', c: 'cafe', K: 'kway', a: 'farine',
-  N: 'bac', L: 'lbd', Y: 'sono', q: 'carte',   // audit nov. 2026 : BAC en civil, tireur de LBD, la SONO (arme 6), carte de cantine
+  N: 'bac', L: 'lbd', Y: 'sono', q: 'carte', g: 'pourris',   // g : ŒUFS POURRIS (trésor du secret du passage)   // audit nov. 2026 : BAC en civil, tireur de LBD, la SONO (arme 6), carte de cantine
 };
 export const PORTES = { D: '9' };   // porte de service (aspect rideau de fer) : s'ouvre en poussant, avec la CARTE DE CANTINE
 export const RIDEAUX = { R: '9' };   // lettre du plan → mur « rideau de fer » (n°9)

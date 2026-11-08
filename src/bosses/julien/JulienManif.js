@@ -9,10 +9,11 @@ import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { texte, voile } from '../../core/ui.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
-import { jouerMusique } from '../../core/musique.js';
+import { jouerMusique, deverrouillerMusiques } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, REGLAGES as RG, DIFFICULTES, RANGS } from './reglages.js';
 import { Sauvegarde } from '../../core/sauvegarde.js';
+const MUSIQUES_JULIEN = ['julien_musique', 'julien_foule', 'julien_lycee_musique', 'julien_boss_musique'];
 const FINS = ['julien_fin_gaze', 'julien_fin_attrape', 'julien_fin_colle', 'julien_fin_victoire'];   // outils/julien/decouper_audit21.py
 import { PLAN_MANIF, OBJETS, SECRETS, ZONES, PARVIS, PAR, ABSENTS_FACILE, RENFORTS_ANARCHISTE, RIDEAUX, FOURGON, PORTES } from './niveau_manif.js';
 import { rendre, murEn, vueLibre } from './raycaster.js';
@@ -99,6 +100,12 @@ export class JulienManif extends BossScene {
     this.tactile = estTactile();   // téléphone : croix = avancer / reculer / pas de côté, ↺ ↻ = tourner, ŒUF en haut
     this.enJeu = false;
     this.lancerMusique();
+    // (Fabien : plus de musique en classe, sur téléphone) le lycée et la classe démarrent SANS appui (fin du niveau
+    // d'avant) : le téléphone refuse alors leur musique. Comme pour Kédric, on DÉBLOQUE toutes les musiques de Julien
+    // à chaque appui (jouées en muet un instant), pour qu'elles puissent partir plus tard toutes seules.
+    const debloquer = () => deverrouillerMusiques(MUSIQUES_JULIEN);
+    for (const t of ['touchend', 'click', 'keydown', 'pointerup']) window.addEventListener(t, debloquer, { capture: true });
+    this.events.once('shutdown', () => { for (const t of ['touchend', 'click', 'keydown', 'pointerup']) window.removeEventListener(t, debloquer, { capture: true }); });
     this.dessiner(0);
     this.diff = DIFFICULTES[Sauvegarde.difficulte(IDENTITE.id)] || DIFFICULTES.bloqueur;
     if (this.donnees.rejouer) { this.appliquerDifficulte(); this.time.delayedCall(60, () => this.demarrer()); }   // « recommencer » : direct
@@ -314,7 +321,7 @@ export class JulienManif extends BossScene {
       if (type === 'lanceur' || type === 'bouclier' || type === 'bac' || type === 'lbd') {
         this.ajouterEnnemi(type, x, y);
       } else {
-        const solide = !RECHARGES[type] && !BONUS[type] && type !== 'sandwich' && type !== 'carte';
+        const solide = !RECHARGES[type] && !BONUS[type] && type !== 'sandwich' && type !== 'carte' && type !== 'pourris';
         const rayon = { barriere: 0.45, statue: 0.75, camion: 0.6, colonne: 0.4 }[type] || 0.3;
         const o = { type, x: px, y: py, solide, rayon, actif: true, n: nm };
         if (type === 'manifestant') nm++;
@@ -941,6 +948,9 @@ export class JulienManif extends BossScene {
         if (o.type === 'kway') { if (j.armure >= RG.bonus.kwayMaxi) continue; j.armure = Math.min(RG.bonus.kwayMaxi, j.armure + RG.bonus.kway); }
         else j[o.type] = RG.bonus[o.type];
         this.message(BONUS[o.type](), 3);
+      } else if (o.type === 'pourris') {
+        j.pourris = RG.pourris.nombre; j.mun.oeufs = Math.max(j.mun.oeufs, RG.pourris.nombre); if (j.armes.has('oeufs')) j.arme = 'oeufs';
+        this.message(`TRÉSOR : des ŒUFS POURRIS ! Les ${RG.pourris.nombre} prochains œufs font ×${RG.pourris.degats} et passent les boucliers (ça pue !)`, 4.5);
       } else if (o.type === 'carte') {
         this.j.carte = true;
         this.message('La CARTE DE CANTINE ! Elle ouvre la PORTE DE SERVICE de la place (le rideau de fer, à droite).', 4.5);
@@ -1092,7 +1102,7 @@ export class JulienManif extends BossScene {
     this.txtArmure.setText(j.armure > 0 ? `K-WAY ${Math.ceil(j.armure)}` : '');
     const restants = this.ennemis.filter(e => e.parvis && e.actif && e.etat !== 'fuite').length;
     const parvis = this.zonesVues.has(ZONES.length - 1) && !this.portailOuvert ? `PARVIS : ${restants} policier${restants > 1 ? 's' : ''}` : '';
-    this.txtBonus.setText([j.echarpe > 0 ? `ÉCHARPE ${Math.ceil(j.echarpe)}` : '', j.cafe > 0 ? `CAFÉ ${Math.ceil(j.cafe)}` : '', parvis].filter(Boolean).join('   '));
+    this.txtBonus.setText([j.echarpe > 0 ? `ÉCHARPE ${Math.ceil(j.echarpe)}` : '', j.cafe > 0 ? `CAFÉ ${Math.ceil(j.cafe)}` : '', j.pourris > 0 ? `POURRIS ${j.pourris}` : '', parvis].filter(Boolean).join('   '));
     const a = armeDe(j.arme);
     this.txtArme.setText(`${ARMES.indexOf(a) + 1} · ${a.nom}`);
     this.txtOeufs.setText(a.mun ? `${Math.ceil(j.mun[a.mun])}` : '∞');

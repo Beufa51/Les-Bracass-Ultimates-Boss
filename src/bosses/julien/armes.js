@@ -71,14 +71,15 @@ export function tirer(scene, dx, dy, appui, nouveau) {
     frapper(scene, dx, dy);
   } else if (j.arme === 'oeufs') {
     j.recharge = RG.oeufs.cadence; j.lanceT = 0.18;
-    ajout('oeuf', vx, vy);
+    ajout('oeuf', vx, vy, j.pourris > 0 ? { pourri: true } : {});   // trésor : œufs pourris
+    if (j.pourris > 0 && --j.pourris === 0) scene.message('Plus d\'œufs pourris…', 1.5);
     jouerSon(scene, 'julien_lancer');
   } else if (j.arme === 'tomates') {
     j.recharge = RG.tomates.cadence; j.lanceT = 0.25;
     ajout('tomate', vx, vy);
     jouerSon(scene, 'julien_lancer', { rate: 0.8 });
   } else if (j.arme === 'sarbacane') {
-    j.recharge = RG.sarbacane.cadence; j.lanceT = 0.12;
+    j.recharge = RG.sarbacane.cadence * (j.turbo ? RG.turbo.cadence : 1); j.lanceT = 0.12;   // trésor : sarbacane TURBO
     ajout('boulette', vx, vy);
     jouerSon(scene, 'julien_lancer', { rate: 1.6 });
   } else if (j.arme === 'eau') {
@@ -150,7 +151,7 @@ export function avancerTirs(scene, dt) {
       // pistolet à eau : petit « plic » toutes les 3 gouttes et un SURSAUT toutes les 6 (audit nov. 2026 : il « ne faisait rien »)
       const goutte = o.genre === 'eau' ? (e.eauN = (e.eauN || 0) + 1) : 0;
       if (goutte % 3 === 1) jouerSon(scene, 'julien_eau', { rate: 1.7, volume: 0.35 });
-      scene.toucherEnnemi(e, R.degats, { recul: [o.dx * R.recul, o.dy * R.recul], silencieux: o.genre === 'eau' && goutte % 6 !== 0, genre: o.genre, tache: o.genre === 'oeuf' ? 'oeuf' : o.genre === 'tomate' ? 'tomate' : null });
+      scene.toucherEnnemi(e, R.degats * (o.pourri ? RG.pourris.degats : 1), { perceBouclier: !!o.pourri, recul: [o.dx * R.recul, o.dy * R.recul], silencieux: o.genre === 'eau' && goutte % 6 !== 0, genre: o.genre, tache: o.genre === 'oeuf' ? 'oeuf' : o.genre === 'tomate' ? 'tomate' : null });
       break;
     }
   }

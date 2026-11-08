@@ -57,7 +57,11 @@ export class JulienLycee extends JulienManif {
       for (const [t, ps] of Object.entries(POSES)) for (const p of ps) { const i = img(`${t}_${p}`); if (i) T.spr[`${t}_${p}`] = i; }
       if (!this.textures.exists('julien_surveillant_essouffle')) T.spr.surveillant_essouffle = T.spr.surveillant_marche0;   // (l'IA du CRS a une pose « essoufflé »)
       for (const n of ['table', 'canette', 'extincteur', 'carnet', 'puree', 'flaque', 'mousse', 'etagere', 'etagere_basse', 'table_lecture', 'ordinateur']) { const i = img(n); if (i) T.spr[n] = i; }
-      for (const n of ['etagere', 'etagere_basse', 'table_lecture', 'ordinateur']) if (!T.spr[n]) T.spr[n] = T.spr.table;   // (image absente : une table)
+      for (const n of ['etagere', 'etagere_basse', 'table_lecture', 'ordinateur']) if (!T.spr[n]) T.spr[n] = T.spr.table;
+      {   // trésor : la SARBACANE TURBO (la sarbacane, dorée)
+        const src = T.spr.sarbacane || spritesClasse().sarbacane, c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
+        const g = c.getContext('2d'); g.filter = 'sepia(1) saturate(4) brightness(1.2)'; g.drawImage(src, 0, 0); T.spr.turbo = c; T.hauteurs.turbo = 0.32;
+      }   // (image absente : une table)
       // touchés par une BOULETTE (sans jaune d'œuf) : l'IA choisit « <type>_touche_propre » quand le coup ne fait pas de tache
       for (const t of ['surveillant', 'cantiniere']) { const i = img(t + '_touche_papier'); if (i) T.spr[t + '_touche_propre'] = i; }
       T.spr.comptoir = img('comptoir') || img('bureau') || T.spr.bureau;   // vraie image du comptoir, sinon le bureau du prof
@@ -199,6 +203,10 @@ export class JulienLycee extends JulienManif {
       if (o.type === 'carnet') {
         o.actif = false; this.carnet = true; this.sortie = { x: PORTE_SALLE_12.x + 0.5, y: PORTE_SALLE_12.y + 1.5 };
         this.message(TXT.carnet, 4.5); jouerSon(this, 'julien_portail', { rate: 1.3 }); j.expr = 'content'; j.exprT = 1.2; j.or = 0.8;
+      } else if (o.type === 'turbo') {   // TRÉSOR du passage secret : gardé jusqu'à la fin du combat contre Julien
+        o.actif = false; j.turbo = true; j.or = 1;
+        this.message('TRÉSOR : la SARBACANE TURBO ! Elle tire 2 fois plus vite… et tu la gardes contre Julien !', 4.5);
+        jouerSon(this, 'julien_secret'); j.expr = 'content'; j.exprT = 1.2;
       } else if (o.type === 'canette' && j.vie < RG.joueur.vie) {
         o.actif = false; this.ramasses++;
         j.vie = Math.min(RG.joueur.vie, j.vie + RG.lycee.canette);
@@ -226,7 +234,7 @@ export class JulienLycee extends JulienManif {
     voile(this, 0.85).setDepth(1000);
     texte(this, LARGEUR / 2, 200, 'SALLE 12', 44, '#ffd84a').setDepth(1001);
     texte(this, LARGEUR / 2, 270, TXT.porte, 24, '#ffffff').setDepth(1001);
-    this.time.delayedCall(2600, () => this.scene.start('JulienClasse', { depuisManif: true }));
+    this.time.delayedCall(2600, () => this.scene.start('JulienClasse', { depuisManif: true, turbo: !!this.j.turbo }));   // (la sarbacane turbo suit)
   }
 
   // ------------------------------------------------------------------ dessin
