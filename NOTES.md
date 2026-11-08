@@ -1479,6 +1479,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 ## LIONEL — V101 : NORMAL UN PEU PLUS DUR (Fabien : « un peu trop simple »)
 - `DIFFICULTES.normal` (lionel/reglages.js) : vitesse 1.0 → 1.03, réaction 0.21 → 0.195 s, erreur 44 → 38,
   lancers 0.89 → 0.94. Toujours sous CHAMPION (1.06 / 0.18 / 32 / 1.04). PERSO garde les anciens chiffres de départ.
+- V103 : ATTAQUE en plus (défense inchangée) : lancers 0.94 → 0.99, supers 7 → 9 %, choix droit/biais/lob
+  50/36/14 → 42/42/16, biais dès le 1er lancer (`biaisApres` 1 → 0).
 
 ## V100 : QUIZ DE FABIEN + PRÉSENTATION DE BEUFA + TEXTES QUI SORTAIENT DE L'ÉCRAN
 - Quiz : les 44 questions de Fabien (`Quizz.docx`) dans `data/beufa_quiz.js` (Link's Awakening : 4 mauvaises
