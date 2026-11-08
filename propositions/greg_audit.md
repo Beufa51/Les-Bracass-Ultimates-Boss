@@ -4,6 +4,11 @@ Méthode : relecture du code (`src/bosses/greg/`, `BossScene.js`, images sur le 
 game designer, et un bot joueur (`outils/greg_bot.mjs`, nouveau) qui a joué **100 combats complets** (4 difficultés ×
 5 profils × 5) dans un vrai navigateur, en accéléré, en réagissant aux signaux comme un humain. 0 erreur JavaScript.
 
+> **FAIT (nov. 2026)** : Fabien a accepté les choix 1 à 17 ; tout est corrigé (détail dans `NOTES.md`, section
+> « GREG — CORRECTIONS DE L'AUDIT »). Choix 3 = « dégâts » ; choix 9 = SMASH au round 2 + Greg plus solide en NORMAL /
+> CHAMPION. Bot après corrections (100 combats, 0 erreur) : spam et tortue perdent partout, l'enfant et le joueur moyen
+> voient le round 3 en NORMAL / CHAMPION, Greg est étourdi plusieurs fois par combat. Reste : les images (choix 18).
+
 ## Résumé en 6 lignes
 - Greg est battu **au round 2** par tous les joueurs corrects, à **toutes** les difficultés : le round 3 et le SMASH ne sont presque jamais vus (3 combats sur 60).
 - La difficulté ne change presque rien pour un bon joueur (rang S partout) ; l'étourdissement de Greg ne s'est **jamais** déclenché.

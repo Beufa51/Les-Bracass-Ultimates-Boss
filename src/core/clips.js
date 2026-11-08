@@ -32,5 +32,6 @@ export function jouerClip(scene, cle) {
     el.play().catch(() => {});
   }
   document.body.appendChild(el);
-  return { duree: e.duree || 2, fermer: () => el.remove() };
+  // cacher(true) : masque le clip sans l'arrêter (ex. pendant la pause)
+  return { duree: e.duree || 2, fermer: () => el.remove(), cacher: (v) => { el.style.visibility = v ? 'hidden' : 'visible'; } };
 }

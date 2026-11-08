@@ -18,6 +18,7 @@ export default {
   reglagesDev: ['entrainement', 'facile', 'normal', 'champion'].flatMap(n => [
     { groupe: D[n].nom, nom: 'Dégâts des coups de Greg (x)', objet: D[n], champ: 'degatsGreg', pas: 0.05, min: 0.2, max: 3 },
     { groupe: D[n].nom, nom: 'Préparation de ses coups (x, + grand = + lent)', objet: D[n], champ: 'vitesse', pas: 0.05, min: 0.5, max: 2 },
+    { groupe: D[n].nom, nom: 'Dégâts de TES coups (x, + petit = combat + long)', objet: D[n], champ: 'degatsJoueur', pas: 0.05, min: 0.1, max: 2 },
     { groupe: D[n].nom, nom: 'Durée de ton esquive (s)', objet: D[n], champ: 'esquive', pas: 0.01, min: 0.15, max: 1 },
     { groupe: D[n].nom, nom: 'Aides (flèche + cible)', objet: D[n], champ: 'aides' },
   ]),

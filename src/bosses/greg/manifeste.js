@@ -25,35 +25,17 @@ export const MANIFESTE = {
     // Vue "Punch-Out" : ton boxeur vu de DOS (heros_boxe_*), Greg vu de FACE (greg_*).
     // Une image par pose. Le bas du corps touche le bas de la case.
     greg_ring:  { fichier: null, largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'ring', pixel: 2 } },
-    // Greg en combat : ses illustrations détourées (garde basse, garde haute, coup au corps, coup au visage, K.O.)
-    greg_combat:   { fichier: 'sprites/greg/greg_combat.png', largeur: 274, hauteur: 470, images: 1, vitesse: 1 },
-    greg_garde_haute: { fichier: 'sprites/greg/greg_garde_haute.png', largeur: 343, hauteur: 517, images: 1, vitesse: 1 },
-    greg_coup_corps:  { fichier: 'sprites/greg/greg_coup_corps.png', largeur: 380, hauteur: 519, images: 1, vitesse: 1 },
-    greg_coup_visage: { fichier: 'sprites/greg/greg_coup_visage.png', largeur: 439, hauteur: 524, images: 1, vitesse: 1 },
-    // Planche de poses en pied (assets_inbox/greg_planche_1.jpg et _2.jpg)
-    greg_garde_basse_pied:  { fichier: 'sprites/greg/greg_garde_basse_pied.png', largeur: 275, hauteur: 547, images: 1, vitesse: 1 },
-    greg_pied_jab:             { fichier: 'sprites/greg/greg_pied_jab.png', largeur: 267, hauteur: 539, images: 1, vitesse: 1 },
-    greg_pied_crochet:           { fichier: 'sprites/greg/greg_pied_crochet.png', largeur: 277, hauteur: 536, images: 1, vitesse: 1 },
-    greg_corps_pied:        { fichier: 'sprites/greg/greg_corps_pied.png', largeur: 222, hauteur: 524, images: 1, vitesse: 1 },
-    greg_smash:             { fichier: 'sprites/greg/greg_smash.png', largeur: 284, hauteur: 559, images: 1, vitesse: 1 },
-    greg_touche_pied:       { fichier: 'sprites/greg/greg_touche_pied.png', largeur: 332, hauteur: 538, images: 1, vitesse: 1 },
-    greg_etourdi:           { fichier: 'sprites/greg/greg_etourdi.png', largeur: 243, hauteur: 534, images: 1, vitesse: 1 },
-    greg_pied_victoire:        { fichier: 'sprites/greg/greg_pied_victoire.png', largeur: 253, hauteur: 550, images: 1, vitesse: 1 },
-    greg_ko_debout:          { fichier: 'sprites/greg/greg_ko_debout.png', largeur: 318, hauteur: 540, images: 1, vitesse: 1 },
     // Greg v2 (nouvelle tête + tatouages, assets_inbox/greg_v2, détourées par outils/greg/preparer_v2.py)
+    // (audit nov. 2026 : les anciennes images v1 du combat ne sont plus chargées ni gardées ; le crochet v2 raté non plus)
     greg2_garde_haute: { fichier: 'sprites/greg/greg2_garde_haute.png', largeur: 402, hauteur: 560, images: 1, vitesse: 1 },
     greg2_nargue: { fichier: 'sprites/greg/greg2_nargue.png', largeur: 237, hauteur: 560, images: 1, vitesse: 1 },
     greg2_entier: { fichier: 'sprites/greg/greg2_entier.png', largeur: 398, hauteur: 560, images: 1, vitesse: 1 },
     greg2_jab: { fichier: 'sprites/greg/greg2_jab.png', largeur: 321, hauteur: 560, images: 1, vitesse: 1 },
-    greg2_crochet: { fichier: 'sprites/greg/greg2_crochet.png', largeur: 281, hauteur: 549, images: 1, vitesse: 1 },
     greg2_corps: { fichier: 'sprites/greg/greg2_corps.png', largeur: 321, hauteur: 562, images: 1, vitesse: 1 },
     greg2_smash: { fichier: 'sprites/greg/greg2_smash.png', largeur: 331, hauteur: 561, images: 1, vitesse: 1 },
     greg2_touche: { fichier: 'sprites/greg/greg2_touche.png', largeur: 360, hauteur: 545, images: 1, vitesse: 1 },
     greg2_etourdi: { fichier: 'sprites/greg/greg2_etourdi.png', largeur: 237, hauteur: 560, images: 1, vitesse: 1 },
     greg2_tape_gants: { fichier: 'sprites/greg/greg2_tape_gants.png', largeur: 258, hauteur: 560, images: 1, vitesse: 1 },
-    greg_garde_pied:  { fichier: 'sprites/greg/greg_garde_pied.png', largeur: 486, hauteur: 743, images: 1, vitesse: 1 },
-    greg_entier:      { fichier: 'sprites/greg/greg_entier.png', largeur: 327, hauteur: 670, images: 1, vitesse: 1 },
-    greg_jambes:      { fichier: 'sprites/greg/greg_jambes.png', largeur: 327, hauteur: 410, images: 1, vitesse: 1 },
     greg_ko:          { fichier: 'sprites/greg/greg_ko.png', largeur: 341, hauteur: 410, images: 1, vitesse: 1 },
     greg_gant:     { fichier: null, largeur: 220, hauteur: 220, images: 1, vitesse: 1,
       provisoire: { forme: 'gantSeul', gants: '#f4f4f4', poignets: '#f4f4f4', croix: true } },

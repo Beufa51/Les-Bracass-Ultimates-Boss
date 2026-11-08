@@ -38,7 +38,24 @@
 - **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo (~45 s, V20) → BABYFOOT (V19, le beer pong est SUPPRIMÉ) → porte (simplifiée V19z). Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
-## AUDIT GREG (nov. 2026) : `propositions/greg_audit.md` — bot `node outils/greg_bot.mjs` (≈ 1 min). EN ATTENTE des choix de Fabien (liste de 18 choix en section 5). Résumé : Greg K.O. au round 2 partout, étourdissement jamais déclenché, 6 gros bugs (boxeur couché après REJOUER, aide Dempsey, esquive facile bridée, cadre de garde, garde basse = nargue, écran de victoire), écrans annexes encore en Greg v1.
+## GREG — CORRECTIONS DE L'AUDIT (nov. 2026, choix 1 à 17 acceptés par Fabien) : `propositions/greg_audit.md`
+- Bugs : boxeur plus couché après REJOUER, aide du Dempsey recréée, esquive ENTRAÎNEMENT / FACILE vraiment plus longue,
+  cadre blanc de garde toujours dessiné (texte « Garde HAUTE / BASSE » à gauche, plus gros), garde basse = `greg2_entier`
+  en attendant l'image (≠ provocation), écran de victoire en colonne (comme Lionel) avec Greg v2, chrono figé pendant le
+  Dempsey, clip du Dempsey caché pendant la pause (`cacher()` dans `src/core/clips.js`), écouteurs retirés à la sortie,
+  Greg attend après ta relève, garde brisée et contre du Dempsey selon la difficulté. Présentation : plus d'« afro ».
+- ENTRAÎNEMENT : ni record ni défis, rang B au mieux (`rangMax`, `sansRecord`) ; FACILE : rang A au mieux.
+  Bilans : « Dégâts donnés / reçus » (défi « Moins de 30 dégâts reçus »).
+- Ménage : 16 anciennes images v1 + `dempsey.gif` supprimées (≈ 4,5 Mo) ; `greg2_crochet.png` gardé sur le disque, pas chargé.
+- Équilibrage (bot `node outils/greg_bot.mjs 5`, 100 combats, 0 erreur) : `degatsJoueur` par difficulté (0,65 / 0,65 /
+  0,32 / 0,25 ; le Dempsey Roll garde toute sa force), `etourdi.baisse` 16, `gardeSouffle` 14, `riposte.prepa` 0,6,
+  ENTRAÎNEMENT `degatsGreg` 0,5, anti-martelage (`martelage` : plus de 3 coups hors contres en 1,5 s = tout paré).
+  Résultat : expert K.O. vers 70-100 s, moyen et enfant au round 3 en NORMAL / CHAMPION ; spam et tortue perdent partout.
+- Jeu : visage = 4 dégâts + étourdit 2x ; corps = 2 dégâts + souffle ; contre au visage sur garde basse x4 ; Greg pare
+  aussi juste après avoir encaissé ; « X HITS » (+10 % par coup) ; esquive PARFAITE (≤ 0,12 s, flash bleu, +5 esprit) ;
+  moment secret visible (« hé hé... », sifflement, éclat sur le ventre, conseil du coach au round 1) ; « ! » violet au
+  milieu ; SMASH une fois au round 2 ; enchaînements au hasard aux rounds 2-3 (+ petites hésitations).
+- RESTE : images (prompts dans `propositions/greg_prompts_images.md`, section « AUDIT NOVEMBRE 2026 »).
 
 ## AUDIT GLOBAL V18 (6 boss, version économe) : `propositions/audit_global.md`
 - 0 plantage (14 lancements + « rejouer »), 0 erreur aux outils. Petits défauts : B1 clic souris inactif sur l'écran de fin
@@ -574,7 +591,7 @@
     le SMASH bloqué brise toujours la garde.
   - Inspiré de Super Punch-Out (structure du jeu original, sans rien copier) :
     ÉTOURDISSEMENT (jauge cachée remplie par les coups qui touchent ; pleine = Greg titube 1,8 s,
-    étoiles, tous les coups passent), annonceur vocal (voix de synthèse du navigateur : « Box ! »,
+    étoiles, tous les coups passent), annonceur vocal (RETIRÉ depuis : `annonceur: false`, `compteVocal: false` ; c'était : « Box ! »,
     compte en japonais « ichi, ni, san… » (voix japonaise du navigateur si elle existe), « K.O. ! »,
     `src/core/annonceur.js`, désactivable avec `annonceur: false`),
     clameur du public, répliques de ton boxeur, chrono au centième dans le classement.
@@ -667,7 +684,7 @@
     d'affilée pour lui), `serieJ` (3e d'affilée pour toi), `superArrete` (il attrape ta tornade), `echange`.
   - Musique de fond : `assets/audio/lionel/lionel_musique.mp3` (Windjammers, « Lawn Court », 64 kbit/s, 2,3 Mo, en boucle,
     volume 0,4 dans le manifeste de Lionel).
-  - Pas de voix (annonceur) dans le match de Lionel, à la demande du propriétaire (Greg garde les siennes).
+  - Pas de voix (annonceur) dans le match de Lionel, à la demande du propriétaire (Greg non plus depuis : voix retirées).
   - Supers de Lionel : il les obtient au hasard (`superHasard`, dès le set 1), et en CHAMPION aussi en rattrapant tes lobs.
   - Lionel chambreur : bulles de moquerie quand il marque / encaisse, il garde parfois le frisbee pour te narguer.
   - IA de Lionel : il devine où arrive le frisbee (simulation du vol) avec un temps de réaction et une erreur selon la difficulté,

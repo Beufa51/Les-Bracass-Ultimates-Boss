@@ -6,15 +6,17 @@ export const IDENTITE = { id: 'greg', nom: 'Greg' };
 // Niveaux de difficulté (choisis avant le combat)
 //  degatsGreg : x dégâts des coups de Greg ; vitesse : x durée de préparation de ses coups (plus petit = plus rapide)
 //  esquive : durée pendant laquelle ton esquive protège ; aides : flèche + cible d'aide
+//  degatsJoueur : x dégâts de TES coups (plus petit = Greg tient plus longtemps : on voit le round 3)
+//  rangMax : meilleur rang possible dans ce mode ; sansRecord : ni record ni défis (mode découverte)
 export const DIFFICULTES = {
   // V18 (audit global) : ENTRAÎNEMENT comme Kédric et Rémi, pour découvrir le combat sans pression
-  entrainement: { nom: 'ENTRAÎNEMENT', couleur: '#9fe0ff', degatsGreg: 0.4, vitesse: 1.5, esquive: 0.65, aides: true,
+  entrainement: { nom: 'ENTRAÎNEMENT', couleur: '#9fe0ff', degatsGreg: 0.5, vitesse: 1.5, esquive: 0.65, aides: true, degatsJoueur: 0.65, rangMax: 'B', sansRecord: true,
     texte: 'Greg tape doucement et prévient longtemps. Pour apprendre les esquives et les contres.' },
-  facile:   { nom: 'FACILE',   couleur: '#7fff7f', degatsGreg: 0.65, vitesse: 1.25, esquive: 0.55, aides: true,
+  facile:   { nom: 'FACILE',   couleur: '#7fff7f', degatsGreg: 0.65, vitesse: 1.25, esquive: 0.55, aides: true, degatsJoueur: 0.65, rangMax: 'A',
     texte: 'Greg frappe moins fort et plus lentement. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 1,    vitesse: 1,    esquive: 0.45, aides: true,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 1,    vitesse: 1,    esquive: 0.45, aides: true, degatsJoueur: 0.32,
     texte: 'Le vrai combat.' },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', degatsGreg: 1.25, vitesse: 0.85, esquive: 0.38, aides: false,
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', degatsGreg: 1.25, vitesse: 0.85, esquive: 0.38, aides: false, degatsJoueur: 0.25,
     texte: 'Sans flèche ni cible, coups rapides et puissants. Pour les vrais.' },
 };
 
@@ -46,7 +48,7 @@ export const REGLAGES = {
       // Greg v2 : toutes posées sur leurs pieds (solY), même taille ; origine x = la tête
       entier:     { cle: 'greg2_entier',      origine: [0.510, 1], taille: 0.78, pied: true },
       gardePied:  { cle: 'greg2_garde_haute', origine: [0.505, 1], taille: 0.78, pied: true },
-      gardeBasse: { cle: 'greg2_nargue',      origine: [0.494, 1], taille: 0.78, pied: true },
+      gardeBasse: { cle: 'greg2_entier',      origine: [0.510, 1], taille: 0.78, pied: true },   // provisoire : image « greg_garde_basse » à générer (prompt n°1)
       nargue:     { cle: 'greg2_nargue',      origine: [0.494, 1], taille: 0.78, pied: true },
       tapeGants:  { cle: 'greg2_tape_gants',  origine: [0.496, 1], taille: 0.78, pied: true },   // avant le SMASH
       jab:        { cle: 'greg2_jab',         origine: [0.427, 1], taille: 0.78, pied: true, cote: 'd' },
@@ -58,11 +60,6 @@ export const REGLAGES = {
       // en attendant leurs images v2 : la chute utilise "étourdi", la victoire utilise "nargue"
       koDebout:   { cle: 'greg2_etourdi',     origine: [0.492, 1], taille: 0.78, pied: true },
       victoire:   { cle: 'greg2_nargue',      origine: [0.494, 1], taille: 0.78, pied: true },
-      // anciennes images (secours, plus utilisées tant que les v2 existent)
-      basse:  { cle: 'greg_combat',      origine: [0.467, 0.134], taille: 0.382 },
-      haute:  { cle: 'greg_garde_haute', origine: [0.584, 0.18],  taille: 0.368, ceinture: [205, 414, 192] },
-      corps:  { cle: 'greg_coup_corps',  origine: [0.3, 0.154],   taille: 0.355, ceinture: [190, 392, 215], cote: 'd' },
-      visage: { cle: 'greg_coup_visage', origine: [0.633, 0.19],  taille: 0.40,  ceinture: [225, 474, 240], cote: 'g' },
     },
     dureeChute: 0.9,   // K.O. : durée de la chute sur le ring avant la case manga
     debutElan: 0.2,    // à partir de ce moment de la préparation, on voit le coup partir
@@ -95,19 +92,23 @@ export const REGLAGES = {
   souffleRecup: 22,            // souffle regagné par seconde quand on ne frappe pas
   coups: {
     //          moment de l'impact, durée totale, dégâts, souffle dépensé, cible
-    visage: { impact: 0.10, duree: 0.30, degats: 3, souffle: 8,  cible: 'tete' },
-    corps:  { impact: 0.14, duree: 0.36, degats: 3, souffle: 11, cible: 'corps', souffleGreg: 15 },
+    // VISAGE = plus de dégâts et étourdit 2x plus vite ; CORPS = moins de dégâts mais vide son souffle
+    visage: { impact: 0.10, duree: 0.30, degats: 4, souffle: 8,  cible: 'tete', vertige: 2 },
+    corps:  { impact: 0.14, duree: 0.36, degats: 2, souffle: 11, cible: 'corps', souffleGreg: 15, vertige: 1 },
   },
   esquiveDuree: 0.5,           // durée de l'esquive (Gauche ou Droite)
-  esquiveProtege: 0.45,        // pendant ce temps, les coups au visage passent à côté
-  tropTot: 0.4,                // esquive finie moins de X s avant le coup => message "Trop tôt !"
+    tropTot: 0.4,                // esquive finie moins de X s avant le coup => message "Trop tôt !"
   esquivePause: 0.2,           // délai avant de pouvoir ré-esquiver
   esquiveSouffle: 8,
   garde: 0.3,                  // part des dégâts reçus en garde (0.3 = 30 %)
-  gardeSouffle: 22,            // souffle perdu par coup bloqué (et pas de récupération tant qu'on garde)
+  gardeSouffle: 14,            // souffle perdu par coup bloqué (audit nov. 2026 : 22 -> 14) (et pas de récupération tant qu'on garde)
   toucheDuree: 0.38,           // temps sonné après un coup reçu
   contreFenetre: 0.8,          // après une esquive réussie, temps pour placer un contre
   contreMultiplicateur: 3,     // dégâts du contre : c'est LA stratégie
+  contreVisageOuvert: 4,       // contre AU VISAGE quand sa garde est BASSE (il protège le ventre) : x4
+  esquiveParfaite: 0.12,       // esquive lancée moins de X s avant l'impact = PARFAITE (flash bleu, + esprit)
+  espritParfait: 5,
+  serie: { bonus: 0.1, oubli: 1.2 },   // « X HITS » : +10 % par coup enchaîné ; la série s'arrête après 1,2 s sans toucher
   memoireAppui: 0.15,          // un appui fait pendant un coup / sonné est gardé en mémoire ce temps
 
   // ---------- Esprit combatif (jauge du Dempsey Roll) ----------
@@ -135,8 +136,8 @@ export const REGLAGES = {
 
   // ---------- Au tapis ----------
   secondeCompte: 0.9,          // durée d'un chiffre du compte de l'arbitre
-  appuisPourSeRelever: [10, 14, 20],   // alternances ◀ ▶ à faire : 1er, 2e, 3e passage au tapis
-  vieApresRelevee: [55, 40, 30],
+  appuisPourSeRelever: [10, 14],   // alternances ◀ ▶ à faire : 1er, 2e passage au tapis (le 3e = K.O.)
+  vieApresRelevee: [55, 40],
   knockdownsMax: 3,            // au 3e tapis... c'est fini (pour toi comme pour Greg)
   vieGregApresRelevee: [100, 100],
   compteGregRelevee: [6, 8],   // Greg se relève à ce chiffre
@@ -161,9 +162,9 @@ export const REGLAGES = {
   // ---------- Étourdissement (comme dans Super Punch-Out) ----------
   // Chaque coup qui TOUCHE remplit une jauge cachée (qui se vide toute seule). Pleine => Greg titube,
   // sans défense pendant 'duree' secondes : tous tes coups passent !
-  etourdi: { parCoup: 15, parContre: 35, baisse: 18, duree: 1.8 },
+  etourdi: { parCoup: 15, parContre: 35, baisse: 16, duree: 1.8 },   // baisse : 18 -> 16 (audit : il n'était jamais étourdi ; le visage étourdit 2x plus)
   compteVocal: false,          // compte de l'arbitre à voix haute (japonais) ; false = seulement à l'écran
-  annonceur: false,            // voix de synthèse retirées : pas assez punchy — tout passe par l'écran et les sons             // voix de synthèse : "Box !", compte, "K.O. !" (si le navigateur en a une)
+  annonceur: false,            // voix de synthèse retirées : pas assez punchy — tout passe par l'écran et les sons
 
   // ---------- Moment secret : Greg baisse la garde un très court instant ----------
   // Une fois par round, à un moment au hasard (entre 'entre' secondes restantes). Pour réussir :
@@ -181,9 +182,11 @@ export const REGLAGES = {
   gardeBriseeSonne: 0.8,       // garde avec souffle à 0 => garde brisée, sonné ce temps
   smashGardeSonne: 1.0,        // le SMASH bloqué brise toujours la garde
   // Greg pare même tes coups "libres" (zone ouverte, hors contre / essoufflement) : chance par round
-  blocageLibre: [0.4, 0.5, 0.6],
+  blocageLibre: [0.4, 0.5, 0.6],   // (aussi juste après avoir encaissé un coup : il faut CONTRER)
+  martelage: { coups: 3, fenetre: 1.5 },   // plus de 3 coups (hors contres) en 1,5 s : il pare tout (le spam ne paie plus)
+  hesitation: { chance: 0.3, duree: [0.2, 0.4] },   // rounds 2-3 : parfois un petit temps d'arrêt avant le coup suivant
   pauseApresTouche: 0.4,       // après avoir encaissé, il ne reste pas bloqué : pause max avant d'attaquer
-  riposte: { prepa: 0.5 },     // après "Il se couvre", il riposte tout de suite par un jab rapide
+  riposte: { prepa: 0.6 },   // (audit : 0,5 -> 0,6, trop rapide pour un enfant)     // après "Il se couvre", il riposte tout de suite par un jab rapide
 };
 
 // Attaques de Greg.
@@ -200,8 +203,8 @@ export const ATTAQUES = {
   smash:   { nom: 'SMASH',        cible: 'smash', prepa: 1.1,  degats: 34, recup: 1.2, souffle: 20, gardeCassee: 0.5 },
 };
 
-// ENCHAÎNEMENTS de Greg, par round : il les joue dans l'ordre, en boucle (comme dans Punch-Out,
-// on peut les apprendre par cœur). Chaque coup : 'attaque' + côté ('g' / 'd') ; le SMASH part du centre.
+// ENCHAÎNEMENTS de Greg, par round. Round 1 : dans l'ordre, en boucle (on les apprend). Rounds 2-3 (et énervé) :
+// au hasard, sans jouer deux fois de suite le même ; le SMASH du round 2 ne sort qu'une fois. Chaque coup : 'attaque' + côté ('g' / 'd') ; le SMASH part du centre.
 // Après chaque enchaînement, Greg change de garde (haute <-> basse) et souffle un peu.
 export const ENCHAINEMENTS = [
   [ // round 1
@@ -215,6 +218,7 @@ export const ENCHAINEMENTS = [
     ['rafale'],
     ['corps', 'crochet d'],
     ['jab g', 'corps', 'jab d'],
+    ['smash'],                       // une seule fois au round 2 (son arme signature, vue par tout le monde)
   ],
   [ // round 3
     ['jab g', 'crochet d'],
@@ -237,15 +241,16 @@ export const ENCHAINEMENTS_ENERVE = [
 export const CONSEILS = [
   [
     'Regarde le cadre blanc : c\'est ce qu\'il protège.',
-    'Il protège le visage ? Tape au CORPS. Le ventre ? Tape au VISAGE.',
-    'Son coup au foie (« ! » violet) : seule la GARDE (▼) marche.',
+    'Il protège le visage ? Tape au CORPS (il s\'essouffle). Le ventre ? Tape au VISAGE (plus fort, ça l\'étourdit).',
+    'Son coup au foie (« ! » violet au milieu) : seule la GARDE (▼) marche.',
+    'Quand il baisse les bras pour te narguer (« hé... ») : COUP AU CORPS tout de suite !',
   ],
   [
     'Coup de GAUCHE ? Esquive à DROITE (et inversement) !',
     'Et juste après une esquive, CONTRE : dégâts x3 !',
     'Chaque esquive réussie remplit ta jauge. Pleine ? DEMPSEY ROLL !',
-    'Il répète toujours les mêmes enchaînements : apprends-les !',
-    'Parfois il baisse sa garde une fraction de seconde... vise là où ça fait mal !',
+    'Il mélange ses enchaînements maintenant : reste concentré !',
+    'Quand il tape ses gants, c\'est le SMASH : ESQUIVE sur le côté !',
   ],
   [
     'Quand il tape ses gants, le SMASH arrive :',
