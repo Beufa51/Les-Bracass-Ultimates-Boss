@@ -69,6 +69,8 @@
   (le nouveau coup partait sur le côté : `heros_coup_cote.jpg` non utilisé), heros_touche, heros_sol, heros_uppercut.
   Greg : visage du bandeau / SMASH (gros plan qui hurle), case K.O. (`greg_ko.jpg`), trophée, ARBITRE (glisse à gauche
   pendant chaque compte et marque les chiffres). Gros plan vertical gardé en réserve (`greg_visage_vertical.jpg`).
+- NORMAL rééquilibré (nov. 2026) : `degatsGreg` 0,9, `degatsJoueur` 0,34 ; jab et crochet de face réduits (taille 0,70, moins de zoom).
+  Maniabilité mobile : 3 propositions dans `propositions/greg_maniabilite_mobile.md` (EN ATTENTE du choix). Public : prompt `greg_ring.jpg`.
 - `greg2_releve` branché : pose prise 1,1 s quand Greg se relève (il monte du tapis).
 - RESTE : poses du héros, portrait / visage / case K.O. / trophée / arbitre
   (prompts dans `propositions/greg_prompts_images.md`).

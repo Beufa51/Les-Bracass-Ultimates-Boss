@@ -368,3 +368,15 @@ POSE: <ligne POSE>
 - **greg_jab.jpg** (REÇU et branché) : `copy the pose of the 2nd figure of the second image: straight punch thrown at the viewer with the glove on the LEFT side of the picture, huge glove in the foreground hiding part of his shoulder, other glove guarding the chin, legs apart.`
 - **greg_crochet.jpg** (REÇU et branché) : `copy the pose of the 3rd figure of the second image: powerful punch thrown at the viewer with the glove on the RIGHT side of the picture, torso turned, big glove in the foreground at face height, other glove guarding the chin, knees bent.`
 - **greg_corps.jpg** (REÇU et branché) : `copy the pose of the 4th figure of the second image: crouched low, driving an uppercut at the viewer's stomach, glove big in the foreground at belly height, other glove guarding the chin, angry face.`
+
+## greg_ring.jpg — le ring et le PUBLIC (remplace le public en pixels dessiné par le code)
+Rien à joindre (ou joindre une capture du jeu pour le cadrage). Format paysage 16:9 (1920 x 1080). Ranger dans `assets_inbox/greg_v2/`.
+```
+Background for a boxing video game, 16:9 landscape, detailed 1990s boxing manga style (like Hajime no Ippo), seen from
+inside the ring at eye level. The ring is EMPTY (no boxer, no referee). Bottom half: blue boxing canvas floor, slightly
+seen from above, with the far ropes (white, red, blue) running horizontally across the middle of the image and a red
+corner post on the left, a blue corner post on the right. Top half: a packed arena crowd in the stands behind the ropes,
+excited fans cheering with raised arms, camera flashes, drawn in manga ink with screentone, slightly darker and less
+detailed than the foreground so a character in front stays readable. Strong spotlights from the ceiling. No text,
+no logo, no readable signs.
+```
