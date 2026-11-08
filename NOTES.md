@@ -78,6 +78,10 @@
 - Étourdi = RUSH (1,3 s, tes coups x3, sans souffle, 40 % plus rapides, « TAPE ! TAPE ! TAPE ! »). Dempsey Roll plus
   nerveux : départ 1,15 s, plus tolérant, tête de Greg qui part à chaque coup, dégâts affichés, caméra qui se rapproche,
   FINISH = tapis direct s'il reste ≤ 50 PV à Greg ; vidéo de lancement seulement au 1er roll (`clipUneFois`).
+- BLOCAGE corrigé (nov. 2026) : Greg essoufflé qu'on frappait repassait en « touché » et ne reprenait jamais son souffle
+  (jusqu'à 45 s sans attaquer, image « étourdi ») -> il encaisse sans sortir de l'essoufflement (1,4 s). Garde-fou
+  `maxSansAttaque` 2,5 s ; martelage paré = riposte immédiate ; « touché » n'utilise plus l'image étourdi. NORMAL :
+  `degatsGreg` 0,8. Bot : plus long temps sans attaque 5-8 s ; enfant NORMAL ≈ 4 fois sur 5, CHAMPION perdu.
 - `greg2_releve` branché : pose prise 1,1 s quand Greg se relève (il monte du tapis).
 - RESTE : poses du héros, portrait / visage / case K.O. / trophée / arbitre
   (prompts dans `propositions/greg_prompts_images.md`).

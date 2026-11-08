@@ -317,7 +317,7 @@ export class GregCombat extends BossScene {
     // anti-martelage : trop de coups en peu de temps (sans contre) = il pare tout ce qui n'est pas un contre
     this.coupsRecents = (this.coupsRecents || []).filter(t => this.horloge - t < R.martelage.fenetre);
     if (!contre) this.coupsRecents.push(this.horloge);
-    const martele = this.coupsRecents.length > R.martelage.coups && (neutre || sonneGreg || g.etat === 'recup' || g.etat === 'essouffle');
+    const martele = this.coupsRecents.length > R.martelage.coups && (neutre || sonneGreg || g.etat === 'recup');   // (essoufflé = grande ouverture : on peut cogner)
     const zoneProtegee = (g.garde === 'haute' && c.cible === 'tete') || (g.garde === 'basse' && c.cible === 'corps');
     // pendant qu'il ARME un coup (sauf SMASH), il pare : il faut esquiver puis contrer
     const pareEnArmant = g.etat === 'prepare' && g.attaque && g.attaque.cible !== 'smash';
@@ -330,6 +330,10 @@ export class GregCombat extends BossScene {
       onomatopee(this, xImpact, yImpact, pareEnArmant ? 'PARÉ !' : (martele ? 'Arrête de marteler !' : ONO.bloque), martele ? 22 : 26, '#cccccc');
       if (g.couvert <= 0) g.poseForcee = { nom: 'bloque', t: 0.18 };
       g.combo = 0; this.finSerie();
+      // tu le martèles : il pare et te punit tout de suite (fini les blocages en boucle)
+      if (martele && (neutre || sonneGreg) && !g.riposte) {
+        g.riposte = true; g.etat = 'garde'; g.t = 0; g.attaque = null; g.pause = 0.15;
+      }
       return;
     }
 
@@ -394,6 +398,7 @@ export class GregCombat extends BossScene {
     if (g.etat === 'sol') return;
     if (contre && Math.random() < 0.35) bulle(this, R.centreX - 220, 330, auHasard(REPLIQUES.joueurContre), 900);
     if (g.etat === 'etourdi') return;   // il titube : il encaisse tout
+    if (g.etat === 'essouffle') return;   // à bout de souffle : il encaisse SANS sortir de son essoufflement (sinon il ne reprenait jamais son souffle)
 
     // jauge d'étourdissement (cachée)
     g.vertige += (contre ? R.etourdi.parContre : R.etourdi.parCoup) * (c.vertige || 1);
@@ -504,6 +509,8 @@ export class GregCombat extends BossScene {
         if (g.t >= R.dureeTouche) {
           g.etat = 'garde'; g.t = 0; g.attaque = null;
           g.pause = Math.min(g.pauseAvant ?? R.pauseApresTouche, R.pauseApresTouche);
+          // garde-fou : s'il n'a pas attaqué depuis longtemps (tu le martèles), il repart tout de suite
+          if (this.horloge - (g.derniereAttaque ?? this.horloge) > R.maxSansAttaque) { g.riposte = true; g.pause = 0.05; }
         }
         break;
       case 'etourdi':
@@ -533,7 +540,7 @@ export class GregCombat extends BossScene {
     g.riposte = false;
     const at = ATTAQUES.jab;
     g.attaque = { id: 'jab', ...at, cote: this.coteAuHasard(at) };
-    g.coupIndex = 0; g.combo = 0;
+    g.coupIndex = 0; g.combo = 0; g.derniereAttaque = this.horloge;
     g.etat = 'prepare'; g.t = 0; g.prepa = R.riposte.prepa * this.diff.vitesse;
     this.montrerAlerte();
     onomatopee(this, R.centreX + 170, 80, 'Riposte !', 22, '#ff8a3d');
@@ -557,7 +564,7 @@ export class GregCombat extends BossScene {
     if (g.finSeq) { g.seqPas = 0; g.seqIndex++; }
     const at = ATTAQUES[nom];
     g.attaque = { id: nom, ...at, cote: at.cible === 'smash' ? 'centre' : (cote || this.coteAuHasard(at)) };
-    g.coupIndex = 0; g.combo = 0;
+    g.coupIndex = 0; g.combo = 0; g.derniereAttaque = this.horloge;
     g.etat = 'prepare'; g.t = 0; g.prepa = at.prepa * g.fureur * R.vitesseRound[this.round - 1] * this.diff.vitesse;
     g.souffle -= at.souffle;
     this.montrerAlerte();
@@ -1331,7 +1338,7 @@ export class GregCombat extends BossScene {
     j.action = null; j.esquive = null; j.sonne = 0; j.contreJusqua = -1;
     const g = this.g; g.seqIndex = 0; g.seqPas = 0; g.finSeq = true; g.riposte = false;   // ses enchaînements repartent du début
     this.momentNargue = entre(...R.nargue.entre);
-    j.dempsey = null;
+    j.dempsey = null; g.derniereAttaque = this.horloge;
     this.retourGardeGreg(1.2);
     this.tempsRound = R.dureeRound;
     this.smashAnnonce = false;
@@ -1512,7 +1519,7 @@ export class GregCombat extends BossScene {
     else if (forcee === 'touche' || g.etat === 'touche' || (g.etat === 'garde' && t - (g.toucheDepuis || -9999) < 550)) {
       // il prend un coup : la tête part en arrière, puis il a l'air sonné une demi-seconde
       const e = t - (g.toucheDepuis || t);
-      pose = e < 140 ? ou('touche', repos) : ou('etourdi', 'touche', repos);
+      pose = ou('touche', repos);
       const sens = g.reculSens || -1;
       dx = e < 140 ? sens * (g.reculSens ? 30 : 18) : Math.sin(t / 120) * 6; angle = g.secousse > 0 ? -sens * 9 : 3; rapide = e < 140;
       if (e < 90) teinte = 0xffc0c0;

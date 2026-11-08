@@ -14,7 +14,7 @@ export const DIFFICULTES = {
     texte: 'Greg tape doucement et prévient longtemps. Pour apprendre les esquives et les contres.' },
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', degatsGreg: 0.65, vitesse: 1.25, esquive: 0.55, aides: true, degatsJoueur: 0.65, rangMax: 'A',
     texte: 'Greg frappe moins fort et plus lentement. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 0.9,  vitesse: 1,    esquive: 0.5,  aides: true, degatsJoueur: 0.34,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 0.8,  vitesse: 1,    esquive: 0.5,  aides: true, degatsJoueur: 0.34,
     texte: 'Le vrai combat.' },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', degatsGreg: 1.25, vitesse: 0.85, esquive: 0.42, aides: false, degatsJoueur: 0.25,
     texte: 'Sans flèche ni cible, coups rapides et puissants. Pour les vrais.' },
@@ -153,7 +153,7 @@ export const REGLAGES = {
   // ---------- Greg ----------
   souffleGregRecup: 7,
   souffleGregApresEssoufflement: 60,
-  dureeEssoufflement: 2.0,     // Greg à bout de souffle = grande ouverture
+  dureeEssoufflement: 1.4,     // Greg à bout de souffle = grande ouverture (nov. 2026 : 2 -> 1,4 s)
   dureeTouche: 0.25,
   comboMax: 3,                 // après 3 coups encaissés d'affilée, Greg se couvre...
   dureeCouverture: 0.8,        // ...pendant ce temps (il bloque tout sauf les contres), puis riposte
@@ -193,6 +193,7 @@ export const REGLAGES = {
   blocageLibre: [0.4, 0.5, 0.6],   // (aussi juste après avoir encaissé un coup : il faut CONTRER)
   martelage: { coups: 3, fenetre: 1.5 },   // plus de 3 coups (hors contres) en 1,5 s : il pare tout (le spam ne paie plus)
   hesitation: { chance: 0.3, duree: [0.2, 0.4] },   // rounds 2-3 : parfois un petit temps d'arrêt avant le coup suivant
+  maxSansAttaque: 2.5,         // garde-fou : jamais plus de 2,5 s sans attaquer (même si tu le martèles)
   pauseApresTouche: 0.4,       // après avoir encaissé, il ne reste pas bloqué : pause max avant d'attaquer
   riposte: { prepa: 0.6 },   // (audit : 0,5 -> 0,6, trop rapide pour un enfant)     // après "Il se couvre", il riposte tout de suite par un jab rapide
 };
