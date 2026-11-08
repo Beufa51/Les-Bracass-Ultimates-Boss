@@ -24,7 +24,7 @@ import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, PORTE as R, REPLIQUES, POINTS, RANGS } from './reglages.js';
 // V19x : bouton « L'AIR DE RIEN » sous le pouce gauche
 const BOUTON_RIEN = { x: 86, y: 446, r: 66 };
-import { bulle, annonce, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile, bilanDe, noterJeu } from './commun.js';
+import { bulle, annonce, bandeauRegle, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile, bilanDe, noterJeu } from './commun.js';
 
 // la porte du décor illustré (remi_porte_decor.jpg, 960 x 536), zoomé x1,5 sur la porte (à droite)
 const BATTANT = { x: 774, y: 147, l: 140, h: 322 };
@@ -104,6 +104,12 @@ export class RemiPorte extends BossScene {
 
     etiquettesTactiles({ ...VIDES, espace: 'OK' });
     const t = estTactile();
+    const lancer = () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.tour('toi'); });
+    if (this.donnees.bilan) {   // soirée enchaînée : un bandeau au lieu de l'écran de règles
+      lancer();
+      bandeauRegle(this, `MAINTIENS ${t ? 'le doigt' : 'ESPACE'} pour armer, LÂCHE sur le + . Quelqu'un arrive ? ${t ? 'L\'AIR DE RIEN' : 'Z'} !`, 3.5);
+      return;
+    }
     this.afficherIntro('RÉMI - La porte et le videur', [
       REPLIQUES.porteIntro,
       `MAINTIENS ${t ? 'le doigt' : 'ESPACE'} pour armer ton poing, LÂCHE quand la cible est sur le + : celui qui fait le PLUS DE DÉGÂTS gagne.`,
@@ -635,7 +641,7 @@ export class RemiPorte extends BossScene {
     j.fillStyle(0x000000, 0.6).fillRect(x0 - 6, 12, L + 12, 30);
     j.fillStyle(0x3a2a1a, 1).fillRect(x0, 18, L, 18);
     j.fillStyle(v < 0.25 ? (Math.floor(this.horloge * 6) % 2 ? 0xff3030 : 0xffd84a) : 0xc89050, 1).fillRect(x0, 18, L * v, 18);
-    if (!this.txtSolidite) this.txtSolidite = texte(this, x0 + L / 2, 52, 'SOLIDITÉ DE LA PORTE', 14, '#ffd84a').setDepth(901);
+    if (!this.txtSolidite) this.txtSolidite = texte(this, x0 + L / 2, 52, 'SOLIDITÉ DE LA PORTE', 17, '#ffd84a').setDepth(901);
     // V17 : qui MÈNE aux dégâts (c'est ça qui fait gagner)
     if (!this.txtDegats) this.txtDegats = texte(this, x0 + L / 2, 76, '', 18, '#ffffff', { fontStyle: 'bold', backgroundColor: '#000000aa', padding: { x: 8, y: 2 } }).setDepth(901);
     const t = this.total;

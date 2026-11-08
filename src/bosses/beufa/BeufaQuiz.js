@@ -1,7 +1,7 @@
 // BEUFA — PHASE 2 : LE QUIZ (après l'infiltration). Le bureau de Beufa, façon CODEC de Metal Gear :
 // une case en bas avec SA TÊTE et ses répliques. Intro : masqué (façon Psycho Mantis), il « lit dans tes
 // pensées », puis enlève son masque (« il fait trop chaud ») et lance le quiz.
-// 10 questions de culture jeu vidéo (QCM à 4 choix), 1 minute chacune ; chaque erreur = une CROIX rouge,
+// 10 questions de culture jeu vidéo (QCM à 4 choix), 30 s chacune en NORMAL ; chaque erreur = une CROIX rouge,
 // 3 croix = GAME OVER (façon MGS). Tout le texte est dans data/beufa_quiz.js.
 import { BossScene } from '../../core/BossScene.js';
 import { BeufaInfiltration } from './BeufaInfiltration.js';
@@ -138,8 +138,8 @@ export class BeufaQuiz extends BossScene {
     // V87 : le chrono en haut à gauche (au centre, il passait sur le visage de Beufa)
     this.chronoFond = this.add.rectangle(170, 52, 304, 12, 0x000000, 0.7).setStrokeStyle(1, 0x888888).setDepth(60).setVisible(false);
     this.chronoBarre = this.add.rectangle(20, 52, 300, 8, VERT).setOrigin(0, 0.5).setDepth(61).setVisible(false);
-    this.chronoTexte = texte(this, 332, 52, '', 16, '#ffffff').setOrigin(0, 0.5).setDepth(61);
-    this.hudJoker = texte(this, LARGEUR - 86 - (R.quiz.erreursMax - 1) * 50, 52, '', 14, '#ffd84a').setOrigin(1, 0.5).setDepth(60);
+    this.chronoTexte = texte(this, 332, 52, '', 20, '#ffffff').setOrigin(0, 0.5).setDepth(61);
+    this.hudJoker = texte(this, LARGEUR - 86 - (R.quiz.erreursMax - 1) * 50, 52, '', 18, '#ffd84a').setOrigin(1, 0.5).setDepth(60);
     this.majJoker();
   }
 
@@ -270,6 +270,7 @@ export class BeufaQuiz extends BossScene {
         this.serie = (this.serie || 0) + 1;
         this.visage(this.serie >= 3 ? 'choque' : this.serie === 2 ? 'surpris' : 'souriant');   // 3 d'affilée : il n'en revient pas
         this.dire([hasard(BRAVOS)], () => this.questionSuivante());
+        this.autoSuite = this.ligne;   // avis jouabilité : après une BONNE réponse, la réplique passe toute seule (toucher = plus vite)
       } else if (this.joker > 0) {   // V94 : le JOKER efface l'erreur
         this.joker--; this.majJoker(); this.jokersUtilises = (this.jokersUtilises || 0) + 1;
         jouerSon(this, 'beufa_faux');
@@ -505,14 +506,20 @@ export class BeufaQuiz extends BossScene {
         this.texteCodec.setText(this.ligne.slice(0, Math.floor(this.lettres)));
         if (Math.floor(this.lettres) % 3 === 0) jouerSon(this, 'beufa_codec');
       }
-      if (this.lettres >= this.ligne.length) this.suite.setVisible(true);
+      if (this.lettres >= this.ligne.length) {
+        this.suite.setVisible(true);
+        if (this.autoSuite === this.ligne) {
+          const l = this.ligne; this.autoSuite = null;
+          this.time.delayedCall(1500, () => { if (this.etape === 'dialogue' && this.ligne === l) this.avancer(); });
+        }
+      }
     }
     // l'effet « Psycho » : portrait et buste qui tremblent pendant la lecture des pensées
     if (this.psy) {
       this.portrait.setPosition(89 + (Math.random() - 0.5) * 4, 445 + (Math.random() - 0.5) * 4);
       this.buste.y = this.busteY + Math.sin(this.time.now / 200) * 4;
     } else if (this.portrait) this.portrait.setPosition(89, 445);
-    // le CHRONO : 1 minute ; les 10 dernières secondes, il passe au rouge et fait « tic »
+    // le CHRONO (30 s en NORMAL) ; les 10 dernières secondes, il passe au rouge et fait « tic »
     if (this.etape === 'question') {
       this.reste -= dt;
       const k = Math.max(0, this.reste / R.quiz.temps);

@@ -108,16 +108,28 @@ export function etiquettesTactiles(etiquettes = {}) {
   }
 }
 
+// Change le style d'un bouton (taille...) ; un boss l'appelle à son arrivée et remet {} en partant.
+// Ex. Lionel : le bouton Lancer plus gros que Lob (avis jouabilité nov. 2026).
+export function styleBouton(nom, styles = {}) {
+  const b = boutons[nom]; if (!b) return;
+  for (const k of ['width', 'height', 'justifySelf', 'alignSelf', 'fontSize', 'zIndex']) b.style[k] = '';
+  Object.assign(b.style, styles);
+}
+
 // Étiquettes actuelles (pour les remettre après la pause)
 export function etiquettesActuelles() { return { ...dernieresEtiquettes }; }
 
-// Bouton pause (en haut au milieu de l'écran) : appelle 'action' quand on le touche
+// Bouton pause : TOUJOURS en haut à droite (avis jouabilité nov. 2026 : au milieu, il cachait titres et scores),
+// caché au hub (montrerBoutonPause(false)) ; appelle 'action' quand on le touche
+let boutonPause = null;
+export function montrerBoutonPause(oui) { if (boutonPause) boutonPause.style.display = oui ? '' : 'none'; }
 export function installerBoutonPause(action) {
   if (!estTactile()) return;
   const b = document.createElement('button');
+  boutonPause = b;
   b.textContent = 'II';
   Object.assign(b.style, {
-    position: 'fixed', top: '6px', left: '50%', transform: 'translateX(-50%)', width: '46px', height: '34px',
+    position: 'fixed', top: '6px', right: '8px', width: '46px', height: '34px',
     zIndex: 11, border: '2px solid rgba(255,255,255,0.55)', borderRadius: '10px', background: 'rgba(20,20,30,0.45)',
     color: '#fff', font: 'bold 16px monospace', touchAction: 'none',
   });

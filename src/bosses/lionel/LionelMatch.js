@@ -10,14 +10,14 @@
 // Toute la logique avance dans update() (pas de minuteries Phaser) : le jeu
 // peut donc être accéléré pour les tests avec des bots.
 // =====================================================================
-import { BossScene } from '../../core/BossScene.js';
+import { BossScene, attendreOK } from '../../core/BossScene.js';
 import { creerTouches } from '../../core/clavier.js';
 import { texte } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
-import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
+import { estTactile, etiquettesTactiles, styleBouton } from '../../core/tactile.js';
 import { installerJoystick } from './joystick.js';
 import { Sauvegarde, formatTemps, lignesDefis } from '../../core/sauvegarde.js';
 import { choisirDifficulte, cleRecord } from './difficulte.js';
@@ -96,6 +96,10 @@ export class LionelMatch extends BossScene {
   constructor() { super('LionelMatch', IDENTITE); }
 
   create() {
+    // avis jouabilité : Lancer sert 5 fois plus que Lob => bouton plus gros (il déborde vers la gauche, où il n'y a rien)
+    styleBouton('espace', { width: '150px', height: '86px', justifySelf: 'end', alignSelf: 'end', fontSize: '20px' });
+    styleBouton('z', { height: '60px', alignSelf: 'start' });
+    this.events.once('shutdown', () => { styleBouton('espace'); styleBouton('z'); });
     this.phase = this.donnees.phase || 'set1';
     this.etat = 'intro';          // intro | jeu | point | finSet | fin
     this.attente = 0; this.apresAttente = null;   // pause chronométrée (après un point...)
@@ -935,7 +939,9 @@ export class LionelMatch extends BossScene {
   //  ÉCRANS
   // =================================================================
   presentation(ensuite) {
-    if (this.donnees.rejouer) { ensuite(); return; }   // V18 : rejouer = pas de présentation
+    // V18 : rejouer = pas de présentation ; avis jouabilité (nov. 2026) : seulement la 1re fois (pause : « Revoir les règles »)
+    const vu = 'regles_' + this.identite.id + '_presentation';
+    if (this.donnees.rejouer || Sauvegarde.fait(vu)) { ensuite(); return; }
     this.etiquettes(ETIQUETTES_OK);
     const el = [];
     el.push(this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0b0b14, 0.96).setDepth(100));
@@ -956,17 +962,16 @@ export class LionelMatch extends BossScene {
       'Armes secrètes : 3 super lancers',
       'Phrase culte : « Trop facile ! »',
     ].join('\n'), 20, '#dddddd', { lineSpacing: 10 }).setDepth(102));
-    el.push(texte(this, 300, 460, (estTactile() ? 'OK' : 'ESPACE') + ' : sur le terrain !', 22, '#7fff7f').setDepth(102));
+    el.push(texte(this, 300, 460, (estTactile() ? 'Touche l\'écran' : 'ESPACE') + ' : sur le terrain !', 22, '#7fff7f').setDepth(102));
     const b = bulle(this, LARGEUR - 190, 66, 'Toi ? Contre moi ? Hé hé...', 99999).setDepth(103);
     el.push(b);
     jouerSon(this, 'frisbee_lancer');
-    this.time.delayedCall(500, () => {
-      this.input.keyboard.once('keydown-SPACE', () => {
-        el.forEach(e => e.destroy());
-        jouerSon(this, 'ui_valider');
-        ensuite();
-      });
-    });
+    attendreOK(this, () => {   // ESPACE / OK, ou toucher n'importe où
+      Sauvegarde.marquerFait(vu);
+      el.forEach(e => e.destroy());
+      jouerSon(this, 'ui_valider');
+      ensuite();
+    }, 500);
   }
 
   // vrai si l'image vient d'un fichier (illustration) et pas d'un dessin du code
@@ -1292,17 +1297,17 @@ export class LionelMatch extends BossScene {
   creerHud() {
     const P = 90;   // sous les écrans d'intro (100) mais au-dessus du jeu
     this.hudFond = this.add.rectangle(LARGEUR / 2, 30, 560, 54, 0x000000, 0.55).setDepth(P).setStrokeStyle(2, 0xffffff, 0.3);
-    this.hudEtiquettes = [texte(this, 260, 18, 'TOI', 16, '#7fd0ff').setDepth(P + 1), texte(this, 700, 18, 'LIONEL', 16, '#7fff9a').setDepth(P + 1)];
+    this.hudEtiquettes = [texte(this, 260, 18, 'TOI', 18, '#7fd0ff').setDepth(P + 1), texte(this, 700, 18, 'LIONEL', 18, '#7fff9a').setDepth(P + 1)];
     this.hudScoreJ = texte(this, 260, 42, '0', 28, '#ffffff', { fontStyle: 'bold' }).setDepth(P + 1);
     this.hudScoreL = texte(this, 700, 42, '0', 28, '#ffffff', { fontStyle: 'bold' }).setDepth(P + 1);
     this.hudChrono = texte(this, LARGEUR / 2, 38, '45', 30, '#ffd84a', { fontStyle: 'bold' }).setDepth(P + 1);
-    this.hudSet = texte(this, LARGEUR / 2, 12, 'SET 1', 13, '#dddddd').setDepth(P + 1);
+    this.hudSet = texte(this, LARGEUR / 2, 12, 'SET 1', 17, '#dddddd').setDepth(P + 1);
     this.hudSets = this.add.graphics().setDepth(P + 1);
     // compteur d'échange (entre les deux jauges du public)
     this.hudEchange = texte(this, LARGEUR / 2, 73, '', 18, '#ffffff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 }).setDepth(P + 2).setVisible(false);
     // jauge du public (sous ton score)
-    this.hudPublicTexte = texte(this, 226, 72, 'PUBLIC', 14, '#ffb070', { fontStyle: 'bold' }).setDepth(P + 1);
-    this.hudPublicTexteL = texte(this, 734, 72, 'PUBLIC', 14, '#a8ffc0', { fontStyle: 'bold' }).setDepth(P + 1);
+    this.hudPublicTexte = texte(this, 226, 72, 'PUBLIC', 16, '#ffb070', { fontStyle: 'bold' }).setDepth(P + 1);
+    this.hudPublicTexteL = texte(this, 734, 72, 'PUBLIC', 16, '#a8ffc0', { fontStyle: 'bold' }).setDepth(P + 1);
     this.hudPublic = this.add.graphics().setDepth(P + 1);
     // message au-dessus de ta tête (SUPER PRÊT, lance !)
     this.hudSuper = texte(this, 0, 0, '', 18, '#7fff7f', { fontStyle: 'bold', backgroundColor: '#000000cc', padding: { x: 8, y: 4 } }).setDepth(P + 1);

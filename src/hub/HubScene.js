@@ -13,7 +13,7 @@ import { jouerSon } from '../core/ressources.js';
 import { jouerMusique } from '../core/musique.js';
 import { BOSS } from '../bosses/liste.js';
 import { REGLAGES_HUB as R } from './reglages.js';
-import { estTactile, etiquettesTactiles } from '../core/tactile.js';
+import { estTactile, etiquettesTactiles, montrerBoutonPause } from '../core/tactile.js';
 import { ouvrirReglagesDev } from '../core/ReglagesDevScene.js';
 
 // place de chaque case dans la grille (colonne, ligne)
@@ -26,7 +26,10 @@ export class HubScene extends Phaser.Scene {
 
   create() {
     this.entree = false;
-    etiquettesTactiles({ espace: 'Combattre', z: null, x: null });
+    // avis jouabilité : au hub, on touche les cases (plus de croix inutile), et pas de bouton pause (il cachait le titre)
+    etiquettesTactiles({ espace: 'Combattre', z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
+    montrerBoutonPause(false);
+    this.events.once('shutdown', () => montrerBoutonPause(true));
     jouerMusique(this, 'hub_musique');
     const nb = BOSS.filter(b => Sauvegarde.aLeBadge(b.id)).length;
     this.complet = nb >= BOSS.length;
@@ -118,7 +121,7 @@ export class HubScene extends Phaser.Scene {
   majChoix() {
     const c = this.choix, g = this.cadreChoix;
     g.clear();
-    g.lineStyle(6, 0xffffff, 1).strokeRect(c.x - R.caseL / 2 - 4, c.y - R.caseH / 2 - 4, R.caseL + 8, R.caseH + 8);
+    g.lineStyle(9, 0xffd84a, 1).strokeRect(c.x - R.caseL / 2 - 5, c.y - R.caseH / 2 - 5, R.caseL + 10, R.caseH + 10);   // cadre jaune épais : bien visible sur le fond bleu
     this.infos.setText(c.info || '');
     this.cases.forEach(k => { if (k.img) { this.tweens.killTweensOf(k.img); k.img.setY(k.y + R.caseH / 2 - 26); } });
     if (c.img) this.tweens.add({ targets: c.img, y: c.img.y - 5, yoyo: true, repeat: -1, duration: 260 });

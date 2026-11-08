@@ -38,7 +38,19 @@
 - **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo (~45 s, V20) → BABYFOOT (V19, le beer pong est SUPPRIMÉ) → porte (simplifiée V19z). Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
-## AVIS JOUABILITÉ (tout le jeu, nov. 2026) : `propositions/avis_jouabilite_global.md` — 15 choix EN ATTENTE de Fabien.
+## AVIS JOUABILITÉ (tout le jeu, nov. 2026) : `propositions/avis_jouabilite_global.md` — FAIT sauf 3, 9, 12 (refusés)
+- Règles et présentations : seulement la 1re FOIS (`Sauvegarde.fait('regles_<boss>_<titre>')`) ; pause : « Revoir les règles
+  (à la prochaine visite) » (`Sauvegarde.oublierFaits`). Écrans de texte : toucher N'IMPORTE OÙ = OK (`attendreOK` de
+  `src/core/BossScene.js`, au lever du doigt) ; présentations de Kédric, Lionel, Greg aussi.
+- Difficulté : retoucher la carte = valider ; plus de ◀ ▶ sur cet écran. Hub : plus de croix, pas de bouton pause, cadre
+  jaune épais. Pause « II » toujours en haut à droite (`installerBoutonPause`, `montrerBoutonPause`). Beufa : plus de OK
+  pendant l'infiltration. Lionel : bouton Lancer plus gros que Lob (`styleBouton` de `tactile.js`).
+- Vibrations avec certains sons (`VIBRATIONS` dans `src/core/ressources.js`, `VIBRER_AVEC_SONS`).
+- Beufa quiz : 30 s par question en NORMAL (60 / 45 / 30 / 25 s), réplique après une bonne réponse qui passe seule (1,5 s).
+- Kédric : glissé qui agit dès 40 px (plus au lever du doigt). Greg : 1 seul conseil en gros au coin du round 1, coins
+  suivants fermés seuls au bout de 3 s ; moitiés de l'écran visibles au round 1 (gestes). Rémi : babyfoot en 4 buts,
+  règles du babyfoot et de la porte = bandeau de 3 s pendant la soirée enchaînée (`bandeauRegle`). Julien : lycée
+  facultatif une fois fini (▶ / 2 = direct en classe). Textes du jeu agrandis (16-20 px) dans les 6 boss.
 
 ## GREG — AVIS « FUN » d'un game designer (nov. 2026) : `propositions/greg_avis_fun.md` — REFUSÉ par Fabien (il trouve
    les combats déjà trop longs) ; il voulait un avis sur la JOUABILITÉ / game design, à refaire si demandé.

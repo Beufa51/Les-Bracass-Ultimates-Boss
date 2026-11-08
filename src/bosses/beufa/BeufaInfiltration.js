@@ -55,7 +55,7 @@ export class BeufaInfiltration extends BossScene {
   create() {
     this.phase = 'intro';   // intro | cinema | jeu | transition | attrape | fin
     this.touches = creerTouches(this);
-    const boutonsJeu = { haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: 'OK', z: 'Sprint', x: null, hg: '◤', hd: '◥' };
+    const boutonsJeu = { haut: '▲', bas: '▼', gauche: '◀', droite: '▶', espace: null, z: 'Sprint', x: null, hg: '◤', hd: '◥' };
     etiquettesTactiles(boutonsJeu);
     this.joystick = installerJoystick(this);   // V29 : sur téléphone, joystick 8 directions (la croix est cachée)   // V28 : plus de pierre   // Espace valide l'intro (bouton OK sur téléphone)
     this.cameras.main.setBackgroundColor('#0a0e15');
@@ -101,7 +101,7 @@ export class BeufaInfiltration extends BossScene {
     // il ne cache JAMAIS ce que tu regardes — arrête-toi pour LIRE la carte.
     // Il se COUPE pendant une alerte — dans MGS aussi, le radar saute quand on te cherche.
     this.radarG = this.add.graphics().setDepth(901).setScrollFactor(0);
-    this.radarEtat = texte(this, 54, 174, 'NORMAL', 13, '#7fff7f').setOrigin(0.5, 0).setDepth(901);
+    this.radarEtat = texte(this, 54, 174, 'NORMAL', 16, '#7fff7f').setOrigin(0.5, 0).setDepth(901);
     // LE VISEUR DE LA PIERRE : un petit cercle là où elle TOMBERA — la diversion devient précise
     this.viseeG = this.add.graphics().setDepth(15);
     // V24 LA FLÈCHE DE SORTIE : l'objectif est hors écran ? une flèche verte clignote
@@ -145,8 +145,8 @@ export class BeufaInfiltration extends BossScene {
     this.hudTitre = texte(this, 18, 20, '', 20, '#ffd84a', { fontStyle: 'bold' }).setOrigin(0, 0.5).setDepth(900);
     this.hudTemps = texte(this, LARGEUR - 18, 20, '', 18, '#dff6ff').setOrigin(1, 0.5).setDepth(900);
     this.hudPierres = texte(this, 18, 44, '', 16, '#ffd84a').setOrigin(0, 0.5).setDepth(900).setVisible(R.joueur.pierres > 0);   // V28 : pierre supprimée → caché
-    this.hudAlertes = texte(this, LARGEUR - 18, 44, '', 16, '#ff9a9a').setOrigin(1, 0.5).setDepth(900);
-    this.hintBas = texte(this, LARGEUR / 2, HAUTEUR - 12, (estTactile() ? 'Sprint : bruyant !   une pièce, puis l\'autre — jusqu\'au QG' : 'Z : sprint (bruyant)   une pièce, puis l\'autre — jusqu\'au QG'), 13, '#8a94a4').setDepth(900);
+    this.hudAlertes = texte(this, LARGEUR - 18, 44, '', 18, '#ff9a9a').setOrigin(1, 0.5).setDepth(900);
+    this.hintBas = texte(this, LARGEUR / 2, HAUTEUR - 12, (estTactile() ? 'Sprint = bruyant !   Va jusqu\'au QG' : 'Z : sprint (bruyant)   Va jusqu\'au QG'), 18, '#c8d0dc').setDepth(900);
     this.message = texte(this, LARGEUR / 2, 150, '', 40, '#ffffff', { fontStyle: 'bold', strokeThickness: 8 }).setOrigin(0.5).setDepth(950).setAlpha(0);
 
     this.nomDiff = Sauvegarde.difficulte('beufa') || 'normal'; this.diff = appliquerDifficulte(this.nomDiff);   // V18

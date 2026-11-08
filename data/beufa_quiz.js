@@ -62,7 +62,7 @@ export const LECTURES = [
 export const MASQUE_CHAUD = 'Ouf… il fait trop chaud dans ce masque.';
 export const DEBUT_QUIZ = [
   'Bon. Assez joué. Place à mon QUIZ !',
-  '10 questions de culture jeu vidéo. 1 minute par question. 3 erreurs… et c\'est GAME OVER.',
+  '10 questions de culture jeu vidéo, et le chrono tourne VITE. 3 erreurs… et c\'est GAME OVER.',
 ];
 
 // LES RÉACTIONS DE BEUFA

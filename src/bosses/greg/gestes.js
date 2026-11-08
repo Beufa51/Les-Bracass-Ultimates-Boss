@@ -34,14 +34,18 @@ export function installerGestes(scene, opts) {
 
   // ---- aides à l'écran (discrètes) ----
   const aide = scene.add.graphics().setDepth(38);
-  aide.lineStyle(2, 0xffffff, 0.35);
+  // round 1 : les deux moitiés de l'écran se voient (voile très léger), puis seulement la ligne visage / corps
+  const moities = scene.add.graphics().setDepth(37);
+  moities.fillStyle(0x5ad1ff, 0.07).fillRect(0, 90, LARGEUR / 2, HAUTEUR - 90);
+  moities.fillStyle(0xffd84a, 0.07).fillRect(LARGEUR / 2, 90, LARGEUR / 2, HAUTEUR - 90);
+  aide.lineStyle(3, 0xffffff, 0.5);
   for (let x = LARGEUR / 2 + 20; x < LARGEUR; x += 24) aide.lineBetween(x, G.ligne, x + 12, G.ligne);   // ligne VISAGE / CORPS
   aide.lineBetween(LARGEUR / 2, 120, LARGEUR / 2, 140); aide.lineBetween(LARGEUR / 2, HAUTEUR - 150, LARGEUR / 2, HAUTEUR - 130);
   const style = { stroke: '#000000', strokeThickness: 4 };
   const etiquettes = [
-    texte(scene, LARGEUR - 70, G.ligne - 26, 'VISAGE', 18, '#ffffff', style),
-    texte(scene, LARGEUR - 70, G.ligne + 26, 'CORPS', 18, '#5ad1ff', style),
-    texte(scene, 130, HAUTEUR - 40, '◀ glisse ▶ : esquive\ndoigt posé : garde', 15, '#ffffff', { ...style, align: 'center' }),
+    texte(scene, LARGEUR - 90, G.ligne - 30, 'VISAGE', 22, '#ffffff', style),
+    texte(scene, LARGEUR - 90, G.ligne + 30, 'CORPS', 22, '#5ad1ff', style),
+    texte(scene, 150, HAUTEUR - 46, '◀ glisse ▶ : ESQUIVE\ndoigt posé : GARDE', 20, '#ffffff', { ...style, align: 'center' }),
   ].map(t => t.setDepth(38));
   const bouton = scene.add.container(G.bouton.x, G.bouton.y).setDepth(39).setVisible(false);
   const rond = scene.add.graphics();
@@ -100,7 +104,7 @@ export function installerGestes(scene, opts) {
     maj(round) {
       const m = opts.mode(), combat = m === 'combat';
       const a = combat ? (round === 1 ? 0.85 : 0.35) : 0;
-      aide.setAlpha(a); etiquettes.forEach(t => t.setAlpha(a));
+      aide.setAlpha(a); etiquettes.forEach(t => t.setAlpha(a)); moities.setAlpha(combat && round === 1 ? 1 : 0);
       bouton.setVisible(!!opts.dempseyPret()).setScale(1 + Math.sin(scene.time.now / 120) * 0.04);
     },
   };

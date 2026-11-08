@@ -52,7 +52,7 @@ export const REGLAGES = {
   quiz: {             // V82 : LA PHASE QUIZ (textes : data/beufa_quiz.js)
     questions: 10,     // nombre de questions tirées au hasard dans la liste
     erreursMax: 3,     // 3 croix = GAME OVER
-    temps: 60,         // secondes par question
+    temps: 30,         // secondes par question (avis jouabilité nov. 2026 : 60 -> 30, plus de pression, quiz plus court)
     lettresParSeconde: 45,   // vitesse d'écriture du codec
     joker: 1,          // V94 : infiltration SANS ALERTE = ce nombre d'erreurs effacées au quiz
     // V94 : le RANG compte aussi le temps d'infiltration et la difficulté (NORMAL parfait = 150 points, comme avant)
@@ -82,13 +82,13 @@ export const REGLAGES = {
 //  portee / angle : vue des gardes (x) ; reperage : temps pour te repérer (x, + grand = + lent) ; poursuite : vitesse
 //  quand ils te courent après (x) ; projecteur : temps de repérage sous un halo (x) ; quiz : erreurs permises, s par question
 export const DIFFICULTES = {
-  entrainement: { bonusRang: -30, nom: 'VERY EASY', couleur: '#9fe0ff', portee: 0.7, angle: 0.8, reperage: 2, poursuite: 0.75, projecteur: 2, erreurs: 5, temps: 90,
+  entrainement: { bonusRang: -30, nom: 'VERY EASY', couleur: '#9fe0ff', portee: 0.7, angle: 0.8, reperage: 2, poursuite: 0.75, projecteur: 2, erreurs: 5, temps: 60,
     texte: 'Gardes myopes et lents à réagir. Quiz : 5 erreurs permises, 90 s par question.' },
-  facile: { bonusRang: -15, nom: 'EASY', couleur: '#7fff7f', portee: 0.85, angle: 0.9, reperage: 1.4, poursuite: 0.88, projecteur: 1.4, erreurs: 4, temps: 75,
+  facile: { bonusRang: -15, nom: 'EASY', couleur: '#7fff7f', portee: 0.85, angle: 0.9, reperage: 1.4, poursuite: 0.88, projecteur: 1.4, erreurs: 4, temps: 45,
     texte: 'Les gardes voient moins loin. Quiz : 4 erreurs permises.' },
-  normal: { bonusRang: 0, nom: 'NORMAL', couleur: '#ffd84a', portee: 1, angle: 1, reperage: 1, poursuite: 1, projecteur: 1, erreurs: 3, temps: 60,
+  normal: { bonusRang: 0, nom: 'NORMAL', couleur: '#ffd84a', portee: 1, angle: 1, reperage: 1, poursuite: 1, projecteur: 1, erreurs: 3, temps: 30,
     texte: 'La vraie mission.' },
-  champion: { bonusRang: 15, nom: 'EXTREME', couleur: '#ff5a6e', portee: 1.12, angle: 1.1, reperage: 0.75, poursuite: 1.06, projecteur: 0.75, erreurs: 2, temps: 45,
+  champion: { bonusRang: 15, nom: 'EXTREME', couleur: '#ff5a6e', portee: 1.12, angle: 1.1, reperage: 0.75, poursuite: 1.06, projecteur: 0.75, erreurs: 2, temps: 25,
     texte: 'Ils voient tout, tout de suite. Quiz : 2 erreurs, 45 s. Pour les vrais.' },
 };
 // applique une difficulté aux réglages (à partir des valeurs d'origine, gardées la première fois)

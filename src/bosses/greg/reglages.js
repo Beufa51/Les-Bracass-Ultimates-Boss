@@ -246,6 +246,9 @@ export const ENCHAINEMENTS_ENERVE = [
   ['corps', 'feinte d', 'jab d', 'smash'],
 ];
 
+// Avant le round 1 : UN seul conseil, en gros (avis jouabilité nov. 2026)
+export const CONSEIL_ROUND1 = 'Esquive du côté OPPOSÉ au coup... puis frappe tout de suite : CONTRE ! (dégâts x3)';
+
 // Ce que dit le vieux coach dans le coin, entre les rounds
 export const CONSEILS = [
   [

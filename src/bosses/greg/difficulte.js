@@ -15,7 +15,7 @@ export function choisirDifficulte(scene, idBoss, difficultes, ensuite, son = 'ui
   if (scene.donnees && scene.donnees.rejouer && scene.donnees.diffObjet) { scene.time.delayedCall(0, () => ensuite(scene.donnees.nomDiff, scene.donnees.diffObjet)); return; }
   const noms = Object.keys(difficultes);
   let i = Math.max(0, noms.indexOf(Sauvegarde.difficulte(idBoss)));
-  etiquettesTactiles({ haut: null, bas: null, z: null, x: null, espace: 'OK' });
+  etiquettesTactiles({ haut: null, bas: null, gauche: null, droite: null, z: null, x: null, espace: 'OK' });   // (on touche les cartes : plus de ◀ ▶)
   const el = [];
   el.push(scene.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0b0b14, 0.95).setDepth(100));
   el.push(texte(scene, LARGEUR / 2, 70, 'DIFFICULTÉ', 44, '#ffd84a').setDepth(101));
@@ -30,7 +30,7 @@ export function choisirDifficulte(scene, idBoss, difficultes, ensuite, son = 'ui
     el.push(fond, titre, desc, r);
     return fond;
   });
-  el.push(texte(scene, LARGEUR / 2, HAUTEUR - 60, `◀ ▶ : choisir     ${estTactile() ? 'OK' : 'ESPACE'} : valider`, 20, '#7fff7f').setDepth(101));
+  el.push(texte(scene, LARGEUR / 2, HAUTEUR - 60, estTactile() ? 'Touche une carte, puis touche-la encore pour valider' : '◀ ▶ : choisir     ESPACE : valider', 20, '#7fff7f').setDepth(101));
   const maj = () => cartes.forEach((c, k) => {
     c.setStrokeStyle(k === i ? 6 : 3, k === i ? 0xffd84a : 0x555566).setScale(k === i ? 1.06 : 0.95);
   });
@@ -40,7 +40,8 @@ export function choisirDifficulte(scene, idBoss, difficultes, ensuite, son = 'ui
   const droite = () => { i = (i + 1) % noms.length; maj(); jouerSon(scene, son); };
   kb.on('keydown-LEFT', gauche); kb.on('keydown-RIGHT', droite);
   // sur téléphone : toucher une carte la choisit
-  cartes.forEach((c, k) => c.setInteractive().on('pointerdown', () => { i = k; maj(); }));
+  // (avis jouabilité) toucher une carte la choisit, la RETOUCHER valide (comme au hub)
+  cartes.forEach((c, k) => c.setInteractive().on('pointerup', () => { if (i === k) kb.emit('keydown-SPACE'); else { i = k; maj(); jouerSon(scene, son); } }));
   scene.time.delayedCall(300, () => kb.once('keydown-SPACE', () => {
     kb.off('keydown-LEFT', gauche); kb.off('keydown-RIGHT', droite);
     Sauvegarde.reglerDifficulte(idBoss, noms[i]);

@@ -26,7 +26,7 @@ import { RemiIA } from './babyfoot/remi_ia.js';
 import { Physique } from './babyfoot/physique.js';
 import { Effets } from './babyfoot/effets.js';
 import { CX, L, W, R, proj, xSur, profondeur, hommes, BARRES, BOUTON_ROULETTE, BOUTON_TIR, VIDES } from './babyfoot/outils.js';
-import { bulle, annonce, jeuSuivant, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile, bilanDe, noterJeu } from './commun.js';
+import { bulle, annonce, bandeauRegle, jeuSuivant, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile, bilanDe, noterJeu } from './commun.js';
 
 export class RemiBaby extends BossScene {
   constructor() { super('RemiBaby', IDENTITE); }
@@ -69,6 +69,12 @@ export class RemiBaby extends BossScene {
     try { if (cam0.postFX) { cam0.postFX.clear(); this.vignette = cam0.postFX.addVignette(0.5, 0.5, 0.75, 0); } } catch (e) { this.vignette = null; }
     etiquettesTactiles({ ...VIDES, espace: 'OK' });
     const t = estTactile();
+    const lancer = () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.demarrer(); });
+    if (this.donnees.bilan) {   // soirée enchaînée : un bandeau au lieu de l'écran de règles
+      lancer();
+      bandeauRegle(this, `Premier à ${B.buts} buts ! Place ton gardien du côté où Rémi se PENCHE. Ligne VERTE = ${t ? 'TIR' : 'ESPACE'} !`);
+      return;
+    }
     this.afficherIntro('RÉMI - Le babyfoot', [
       `Premier à ${B.buts} buts. Rémi se PENCHE du côté où il va tirer : place ton gardien (${t ? 'pouce gauche ◀ ▶' : '◀ ▶'}).`,
       `Balle arrêtée : ◀ ▶ tournent ta visée (rebonds sur les bandes). Ligne VERTE = ${t ? 'gros bouton TIR (pouce droit)' : 'ESPACE'} !`,

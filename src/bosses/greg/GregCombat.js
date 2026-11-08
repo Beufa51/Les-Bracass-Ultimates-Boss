@@ -10,14 +10,14 @@
 //   - Au tapis : alterner ◀ ▶ avant 10 !
 // Tous les chiffres sont dans reglages.js.
 // =====================================================================
-import { BossScene } from '../../core/BossScene.js';
+import { BossScene, attendreOK } from '../../core/BossScene.js';
 import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { texte, voile } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { annoncer, taireAnnonceur } from '../../core/annonceur.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
-import { IDENTITE, DIFFICULTES, REGLAGES as R, ATTAQUES, ENCHAINEMENTS, ENCHAINEMENTS_ENERVE, CONSEILS, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
+import { IDENTITE, DIFFICULTES, REGLAGES as R, ATTAQUES, ENCHAINEMENTS, ENCHAINEMENTS_ENERVE, CONSEILS, CONSEIL_ROUND1, REPLIQUES, ONOMATOPEES as ONO } from './reglages.js';
 import { lignesImpact, onomatopee, flash, encart, encartDempsey, bulle, gouttes } from './effets.js';
 import { jouerClip } from '../../core/clips.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
@@ -1138,7 +1138,9 @@ export class GregCombat extends BossScene {
 
   // Écran de présentation de Greg (son illustration), avant le premier round
   presentation(ensuite) {
-    if (this.donnees.rejouer) { ensuite(); return; }   // V18 : rejouer = pas de présentation
+    // V18 : rejouer = pas de présentation ; avis jouabilité (nov. 2026) : seulement la 1re fois (pause : « Revoir les règles »)
+    const vu = 'regles_' + this.identite.id + '_presentation';
+    if (this.donnees.rejouer || Sauvegarde.fait(vu)) { ensuite(); return; }
     this.etat = 'coin';
     etiquettesTactiles(ETIQUETTES_OK);
     const el = [];
@@ -1159,16 +1161,15 @@ export class GregCombat extends BossScene {
       '(« le mode normal, c\'est pour les faibles »)',
       'Tatouages : guerriers de légende',
     ].join('\n'), 20, '#dddddd', { lineSpacing: 10 }).setDepth(102));
-    el.push(texte(this, 300, 460, (estTactile() ? 'OK' : 'ESPACE') + ' : au coin !', 22, '#7fff7f').setDepth(102));
+    el.push(texte(this, 300, 460, (estTactile() ? 'Touche l\'écran' : 'ESPACE') + ' : au coin !', 22, '#7fff7f').setDepth(102));
     jouerSon(this, 'greg_coup_fort');
     this.cameras.main.shake(200, 0.01);
-    this.time.delayedCall(500, () => {
-      this.input.keyboard.once('keydown-SPACE', () => {
-        el.forEach(e => e.destroy());
-        jouerSon(this, 'ui_valider');
-        ensuite();
-      });
-    });
+    attendreOK(this, () => {   // ESPACE / OK, ou toucher n'importe où
+      Sauvegarde.marquerFait(vu);
+      el.forEach(e => e.destroy());
+      jouerSon(this, 'ui_valider');
+      ensuite();
+    }, 500);
   }
 
   ouvrirCoin() {
@@ -1192,7 +1193,9 @@ export class GregCombat extends BossScene {
     el.push(texte(this, 170, 360, 'Coach Kamogawa', 18, '#dddddd').setDepth(101));
     el.push(texte(this, 580, 115, `Conseils pour le ROUND ${this.round} :`, 24, '#ffffff').setDepth(101));
     // les blocs de texte se placent les uns sous les autres (pas de chevauchement)
-    const conseils = texte(this, 580, 145, CONSEILS[this.round - 1].map(l => '- ' + l).join('\n'), 16, '#ffffff', {
+    // avis jouabilité : au round 1, UN seul conseil en gros (le reste s'apprend en jouant)
+    const lignesConseils = this.round === 1 ? [CONSEIL_ROUND1] : CONSEILS[this.round - 1].map(l => '- ' + l);
+    const conseils = texte(this, 580, 145, lignesConseils.join('\n'), this.round === 1 ? 24 : 18, '#ffffff', {
       wordWrap: { width: 600 }, lineSpacing: 8,
     }).setOrigin(0.5, 0).setDepth(101);
     el.push(conseils);
@@ -1203,18 +1206,15 @@ export class GregCombat extends BossScene {
         15, '#7fff7f', { wordWrap: { width: 600 } }).setOrigin(0.5, 0).setDepth(101);
       y += bilan.height + 12;
       // le coach commente ce que tu as raté pendant le round
-      el.push(bilan, texte(this, 580, y, 'Coach : « ' + this.remarqueCoach() + ' »', 16, '#ffd84a', { wordWrap: { width: 600 } })
+      el.push(bilan, texte(this, 580, y, 'Coach : « ' + this.remarqueCoach() + ' »', 19, '#ffd84a', { wordWrap: { width: 600 } })
         .setOrigin(0.5, 0).setDepth(101));
     }
     this.statsRound = this.nouvellesStatsRound();
-    el.push(texte(this, LARGEUR / 2, HAUTEUR - 50, (estTactile() ? 'OK' : 'ESPACE') + ' : on y va !', 22, '#7fff7f').setDepth(101));
-    this.time.delayedCall(400, () => {
-      this.input.keyboard.once('keydown-SPACE', () => {
-        el.forEach(e => e.destroy());
-        jouerSon(this, 'ui_valider');
-        this.debutRound();
-      });
-    });
+    el.push(texte(this, LARGEUR / 2, HAUTEUR - 50, (estTactile() ? 'Touche l\'écran' : 'ESPACE') + ' : on y va !' + (fin ? '  (ou attends 3 s)' : ''), 22, '#7fff7f').setDepth(101));
+    let parti = false;
+    const go = () => { if (parti) return; parti = true; el.forEach(e => e.destroy()); jouerSon(this, 'ui_valider'); this.debutRound(); };
+    attendreOK(this, go, 400);
+    if (fin) this.time.delayedCall(3000, go);   // entre deux rounds : le coin se ferme tout seul
   }
 
   // Classement de fin : rang S / A / B / C + record gardé dans le navigateur
@@ -1657,9 +1657,9 @@ export class GregCombat extends BossScene {
     this.hudCadre.lineStyle(3, 0xffd84a, 1).strokeRect(LARGEUR - 68, 8, 60, 60);
     texte(this, LARGEUR / 2, 24, 'VS', 30, '#ffd84a', { fontStyle: 'bold italic', stroke: '#b3202c', strokeThickness: 6 }).setDepth(41);
     this.texteTemps = texte(this, LARGEUR / 2, 56, '', 24, '#ffffff').setDepth(41);
-    this.texteRound = texte(this, LARGEUR / 2, 80, '', 15, '#dddddd').setDepth(41);
+    this.texteRound = texte(this, LARGEUR / 2, 80, '', 18, '#dddddd').setDepth(41);
     this.texteGarde = texte(this, 20, 108, '', 17, '#ffffff', { stroke: '#000000', strokeThickness: 4 }).setOrigin(0, 0.5).setDepth(41);
-    texte(this, 120, 76, 'ESPRIT', 14, '#ffd84a').setOrigin(1, 0.5).setDepth(41);
+    texte(this, 120, 76, 'ESPRIT', 16, '#ffd84a').setOrigin(1, 0.5).setDepth(41);
     this.texteDempsey = texte(this, 80, 98, estTactile() ? 'Dempsey : DEMPSEY ROLL !' : 'X : DEMPSEY ROLL !', 18, '#ffd84a').setOrigin(0, 0.5).setDepth(41).setVisible(false);
   }
 

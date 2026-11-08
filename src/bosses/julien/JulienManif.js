@@ -66,16 +66,16 @@ export class JulienManif extends BossScene {
 
     // barre du bas : chiffres en haute résolution par-dessus la toile
     const yb = VUE_H * 2;
-    texte(this, 92, yb + 20, 'VIE', 14, '#c9b48a');
+    texte(this, 92, yb + 20, 'VIE', 16, '#c9b48a');
     this.txtVie = texte(this, 92, yb + 52, '', 40, '#ff5a3c');
     this.txtArmure = texte(this, 92, yb + 84, '', 14, '#f0c818');   // K-Way
     this.txtMunitions = texte(this, 660, yb + 86, '', 12, '#c9b48a');   // tableau des munitions, comme Doom
     this.txtBonus = texte(this, 16, 44, '', 16, '#9fd8ff').setOrigin(0, 0).setStroke('#000', 4);   // bonus en cours
-    this.txtArme = texte(this, 300, yb + 20, '', 14, '#c9b48a');
+    this.txtArme = texte(this, 300, yb + 20, '', 16, '#c9b48a');
     this.txtOeufs = texte(this, 300, yb + 58, '', 40, '#fff2c8');
-    this.lblFlics = texte(this, 660, yb + 20, 'POLICIERS REPOUSSÉS', 14, '#c9b48a');
+    this.lblFlics = texte(this, 660, yb + 20, 'POLICIERS REPOUSSÉS', 16, '#c9b48a');
     this.txtFlics = texte(this, 660, yb + 58, '', 32, '#9fd0ff');
-    this.lblLycee = texte(this, 868, yb + 20, 'LYCÉE', 14, '#c9b48a');
+    this.lblLycee = texte(this, 868, yb + 20, 'LYCÉE', 16, '#c9b48a');
     // tête du héros (vraie image, en haute résolution par-dessus la barre)
     this.tete = T.tetes ? this.add.image(LARGEUR / 2, yb + 50, 'julien_tetes', 0).setDisplaySize(82, 84) : null;
     this.txtMsg = texte(this, 16, 14, '', 18, '#ffffff').setOrigin(0, 0).setStroke('#000', 4).setWordWrapWidth(LARGEUR - 40).setAlign('left');   // (les longs messages passent à la ligne)
@@ -999,8 +999,20 @@ export class JulienManif extends BossScene {
     });
     this.time.delayedCall(1000 + lignes.length * 450, () => {
       texte(this, LARGEUR / 2, 452, 'Mais Julien t\'attend en classe… salle 12, au fond du lycée.', 18, '#9fd0ff').setDepth(1001);
-      texte(this, LARGEUR / 2, HAUTEUR - 28, `${estTactile() ? 'OK' : 'ESPACE'} : entrer dans le lycée`, 20, '#aaaaaa').setDepth(1001);
-      this.time.delayedCall(300, () => this.input.keyboard.once('keydown-SPACE', () => this.scene.start('JulienLycee', { depuisManif: true })));
+      // avis jouabilité : lycée déjà fini une fois => il devient FACULTATIF (▶ / 2 = direct en classe)
+      const lyceeFait = Sauvegarde.fait('julien_lycee');
+      texte(this, LARGEUR / 2, HAUTEUR - 28, `${estTactile() ? 'OK' : 'ESPACE'} : entrer dans le lycée` +
+        (lyceeFait ? `      ${estTactile() ? '▶' : '2'} : direct en CLASSE` : ''), 20, '#aaaaaa').setDepth(1001);
+      if (lyceeFait && estTactile()) etiquettesTactiles({ espace: 'OK', droite: '▶', gauche: null, haut: null, bas: null, z: null, x: null });
+      this.time.delayedCall(300, () => {
+        let parti = false;
+        const aller = (cle) => { if (parti) return; parti = true; this.input.keyboard.off('keydown', choix); this.scene.start(cle, { depuisManif: true }); };
+        const choix = (ev) => {
+          if (ev.key === ' ') aller('JulienLycee');
+          else if (lyceeFait && (ev.key === '2' || ev.key === 'ArrowRight')) aller('JulienClasse');
+        };
+        this.input.keyboard.on('keydown', choix);
+      });
     });
   }
 

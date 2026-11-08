@@ -141,8 +141,8 @@ export class JulienClasse extends JulienManif {
     this.txtBoss = texte(this, LARGEUR / 2 - 212, 34, 'JULIEN, LE PROF', 16, '#ffd84a').setOrigin(1, 0.5).setStroke('#000', 4).setDepth(5);   // à gauche de la barre (le bouton II est au milieu)
     this.txtMsg.setY(66);   // les répliques sous la barre de vie de Julien
     this.txtAnnonce = texte(this, LARGEUR / 2, 102, '', 30, '#ffd84a').setStroke('#000', 6).setDepth(5);   // l'attaque qui arrive
-    this.txtConseil = texte(this, LARGEUR / 2, 130, '', 16, '#ffffff').setStroke('#000', 4).setDepth(5);
-    this.txtEleves = texte(this, LARGEUR / 2, VUE_H * 2 - 24, '', 16, '#9fd8ff').setStroke('#000', 4).setDepth(5);
+    this.txtConseil = texte(this, LARGEUR / 2, 130, '', 20, '#ffffff').setStroke('#000', 4).setDepth(5);
+    this.txtEleves = texte(this, LARGEUR / 2, VUE_H * 2 - 24, '', 19, '#9fd8ff').setStroke('#000', 4).setDepth(5);
     this.annonceT = 0; this.elevesT = 0;
     this.dessiner(0);
   }

@@ -26,6 +26,8 @@ export class PauseScene extends Phaser.Scene {
       { libelle: () => `Bruitages : ${this.jauge('sons')}`, reglage: 'sons' },
       { libelle: () => `Voix : ${this.jauge('voix')}`, reglage: 'voix' },
       ...(this.sceneCommandes() ? [{ libelle: () => 'Commandes du clavier', action: () => this.commandes() }] : []),
+      ...(this.bossEnPause() ? [{ libelle: () => this.reglesRevues ? 'Règles : revues à la prochaine visite' : 'Revoir les règles (à la prochaine visite)',
+        action: () => { Sauvegarde.oublierFaits('regles_' + this.bossEnPause() + '_'); this.reglesRevues = true; this.majAffichage(); } }] : []),
       { libelle: () => 'Abandonner (retour au hub)', action: () => this.quitter() },
       { libelle: () => 'Menu de test (aller à un combat)', action: () => this.menuTest() },
     ];
@@ -72,6 +74,12 @@ export class PauseScene extends Phaser.Scene {
   }
 
   // jeu en pause qui sait afficher son écran de commandes (Julien, sur PC) : méthode ouvrirCommandes(retour)
+  // id du boss mis en pause (pour « Revoir les règles »), ou null (hub...)
+  bossEnPause() {
+    const s = this.enPause.map(k => this.scene.get(k)).find(x => x && x.identite && x.identite.id);
+    return s ? s.identite.id : null;
+  }
+
   sceneCommandes() {
     if (estTactile()) return null;
     return this.enPause.map(k => this.scene.get(k)).find(s => s && typeof s.ouvrirCommandes === 'function'

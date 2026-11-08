@@ -13,6 +13,24 @@ import { estTactile, etiquettesTactiles, etiquettesActuelles } from './tactile.j
 // écrans de règles et de présentation : seul le bouton OK reste (les autres gênaient la lecture sur téléphone)
 const SEULEMENT_OK = { espace: 'OK', z: null, x: null, haut: null, bas: null, gauche: null, droite: null, hg: null, hd: null };
 
+// Avis jouabilité (nov. 2026) : un écran de texte se ferme avec ESPACE / OK, ou en touchant N'IMPORTE OÙ (au lever du
+// doigt, pour que ce toucher ne frappe pas aussi dans le jeu). delai : on ignore les appuis trop rapides.
+export function attendreOK(scene, ensuite, delai = 400) {
+  let fait = false;
+  const fin = () => {
+    if (fait) return; fait = true;
+    scene.input.keyboard.off('keydown-SPACE', fin); window.removeEventListener('pointerup', toucher);
+    ensuite();
+  };
+  const toucher = (e) => { if (e.target && e.target.closest && e.target.closest('button')) return; fin(); };
+  scene.time.delayedCall(delai, () => {
+    if (fait) return;
+    scene.input.keyboard.once('keydown-SPACE', fin);
+    window.addEventListener('pointerup', toucher);
+  });
+  scene.events.once('shutdown', () => { fait = true; window.removeEventListener('pointerup', toucher); });
+}
+
 export class BossScene extends Phaser.Scene {
   // cle : nom unique de la scène ; identite : { id, nom } du boss
   constructor(cle, identite) {
@@ -45,7 +63,9 @@ export class BossScene extends Phaser.Scene {
   // Affiche le titre et la liste des commandes, puis attend Espace
   afficherIntro(titre, commandes, quandPret) {
     // V18 : REJOUER après une défaite → on saute l'écran des commandes (déjà lu)
-    if (this.donnees.rejouer) { this.time.delayedCall(0, quandPret); return; }
+    // Avis jouabilité (nov. 2026) : les règles ne s'affichent que la 1re FOIS (menu pause : « Revoir les règles »)
+    const vu = 'regles_' + this.identite.id + '_' + titre;
+    if (this.donnees.rejouer || Sauvegarde.fait(vu)) { this.time.delayedCall(0, quandPret); return; }
     // (Fabien) sur téléphone, les boutons du jeu gênaient la lecture des règles : on ne garde que OK pendant cet écran,
     // et on remet EXACTEMENT les boutons du niveau quand on appuie sur OK
     const avant = etiquettesActuelles();
@@ -58,25 +78,28 @@ export class BossScene extends Phaser.Scene {
     // plus jamais par-dessus (Kédric et ses 9 lignes de règles du match chevauchaient l'invite !)
     const vert = texte(this, LARGEUR / 2,
       Math.min(HAUTEUR - 14, Math.max(HAUTEUR - 45, 220 + liste.height + 16)),
-      `Appuie sur ${estTactile() ? 'OK' : 'ESPACE'} pour commencer`, 22, '#7fff7f').setDepth(1001);
+      `${estTactile() ? 'Touche l\'écran' : 'Appuie sur ESPACE'} pour commencer`, 22, '#7fff7f').setDepth(1001);
     const elements = [
       voile(this, 0.85).setDepth(1000),
       texte(this, LARGEUR / 2, 120, titre, 40, '#ffd84a').setDepth(1001),
       texte(this, LARGEUR / 2, 190, 'COMMANDES', 22, '#aaaaaa').setDepth(1001),
       liste, vert,
     ];
-    this.input.keyboard.once('keydown-SPACE', () => {
+    attendreOK(this, () => {
+      Sauvegarde.marquerFait(vu);
       elements.forEach(el => el.destroy());
       etiquettesTactiles(avant);
       jouerSon(this, 'ui_valider');
       quandPret();
-    });
+    }, 250);
   }
 
   // Écran de PRÉSENTATION du boss (comme Greg, Kédric, Lionel) : son avatar glisse depuis la droite,
   // son nom, son surnom et quelques infos à gauche. o = { image, nom, surnom, infos: [...], couleur, fond, invite, son }
   afficherPresentation(o, ensuite) {
-    if (this.donnees.rejouer) { this.time.delayedCall(0, ensuite); return; }   // V18 : rejouer = pas de présentation
+    // V18 : rejouer = pas de présentation ; avis jouabilité : seulement la 1re fois (pause : « Revoir les règles »)
+    const vu = 'regles_' + this.identite.id + '_presentation';
+    if (this.donnees.rejouer || Sauvegarde.fait(vu)) { this.time.delayedCall(0, ensuite); return; }
     const avant = etiquettesActuelles();   // boutons du jeu (ex. Sprint de Beufa) : remis après la présentation
     etiquettesTactiles(SEULEMENT_OK);   // (la croix aussi est cachée : elle gênait la lecture)
     const el = [];
@@ -97,17 +120,16 @@ export class BossScene extends Phaser.Scene {
     el.push(texte(this, 300, 90, o.nom, 96, '#ffffff', { fontStyle: 'bold italic', stroke: o.couleur || '#b3202c', strokeThickness: 14 }).setDepth(1002));
     el.push(texte(this, 300, 175, o.surnom, 34, '#ffd84a').setDepth(1002));
     el.push(texte(this, 300, 300, o.infos.join('\n'), 20, '#dddddd', { lineSpacing: 10, wordWrap: { width: 540 } }).setDepth(1002));
-    el.push(texte(this, 300, 460, `${estTactile() ? 'OK' : 'ESPACE'} : ${o.invite || 'c\'est parti !'}`, 22, '#7fff7f').setDepth(1002));
+    el.push(texte(this, 300, 460, `${estTactile() ? 'Touche l\'écran' : 'ESPACE'} : ${o.invite || 'c\'est parti !'}`, 22, '#7fff7f').setDepth(1002));
     if (o.son) jouerSon(this, o.son);
     this.cameras.main.shake(200, 0.008);
-    this.time.delayedCall(500, () => {
-      this.input.keyboard.once('keydown-SPACE', () => {
-        el.forEach(e => e.destroy());
-        etiquettesTactiles(avant);
-        jouerSon(this, 'ui_valider');
-        ensuite();
-      });
-    });
+    attendreOK(this, () => {
+      Sauvegarde.marquerFait(vu);
+      el.forEach(e => e.destroy());
+      etiquettesTactiles(avant);
+      jouerSon(this, 'ui_valider');
+      ensuite();
+    }, 500);
   }
 
   victoire(message = 'Badge obtenu !') {

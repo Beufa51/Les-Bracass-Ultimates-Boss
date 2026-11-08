@@ -96,7 +96,7 @@ export const VELO = {
 
 // BABYFOOT (prototype) : mètres et secondes. Vue depuis ton but (z = 0), celui de Rémi à z = longueur.
 export const BABY = {
-  buts: 5,                // premier à ce nombre de buts
+  buts: 4,                // premier à ce nombre de buts (avis jouabilité nov. 2026 : 5 -> 4, le babyfoot traînait)
   largeur: 0.68, longueur: 1.0, balle: 0.02, but: 0.24,
   course: 0.13,           // débattement de ton gardien (m de chaque côté)
   // V19p : chiffres sortis du code

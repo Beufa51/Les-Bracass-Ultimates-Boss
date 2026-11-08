@@ -12,6 +12,7 @@ import { JulienManif } from './JulienManif.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { estTactile } from '../../core/tactile.js';
+import { Sauvegarde } from '../../core/sauvegarde.js';
 import { texte, voile } from '../../core/ui.js';
 import { LARGEUR } from '../../core/reglages.js';
 import { REGLAGES as RG, DIFFICULTES } from './reglages.js';
@@ -226,6 +227,7 @@ export class JulienLycee extends JulienManif {
     voile(this, 0.85).setDepth(1000);
     texte(this, LARGEUR / 2, 200, 'SALLE 12', 44, '#ffd84a').setDepth(1001);
     texte(this, LARGEUR / 2, 270, TXT.porte, 24, '#ffffff').setDepth(1001);
+    Sauvegarde.marquerFait('julien_lycee');   // avis jouabilité : une fois fini, le lycée devient facultatif
     this.time.delayedCall(2600, () => this.scene.start('JulienClasse', { depuisManif: true }));
   }
 

@@ -40,9 +40,21 @@ export function preparerVisuels(scene, groupe = 'commun') {
 
 // Joue un son du manifeste (ou un bip provisoire)
 // options (facultatif) : { rate: vitesse/hauteur, volume }
+// Avis jouabilité (nov. 2026) : une petite VIBRATION (téléphone) en même temps que certains bruitages forts,
+// dans tous les boss. Durée en millisecondes ; mettre VIBRER_AVEC_SONS = false pour tout couper.
+export const VIBRER_AVEC_SONS = true;
+const VIBRATIONS = {
+  beufa_alerte: 60, beufa_attrape: 120,            // repéré « ! », attrapé
+  julien_aie: 40,                                  // touché
+  remi_chute: 80, remi_baby_but: 50, remi_porte_fort: 40,   // chute à vélo, but au babyfoot, gros coup dans la porte
+  frisbee_but: 50, frisbee_plongeon: 30,           // point marqué, plongeon / arrêt
+};
+export function vibrer(ms) { try { if (VIBRER_AVEC_SONS && navigator.vibrate) navigator.vibrate(ms); } catch (e) { /* ignoré */ } }
+
 export function jouerSon(scene, cle, options) {
   const e = MANIFESTE.sons[cle];
   if (!e) return;
+  if (VIBRATIONS[cle]) vibrer(VIBRATIONS[cle]);
   if (sonsCoupes) return;   // coupure de courant : aucun effet sonore (la musique, elle, continue)
   const volSons = Sauvegarde.volume('sons');
   if (volSons <= 0) return;

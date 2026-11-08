@@ -28,6 +28,15 @@ export function bulle(scene, message, couleur = '#ffffff', duree = 2.2, y = 70) 
 }
 
 // Grand titre au centre (« MANCHE 2 », « BALLS BACK ! »)
+// Avis jouabilité (nov. 2026) : pendant la SOIRÉE enchaînée, les règles d'un jeu = un bandeau de quelques secondes
+// en haut de l'écran (pas d'écran à fermer). L'écran complet reste pour un accès direct au jeu.
+export function bandeauRegle(scene, message, duree = 3) {
+  const fond = scene.add.rectangle(LARGEUR / 2, 70, LARGEUR - 40, 64, 0x000000, 0.8).setDepth(970).setStrokeStyle(2, 0xffd84a, 0.8);
+  const t = texte(scene, LARGEUR / 2, 70, message, 20, '#ffffff', { wordWrap: { width: LARGEUR - 80 }, align: 'center' }).setDepth(971);
+  [fond, t].forEach(o => { o.setAlpha(0); scene.tweens.add({ targets: o, alpha: 1, duration: 200 }); });
+  scene.tweens.add({ targets: [fond, t], alpha: 0, delay: duree * 1000, duration: 300, onComplete: () => { fond.destroy(); t.destroy(); } });
+}
+
 export function annonce(scene, titre, couleur = '#ffd84a', duree = 1.1) {
   const t = texte(scene, LARGEUR / 2, HAUTEUR / 2 - 40, titre, 56, couleur, { fontStyle: 'bold italic', strokeThickness: 8 }).setDepth(960).setScale(0.4);
   scene.tweens.add({ targets: t, scale: 1, duration: 220, ease: 'Back.Out' });

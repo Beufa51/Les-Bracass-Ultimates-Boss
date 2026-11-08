@@ -11,7 +11,7 @@
 // Toute la logique avance dans pas() (pas de minuteries Phaser) : les bots de test
 // peuvent jouer en accéléré.
 // =====================================================================
-import { BossScene } from '../../core/BossScene.js';
+import { BossScene, attendreOK } from '../../core/BossScene.js';
 import { creerTouches } from '../../core/clavier.js';
 import { texte } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
@@ -394,14 +394,20 @@ export class KedricCourse extends BossScene {
 
   // Sur téléphone (et à la souris) : glisser vers le haut / bas / gauche / droite = la flèche
   installerBalayage() {
+    // avis jouabilité (nov. 2026) : le glissé agit DÈS que le doigt a parcouru 40 px (plus au lever du doigt :
+    // on gagnait 0,1 à 0,2 s sur les esquives « au dernier moment »), une seule fois par toucher
     let debut = null;
     this.input.on('pointerdown', (p) => { debut = { x: p.x, y: p.y }; });
-    this.input.on('pointerup', (p) => {
-      if (!debut || !['jeu', 'envoi'].includes(this.etat)) { debut = null; return; }
-      const dx = p.x - debut.x, dy = p.y - debut.y; debut = null;
+    const regarder = (p) => {
+      if (!debut || !p.isDown && p.event && p.event.type === 'pointermove') return;
+      if (!['jeu', 'envoi'].includes(this.etat)) { debut = null; return; }
+      const dx = p.x - debut.x, dy = p.y - debut.y;
       if (Math.max(Math.abs(dx), Math.abs(dy)) < 40) return;
+      debut = null;
       this.balaye = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'gauche' : 'droite') : (dy < 0 ? 'haut' : 'bas');
-    });
+    };
+    this.input.on('pointermove', regarder);
+    this.input.on('pointerup', (p) => { regarder(p); debut = null; });
   }
 
   vitesse() {
@@ -1021,7 +1027,9 @@ export class KedricCourse extends BossScene {
   //  ÉCRANS
   // =================================================================
   presentation(ensuite) {
-    if (this.donnees.rejouer) { ensuite(); return; }   // V18 : rejouer = pas de présentation
+    // V18 : rejouer = pas de présentation ; avis jouabilité (nov. 2026) : seulement la 1re fois (pause : « Revoir les règles »)
+    const vu = 'regles_' + this.identite.id + '_presentation';
+    if (this.donnees.rejouer || Sauvegarde.fait(vu)) { ensuite(); return; }
     etiquettesTactiles(ETIQUETTES_OK);
     const el = [];
     el.push(this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x0b0b14, 0.96).setDepth(1100));
@@ -1044,16 +1052,15 @@ export class KedricCourse extends BossScene {
       'Arme secrète : ses combinaisons',
       'Phrase culte : « C\'est MON show ! »',
     ].join('\n'), 22, '#ffffff', { lineSpacing: 12 }).setDepth(1102));
-    el.push(texte(this, 300, 460, (estTactile() ? 'OK' : 'ESPACE') + ' : sur le terrain !', 22, '#7fff7f').setDepth(1102));
+    el.push(texte(this, 300, 460, (estTactile() ? 'Touche l\'écran' : 'ESPACE') + ' : sur le terrain !', 22, '#7fff7f').setDepth(1102));
     el.push(bulle(this, LARGEUR - 190, 80, REPLIQUES.presentation, 99999).setDepth(1103));
     jouerSon(this, 'kedric_foule', { volume: 0.6 });
-    this.time.delayedCall(500, () => {
-      this.input.keyboard.once('keydown-SPACE', () => {
-        el.forEach(e => e.destroy());
-        jouerSon(this, 'ui_valider');
-        ensuite();
-      });
-    });
+    attendreOK(this, () => {   // ESPACE / OK, ou toucher n'importe où
+      Sauvegarde.marquerFait(vu);
+      el.forEach(e => e.destroy());
+      jouerSon(this, 'ui_valider');
+      ensuite();
+    }, 500);
   }
 
   // un pied touche la pelouse : bruit de crampons + touffe d'herbe qui part vers l'arrière (vers toi)
@@ -1424,11 +1431,11 @@ export class KedricCourse extends BossScene {
     this.hudBarre = this.add.graphics().setDepth(P);
     // à gauche : la vitesse ; à droite : la jauge du Devil Bat Ghost
     this.hudVitesse = this.add.graphics().setDepth(P);
-    this.hudVitesseTexte = texte(this, 34, 440, '', 13, '#ffffff').setDepth(P);
-    texte(this, 34, 182, 'VITESSE', 12, '#7fff7f').setDepth(P);
+    this.hudVitesseTexte = texte(this, 34, 440, '', 16, '#ffffff').setDepth(P);
+    texte(this, 34, 182, 'VITESSE', 15, '#7fff7f').setDepth(P);
     this.hudGhost = this.add.graphics().setDepth(P);
-    this.hudGhostTexte = texte(this, LARGEUR - 34, 182, 'GHOST', 12, '#9fe0ff').setDepth(P);
-    this.hudPret = texte(this, LARGEUR - 34, 440, '', 13, '#9fe0ff', { fontStyle: 'bold' }).setDepth(P);
+    this.hudGhostTexte = texte(this, LARGEUR - 34, 182, 'GHOST', 15, '#9fe0ff').setDepth(P);
+    this.hudPret = texte(this, LARGEUR - 34, 440, '', 16, '#9fe0ff', { fontStyle: 'bold' }).setDepth(P);
     this.elementsHud = this.children.list.slice(avant);   // cachés pendant le battle de danse
   }
 

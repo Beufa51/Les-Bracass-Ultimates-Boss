@@ -39,6 +39,12 @@ export const Sauvegarde = {
   // choses déjà faites une fois (ex. 'lionel_entrainement')
   fait(cle) { return !!(donnees.faits || {})[cle]; },
   marquerFait(cle) { donnees.faits = { ...(donnees.faits || {}), [cle]: true }; ecrire(donnees); },
+  // oublie toutes les choses faites dont la clé commence par ce début (ex. revoir les règles d'un boss)
+  oublierFaits(debut) {
+    const f = { ...(donnees.faits || {}) };
+    for (const k of Object.keys(f)) if (k.startsWith(debut)) delete f[k];
+    donnees.faits = f; ecrire(donnees);
+  },
 
   // DÉFIS DE MAÎTRISE d'un boss (une clé par défi, gardés pour toujours)
   defis(id) { return (donnees.defis || {})[id] || {}; },
