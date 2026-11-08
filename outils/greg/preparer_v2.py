@@ -7,7 +7,7 @@ from scipy import ndimage
 
 SRC, DST = 'assets_inbox/greg_v2', 'assets/sprites/greg'
 POSES = ['garde_haute', 'nargue', 'entier', 'jab', 'crochet', 'corps', 'smash', 'touche', 'etourdi', 'tape_gants',
-         'garde_basse', 'ko_debout', 'victoire', 'arme', 'releve']   # nov. 2026
+         'garde_basse', 'ko_debout', 'victoire', 'releve']   # + 'arme' quand la nouvelle image sera là   # nov. 2026
 HAUTEUR_ENTIER = 560   # hauteur finale de la pose "entier" (les autres suivent le même facteur)
 
 def detourer(im):

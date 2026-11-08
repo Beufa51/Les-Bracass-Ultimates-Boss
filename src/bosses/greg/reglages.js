@@ -53,7 +53,6 @@ export const REGLAGES = {
       tapeGants:  { cle: 'greg2_tape_gants',  origine: [0.496, 1], taille: 0.78, pied: true },   // avant le SMASH
       jab:        { cle: 'greg2_jab',         origine: [0.427, 1], taille: 0.78, pied: true, cote: 'd' },
       crochet:    { cle: 'greg2_crochet',     origine: [0.582, 1], taille: 0.78, pied: true, cote: 'g' },
-      arme:       { cle: 'greg2_arme',        origine: [0.481, 1], taille: 0.78, pied: true, cote: 'd' },   // il arme son coup au visage
       corpsPied:  { cle: 'greg2_corps',       origine: [0.526, 1], taille: 0.78, pied: true, cote: 'g' },
       smash:      { cle: 'greg2_smash',       origine: [0.636, 1], taille: 0.78, pied: true },
       touche:     { cle: 'greg2_touche',      origine: [0.616, 1], taille: 0.78, pied: true },

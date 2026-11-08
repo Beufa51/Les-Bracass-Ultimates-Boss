@@ -56,7 +56,7 @@
   moment secret visible (« hé hé... », sifflement, éclat sur le ventre, conseil du coach au round 1) ; « ! » violet au
   milieu ; SMASH une fois au round 2 ; enchaînements au hasard aux rounds 2-3 (+ petites hésitations).
 - Images reçues et branchées : `greg2_garde_basse`, `greg2_nargue` (nouvelle, langue tirée), `greg2_crochet` (refait),
-  `greg2_ko_debout` (chute), `greg2_victoire`, `greg2_arme` (il arme ses coups au visage). Anciennes versions gardées
+  `greg2_ko_debout` (chute), `greg2_victoire` (`greg_arme` retirée : bras tendu de côté, on croyait qu'il tapait à côté ; nouveau prompt). Anciennes versions gardées
   dans `assets_inbox/greg_v2/` (`_ancien`, `_rate`). Outil : `python3 outils/greg/preparer_v2.py`.
 - `greg2_releve` branché : pose prise 1,1 s quand Greg se relève (il monte du tapis).
 - RESTE : poses du héros, portrait / visage / case K.O. / trophée / arbitre
