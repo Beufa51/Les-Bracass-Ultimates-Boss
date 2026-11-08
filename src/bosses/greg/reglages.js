@@ -59,6 +59,7 @@ export const REGLAGES = {
       touche:     { cle: 'greg2_touche',      origine: [0.616, 1], taille: 0.78, pied: true },
       etourdi:    { cle: 'greg2_etourdi',     origine: [0.492, 1], taille: 0.78, pied: true },
       koDebout:   { cle: 'greg2_ko_debout',   origine: [0.492, 1], taille: 0.78, pied: true },   // yeux blancs, il bascule
+      releve:     { cle: 'greg2_releve',      origine: [0.494, 1], taille: 0.78, pied: true },   // il se relève, amoché et furieux
       victoire:   { cle: 'greg2_victoire',    origine: [0.501, 1], taille: 0.78, pied: true },
     },
     dureeChute: 0.9,   // K.O. : durée de la chute sur le ring avant la case manga

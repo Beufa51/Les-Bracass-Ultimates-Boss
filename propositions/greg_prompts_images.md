@@ -1,7 +1,7 @@
 # Greg — prompts d'images (proposés par l'audit fun / animation)
 
 > **Reçues et branchées (nov. 2026)** : greg_garde_basse, greg_nargue (nouvelle), greg_crochet (refait), greg_ko_debout,
-> greg_victoire, greg_arme. **Restent** : greg_releve (nouveau prompt plus simple en fin de fichier), poses du héros,
+> greg_victoire, greg_arme, greg_releve. **Restent** : poses du héros,
 > portrait / visage / case K.O. / trophée / arbitre.
 
 Pour chaque image : JOINDRE `assets/sprites/greg/heros_garde.png` (pour garder le même boxeur et le même style).

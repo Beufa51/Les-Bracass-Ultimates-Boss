@@ -1046,7 +1046,8 @@ export class GregCombat extends BossScene {
     g.vie = R.vieGregApresRelevee[Math.min(g.downs, R.vieGregApresRelevee.length) - 1];
     g.souffle = 100;
     g.fureur *= R.fureur;
-    this.retourGardeGreg();
+    this.retourGardeGreg(1.0);   // il se remet debout avant de repartir à l'attaque
+    g.poseForcee = { nom: 'releve', t: 1.1 }; g.releveDebut = this.time.now;
     this.finCompte();
     if (g.downs >= 2 && !g.enerve) {   // il s'énerve : nouveaux enchaînements avec des feintes
       g.enerve = true; g.seqIndex = 0; g.seqPas = 0; g.finSeq = true;
@@ -1451,6 +1452,10 @@ export class GregCombat extends BossScene {
       pose = e < 140 ? ou('touche', repos) : ou('etourdi', 'touche', repos);
       dx = e < 140 ? -18 : Math.sin(t / 120) * 6; angle = g.secousse > 0 ? 7 : 3; rapide = e < 140;
       if (e < 90) teinte = 0xffc0c0;
+    }
+    else if (forcee === 'releve') {   // il se relève : il monte du tapis, amoché et furieux, puis souffle
+      const e = Math.min(1, (t - (g.releveDebut || t)) / 350);
+      pose = ou('releve', 'etourdi', repos); dy = 40 * (1 - e) + Math.sin(t / 150) * 3; echelle = 0.92 + 0.08 * e;
     }
     else if (forcee === 'bloque') { pose = existe(haute) ? haute : repos; echelle = 0.97; teinte = 0xc8d4ff; rapide = true; }
     else if (forcee === 'uppercut') { pose = ou('smash', 'visage'); echelle = 1.12; dy = 20; rapide = true; }

@@ -58,7 +58,8 @@
 - Images reçues et branchées : `greg2_garde_basse`, `greg2_nargue` (nouvelle, langue tirée), `greg2_crochet` (refait),
   `greg2_ko_debout` (chute), `greg2_victoire`, `greg2_arme` (il arme ses coups au visage). Anciennes versions gardées
   dans `assets_inbox/greg_v2/` (`_ancien`, `_rate`). Outil : `python3 outils/greg/preparer_v2.py`.
-- RESTE : greg_releve (nouveau prompt), poses du héros, portrait / visage / case K.O. / trophée / arbitre
+- `greg2_releve` branché : pose prise 1,1 s quand Greg se relève (il monte du tapis).
+- RESTE : poses du héros, portrait / visage / case K.O. / trophée / arbitre
   (prompts dans `propositions/greg_prompts_images.md`).
 
 ## AUDIT GLOBAL V18 (6 boss, version économe) : `propositions/audit_global.md`
