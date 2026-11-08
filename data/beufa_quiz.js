@@ -56,7 +56,6 @@ export const LECTURES = [
   'Je sais que tu as déjà dit « encore une partie »… à 3 heures du matin.',
   'Je sais que tu as déjà soufflé dans une cartouche pour qu\'elle marche.',
   'Je sais que tu as déjà accusé la manette après avoir perdu.',
-  'Je sais que tu as déjà coupé le son d\'un jeu parce que tu avais peur.',
   'Je sais que tu as déjà regardé l\'écran de ton pote en multijoueur.',
   'Je sais que tu as déjà oublié de sauvegarder… et tout perdu.',
 ];
