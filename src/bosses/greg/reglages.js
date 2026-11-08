@@ -14,9 +14,9 @@ export const DIFFICULTES = {
     texte: 'Greg tape doucement et prévient longtemps. Pour apprendre les esquives et les contres.' },
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', degatsGreg: 0.65, vitesse: 1.25, esquive: 0.55, aides: true, degatsJoueur: 0.65, rangMax: 'A',
     texte: 'Greg frappe moins fort et plus lentement. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 0.9,  vitesse: 1,    esquive: 0.45, aides: true, degatsJoueur: 0.34,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 0.9,  vitesse: 1,    esquive: 0.5,  aides: true, degatsJoueur: 0.34,
     texte: 'Le vrai combat.' },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', degatsGreg: 1.25, vitesse: 0.85, esquive: 0.38, aides: false, degatsJoueur: 0.25,
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', degatsGreg: 1.25, vitesse: 0.85, esquive: 0.42, aides: false, degatsJoueur: 0.25,
     texte: 'Sans flèche ni cible, coups rapides et puissants. Pour les vrais.' },
 };
 
@@ -84,6 +84,7 @@ export const REGLAGES = {
       jab:       { cle: 'heros_coup', miroir: true },
       crochet:   { cle: 'heros_coup' },
       corps:     { cle: 'heros_coup', dy: 30, angle: 8 },
+      corps_g:   { cle: 'heros_coup', miroir: true, dy: 30, angle: -8 },
       dempsey_g: { cle: 'heros_dempsey', miroir: true, echelle: 0.6, dy: -60 },
       dempsey_d: { cle: 'heros_dempsey', echelle: 0.6, dy: -60 },
       victoire:  { cle: 'heros_victoire' },
@@ -114,6 +115,7 @@ export const REGLAGES = {
   espritParfait: 5,
   serie: { bonus: 0.1, oubli: 1.2 },   // « X HITS » : +10 % par coup enchaîné ; la série s'arrête après 1,2 s sans toucher
   memoireAppui: 0.15,          // un appui fait pendant un coup / sonné est gardé en mémoire ce temps
+  memoireEsquive: 0.25,        // ... un peu plus pour les esquives (elles ne doivent jamais « se perdre »)
 
   // ---------- Esprit combatif (jauge du Dempsey Roll) ----------
   // la jauge ne se remplit QU'avec les esquives réussies (environ 8 esquives pour un Dempsey)

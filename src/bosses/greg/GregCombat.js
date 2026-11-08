@@ -207,7 +207,7 @@ export class GregCombat extends BossScene {
     };
     this.memoire = this.memoire || {};
     for (const k of ['espace', 'z', 'x', 'gauche', 'droite']) {
-      if (this.appuis[k]) this.memoire[k] = this.time.now + R.memoireAppui * 1000;
+      if (this.appuis[k]) this.memoire[k] = this.time.now + (k === 'gauche' || k === 'droite' ? R.memoireEsquive : R.memoireAppui) * 1000;
     }
   }
 
@@ -249,7 +249,7 @@ export class GregCombat extends BossScene {
       if (!j.action.fait && j.action.t >= c.impact) { j.action.fait = true; this.coupDuJoueur(j.action.coup); }
       if (j.action && j.action.t >= c.duree) j.action = null;
       // on peut couper la fin de son coup pour esquiver
-      else if (j.action && j.action.fait && j.action.t > c.impact + 0.06 && (this.memo('gauche') || this.memo('droite'))) j.action = null;
+      else if (j.action && j.action.fait && (this.memo('gauche') || this.memo('droite'))) j.action = null;   // on peut couper son coup dès l'impact
       else return;
       if (j.action) return;
     }
@@ -261,7 +261,8 @@ export class GregCombat extends BossScene {
       if (contrePossible && (this.memo('espace') || this.memo('z'))) {
         const coup = this.memo('z') ? 'corps' : 'visage';
         this.consommer('espace', 'z');
-        j.esquive = null; this.frapper(coup); return;
+        const poing = j.esquive.cote < 0 ? 'd' : 'g';   // esquive à gauche => le poing DROIT part (et inversement)
+        j.esquive = null; this.frapper(coup, poing); return;
       }
       if (j.esquive.t >= Math.max(R.esquiveDuree, this.diff.esquive + 0.05)) { j.esquive = null; j.esquivePause = R.esquivePause; j.finEsquive = this.horloge; }
       return;
@@ -285,13 +286,14 @@ export class GregCombat extends BossScene {
     }
   }
 
-  frapper(coup) {
+  frapper(coup, poing) {
     const j = this.j, c = R.coups[coup];
     if (j.souffle < c.souffle) { this.essouffle(); return; }
     j.souffle -= c.souffle; j.reposSouffle = 0.5;
-    // pour le visage, on alterne jab et crochet (juste pour l'animation)
-    this.alterne = !this.alterne;
-    j.action = { coup, t: 0, fait: false, debut: this.horloge, pose: coup === 'corps' ? 'corps' : (this.alterne ? 'jab' : 'crochet') };
+    // poing GAUCHE / DROIT : imposé (contre après une esquive) ou chacun son tour (juste pour l'animation)
+    if (!poing) { this.alterne = !this.alterne; poing = this.alterne ? 'g' : 'd'; } else this.alterne = poing === 'g';
+    const pose = coup === 'corps' ? (poing === 'g' ? 'corps_g' : 'corps') : (poing === 'g' ? 'jab' : 'crochet');
+    j.action = { coup, t: 0, fait: false, debut: this.horloge, pose };
   }
 
   essouffle() {
@@ -1363,7 +1365,7 @@ export class GregCombat extends BossScene {
     else if (j.poseJusqua > this.time.now && !j.esquive && !j.garde) pj = j.dernierePose;   // le coup reste visible un instant
     else if (j.esquive) pj = 'esquive';
     else if (j.garde) pj = 'bloque';
-    j.sprite.setTexture('heros_boxe_' + pj);
+    j.sprite.setTexture('heros_boxe_' + (pj === 'corps_g' ? 'corps' : pj));
     // l'esquive fait glisser le boxeur sur le côté
     let cible = 0;
     if (j.esquive) cible = j.esquive.cote * R.decalageEsquive;

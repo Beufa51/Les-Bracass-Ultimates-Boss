@@ -24,7 +24,7 @@ export const MANIFESTE = {
     // ---------- GREG (combat de boxe) ----------
     // Vue "Punch-Out" : ton boxeur vu de DOS (heros_boxe_*), Greg vu de FACE (greg_*).
     // Une image par pose. Le bas du corps touche le bas de la case.
-    greg_ring:  { fichier: null, largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'ring', pixel: 2 } },
+    greg_ring:  { fichier: 'sprites/greg/greg_ring.jpg', largeur: 960, hauteur: 540, images: 1, vitesse: 1, provisoire: { forme: 'ring', pixel: 2 } },   // ring + public illustrés (nov. 2026)
     // Greg v2 (nouvelle tête + tatouages, assets_inbox/greg_v2, détourées par outils/greg/preparer_v2.py)
     // (audit nov. 2026 : les anciennes images v1 du combat ne sont plus chargées ni gardées)
     greg2_garde_haute: { fichier: 'sprites/greg/greg2_garde_haute.png', largeur: 402, hauteur: 560, images: 1, vitesse: 1 },

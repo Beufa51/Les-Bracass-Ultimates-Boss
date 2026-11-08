@@ -72,7 +72,9 @@
 - NORMAL rééquilibré (nov. 2026) : `degatsGreg` 0,9, `degatsJoueur` 0,34 ; jab et crochet de face réduits (taille 0,70, moins de zoom).
   Téléphone : GESTES (choix A, `src/bosses/greg/gestes.js`, `gestesTactiles: false` pour revenir aux boutons) : gauche de
   l'écran glisser = esquive, doigt posé = garde ; droite haut = visage, bas = corps ; bouton doré Dempsey ; bandes noires
-  comprises. Public : prompt `greg_ring.jpg` (en attente de l'image).
+  comprises. Ring + public illustrés : `greg_ring.jpg` (960 x 540, original dans `assets_inbox/greg_v2/`).
+  Esquive plus tolérante : NORMAL 0,5 s, CHAMPION 0,42 s, appui d'esquive gardé 0,25 s (`memoireEsquive`), on coupe son
+  coup dès l'impact. Poings : contre = poing opposé au côté de l'esquive, sinon gauche / droit chacun son tour (corps aussi).
 - `greg2_releve` branché : pose prise 1,1 s quand Greg se relève (il monte du tapis).
 - RESTE : poses du héros, portrait / visage / case K.O. / trophée / arbitre
   (prompts dans `propositions/greg_prompts_images.md`).
