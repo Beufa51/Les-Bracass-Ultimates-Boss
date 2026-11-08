@@ -448,7 +448,7 @@ IMPORTANT: every object is clearly SEPARATED from the others by a wide empty whi
 Branchées (`python3 outils/julien/decouper_audit21.py`) : main vide, élèves trempés (rangée du bas : cahier sur la tête
 + recroquevillés), surveillant essoufflé / qui t'attrape, policier lanceur qui tousse / enfariné, CRS enfariné, les
 4 écrans de fin (gazé : version SANS « COUGH », l'autre est gardée dans `julien_fin_gaze_toux.jpg`).
-À REFAIRE :
+À REFAIRE (FAIT : les deux versions « bis » sont livrées et branchées) :
 
 #### 21c bis. Bureau renversé — `julien_bureau_renverse.jpg` (joindre `julien_objets_classe.jpg`)
 L'image livrée est plus HAUTE que large : dans le jeu le bureau doit être une barricade LARGE et BASSE (2 fois plus large

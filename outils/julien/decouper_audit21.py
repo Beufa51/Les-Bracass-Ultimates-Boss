@@ -3,7 +3,8 @@
 #   julien_eleves_2.jpg        → julien_eleve_<k>_mouille / _mouille_cache (phase 3, sprinklers ; rangée du BAS)
 #   julien_surveillant_2.jpg   → julien_surveillant_essouffle / _attrape
 #   julien_police_effets.jpg   → julien_lanceur_tousse / _farine, julien_bouclier_tousse / _farine (2e, 3e (CRS bleu) et 5e poses ignorées)
-#   julien_bureau_renverse.jpg → julien_bureau_renverse.png
+#   julien_bureau_renverse.jpg → julien_bureau_renverse.png (2e version, large)
+#   julien_crs_tousse.jpg      → julien_bouclier_tousse.png (CRS noir du jeu)
 #   julien_fin_*.jpg           → julien_fin_*.jpg en 960 × 540 (écrans de fin illustrés)
 # Chaque pose est réduite avec l'ÉCHELLE de son personnage (k) pour avoir la même taille que ses autres poses,
 # puis posée en bas d'un cadre de la hauteur des autres images du personnage.
@@ -22,7 +23,9 @@ PLANCHES = {
     'julien_surveillant_2.jpg': [('surveillant_essouffle', (340, 400), 0.215, 200), ('surveillant_attrape', (1060, 400), 0.215, 200)],
     'julien_police_effets.jpg': [(None, (361, 460), 0, 0), ('lanceur_tousse', (160, 470), 0.30, 200), ('lanceur_farine', (595, 460), 0.30, 200),
                                  (None, (830, 460), 0, 0), ('bouclier_farine', (1290, 470), 0.34, 200)],
-    # bureau renversé : image livrée trop haute, à refaire (prompt 21c bis)
+    # 21c bis / 21d bis (2e livraison) : bureau renversé LARGE ; CRS noir qui tousse
+    'julien_bureau_renverse.jpg': [('bureau_renverse', (700, 480), 0.25, None)],
+    'julien_crs_tousse.jpg': [('bouclier_tousse', (740, 400), 0.235, 200)],
 }
 # les 2 dernières poses des policiers se touchent : on coupe entre elles (zones effacées en blanc avant la découpe)
 EFFACER = {'julien_police_effets.jpg': [(950, 0, 1182, 625), (950, 625, 1128, 768)]}

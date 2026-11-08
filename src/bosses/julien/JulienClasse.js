@@ -77,7 +77,7 @@ export class JulienClasse extends JulienManif {
 
   // vraies images de Julien (outils/julien/decouper_prof.py) ; image absente = dessin provisoire
   preload() {
-    for (const n of [...POSES_PROF.map(p => 'julien_' + p), ...Object.values(MURS_IMAGES), ...OBJETS_IMAGES, ...ELEVES_IMAGES, ...DESSUS_IMAGES, 'main_sarbacane', 'main_sarbacane_tir']) {
+    for (const n of [...POSES_PROF.map(p => 'julien_' + p), ...Object.values(MURS_IMAGES), ...OBJETS_IMAGES, ...ELEVES_IMAGES, ...DESSUS_IMAGES, 'main_sarbacane', 'main_sarbacane_tir', 'bureau_renverse']) {
       if (!this.textures.exists('julien_' + n)) this.load.image('julien_' + n, `assets/sprites/julien/julien_${n}.png`);
     }
     super.preload();
@@ -114,6 +114,8 @@ export class JulienClasse extends JulienManif {
       const b = T.spr.bureau, c = document.createElement('canvas'); c.width = Math.round(b.width * 1.6); c.height = b.height;
       const g = c.getContext('2d'); g.translate(0, b.height); g.scale(1, -1); g.drawImage(b, 0, 0, c.width, b.height);
       T.spr.bureau_renverse = c; T.hauteurs.bureau_renverse = (T.hauteurs.bureau || 0.6) * 1.6;   // presque aussi haut que Julien : on voit qu'il est à l'abri
+      const br = img('bureau_renverse');   // vraie image (prompt 21c bis) : même LARGEUR à l'écran que le dessin ci-dessus
+      if (br) { T.hauteurs.bureau_renverse *= (c.width / c.height) / (br.width / br.height); T.spr.bureau_renverse = br; }
       for (const [code, n] of Object.entries(MURS_IMAGES)) {
         const i = img(n); if (!i || code === 'a') continue;
         const m = T.classe.murs;
