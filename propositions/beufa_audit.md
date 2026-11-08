@@ -14,7 +14,7 @@ L'audit précédent (`beufa_audit_final.md`, V91) est entièrement fait (V92).
 | ENTRAÎNEMENT | 52 s, 0 alerte | 60-77 s, 0-1 alerte | 80-99 s, 1-2 alertes |
 | FACILE | 50 s, 0 alerte | 55-74 s, 0 alerte | 102-181 s, **4 et 15 alertes** (9 renvois dans le parc) |
 | NORMAL | 50 s, 0 alerte | 84-112 s, 1 alerte | 132-140 s, **6 et 9 alertes** |
-| CHAMPION (EXTREME) | **146 s**, 0 alerte (dont 105 s à l'arsenal) | pas fini au moment de l'audit | pas fini |
+| CHAMPION (EXTREME) | **146 s**, 0 alerte (dont 105 s à l'arsenal) | pas joué (voir ci-dessous) | pas joué |
 
 - Temps par pièce (expert) : quai 6 s, parc 16 s, arsenal 9-14 s, QG 15-19 s. L'infiltration complète dure 1 à 3 min.
 - **FACILE et NORMAL donnent EXACTEMENT le même parcours expert** (50,0 s, mêmes temps par pièce) : pour un bon
@@ -25,7 +25,8 @@ L'audit précédent (`beufa_audit_final.md`, V91) est entièrement fait (V92).
   (« frôle ») ; en ENTRAÎNEMENT il passe proprement. Le joueur moyen y reste bloqué 61 s (54 fois « pas de chemin »)
   et l'enfant y prend 2-3 alertes. **En EXTREME, l'expert reste 105 s à l'arsenal** (183 fois « pas de chemin ») :
   il n'y passe qu'en attendant une rare fenêtre. En EXTREME le bot met plusieurs minutes de calcul par partie (il attend à
-  l'arsenal) : moyen / enfant pas encore finis au moment de l'audit. L'arsenal en EXTREME est presque bouché.
+  l'arsenal), et son navigateur s'est fermé pendant la 2e partie expert (souci du bot, pas du jeu) : moyen / enfant
+  EXTREME pas joués (à relancer : `node outils/beufa_bot.mjs 1 champion moyen,enfant`, long). L'arsenal en EXTREME est presque bouché.
 
 ## Chiffres — quiz (10 questions tirées parmi 60)
 
