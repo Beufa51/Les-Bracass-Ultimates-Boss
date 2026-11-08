@@ -38,6 +38,8 @@
 - **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo (~45 s, V20) → BABYFOOT (V19, le beer pong est SUPPRIMÉ) → porte (simplifiée V19z). Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
+## AVIS JOUABILITÉ (tout le jeu, nov. 2026) : `propositions/avis_jouabilite_global.md` — 15 choix EN ATTENTE de Fabien.
+
 ## GREG — AVIS « FUN » d'un game designer (nov. 2026) : `propositions/greg_avis_fun.md` — REFUSÉ par Fabien (il trouve
    les combats déjà trop longs) ; il voulait un avis sur la JOUABILITÉ / game design, à refaire si demandé.
 
