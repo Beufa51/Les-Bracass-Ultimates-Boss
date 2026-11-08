@@ -38,13 +38,14 @@
 - **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo (~45 s, V20) → BABYFOOT (V19, le beer pong est SUPPRIMÉ) → porte (simplifiée V19z). Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
-## GREG — AVIS « FUN » d'un game designer (nov. 2026) : `propositions/greg_avis_fun.md` — 12 choix EN ATTENTE de Fabien.
+## GREG — AVIS « FUN » d'un game designer (nov. 2026) : `propositions/greg_avis_fun.md` — REFUSÉ par Fabien (il trouve
+   les combats déjà trop longs) ; il voulait un avis sur la JOUABILITÉ / game design, à refaire si demandé.
 
 ## HUB = ÉCRAN DE SÉLECTION DES BOSS façon Mega Man (nov. 2026, remplace la salle aux portes)
-- `src/hub/HubScene.js` : grille 3 x 3 (Beufa Kédric Julien / Greg TOI Rémi / Lionel BADGES LA FIN). Pas battu = OMBRE
-  (silhouette + liseré bleu, « ? »), battu = buste en couleur + badge + cadre doré. Flèches + Espace ; au doigt : toucher
+- `src/hub/HubScene.js` : grille 3 x 2 des 6 BOSS seulement (Beufa Kédric Julien / Greg Rémi Lionel), fond bleu vif.
+  Pas battu = OMBRE (silhouette + liseré bleu, « ? »), même pendant l'entrée (on découvre son design en le battant) ;
+  battu = buste en couleur + badge + cadre doré. Bandeau du bas : badges (5 appuis = réglages dev) et ★ LA FIN. Flèches + Espace ; au doigt : toucher
   une case la choisit, la retoucher = combattre. Entrée : bande façon Mega Man (buste qui glisse + nom lettre par lettre).
-  Case BADGES : 5 appuis rapides = réglages développeur (et touche D) ; case LA FIN (ou F) quand les 6 badges sont là.
 - Images : `python3 outils/hub/preparer_selection.py` (bustes tirés des images détourées de chaque boss -> `assets/sprites/hub/select_*`).
 - Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
   allégée en 80 kbit/s ; original dans `assets_inbox/hub/`). Réglages de la grille : `src/hub/reglages.js`.

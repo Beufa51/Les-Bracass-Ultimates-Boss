@@ -1,6 +1,6 @@
 """Écran de sélection des boss (façon Mega Man) : pour chaque boss, un BUSTE en couleur et son OMBRE.
 Source : l'image détourée (fond transparent) de chaque boss -> assets/sprites/hub/select_<id>.png et select_<id>_ombre.png
-(150 x 130, buste posé en bas de la case). Lancer : python3 outils/hub/preparer_selection.py"""
+(240 x 200, buste posé en bas de la case). Lancer : python3 outils/hub/preparer_selection.py"""
 import numpy as np
 from PIL import Image
 from scipy import ndimage
@@ -10,7 +10,7 @@ SOURCES = {   # id : (image détourée, part du haut du corps gardée)
     'julien': ('julien/julien_presentation.png', 0.38), 'greg': ('greg/greg2_entier.png', 0.45),
     'remi': ('remi/remi_presentation.png', 0.42), 'lionel': ('lionel/lionel_portrait.png', 0.40),
 }
-L, H = 150, 130
+L, H = 240, 200
 for id_, (src, part) in SOURCES.items():
     im = Image.open('assets/sprites/' + src).convert('RGBA')
     im = im.crop(im.getbbox())
