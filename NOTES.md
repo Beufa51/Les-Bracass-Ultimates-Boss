@@ -15,9 +15,11 @@
   `src/core/musique.js`, appelé par le battle au premier appui (joue les 2 morceaux en muet un instant).
   « Tout est raté au bon moment » sur téléphone : le doigt est lu en DIRECT (`touchstart` du navigateur + place réelle
   du jeu à l'écran, plus les coordonnées du moteur qui pouvaient être périmées), à l'instant exact du toucher ;
-  compensation du tactile remise à 0 (`showtime.latenceTactile` : Fabien était « en avance ») et fenêtres x1,35 sur
+  compensation du tactile -0,06 s (`showtime.latenceTactile` : Fabien était « en avance ») et fenêtres x1,35 sur
   téléphone (`showtime.fenetreTactile`, réglage dev) ; BIEN / RATÉ disent « en avance / en
   retard » et le bilan donne ton décalage moyen en ms.
+  Boutons des COURSES sur téléphone minuscules : des commentaires « // » dans le CSS de `src/core/tactile.js` cassaient
+  la règle `.separee` (corrigé en /* */) ; boutons agrandis (◀ ▶ 120 px, ▲ ▼ 130x96).
 - **Beufa** : TERMINÉ — infiltration façon Metal Gear (4 pièces) puis QUIZ dans son bureau (codec, Psycho Mantis,
   rideau, 60 questions, GAME OVER façon MGS, classement BIG BOSS → CHICKEN, médaille = badge du hub, meilleur rang
   sauvegardé). Audit final : `propositions/beufa_audit_final.md`.

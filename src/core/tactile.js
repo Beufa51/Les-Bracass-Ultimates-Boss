@@ -48,12 +48,13 @@ export function installerTactile() {
     .tactile.droite.danse { grid-template-columns: repeat(2, 124px); grid-template-rows: 124px; }
     .tactile.danse button { font-size: 46px; }
     .tactile.danse button.cache { display: none; }
-    .tactile.noir { z-index: 45; }   // AU-DESSUS du voile #noir (z-index 40) : on VOIT les boutons pendant la coupure
-    .tactile.noir button { opacity: 0.55; }   // coupure de courant : visibles en lumière faible — on peut continuer à appuyer
-    .tactile.gauche.separee { grid-template-columns: repeat(2, 96px); grid-template-rows: 96px; }
-    .tactile.droite.separee { grid-template-columns: repeat(2, 84px); grid-template-rows: repeat(2, 76px); }
+    /* (commentaires en /* */ : les « // » d'avant CASSAIENT les règles suivantes, boutons des courses de Kédric minuscules) */
+    .tactile.noir { z-index: 45; }   /* AU-DESSUS du voile #noir (z-index 40) : on VOIT les boutons pendant la coupure */
+    .tactile.noir button { opacity: 0.55; }   /* coupure de courant : visibles en lumière faible */
+    .tactile.gauche.separee { grid-template-columns: repeat(2, 120px); grid-template-rows: 120px; }
+    .tactile.droite.separee { grid-template-columns: 130px auto; grid-template-rows: repeat(2, 96px); }
+    .tactile.separee button { font-size: 40px; }
     .tactile.separee button.cache { display: none; }
-    .tactile.gauche.separee button { font-size: 36px; }
   `;
   document.head.appendChild(style);
 
