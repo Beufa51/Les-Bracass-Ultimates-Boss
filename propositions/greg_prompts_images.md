@@ -345,3 +345,25 @@ ear (elbow high, the glove partly hidden behind his head), his left glove up in 
 turned, weight on the back leg, eyes locked on the viewer, teeth clenched. NO arm stretched out, nothing pointing to
 the side: the punch has NOT been thrown yet. The belt has a plain gold buckle with NO text.
 ```
+
+## COUPS DE FACE (nov. 2026) : les poses de l'ancienne planche, avec le NOUVEAU Greg
+Problème : les coups v2 partent sur le CÔTÉ ; sur l'ancienne planche (`assets_inbox/greg_planche_1.jpg`) le gant part
+DROIT VERS LE JOUEUR. Une image par prompt. Joindre DEUX images, dans cet ordre :
+1. `assets_inbox/greg_reference_face.jpg` (le personnage)  2. `assets_inbox/greg_planche_1.jpg` (les poses)
+Puis coller le prompt commun ci-dessous en remplaçant la dernière ligne par la ligne POSE voulue.
+```
+FIRST attached image = the CHARACTER: copy exactly his face, curly hair, beard, skin tone, muscular body, the arm
+tattoos (each tattoo on the SAME arm and at the same place), red satin trunks with gold belt (plain gold buckle, NO
+text), red gloves with white wraps, red boots, and the detailed 1990s boxing manga drawing style.
+SECOND attached image = the POSES ONLY (an old version of the character with an afro, blue trunks and white gloves:
+do NOT copy his hair, clothes or glove colors, ONLY the body position).
+Draw ONE single figure, FULL BODY, seen from the FRONT, facing the viewer like an opponent in the ring.
+THE PUNCH GOES STRAIGHT AT THE VIEWER: the punching glove is in FRONT of his body, very big because it comes toward the
+camera (strong foreshortening), the arm pointing at the viewer, NOT stretched out to the side.
+FRAMING: the whole character inside the image, never cropped (hair, both gloves, both feet), centered, wide empty
+white margin on all four sides. Plain pure white background, no text, no motion lines crossing the body.
+POSE: <ligne POSE>
+```
+- **greg_jab.jpg** : `copy the pose of the 2nd figure of the second image: straight punch thrown at the viewer with the glove on the LEFT side of the picture, huge glove in the foreground hiding part of his shoulder, other glove guarding the chin, legs apart.`
+- **greg_crochet.jpg** : `copy the pose of the 3rd figure of the second image: powerful punch thrown at the viewer with the glove on the RIGHT side of the picture, torso turned, big glove in the foreground at face height, other glove guarding the chin, knees bent.`
+- **greg_corps.jpg** : `copy the pose of the 4th figure of the second image: crouched low, driving an uppercut at the viewer's stomach, glove big in the foreground at belly height, other glove guarding the chin, angry face.`
