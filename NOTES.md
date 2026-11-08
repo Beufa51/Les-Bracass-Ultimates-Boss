@@ -1469,6 +1469,13 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   les autres étaient de biais). Course de dos tout droit : la planche reçue (`course_dos2`) n'a que 2 images vraiment de
   dos → pas utilisée, le sprint vers le haut garde la marche de dos accélérée.
 
+## BEUFA — V102 : PRÉSENTATION DÉTOURÉE PROPREMENT
+- `beufa_presentation.png` (162×488, fond transparent) fait par `python3 outils/beufa/presentation_detourer.py` :
+  fond à 2 couleurs (blanc en haut, « sol » gris-bleu en bas), runes et OMBRE sous les pieds retirées, contour rongé
+  d'1 px + adouci (plus de liseré clair). Le manifeste n'a plus de `fond` (rien à retirer en jeu).
+- Résolution : l'image de Fabien fait 375×512 (le perso 162×488) ; elle est affichée à sa taille (500 px de haut sur
+  un jeu de 540) : pour plus net, il faut un original plus grand (même prompt, « high resolution »).
+
 ## LIONEL — V101 : NORMAL UN PEU PLUS DUR (Fabien : « un peu trop simple »)
 - `DIFFICULTES.normal` (lionel/reglages.js) : vitesse 1.0 → 1.03, réaction 0.21 → 0.195 s, erreur 44 → 38,
   lancers 0.89 → 0.94. Toujours sous CHAMPION (1.06 / 0.18 / 32 / 1.04). PERSO garde les anciens chiffres de départ.
