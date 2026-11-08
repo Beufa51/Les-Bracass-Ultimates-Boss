@@ -1061,6 +1061,8 @@ export class BeufaInfiltration extends BossScene {
     if (cle !== 'beufa_heros_profil' && cle !== 'beufa_heros_course_profil' && Math.abs(ca) > 0.3 && this.heroSprint && this.heroBouge && this.textures.exists(cleCourseH)) {
       cle = cleCourseH; miroir = ca < -0.05;
     }
+    // V98 : sprint TOUT DROIT vers le bas : la course bien de face (vers le haut : pas encore d'image droite → la marche)
+    else if (cle === 'beufa_heros' && this.heroSprint && this.heroBouge && this.textures.exists('beufa_heros_course_face2')) cle = 'beufa_heros_course_face2';
     const nH = Math.max(1, Object.keys(this.textures.get(cle).frames).length - 1);
     const pasH = cle.startsWith('beufa_heros_course') ? R.joueur.pasCourse : (cle === 'beufa_heros_profil' ? R.joueur.pas : R.joueur.pasFace);   // V51 : course plus longue — V71 : face/dos = 4 cycles par planche
     const imageH = this.heroBouge ? Math.floor((this.joueur.distPas || 0) / pasH * nH) % nH

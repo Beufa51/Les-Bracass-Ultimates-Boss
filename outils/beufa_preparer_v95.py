@@ -120,3 +120,9 @@ planche('beufa_heros_attrape', [snake[0], snake[-2], snake[-1]])
 #    (le jeu les retourne quand il va vers la gauche)
 for sens in ['face', 'dos']:
     planche(f'beufa_heros_course_{sens}', personnages(f'beufa_heros_course_{sens}.jpg'))
+
+# 8. (V98) Snake qui court TOUT DROIT vers le bas : la planche de 12 a la moitié des images tournées de biais
+#    (6, 8, 11, 12) : on garde les 6 bien de face, dans l'ordre. La planche de dos (beufa_heros_course_dos2.jpg)
+#    n'a que 2 images vraiment de dos : pas utilisée (la marche reste pour le sprint vers le haut).
+face2 = personnages('beufa_heros_course_face2.jpg')
+planche('beufa_heros_course_face2', [face2[i - 1] for i in [1, 2, 3, 4, 5, 7]])

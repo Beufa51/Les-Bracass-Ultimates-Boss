@@ -1465,6 +1465,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - V96 : n°5 LIVRÉ (en 2 images, prompt 5 bis) : `beufa_heros_course_face/dos` (6 images, dessinées en 3/4 vers la
   DROITE, retournées quand on va à gauche, `ancre: 'buste'`) : SPRINT en DIAGONALE seulement (V97 : tout droit
   il « courait de biais », refusé par Fabien → la marche, en attendant le prompt 5 ter), cycle `R.joueur.pasCourse`. Toutes les images de l'audit sont branchées. (`beufa_heros_planche2.jpg` ne sert pas.)
+- V98 (prompt 5 ter) : `beufa_heros_course_face2` = sprint TOUT DROIT vers le bas (6 images sur 12 gardées : 1-5 et 7,
+  les autres étaient de biais). Course de dos tout droit : la planche reçue (`course_dos2`) n'a que 2 images vraiment de
+  dos → pas utilisée, le sprint vers le haut garde la marche de dos accélérée.
 
 ## JULIEN — FPS FAÇON WOLFENSTEIN (décidé avec Fabien)
 Histoire : tu es un étudiant en pleine manif, tu dois rejoindre le lycée (niveau 1), puis affronter Julien, prof, qui
