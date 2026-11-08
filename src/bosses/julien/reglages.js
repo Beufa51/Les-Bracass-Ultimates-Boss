@@ -105,7 +105,7 @@ export const REGLAGES = {
   lycee: { anarchisteAlerte: 1.5, canette: 15, fayotCri: 3.5, fayotAlerte: 10, fayotVue: 8 },   // canette : vie rendue ; fayot : s entre 2 cris, rayon d'alerte, vue
   // NIVEAU 2 : JULIEN, le prof (JulienClasse.js). 3 phases : > 50 % de vie, 50-20 %, < 20 % (il pète un câble)
   julien: {
-    vie: 55,             // (Fabien : trop simple → 40 → 55) 1 boulette = 1, 1 tomate = 2, 1 coup de pancarte = 1 ; DE DOS : ×2
+    vie: 90,             // (Fabien : trop simple → 40 → 55 ; audit nov. 2026 → 90) 1 boulette = 1 × multFace (de face) ou × multDos (de dos)
     vitesse: 1.1,        // il fait les cent pas devant le tableau (phase 3 : vitesseRage, derrière son bureau renversé)
     vitesseRage: 1.6,
     cadence: [1.9, 1.5, 1.1],    // secondes entre 2 attaques, par phase (× la difficulté)
@@ -115,6 +115,8 @@ export const REGLAGES = {
     dos: [1.9, 1.7, 2.0],         // FENÊTRE DE PUNITION : après une grosse attaque, il écrit au tableau DE DOS (s)
     dosApresPetite: [0, 0.2, 0.6], // chance qu'il se retourne aussi après une petite attaque (il perd ses moyens)
     multDos: 2,          // (le ×3 de la sarbacane a été retiré : demande de Fabien)
+    multFace: 0.5,       // DE FACE il se protège avec son livre : dégâts × 0,5 (audit nov. 2026 : la fenêtre « de dos » devient le cœur du combat)
+    aide: 0.5,           // aide à la visée en classe : × celle de la manif (elle anticipe déjà sa marche)
     livre: { vitesse: 6, degats: 14 },
     eventail: 0.28,      // écart (radians) entre les 3 livres de l'éventail
     dico: { vitesse: 4.5, degats: 22, rebonds: 3, preavis: 0.8 },   // le dictionnaire rebondit sur les murs (pas sur les tables)

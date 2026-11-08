@@ -60,10 +60,11 @@ export const ZONES_LYCEE = [
 // Répliques (à personnaliser lors de la passe de finition)
 export const REPLIQUES_LYCEE = {
   sifflet: '« TWEEET ! Hé toi ! Tu vas où comme ça ?! »',
-  fayot: ['« M\'SIEUR ! IL EST LÀ ! »', '« Je vais le dire au CPE ! »', '« Il a des ŒUFS, m\'sieur ! »'],
+  fayot: ['« M\'SIEUR ! IL EST LÀ ! »', '« Je vais le dire au CPE ! »', '« Il a une SARBACANE, m\'sieur ! »'],
   fayotTouche: '« Hé ! Je vais le dire ! »',
   puree: '« Reprends donc de la purée ! »',
   porteFermee: 'Fermée à clé ! Sans ton CARNET DE CORRESPONDANCE, pas question d\'entrer (il est au CDI).',
   carnet: 'Ton CARNET DE CORRESPONDANCE ! Vite, la salle 12 : en haut du couloir des casiers, tout à gauche.',
   porte: '« Entrez !… Vous êtes en RETARD. »',
+  fuite: ['Au bureau du CPE !', 'Il file se changer !', 'Un de moins !', 'Il retourne en salle des profs !'],
 };

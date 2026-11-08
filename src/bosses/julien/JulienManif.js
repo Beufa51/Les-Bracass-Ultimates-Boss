@@ -109,7 +109,7 @@ export class JulienManif extends BossScene {
         'Signe distinctif : barbe poivre et sel',
         'Tee-shirt : Pyramid Head (Silent Hill)',
       ],
-      invite: 'à la manif !',
+      invite: { JulienLycee: 'au lycée !', JulienClasse: 'en classe !' }[this.scene.key] || 'à la manif !',
     }, () => this.choisirDifficulte(() => this.time.delayedCall(120, () => this.intro())));
   }
 
@@ -175,8 +175,9 @@ export class JulienManif extends BossScene {
     texte(this, LARGEUR / 2, 400, `${estTactile() ? 'HUB' : 'X'} : retour au hub`, 18, '#aaaaaa').setDepth(1001);
     this.time.delayedCall(600, () => {
       this.input.keyboard.once('keydown-SPACE', () => this.scene.restart({ rejouer: true }));
-      this.input.keyboard.once('keydown-X', () => this.retourHub());
     });
+    // HUB seulement après 1,5 s : LANCER (= X) tapé en rafale au moment de mourir ne renvoie plus au hub par erreur
+    this.time.delayedCall(1500, () => this.input.keyboard.once('keydown-X', () => this.retourHub()));
   }
 
   // Écran COMMANDES (PC) : préréglage, souris, toujours courir, et chaque touche à personnaliser
@@ -549,10 +550,12 @@ export class JulienManif extends BossScene {
     jouerSon(this, 'julien_ramasse', { rate: 1.2 });
   }
 
+  multAide() { return 1; }   // (la classe la réduit : RG.julien.aide)
+
   // Aide à la visée : un œuf lancé presque vers un policier (écart < aide) part droit sur lui
   viser(dx, dy) {
     const j = this.j;
-    let meilleur = this.tactile ? RG.oeufs.aideTactile : RG.oeufs.aide, vx = dx, vy = dy;
+    let meilleur = (this.tactile ? RG.oeufs.aideTactile : RG.oeufs.aide) * this.multAide(), vx = dx, vy = dy;
     for (const e of this.ennemis) if (e.actif && e.etat !== 'fuite') {
       const ox = e.x - j.x, oy = e.y - j.y, d = Math.hypot(ox, oy);
       if (d > 12 || d < 0.3) continue;
@@ -765,7 +768,11 @@ export class JulienManif extends BossScene {
   // tache : 'oeuf' (jaune), 'tomate' (rouge) ou null (pancarte, eau, fumée : pas de trace)
   toucherEnnemi(e, degats = 1, { recul = null, perceBouclier = false, silencieux = false, tache = null, genre = null } = {}) {
     if (recul) this.deplacer(e, recul[0], recul[1], 0.28);
-    if (e.type === 'bouclier' && !this.bouclierBaisse(e) && !perceBouclier) { if (!silencieux) jouerSon(this, 'julien_plonk'); return; }
+    if (e.type === 'bouclier' && !this.bouclierBaisse(e) && !perceBouclier) {
+      if (!silencieux) jouerSon(this, 'julien_plonk');
+      if (!e.alerte) { e.alerte = true; e.vuX = this.j.x; e.vuY = this.j.y; e.etat = 'approche'; }   // « plonk » : il t'a repéré
+      return;
+    }
     e.vie -= degats;
     e.dernier = tache || 'propre';   // pour l'image « touché » / « fuite » : jaune, rouge ou sans trace
     // il garde la trace : jaune d'œuf ou tomate sur l'uniforme (4 au plus)
@@ -779,7 +786,7 @@ export class JulienManif extends BossScene {
         this.time.delayedCall(900, () => this.message('Il a lâché son casse-croûte !', 2));
       }
       this.combo(tache, genre);
-      this.message(['Il s\'enfuit tout dégoulinant !', 'Omelette !', 'Un de moins !', 'Retour au commissariat !'][this.repousses % 4]);
+      this.message(this.messagesFuite()[this.repousses % 4]);
       this.j.expr = 'content'; this.j.exprT = 0.9;
       return;
     }
@@ -788,6 +795,12 @@ export class JulienManif extends BossScene {
     if (e.type === 'lanceur' && e.etat === 'prepare') return;   // le lancer part quand même
     e.apres = e.etat; e.tApres = e.t; e.etat = 'touche'; e.t = 0.22;
   }
+
+  // durée de la dernière image en « images à 60 Hz » (les flashs durent pareil sur un téléphone à 120 Hz)
+  pas60() { return Math.min(4, (this.game.loop.delta || 16.7) / 16.7); }
+
+  // message quand un ennemi s'enfuit (le lycée a les siens)
+  messagesFuite() { return ['Il s\'enfuit tout dégoulinant !', 'Omelette !', 'Un de moins !', 'Retour au commissariat !']; }
 
   // CRS vulnérable : essoufflé, ou en train de sursauter pendant son essoufflement (sinon le 2e œuf fait « plonk »)
   bouclierBaisse(e) { return e.etat === 'essouffle' || (e.etat === 'touche' && e.apres === 'essouffle'); }
@@ -979,8 +992,8 @@ export class JulienManif extends BossScene {
     if (j.gaz > 0) { g.fillStyle = `rgba(190,205,160,${0.5 * j.gaz})`; g.fillRect(0, 0, L, VUE_H); }
     if (j.rose > 0) { g.fillStyle = `rgba(230,120,190,${0.35 * j.rose})`; g.fillRect(0, 0, L, VUE_H); }
     if (j.rouge > 0) { g.fillStyle = `rgba(200,0,0,${j.rouge * 0.6})`; g.fillRect(0, 0, L, VUE_H); }
-    if (j.blanc > 0) { g.fillStyle = `rgba(255,255,250,${j.blanc * 0.7})`; g.fillRect(0, 0, L, VUE_H); j.blanc = Math.max(0, j.blanc - 0.03); }
-    if (j.or > 0) { g.fillStyle = `rgba(255,210,80,${j.or * 0.35})`; g.fillRect(0, 0, L, VUE_H); j.or = Math.max(0, j.or - 0.04); }
+    if (j.blanc > 0) { g.fillStyle = `rgba(255,255,250,${j.blanc * 0.7})`; g.fillRect(0, 0, L, VUE_H); j.blanc = Math.max(0, j.blanc - 0.03 * this.pas60()); }
+    if (j.or > 0) { g.fillStyle = `rgba(255,210,80,${j.or * 0.35})`; g.fillRect(0, 0, L, VUE_H); j.or = Math.max(0, j.or - 0.04 * this.pas60()); }
     let gyro = 99;   // gyrophares des camions de CRS : flash bleu quand on est près
     for (const o of this.objets) if (o.type === 'camion') gyro = Math.min(gyro, Math.hypot(o.x - j.x, o.y - j.y));
     if (gyro < 6 && Math.sin(this.time.now / 110) > 0.2) { g.fillStyle = `rgba(60,110,255,${0.16 * (1 - gyro / 6)})`; g.fillRect(0, 0, L, VUE_H); }

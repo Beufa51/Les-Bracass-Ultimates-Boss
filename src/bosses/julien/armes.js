@@ -48,9 +48,11 @@ export function armeSuivante(scene) {
   }
 }
 // plus de munitions : on passe aux œufs, sinon à la pancarte
+// (même si le bouton reste enfoncé, comme dans Doom : on n'attend pas qu'il soit relâché)
 function armeDeSecours(scene) {
-  const j = scene.j;
-  j.arme = j.mun.oeufs > 0 ? 'oeufs' : 'pancarte';
+  const j = scene.j, avant = j.arme;
+  armeSuivante(scene);
+  if (j.arme === avant) j.arme = j.mun.oeufs > 0 ? 'oeufs' : 'pancarte';
   scene.message(`À court ! ${armeDe(j.arme).nom}`, 1.5);
 }
 
@@ -59,7 +61,7 @@ export function tirer(scene, dx, dy, appui, nouveau) {
   const j = scene.j, a = armeDe(j.arme);
   if (!appui || j.recharge > 0 || j.changeT > 0) return;
   if (scene.confisque && scene.confisque.id === j.arme) return;   // (la classe) Julien l'a confisquée
-  if (a.mun && j.mun[a.mun] <= 0) { if (nouveau) armeDeSecours(scene); return; }
+  if (a.mun && j.mun[a.mun] <= 0) { armeDeSecours(scene); return; }
   if (a.mun) j.mun[a.mun]--;
   const [vx, vy] = scene.viser(dx, dy);
   const ajout = (genre, ax, ay, extra = {}) => scene.tirs.push({ genre, x: j.x + ax * 0.3, y: j.y + ay * 0.3, dx: ax, dy: ay, t: 0, ...extra });

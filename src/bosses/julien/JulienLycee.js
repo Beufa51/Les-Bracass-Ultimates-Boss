@@ -68,6 +68,7 @@ export class JulienLycee extends JulienManif {
   }
   planDepart() { return PLAN_LYCEE; }
   lancerMusique() { jouerMusique(this, 'julien_lycee_musique'); }   // thème de Duke Nukem 3D
+  messagesFuite() { return TXT.fuite; }   // surveillants et fayots : pas de « commissariat » au lycée
 
   create() {
     this.txtLycee = null;   // (la scène est réutilisée quand on rejoue : ne pas toucher au texte de la partie d'avant)

@@ -26,7 +26,7 @@ export const VueDessus = {
   // vers le haut. Réglages : RG.julien.dessus (px, px/s), RG.julien.murs (nombre et cadence des murs), RG.julien.mur.
   entrerDessus(e) {
     const D = RG.julien.dessus;
-    this.livres = [];
+    this.livres = []; this.tirs = [];   // une boulette 3D encore en vol ne touche plus Julien pendant la rafale
     this.dessus = { prochain: D.attente, restants: RG.julien.murs.nombre[e.phase - 1] + (e.motif === 'murs' ? 1 : 0),
       murs: [], tirs: [], px: L / 2, py: VUE_H - 26, prof: L / 2, profV: 1, invT: 0, trou: null, sens: Math.random() < 0.5 ? -1 : 1,
       recharge: 0, lanceT: 0, flash: 0, parts: [], fx: [], entree: 0.45, fin: null, rouge: 0, poussiere: 0, touches: 0, souffleT: 0, rageT: 0, murN: 0 };

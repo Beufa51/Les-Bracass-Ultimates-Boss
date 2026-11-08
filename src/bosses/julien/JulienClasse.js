@@ -30,7 +30,8 @@ const MURS_IMAGES = { 1: 'mur_classe', 3: 'fenetres_classe', 4: 'porte_classe', 
 // vraies images des objets (table avec sa chaise, bureau, projectiles) et leur hauteur dans le monde
 const OBJETS_IMAGES = ['table', 'bureau', 'livre', 'dico', 'copie', 'craie'];
 const HAUTEURS_IMAGES_CLASSE = { table: 0.72, bureau: 0.62, livre: 0.15, dico: 0.17, copie: 0.15, craie: 0.06 };
-const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'touche_papier', 'dos', 'rage', 'vaincu', 'vaincu_papier'];
+const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'touche_papier', 'dos', 'rage', 'vaincu', 'vaincu_papier',
+  'dos2', 'pointe', 'crie', 'confisque', 'regle'];   // (3e planche, prompt 21a : 2e image de dos, « au tableau », cri, confisqué, règle)
 const ELEVES_IMAGES = [0, 1, 2, 3].flatMap(k => [`eleve_${k}_content`, `eleve_${k}_cache`]);
 const GROSSES = new Set(['eventail', 'mur', 'murs', 'deluge', 'dico', 'aimant', 'rafale']);   // après elles : il se retourne (fenêtre de punition)
 // ce qu'on annonce en grand quand il prépare une attaque, et le conseil la 1re fois
@@ -185,7 +186,7 @@ export class JulienClasse extends JulienManif {
       if (c === 'J') { this.j.x = px; this.j.y = py; return '.'; }
       if (c === 'U') {
         this.julien = { type: 'julien', x: px, y: py, vie: (this.vieMax = RG.julien.vie), etat: 'attente', t: 1, anim: 0, bouge: false,
-          vuX: px, vuY: py + 5, alerte: true, actif: true, phase: 1, cible: null, taches: [], flash: 0, reste: 0 };
+          vuX: px, vuY: py + 5, alerte: true, actif: true, phase: 1, cible: null, taches: [], flash: 0, reste: 0, forcer: 'mur' };   // 1re attaque : une rafale de murs (tout le monde voit la vue du dessus)
         this.ennemis.push(this.julien);
         return '.';
       }
@@ -319,7 +320,7 @@ export class JulienClasse extends JulienManif {
   }
 
   choisirMotif(e, d) {
-    if (e.forcer) { const m = e.forcer; e.forcer = null; return m; }   // (ANARCHISTE : rafale imposée au changement de phase)
+    if (e.forcer) { const m = e.forcer; e.forcer = null; return m; }   // (rafale de murs imposée au début de chaque phase)
     const J = RG.julien, j = this.j, r = Math.random();
     if (d < J.regle.portee) return 'regle';
     if (d < J.confisque.portee && !this.confisque && Math.random() < [0.5, 0.6, 0.85][e.phase - 1]) return 'confisque';
@@ -381,12 +382,14 @@ export class JulienClasse extends JulienManif {
   }
 
   // aide à la visée : comme dans la manif, mais l'œuf part là où Julien SERA (il marche)
+  multAide() { return RG.julien.aide; }   // aide à la visée réduite en classe
+
   viser(dx, dy) {
     const [vx, vy] = super.viser(dx, dy), e = this.julien, j = this.j;
     if (e.etat === 'fuite' || !(e.vx || e.vy)) return [vx, vy];
     const ox = e.x - j.x, oy = e.y - j.y, d = Math.hypot(ox, oy);
     if (Math.abs(vx * oy - vy * ox) / d > 0.02) return [vx, vy];   // l'aide n'a pas choisi Julien
-    const t = d / RG.oeufs.vitesse, px = ox + e.vx * t, py = oy + e.vy * t, n = Math.hypot(px, py);
+    const t = d / RG.sarbacane.vitesse, px = ox + e.vx * t, py = oy + e.vy * t, n = Math.hypot(px, py);
     return [px / n, py / n];
   }
 
@@ -493,7 +496,7 @@ export class JulienClasse extends JulienManif {
 
   changerPhase(ph) {
     const e = this.julien;
-    if (this.anarchiste) e.forcer = 'murs';   // ANARCHISTE : il enchaîne direct sur une rafale de murs
+    e.forcer = this.anarchiste ? 'murs' : 'mur';   // chaque phase commence par une rafale de murs (ANARCHISTE : un mur de plus)
     if (ph === 2) {   // INTERRO SURPRISE : copies, dictionnaire, « au tableau ! »
       this.txtAnnonce.setText('INTERRO SURPRISE !'); this.annonceT = 3;
       this.txtConseil.setText('Murs de copies, dictionnaire, « AU TABLEAU ! » : lis bien les annonces !');
@@ -523,7 +526,7 @@ export class JulienClasse extends JulienManif {
       const m = RG.julien.multDos;
       degats *= m;
       if (!silencieux) this.bulle(`×${m}`);
-    }
+    } else degats *= RG.julien.multFace;   // de face, il se protège avec son livre : la fenêtre « de dos » compte vraiment
     e.vie = Math.max(0, e.vie - degats); e.flash = 0.15;
     if (genre === 'boulette') {   // petite explosion de papier sur lui (pas de jaune d'œuf : c'est une boulette)
       const j = this.j, d = Math.hypot(j.x - e.x, j.y - e.y) || 1;
@@ -553,7 +556,7 @@ export class JulienClasse extends JulienManif {
       return;
     }
     if (Math.random() < 0.1) this.message(hasard(REPLIQUES.touche), 1.6);
-    if (e.etat === 'marche') { e.apres = 'marche'; e.tApres = e.t; e.etat = 'touche'; e.t = 0.18; }   // ne coupe pas un lancer
+    // (plus de petit arrêt « touché » : il ne se fige plus sous les boulettes ; le flash suffit à montrer la pose touchée)
   }
 
   // petit « ×2 » qui saute au milieu de l'écran
@@ -577,10 +580,13 @@ export class JulienClasse extends JulienManif {
     const s = this.T.spr;
     if (e.etat === 'fuite') return s.julien_vaincu_papier || s.julien_vaincu;   // vaincu à la sarbacane : sans jaune d'œuf
     if (e.etat === 'touche' || e.flash > 0) return s.julien_touche_papier || s.julien_rage || s.julien_touche;   // touché par une BOULETTE (sans jaune d'œuf)
-    if (e.etat === 'dos') return s.julien_dos || s.julien_marche0;
-    if (e.etat === 'prepare' || e.etat === 'aimant') return s.julien_bras;
-    if (e.etat === 'lance') return s.julien_lance;
-    if (e.etat === 'pause' || (e.phase === 3 && ((this.time.now / 200) | 0) % 5 === 0)) return s.julien_rage;
+    if (e.etat === 'dos') return (((this.time.now / 380) | 0) % 2 && s.julien_dos2) || s.julien_dos || s.julien_marche0;   // il écrit (2 images)
+    const propre = { aimant: s.julien_pointe, confisque: s.julien_confisque, regle: s.julien_regle }[e.motif];   // poses de la 3e planche
+    if (e.etat === 'aimant') return s.julien_pointe || s.julien_bras;
+    if (e.etat === 'prepare') return propre || s.julien_bras;
+    if (e.etat === 'lance') return (e.motif !== 'aimant' && propre) || s.julien_lance;
+    if (e.etat === 'pause') return s.julien_crie || s.julien_rage;   // changement de phase : il crie
+    if ((e.phase === 3 && ((this.time.now / 200) | 0) % 5 === 0)) return s.julien_rage;
     return s[(e.bouge && (e.anim * 4 | 0) % 2) ? 'julien_marche1' : 'julien_marche0'];
   }
 

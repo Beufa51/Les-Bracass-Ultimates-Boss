@@ -1781,7 +1781,17 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   10 à 16 (Julien 8 poses, objets de la classe, élèves assis, ennemis du lycée, murs, bonus de la manif, rideau de fer).
 - AUDIT « comme Lionel » (nov. 2026) : `propositions/julien_audit.md` + bot `node outils/julien_bot.mjs` (216 parties, ≈ 1 min).
   Manif et lycée bien réglés ; classe trop facile (72/72 victoires, 25-55 s, 5 attaques par combat) ; 9 bugs listés ;
-  prompts section 21 de `julien_prompts_images.md`. EN ATTENTE des choix de Fabien (A à J). Rien de changé dans src/.
+  prompts section 21 de `julien_prompts_images.md`.
+- V104 (choix A + B + C de l'audit, FAITS) : bugs 1 à 9 corrigés (Julien ne se fige plus sous les boulettes ; arme vide
+  = arme suivante même bouton enfoncé ; HUB de l'écran PERDU seulement après 1,5 s ; « plonk » sur le bouclier alerte le CRS ;
+  aide à la visée de la classe à la vitesse de la sarbacane ; boulettes 3D vidées en entrant en vue du dessus ; messages de
+  fuite et fayot propres au lycée ; invite « au lycée / en classe » ; flashs blanc/or au temps réel). Équilibrage :
+  `RG.julien.vie` 55 → 90, `multFace` 0,5 (de dos ×2), `aide` 0,5 en classe ; chaque phase COMMENCE par une rafale de murs
+  (`e.forcer`). Bot : classe 66-100 s (avant 23-56), de dos ≈ 60 % des dégâts, débutant BLOQUEUR gagne avec ~40 % de vie
+  (un vrai joueur : 2 à 3 fois plus long). Restent : D (il descend de l'estrade : confisqué / règle jamais vus), E à J.
+- 3e PLANCHE de Julien (prompt 21a) LIVRÉE : `assets_inbox/julien/julien_prof_3.jpg` → `decouper_prof.py` (`planche_3`)
+  → `julien_julien_dos2` (alterne avec dos), `pointe` (« AU TABLEAU ! »), `crie` (changement de phase), `confisque`,
+  `regle` (2 règles croisées, haut coupé). Branchées dans `imageEnnemi` (JulienClasse).
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,
