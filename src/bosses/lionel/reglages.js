@@ -35,7 +35,9 @@ export const DIFFICULTES = {
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', vitesse: 0.78, reaction: 0.34, erreur: 70, disque: 0.72, superHasard: 0.03, lentLob: 2.2, surprises: [16, 24], fenetreParfait: 0.2, publicLionel: 0.5,
     aides: 'tot', choix: { droit: 64, biais: 24, lob: 12 }, attrape: { x: 62, haut: 90, bas: 40 }, ralenti: 0.7, superSurLob: false, biaisApres: 3,
     texte: 'Lionel court moins vite et rate plus souvent. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 1.0, reaction: 0.21, erreur: 44, disque: 0.89, superHasard: 0.07, lentLob: 2.2, surprises: [12, 20], fenetreParfait: 0.15, publicLionel: 0.85,
+  // V101 (Fabien : « un peu trop simple ») : un peu plus rapide, réagit plus vite, rate moins, lancers plus vifs
+  // (avant : vitesse 1.0, reaction 0.21, erreur 44, disque 0.89) — toujours sous CHAMPION
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vitesse: 1.03, reaction: 0.195, erreur: 38, disque: 0.94, superHasard: 0.07, lentLob: 2.2, surprises: [12, 20], fenetreParfait: 0.15, publicLionel: 0.85,
     aides: 'tot', choix: { droit: 50, biais: 36, lob: 14 }, attrape: { x: 44, haut: 70, bas: 30 }, ralenti: 0.85, superSurLob: false, biaisApres: 1,
     texte: 'Le vrai match.' },
   // AUDIT 3 : adouci (un joueur moyen prenait 0-16 sans marquer) : un peu moins rapide, se trompe un peu plus

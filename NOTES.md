@@ -1469,6 +1469,10 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   les autres étaient de biais). Course de dos tout droit : la planche reçue (`course_dos2`) n'a que 2 images vraiment de
   dos → pas utilisée, le sprint vers le haut garde la marche de dos accélérée.
 
+## LIONEL — V101 : NORMAL UN PEU PLUS DUR (Fabien : « un peu trop simple »)
+- `DIFFICULTES.normal` (lionel/reglages.js) : vitesse 1.0 → 1.03, réaction 0.21 → 0.195 s, erreur 44 → 38,
+  lancers 0.89 → 0.94. Toujours sous CHAMPION (1.06 / 0.18 / 32 / 1.04). PERSO garde les anciens chiffres de départ.
+
 ## V100 : QUIZ DE FABIEN + PRÉSENTATION DE BEUFA + TEXTES QUI SORTAIENT DE L'ÉCRAN
 - Quiz : les 44 questions de Fabien (`Quizz.docx`) dans `data/beufa_quiz.js` (Link's Awakening : 4 mauvaises
   réponses proposées, « Zelda » retirée car l'écran a 4 cases). Présentation : « 44 questions ».
