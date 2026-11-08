@@ -28,6 +28,7 @@ export const MANIFESTE = {
     // course en 8 images tirées de la VIDÉO du propriétaire (outils/kedric/course_video.py) : une foulée complète
     kedric_toi_course:   { ...toi('course', 4, 12), fichier: 'sprites/kedric/kedric_toi_course6.png', largeur: 197, hauteur: 326, images: 8, vitesse: 12 },
     kedric_toi_saut:     ill('toi_saut', 277, 300, toi('saut')),
+    kedric_toi_attente:  ill('toi_attente', 188, 308, toi('course')),   // coup d'envoi : tu attends le ballon, MAINS VIDES
     kedric_toi_reception: ill('toi_reception', 112, 450, toi('saut')),   // coup d'envoi : tu attrapes le ballon (outils/kedric/preparer_nouvelles.py)
     kedric_toi_rotation: ill('toi_rotation', 282, 240, toi('rotation')),
     kedric_toi_plaque:   ill('toi_plaque', 265, 368, toi('plaque')),       // le plaqueur est déjà sur l'image

@@ -1,6 +1,7 @@
-# Prépare les 2 illustrations demandées par l'audit de Kédric (prompts n°3 et n°4 de propositions/kedric_prompts_images.md) :
+# Prépare les illustrations ajoutées après l'audit de Kédric (prompts n°3, 4 et 5 de propositions/kedric_prompts_images.md) :
 #  - assets_inbox/kedric/kedric_def_course_planche.jpg -> kedric_def_course4.png (le défenseur qui court : 4 images côte à côte)
 #  - assets_inbox/kedric/kedric_toi_reception.jpg      -> kedric_toi_reception.png (toi qui attrapes le ballon, de dos)
+#  - assets_inbox/kedric/kedric_toi_attente.jpg        -> kedric_toi_attente.png (toi qui attends le coup d'envoi, mains vides)
 # Même traitement que preparer_images.py : fond retiré (rembg isnet-anime), bords nets, 1,5 fois la taille d'affichage.
 # Utilisation : python3 outils/kedric/preparer_nouvelles.py   (depuis la racine du projet)
 import numpy as np, cv2
@@ -63,3 +64,9 @@ img = recadrer(*detourer('kedric_toi_reception'))
 h = round(300 * ZOOM); w = round(img.width * h / img.height)   # bras levés : le corps garde la taille de ta course
 img.resize((w, h), Image.LANCZOS).save(f'{SORTIE}/kedric_toi_reception.png', optimize=True)
 print('kedric_toi_reception', w, h)
+
+# ---------- toi qui attends le coup d'envoi (mains vides) ----------
+img = recadrer(*detourer('kedric_toi_attente'))
+h = round(205 * ZOOM); w = round(img.width * h / img.height)   # un peu fléchi : un peu moins haut que ta course (217)
+img.resize((w, h), Image.LANCZOS).save(f'{SORTIE}/kedric_toi_attente.png', optimize=True)
+print('kedric_toi_attente', w, h)

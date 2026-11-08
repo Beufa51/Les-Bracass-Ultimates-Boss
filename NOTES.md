@@ -7,6 +7,7 @@
   touchdown), battle calé de justesse (rappel élastique `showtime.rappel`), nouveau rang et défis, courses 2-3 plus dures,
   ENTRAÎNEMENT sans record ni défis. Images n°3 (défenseur qui court, 4 images) et n°4 (ta réception au coup d'envoi)
   REÇUES : `outils/kedric/preparer_nouvelles.py` → `kedric_def_course4.png`, `kedric_toi_reception.png`.
+  Image n°5 REÇUE : `kedric_toi_attente.png` (mains vides) pendant tout le coup d'envoi (avant : ballon déjà en main).
   Ballon du coup d'envoi : finit à hauteur des mains (`envoi.hauteurMains`), pose bras levés seulement les dernières
   0,2 s (`envoi.mains`, l'image a déjà le ballon : on cache le vrai). BATTLE SUR TÉLÉPHONE : les boutons de la page sont
   CACHÉS (ils débordaient sur les bandes noires, flèches à côté) : ronds fléchés dans le jeu (`COULOIRS_TEL`), on TAPE

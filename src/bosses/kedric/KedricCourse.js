@@ -1258,7 +1258,9 @@ export class KedricCourse extends BossScene {
     const E0 = this.envoi;
     const saut = this.etat === 'envoi' && E0 && E0.rebond <= 0 && E0.t >= E0.vol - R.envoi.mains && Math.abs(j.x - E0.voie) < 0.5
       && this.estIllustre('kedric_toi_reception') ? 'reception' : 'saut';
-    let pose = j.poseTemps > 0 && j.pose ? j.pose : (j.saut > 0 ? saut : j.rotation > 0 ? 'rotation' : 'course');
+    // coup d'envoi : tu n'as PAS ENCORE le ballon : pose d'attente, mains vides (toutes les images de course l'ont en main)
+    const sol = this.etat === 'envoi' && this.estIllustre('kedric_toi_attente') ? 'attente' : 'course';
+    let pose = j.poseTemps > 0 && j.pose ? j.pose : (j.saut > 0 ? saut : j.rotation > 0 ? 'rotation' : sol);
     const hauteur = j.saut > 0 ? Math.sin(Math.PI * (1 - j.saut / R.saut.duree)) * 80 : 0;
     const cle = 'kedric_toi_' + pose;
     const enCourse = pose === 'course' && this.etat === 'jeu' && this.gel <= 0;

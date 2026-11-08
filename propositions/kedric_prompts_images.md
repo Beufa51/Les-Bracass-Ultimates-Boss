@@ -44,7 +44,7 @@ décollés du sol, tête levée vers le ballon. Image verticale, corps entier vi
 pas d'ombre au sol.
 ```
 
-## 5. TOI qui attends le coup d'envoi, SANS ballon — `kedric_toi_attente.jpg` (aujourd'hui : l'image de course, ballon déjà en main)
+## 5. TOI qui attends le coup d'envoi, SANS ballon — `kedric_toi_attente.jpg` ✅ REÇU, branché
 À joindre : `assets/sprites/kedric/kedric_toi_reception.png` (même joueur, mêmes couleurs, n°21).
 ```
 Illustration style manga/anime coloré (façon Eyeshield 21), contours noirs nets, fond BLANC uni. Le MÊME joueur de
