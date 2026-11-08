@@ -343,3 +343,103 @@ Reprends exactement ce personnage (même visage, même tee-shirt Pyramid Head, m
 en pied de la tête aux genoux, ENTIÈREMENT dans le cadre : bras droit et livre non coupés, avec une marge
 de chaque côté. Fond transparent (PNG), sans ombre ni halo blanc autour. Format portrait 2:3.
 ```
+
+## 21. Audit de novembre 2026 (`propositions/julien_audit.md`, section « Animations et images ») — poses et écrans qui manquent
+Toutes à déposer dans `assets_inbox/julien/` ; Claude découpe (`outils/julien/decouper_planches.py` / `decouper_prof.py`),
+enlève le fond blanc et branche (image absente = le jeu garde ce qu'il fait aujourd'hui). Par ordre d'intérêt.
+
+### 21a. Julien : les poses d'attaque qui manquent — `julien_prof_3.jpg` (joindre `julien_reference.jpg` ET `julien_prof_1.jpg`)
+Aujourd'hui « AU TABLEAU ! », « CONFISQUÉ ! », la RÈGLE et le DICO utilisent tous la même pose « livre levé », et la
+fenêtre de punition n'a qu'une image de dos (figée 2 s). Fichiers découpés : `julien_julien_dos2`, `_pointe`, `_confisque`, `_regle`.
+```
+Use the attached images as the exact character: same face, hair, beard, clothes, colors, scale and pixel art style. Do not redesign him.
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D. Humorous, cartoonish, no blood, no gore. Full body, seen strictly from the FRONT unless stated, no perspective tilt.
+4 poses in one row, each in its own equal-size cell, same scale as the attached images, feet aligned on the same bottom line:
+1) seen from the BACK, writing on an invisible blackboard with a piece of chalk, arm lower than in the attached back pose, head slightly turned to the side (second frame of the writing animation);
+2) pointing his index finger straight at the viewer with an outstretched arm, shouting "to the board!", very stern face;
+3) leaning forward, one open hand reaching toward the viewer to snatch something, the other hand on his hip, smug confiscating face;
+4) holding a huge wooden ruler (as long as his arm) raised high above his head with both hands, about to strike, angry eyebrows.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no arm, ruler or chalk may touch another pose or the cell border.
+```
+
+### 21b. Écrans de fin illustrés — `julien_fin_gaze.jpg`, `julien_fin_attrape.jpg`, `julien_fin_colle.jpg`, `julien_fin_victoire.jpg` (joindre `julien_reference.jpg` pour la 3e et la 4e)
+Aujourd'hui « GAZÉ ! », « ATTRAPÉ ! », « COLLÉ ! » et la victoire ne sont que du texte sur un voile noir. Une image 16:9 par prompt.
+```
+Pixel art scene in the style of DOOM (1993) and Wolfenstein 3D intermission screens: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. Humorous, cartoonish, no blood, no gore. Wide 16:9 image, no text, no frame.
+SCENE
+```
+Remplacer SCENE par :
+- `julien_fin_gaze.jpg` : `A French teenage protester (dark blue hoodie, backpack) sitting on a Paris sidewalk curb, red teary eyes, coughing, a green tear-gas cloud drifting around him, a broken egg carton next to him, riot police vans with blue lights blurred in the background, Haussmann buildings.`
+- `julien_fin_attrape.jpg` : `A French high-school hallway with lockers; the same teenage student (dark blue hoodie) being held by the collar by a school supervisor (red hoodie, whistle, lanyard badge) who points to a door labelled with a small plaque, two smug students in the background pointing and laughing.`
+- `julien_fin_colle.jpg` : `An empty French classroom after school, orange evening light through the windows; the same teenage student alone at a desk, writing lines on a sheet, a huge pile of paper next to him; the teacher of the attached image sits at his desk in the background, arms crossed, smug smile, a wall clock showing 6 o'clock.`
+- `julien_fin_victoire.jpg` : `A French classroom in chaos, paper balls and exam sheets everywhere; the teacher of the attached image sitting on the floor, dazed, little stars and crumpled paper balls around his head; students standing on their chairs cheering with arms up; in the foreground, the same teenage student seen from behind raising a ballpoint-pen blowpipe like a trophy.`
+
+### 21c. Le bureau renversé (phase 3) — `julien_bureau_renverse.jpg` (joindre `julien_objets_classe.jpg` pour garder le même bureau)
+Aujourd'hui c'est l'image du bureau retournée la tête en bas et étirée ×1,6 par le code : on comprend mal que c'est un abri.
+```
+Pixel art sprite in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. French high-school classroom theme.
+The SAME teacher's desk as in the attached image (big dark wooden desk), now knocked over on its side to make a barricade: the wooden top faces the viewer like a wall, the legs point to the right, a few exam papers, a red apple and a pen pot scattered on the floor in front of it. Wide object (about twice as wide as tall), seen strictly from the FRONT, no perspective tilt.
+One single object. Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+```
+
+### 21d. Policiers : toux et farine — `julien_police_effets.jpg` (joindre `julien_policier.jpg` ET `julien_crs.jpg`)
+Les policiers toussent dans leur propre lacrymo et sont aveuglés 3 s par la farine, mais on ne le voit pas (pose de marche).
+Fichiers découpés : `julien_lanceur_tousse`, `julien_lanceur_farine`, `julien_bouclier_tousse`, `julien_bouclier_farine`.
+```
+Use the attached images as the exact characters: same uniforms, helmets, shield, colors, scale and pixel art style.
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. Humorous, cartoonish French street-protest theme, no blood, no gore. Full body, seen strictly from the FRONT, facing the viewer, no perspective tilt.
+4 poses in one row, each in its own equal-size cell, same scale, feet aligned on the same bottom line:
+1) the riot police officer with the tear-gas launcher, bent forward, coughing into his fist, eyes shut, a little green gas around his feet;
+2) the same officer covered from head to toe in white flour, rubbing his eyes with both hands, blinded;
+3) the riot police officer with the big shield, shield lowered, coughing, eyes watering, a little green gas around his feet;
+4) the same shield officer covered in white flour, shield dropped to his knees, rubbing his eyes, blinded.
+Plain solid pure white background (#FFFFFF) — the flour must stay visible: light grey-white with dark grey outlines —, no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no part may touch another pose or the cell border.
+```
+
+### 21e. Surveillant : essoufflé et « il t'attrape » — `julien_surveillant_2.jpg` (joindre `julien_surveillant.jpg`)
+Aujourd'hui le surveillant essoufflé garde sa pose de marche, et quand il t'attrape (8 dégâts toutes les 0,9 s) rien ne change.
+Fichiers découpés : `julien_surveillant_essouffle`, `julien_surveillant_attrape`.
+```
+Use the attached image as the exact character: same school supervisor (red hoodie, jeans, whistle, lanyard badge), same colors, scale and pixel art style.
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D. Humorous, cartoonish, no blood, no gore. Full body, seen strictly from the FRONT, facing the viewer, no perspective tilt.
+2 poses in one row, each in its own equal-size cell, same scale, feet aligned on the same bottom line:
+1) out of breath after running, bent forward, hands on his knees, tongue out, sweat drops, whistle hanging;
+2) both arms stretched toward the viewer, hands open to grab the viewer by the collar, angry face, whistle in his mouth.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: the two poses are clearly SEPARATED by a wide empty white gap (at least a quarter of a cell wide); no part may touch the other pose or the cell border.
+```
+
+### 21f. Élèves sous les sprinklers (phase 3) — `julien_eleves_2.jpg` (joindre `julien_eleves.jpg`)
+En phase 3 (alarme, sprinklers) les élèves restent « cachés » ; une pose « trempés, cahier sur la tête » ferait rire.
+Fichiers découpés : `julien_eleve_<0-3>_mouille`.
+```
+Use the attached image as the exact four students: same faces, hair, clothes, colors, scale and pixel art style.
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D. Humorous, cartoonish French high-school theme. Each student sitting on a chair, seen strictly from the FRONT, facing the viewer, no perspective tilt, no desk.
+4 cells in one row, same scale, chairs aligned on the same bottom line, in the same order as the attached image (student A, B, C, D): each student soaking wet from the fire sprinklers, holding an open notebook over the head like an umbrella, water drops falling, grumpy or laughing face.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every pose is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no part may touch another pose or the cell border.
+```
+
+### 21g. Main vide (sarbacane CONFISQUÉE) — `julien_main_vide.jpg` (joindre `julien_main_sarbacane.jpg`)
+Pendant les 8 s de « CONFISQUÉ ! », la main disparaît : une main vide qui proteste montre ce qui se passe.
+Fichier découpé : `julien_main_vide.png` (même cadre que les autres mains, sortie du bas à droite de l'écran).
+```
+Use the attached image as the exact style and the exact same hand and sleeve (navy blue hoodie sleeve, same skin tone), same size and position in the frame.
+First-person view (like the weapon hand of DOOM 1993), pixel art, visible chunky pixels, limited color palette.
+The hand is now EMPTY: palm turned up, fingers open, a little shrug gesture, as if saying "hey, give it back!".
+One single pose, the sleeve coming from the bottom-right edge of the image. Plain solid pure white background (#FFFFFF), no text, no frame.
+```
+
+### 21h. Livres qui volent (animation) — `julien_livres_vol.jpg`
+Le livre et le dico en vol sont une seule image qui monte et descend ; 3 images qui « battent des pages » les rendraient
+plus lisibles. Fichiers découpés : `julien_livre_0/1/2`, `julien_dico_0/1/2`.
+```
+Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. French classroom theme.
+6 separate objects in one row, each in its own equal-size cell, seen from the FRONT, same pixel scale:
+1) 2) 3) a blue school textbook flying toward the viewer, pages flapping like wings: wide open, half closed, almost closed (three animation frames of the same book);
+4) 5) 6) a huge thick red dictionary spinning in the air: seen from the front, tilted 45 degrees, seen edge-on (three animation frames of the same dictionary).
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+IMPORTANT: every object is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no object may touch another object or the cell border.
+```

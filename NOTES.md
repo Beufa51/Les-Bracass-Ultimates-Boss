@@ -1779,6 +1779,9 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   canette découpés pour plus tard ; ÉLÈVES ASSIS `eleve_<0-3>_<content|cache>` découpés (pour le combat refait, B).
 - PROMPTS des images du niveau 2 + images manquantes de la manif : `propositions/julien_prompts_images.md`, sections
   10 à 16 (Julien 8 poses, objets de la classe, élèves assis, ennemis du lycée, murs, bonus de la manif, rideau de fer).
+- AUDIT « comme Lionel » (nov. 2026) : `propositions/julien_audit.md` + bot `node outils/julien_bot.mjs` (216 parties, ≈ 1 min).
+  Manif et lycée bien réglés ; classe trop facile (72/72 victoires, 25-55 s, 5 attaques par combat) ; 9 bugs listés ;
+  prompts section 21 de `julien_prompts_images.md`. EN ATTENTE des choix de Fabien (A à J). Rien de changé dans src/.
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,
