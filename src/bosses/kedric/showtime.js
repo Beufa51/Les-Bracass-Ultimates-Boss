@@ -127,15 +127,22 @@ export class Showtime {
     this.retirerDeblocage = () => { for (const t of ['touchend', 'click', 'keydown', 'pointerup']) window.removeEventListener(t, this.debloquer, { capture: true }); };
     if (estTactile()) {
       etiquettesTactiles(CACHER_BOUTONS); traverser(true);
-      scene.input.addPointer(2);   // jusqu'à 3 doigts (flèches doublées)
-      this.surToucher = (p) => {
+      // le doigt est lu DIRECTEMENT (événement du navigateur), avec la place RÉELLE du jeu à l'écran à cet instant :
+      // les coordonnées du moteur pouvaient être périmées (écran tourné, plein écran) et TOUS les touchers tombaient
+      // dans le même couloir (« tout est raté même au bon moment » — retour de Fabien). Plusieurs doigts = flèches doublées.
+      this.surToucher = (ev) => {
         if (this.termine || scene.scene.isPaused()) return;
-        // le couloir le plus proche du doigt (tout l'écran compte : gauche ◀ ▶, droite ▲ ▼)
-        let mieux = null, dmin = 1e9;
-        for (const n of DIRS) { const d = Math.abs(p.x - this.c.x[n]); if (d < dmin) { dmin = d; mieux = n; } }
-        this.tapes[mieux] = true;
+        const r = scene.game.canvas.getBoundingClientRect();
+        if (!r.width) return;
+        for (const t of ev.changedTouches) {
+          const x = (t.clientX - r.left) * LARGEUR / r.width, y = (t.clientY - r.top) * HAUTEUR / r.height;
+          if (y < 70 || x < -40 || x > LARGEUR + 40) continue;   // le haut de l'écran (bouton pause) ne compte pas
+          let mieux = null, dmin = 1e9;
+          for (const n of DIRS) { const d = Math.abs(x - this.c.x[n]); if (d < dmin) { dmin = d; mieux = n; } }
+          this.tapes[mieux] = performance.now();   // l'instant EXACT du toucher (le jeu ne le traite qu'à l'image suivante)
+        }
       };
-      scene.input.on('pointerdown', this.surToucher);
+      window.addEventListener('touchstart', this.surToucher, { capture: true, passive: true });
     }
     this.surPause = () => { eteindreBoutons(); traverser(false); disposition('normale'); couperSons(false); voileNoirTactile(false); this.s.cameras.main.resetFX(); };
     this.surReprise = () => { disposition('danse'); if (estTactile()) { etiquettesTactiles(CACHER_BOUTONS); traverser(true); } this.calculerCouloirs(); };
@@ -143,7 +150,7 @@ export class Showtime {
     // ABANDON depuis la pause pendant le battle : detruire() ne sera jamais appelé (seule la fin l'appelle).
     // Au shutdown de la scène, on éteint au moins les boutons (sinon ils restent allumés au hub) —
     // sans relancer la musique du match : le shutdown s'en occupe déjà, lui.
-    scene.events.once('shutdown', () => { traverser(false); this.retirerDeblocage(); eteindreBoutons(); couperSons(false); voileNoirTactile(false); });
+    scene.events.once('shutdown', () => { traverser(false); this.retirerDeblocage(); if (this.surToucher) window.removeEventListener('touchstart', this.surToucher, { capture: true }); eteindreBoutons(); couperSons(false); voileNoirTactile(false); });
     this.annonce();
   }
 
@@ -152,7 +159,7 @@ export class Showtime {
   detruire() {
     this.el.forEach(o => o.destroy()); this.viderNotes(); this.viderAnnonce(); this.el = [];
     this.s.events.off('pause', this.surPause); this.s.events.off('resume', this.surReprise);
-    if (this.surToucher) this.s.input.off('pointerdown', this.surToucher);
+    if (this.surToucher) window.removeEventListener('touchstart', this.surToucher, { capture: true });
     traverser(false);
     this.retirerDeblocage();
     couperSons(false); voileNoirTactile(false);   // par sécurité : sons ET boutons reviennent toujours à la fin du battle
@@ -473,7 +480,8 @@ export class Showtime {
   // ---------- la boucle ----------
   maj(dt, e) {
     if (this.termine) { this.afficher(); return; }
-    for (const n of DIRS) if (this.tapes[n]) { e = { ...e, [n]: true }; }
+    this.retards = {};
+    for (const n of DIRS) if (this.tapes[n]) { e = { ...e, [n]: true }; this.retards[n] = Math.max(0, (performance.now() - this.tapes[n]) / 1000); }
     this.tapes = {};
     this.horloge(dt);
     if (this.phase === 'intro') {
@@ -533,7 +541,9 @@ export class Showtime {
       // AUDIT : RAPPEL ÉLASTIQUE vers le milieu (des deux côtés) : la jauge montre comment tu danses EN CE MOMENT,
       // elle ne file plus à +100 / -100 ; celui qui est mené peut toujours remonter (de justesse, mais pas injuste)
       if (!this.entrainement) this.public(-S.rappel * this.jauge * dt);
-      for (const t of DIRS) if (e[t]) this.appui(t);
+      // téléphone : un toucher s'affiche / arrive en retard (écran tactile + image) : on le compense (S.latenceTactile)
+      const compense = estTactile() ? S.latenceTactile : 0;
+      for (const t of DIRS) if (e[t]) this.appui(t, (this.retards[t] || 0) + compense);
       for (let i = 0; i < this.pas.length; i++) {
         const p = this.pas[i];
         if (p.note === null && this.T > p.t + this.fenetre.bien) {
@@ -555,13 +565,15 @@ export class Showtime {
     if (p) this.poseKedric(p.rouge ? 'triche' : p.montre);   // Kédric fait le pas en même temps que toi
   }
 
-  appui(t) {
+  // retard : de combien (s) l'appui a été traité APRÈS le vrai geste (toucher arrivé entre deux images, latence de l'écran)
+  appui(t, retard = 0) {
+    const T = this.T - retard;
     // les flèches dont le moment arrive (les DOUBLÉES partagent le même moment : deux touches différentes)
     const fen = Math.min(this.fenetre.bien * 1.5, this.duree * 0.5);
     const proches = [];
     for (let i = 0; i < this.pas.length; i++) {
       const p = this.pas[i];
-      if (p.note === null) { const ecart = Math.abs(this.T - p.t); if (ecart <= fen) proches.push(i); else break; }
+      if (p.note === null) { const ecart = Math.abs(T - p.t); if (ecart <= fen) proches.push(i); else break; }
     }
     if (!proches.length) return;   // appui bien trop tôt : ignoré
     // d'abord la flèche qui attend CETTE touche ; sinon, une flèche DORÉE de cette touche = tombé dans le piège ;
@@ -576,8 +588,12 @@ export class Showtime {
     this.poseToi(t);
     if (t !== p.attendu) this.noter(i, 'rate');
     else {
-      const ecart = Math.abs(this.T - p.t);
-      this.noter(i, ecart <= this.fenetre.parfait ? 'parfait' : ecart <= this.fenetre.bien ? 'bien' : 'rate');
+      const signe = T - p.t, ecart = Math.abs(signe);
+      this.bilan.ecarts = (this.bilan.ecarts || 0) + signe; this.bilan.nbEcarts = (this.bilan.nbEcarts || 0) + 1;   // ton décalage moyen (bilan)
+      const note = ecart <= this.fenetre.parfait ? 'parfait' : ecart <= this.fenetre.bien ? 'bien' : 'rate';
+      this.noter(i, note);
+      // on te DIT pourquoi : en avance ou en retard (sinon « RATÉ » au bon moment, on ne comprend pas)
+      if (note !== 'parfait' && this.retour.text !== 'JOKER !') this.retour.setText((note === 'bien' ? 'BIEN ! ' : 'RATÉ ! ') + (signe > 0 ? 'en retard' : 'en avance'));
     }
   }
 

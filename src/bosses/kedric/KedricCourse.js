@@ -919,7 +919,7 @@ export class KedricCourse extends BossScene {
         this.dernierBilanDanse = bilan;   // parfaits, biens, ratés, part du public : pour le bilan de victoire
         this.stats.parfaits += bilan.parfaits;
         if (bilan.entrainement) {
-          const f = encart(this, 'ENTRAÎNEMENT TERMINÉ !', `Parfaits : ${bilan.parfaits} - Ratés : ${bilan.rates}\nAucune défaite comptée, aucune victoire non plus.\nReviens gagner le vrai match !`, '#7fe8ff', 0x0b2230);
+          const f = encart(this, 'ENTRAÎNEMENT TERMINÉ !', `Parfaits : ${bilan.parfaits} - Ratés : ${bilan.rates}` + (bilan.nbEcarts ? ` - timing : ${Math.round(1000 * Math.abs(bilan.ecarts / bilan.nbEcarts))} ms ${bilan.ecarts > 0 ? 'en retard' : 'en avance'}` : '') + `\nAucune défaite comptée, aucune victoire non plus.\nReviens gagner le vrai match !`, '#7fe8ff', 0x0b2230);
           this.attendre(3.2, () => { f.fermer(); this.finMatch(false); });
         } else if (gagne) {
           jouerSon(this, 'kedric_touchdown'); jouerSon(this, 'kedric_foule');
@@ -983,6 +983,7 @@ export class KedricCourse extends BossScene {
       (this.stats.ghosts ? `\nDevil Bat Ghost : ${this.stats.ghosts}` : '') +
       `\nBattle : ${bd.parfaits} parfaits, ${bd.bien} biens, ${bd.rates} ratés` + (bd.jokers ? `, ${bd.jokers} joker(s) utilisé(s)` : '') +
       `\nPublic gagné : ${publicPourToi} %` +
+      (bd.nbEcarts ? `\nTon timing : en moyenne ${Math.round(1000 * Math.abs(bd.ecarts / bd.nbEcarts))} ms ${bd.ecarts > 0 ? 'en retard' : 'en avance'}` : '') +
       (record ? `\nRecord : rang ${record.rang} en ${formatTemps(record.temps)}` : '') +
       (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '') +
       (sansRecord ? '' : '\n' + lignesDefis('kedric', [

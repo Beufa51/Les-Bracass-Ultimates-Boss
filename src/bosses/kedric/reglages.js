@@ -111,6 +111,8 @@ export const REGLAGES = {
     // (le DÉCOMPTE 5-4-3-2-1-GO est dans showtime.js : DECOMPTE = 5 secondes PILE, calées sur le tempo de chaque morceau)
     intro: 9, introMini: 1.5, introMusique: 54.969,
     piste: { chute: 1.8 }, rougeChance: 0.12, latence: 0,
+    latenceTactile: 0.05,   // téléphone : un toucher arrive ~0,05 s après le geste (écran tactile + affichage) : compensé (réglage dev)
+   
     pieges: { duree: 6, fumee: 0.55, leurres: 0.4, turbo: 2 },
     ecartTech: 12,   // écart MINIMUM (s) entre deux techniques de Kédric : pas la mitraille
     double: { duree: 12 },
