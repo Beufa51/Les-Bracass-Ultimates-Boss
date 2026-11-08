@@ -13,6 +13,7 @@ import { jouerMusique } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, REGLAGES as RG, DIFFICULTES, RANGS } from './reglages.js';
 import { Sauvegarde } from '../../core/sauvegarde.js';
+const FINS = ['julien_fin_gaze', 'julien_fin_attrape', 'julien_fin_colle', 'julien_fin_victoire'];   // outils/julien/decouper_audit21.py
 import { PLAN_MANIF, OBJETS, SECRETS, ZONES, PARVIS, PAR, ABSENTS_FACILE, RENFORTS_ANARCHISTE, RIDEAUX, FOURGON } from './niveau_manif.js';
 import { rendre, murEn, vueLibre } from './raycaster.js';
 import { texturesMurs, texturesSprites, texturesMain, chargerImages, appliquerImages, variantesTaches } from './textures.js';
@@ -37,6 +38,7 @@ export class JulienManif extends BossScene {
 
   preload() {
     chargerImages(this);   // vraies images (assets/sprites/julien/), avant la barre de chargement commune
+    for (const n of FINS) if (!this.textures.exists(n)) this.load.image(n, `assets/sprites/julien/${n}.jpg`);   // écrans de fin illustrés
     super.preload();
   }
 
@@ -168,11 +170,12 @@ export class JulienManif extends BossScene {
     this.libererSouris();
     jouerSon(this, 'ui_defaite');
     etiquettesTactiles({ espace: 'REJOUER', x: 'HUB', z: null, haut: null, bas: null, gauche: null, droite: null });
-    voile(this, 0.75).setDepth(1000);
-    texte(this, LARGEUR / 2, 170, titre, 56, '#ff6b6b').setDepth(1001);
-    texte(this, LARGEUR / 2, 250, sous, 22, '#ffffff').setDepth(1001);
-    texte(this, LARGEUR / 2, 360, `${estTactile() ? 'REJOUER' : 'ESPACE'} : recommencer tout de suite`, 24, '#7fff7f').setDepth(1001);
-    texte(this, LARGEUR / 2, 400, `${estTactile() ? 'HUB' : 'X'} : retour au hub`, 18, '#aaaaaa').setDepth(1001);
+    const fond = this.textures.exists(this.imageFin()) ? this.add.image(LARGEUR / 2, HAUTEUR / 2, this.imageFin()).setDisplaySize(LARGEUR, HAUTEUR).setDepth(1000) : null;   // écran illustré
+    voile(this, fond ? 0.4 : 0.75).setDepth(1000);
+    texte(this, LARGEUR / 2, 170, titre, 56, '#ff6b6b').setDepth(1001).setStroke('#000', 8);
+    texte(this, LARGEUR / 2, 250, sous, 22, '#ffffff').setDepth(1001).setStroke('#000', 5);
+    texte(this, LARGEUR / 2, 360, `${estTactile() ? 'REJOUER' : 'ESPACE'} : recommencer tout de suite`, 24, '#7fff7f').setDepth(1001).setStroke('#000', 5);
+    texte(this, LARGEUR / 2, 400, `${estTactile() ? 'HUB' : 'X'} : retour au hub`, 18, '#dddddd').setDepth(1001).setStroke('#000', 4);
     this.time.delayedCall(600, () => {
       this.input.keyboard.once('keydown-SPACE', () => this.scene.restart({ rejouer: true }));
     });
@@ -667,6 +670,7 @@ export class JulienManif extends BossScene {
     const j = this.j, R = RG[e.type];
     const ox = j.x - e.x, oy = j.y - e.y, d = Math.hypot(ox, oy);
     e.aveugle = Math.max(0, (e.aveugle || 0) - dt);   // farine dans les yeux
+    e.tousseT = Math.max(0, (e.tousseT || 0) - dt); e.attrapePose = Math.max(0, (e.attrapePose || 0) - dt);   // (poses « tousse » et « attrape »)
     const voit = j.vie > 0 && !e.aveugle && d < R.vue && vueLibre(this.plan, e.x, e.y, j.x, j.y) && !dansFumee(this, e.x, e.y) && !dansFumee(this, j.x, j.y);
     if (voit) { e.vuX = j.x; e.vuY = j.y; if (!e.alerte) { e.alerte = true; e.t = 0.6 + Math.random() * 0.6; this.alerter(e.x, e.y, 6); jouerSon(this, 'julien_halte', { rate: e.type === 'bouclier' ? 0.8 : 1 }); } }
     e.t -= dt; e.bouge = false;
@@ -712,7 +716,7 @@ export class JulienManif extends BossScene {
     if (R.attrape && (e.etat === 'approche' || e.etat === 'cri') && voit) {
       e.attrapeT = (e.attrapeT || 0) - dt;
       if (d < R.attrape.portee && e.attrapeT <= 0) {
-        e.attrapeT = R.attrape.cadence;
+        e.attrapeT = R.attrape.cadence; e.attrapePose = 0.5;
         this.degats(R.attrape.degats, e.x, e.y);
         this.deplacer(j, ox / d * 0.6, oy / d * 0.6, RG.joueur.rayon);
         this.cameras.main.shake(150, 0.008);
@@ -799,6 +803,8 @@ export class JulienManif extends BossScene {
   // durée de la dernière image en « images à 60 Hz » (les flashs durent pareil sur un téléphone à 120 Hz)
   pas60() { return Math.min(4, (this.game.loop.delta || 16.7) / 16.7); }
 
+  imageFin() { return 'julien_fin_gaze'; }   // image de l'écran PERDU (le lycée et la classe ont la leur)
+
   // message quand un ennemi s'enfuit (le lycée a les siens)
   messagesFuite() { return ['Il s\'enfuit tout dégoulinant !', 'Omelette !', 'Un de moins !', 'Retour au commissariat !']; }
 
@@ -829,6 +835,7 @@ export class JulienManif extends BossScene {
       n.t -= dt;
       for (const e of this.ennemis) if (e.actif && e.etat !== 'fuite' && Math.hypot(e.x - n.x, e.y - n.y) < RG.lacrymo.rayon) {
         this.toucherEnnemi(e, RG.lacrymo.degatsPolice * dt, { perceBouclier: true, silencieux: true });   // ils toussent aussi !
+        e.tousseT = 0.6;
       }
       if (j.vie > 0 && j.echarpe <= 0 && Math.hypot(n.x - j.x, n.y - j.y) < RG.lacrymo.rayon) {   // l'écharpe mouillée protège
         this.degats(RG.lacrymo.degats * dt);
@@ -929,6 +936,9 @@ export class JulienManif extends BossScene {
     const v = e.dernier === 'tomate' ? '_rouge' : e.dernier === 'propre' ? '_propre' : '';   // les images ont du jaune d'œuf
     if (e.etat === 'fuite') return s[p + 'fuite' + v] || s[p + 'fuite'];
     if (e.etat === 'touche') return s[p + 'touche' + v] || s[p + 'touche'];
+    if (e.aveugle > 0 && s[p + 'farine']) return s[p + 'farine'];   // enfariné : il se frotte les yeux
+    if (e.tousseT > 0 && s[p + 'tousse']) return s[p + 'tousse'];   // dans la lacrymo : il tousse
+    if (e.attrapePose > 0 && s[p + 'attrape']) return s[p + 'attrape'];   // le surveillant t'attrape
     if (e.type === 'lanceur' || e.type === 'cantiniere') {
       if (e.etat === 'prepare') return s[p + 'bras'];
       if (e.etat === 'lance') return s[p + 'lance'];
@@ -975,7 +985,9 @@ export class JulienManif extends BossScene {
 
     // la main et l'arme en bas de l'écran
     const bx = Math.sin(j.bob) * 5, by = Math.abs(Math.cos(j.bob)) * 4 + (j.changeT > 0 ? Math.sin(Math.PI * j.changeT / 0.3) * 90 : 0);   // changement d'arme : elle descend puis remonte
-    if (this.confisque && this.confisque.id === j.arme) { /* arme confisquée (la classe) : pas de main */ }
+    if (this.confisque && this.confisque.id === j.arme) {   // arme confisquée (la classe) : la main vide qui proteste
+      const v = T.main.vide; if (v) g.drawImage(v, L / 2 + 60 + bx, VUE_H - 110 + by, 120 * v.width / v.height, 120);
+    }
     else if (j.arme === 'oeufs' && T.main.image) {   // vraies images (210×240) : le bras sort du bas de l'écran
       if (j.lanceT > 0) g.drawImage(T.main.lance, L / 2 + 30, VUE_H - 128, 112, 128);
       else if (j.mun.oeufs > 0) g.drawImage(T.main.tient, L / 2 + 60 + bx, VUE_H - 110 + by, 105, 120);

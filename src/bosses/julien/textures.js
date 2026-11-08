@@ -340,8 +340,8 @@ export function texturesMain() {
 // Faites par outils/julien/decouper_planches.py à partir des planches de assets_inbox/julien/.
 // Une image absente de cette liste garde son dessin provisoire ci-dessus.
 const SPRITES = [
-  ...['marche0', 'marche1', 'bras', 'lance', 'touche', 'fuite'].map(p => 'lanceur_' + p),
-  ...['marche0', 'marche1', 'cri', 'charge', 'essouffle', 'touche', 'fuite'].map(p => 'bouclier_' + p),
+  ...['marche0', 'marche1', 'bras', 'lance', 'touche', 'fuite', 'tousse', 'farine'].map(p => 'lanceur_' + p),
+  ...['marche0', 'marche1', 'cri', 'charge', 'essouffle', 'touche', 'fuite', 'farine'].map(p => 'bouclier_' + p),   // (tousse, farine : section 21d)
   ...[0, 1, 2, 3, 4, 5, 6, 7].map(n => 'manifestant_' + n),
   'barriere', 'poubelle', 'oeufs', 'sandwich', 'oeuf', 'splat', 'grenade', 'nuage', 'statue', 'camion', 'colonne',
   'tomates', 'eau_pistolet', 'fumigenes', 'tomate', 'splat_rouge', 'fumee',
@@ -349,7 +349,8 @@ const SPRITES = [
 ];
 const MURS = { 1: 'mur_briques', 2: 'mur_immeuble', 3: 'mur_boutique', 4: 'mur_tag', 5: 'mur_palissade', 6: 'mur_lycee',
   7: 'portail_lycee', 8: 'mur_boutique2', 9: 'mur_rideau' };   // 8 : 2e tabac (façade en pierre), pas de dessin provisoire (repli : briques)
-const MAINS = { tient: 'main_tient', lance: 'main_lance',
+const MAINS = { tient: 'main_tient', lance: 'main_lance', vide: 'main_vide',   // vide : arme CONFISQUÉE (la classe)
+ 
   ...Object.fromEntries(['pancarte', 'tomates', 'eau', 'fumigenes'].flatMap(a => [[a, 'main_' + a], [a + '_tir', 'main_' + a + '_tir']])) };
 // hauteur dans le monde (1 = un mur) avec les vraies images : leur cadre inclut bras levés, pancartes, fumée…
 const HAUTEURS_IMAGES = { lanceur: 1.0, bouclier: 0.95, manifestant: 1.1, barriere: 0.45, poubelle: 0.5, oeufs: 0.2,

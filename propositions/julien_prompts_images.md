@@ -443,3 +443,29 @@ Pixel art sprite sheet in the style of DOOM (1993) and Wolfenstein 3D: digitized
 Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
 IMPORTANT: every object is clearly SEPARATED from the others by a wide empty white gap (at least a quarter of a cell wide) on all sides; no object may touch another object or the cell border.
 ```
+
+### 21 — LIVRAISON (V105) : ce qui est branché, ce qui est à refaire
+Branchées (`python3 outils/julien/decouper_audit21.py`) : main vide, élèves trempés (rangée du bas : cahier sur la tête
++ recroquevillés), surveillant essoufflé / qui t'attrape, policier lanceur qui tousse / enfariné, CRS enfariné, les
+4 écrans de fin (gazé : version SANS « COUGH », l'autre est gardée dans `julien_fin_gaze_toux.jpg`).
+À REFAIRE :
+
+#### 21c bis. Bureau renversé — `julien_bureau_renverse.jpg` (joindre `julien_objets_classe.jpg`)
+L'image livrée est plus HAUTE que large : dans le jeu le bureau doit être une barricade LARGE et BASSE (2 fois plus large
+que haute), sinon elle paraît moitié moins large que la zone qui arrête les tirs.
+```
+Pixel art sprite in the style of DOOM (1993) and Wolfenstein 3D: digitized, slightly gritty 90s look, limited color palette, visible chunky pixels, strong shading. French high-school classroom theme.
+The SAME teacher's desk as in the attached image (big dark wooden desk), knocked over on its long side to make a LOW, WIDE barricade: we see the underside of the desktop facing the viewer as a long horizontal wooden panel, two legs sticking out horizontally to the right, a few exam papers and a red apple on the floor in front of it.
+The object is a WIDE HORIZONTAL rectangle: exactly 2.5 times wider than tall. Seen strictly from the FRONT, no perspective, no 3/4 view.
+One single object filling a wide landscape image (16:9). Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+```
+
+#### 21d bis. CRS qui tousse — `julien_crs_tousse.jpg` (joindre `julien_crs.jpg` : le CRS du jeu est en armure NOIRE avec le bouclier « POLICE »)
+Le CRS livré dans `julien_police_effets.jpg` est en bleu (comme le lanceur) : pas le même personnage. L'enfariné passe
+(il est tout blanc), celui qui tousse non.
+```
+Use the attached image as the exact character: same black riot armor, same helmet, same transparent shield with "POLICE", same colors, scale and pixel art style. Do not redesign him.
+Pixel art sprite in the style of DOOM (1993) and Wolfenstein 3D. Humorous, cartoonish, no blood, no gore. Full body, seen strictly from the FRONT, facing the viewer, no perspective tilt.
+One single pose: bent forward, coughing into his fist, eyes watering behind the visor, shield lowered at his side, a little green tear-gas around his feet.
+Plain solid pure white background (#FFFFFF), no ground shadow, no text, no frame, no grid lines.
+```

@@ -23,7 +23,7 @@ import { mainSarbacane } from './JulienClasse.js';
 const L = 480, VUE_H = 222;   // comme JulienManif
 const hasard = (liste) => liste[(Math.random() * liste.length) | 0];
 const POSES = {
-  surveillant: ['marche0', 'marche1', 'cri', 'charge', 'touche', 'fuite'],
+  surveillant: ['marche0', 'marche1', 'cri', 'charge', 'touche', 'fuite', 'essouffle', 'attrape'],   // (2 derniers : section 21e)
   cantiniere: ['marche0', 'marche1', 'bras', 'lance', 'touche', 'fuite'],
   fayot: ['bras', 'crie', 'saute', 'fuite'],
 };
@@ -55,7 +55,7 @@ export class JulienLycee extends JulienManif {
       Object.assign(T.spr, spritesLycee());
       Object.assign(T.hauteurs, HAUTEURS_LYCEE);
       for (const [t, ps] of Object.entries(POSES)) for (const p of ps) { const i = img(`${t}_${p}`); if (i) T.spr[`${t}_${p}`] = i; }
-      T.spr.surveillant_essouffle = T.spr.surveillant_marche0;   // (l'IA du CRS a une pose « essoufflé »)
+      if (!this.textures.exists('julien_surveillant_essouffle')) T.spr.surveillant_essouffle = T.spr.surveillant_marche0;   // (l'IA du CRS a une pose « essoufflé »)
       for (const n of ['table', 'canette', 'extincteur', 'carnet', 'puree', 'flaque', 'mousse', 'etagere', 'etagere_basse', 'table_lecture', 'ordinateur']) { const i = img(n); if (i) T.spr[n] = i; }
       for (const n of ['etagere', 'etagere_basse', 'table_lecture', 'ordinateur']) if (!T.spr[n]) T.spr[n] = T.spr.table;   // (image absente : une table)
       // touchés par une BOULETTE (sans jaune d'œuf) : l'IA choisit « <type>_touche_propre » quand le coup ne fait pas de tache
@@ -68,6 +68,7 @@ export class JulienLycee extends JulienManif {
   }
   planDepart() { return PLAN_LYCEE; }
   lancerMusique() { jouerMusique(this, 'julien_lycee_musique'); }   // thème de Duke Nukem 3D
+  imageFin() { return 'julien_fin_attrape'; }
   messagesFuite() { return TXT.fuite; }   // surveillants et fayots : pas de « commissariat » au lycée
 
   create() {

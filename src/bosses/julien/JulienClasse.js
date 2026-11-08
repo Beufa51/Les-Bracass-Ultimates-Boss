@@ -12,7 +12,7 @@
 // - Élèves assis qui réagissent. Dans le lycée, les armes de la manif sont INTERDITES : seulement la SARBACANE.
 import { JulienManif } from './JulienManif.js';
 import { texte } from '../../core/ui.js';
-import { LARGEUR } from '../../core/reglages.js';
+import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { estTactile } from '../../core/tactile.js';
@@ -32,7 +32,7 @@ const OBJETS_IMAGES = ['table', 'bureau', 'livre', 'dico', 'copie', 'craie'];
 const HAUTEURS_IMAGES_CLASSE = { table: 0.72, bureau: 0.62, livre: 0.15, dico: 0.17, copie: 0.15, craie: 0.06 };
 const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'touche_papier', 'dos', 'rage', 'vaincu', 'vaincu_papier',
   'dos2', 'pointe', 'crie', 'confisque', 'regle'];   // (3e planche, prompt 21a : 2e image de dos, « au tableau », cri, confisqué, règle)
-const ELEVES_IMAGES = [0, 1, 2, 3].flatMap(k => [`eleve_${k}_content`, `eleve_${k}_cache`]);
+const ELEVES_IMAGES = [0, 1, 2, 3].flatMap(k => ['content', 'cache', 'mouille', 'mouille_cache'].map(p => `eleve_${k}_${p}`));   // mouille : phase 3 (21f)
 const GROSSES = new Set(['eventail', 'mur', 'murs', 'deluge', 'dico', 'aimant', 'rafale']);   // après elles : il se retourne (fenêtre de punition)
 // ce qu'on annonce en grand quand il prépare une attaque, et le conseil la 1re fois
 const ANNONCES = {
@@ -96,7 +96,8 @@ export class JulienClasse extends JulienManif {
       for (const n of [...ELEVES_IMAGES, ...DESSUS_IMAGES]) { const i = img(n); if (i) T.spr[n] = i; }
       // chaque élève assis derrière SA table : une seule image (pas d'élève qui passe devant / derrière la table)
       const tb = T.spr.table, ppu = tb.height / T.hauteurs.table;
-      for (let k = 0; k < 4; k++) for (const p of ['content', 'cache']) {
+      for (let k = 0; k < 4; k++) for (const p of ['content', 'cache', 'mouille', 'mouille_cache']) {
+        if (!T.spr[`eleve_${k}_${p}`]) T.spr[`eleve_${k}_${p}`] = T.spr[`eleve_${k}_${p.startsWith('mouille') ? p.replace('mouille_', '').replace('mouille', 'content') : p}`];   // pas d'image : pose sèche
         // l'élève est un peu plus grand et assis plus haut que le bas de la table : on voit son buste au-dessus
         const el = T.spr[`eleve_${k}_${p}`], sh = 1.0 * ppu, sw = el.width * sh / el.height, leve = 0.16 * ppu;
         const c = document.createElement('canvas'); c.width = Math.ceil(Math.max(tb.width, sw)); c.height = Math.ceil(Math.max(sh + leve, tb.height));
@@ -168,6 +169,17 @@ export class JulienClasse extends JulienManif {
     // des pluies de copies plus longues (RG.julien.anarchiste)
     this.anarchiste = this.diff === DIFFICULTES.anarchiste;
     if (this.anarchiste) { this.vieMax = Math.round(RG.julien.vie * RG.julien.anarchiste.vie); this.julien.vie = this.vieMax; }
+  }
+
+  imageFin() { return 'julien_fin_colle'; }
+
+  // victoire : écran illustré (la classe en fête), le message et le badge
+  ecranVictoire(message) {
+    if (this.textures.exists('julien_fin_victoire')) this.add.image(LARGEUR / 2, HAUTEUR / 2, 'julien_fin_victoire').setDisplaySize(LARGEUR, HAUTEUR).setDepth(1000);
+    this.add.rectangle(LARGEUR / 2, 95, LARGEUR, 170, 0x000000, 0.55).setDepth(1000);
+    texte(this, LARGEUR / 2, 55, 'VICTOIRE', 56, '#ffd84a').setDepth(1001).setStroke('#000', 8);
+    texte(this, LARGEUR / 2, 130, message, 22, '#ffffff', { wordWrap: { width: 800 } }).setDepth(1001).setStroke('#000', 5);
+    this.add.image(LARGEUR - 90, HAUTEUR - 90, 'badge_' + this.identite.id).setScale(2).setDepth(1001);
   }
 
   perdu() { super.perdu('COLLÉ !', 'Deux heures de retenue avec Julien… Retente ta chance !'); }
@@ -476,7 +488,8 @@ export class JulienClasse extends JulienManif {
     const chaud = this.julien.phase > 1 || this.alarme || this.julien.etat === 'aimant';
     for (const el of this.eleves) {
       el.t -= dt;
-      el.table.type = `te_${el.k}_${el.t > 0 || (!chaud && this.julien.phase === 1) ? 'content' : 'cache'}`;
+      const content = el.t > 0 || (!chaud && this.julien.phase === 1);
+      el.table.type = `te_${el.k}_${this.alarme ? (content ? 'mouille' : 'mouille_cache') : content ? 'content' : 'cache'}`;   // sprinklers : trempés
     }
     if (this.confisque && (this.confisque.t -= dt) <= 0) {   // il te rend ton arme
       const id = this.confisque.id; this.confisque = null;
