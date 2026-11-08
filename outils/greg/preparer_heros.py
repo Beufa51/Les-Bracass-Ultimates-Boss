@@ -11,13 +11,13 @@ from scipy import ndimage
 
 H, V, DST = 'assets_inbox/greg_heros', 'assets_inbox/greg_v2', 'assets/sprites/greg'
 
-def detourer(im, seuil=232):
+def detourer(im, seuil=232, trous=True):
     a = np.asarray(im.convert('RGB')).astype(np.int16)
     mini = a.min(axis=2); blanc = mini > seuil
     lab, n = ndimage.label(blanc)
     bord = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
     tailles = ndimage.sum(blanc, lab, range(n + 1))
-    fond = np.isin(lab, list(bord)) | ((tailles[lab] > 6000) & blanc)
+    fond = np.isin(lab, list(bord)) | (((tailles[lab] > 6000) & blanc) if trous else False)
     autour = ndimage.binary_dilation(fond) & ~fond
     alpha = np.where(fond, 0, 255).astype(np.float32)
     alpha[autour] = np.clip((255 - mini[autour]) * 4, 60, 255)
@@ -55,6 +55,6 @@ p.crop((120, 40, 920, 840)).resize((128, 128), Image.LANCZOS).save(f'{DST}/heros
 Image.open(f'{V}/greg_visage.jpg').convert('RGB').resize((300, 260), Image.LANCZOS).save(f'{DST}/greg_visage.jpg', quality=88)
 k = Image.open(f'{V}/greg_ko.jpg').convert('RGB'); k.resize((round(k.width * 410 / k.height), 410), Image.LANCZOS).save(f'{DST}/greg_ko.jpg', quality=86)
 for nom, haut in [('trophee', 300), ('arbitre', 320)]:
-    im = detourer(Image.open(f'{V}/greg_{nom}.jpg')); im = im.crop(im.getbbox())
+    im = detourer(Image.open(f'{V}/greg_{nom}.jpg'), trous=(nom != 'arbitre')); im = im.crop(im.getbbox())   # chemise blanche de l'arbitre : gardée
     im = im.resize((round(im.width * haut / im.height), haut), Image.LANCZOS); im.save(f'{DST}/greg_{nom}.png', optimize=True)
     print(f"greg_{nom}: {im.width}x{im.height}")

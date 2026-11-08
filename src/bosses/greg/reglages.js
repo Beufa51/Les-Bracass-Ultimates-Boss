@@ -14,7 +14,7 @@ export const DIFFICULTES = {
     texte: 'Greg tape doucement et prévient longtemps. Pour apprendre les esquives et les contres.' },
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', degatsGreg: 0.65, vitesse: 1.25, esquive: 0.55, aides: true, degatsJoueur: 0.65, rangMax: 'A',
     texte: 'Greg frappe moins fort et plus lentement. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 1,    vitesse: 1,    esquive: 0.45, aides: true, degatsJoueur: 0.32,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 0.9,  vitesse: 1,    esquive: 0.45, aides: true, degatsJoueur: 0.34,
     texte: 'Le vrai combat.' },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', degatsGreg: 1.25, vitesse: 0.85, esquive: 0.38, aides: false, degatsJoueur: 0.25,
     texte: 'Sans flèche ni cible, coups rapides et puissants. Pour les vrais.' },
@@ -51,8 +51,8 @@ export const REGLAGES = {
       gardeBasse: { cle: 'greg2_garde_basse', origine: [0.483, 1], taille: 0.78, pied: true },
       nargue:     { cle: 'greg2_nargue',      origine: [0.418, 1], taille: 0.78, pied: true },   // langue tirée, bras ballants
       tapeGants:  { cle: 'greg2_tape_gants',  origine: [0.496, 1], taille: 0.78, pied: true },   // avant le SMASH
-      jab:        { cle: 'greg2_jab',         origine: [0.625, 1], taille: 0.78, pied: true, cote: 'g' },   // DE FACE : gant vers toi
-      crochet:    { cle: 'greg2_crochet',     origine: [0.320, 1], taille: 0.78, pied: true, cote: 'd' },   // DE FACE : gant en avant, à droite
+      jab:        { cle: 'greg2_jab',         origine: [0.625, 1], taille: 0.70, pied: true, cote: 'g' },   // DE FACE : gant vers toi
+      crochet:    { cle: 'greg2_crochet',     origine: [0.320, 1], taille: 0.70, pied: true, cote: 'd' },   // DE FACE : gant en avant, à droite
       corpsPied:  { cle: 'greg2_corps',       origine: [0.732, 1], taille: 0.78, pied: true, cote: 'g' },   // DE FACE : accroupi, gant au ventre
       smash:      { cle: 'greg2_smash',       origine: [0.636, 1], taille: 0.78, pied: true },
       touche:     { cle: 'greg2_touche',      origine: [0.616, 1], taille: 0.78, pied: true },

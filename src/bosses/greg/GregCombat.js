@@ -1483,14 +1483,14 @@ export class GregCombat extends BossScene {
         if (c === 'corps') {            // coup au corps : il remonte d'en bas, en tournant
           echelle = 0.84 + elan * 0.24; dx = sens * 26 * (1 - elan); dy = 60 - elan * 30; angle = sens * 10 * (1 - elan);
         } else {
-          echelle = 0.82 + elan * 0.25; dx = sens * 30 * (1 - elan);
+          echelle = 0.86 + elan * 0.12; dx = sens * 30 * (1 - elan);   // (moins de zoom : le gant de face est déjà énorme)
           dy = c === 'smash' ? 30 - elan * 40 : elan * 10;
         }
       }
       if (c === 'smash' && Math.floor(this.horloge * 10) % 2) teinte = 0xff7070;
     }
     else if (g.etat === 'frappe' || (g.etat === 'recup' && g.t < 0.15 && g.attaque && g.attaque.cible)) {
-      pose = imageCoup(g.attaque.cible); echelle = 1.1; dy = g.attaque.cible === 'smash' ? -15 : (g.attaque.cible === 'corps' ? 30 : 14); rapide = true;
+      pose = imageCoup(g.attaque.cible); echelle = g.attaque.cible === 'smash' ? 1.1 : 1.0; dy = g.attaque.cible === 'smash' ? -15 : (g.attaque.cible === 'corps' ? 30 : 14); rapide = true;
       angle = g.attaque.id === 'crochet' ? -6 : 0;
     }
     else if (g.etat === 'recup') { pose = garde; dy = 6; }   // après son coup, il reprend sa garde
