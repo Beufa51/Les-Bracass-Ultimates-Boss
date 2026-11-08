@@ -61,6 +61,8 @@
 - Coups DE FACE (gant vers le joueur) : `greg2_jab` et `greg2_corps` remplacés (anciens « de côté » gardés en
   `assets_inbox/greg_v2/*_cote.jpg`) ; `preparer_v2.py` les met à l'échelle (jab : hauteur 545 ; corps : taille de la tête).
   Crochet DE FACE aussi (`greg2_crochet`, hauteur 545 ; ancien en `greg_crochet_cote.jpg`).
+- Portrait de présentation v2 (`greg_portrait.jpg`, original dans `assets_inbox/greg_v2/`) ; `greg_visage.jpg` (bandeau,
+  annonce du SMASH) = sa tête recadrée.
 - `greg2_releve` branché : pose prise 1,1 s quand Greg se relève (il monte du tapis).
 - RESTE : poses du héros, portrait / visage / case K.O. / trophée / arbitre
   (prompts dans `propositions/greg_prompts_images.md`).
