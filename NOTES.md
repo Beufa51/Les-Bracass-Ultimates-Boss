@@ -1793,7 +1793,7 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   → `julien_julien_dos2` (alterne avec dos), `pointe` (« AU TABLEAU ! »), `crie` (changement de phase), `confisque`,
   `regle` (2 règles croisées, haut coupé). Branchées dans `imageEnnemi` (JulienClasse).
 - V105 : IMAGES DE LA SECTION 21 LIVRÉES → `python3 outils/julien/decouper_audit21.py` (échelle par personnage) :
-  main vide (CONFISQUÉ, `T.main.vide`), élèves trempés en phase 3 (`eleve_<k>_mouille` / `_mouille_cache`, choisis si
+  main vide (CONFISQUÉ, `T.main.vide`, retournée : livrée en main gauche), élèves trempés en phase 3 (`eleve_<k>_mouille` / `_mouille_cache`, choisis si
   `this.alarme`), surveillant `essouffle` / `attrape` (`e.attrapePose` 0,5 s), lanceur `tousse` (`e.tousseT`, dans la
   lacrymo) / `farine` (`e.aveugle`), CRS `farine`. ÉCRANS DE FIN : `imageFin()` (gazé / attrapé / collé) derrière le texte
   de PERDU, `ecranVictoire()` de la classe. À REFAIRE (prompts 21c bis, 21d bis) : bureau renversé (image trop haute,

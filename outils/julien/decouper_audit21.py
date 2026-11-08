@@ -2,7 +2,7 @@
 #   julien_main_vide.jpg       → julien_main_vide.png (main vide pendant « CONFISQUÉ ! »)
 #   julien_eleves_2.jpg        → julien_eleve_<k>_mouille / _mouille_cache (phase 3, sprinklers ; rangée du BAS)
 #   julien_surveillant_2.jpg   → julien_surveillant_essouffle / _attrape
-#   julien_police_effets.jpg   → julien_lanceur_tousse / _farine, julien_bouclier_tousse / _farine (2e et 5e poses ignorées)
+#   julien_police_effets.jpg   → julien_lanceur_tousse / _farine, julien_bouclier_tousse / _farine (2e, 3e (CRS bleu) et 5e poses ignorées)
 #   julien_bureau_renverse.jpg → julien_bureau_renverse.png
 #   julien_fin_*.jpg           → julien_fin_*.jpg en 960 × 540 (écrans de fin illustrés)
 # Chaque pose est réduite avec l'ÉCHELLE de son personnage (k) pour avoir la même taille que ses autres poses,
@@ -21,11 +21,12 @@ PLANCHES = {
                             enumerate([(118, 291), (467, 628), (817, 987), (1163, 1323)]) for p, x in (('mouille', x1), ('mouille_cache', x2))],
     'julien_surveillant_2.jpg': [('surveillant_essouffle', (340, 400), 0.215, 200), ('surveillant_attrape', (1060, 400), 0.215, 200)],
     'julien_police_effets.jpg': [(None, (361, 460), 0, 0), ('lanceur_tousse', (160, 470), 0.30, 200), ('lanceur_farine', (595, 460), 0.30, 200),
-                                 ('bouclier_tousse', (830, 460), 0.34, 200), ('bouclier_farine', (1290, 470), 0.34, 200)],
-    'julien_bureau_renverse.jpg': [('bureau_renverse', (250, 1050), 0.4, None)],
+                                 (None, (830, 460), 0, 0), ('bouclier_farine', (1290, 470), 0.34, 200)],
+    # bureau renversé : image livrée trop haute, à refaire (prompt 21c bis)
 }
 # les 2 dernières poses des policiers se touchent : on coupe entre elles (zones effacées en blanc avant la découpe)
 EFFACER = {'julien_police_effets.jpg': [(950, 0, 1182, 625), (950, 625, 1128, 768)]}
+MIROIR = {'main_vide'}   # livrée en main GAUCHE : retournée pour faire la main droite (comme les autres mains)
 FINS = ['julien_fin_gaze', 'julien_fin_attrape', 'julien_fin_colle', 'julien_fin_victoire']
 
 
@@ -44,6 +45,7 @@ def main():
                 print('  !! pose introuvable :', nom); continue
             i = detourer(img, m, nettoyer=True)
             i = i.resize((max(1, round(i.width * k)), max(1, round(i.height * k))), Image.LANCZOS)
+            if nom in MIROIR: i = i.transpose(Image.FLIP_LEFT_RIGHT)
             if h and i.height < h:
                 c = Image.new('RGBA', (i.width, h), (0, 0, 0, 0)); c.paste(i, (0, h - i.height), i); i = c
             elif h and i.height > h:
