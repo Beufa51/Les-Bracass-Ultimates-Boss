@@ -79,7 +79,7 @@ export function tirer(scene, dx, dy, appui, nouveau) {
     ajout('tomate', vx, vy);
     jouerSon(scene, 'julien_lancer', { rate: 0.8 });
   } else if (j.arme === 'sarbacane') {
-    j.recharge = RG.sarbacane.cadence * (j.turbo ? RG.turbo.cadence : 1); j.lanceT = 0.12;   // trésor : sarbacane TURBO
+    j.recharge = RG.sarbacane.cadence; j.lanceT = 0.12;
     ajout('boulette', vx, vy);
     jouerSon(scene, 'julien_lancer', { rate: 1.6 });
   } else if (j.arme === 'eau') {

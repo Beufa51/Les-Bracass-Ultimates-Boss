@@ -58,128 +58,6 @@ export class JulienLycee extends JulienManif {
       if (!this.textures.exists('julien_surveillant_essouffle')) T.spr.surveillant_essouffle = T.spr.surveillant_marche0;   // (l'IA du CRS a une pose « essoufflé »)
       for (const n of ['table', 'canette', 'extincteur', 'carnet', 'puree', 'flaque', 'mousse', 'etagere', 'etagere_basse', 'table_lecture', 'ordinateur']) { const i = img(n); if (i) T.spr[n] = i; }
       for (const n of ['etagere', 'etagere_basse', 'table_lecture', 'ordinateur']) if (!T.spr[n]) T.spr[n] = T.spr.table;
-      {   // trésor : la SARBACANE TURBO (la sarbacane, dorée)
-        const src = T.spr.sarbacane || spritesClasse().sarbacane, c = document.createElement('canvas'); c.width = src.width; c.height = src.height;
-        const g = c.getContext('2d'); g.filter = 'sepia(1) saturate(4) brightness(1.2)'; g.drawImage(src, 0, 0); T.spr.turbo = c; T.hauteurs.turbo = 0.32;
-      }   // (image absente : une table)
-      // touchés par une BOULETTE (sans jaune d'œuf) : l'IA choisit « <type>_touche_propre » quand le coup ne fait pas de tache
-      for (const t of ['surveillant', 'cantiniere']) { const i = img(t + '_touche_papier'); if (i) T.spr[t + '_touche_propre'] = i; }
-      T.spr.comptoir = img('comptoir') || img('bureau') || T.spr.bureau;   // vraie image du comptoir, sinon le bureau du prof
-      T.lycee = construireDecorLycee(this.ctx, L, VUE_H, PLAN_LYCEE, estCantine);
-      for (const [code, n] of Object.entries(MURS_IMAGES)) { const i = img(n); if (i) T.lycee.murs[code] = i; }
-    }
-    return T.lycee;
-  }
-  planDepart() { return PLAN_LYCEE; }
-  lancerMusique() { jouerMusique(this, 'julien_lycee_musique'); }   // thème de Duke Nukem 3D
-  imageFin() { return 'julien_fin_attrape'; }
-  // carte : le CARNET (tant qu'il n'est pas pris), puis la porte de la salle 12
-  reperesCarte() {
-    if (!this.carnet) { const k = this.objets.find(o => o.type === 'carnet' && o.actif); return k ? [{ x: k.x, y: k.y, couleur: '#ffd84a', nom: 'CARNET' }] : []; }
-    return [{ x: PORTE_SALLE_12.x + 0.5, y: PORTE_SALLE_12.y + 0.5, couleur: '#7fff7f', nom: 'SALLE 12' }];
-  }
-  messagesFuite() { return TXT.fuite; }   // surveillants et fayots : pas de « commissariat » au lycée
-
-  create() {
-    this.txtLycee = null;   // (la scène est réutilisée quand on rejoue : ne pas toucher au texte de la partie d'avant)
-    super.create();
-    this.lblFlics.setText('REPOUSSÉS');
-    this.lblLycee.setText('CARNET');
-    this.txtLycee = texte(this, 868, VUE_H * 2 + 86, '', 12, '#ffd84a');   // sous la boussole (elle vise le carnet, puis la porte)
-    this.dessiner(0);
-  }
-
-  intro() {
-    const tact = estTactile();
-    this.afficherIntro('LE LYCÉE', [
-      'Tu es dans le lycée… et en RETARD ! Julien t\'attend en SALLE 12.',
-      'Œufs et tomates INTERDITS ici : seulement ta SARBACANE (infinie).',
-      'Salle 12 fermée : va chercher ton CARNET au CDI (après la cantine).',
-      'SURVEILLANT : il siffle puis fonce → pas de côté. CANTINIÈRE : gare à la purée.',
-      'Les FAYOTS te dénoncent : on ne peut pas les toucher, contourne-les.',
-      'Une boulette sur un EXTINCTEUR : mousse partout !   Les CANETTES soignent.',
-      ...(tact ? [this.joy ? 'Joystick : avancer, reculer, pas de côté     ↺ ↻ : tourner' : '▲ ▼ avancer / reculer   ◀ ▶ pas de côté   ↺ ↻ tourner',
-        'LANCER : tirer      ARME : changer d\'arme'] : this.lignesCommandes()),
-    ], () => this.demarrer());
-  }
-
-  demarrer() {
-    super.demarrer();
-    if (this.anarchiste) this.message('ANARCHISTE : le CPE a doublé les surveillants… et les fayots ont l\'oreille fine !', 4);
-  }
-
-  appliquerDifficulte() {
-    this.j.mun.oeufs = 0; this.j.mun.tomates = 0;   // armes de la manif interdites : seulement la sarbacane
-    // ANARCHISTE (audit : « pas de surprise ») : renforts de surveillants et de cantinières, fayots qui alertent plus loin
-    this.anarchiste = this.diff === DIFFICULTES.anarchiste;
-    if (this.anarchiste) for (const [type, x, y] of RENFORTS_LYCEE) this.ajouterEnnemi(type, x, y);
-    this.total = this.ennemis.filter(e => e.actif).length;
-  }
-
-  perdu() { super.perdu('ATTRAPÉ !', 'Direction le bureau du CPE… Retente ta chance !'); }
-
-  // ------------------------------------------------------------------ niveau
-  lireNiveau() {
-    this.j = this.nouveauJoueur();
-    this.j.armes = new Set(['sarbacane']); this.j.arme = 'sarbacane';   // les armes de la manif sont INTERDITES au lycée
-    this.ennemis = []; this.objets = []; this.tirs = []; this.grenades = []; this.nuages = []; this.splats = [];
-    this.farines = []; this.rideaux = []; this.flaques = []; this.fourgonFait = true;
-    this.secrets = new Map(); this.secretsTrouves = 0; this.secretsSignales = new Set();
-    this.carnet = false; this.fini = false; this.porteT = 0;
-    this.plan = this.plan.map((ligne, y) => [...ligne].map((c, x) => {
-      const px = x + 0.5, py = y + 0.5;
-      if (c === 'J') { this.j.x = px; this.j.y = py; return '.'; }
-      if (SECRETS_LYCEE[c]) { this.secrets.set(`${x},${y}`, true); return SECRETS_LYCEE[c]; }
-      const type = OBJETS_LYCEE[c];
-      if (!type) return c;
-      if (type === 'surveillant' || type === 'cantiniere') { this.ajouterEnnemi(type, x, y); return '.'; }
-      const o = { type, x: px, y: py, solide: !!RAYONS[type], rayon: RAYONS[type] || 0.3, actif: true, n: 0 };
-      if (type === 'fayot') Object.assign(o, { type: 'fayot_bras', fayot: true, criT: 0, replique: TXT.fayotTouche });
-      this.objets.push(o);
-      return '.';
-    }).join(''));
-    this.total = this.ennemis.length; this.repousses = 0;
-    this.totalObjets = this.objets.filter(o => !o.solide).length; this.ramasses = 0;
-    this.zonesVues = new Set(); this.portailOuvert = true; this.temps = 0;
-    this.sortieCases = new Set();
-    const k = this.objets.find(o => o.type === 'carnet');
-    this.sortie = { x: k.x, y: k.y };   // la boussole vise le carnet, puis la porte de la salle 12
-  }
-
-  ajouterEnnemi(type, x, y) {
-    const px = x + 0.5, py = y + 0.5;
-    this.ennemis.push({ type, x: px, y: py, vie: RG[type].vie, etat: 'attente', t: 1 + Math.random(), anim: 0, bouge: false,
-      vuX: px, vuY: py, alerte: false, cdx: 0, cdy: 0, actif: true, parvis: false,
-      ronde: true, rdx: x % 2 ? 1 : -1, rdy: 0, rondeT: 2.5 });
-  }
-
-  // ------------------------------------------------------------------ boucle (la boucle commune est dans JulienManif)
-  zonesNiveau() { return ZONES_LYCEE; }
-  majJeu(dt) {
-    const j = this.j;
-    for (const f of this.flaques) f.t -= dt;
-    this.flaques = this.flaques.filter(f => f.t > 0);
-    j.lent = this.flaques.some(f => Math.hypot(f.x - j.x, f.y - j.y) < 0.8);
-    this.bougerJoueur(dt);
-    this.ennemis.forEach(e => this.ia(e, dt));
-    this.fayots(dt);
-    this.projectiles(dt);
-    this.ramasser();
-    this.porte(dt);
-  }
-
-  // les FAYOTS : ils te voient → ils crient et alertent tout le monde ; trop près → ils s'enfuient (en courant)
-  fayots(dt) {
-    const j = this.j, F = RG.lycee;
-    for (const o of this.objets) {
-      if (!o.fayot || !o.actif) continue;
-      const ox = j.x - o.x, oy = j.y - o.y, d = Math.hypot(ox, oy);
-      if (o.fuit) {
-        this.deplacer(o, -ox / d * 2.4 * dt, -oy / d * 2.4 * dt, 0.28, o);
-        o.fuitT += dt;
-        if (o.fuitT > 0.6 && !this.visible(o)) o.actif = false;
-        continue;
-      }
       if (d < 1.3) { o.fuit = true; o.fuitT = 0; o.type = 'fayot_fuite'; o.solide = false; this.message('« Je le dirai à ma mère ! »', 1.6); continue; }
       o.criT -= dt;
       const voit = j.vie > 0 && d < F.fayotVue && vueLibre(this.plan, o.x, o.y, j.x, j.y);
@@ -203,10 +81,6 @@ export class JulienLycee extends JulienManif {
       if (o.type === 'carnet') {
         o.actif = false; this.carnet = true; this.sortie = { x: PORTE_SALLE_12.x + 0.5, y: PORTE_SALLE_12.y + 1.5 };
         this.message(TXT.carnet, 4.5); jouerSon(this, 'julien_portail', { rate: 1.3 }); j.expr = 'content'; j.exprT = 1.2; j.or = 0.8;
-      } else if (o.type === 'turbo') {   // TRÉSOR du passage secret : gardé jusqu'à la fin du combat contre Julien
-        o.actif = false; j.turbo = true; j.or = 1;
-        this.message('TRÉSOR : la SARBACANE TURBO ! Elle tire 2 fois plus vite… et tu la gardes contre Julien !', 4.5);
-        jouerSon(this, 'julien_secret'); j.expr = 'content'; j.exprT = 1.2;
       } else if (o.type === 'canette' && j.vie < RG.joueur.vie) {
         o.actif = false; this.ramasses++;
         j.vie = Math.min(RG.joueur.vie, j.vie + RG.lycee.canette);
@@ -234,7 +108,7 @@ export class JulienLycee extends JulienManif {
     voile(this, 0.85).setDepth(1000);
     texte(this, LARGEUR / 2, 200, 'SALLE 12', 44, '#ffd84a').setDepth(1001);
     texte(this, LARGEUR / 2, 270, TXT.porte, 24, '#ffffff').setDepth(1001);
-    this.time.delayedCall(2600, () => this.scene.start('JulienClasse', { depuisManif: true, turbo: !!this.j.turbo }));   // (la sarbacane turbo suit)
+    this.time.delayedCall(2600, () => this.scene.start('JulienClasse', { depuisManif: true }));
   }
 
   // ------------------------------------------------------------------ dessin

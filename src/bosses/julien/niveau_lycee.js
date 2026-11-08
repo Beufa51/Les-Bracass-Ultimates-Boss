@@ -26,7 +26,7 @@ export const PLAN_LYCEE = [
   '51..F153..d.d.d.......36.B..O.65',
   '51...153........x...V.36...V..65',
   '51.x.153.s............36.....n65',
-  '51...1uK33333...33333336E.E.E.65',
+  '51...1.K33333...33333336E.E.E.65',
   '51...Xs.55552...25555556......65',
   '51F..1.n55552.F.25555556x....F65',
   '51...15555552...25555556.L.L..65',
@@ -42,7 +42,7 @@ export const PLAN_LYCEE = [
 
 export const OBJETS_LYCEE = {
   V: 'surveillant', Q: 'cantiniere', F: 'fayot', x: 'extincteur', n: 'canette', k: 'carnet', d: 'table', q: 'comptoir',
-  s: 'sandwich', K: 'kway', u: 'turbo', E: 'etagere', B: 'etagere_basse', L: 'table_lecture', O: 'ordinateur',   // u : SARBACANE TURBO (trésor du passage secret, gardée en classe)
+  s: 'sandwich', K: 'kway', E: 'etagere', B: 'etagere_basse', L: 'table_lecture', O: 'ordinateur',
 };
 export const SECRETS_LYCEE = { X: '1' };
 export const PORTE_SALLE_12 = { x: 3, y: 1 };

@@ -103,7 +103,6 @@ export const REGLAGES = {
   },
   // TRÉSORS des passages secrets (Fabien : « des choses plus intéressantes ») :
   pourris: { nombre: 15, degats: 3 },   // ŒUFS POURRIS (manif) : les 15 prochains œufs font ×3 et passent le bouclier
-  turbo: { cadence: 0.5 },              // SARBACANE TURBO (lycée) : tire 2 fois plus vite, jusqu'à la fin du combat contre Julien
   sono: { cadence: 1.5, portee: 10, charges: 2, maxi: 3 },   // la SONO (arme 7, le « BFG ») : tous les policiers EN VUE fuient
   lacrymo: {
     vol: 1.0,            // temps de vol de la grenade

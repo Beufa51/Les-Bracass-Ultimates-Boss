@@ -163,7 +163,6 @@ export class JulienClasse extends JulienManif {
     super.demarrer();
     this.julien.etat = 'marche'; this.julien.t = 1.2;
     this.message(REPLIQUES.debut, 4);
-    if (this.j.turbo) this.time.delayedCall(4200, () => this.message('Ta SARBACANE TURBO (trouvée au lycée) tire 2 fois plus vite !', 3));
     const r = this.donnees.reprise;
     if (r) {   // POINT DE REPRISE : début de la phase atteinte (pas de vue du dessus avant 20 s, comme au début)
       this.donnees.reprise = null; this.repris = true;
@@ -195,7 +194,7 @@ export class JulienClasse extends JulienManif {
 
   perdu() { super.perdu('COLLÉ !', this.reprise ? `Deux heures de retenue… Tu reprends à la PHASE ${this.reprise.phase} / 3.` : 'Deux heures de retenue avec Julien… Retente ta chance !'); }
   // POINT DE REPRISE : après une défaite, on reprend au début de la dernière phase atteinte (vie de Julien d'alors)
-  donneesRejouer() { return { rejouer: true, turbo: this.j.turbo, ...(this.reprise ? { reprise: this.reprise } : {}) }; }
+  donneesRejouer() { return this.reprise ? { rejouer: true, reprise: this.reprise } : { rejouer: true }; }
 
   // ------------------------------------------------------------------ niveau
   lireNiveau() {
@@ -203,8 +202,7 @@ export class JulienClasse extends JulienManif {
     this.j.armes = new Set(['sarbacane']); this.j.arme = 'sarbacane';   // armes de la manif interdites au lycée
     this.ennemis = []; this.objets = []; this.tirs = []; this.grenades = []; this.nuages = []; this.splats = [];
     this.farines = []; this.rideaux = []; this.secrets = new Map(); this.secretsTrouves = 0; this.fourgonFait = true;
-    this.stats = { rafales: 0, notes20: 0, dos: 0, total: 0 }; this.reprise = null; this.repris = false;
-    this.j.turbo = !!this.donnees.turbo;   // trésor du lycée : la sarbacane TURBO   // rang de fin, point de reprise
+    this.stats = { rafales: 0, notes20: 0, dos: 0, total: 0 }; this.reprise = null; this.repris = false;   // rang de fin, point de reprise
     this.livres = []; this.finDemandee = false; this.dessus = null;
     this.eleves = []; this.alarme = false; this.confisque = null;
     this.vus = new Set(); this.bureau = null;
