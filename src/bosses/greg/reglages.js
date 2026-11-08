@@ -14,9 +14,9 @@ export const DIFFICULTES = {
     texte: 'Greg tape doucement et prévient longtemps. Pour apprendre les esquives et les contres.' },
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', degatsGreg: 0.65, vitesse: 1.25, esquive: 0.55, aides: true, degatsJoueur: 0.65, rangMax: 'A',
     texte: 'Greg frappe moins fort et plus lentement. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 0.8,  vitesse: 1,    esquive: 0.5,  aides: true, degatsJoueur: 0.34,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 0.6,  vitesse: 1,    esquive: 0.5,  aides: true, degatsJoueur: 0.6,
     texte: 'Le vrai combat.' },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', degatsGreg: 1.25, vitesse: 0.85, esquive: 0.42, aides: false, degatsJoueur: 0.25,
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', degatsGreg: 0.9,  vitesse: 0.85, esquive: 0.42, aides: false, degatsJoueur: 0.5,
     texte: 'Sans flèche ni cible, coups rapides et puissants. Pour les vrais.' },
 };
 
@@ -190,7 +190,7 @@ export const REGLAGES = {
   gardeBriseeSonne: 0.8,       // garde avec souffle à 0 => garde brisée, sonné ce temps
   smashGardeSonne: 1.0,        // le SMASH bloqué brise toujours la garde
   // Greg pare même tes coups "libres" (zone ouverte, hors contre / essoufflement) : chance par round
-  blocageLibre: [0.4, 0.5, 0.6],   // (aussi juste après avoir encaissé un coup : il faut CONTRER)
+  blocageLibre: [0.6, 0.7, 0.8],   // nov. 2026 : il pare plus les coups gratuits ; tes coups qui passent font plus mal   // (aussi juste après avoir encaissé un coup : il faut CONTRER)
   martelage: { coups: 3, fenetre: 1.5 },   // plus de 3 coups (hors contres) en 1,5 s : il pare tout (le spam ne paie plus)
   hesitation: { chance: 0.3, duree: [0.2, 0.4] },   // rounds 2-3 : parfois un petit temps d'arrêt avant le coup suivant
   maxSansAttaque: 2.5,         // garde-fou : jamais plus de 2,5 s sans attaquer (même si tu le martèles)

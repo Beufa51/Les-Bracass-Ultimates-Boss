@@ -82,6 +82,8 @@
   (jusqu'à 45 s sans attaquer, image « étourdi ») -> il encaisse sans sortir de l'essoufflement (1,4 s). Garde-fou
   `maxSansAttaque` 2,5 s ; martelage paré = riposte immédiate ; « touché » n'utilise plus l'image étourdi. NORMAL :
   `degatsGreg` 0,8. Bot : plus long temps sans attaque 5-8 s ; enfant NORMAL ≈ 4 fois sur 5, CHAMPION perdu.
+- Dégâts plus équilibrés (retour « ses coups font bien plus mal que les miens ») : NORMAL `degatsJoueur` 0,6 /
+  `degatsGreg` 0,6 ; CHAMPION 0,5 / 0,9 ; `blocageLibre` [0,6 ; 0,7 ; 0,8] (les gros dégâts = contres, rush, Dempsey).
 - `greg2_releve` branché : pose prise 1,1 s quand Greg se relève (il monte du tapis).
 - RESTE : poses du héros, portrait / visage / case K.O. / trophée / arbitre
   (prompts dans `propositions/greg_prompts_images.md`).
