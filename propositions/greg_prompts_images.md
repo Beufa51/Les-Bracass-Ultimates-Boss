@@ -380,3 +380,10 @@ excited fans cheering with raised arms, camera flashes, drawn in manga ink with 
 detailed than the foreground so a character in front stays readable. Strong spotlights from the ceiling. No text,
 no logo, no readable signs.
 ```
+
+## greg_enerve.jpg — Greg ÉNERVÉ (facultatif, proposé par l'avis « fun », voir `propositions/greg_avis_fun.md`)
+Joindre `assets_inbox/greg_reference_face.jpg`, coller le Prompt commun de l'Étape 2, puis :
+```
+POSE: high boxing guard, gloves up in front of the face, but FURIOUS: veins on the forehead, red angry eyes, steam coming
+from his head, teeth clenched, heavy sweat, a bruise on the cheek. The belt has a plain gold buckle with NO text.
+```

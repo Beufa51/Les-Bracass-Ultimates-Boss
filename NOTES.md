@@ -38,6 +38,8 @@
 - **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo (~45 s, V20) → BABYFOOT (V19, le beer pong est SUPPRIMÉ) → porte (simplifiée V19z). Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
+## GREG — AVIS « FUN » d'un game designer (nov. 2026) : `propositions/greg_avis_fun.md` — 12 choix EN ATTENTE de Fabien.
+
 ## HUB = ÉCRAN DE SÉLECTION DES BOSS façon Mega Man (nov. 2026, remplace la salle aux portes)
 - `src/hub/HubScene.js` : grille 3 x 3 (Beufa Kédric Julien / Greg TOI Rémi / Lionel BADGES LA FIN). Pas battu = OMBRE
   (silhouette + liseré bleu, « ? »), battu = buste en couleur + badge + cadre doré. Flèches + Espace ; au doigt : toucher
