@@ -52,7 +52,7 @@ export const REGLAGES = {
       nargue:     { cle: 'greg2_nargue',      origine: [0.418, 1], taille: 0.78, pied: true },   // langue tirée, bras ballants
       tapeGants:  { cle: 'greg2_tape_gants',  origine: [0.496, 1], taille: 0.78, pied: true },   // avant le SMASH
       jab:        { cle: 'greg2_jab',         origine: [0.625, 1], taille: 0.78, pied: true, cote: 'g' },   // DE FACE : gant vers toi
-      crochet:    { cle: 'greg2_crochet',     origine: [0.582, 1], taille: 0.78, pied: true, cote: 'g' },
+      crochet:    { cle: 'greg2_crochet',     origine: [0.320, 1], taille: 0.78, pied: true, cote: 'd' },   // DE FACE : gant en avant, à droite
       corpsPied:  { cle: 'greg2_corps',       origine: [0.732, 1], taille: 0.78, pied: true, cote: 'g' },   // DE FACE : accroupi, gant au ventre
       smash:      { cle: 'greg2_smash',       origine: [0.636, 1], taille: 0.78, pied: true },
       touche:     { cle: 'greg2_touche',      origine: [0.616, 1], taille: 0.78, pied: true },

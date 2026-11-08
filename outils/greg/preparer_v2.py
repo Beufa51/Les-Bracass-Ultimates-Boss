@@ -44,7 +44,7 @@ images = {p: detourer(Image.open(f'{SRC}/greg_{p}.jpg')) for p in POSES}
 # Poses dessinées à une autre échelle (autre format d'image) : on les met à la taille de la TÊTE de "entier"
 # (largeur des cheveux noirs en haut du personnage).
 A_LA_TETE = ['corps']   # nov. 2026 : coup au corps DE FACE (accroupi : on se cale sur la tête)
-A_LA_HAUTEUR = {'jab': 545}   # jab DE FACE (debout, tête dessinée plus grosse : on se cale sur la hauteur)
+A_LA_HAUTEUR = {'jab': 545, 'crochet': 545}   # jab DE FACE (debout, tête dessinée plus grosse : on se cale sur la hauteur)
 def largeur_tete(im):
     a = np.asarray(im.crop(im.getbbox()))
     al = a[:, :, 3] > 128; noir = (a[:, :, :3].max(axis=2) < 70) & al

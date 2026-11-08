@@ -35,7 +35,7 @@ export const MANIFESTE = {
     greg2_smash: { fichier: 'sprites/greg/greg2_smash.png', largeur: 331, hauteur: 561, images: 1, vitesse: 1 },
     greg2_touche: { fichier: 'sprites/greg/greg2_touche.png', largeur: 360, hauteur: 545, images: 1, vitesse: 1 },
     greg2_etourdi: { fichier: 'sprites/greg/greg2_etourdi.png', largeur: 237, hauteur: 560, images: 1, vitesse: 1 },
-    greg2_crochet: { fichier: 'sprites/greg/greg2_crochet.png', largeur: 287, hauteur: 560, images: 1, vitesse: 1 },
+    greg2_crochet: { fichier: 'sprites/greg/greg2_crochet.png', largeur: 353, hauteur: 545, images: 1, vitesse: 1 },
     greg2_garde_basse: { fichier: 'sprites/greg/greg2_garde_basse.png', largeur: 231, hauteur: 560, images: 1, vitesse: 1 },
     greg2_ko_debout: { fichier: 'sprites/greg/greg2_ko_debout.png', largeur: 237, hauteur: 560, images: 1, vitesse: 1 },
     greg2_victoire: { fichier: 'sprites/greg/greg2_victoire.png', largeur: 318, hauteur: 559, images: 1, vitesse: 1 },
