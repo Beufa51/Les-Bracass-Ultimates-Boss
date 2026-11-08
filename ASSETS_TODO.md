@@ -65,7 +65,7 @@ Ton boxeur : vu de dos, cheveux bruns en pics, short vert, gants blancs.
 | greg_sol.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, K.O. allongé sur le dos, étoiles au-dessus de la tête, fond transparent |
 | greg_victoire.png | 360x420 | 1 | provisoire | Greg vu de FACE, coupé aux genoux, lève le poing droit, fond transparent |
 
-Clip : `dempsey.gif` (dans `assets/sprites/greg/`) : **intégré**, joué au lancement du Dempsey Roll (2 boucles = 2,46 s).
+Clip : `dempsey.mp4` (dans `assets/sprites/greg/`, le GIF a été retiré) : **intégré**, joué au lancement du Dempsey Roll (2 boucles = 2,46 s).
 
 Sons Greg : greg_coup, greg_coup_fort, greg_bloque, greg_esquive, greg_cloche, greg_compte, greg_alerte, greg_tapis
 (générés par `outils/greg/generer_sons.py`, remplaçables par de vrais fichiers).
