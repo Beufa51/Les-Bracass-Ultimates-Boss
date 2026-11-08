@@ -1,6 +1,8 @@
 // GREG sur téléphone : commandes par GESTES (proposition A, nov. 2026 — voir propositions/greg_maniabilite_mobile.md).
 //   Moitié GAUCHE de l'écran = défense : glisser ← / → = esquive ; doigt posé sans bouger = GARDE.
 //   Moitié DROITE = attaque : toucher en HAUT = coup au visage, en BAS = coup au corps.
+//   (nov. 2026, retour Fabien : on peut aussi ESQUIVER en glissant sur la moitié DROITE ; le coup part au lever du doigt
+//    ou dès qu'il reste posé G.coup s, donc un glissé n'envoie pas de coup.)
 //   Jauge pleine : gros bouton doré DEMPSEY au milieu. Pendant le roll / au tapis : toucher à gauche / à droite.
 //   Boule ROUGE du roll (Greg contre) : toucher n'importe où = FREIN.
 // Comme les boutons tactiles, chaque geste « appuie » sur une vraie touche du clavier : le combat ne change pas.
@@ -25,6 +27,7 @@ export const GESTES = {
   ligne: 320,          // hauteur (écran) qui sépare VISAGE (au-dessus) et CORPS (en dessous) : la ceinture de Greg
   glisse: 26,          // pixels à glisser pour une esquive
   garde: 0.12,         // secondes de doigt immobile pour lever la garde
+  coup: 0.09,          // moitié droite : doigt posé sans glisser pendant X s = le coup part (sinon au lever du doigt)
   bouton: { x: LARGEUR / 2, y: HAUTEUR - 70, r: 58 },   // bouton DEMPSEY
 };
 
@@ -45,7 +48,7 @@ export function installerGestes(scene, opts) {
   const etiquettes = [
     texte(scene, LARGEUR - 90, G.ligne - 30, 'VISAGE', 22, '#ffffff', style),
     texte(scene, LARGEUR - 90, G.ligne + 30, 'CORPS', 22, '#5ad1ff', style),
-    texte(scene, 150, HAUTEUR - 46, '◀ glisse ▶ : ESQUIVE\ndoigt posé : GARDE', 20, '#ffffff', { ...style, align: 'center' }),
+    texte(scene, 150, HAUTEUR - 46, '◀ glisse ▶ : ESQUIVE (partout)\ndoigt posé : GARDE', 20, '#ffffff', { ...style, align: 'center' }),
   ].map(t => t.setDepth(38));
   const bouton = scene.add.container(G.bouton.x, G.bouton.y).setDepth(39).setVisible(false);
   const rond = scene.add.graphics();
@@ -63,20 +66,25 @@ export function installerGestes(scene, opts) {
     if (opts.dempseyPret() && Math.hypot(p.x - G.bouton.x, p.y - G.bouton.y) < G.bouton.r + 10) { taper('x'); onde(p.x, p.y, 0xffd84a); return; }
     if (m === 'frein') { taper('bas'); onde(p.x, p.y, 0x7fff7f); return; }
     if (m === 'tapis' || m === 'dempsey') { taper(p.x < LARGEUR / 2 ? 'gauche' : 'droite'); onde(p.x, p.y, 0xffffff); return; }
-    if (p.x >= LARGEUR / 2) { taper(p.y < G.ligne ? 'espace' : 'z'); onde(p.x, p.y, p.y < G.ligne ? 0xffffff : 0x5ad1ff); return; }
+    if (p.x >= LARGEUR / 2) {   // attaque : le coup part au lever du doigt ou après G.coup s ; un glissé = esquive
+      const d = { x0: p.x, fait: false, garde: false, attaque: true };
+      d.frapper = () => { if (d.fait) return; d.fait = true; if (d.minuterie) d.minuterie.remove(); taper(p.y < G.ligne ? 'espace' : 'z'); onde(p.x, p.y, p.y < G.ligne ? 0xffffff : 0x5ad1ff); };
+      d.minuterie = scene.time.delayedCall(G.coup * 1000, () => { if (doigts.get(p.id) === d) d.frapper(); });
+      doigts.set(p.id, d); return;
+    }
     const d = { x0: p.x, fait: false, garde: false };
     d.minuterie = scene.time.delayedCall(G.garde * 1000, () => { if (!d.fait && doigts.get(p.id) === d) { d.garde = true; envoyer('keydown', 'bas'); } });
     doigts.set(p.id, d);
   };
   const bouge = (p) => {
-    const d = doigts.get(p.id); if (!d || d.fait || !p.isDown) return;
+    const d = doigts.get(p.id); if (!d || d.glisse || (d.fait && !d.attaque) || !p.isDown) return;
     const dx = p.x - d.x0;
-    if (Math.abs(dx) >= G.glisse) {   // esquive (la garde éventuelle est relâchée)
-      d.fait = true; lacher(d);
+    if (Math.abs(dx) >= G.glisse) {   // esquive (la garde éventuelle est relâchée ; à droite, elle coupe le coup déjà parti)
+      d.fait = true; d.glisse = true; lacher(d);
       taper(dx < 0 ? 'gauche' : 'droite'); onde(p.x, p.y, 0xaaffff);
     }
   };
-  const haut = (p) => { const d = doigts.get(p.id); if (d) { lacher(d); doigts.delete(p.id); } };
+  const haut = (p, annule) => { const d = doigts.get(p.id); if (d) { if (d.attaque && !annule) d.frapper(); lacher(d); doigts.delete(p.id); } };
   // On écoute TOUT l'écran (y compris les bandes noires à gauche / à droite du jeu, là où sont les pouces) ;
   // la position est ramenée en coordonnées du jeu. Les vrais boutons (pause...) gardent leurs touches.
   const versJeu = (e) => {
@@ -90,7 +98,7 @@ export function installerGestes(scene, opts) {
     pointerdown: (e) => { if (!surBouton(e) && !scene.sys.isPaused()) { bas(versJeu(e)); } },
     pointermove: (e) => bouge(versJeu(e)),
     pointerup: (e) => haut(versJeu(e)),
-    pointercancel: (e) => haut(versJeu(e)),
+    pointercancel: (e) => haut(versJeu(e), true),
   };
   for (const [n, f] of Object.entries(ecoute)) window.addEventListener(n, f);
   scene.events.once('shutdown', () => {

@@ -130,6 +130,7 @@ export const REGLAGES = {
     periodeMin: 0.55,
     parfait: 0.4,              // tolérance (en "angle") pour un PARFAIT
     bien: 1.0,                 // ... et pour un BIEN (au-delà : raté)
+    toleranceTactile: 1.3,     // au doigt (téléphone) : fenêtre BIEN x1,3 (le côté droit passait mal, nov. 2026)
     erreursPermises: 2,        // ratés pardonnés ; le suivant arrête le roll
     attenteMax: 6,             // secondes pour donner le 1er coup (▶) avant que le roll s'annule
     degatsParfait: 3,

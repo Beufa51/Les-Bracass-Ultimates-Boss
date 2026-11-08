@@ -809,7 +809,7 @@ export class GregCombat extends BossScene {
     if (d.contre) {
       // ▼ trop tôt (boule encore loin) = le contre de Greg passe
       if (a.bas && !d.touche && ecart > D.bien * 1.6) { this.contreDempsey(); return; }
-      if (a.bas && !d.touche && ecart <= D.bien) {
+      if (a.bas && !d.touche && ecart <= D.bien * (this.gestes ? D.toleranceTactile : 1)) {
         d.touche = true; d.contre = false;
         this.alerte.setVisible(false);
         onomatopee(this, R.centreX, 300, 'FREIN !', 46, '#7fff7f');
@@ -826,7 +826,8 @@ export class GregCombat extends BossScene {
     const appui = a.gauche ? 'g' : (a.droite ? 'd' : null);
     if (!appui || d.touche) return;
     if (appui !== coteDemi) { d.touche = true; this.erreurDempsey('Mauvais côté !'); return; }
-    if (ecart > D.bien) { d.touche = true; this.erreurDempsey(Phaser.Math.Angle.Wrap(d.phi - centre) < 0 ? 'Trop tôt !' : 'Trop tard !'); return; }
+    const bien = D.bien * (this.gestes ? D.toleranceTactile : 1);   // au doigt : fenêtre plus large (retour Fabien nov. 2026)
+    if (ecart > bien) { d.touche = true; this.erreurDempsey(Phaser.Math.Angle.Wrap(d.phi - centre) < 0 ? 'Trop tôt !' : 'Trop tard !'); return; }
     this.coupDempsey(appui, ecart <= D.parfait);
   }
 

@@ -37,7 +37,9 @@ export function installerTactile() {
   if (!estTactile()) return;
   const style = document.createElement('style');
   style.textContent = `
-    .tactile { position: fixed; bottom: 12px; display: grid; gap: 8px; z-index: 10; touch-action: none; user-select: none; -webkit-user-select: none; }
+    .tactile { position: fixed; bottom: 12px; display: grid; gap: 8px; z-index: 10; touch-action: none; user-select: none; -webkit-user-select: none; pointer-events: none; }
+    /* le cadre des boutons laisse passer le doigt (il « avalait » les touchers même boutons cachés : case de Greg au hub) */
+    .tactile button { pointer-events: auto; }
     .tactile.gauche { left: 12px; grid-template-columns: repeat(3, 72px); grid-template-rows: repeat(2, 72px); }
     .tactile.droite { right: 12px; grid-template-columns: repeat(2, 96px); grid-template-rows: repeat(2, 72px); }
     .tactile button { border: 2px solid rgba(255,255,255,0.55); border-radius: 14px; background: rgba(20,20,30,0.35);

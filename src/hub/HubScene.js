@@ -2,7 +2,7 @@
 // HUB : écran de SÉLECTION DES BOSS, façon Mega Man (nov. 2026, remplace la salle aux 6 portes).
 // Grille 3 x 2 : les 6 boss, rien d'autre. Bandeau du bas : badges (5 appuis = réglages développeur) et LA FIN.
 // Un boss pas encore battu n'apparaît qu'en OMBRE (même à l'entrée) : on découvre son design en le battant.
-// Flèches = déplacer le curseur, Espace = combattre ; au doigt : toucher une case la choisit, la retoucher = combattre.
+// Flèches = déplacer le curseur, Espace = combattre ; au doigt / à la souris : toucher une case = combattre direct (retour Fabien nov. 2026).
 // Musique : hub_musique (assets/audio/hub/). Images : outils/hub/preparer_selection.py.
 // =====================================================================
 import { LARGEUR, HAUTEUR } from '../core/reglages.js';
@@ -27,7 +27,7 @@ export class HubScene extends Phaser.Scene {
   create() {
     this.entree = false;
     // avis jouabilité : au hub, on touche les cases (plus de croix inutile), et pas de bouton pause (il cachait le titre)
-    etiquettesTactiles({ espace: 'Combattre', z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
+    etiquettesTactiles({ espace: null, z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
     montrerBoutonPause(false);
     this.events.once('shutdown', () => montrerBoutonPause(true));
     jouerMusique(this, 'hub_musique');
@@ -55,7 +55,7 @@ export class HubScene extends Phaser.Scene {
     this.cadreChoix = this.add.graphics().setDepth(5);
 
     this.aide = texte(this, 590, R.bandeauY,
-      estTactile() ? 'Touche un boss, puis encore pour l\'affronter' : '◀ ▲ ▼ ▶ choisir   ESPACE combattre', 14, '#c8d8ff');
+      estTactile() ? 'Touche le boss à affronter' : '◀ ▲ ▼ ▶ choisir   ESPACE combattre', 14, '#c8d8ff');
     this.infos = texte(this, LARGEUR / 2, R.infosY, '', 18, '#ffffff', { stroke: '#0a1440', strokeThickness: 5 });
     this.touches = creerTouches(this);
     this.input.on('pointerdown', (p) => this.toucher(p.x, p.y));
@@ -163,13 +163,13 @@ export class HubScene extends Phaser.Scene {
     else if (vientDAppuyer(t.espace)) this.valider();
   }
 
-  // toucher une case : la choisir ; la retoucher : la valider
+  // toucher une case = l'affronter tout de suite (un seul toucher, comme on s'y attend)
   toucher(x, y) {
     if (this.entree) return;
-    const c = this.cases.find(k => Math.abs(k.x - x) < R.caseL / 2 && Math.abs(k.y - y) < R.caseH / 2);
+    const c = this.cases.find(k => Math.abs(k.x - x) < (R.caseL + R.ecart) / 2 && Math.abs(k.y - y) < (R.caseH + R.ecart) / 2);
     if (!c) return;
-    if (c === this.choix) this.valider(c);
-    else { this.choix = c; jouerSon(this, 'ui_valider'); this.majChoix(); if (c.secret) c.secret(); }
+    if (c !== this.choix) { this.choix = c; this.majChoix(); }
+    this.valider(c);
   }
 
   voirFin() { if (this.entree) return; this.entree = true; this.scene.start('Finale'); }

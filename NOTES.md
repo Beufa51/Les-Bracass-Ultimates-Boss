@@ -71,6 +71,13 @@
 ## GREG — AVIS « FUN » d'un game designer (nov. 2026) : `propositions/greg_avis_fun.md` — REFUSÉ par Fabien (il trouve
    les combats déjà trop longs) ; il voulait un avis sur la JOUABILITÉ / game design, à refaire si demandé.
 
+## RETOUR FABIEN (8 nov. 2026) : hub au doigt + Greg côté droit
+- BUG trouvé : le cadre `.tactile` des boutons (bas gauche / bas droite) avalait les touchers même boutons cachés
+  (la case de Greg au hub ne répondait pas). `src/core/tactile.js` : cadre en `pointer-events: none`, boutons en `auto`.
+- Hub : UN toucher sur une case = combattre direct (plus de « toucher puis retoucher »), bouton « Combattre » retiré.
+- Greg (gestes.js) : glisser ◀ ▶ = esquive sur TOUT l'écran ; à droite, le coup part au lever du doigt ou après
+  `GESTES.coup` (0,09 s) doigt posé. Dempsey Roll au doigt : fenêtre BIEN x `dempsey.toleranceTactile` (1,3), frein aussi.
+
 ## HUB = ÉCRAN DE SÉLECTION DES BOSS façon Mega Man (nov. 2026, remplace la salle aux portes)
 - `src/hub/HubScene.js` : grille 3 x 2 des 6 BOSS seulement (Beufa Kédric Julien / Greg Rémi Lionel), fond bleu vif.
   Pas battu = OMBRE (silhouette + liseré bleu, « ? »), même pendant l'entrée (on découvre son design en le battant) ;
