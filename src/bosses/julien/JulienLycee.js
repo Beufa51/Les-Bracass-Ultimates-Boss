@@ -95,7 +95,7 @@ export class JulienLycee extends JulienManif {
       'SURVEILLANT : il siffle puis fonce → pas de côté. CANTINIÈRE : gare à la purée.',
       'Les FAYOTS te dénoncent : on ne peut pas les toucher, contourne-les.',
       'Une boulette sur un EXTINCTEUR : mousse partout !   Les CANETTES soignent.',
-      ...(tact ? [this.joy ? 'Joystick : avancer, reculer, pas de côté     ↺ ↻ : tourner' : '▲ ▼ avancer / reculer   ◀ ▶ pas de côté   ↺ ↻ tourner',
+      ...(tact ? [this.joy ? 'Joystick : avancer, reculer, pas de côté     ↺ ↻ : tourner (2 fois vite = demi-tour)' : '▲ ▼ avancer / reculer   ◀ ▶ pas de côté   ↺ ↻ tourner (2 fois vite = demi-tour)',
         'LANCER : tirer      ARME : changer d\'arme'] : this.lignesCommandes()),
     ], () => this.demarrer());
   }

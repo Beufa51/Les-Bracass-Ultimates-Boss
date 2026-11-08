@@ -49,6 +49,13 @@ const ORIENT_BOSS = -Math.PI / 2;    // planche boss : regarde vers le bas aussi
 // V56 : TRI PAR Y (vue 3/4) — plus le bas d'un objet est bas à l'écran, plus il passe devant. 20 → 20.72.
 const profondeurY = (yBas) => 20 + yBas / 1000;
 
+// couleur du cône d'un garde selon sa jauge de repérage (0 = jaune pâle, 1 = rouge)
+function couleurReperage(k) {
+  const a = Phaser.Display.Color.ValueToColor(0xffe9a0), b = Phaser.Display.Color.ValueToColor(k < 0.5 ? 0xffa040 : 0xff3b3b);
+  const c = Phaser.Display.Color.Interpolate.ColorWithColor(k < 0.5 ? a : Phaser.Display.Color.ValueToColor(0xffa040), b, 100, Math.round((k < 0.5 ? k * 2 : (k - 0.5) * 2) * 100));
+  return Phaser.Display.Color.GetColor(c.r, c.g, c.b);
+}
+
 export class BeufaInfiltration extends BossScene {
   constructor() { super('BeufaInfiltration', IDENTITE); }
 
@@ -447,7 +454,7 @@ export class BeufaInfiltration extends BossScene {
 
   // ---------- UNE PIÈCE : on la charge, et rien d'autre n'existe ----------
   chargerPiece(i) {
-    this.piece = i;
+    this.piece = i; this.debutPiece = this.temps || 0;
     const P = PIECES[i];
     for (const d of this.decor) d.destroy();   // la pièce précédente disparaît tout entière
     this.lueurs = [];   // les reflets LED seront re-déclarés avec les portes
@@ -706,12 +713,20 @@ export class BeufaInfiltration extends BossScene {
     if (P.sortie === 'qg' && this.joueur.x > 1396 && this.joueur.y > 330 && this.joueur.y < 400) this.reussite();
   }
 
+  // (analyse comparée, façon MGS VR Missions) temps de la pièce + record (par difficulté)
+  tempsPiece() {
+    const t = (this.temps || 0) - (this.debutPiece || 0), cle = `beufa_piece${this.piece}_${this.nomDiff || 'normal'}`;
+    const ancien = Sauvegarde.record(cle);
+    Sauvegarde.proposerRecord(cle, 'P', t, ['P']);
+    return `\n${formatTemps(t)}` + (!ancien ? '' : t < ancien.temps ? '   ★ RECORD !' : `   (record ${formatTemps(ancien.temps)})`);
+  }
+
   // le fondu de changement de pièce : l'écran s'éteint, la pièce suivante se charge
   changerDePiece(i) {
     if (this.phase !== 'jeu') return;
     this.phase = 'transition';
     jouerSon(this, 'beufa_reussi');
-    this.messageCentre(PIECES[this.piece].nom + ' — PASSÉ !', '#7fff7f', 1.2);
+    this.messageCentre(PIECES[this.piece].nom + ' — PASSÉ !' + this.tempsPiece(), '#7fff7f', 1.4);
     this.cameras.main.fadeOut(400, 2, 3, 8);
     this.dans(0.5, () => {
       this.chargerPiece(i);
@@ -740,6 +755,12 @@ export class BeufaInfiltration extends BossScene {
   }
 
   bruit(rayon = R.joueur.bruit) {
+    // (analyse comparée, façon Mark of the Ninja) le bruit se VOIT : un cercle blanc qui s'élargit jusqu'où on t'entend
+    if (this.temps > (this.prochCercleBruit || 0)) {
+      this.prochCercleBruit = this.temps + 0.4;
+      const c = this.add.circle(this.joueur.x, this.joueur.y, 10).setStrokeStyle(3, 0xffffff, 0.7).setDepth(5000);
+      this.tweens.add({ targets: c, radius: rayon, alpha: 0, duration: 450, ease: 'Quad.Out', onUpdate: () => c.setStrokeStyle(3, 0xffffff, 0.7 * c.alpha), onComplete: () => c.destroy() });
+    }
     for (const g of this.gardes) {
       if (g.etat === 'ronde' && Math.hypot(g.x - this.joueur.x, g.y - this.joueur.y) < rayon) {
         g.angle = Math.atan2(this.joueur.y - g.y, this.joueur.x - g.x);
@@ -1011,7 +1032,7 @@ export class BeufaInfiltration extends BossScene {
     cam.stopFollow(); cam.setZoom(1); cam.centerOn(LARGEUR / 2, HAUTEUR / 2);
     jouerSon(this, 'beufa_reussi');
     // V82 : pas encore de badge : la porte de Beufa mène à SON BUREAU → la phase QUIZ
-    this.messageCentre('INFILTRATION RÉUSSIE ! (' + formatTemps(this.temps) + ', alertes : ' + this.alertes + ')\nLa porte de Beufa s\'ouvre…', '#7fff7f', 2.4);
+    this.messageCentre('INFILTRATION RÉUSSIE ! (' + formatTemps(this.temps) + ', alertes : ' + this.alertes + ')' + this.tempsPiece() + '\nLa porte de Beufa s\'ouvre…', '#7fff7f', 2.4);
     this.time.delayedCall(2600, () => this.scene.start('BeufaQuiz', { temps: this.temps, alertes: this.alertes }));
   }
 
@@ -1155,7 +1176,8 @@ export class BeufaInfiltration extends BossScene {
           .setFrame(g.bouge ? imageG : this.poseArretGarde);
         g.alerte.setPosition(g.x, g.y - 32).setScale(1 + Math.sin(this.temps * 18) * 0.12);
       }
-      this.dessinerCone(gg, g.x, g.y, g.angle, R.garde, g.etat === 'poursuite' ? 0xff5a5a : 0xffe9a0, null);
+      // (analyse comparée, façon Mark of the Ninja) le cône CHAUFFE pendant qu'il te repère : jaune pâle -> orange -> rouge
+      this.dessinerCone(gg, g.x, g.y, g.angle, R.garde, g.etat === 'poursuite' ? 0xff5a5a : couleurReperage(g.jauge), null);
     }
     // LE VISEUR DE LA PIERRE : là où elle tombera — viser une diversion devient un vrai choix
     this.viseeG.clear();

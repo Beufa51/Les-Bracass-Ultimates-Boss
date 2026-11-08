@@ -586,7 +586,7 @@ export class RemiVelo extends BossScene {
     jouerSon(this, 'remi_arrivee');
     annonce(this, 'AU BAR !', '#ff4fd8', 1.2);
     const marge = Math.ceil(this.tempsRestant);
-    noterJeu(this, 'velo', this.score + marge * POINTS.veloSeconde - this.chutes * POINTS.veloChute);
+    noterJeu(this, 'velo', this.score + marge * POINTS.veloSeconde - this.chutes * POINTS.veloChute, { chutes: this.chutes });
     this.time.delayedCall(700, () => bulle(this, `${marge} s d'avance  -  ${this.pintesPrises} pinte${this.pintesPrises > 1 ? 's' : ''}  -  ${this.chutes ? `${this.chutes} chute${this.chutes > 1 ? 's' : ''}` : 'aucune chute !'}  -  score ${this.score}`, '#7fff7f', 3, 140));
     this.time.delayedCall(900, () => bulle(this, `Rémi : « ${REPLIQUES.arrivee} »`, '#ffd84a', 2.6, 90));
     this.time.delayedCall(3600, () => jeuSuivant(this, 'velo', this.nomDiff));

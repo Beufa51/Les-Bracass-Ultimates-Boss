@@ -72,7 +72,7 @@ export class RemiBaby extends BossScene {
     const lancer = () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.demarrer(); });
     if (this.donnees.bilan) {   // soirée enchaînée : un bandeau au lieu de l'écran de règles
       lancer();
-      bandeauRegle(this, `Premier à ${B.buts} buts ! Place ton gardien du côté où Rémi se PENCHE. Ligne VERTE = ${t ? 'TIR' : 'ESPACE'} !`);
+      bandeauRegle(this, `Premier à ${B.buts} buts : ton gardien du côté où Rémi se PENCHE, et tire sur la ligne VERTE (${t ? 'TIR' : 'ESPACE'})`, 3, 'ARRÊTE ! TIRE !', 'glisser');
       return;
     }
     this.afficherIntro('RÉMI - Le babyfoot', [
@@ -241,7 +241,7 @@ export class RemiBaby extends BossScene {
 
   gagne() {
     this.etat = 'fin';
-    noterJeu(this, 'baby', (this.butsToi - this.butsRemi) * POINTS.babyEcart + this.arrets * POINTS.babyArret + this.gamelles * POINTS.babyGamelle + ((this.billards || 0) + (this.culots || 0)) * POINTS.babyBeauCoup);
+    noterJeu(this, 'baby', (this.butsToi - this.butsRemi) * POINTS.babyEcart + this.arrets * POINTS.babyArret + this.gamelles * POINTS.babyGamelle + ((this.billards || 0) + (this.culots || 0)) * POINTS.babyBeauCoup, { gamelles: this.gamelles, arrets: this.arrets });
     annonce(this, 'GAGNÉ !', '#7fff7f', 1.4);
     jouerSon(this, 'remi_arrivee');
     this.time.delayedCall(900, () => bulle(this, `Rémi : « ${REPLIQUES.babyGagne} »`, '#ffd84a', 2.8, 90));

@@ -6,4 +6,13 @@ export const REGLAGES_HUB = {
   grilleY: 158,      // milieu de la 1re ligne de cases
   infosY: 472,       // texte du boss choisi
   bandeauY: 512,     // bandeau du bas (badges, la fin)
+  // fiche d'une ligne du boss choisi (genre · durée · commandes au doigt)
+  fiches: {
+    beufa: 'Infiltration + quiz · ≈ 5 min · joystick',
+    kedric: 'Course + danse · ≈ 3 min · glisser',
+    julien: 'Tir rétro · ≈ 8 min · joystick + lancer',
+    greg: 'Boxe · ≈ 2 min · glisser / toucher',
+    remi: 'Soirée au bar · ≈ 3 min · toucher',
+    lionel: 'Frisbee · ≈ 3 min · joystick + 2 boutons',
+  },
 };

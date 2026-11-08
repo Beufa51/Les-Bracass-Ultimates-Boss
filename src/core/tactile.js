@@ -55,6 +55,8 @@ export function installerTactile() {
     .tactile.droite.separee { grid-template-columns: 130px auto; grid-template-rows: repeat(2, 96px); }
     .tactile.separee button { font-size: 40px; }
     .tactile.separee button.cache { display: none; }
+    .tactile button.feu { border-color: #ff9a3c; box-shadow: 0 0 14px 4px rgba(255,140,40,0.85); animation: feu 0.5s ease-in-out infinite alternate; }
+    @keyframes feu { from { box-shadow: 0 0 6px 2px rgba(255,140,40,0.6); } to { box-shadow: 0 0 18px 6px rgba(255,90,20,0.95); } }
   `;
   document.head.appendChild(style);
 
@@ -115,6 +117,9 @@ export function styleBouton(nom, styles = {}) {
   for (const k of ['width', 'height', 'justifySelf', 'alignSelf', 'fontSize', 'zIndex']) b.style[k] = '';
   Object.assign(b.style, styles);
 }
+
+// Bouton « en feu » (bord orange qui pulse) : ex. Lionel, Lancer quand le super est prêt
+export function boutonEnFeu(nom, oui) { const b = boutons[nom]; if (b) b.classList.toggle('feu', !!oui); }
 
 // Étiquettes actuelles (pour les remettre après la pause)
 export function etiquettesActuelles() { return { ...dernieresEtiquettes }; }

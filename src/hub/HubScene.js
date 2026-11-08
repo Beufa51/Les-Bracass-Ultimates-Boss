@@ -90,11 +90,19 @@ export class HubScene extends Phaser.Scene {
     texte(this, x, y + R.caseH / 2 - 13, boss.nom.toUpperCase(), 17, battu ? '#ffd84a' : '#ffffff', { fontStyle: 'bold' });
     if (battu) this.add.image(x + R.caseL / 2 - 22, y - R.caseH / 2 + 22, 'badge_' + boss.id).setScale(0.75);
     if (!boss.pret) texte(this, x, y - 10, 'BIENTÔT', 18, '#ffb347', { stroke: '#000000', strokeThickness: 4 });
-    else if (!battu) texte(this, x - R.caseL / 2 + 18, y - R.caseH / 2 + 18, '?', 22, '#5aa8ff', { fontStyle: 'bold' });
+    else if (!battu) texte(this, x + R.caseL / 2 - 18, y - R.caseH / 2 + 18, '?', 22, '#5aa8ff', { fontStyle: 'bold' });
     const rec = boss.pret && Sauvegarde.record(boss.id);
+    // (analyse comparée) ta meilleure lettre de rang, en tampon dans le coin (comme les étoiles d'Angry Birds)
+    if (rec) {
+      const tampon = texte(this, x - R.caseL / 2 + 26, y - R.caseH / 2 + 26, rec.rang, 30, rec.rang === 'S' ? '#ffd84a' : '#ffffff',
+        { fontStyle: 'bold', stroke: '#b3202c', strokeThickness: 6 }).setAngle(-12);
+      if (rec.rang === 'S') this.tweens.add({ targets: tampon, scale: 1.12, yoyo: true, repeat: -1, duration: 700 });
+    }
+    // (analyse comparée, façon Mario Party) une fiche d'une ligne : genre · durée · commandes
+    const fiche = R.fiches[boss.id] ? `   —   ${R.fiches[boss.id]}` : '';
     const info = !boss.pret ? `${boss.nom} : bientôt...` : battu
-      ? `${boss.nom} : battu !${rec ? `   Record ${rec.rang} en ${formatTemps(rec.temps)}` : ''}`
-      : `${boss.nom} : pas encore battu`;
+      ? `${boss.nom} : battu !${rec ? ` Record ${rec.rang} en ${formatTemps(rec.temps)}` : ''}${fiche}`
+      : `${boss.nom}${fiche}`;
     return { boss, x, y, img, info, action: () => this.entrer(boss) };
   }
 

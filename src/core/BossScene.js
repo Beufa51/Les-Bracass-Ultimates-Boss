@@ -153,8 +153,26 @@ export class BossScene extends Phaser.Scene {
     this.scene.restart({ ...this.donnees, rejouer: true, nomDiff: this.nomDiff, diffObjet: this.diff });
   }
 
+  // (analyse comparée) PARTAGER son résultat aux copains (WhatsApp, SMS...) : bouton en bas à gauche, seulement si le
+  // téléphone sait partager (navigator.share) ; il disparaît en quittant l'écran.
+  boutonPartager(gagne, message) {
+    if (!navigator.share) return;
+    const rang = (message.match(/RANG (\w)/) || [])[1];
+    const texteP = gagne
+      ? `J'ai battu ${this.identite.nom} dans Les Bracass'${rang ? ` avec le rang ${rang}` : ''} ! À toi de faire mieux 😎`
+      : `${this.identite.nom} m'a battu dans Les Bracass'... Qui me venge ? 😤`;
+    const b = document.createElement('button');
+    b.textContent = '📤 Partager';
+    Object.assign(b.style, { position: 'fixed', left: '10px', bottom: '10px', zIndex: 12, padding: '10px 14px', font: 'bold 16px monospace',
+      color: '#fff', background: 'rgba(30,60,140,0.85)', border: '2px solid #ffd84a', borderRadius: '12px', touchAction: 'none' });
+    b.addEventListener('pointerup', (e) => { e.preventDefault(); e.stopPropagation(); navigator.share({ title: 'Les Bracass\'', text: texteP, url: location.href }).catch(() => {}); });
+    document.body.appendChild(b);
+    this.events.once('shutdown', () => b.remove());
+  }
+
   ecranFin(titre, message, couleur, gagne) {
     etiquettesTactiles({ espace: 'OK', z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
+    this.boutonPartager(gagne, message);
     if (gagne && this.ecranVictoire) { this.ecranVictoire(message); this.attendreRetour(1200); return; }
     voile(this, 0.8).setDepth(1000);
     texte(this, LARGEUR / 2, 170, titre, 56, couleur).setDepth(1001);

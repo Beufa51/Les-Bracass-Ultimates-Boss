@@ -138,7 +138,7 @@ export class JulienManif extends BossScene {
       'Rejoins le portail du LYCÉE à travers la manif !',
       ...(tact ? [
         this.joy ? 'Joystick (pouce gauche) : avancer, reculer, pas de côté' : '▲ ▼ : avancer / reculer      ◀ ▶ : pas de côté',
-        '↺ ↻ : tourner', 'LANCER : tirer      ARME (au-dessus) : changer d\'arme',
+        '↺ ↻ : tourner (2 appuis rapides = DEMI-TOUR)', 'LANCER : tirer      ARME (au-dessus) : changer d\'arme',
       ] : this.lignesCommandes()),
       tact ? 'CARTE (en haut à droite) : la carte, comme dans Doom' : 'TAB ou M : la carte, comme dans Doom',
       'Les lacrymos piquent : sors vite du nuage.',
@@ -436,6 +436,17 @@ export class JulienManif extends BossScene {
     return bloque;
   }
 
+  // (analyse comparée, comme tous les FPS depuis Doom) lueur rouge sur le bord de l'écran d'où vient le coup
+  bordRouge(cote) {
+    const g = this.add.graphics().setScrollFactor(0).setDepth(900);
+    const bandes = cote === 0 ? [-1, 1] : [cote];
+    for (const c of bandes) for (let k = 0; k < 8; k++) {
+      g.fillStyle(0xff2020, 0.09 * (8 - k) / 8);
+      g.fillRect(c < 0 ? k * 9 : LARGEUR - (k + 1) * 9, 0, 9, HAUTEUR);
+    }
+    this.tweens.add({ targets: g, alpha: 0, delay: 150, duration: 350, onComplete: () => g.destroy() });
+  }
+
   degats(n, sx, sy) {
     const j = this.j;
     if (j.vie <= 0) return;
@@ -448,6 +459,7 @@ export class JulienManif extends BossScene {
       j.regard = droite > 0.2 ? 1 : droite < -0.2 ? -1 : 0;
       j.expr = 'aie'; j.exprT = 0.6; j.rouge = 0.55;
       jouerSon(this, 'julien_aie');
+      this.bordRouge(j.regard);
     }
     if (j.vie <= 0) {
       j.expr = 'ko'; j.exprT = 99;
@@ -518,6 +530,18 @@ export class JulienManif extends BossScene {
       if (!k.espace.isDown) this.okRelache = true;   // le OK du départ (même bouton que ↻) ne fait pas tourner
       if (k.z.isDown) tourne -= 1;
       if (k.espace.isDown && this.okRelache) tourne += 1;
+      // (analyse comparée, Doom 64 / Resident Evil) DEMI-TOUR ÉCLAIR : toucher 2 fois vite ↺ ou ↻
+      for (const [touche, sens] of [[k.z, -1], [k.espace, 1]]) {
+        if (!Phaser.Input.Keyboard.JustDown(touche) || (sens > 0 && !this.okRelache)) continue;
+        if (this.dernierTourne && this.dernierTourne.sens === sens && this.time.now - this.dernierTourne.t < 300) {
+          this.demiTour = { reste: Math.PI, sens }; this.dernierTourne = null;
+        } else this.dernierTourne = { sens, t: this.time.now };
+      }
+    }
+    if (this.demiTour) {   // le demi-tour se fait en 0,2 s
+      const pas = Math.min(this.demiTour.reste, Math.PI / 0.2 * dt);
+      j.a += pas * this.demiTour.sens; this.demiTour.reste -= pas; tourne = 0;
+      if (this.demiTour.reste <= 0) this.demiTour = null;
     }
     cote = Math.sign(cote) * course;
     if (this.joy) { const jv = this.joy.valeur(); avance += jv.y; cote += jv.x; }   // joystick : en douceur

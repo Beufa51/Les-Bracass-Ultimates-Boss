@@ -17,7 +17,7 @@ import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
-import { estTactile, etiquettesTactiles, styleBouton } from '../../core/tactile.js';
+import { estTactile, etiquettesTactiles, styleBouton, boutonEnFeu } from '../../core/tactile.js';
 import { installerJoystick } from './joystick.js';
 import { Sauvegarde, formatTemps, lignesDefis } from '../../core/sauvegarde.js';
 import { choisirDifficulte, cleRecord } from './difficulte.js';
@@ -99,7 +99,7 @@ export class LionelMatch extends BossScene {
     // avis jouabilité : Lancer sert 5 fois plus que Lob => bouton plus gros (il déborde vers la gauche, où il n'y a rien)
     styleBouton('espace', { width: '150px', height: '86px', justifySelf: 'end', alignSelf: 'end', fontSize: '20px' });
     styleBouton('z', { height: '60px', alignSelf: 'start' });
-    this.events.once('shutdown', () => { styleBouton('espace'); styleBouton('z'); });
+    this.events.once('shutdown', () => { styleBouton('espace'); styleBouton('z'); boutonEnFeu('espace', false); });
     this.phase = this.donnees.phase || 'set1';
     this.etat = 'intro';          // intro | jeu | point | finSet | fin
     this.attente = 0; this.apresAttente = null;   // pause chronométrée (après un point...)
@@ -749,6 +749,8 @@ export class LionelMatch extends BossScene {
     if (sousLeLob && (p === this.j || this.diff.superSurLob)) {
       p.superPret = true;
       onomatopee(this, p.x, p.y - 130, 'SUPER PRÊT !', 26, p === this.j ? '#7fff7f' : '#c77dff');
+      // (on ne savait pas d'où venait le super) : on dit pourquoi
+      onomatopee(this, p.x, p.y - 100, p === this.j ? 'lob rattrapé dans le cercle !' : 'il a rattrapé ton lob !', 16, '#ffffff');
       jouerSon(this, 'frisbee_pret');
     }
     if (p === this.l) {
@@ -812,6 +814,10 @@ export class LionelMatch extends BossScene {
     const x = raison === 'lob' ? d.x : (qui === 'j' ? T.x1 - 40 : T.x0 + 40);
     const y = d.y;
     jouerSon(this, raison === 'lob' ? 'frisbee_sol' : 'frisbee_but');
+    // (analyse comparée) le point « claque » : flash + léger zoom vers l'endroit touché, dans la pause qui existe déjà
+    const cam = this.cameras.main;
+    cam.flash(120, 255, 255, 255);
+    this.tweens.add({ targets: cam, zoom: 1.06, scrollX: (x - LARGEUR / 2) * 0.06, scrollY: (y - HAUTEUR / 2) * 0.06, duration: 160, yoyo: true, hold: 500, ease: 'Quad.Out' });
     if (raison === 'lob') this.explosionSable(x, y, points);
     if (raison === 'but') { flash(this, 0.35, points === 5 ? 0xff3b3b : 0xffd84a); this.cameras.main.shake(220, 0.012); lignesImpact(this, x, y, 0xffffff, 20, 150); }
     const t = texte(this, x + (qui === 'j' ? -60 : 60), y - 40, `+${points}`, 48, points === 5 ? '#ff5a5a' : '#ffd84a', { fontStyle: 'bold' }).setDepth(900).setScale(0.3);
@@ -1163,11 +1169,17 @@ export class LionelMatch extends BossScene {
       g.lineStyle(3, couleur, 0.9).strokeEllipse(c.x1, c.y1, 50 * pulse, 20 * pulse);
       g.lineBetween(c.x1 - 14, c.y1, c.x1 + 14, c.y1).lineBetween(c.x1, c.y1 - 7, c.x1, c.y1 + 7);
     }
+    if (this.texteLobSuper && this.texteLobSuper.active) this.texteLobSuper.setVisible(false);
     if (!d || this.etat !== 'jeu') return;
     if (d.type === 'lob') {
       const k = Math.min(1, d.t / d.lob.duree), r = 34 - 18 * k;
       g.lineStyle(3, 0xffffff, 0.8).strokeEllipse(d.lob.x1, d.lob.y1, r * 2, r * 0.8);
       g.lineStyle(2, d.lob.x1 < T.filet ? 0x7fff7f : 0xc77dff, 0.9).strokeEllipse(d.lob.x1, d.lob.y1, R.lob.attrape * 2, R.lob.attrape * 0.8);
+      // un lob qui tombe chez toi : « ★ SUPER » dans le cercle (le rattraper dedans donne le super lancer)
+      if (d.lob.x1 < T.filet) {
+        if (!this.texteLobSuper || !this.texteLobSuper.active) this.texteLobSuper = texte(this, 0, 0, '★ ATTRAPE = SUPER', 14, '#7fff7f', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 }).setDepth(30);
+        this.texteLobSuper.setPosition(d.lob.x1, d.lob.y1 - R.lob.attrape * 0.4 - 14).setVisible(true);
+      }
       return;
     }
     // super de Lionel arrêté au filet : une ligne montre où il va repartir (dans toutes les difficultés)
@@ -1378,6 +1390,7 @@ export class LionelMatch extends BossScene {
     else if (j.superPret) msg = `SUPER PRÊT !  ${bouton}`;
     else if (j.tient && j.tenue > 0.8 && this.etat === 'jeu') msg = `${bouton} : lance !`;
     if (this.hudSuper.text !== msg) this.hudSuper.setText(msg).setColor(j.superPret ? '#7fff7f' : '#ffd84a');
+    if (this.feuLancer !== !!j.superPret) { this.feuLancer = !!j.superPret; boutonEnFeu('espace', this.feuLancer); }   // le pouce sait que le super est prêt
     const enHaut = j.y - 160 < 90;   // joueur en haut du terrain : message sous lui, HUD transparent
     this.hudSuper.setVisible(!!msg).setPosition(borne(j.x, 120, LARGEUR - 120), enHaut ? j.y + 30 : j.y - 160);
     const alpha = j.y < T.y0 + 70 ? 0.4 : 1;

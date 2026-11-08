@@ -29,7 +29,7 @@ export class BeufaQuiz extends BossScene {
     this.nomDiff = Sauvegarde.difficulte('beufa') || 'normal'; appliquerDifficulte(this.nomDiff);   // V18 : erreurs / temps selon la difficulté
     const Q = R.quiz;
     this.etape = 'intro';
-    this.erreurs = 0; this.bons = 0; this.numero = 0; this.serie = 0;
+    this.erreurs = 0; this.bons = 0; this.numero = 0; this.serie = 0; this.rapides = 0;
     // V94 : infiltration SANS ALERTE = un JOKER (la première erreur ne compte pas), à chaque tentative
     this.joker = this.donnees.alertes === 0 ? R.quiz.joker : 0;
     this.masque = !this.donnees.reprise;   // une nouvelle tentative après un GAME OVER saute la lecture des pensées
@@ -266,7 +266,14 @@ export class BeufaQuiz extends BossScene {
       this.boutons.forEach((b) => { b.fond.destroy(); b.txt.destroy(); }); this.boutons = [];
       if (bon) {
         this.bons++;
+        // (analyse comparée, façon Buzz!) réponse ÉCLAIR = quelques points de rang en plus
+        if (R.quiz.temps - (this.reste ?? 0) <= R.quiz.rang.eclair) { this.rapides++; this.messageEclair = true; }
         jouerSon(this, 'beufa_bon');
+        if (this.messageEclair) {
+          this.messageEclair = false;
+          const t = texte(this, LARGEUR / 2, 120, `ÉCLAIR ! +${R.quiz.rang.parEclair}`, 34, '#ffd84a', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 6 }).setDepth(70);
+          this.tweens.add({ targets: t, y: 90, alpha: 0, delay: 500, duration: 500, onComplete: () => t.destroy() });
+        }
         this.serie = (this.serie || 0) + 1;
         this.visage(this.serie >= 3 ? 'choque' : this.serie === 2 ? 'surpris' : 'souriant');   // 3 d'affilée : il n'en revient pas
         this.dire([hasard(BRAVOS)], () => this.questionSuivante());
@@ -392,7 +399,8 @@ export class BeufaQuiz extends BossScene {
     const joue = d.alertes !== undefined, temps = d.temps ?? 9999;
     this.ptsTemps = joue ? Math.round(Q.bonusTemps * Math.max(0, Math.min(1, (Q.tempsZero - temps) / (Q.tempsZero - Q.tempsPlein)))) : 0;
     this.ptsDiff = (DIFFICULTES[this.nomDiff] || DIFFICULTES.normal).bonusRang || 0;
-    const points = this.bons * 10 + (joue ? Math.max(0, Q.alertes - alertes * Q.parAlerte) + this.ptsTemps : 0) + this.ptsDiff - continues * Q.parContinue;
+    this.ptsEclair = Math.min(Q.eclairMax, (this.rapides || 0) * Q.parEclair);
+    const points = this.bons * 10 + this.ptsEclair + (joue ? Math.max(0, Q.alertes - alertes * Q.parAlerte) + this.ptsTemps : 0) + this.ptsDiff - continues * Q.parContinue;
     // BIG BOSS : 0 alerte, 10/10, 0 continue, infiltration rapide, en NORMAL ou EXTREME
     if (joue && alertes === 0 && this.bons === this.questions.length && continues === 0 && temps <= Q.tempsPlein && this.ptsDiff >= 0) return { ...RANG_PARFAIT, points, parfait: true };
     return { ...RANGS.find((r) => points >= r.min), points };
@@ -422,6 +430,7 @@ export class BeufaQuiz extends BossScene {
       ['TEMPS D\'INFILTRATION', d.temps !== undefined ? `${minutes(d.temps)} (+${this.ptsTemps})` : '—'],
       ['ALERTES', d.alertes !== undefined ? String(d.alertes) : '— (non jouée)'],
       ['BONNES RÉPONSES', `${this.bons} / ${this.questions.length}`],
+      ['RÉPONSES ÉCLAIR', `${this.rapides || 0} (+${this.ptsEclair || 0})`],
       ['ERREURS', String(this.erreurs) + (this.jokersUtilises ? ` (+${this.jokersUtilises} effacée par le joker)` : '')],
       ['CONTINUES', String(d.continues || 0)],
       ['POINTS', String(rang.points)],

@@ -154,7 +154,7 @@ export class JulienClasse extends JulienManif {
       'Chaque attaque s\'annonce à l\'écran : lis et réagis vite !',
       'Après une grosse attaque, il écrit au tableau DE DOS : FONCE, dégâts ×2 !',
       'Les TABLES t\'abritent. Trop près, il CONFISQUE ta sarbacane !',
-      ...(tact ? [this.joy ? 'Joystick : avancer, reculer, pas de côté     ↺ ↻ : tourner' : '▲ ▼ avancer / reculer   ◀ ▶ pas de côté   ↺ ↻ tourner',
+      ...(tact ? [this.joy ? 'Joystick : avancer, reculer, pas de côté     ↺ ↻ : tourner (2 fois vite = demi-tour)' : '▲ ▼ avancer / reculer   ◀ ▶ pas de côté   ↺ ↻ tourner (2 fois vite = demi-tour)',
         'LANCER : tirer      ARME : changer d\'arme'] : this.lignesCommandes()),
     ], () => this.demarrer());
   }

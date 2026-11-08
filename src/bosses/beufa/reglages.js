@@ -63,6 +63,9 @@ export const REGLAGES = {
       tempsPlein: 90,
       tempsZero: 210,   // …puis de moins en moins, 0 point à tempsZero secondes
       parContinue: 15,  // points perdus par CONTINUE
+      eclair: 10,       // (analyse comparée) bonne réponse en moins de ça (s) = réponse ÉCLAIR…
+      parEclair: 2,     // …qui rapporte ces points de rang…
+      eclairMax: 10,    // …au plus ça en tout
     },
   },
   vue: {

@@ -195,6 +195,15 @@ export const REGLAGES = {
   hesitation: { chance: 0.3, duree: [0.2, 0.4] },   // rounds 2-3 : parfois un petit temps d'arrêt avant le coup suivant
   maxSansAttaque: 2.5,         // garde-fou : jamais plus de 2,5 s sans attaquer (même si tu le martèles)
   pauseApresTouche: 0.4,       // après avoir encaissé, il ne reste pas bloqué : pause max avant d'attaquer
+  // son d'annonce de chaque coup de Greg (au moment du « ! ») : son existant + hauteur (rate)
+  annonces: {
+    jab: { son: 'greg_alerte', rate: 1.25 },       // petit « bip » aigu
+    rafale: { son: 'greg_alerte', rate: 1.6 },     // très aigu
+    crochet: { son: 'greg_alerte', rate: 0.75 },   // plus grave
+    corps: { son: 'greg_bloque', rate: 0.55 },     // « tok » sourd
+    smash: { son: 'greg_coup_fort', rate: 0.6 },   // gros « boum » (en plus du TAP ! TAP !)
+    feinte: { son: 'greg_alerte', rate: 1.25 },    // comme un jab : c'est une feinte !
+  },
   riposte: { prepa: 0.6 },   // (audit : 0,5 -> 0,6, trop rapide pour un enfant)     // après "Il se couvre", il riposte tout de suite par un jab rapide
 };
 

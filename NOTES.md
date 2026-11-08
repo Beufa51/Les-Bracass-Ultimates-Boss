@@ -38,8 +38,21 @@
 - **Rémi** : V1 JOUABLE (3 jeux à la suite) : vélo (~45 s, V20) → BABYFOOT (V19, le beer pong est SUPPRIMÉ) → porte (simplifiée V19z). Voir « RÉMI » plus bas.
 - Le site a un service worker (`sw.js`) qui revérifie chaque fichier : les mises à jour apparaissent sans vider le cache.
 
-## ANALYSE COMPARÉE avec des jeux existants (nov. 2026) : `propositions/analyse_comparee_jeux.md` — 15 choix EN ATTENTE
-  (NB : le choix 3, arrêt sur image de Greg, existe déjà : `arretImpact` 0,06 / 0,12 s).
+## ANALYSE COMPARÉE avec des jeux existants (nov. 2026) : `propositions/analyse_comparee_jeux.md` — FAIT sauf 1 (tir auto
+   de Julien, refusé) ; 3 (arrêt sur image de Greg) et 10 (flèches colorées de Kédric) existaient déjà ; 15 « essayer le geste
+   sur l'écran de règles de Rémi » PAS fait (risqué, à reprendre si Fabien y tient).
+- Hub : meilleure lettre de rang en tampon sur chaque case ; fiche d'une ligne (`fiches` dans `src/hub/reglages.js`).
+- Beufa : cône jaune -> orange -> rouge selon la jauge de repérage ; cercle de bruit visible (sprint, flaque) ; temps de chaque
+  pièce + record (`beufa_piece<i>_<diff>`) ; quiz : réponse ÉCLAIR (< 10 s) = +2 points de rang (max 10).
+- Kédric : battle qui bat la mesure bien visiblement ; une fois sur 4, Kédric fait déjà le pas suivant.
+- Julien : bord rouge du côté du coup reçu ; DEMI-TOUR ÉCLAIR = 2 appuis rapides sur ↺ ou ↻.
+- Greg : son d'annonce différent par coup (`annonces` dans reglages.js).
+- Rémi : bandeaux = verbe géant + doigt qui mime le geste ; « étoiles bonus » sur le bilan (`etoilesBonus` de commun.js).
+- Lionel : bouton Lancer « en feu » quand le super est prêt (`boutonEnFeu`) ; flash + léger zoom à chaque point ; « ★ ATTRAPE =
+  SUPER » dans le cercle d'un lob qui tombe chez toi ; « lob rattrapé dans le cercle ! » quand le super vient de là.
+  SUPER LANCER : 2 façons (a) rattraper un lob DANS son cercle d'arrivée, (b) jauge PUBLIC pleine (15 pts : plongeon 2,
+  contre parfait 3, échange ≥ 3 passes 1, lancer puissant 1, point 1). Le (a) arrivait sans qu'on le comprenne.
+- Écrans de fin (core) : bouton « Partager » (navigator.share) sur téléphone.
 
 ## AVIS JOUABILITÉ (tout le jeu, nov. 2026) : `propositions/avis_jouabilite_global.md` — FAIT sauf 3, 9, 12 (refusés)
 - Règles et présentations : seulement la 1re FOIS (`Sauvegarde.fait('regles_<boss>_<titre>')`) ; pause : « Revoir les règles

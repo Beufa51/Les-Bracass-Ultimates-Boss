@@ -567,6 +567,9 @@ export class Showtime {
     const j = k - S.annonce - this.comptes[this.numManche];   // le décompte a fait glisser les flèches (DECOMPTE s, en pas de SA musique)
     if (j < 0) return;   // pendant le décompte : rien (les secondes s'affichent depuis maj())
     const p = this.pas.find(q => q.manche === this.numManche && q.slot === j);
+    // (analyse comparée, façon Just Dance) une fois sur quatre, Kédric fait DÉJÀ le pas suivant : on lit le danseur
+    const suivant = this.pas.find(q => q.manche === this.numManche && q.slot === j + 1);
+    if (j % 4 === 3 && suivant && !suivant.rouge && !suivant.leurre) { this.poseKedric(suivant.montre); return; }
     if (p) this.poseKedric(p.rouge ? 'triche' : p.montre);   // Kédric fait le pas en même temps que toi
   }
 
@@ -760,10 +763,11 @@ export class Showtime {
       const allume = cible && cible.nom === n;
       const coul = allume ? Phaser.Display.Color.HexStringToColor(cible.couleur).color : Phaser.Display.Color.HexStringToColor(COULEURS[n]).color;
       {
-        g.fillStyle(coul, allume ? 0.25 + 0.35 * cible.force : 0.1 + 0.15 * boum); g.fillCircle(x, C.cibleY, w * 0.45);
-        g.lineStyle(allume ? 6 : 4, coul, allume ? 1 : 0.8); g.strokeCircle(x, C.cibleY, w * 0.45 + 3 * boum);
+        // (analyse comparée, façon Rhythm Heaven) tout BAT LA MESURE, bien visible : on peut jouer son coupé
+        g.fillStyle(coul, allume ? 0.25 + 0.35 * cible.force : 0.1 + 0.35 * boum); g.fillCircle(x, C.cibleY, w * (0.45 + 0.06 * boum));
+        g.lineStyle(allume ? 6 : 4 + 2 * boum, coul, allume ? 1 : 0.8); g.strokeCircle(x, C.cibleY, w * 0.45 + 9 * boum);
       }
-      this.touchesC[n].setPosition(x, C.cibleY).setAlpha(allume ? 0.9 : 0.45);
+      this.touchesC[n].setPosition(x, C.cibleY).setAlpha(allume ? 0.9 : 0.45 + 0.4 * boum).setScale(1 + 0.12 * boum);
     }
     // des petits traits en travers des couloirs, un par temps de musique (on voit venir le rythme)
     g.lineStyle(2, 0xffffff, 0.22);

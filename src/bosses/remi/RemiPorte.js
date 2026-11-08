@@ -24,7 +24,7 @@ import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, PORTE as R, REPLIQUES, POINTS, RANGS } from './reglages.js';
 // V19x : bouton « L'AIR DE RIEN » sous le pouce gauche
 const BOUTON_RIEN = { x: 86, y: 446, r: 66 };
-import { bulle, annonce, bandeauRegle, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile, bilanDe, noterJeu } from './commun.js';
+import { bulle, annonce, bandeauRegle, etoilesBonus, ecranPerdu, difficulteOuChoix, hasard, choisir, laisserPasserTactile, bilanDe, noterJeu } from './commun.js';
 
 // la porte du décor illustré (remi_porte_decor.jpg, 960 x 536), zoomé x1,5 sur la porte (à droite)
 const BATTANT = { x: 774, y: 147, l: 140, h: 322 };
@@ -107,7 +107,7 @@ export class RemiPorte extends BossScene {
     const lancer = () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.tour('toi'); });
     if (this.donnees.bilan) {   // soirée enchaînée : un bandeau au lieu de l'écran de règles
       lancer();
-      bandeauRegle(this, `MAINTIENS ${t ? 'le doigt' : 'ESPACE'} pour armer, LÂCHE sur le + . Quelqu'un arrive ? ${t ? 'L\'AIR DE RIEN' : 'Z'} !`, 3.5);
+      bandeauRegle(this, `Maintiens ${t ? 'le doigt' : 'ESPACE'} pour armer, lâche sur le + . Quelqu'un arrive ? ${t ? 'L\'AIR DE RIEN' : 'Z'} !`, 3.5, 'COGNE !', 'maintenir');
       return;
     }
     this.afficherIntro('RÉMI - La porte et le videur', [
@@ -483,7 +483,7 @@ export class RemiPorte extends BossScene {
     this.degats = 0;
     if (qui === 'toi') {
       noterJeu(this, 'porte', POINTS.porteGagne + this.parfaits * POINTS.porteParfait - this.attrapes.toi * POINTS.porteAttrape
-        + (this.total.toi - this.total.remi) * POINTS.porteEcart);
+        + (this.total.toi - this.total.remi) * POINTS.porteEcart, { attrapes: this.attrapes.toi, parfaits: this.parfaits });
       annonce(this, 'LA PORTE CÈDE !', '#ffd84a', 1.4);
       bulle(this, `Dégâts : TOI ${this.total.toi} - ${this.total.remi} RÉMI`, '#7fff7f', 1.6, 330);
       this.time.delayedCall(1800, () => this.victoire(REPLIQUES.porteGagne));
@@ -530,6 +530,8 @@ export class RemiPorte extends BossScene {
       texte(this, cx + 60, 430, nouveau ? '★ NOUVEAU RECORD ★' : `Record : rang ${record.rang} en ${formatTemps(record.temps)}`, 18, nouveau ? '#7fff7f' : '#aaaaaa').setDepth(P + 1);
       const suivant = RANGS[RANGS.indexOf(r) - 1];
       if (suivant) texte(this, cx + 60, 460, `Rang ${suivant.rang} (${suivant.nom}) à ${suivant.seuil} pts`, 15, '#9fe0ff').setDepth(P + 1);
+      const etoiles = etoilesBonus(b);
+      if (etoiles.length) texte(this, cx + 60, 490, etoiles.map(t => '★ ' + t).join('     '), 17, '#ffd84a').setDepth(P + 1);
       jouerSon(this, 'remi_foule');
     });
     texte(this, cx, HAUTEUR - 22, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, 18, '#aaaaaa').setDepth(P + 1);

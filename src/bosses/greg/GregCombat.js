@@ -615,7 +615,9 @@ export class GregCombat extends BossScene {
     else f.setText('◀◀\nESQUIVE').setPosition(R.centreX - 190, 285);
     f.setColor(COULEUR_ALERTE[at.cible]);
     this.tweens.add({ targets: this.alerte, scale: 1, duration: 120, ease: 'Back.Out' });
-    jouerSon(this, 'greg_alerte');
+    // (analyse comparée, façon Punch-Out) chaque coup a SON annonce sonore : on finit par jouer à l'oreille
+    const A = R.annonces[at.feinte ? 'feinte' : at.id] || R.annonces.jab;
+    jouerSon(this, A.son, { rate: A.rate });
   }
 
   // Le coup de Greg arrive : esquivé, bloqué ou encaissé ?
