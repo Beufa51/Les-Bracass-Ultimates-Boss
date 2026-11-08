@@ -111,8 +111,8 @@ export const REGLAGES = {
     // (le DÉCOMPTE 5-4-3-2-1-GO est dans showtime.js : DECOMPTE = 5 secondes PILE, calées sur le tempo de chaque morceau)
     intro: 9, introMini: 1.5, introMusique: 54.969,
     piste: { chute: 1.8 }, rougeChance: 0.12, latence: 0,
-    latenceTactile: -0.06,   // téléphone : décalage ajouté à chaque toucher ; NÉGATIF = on juge l'appui plus tard (Fabien : « la majorité est en avance ») (réglage dev)
-    fenetreTactile: 1.35,   // téléphone : fenêtres PARFAIT / BIEN x1,35 (en NORMAL : ±0,095 s / ±0,22 s)
+    latenceTactile: -0.12,   // téléphone : décalage ajouté à chaque toucher ; NÉGATIF = on juge l'appui plus tard (Fabien : « en avance 90 % du temps » à -0,06) (réglage dev)
+    fenetreTactile: 1.5,   // téléphone : fenêtres PARFAIT / BIEN x1,5 (en NORMAL : ±0,105 s / ±0,24 s)
    
     pieges: { duree: 6, fumee: 0.55, leurres: 0.4, turbo: 2 },
     ecartTech: 12,   // écart MINIMUM (s) entre deux techniques de Kédric : pas la mitraille
@@ -121,7 +121,7 @@ export const REGLAGES = {
     rappel: 0.06,   // AUDIT : la jauge revient vers le milieu de 6 % par seconde (des deux côtés) : fini les +100 / -100 d'avance
     // AUDIT (calé au bot, 36 matchs) : NORMAL joueur moyen gagne de justesse (19 à 51 % du public), joueur enfant
     // gagne en FACILE (5 à 40 %) et perd en NORMAL ; CHAMPION joueur moyen : une chance sur deux. (Avant : ±0,12 / ±0,28 s, +100 pour tous.)
-    parfait: 0.07, bien: 0.16, gain: { parfait: 2.1, bien: 1.2, rate: 8 },
+    parfait: 0.07, bien: 0.16, gain: { parfait: 2.1, bien: 1.3, rate: 7 },   // (Fabien perdait 2 fois de suite concentré : raté 8 → 7, bien 1,2 → 1,3)
     parTouchdown: 15, avanceMax: 30,
     jokerParTouchdown: 1 },   // AUDIT : chaque touchdown = 1 JOKER au battle (un raté pardonné : le public ne bouge pas)
   // ---------- Kédric en personne sur le terrain (option : course avec kedric: true) ----------

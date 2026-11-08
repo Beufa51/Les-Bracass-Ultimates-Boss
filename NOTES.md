@@ -15,7 +15,7 @@
   `src/core/musique.js`, appelé par le battle au premier appui (joue les 2 morceaux en muet un instant).
   « Tout est raté au bon moment » sur téléphone : le doigt est lu en DIRECT (`touchstart` du navigateur + place réelle
   du jeu à l'écran, plus les coordonnées du moteur qui pouvaient être périmées), à l'instant exact du toucher ;
-  compensation du tactile -0,06 s (`showtime.latenceTactile` : Fabien était « en avance ») et fenêtres x1,35 sur
+  compensation du tactile -0,12 s (`showtime.latenceTactile` : Fabien « en avance 90 % du temps ») et fenêtres x1,5 sur
   téléphone (`showtime.fenetreTactile`, réglage dev) ; BIEN / RATÉ disent « en avance / en
   retard » et le bilan donne ton décalage moyen en ms.
   Boutons des COURSES sur téléphone minuscules : des commentaires « // » dans le CSS de `src/core/tactile.js` cassaient
@@ -25,6 +25,8 @@
   0,38 s / 0,50 s), quelques flèches sur les temps dans les longs blancs → `src/bosses/kedric/paroles.js` (généré) ;
   manche avec `paroles: true` l'utilise. 72 + 69 flèches (avant 77 + 113). Bot : équilibre inchangé (NORMAL moyen 26-44 %).
   Si un passage sonne faux : régler `delta` / `densite` / `ecart` en tête du script et le relancer.
+  Difficulté baissée (Fabien perdait concentré) : raté -7 (au lieu de -8), bien +1,3. Bot ordinateur : NORMAL moyen
+  34-64 %, enfant 1 sur 3 ; FACILE enfant 2 sur 3 (le téléphone a en plus ses fenêtres x1,5).
 - **Beufa** : TERMINÉ — infiltration façon Metal Gear (4 pièces) puis QUIZ dans son bureau (codec, Psycho Mantis,
   rideau, 60 questions, GAME OVER façon MGS, classement BIG BOSS → CHICKEN, médaille = badge du hub, meilleur rang
   sauvegardé). Audit final : `propositions/beufa_audit_final.md`.
