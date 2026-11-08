@@ -29,6 +29,7 @@ const hasard = (liste) => liste[(Math.random() * liste.length) | 0];
 const MURS_IMAGES = { 1: 'mur_classe', 3: 'fenetres_classe', 4: 'porte_classe', 5: 'tableau_0', 6: 'tableau_1', 7: 'tableau_2', a: 'mur_classe_affiche' };
 // vraies images des objets (table avec sa chaise, bureau, projectiles) et leur hauteur dans le monde
 const OBJETS_IMAGES = ['table', 'bureau', 'livre', 'dico', 'copie', 'craie'];
+const VOL_IMAGES = ['livre', 'dico'].flatMap(n => [0, 1, 2].map(k => `${n}_${k}`));   // en vol, 3 images (prompt 21h)
 const HAUTEURS_IMAGES_CLASSE = { table: 0.72, bureau: 0.62, livre: 0.15, dico: 0.17, copie: 0.15, craie: 0.06 };
 const POSES_PROF = ['marche0', 'marche1', 'bras', 'lance', 'touche', 'touche_papier', 'dos', 'rage', 'vaincu', 'vaincu_papier',
   'dos2', 'pointe', 'crie', 'confisque', 'regle'];   // (3e planche, prompt 21a : 2e image de dos, « au tableau », cri, confisqué, règle)
@@ -77,7 +78,7 @@ export class JulienClasse extends JulienManif {
 
   // vraies images de Julien (outils/julien/decouper_prof.py) ; image absente = dessin provisoire
   preload() {
-    for (const n of [...POSES_PROF.map(p => 'julien_' + p), ...Object.values(MURS_IMAGES), ...OBJETS_IMAGES, ...ELEVES_IMAGES, ...DESSUS_IMAGES, 'main_sarbacane', 'main_sarbacane_tir', 'bureau_renverse']) {
+    for (const n of [...POSES_PROF.map(p => 'julien_' + p), ...Object.values(MURS_IMAGES), ...OBJETS_IMAGES, ...ELEVES_IMAGES, ...DESSUS_IMAGES, ...VOL_IMAGES, 'main_sarbacane', 'main_sarbacane_tir', 'bureau_renverse']) {
       if (!this.textures.exists('julien_' + n)) this.load.image('julien_' + n, `assets/sprites/julien/julien_${n}.png`);
     }
     super.preload();
@@ -93,7 +94,7 @@ export class JulienClasse extends JulienManif {
       T.classe = construireDecorClasse(this.ctx, L, VUE_H);
       const img = (n) => this.textures.exists('julien_' + n) ? this.textures.get('julien_' + n).getSourceImage() : null;
       for (const n of OBJETS_IMAGES) { const i = img(n); if (i) { T.spr[n] = i; T.hauteurs[n] = HAUTEURS_IMAGES_CLASSE[n]; } }
-      for (const n of [...ELEVES_IMAGES, ...DESSUS_IMAGES]) { const i = img(n); if (i) T.spr[n] = i; }
+      for (const n of [...ELEVES_IMAGES, ...DESSUS_IMAGES, ...VOL_IMAGES]) { const i = img(n); if (i) T.spr[n] = i; }
       // chaque élève assis derrière SA table : une seule image (pas d'élève qui passe devant / derrière la table)
       const tb = T.spr.table, ppu = tb.height / T.hauteurs.table;
       for (let k = 0; k < 4; k++) for (const p of ['content', 'cache', 'mouille', 'mouille_cache']) {
@@ -609,7 +610,8 @@ export class JulienClasse extends JulienManif {
     const s = this.T.spr, H = this.T.hauteurs;
     for (const b of this.livres) {
       const g = b.genre;   // (les copies du déluge, « droit », sont dessinées plus grandes)
-      liste.push({ x: b.x, y: b.y, toile: s[g], haut: b.droit ? 0.24 : H[g], z: 0.42 + (g !== 'craie' ? Math.sin(b.t * 9 + b.ph) * 0.04 : 0) });
+      const anim = s[`${g}_${(b.t * (g === 'dico' ? 7 : 10) | 0) % 3}`];   // livre qui bat des pages, dico qui tourne
+      liste.push({ x: b.x, y: b.y, toile: anim || s[g], haut: b.droit ? 0.24 : H[g], z: 0.42 + (g !== 'craie' ? Math.sin(b.t * 9 + b.ph) * 0.04 : 0) });
     }
   }
 

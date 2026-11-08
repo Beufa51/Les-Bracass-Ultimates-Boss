@@ -1797,7 +1797,8 @@ lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : coll
   `this.alarme`), surveillant `essouffle` / `attrape` (`e.attrapePose` 0,5 s), lanceur `tousse` (`e.tousseT`, dans la
   lacrymo) / `farine` (`e.aveugle`), CRS `farine`. ÉCRANS DE FIN : `imageFin()` (gazé / attrapé / collé) derrière le texte
   de PERDU, `ecranVictoire()` de la classe. 21c bis / 21d bis LIVRÉS ensuite : bureau renversé LARGE (`julien_bureau_renverse`,
-  même largeur à l'écran que l'ancien dessin) et CRS noir qui tousse (`bouclier_tousse`). Manque encore 21h (livres qui volent).
+  même largeur à l'écran que l'ancien dessin) et CRS noir qui tousse (`bouclier_tousse`). 21h LIVRÉ : `livre_0/1/2`,
+  `dico_0/1/2` (en vol, `spritesEnPlus` : 10 et 7 images/s). SECTION 21 TERMINÉE.
 - À FAIRE : vrais sons (planche de la tête : 5 niveaux × regard g/c/d + aïe + tousse + content + KO ;
   policiers de face : marche ×2, bras levé, lancer, touché, fuite ; CRS : + cri, charge, essoufflé), musique,
   équilibrage avec Fabien, puis NIVEAU 2 (salle de classe, tables = abris, livres annoncés : seul, éventail de 3,

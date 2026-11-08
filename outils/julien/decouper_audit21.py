@@ -4,6 +4,7 @@
 #   julien_surveillant_2.jpg   → julien_surveillant_essouffle / _attrape
 #   julien_police_effets.jpg   → julien_lanceur_tousse / _farine, julien_bouclier_tousse / _farine (2e, 3e (CRS bleu) et 5e poses ignorées)
 #   julien_bureau_renverse.jpg → julien_bureau_renverse.png (2e version, large)
+#   julien_livres_vol.jpg     → julien_livre_<0-2>, julien_dico_<0-2> (en vol)
 #   julien_crs_tousse.jpg      → julien_bouclier_tousse.png (CRS noir du jeu)
 #   julien_fin_*.jpg           → julien_fin_*.jpg en 960 × 540 (écrans de fin illustrés)
 # Chaque pose est réduite avec l'ÉCHELLE de son personnage (k) pour avoir la même taille que ses autres poses,
@@ -25,10 +26,14 @@ PLANCHES = {
                                  (None, (830, 460), 0, 0), ('bouclier_farine', (1290, 470), 0.34, 200)],
     # 21c bis / 21d bis (2e livraison) : bureau renversé LARGE ; CRS noir qui tousse
     'julien_bureau_renverse.jpg': [('bureau_renverse', (700, 480), 0.25, None)],
+    # 21h : livre et dico en vol, 3 images chacun (même hauteur : le jeu leur donne la hauteur de RG / HAUTEURS)
+    'julien_livres_vol.jpg': [(f'{n}_{k}', (x, y), 1, 60) for n, y in (('livre', 190), ('dico', 575)) for k, x in enumerate((250, 760, 1230))],
     'julien_crs_tousse.jpg': [('bouclier_tousse', (740, 400), 0.235, 200)],
 }
 # les 2 dernières poses des policiers se touchent : on coupe entre elles (zones effacées en blanc avant la découpe)
-EFFACER = {'julien_police_effets.jpg': [(950, 0, 1182, 625), (950, 625, 1128, 768)]}
+EFFACER = {'julien_livres_vol.jpg': [(0, 0, 1408, 6), (0, 762, 1408, 768), (0, 0, 6, 768), (1401, 0, 1408, 768),
+                                     (498, 0, 510, 768), (1050, 0, 1062, 768), (0, 378, 1408, 390)],
+           'julien_police_effets.jpg': [(950, 0, 1182, 625), (950, 625, 1128, 768)]}
 MIROIR = {'main_vide'}   # livrée en main GAUCHE : retournée pour faire la main droite (comme les autres mains)
 FINS = ['julien_fin_gaze', 'julien_fin_attrape', 'julien_fin_colle', 'julien_fin_victoire']
 
