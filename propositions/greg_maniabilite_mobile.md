@@ -1,4 +1,4 @@
-# Greg — maniabilité sur téléphone : propositions (nov. 2026, en attente du choix de Fabien)
+# Greg — maniabilité sur téléphone : propositions (nov. 2026) — CHOIX A FAIT (src/bosses/greg/gestes.js)
 
 Aujourd'hui : 5 petits boutons en bas (◀ Garde ▶ à gauche, Corps / Visage à droite) + bouton Dempsey quand la jauge est
 pleine. Défauts : boutons petits et serrés, on regarde ses pouces au lieu de Greg, « Garde » entre les deux flèches =

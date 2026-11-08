@@ -70,7 +70,9 @@
   Greg : visage du bandeau / SMASH (gros plan qui hurle), case K.O. (`greg_ko.jpg`), trophée, ARBITRE (glisse à gauche
   pendant chaque compte et marque les chiffres). Gros plan vertical gardé en réserve (`greg_visage_vertical.jpg`).
 - NORMAL rééquilibré (nov. 2026) : `degatsGreg` 0,9, `degatsJoueur` 0,34 ; jab et crochet de face réduits (taille 0,70, moins de zoom).
-  Maniabilité mobile : 3 propositions dans `propositions/greg_maniabilite_mobile.md` (EN ATTENTE du choix). Public : prompt `greg_ring.jpg`.
+  Téléphone : GESTES (choix A, `src/bosses/greg/gestes.js`, `gestesTactiles: false` pour revenir aux boutons) : gauche de
+  l'écran glisser = esquive, doigt posé = garde ; droite haut = visage, bas = corps ; bouton doré Dempsey ; bandes noires
+  comprises. Public : prompt `greg_ring.jpg` (en attente de l'image).
 - `greg2_releve` branché : pose prise 1,1 s quand Greg se relève (il monte du tapis).
 - RESTE : poses du héros, portrait / visage / case K.O. / trophée / arbitre
   (prompts dans `propositions/greg_prompts_images.md`).

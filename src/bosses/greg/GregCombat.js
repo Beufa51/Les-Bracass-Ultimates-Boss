@@ -24,6 +24,7 @@ import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { Sauvegarde, formatTemps, lignesDefis } from '../../core/sauvegarde.js';
 import { choisirDifficulte, cleRecord } from './difficulte.js';
 import { rangerBoutonPause } from './boutonPause.js';
+import { installerGestes } from './gestes.js';
 
 // compte en japonais : [kana, lecture en lettres si le navigateur n'a pas de voix japonaise]
 const JAPONAIS = [['いち', 'itchi'], ['に', 'ni'], ['さん', 'sann'], ['し', 'chi'], ['ご', 'go'],
@@ -43,6 +44,8 @@ const VENTRE_JOUEUR = 70;        // le ventre est un peu plus bas
 // Boutons tactiles : pendant le combat / sur les écrans à valider
 const ETIQUETTES_COMBAT = { haut: null, bas: '▼\nGarde', espace: 'Visage', z: 'Corps', x: 'Dempsey' };
 const ETIQUETTES_OK = { haut: null, bas: null, gauche: null, droite: null, espace: 'OK', z: null, x: null };
+// téléphone : en combat, plus de boutons, des GESTES (gestes.js) ; R.gestesTactiles = false pour revenir aux boutons
+const SANS_BOUTONS = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
 
 export class GregCombat extends BossScene {
   constructor() { super('GregCombat', IDENTITE); }
@@ -109,6 +112,15 @@ export class GregCombat extends BossScene {
     this.touches = creerTouches(this);
     this.events.once('shutdown', () => taireAnnonceur());
     rangerBoutonPause(this);   // sur téléphone : pause en haut à droite (comme chez Lionel)
+    this.gestes = estTactile() && R.gestesTactiles ? installerGestes(this, {
+      mode: () => {
+        if (this.etat === 'compte' && this.compte && this.compte.qui === 'joueur') return 'tapis';
+        if (this.etat !== 'combat' || this.gel > 0) return null;
+        const d = this.j.dempsey;
+        return d ? (d.contre ? 'frein' : 'dempsey') : 'combat';
+      },
+      dempseyPret: () => this.j.esprit >= 100 && this.etat === 'combat' && !this.j.dempsey && this.gel <= 0,
+    }) : null;
     // ambiance du public en continu : plus Greg est en difficulté, plus le public hurle
     if (this.cache.audio.exists('greg_ambiance')) {
       this.ambiance = this.sound.add('greg_ambiance', { loop: true, volume: 0 });
@@ -132,7 +144,13 @@ export class GregCombat extends BossScene {
 
     etiquettesTactiles(ETIQUETTES_OK);
     const tactile = estTactile();
-    this.afficherIntro('GREG - Le Boxeur', [
+    this.afficherIntro('GREG - Le Boxeur', this.gestes ? [
+      'GAUCHE de l\'écran : glisse ◀ ▶ = esquive (côté OPPOSÉ au coup)',
+      'GAUCHE de l\'écran : doigt posé = GARDE',
+      'DROITE de l\'écran : touche en HAUT = visage, en BAS = corps',
+      'Esquives réussies => jauge => bouton doré DEMPSEY ROLL',
+      'Au tapis : touche gauche / droite très vite pour te relever !',
+    ] : [
       '◀ / ▶ : esquive du côté OPPOSÉ au coup (puis frappe vite = CONTRE !)',
       tactile ? 'Visage : coup au visage      Corps : coup au corps' : 'Espace : coup au VISAGE      Z : coup au CORPS',
       tactile ? '▼ Garde (maintenu) : garde' : 'Bas (maintenu) : garde',
@@ -717,7 +735,9 @@ export class GregCombat extends BossScene {
     if (!this.texteAideDempsey || !this.texteAideDempsey.active) {
       this.texteAideDempsey = texte(this, R.centreX, 300, '', 19, '#ffd84a', { lineSpacing: 4, backgroundColor: '#000000c0', padding: { x: 10, y: 6 } }).setDepth(46);
     }
-    this.texteAideDempsey.setText('Appuie sur ▶ pour lancer le roll !\nEnsuite : ◀ quand la boule arrive à GAUCHE, ▶ à DROITE').setVisible(true);
+    this.texteAideDempsey.setText(this.gestes
+      ? 'Touche à DROITE de l\'écran pour lancer le roll !\nEnsuite : touche à GAUCHE / à DROITE quand la boule y arrive'
+      : 'Appuie sur ▶ pour lancer le roll !\nEnsuite : ◀ quand la boule arrive à GAUCHE, ▶ à DROITE').setVisible(true);
   }
 
   // Le "∞" : x de -1 à 1, droite quand phi = 0, gauche quand phi = PI
@@ -750,7 +770,7 @@ export class GregCombat extends BossScene {
       d.contre = d.coups === d.contreA;
       if (d.contre) {
         d.contreA = -1;   // un seul contre par Dempsey Roll
-        this.alerte.setText('!!\nGARDE !').setColor('#ff3b3b').setVisible(true).setPosition(R.centreX + 170, 150);
+        this.alerte.setText(this.gestes ? '!!\nTOUCHE !' : '!!\nGARDE !').setColor('#ff3b3b').setVisible(true).setPosition(R.centreX + 170, 150);
         jouerSon(this, 'greg_alerte');
       }
     }
@@ -957,7 +977,7 @@ export class GregCombat extends BossScene {
     }
     if (qui === 'joueur') {
       this.barreReleve = this.add.graphics().setDepth(45);
-      this.texteCompte2.setText('◀ ▶ ◀ ▶  RELÈVE-TOI !').setColor('#7fff7f');
+      this.texteCompte2.setText(this.gestes ? 'TOUCHE GAUCHE / DROITE : RELÈVE-TOI !' : '◀ ▶ ◀ ▶  RELÈVE-TOI !').setColor('#7fff7f');
     }
   }
 
@@ -1272,7 +1292,7 @@ export class GregCombat extends BossScene {
   }
 
   debutRound() {
-    etiquettesTactiles({ ...ETIQUETTES_COMBAT, x: null });
+    etiquettesTactiles(this.gestes ? SANS_BOUTONS : { ...ETIQUETTES_COMBAT, x: null });
     this.boutonDempsey = false;
     const j = this.j;
     j.souffle = 100; this.g.souffle = 100;
@@ -1628,7 +1648,8 @@ export class GregCombat extends BossScene {
     const dempseyPret = plein && this.etat === 'combat' && !j.dempsey;
     this.texteDempsey.setVisible(dempseyPret);
     // sur mobile, le bouton Dempsey n'apparaît que quand la jauge est pleine
-    if (this.etat === 'combat' && dempseyPret !== this.boutonDempsey) {
+    if (this.gestes) { this.texteDempsey.setVisible(false); this.gestes.maj(this.round); }   // le bouton doré est au milieu
+    else if (this.etat === 'combat' && dempseyPret !== this.boutonDempsey) {
       this.boutonDempsey = dempseyPret;
       etiquettesTactiles({ ...ETIQUETTES_COMBAT, x: dempseyPret ? 'Dempsey' : null });
     }

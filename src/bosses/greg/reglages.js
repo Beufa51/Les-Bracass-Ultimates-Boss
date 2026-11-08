@@ -92,6 +92,7 @@ export const REGLAGES = {
   transparenceJoueur: 0.75,
 
   // ---------- Joueur ----------
+  gestesTactiles: true,        // téléphone : gestes (glisser / toucher, voir gestes.js) au lieu des boutons en combat
   souffleRecup: 22,            // souffle regagné par seconde quand on ne frappe pas
   coups: {
     //          moment de l'impact, durée totale, dégâts, souffle dépensé, cible
