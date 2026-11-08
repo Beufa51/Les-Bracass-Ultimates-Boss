@@ -40,11 +40,25 @@ def effacer_texte_ceinture(img):
     return Image.fromarray(a, 'RGBA')
 
 images = {p: detourer(Image.open(f'{SRC}/greg_{p}.jpg')) for p in POSES}
+
+# Poses dessinées à une autre échelle (autre format d'image) : on les met à la taille de la TÊTE de "entier"
+# (largeur des cheveux noirs en haut du personnage).
+A_LA_TETE = ['corps']   # nov. 2026 : coup au corps DE FACE (accroupi : on se cale sur la tête)
+A_LA_HAUTEUR = {'jab': 545}   # jab DE FACE (debout, tête dessinée plus grosse : on se cale sur la hauteur)
+def largeur_tete(im):
+    a = np.asarray(im.crop(im.getbbox()))
+    al = a[:, :, 3] > 128; noir = (a[:, :, :3].max(axis=2) < 70) & al
+    ys = np.where(al.any(axis=1))[0]
+    bande = noir[ys[0]:ys[0] + int((ys[-1] - ys[0]) * 0.06)]
+    xs = np.where(bande.any(axis=0))[0]
+    return xs.max() - xs.min()
 bb = images['entier'].getbbox()
 f = HAUTEUR_ENTIER / (bb[3] - bb[1])
 for p, im in images.items():
     im = im.crop(im.getbbox())
-    im = im.resize((round(im.width * f), round(im.height * f)), Image.LANCZOS)
+    fp = f * largeur_tete(images['entier']) / largeur_tete(images[p]) if p in A_LA_TETE else f
+    if p in A_LA_HAUTEUR: fp = A_LA_HAUTEUR[p] / im.height
+    im = im.resize((round(im.width * fp), round(im.height * fp)), Image.LANCZOS)
     if p == 'tape_gants': im = effacer_texte_ceinture(im)
     im.save(f'{DST}/greg2_{p}.png', optimize=True)
     a = np.asarray(im)[:, :, 3] > 128

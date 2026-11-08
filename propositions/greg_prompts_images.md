@@ -364,6 +364,6 @@ FRAMING: the whole character inside the image, never cropped (hair, both gloves,
 white margin on all four sides. Plain pure white background, no text, no motion lines crossing the body.
 POSE: <ligne POSE>
 ```
-- **greg_jab.jpg** : `copy the pose of the 2nd figure of the second image: straight punch thrown at the viewer with the glove on the LEFT side of the picture, huge glove in the foreground hiding part of his shoulder, other glove guarding the chin, legs apart.`
+- **greg_jab.jpg** (REÇU et branché) : `copy the pose of the 2nd figure of the second image: straight punch thrown at the viewer with the glove on the LEFT side of the picture, huge glove in the foreground hiding part of his shoulder, other glove guarding the chin, legs apart.`
 - **greg_crochet.jpg** : `copy the pose of the 3rd figure of the second image: powerful punch thrown at the viewer with the glove on the RIGHT side of the picture, torso turned, big glove in the foreground at face height, other glove guarding the chin, knees bent.`
-- **greg_corps.jpg** : `copy the pose of the 4th figure of the second image: crouched low, driving an uppercut at the viewer's stomach, glove big in the foreground at belly height, other glove guarding the chin, angry face.`
+- **greg_corps.jpg** (REÇU et branché) : `copy the pose of the 4th figure of the second image: crouched low, driving an uppercut at the viewer's stomach, glove big in the foreground at belly height, other glove guarding the chin, angry face.`

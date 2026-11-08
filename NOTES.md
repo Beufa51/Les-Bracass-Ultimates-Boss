@@ -58,6 +58,9 @@
 - Images reçues et branchées : `greg2_garde_basse`, `greg2_nargue` (nouvelle, langue tirée), `greg2_crochet` (refait),
   `greg2_ko_debout` (chute), `greg2_victoire` (`greg_arme` retirée : bras tendu de côté, on croyait qu'il tapait à côté ; nouveau prompt). Anciennes versions gardées
   dans `assets_inbox/greg_v2/` (`_ancien`, `_rate`). Outil : `python3 outils/greg/preparer_v2.py`.
+- Coups DE FACE (gant vers le joueur) : `greg2_jab` et `greg2_corps` remplacés (anciens « de côté » gardés en
+  `assets_inbox/greg_v2/*_cote.jpg`) ; `preparer_v2.py` les met à l'échelle (jab : hauteur 545 ; corps : taille de la tête).
+  Le crochet reste l'image « de côté » (prompt « COUPS DE FACE » pour le refaire).
 - `greg2_releve` branché : pose prise 1,1 s quand Greg se relève (il monte du tapis).
 - RESTE : poses du héros, portrait / visage / case K.O. / trophée / arbitre
   (prompts dans `propositions/greg_prompts_images.md`).
