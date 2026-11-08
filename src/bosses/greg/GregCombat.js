@@ -1096,7 +1096,8 @@ export class GregCombat extends BossScene {
     el.push(texte(this, 300, 300, [
       'Style : bagarreur, cogneur',
       'Arme secrète : le SMASH (dès le round 2)',
-      'Signe distinctif : barbe et regard qui tue',
+      'Signe distinctif : joue TOUJOURS en difficile',
+      '(« le mode normal, c\'est pour les faibles »)',
       'Tatouages : guerriers de légende',
     ].join('\n'), 20, '#dddddd', { lineSpacing: 10 }).setDepth(102));
     el.push(texte(this, 300, 460, (estTactile() ? 'OK' : 'ESPACE') + ' : au coin !', 22, '#7fff7f').setDepth(102));
