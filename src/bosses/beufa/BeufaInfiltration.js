@@ -167,7 +167,8 @@ export class BeufaInfiltration extends BossScene {
       infos: [
         'Repaire : sa base militaire',
         'Arme secrète : LE QUIZ (44 questions)',
-        'Signe distinctif : chemise impeccable',
+        'Son excuse pour tester les nouveaux jeux :',
+        '« c\'est pour ma culture »',
         'Conseil : reste dans l\'ombre…',
       ],
       invite: 'infiltration !',
