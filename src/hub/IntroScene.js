@@ -26,7 +26,16 @@ export const INTRO = {
     { id: 'lionel', couleur: 0xb04aff, debut: 17.93 },
   ],
   rafale: 20.9,    // les 6 traits de couleur à la suite
-  titre: 22.41,    // le gros coup du morceau : le titre tombe
+  titre: 22.41,    // le gros coup du morceau : le groupe tombe, puis le logo
+  // POSE DE GROUPE façon Commando Ginyu : place de chacun (x, bas = pieds, e = taille), du fond vers l'avant
+  groupe: [
+    { id: 'kedric', x: 705, bas: 455, e: 0.56 },   // en l'air, au fond
+    { id: 'greg',   x: 210, bas: 522, e: 0.64 },
+    { id: 'remi',   x: 845, bas: 530, e: 0.6 },
+    { id: 'lionel', x: 590, bas: 515, e: 0.58 },
+    { id: 'julien', x: 345, bas: 540, e: 0.5 },    // accroupi, devant
+    { id: 'beufa',  x: 485, bas: 545, e: 0.62 },   // le chef, au centre devant
+  ],
 };
 
 export class IntroScene extends Phaser.Scene {
@@ -211,18 +220,19 @@ export class IntroScene extends Phaser.Scene {
     this.cameras.main.shake(300, 0.012);
     if (this.textures.exists('intro_logo')) {
       // explosion de rayons derrière le logo (dessinée ici : celle de l'image était mêlée au damier)
-      const rayons = this.add.graphics().setPosition(LARGEUR / 2, 190).setBlendMode(Phaser.BlendModes.ADD).setScale(0);
+      const rayons = this.add.graphics().setPosition(LARGEUR / 2, 105).setBlendMode(Phaser.BlendModes.ADD).setScale(0);
       const couleurs = [0xffffff, 0x7fc4ff, 0xff9a3a];
       for (let k = 0; k < 28; k++) {
         const ang = k / 28 * Math.PI * 2 + Math.random() * 0.1, l = 200 + Math.random() * 240, e = 0.015 + Math.random() * 0.03;
         rayons.fillStyle(couleurs[k % 3], 0.22);
         rayons.fillTriangle(0, 0, Math.cos(ang - e) * l, Math.sin(ang - e) * l, Math.cos(ang + e) * l, Math.sin(ang + e) * l);
       }
-      const logo = this.add.image(LARGEUR / 2, 190, 'intro_logo').setScale(2.6).setAlpha(0);
-      this.calque.add([rayons, logo]);
-      this.tweens.add({ targets: logo, scale: 0.82, alpha: 1, duration: 240, ease: 'Cubic.In',
-        onComplete: () => this.tweens.add({ targets: logo, scale: 0.85, duration: T * 1000, yoyo: true, repeat: -1 }) });
-      this.tweens.add({ targets: rayons, scale: 1, duration: 300, delay: 200, ease: 'Back.Out' });
+      const logo = this.add.image(LARGEUR / 2, 105, 'intro_logo').setScale(2.6).setAlpha(0).setDepth(11);
+      this.calque.addAt(rayons, 0);
+      this.tweens.add({ targets: logo, scale: 0.62, alpha: 1, duration: 240, delay: T * 2000, ease: 'Cubic.In',
+        onComplete: () => { this.cameras.main.shake(150, 0.01);
+          this.tweens.add({ targets: logo, scale: 0.65, duration: T * 1000, yoyo: true, repeat: -1 }); } });
+      this.tweens.add({ targets: rayons, scale: 1, duration: 300, ease: 'Back.Out' });
       this.tweens.add({ targets: rayons, angle: 360, duration: 30000, repeat: -1 });
     } else {   // sans l'image : le titre en texte
       const t1 = texte(this, LARGEUR / 2, 150, "LES BRACASS'", 92, '#ffffff',
@@ -235,24 +245,29 @@ export class IntroScene extends Phaser.Scene {
         onComplete: () => this.cameras.main.shake(150, 0.008) });
     }
 
-    // les 6 boss en ligne : ombre tant qu'ils ne sont pas battus
-    INTRO.passages.forEach((p, i) => {
-      const cle = this.cleImage(p.id);
+    // POSE DE GROUPE : tous ensemble, serrés et superposés (ombre tant qu'un boss n'est pas battu)
+    INTRO.groupe.forEach((pl, i) => {
+      const p = INTRO.passages.find(q => q.id === pl.id);
+      const cle = p && this.cleImage(p.id);
       if (!cle) return;
-      const e = cle.includes('pose') ? 0.3 : 0.34;   // pose en pied (boîte 460 x 520) ou buste (400 x 440)
-      const x = 130 + i * 140;
-      const halo = this.add.image(x, HAUTEUR + 200, cle).setOrigin(0.5, 1).setScale(e * 1.06).setTintFill(p.couleur)
-        .setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.8);
-      const img = this.add.image(x, HAUTEUR + 200, cle).setOrigin(0.5, 1).setScale(e);
+      const e = cle.includes('pose') ? pl.e : pl.e * 0.8;   // pose en pied (460 x 520) ou buste (400 x 440) en attendant
+      const depart = pl.x < LARGEUR / 2 ? -260 : LARGEUR + 260;
+      const halo = this.add.image(depart, pl.bas + 520 * e * 0.03, cle).setOrigin(0.5, 1).setScale(e * 1.06)
+        .setTintFill(p.couleur).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.85);
+      const img = this.add.image(depart, pl.bas, cle).setOrigin(0.5, 1).setScale(e);
       if (!Sauvegarde.aLeBadge(p.id)) img.setTintFill(0x05060c);
       this.calque.add([halo, img]);
-      this.tweens.add({ targets: img, y: HAUTEUR - 52, duration: 350, delay: 400 + i * T * 500, ease: 'Back.Out' });
-      this.tweens.add({ targets: halo, y: HAUTEUR - 52 + halo.height * e * 0.03, duration: 350, delay: 400 + i * T * 500, ease: 'Back.Out' });
+      this.tweens.add({ targets: [halo, img], x: pl.x, duration: 200, delay: i * T * 250, ease: 'Back.Out' });
+    });
+    this.time.delayedCall(INTRO.groupe.length * T * 250 + 150, () => {
+      this.cameras.main.flash(250, 255, 255, 255); this.cameras.main.shake(220, 0.012);
     });
     const nb = BOSS.filter(b => Sauvegarde.aLeBadge(b.id)).length;
-    const appuie = texte(this, LARGEUR / 2, HAUTEUR - 26, `APPUIE POUR JOUER   ·   ${nb} / ${BOSS.length} dévoilés`, 20,
-      '#ffffff', { fontStyle: 'bold', stroke: '#0a1440', strokeThickness: 5 }).setAlpha(0).setDepth(12);
-    this.tweens.add({ targets: appuie, alpha: 1, duration: 300, delay: 1400,
+    const appuie = texte(this, LARGEUR / 2, HAUTEUR - 18, `APPUIE POUR JOUER   ·   ${nb} / ${BOSS.length} dévoilés`, 20,
+      '#ffffff', { fontStyle: 'bold', stroke: '#0a1440', strokeThickness: 7 }).setAlpha(0).setDepth(12);
+    const bande = this.add.rectangle(LARGEUR / 2, HAUTEUR - 18, LARGEUR, 34, 0x05060c, 0.7).setDepth(11).setAlpha(0);
+    this.tweens.add({ targets: bande, alpha: 1, duration: 300, delay: 2000 });
+    this.tweens.add({ targets: appuie, alpha: 1, duration: 300, delay: 2000,
       onComplete: () => this.tweens.add({ targets: appuie, alpha: 0.3, duration: 600, yoyo: true, repeat: -1 }) });
   }
 }

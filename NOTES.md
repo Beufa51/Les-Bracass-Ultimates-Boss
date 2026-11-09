@@ -93,6 +93,8 @@
 - POSES façon Commando Ginyu (images de Fabien, fond blanc, `assets_inbox/intro/pose_<id>.jpg`) :
   `python3 outils/intro/preparer_poses.py` → `intro_pose_<id>.png` (boîte 460 x 520), prioritaires sur les bustes.
   REÇUES : Beufa, Kédric, Julien, Greg, Rémi. MANQUE : Lionel (prompt dans `propositions/intro_prompts_images.md`).
+- TITRE = POSE DE GROUPE (demande de Fabien) : les 6 serrés et superposés comme le Commando (place de chacun :
+  `INTRO.groupe`, du fond vers l'avant ; Beufa le chef au centre devant), puis le logo tombe 2 temps après, en haut.
 
 ## HUB = ÉCRAN DE SÉLECTION DES BOSS façon Mega Man (nov. 2026, remplace la salle aux portes)
 - `src/hub/HubScene.js` : grille 3 x 2 des 6 BOSS seulement (Beufa Kédric Julien / Greg Rémi Lionel), fond bleu vif.
