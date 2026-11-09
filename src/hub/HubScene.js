@@ -99,7 +99,8 @@ export class HubScene extends Phaser.Scene {
 
   // RÉVÉLATION du BOSS FINAL (1re fois seulement, Fabien) : une TRAPPE blindée cache la case du milieu. Alerte rouge,
   // la trappe se FISSURE (jet de vapeur), se bloque, puis s'ouvre LENTEMENT dans la fumée : on devine d'abord l'OMBRE du
-  // mécha (lueur rouge derrière), la fumée se dissipe, il prend ses COULEURS, flash, puis le combat (≈ 10 s).
+  // mécha (lueur rouge derrière), la fumée se dissipe, il prend ses COULEURS, flash, puis le combat (≈ 17 s : ça n'arrive
+  // qu'une fois, Fabien veut que ça dure).
   devoilerFinale() {
     this.entree = true;   // pas de choix au clavier / au doigt pendant la séquence
     const c = this.cases.find(k => k.finale), L = c.w + 14, H = c.h + 14, haut = c.y - H / 2;
@@ -122,14 +123,14 @@ export class HubScene extends Phaser.Scene {
     const ombreCle = 'select_mecha_ombre', avecImage = c.img && this.textures.exists(ombreCle);
     if (avecImage) c.img.setTexture(ombreCle);
     const couleur = avecImage ? this.add.image(c.img.x, c.img.y, 'select_mecha').setOrigin(0.5, 1).setScale(c.img.scale).setAlpha(0).setDepth(1) : null;
-    const lueur = this.add.circle(c.x, c.y - 30, 120, 0xff2030, 0).setDepth(0.5);
+    const lueur = this.add.circle(c.x, c.y - 30, 120, 0xff2030, 0).setDepth(6.5);   // (au-dessus du brouillard : elle perce la fumée)
     if (c.etiquette) c.etiquette.setText('???').setColor('#c9a0ff');
     const rouge = this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0xff0000, 0).setDepth(9);
     const alerte = texte(this, LARGEUR / 2, c.y, 'ALERTE !', 54, '#ffffff', { fontStyle: 'bold italic', stroke: '#b3202c', strokeThickness: 10 }).setDepth(10).setAlpha(0);
     this.infos.setText('ALERTE : LES BRACASS\' FUSIONNENT !').setColor('#ff6b6b');
     // fumée : bouffées qui s'élargissent et montent lentement, posées sur la case (pas au-dessus des volets)
-    const fumee = (x, y, force = 1) => {
-      const f = this.add.circle(x, y, (18 + Math.random() * 22) * force, Math.random() < 0.5 ? 0xcfd4dc : 0xa9b0bb, 0.85).setDepth(7);
+    const fumee = (x, y, force = 1, opacite = 0.85) => {
+      const f = this.add.circle(x, y, (18 + Math.random() * 22) * force, Math.random() < 0.5 ? 0xcfd4dc : 0xa9b0bb, opacite).setDepth(7);
       this.tweens.add({ targets: f, scale: 2.4 + Math.random() * 1.6, alpha: 0, x: x + (Math.random() - 0.5) * 70, y: y - 30 - Math.random() * 60,
         duration: 2200 + Math.random() * 1600, ease: 'Sine.Out', onComplete: () => f.destroy() });
     };
@@ -140,29 +141,49 @@ export class HubScene extends Phaser.Scene {
       this.cameras.main.shake(1700, 0.006);
       for (let k = 0; k < 4; k++) this.time.delayedCall(k * 440, () => jouerSon(this, 'ui_valider'));
     });
-    // 2. la trappe se FISSURE : elle s'entrouvre à peine dans un jet de vapeur, se bloque et tremble (2,4 → 3,6 s)
+    // brouillard épais posé sur la case (sous les volets) : il se remplit à la fissure, ne se dissipe qu'à la fin
+    const brouillard = this.add.rectangle(c.x, c.y, L, H, 0xc4cad3, 0).setDepth(6);
+    const jet = (y, n) => { for (let k = 0; k < n; k++) this.time.delayedCall(k * 15, () => fumee(c.x - L / 2 + Math.random() * L, y + (Math.random() - 0.5) * 18, 0.9)); };
+    // 2. la trappe se FISSURE : elle s'entrouvre à peine dans un jet de vapeur, se bloque (2,4 s)
     this.time.delayedCall(2400, () => {
       jouerSon(this, 'hub_porte');
-      this.tweens.add({ targets: v1, y: haut - 16, duration: 350, ease: 'Back.Out' });
-      this.tweens.add({ targets: v2, y: haut + H / 2 + 16, duration: 350, ease: 'Back.Out' });
-      for (let k = 0; k < 24; k++) this.time.delayedCall(k * 18, () => fumee(c.x - L / 2 + Math.random() * L, c.y + (Math.random() - 0.5) * 20, 0.8));
-      this.time.delayedCall(500, () => this.cameras.main.shake(500, 0.004));
+      this.tweens.add({ targets: v1, y: haut - 14, duration: 350, ease: 'Back.Out' });
+      this.tweens.add({ targets: v2, y: haut + H / 2 + 14, duration: 350, ease: 'Back.Out' });
+      jet(c.y, 30);
+      this.tweens.add({ targets: brouillard, fillAlpha: 0.75, duration: 1500 });
     });
-    // 3. elle s'ouvre LENTEMENT (3,6 → 6,8 s) en crachant de la fumée : sous la fumée, l'ombre et la lueur rouge
-    this.time.delayedCall(3600, () => {
+    // ... elle force, crache de la vapeur par à-coups et tremble (3,4 → 6 s)
+    for (const [t, d] of [[3400, 26], [4300, 36], [5200, 26]]) this.time.delayedCall(t, () => {
+      jouerSon(this, 'hub_porte'); this.cameras.main.shake(350, 0.005);
+      this.tweens.add({ targets: v1, y: v1.y - d * 0.5, duration: 250, ease: 'Back.Out' });
+      this.tweens.add({ targets: v2, y: v2.y + d * 0.5, duration: 250, ease: 'Back.Out' });
+      jet(c.y, 22);
+    });
+    // 3. elle s'ouvre TRÈS LENTEMENT (6 → 13 s) dans un nuage de fumée : sous la fumée, l'ombre et la lueur rouge
+    this.time.delayedCall(6000, () => {
       jouerSon(this, 'hub_porte');
-      this.tweens.add({ targets: v1, y: haut - H / 2, duration: 3200, ease: 'Sine.InOut' });
-      this.tweens.add({ targets: v2, y: haut + H, duration: 3200, ease: 'Sine.InOut' });
-      this.tweens.add({ targets: lueur, fillAlpha: 0.35, yoyo: true, repeat: 4, duration: 600, ease: 'Sine.InOut' });
-      this.time.addEvent({ delay: 55, repeat: 70, callback: () => fumee(c.x + (Math.random() - 0.5) * L * 0.9, c.y + (Math.random() - 0.3) * H * 0.7) });
+      this.tweens.add({ targets: v1, y: haut - H / 2, duration: 7000, ease: 'Sine.InOut' });
+      this.tweens.add({ targets: v2, y: haut + H, duration: 7000, ease: 'Sine.InOut' });
+      this.tweens.add({ targets: lueur, fillAlpha: 0.4, yoyo: true, repeat: 6, duration: 700, ease: 'Sine.InOut' });
+      this.tweens.add({ targets: brouillard, fillAlpha: 0.3, duration: 6500, ease: 'Sine.In' });   // l'ombre se devine petit à petit
+      // fumée sans arrêt : dans toute la case, et par les deux bords qui s'ouvrent
+      // (de plus en plus légère : au fil de l'ouverture, l'ombre se devine à travers)
+      const debutOuverture = this.time.now;
+      this.time.addEvent({ delay: 30, repeat: 230, callback: () => {
+        const k = Math.min(1, (this.time.now - debutOuverture) / 7000), op = 0.8 - 0.55 * k;
+        if (Math.random() < 1 - 0.5 * k) fumee(c.x + (Math.random() - 0.5) * L, c.y + (Math.random() - 0.5) * H * 0.85, 1, op);
+        if (Math.random() < 0.6) fumee(c.x + (Math.random() - 0.5) * L, (Math.random() < 0.5 ? v1.y + H / 2 : v2.y) + (Math.random() - 0.5) * 20, 0.8, op + 0.1);
+      } });
     });
-    // 4. la fumée se dissipe : l'ombre prend ses COULEURS (7,4 → 8,8 s), « ??? » devient « BOSS FINAL »
-    this.time.delayedCall(7400, () => {
-      v1.destroy(); v2.destroy(); zone.destroy(); rouge.destroy(); alerte.destroy();
-      if (couleur) this.tweens.add({ targets: couleur, alpha: 1, duration: 1400, ease: 'Sine.In' });
-      this.tweens.add({ targets: lueur, fillAlpha: 0, duration: 1400 });
+    // 4. la fumée se dissipe : l'ombre prend ses COULEURS (12,5 → 15 s), « ??? » devient « BOSS FINAL »
+    this.time.delayedCall(12500, () => {
+      this.tweens.add({ targets: brouillard, fillAlpha: 0, duration: 2600, ease: 'Sine.InOut' });
+      if (couleur) this.tweens.add({ targets: couleur, alpha: 1, delay: 600, duration: 2200, ease: 'Sine.In' });
+      this.tweens.add({ targets: lueur, fillAlpha: 0, duration: 2400 });
     });
-    this.time.delayedCall(8800, () => {
+    this.time.delayedCall(13200, () => { v1.destroy(); v2.destroy(); zone.destroy(); rouge.destroy(); alerte.destroy(); });
+    this.time.delayedCall(15300, () => {
+      brouillard.destroy();
       this.cameras.main.flash(500, 255, 255, 255); jouerSon(this, 'ui_badge');
       if (couleur) { couleur.destroy(); c.img.setTexture('select_mecha'); }
       lueur.destroy();
@@ -170,7 +191,7 @@ export class HubScene extends Phaser.Scene {
       this.choix = c; this.majChoix();
       if (c.img) this.tweens.add({ targets: c.img, scale: c.img.scale * 1.08, yoyo: true, duration: 180, repeat: 1 });
     });
-    this.time.delayedCall(10300, () => { this.entree = false; this.entrerFinale(); });
+    this.time.delayedCall(17000, () => { this.entree = false; this.entrerFinale(); });
   }
 
   position([col, ligne]) {

@@ -172,7 +172,10 @@
     (`manifeste.js`) ; l'ancien gardé dans `assets_inbox/finale/ancien_vaisseau.jpg`.
   - SURPRISE GARDÉE (Fabien) : avant les 6 badges, le hub reprend la GRILLE 3 x 2 d'origine (`REGLAGES_HUB.grille`,
     `PLACES_GRILLE`), pas de case ni de ligne PROGRÈS « BOSS FINAL » ; après, disposition 3 / BOSS FINAL / 3 + flash.
-  - RÉVÉLATION (1re fois aux 6 badges, `devoilerFinale` dans HubScene, ≈ 10 s, plus de suspens demandé par Fabien) :
+  - RÉVÉLATION (1re fois aux 6 badges, `devoilerFinale` dans HubScene, ≈ 17 s : Fabien veut au moins 10 s de trappe) :
+    alerte 2 s ; fissure + 3 à-coups de vapeur (2,4 → 6 s) ; ouverture TRÈS lente 7 s dans un brouillard + fumée continue
+    qui s'éclaircissent (l'ombre se devine, lueur rouge par-dessus) ; couleurs en fondu (12,5 → 15 s) ; flash ; combat à 17 s.
+    (Ancien résumé :)
     TRAPPE blindée sur la case du milieu ; ALERTE rouge ; la trappe se FISSURE (jet de vapeur, se bloque) ; s'ouvre LENTEMENT
     (3,2 s) en crachant de la fumée : on devine l'OMBRE (`select_mecha_ombre`) + lueur rouge ; la fumée se dissipe, les
     COULEURS arrivent en fondu, « ??? » → « BOSS FINAL », flash, puis le combat. Les fois suivantes : la case est simplement là.
