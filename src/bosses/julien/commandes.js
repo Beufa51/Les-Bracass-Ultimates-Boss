@@ -34,7 +34,9 @@ export const nomsTouches = (liste) => liste.map(nomTouche).join(' / ') || '—';
 export function lireCommandes() {
   let r = null;
   try { r = JSON.parse(localStorage.getItem(CLE) || 'null'); } catch (e) { /* ignoré */ }
-  if (!r || !r.touches) r = { preset: 'moderne', touches: structuredClone(PRESETS.moderne.touches), souris: true, toujoursCourir: true };
+  if (!r || !r.touches) r = { preset: 'moderne', touches: structuredClone(PRESETS.moderne.touches), souris: true, toujoursCourir: false, v2: true };
+  // 9 nov. 2026 (Fabien : PC « trop speed ») : on remet une fois « toujours courir » à NON dans les réglages déjà gardés
+  if (!r.v2) { r.toujoursCourir = false; r.v2 = true; try { localStorage.setItem(CLE, JSON.stringify(r)); } catch (e) { /* ignoré */ } }
   for (const [a] of ACTIONS) if (!r.touches[a]) r.touches[a] = [];
   return r;
 }

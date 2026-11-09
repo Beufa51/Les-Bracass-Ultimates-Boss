@@ -33,9 +33,9 @@ export const REGLAGES = {
     vie: 100,            // vie au départ (et maximum)
     vitesse: 3.2,        // avancer / reculer
     vitesseCote: 2.8,    // pas de côté
-    rotation: 3.0,       // radians par seconde (≈ 170° / s)
+    rotation: 2.0,       // radians par seconde au clavier (≈ 115° / s) ; 9 nov. 2026 : 3,0 → 2,0 comme sur téléphone (Fabien : « trop speed »)
     course: 1.6,         // vitesse ×1,6 en courant
-    toujoursCourir: true,   // comme les joueurs de Doom (« always run ») : Maj fait alors MARCHER
+    toujoursCourir: false,  // 9 nov. 2026 : PC au rythme du téléphone (on MARCHE ; Maj = courir). Réglable dans l'écran COMMANDES
     tactile: { courir: false, rotation: 2.0, joystick: true },   // téléphone : pas de course, rotation douce ; joystick à gauche (false = la croix)
     sourisActive: true,  // PC : un clic dans le jeu capture la souris pour tourner la vue (Échap la libère)
     souris: 0.0035,      // rotation par pixel de souris

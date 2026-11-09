@@ -1772,6 +1772,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   (`boutonsJeu` dans `create()`) sont remis après le choix. Vérifié en téléphone simulé : « Sprint | OK » + joystick.
 
 ## JULIEN — FPS FAÇON WOLFENSTEIN (décidé avec Fabien)
+- 9 nov. 2026 (Fabien : PC « un peu trop speed ») : PC au rythme du téléphone : `toujoursCourir` NON par défaut (Maj =
+  courir, réglable dans COMMANDES), `rotation` clavier 3,0 → 2,0. Réglages déjà gardés remis à NON une seule fois
+  (drapeau `v2` dans `commandes.js`).
 - 9 nov. 2026 : `julien_main_tomates(_tir).png` étaient des mains GAUCHES (pouce à droite) → retournées en miroir (anciennes
   dans `assets_inbox/julien/ancienne_*_main_gauche.png`).
 Histoire : tu es un étudiant en pleine manif, tu dois rejoindre le lycée (niveau 1), puis affronter Julien, prof, qui
