@@ -189,8 +189,8 @@ export const REGLAGES = {
   // nov. 2026 (Fabien : rang B sans être tombé) : avant 0,4 / 40 / 15 / 60 s / 0,15
   rangCalcul: { parRecu: 0.3, recusMax: 40, parTapis: 15, tempsLibre: 75, parSeconde: 0.15 },
   rangs: [ // du meilleur au moins bon : il faut un score >= au seuil
-    { rang: 'S', nom: 'CEINTURE D\'OR', seuil: 90 }, { rang: 'A', nom: 'POIDS LOURD', seuil: 70 },
-    { rang: 'B', nom: 'BOXEUR DU DIMANCHE', seuil: 45 }, { rang: 'C', nom: 'SAC DE FRAPPE', seuil: 0 },
+    { rang: 'S', nom: 'TAKAMURA', seuil: 90 }, { rang: 'A', nom: 'IPPO', seuil: 70 },
+    { rang: 'B', nom: 'AOKI', seuil: 45 }, { rang: 'C', nom: 'LUMI', seuil: 0 },
   ],
 
   // ---------- Coups / garde : finitions ----------

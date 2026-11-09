@@ -132,10 +132,10 @@ export const REGLAGES = {
   // (plus le temps : une course plaquée est plus courte, ce serait récompenser le plaquage)
   rang: { base: 30, parTouchdown: 12, parPublic: 0.4, parRate: 0.5, parParfait: 0.6, parfaitsMax: 10 },
   rangs: [
-    { rang: 'S', nom: 'MVP DU SUPER BOWL', seuil: 88 },
-    { rang: 'A', nom: 'QUARTERBACK STAR', seuil: 72 },
-    { rang: 'B', nom: 'REMPLAÇANT', seuil: 50 },
-    { rang: 'C', nom: 'PORTEUR DE GOURDE', seuil: -Infinity },
+    { rang: 'S', nom: 'EYESHIELD 21', seuil: 88 },
+    { rang: 'A', nom: 'SHIN', seuil: 72 },
+    { rang: 'B', nom: 'CERBERUS', seuil: 50 },
+    { rang: 'C', nom: 'MAMORI NI CHAN', seuil: -Infinity },
   ],
 };
 

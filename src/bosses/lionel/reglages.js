@@ -125,10 +125,10 @@ export const REGLAGES = {
   rangParPoint: 0.5,      // chaque point encaissé retire 0,5 au score du classement (sur 100)
   defiHermetique: 14,     // défi : encaisser moins de 14 points sur le match
   rangs: [
-    { rang: 'S', nom: 'DIEU DE LA PLAGE', seuil: 85 },
-    { rang: 'A', nom: 'ROI DU SABLE', seuil: 68 },
+    { rang: 'S', nom: 'ULTIMATE BOSS', seuil: 85 },
+    { rang: 'A', nom: 'KING OF THE BEACH', seuil: 68 },
     { rang: 'B', nom: 'VACANCIER', seuil: 48 },
-    { rang: 'C', nom: 'TOURISTE EN TONGS', seuil: -Infinity },
+    { rang: 'C', nom: 'TOURISTE EN TONG', seuil: -Infinity },
   ],
 };
 

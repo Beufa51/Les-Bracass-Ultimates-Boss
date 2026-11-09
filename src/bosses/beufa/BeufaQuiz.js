@@ -447,7 +447,7 @@ export class BeufaQuiz extends BossScene {
     const tDebut = 300 + lignes.length * 250 + 400;
     const titre = this.add.text(60, 340, 'CODE NAME', st(20)).setDepth(P + 2).setAlpha(0);
     const nom = this.add.text(60, 368, rangLisible(rang.nom, rang.lettre), { fontFamily: '"Arial Black", Impact, sans-serif', fontStyle: 'italic', fontSize: '64px', color: rang.parfait ? '#ffd84a' : '#bff4ff', stroke: rang.parfait ? '#b37a00' : '#1c8c5a', strokeThickness: 4 }).setDepth(P + 2).setAlpha(0).setScale(2);
-    if (nom.width > 640) nom.setFontSize(Math.floor(64 * 640 / nom.width));   // « CROCODILE (C) » : ne déborde pas
+    if (nom.width > 640) nom.setFontSize(Math.floor(64 * 640 / nom.width));   // « BOÎTE EN CARTON (C) » : ne déborde pas
     const phrase = this.add.text(62, 450, rang.phrase, st(18, '#e8fff0')).setDepth(P + 2).setAlpha(0);
     this.time.delayedCall(tDebut, () => {
       jouerSon(this, 'beufa_reussi');

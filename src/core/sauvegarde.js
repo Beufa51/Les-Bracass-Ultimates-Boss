@@ -2,6 +2,7 @@
 // Si le navigateur refuse (navigation privée...), le jeu marche quand même,
 // mais la sauvegarde est perdue à la fermeture de l'onglet.
 const CLE = 'bracass_sauvegarde_v1';
+const ANCIENS_RANGS_BEUFA = { DOBERMAN: 'FOX', EAGLE: 'HOUND', PUMA: 'BOÎTE EN CARTON', CROCODILE: 'BOÎTE EN CARTON', CHICKEN: 'BOÎTE EN CARTON' };
 const VOLUMES_DEFAUT = { musique: 1, sons: 1, voix: 1 };
 
 function lire() {
@@ -13,6 +14,10 @@ function lire() {
   if (!d || typeof d.badges !== 'object') d = { badges: {} };
   d.volumes = { ...VOLUMES_DEFAUT, ...(d.volumes || {}) };
   d.records = d.records || {};
+  // Beufa : anciens noms de rangs (8 rangs avant nov. 2026) → les 4 nouveaux (sinon le vieux record ne serait plus battable)
+  for (const [k, r] of Object.entries(d.records)) {
+    if (/^beufa(_(?!piece)\w+)?$/.test(k) && r && ANCIENS_RANGS_BEUFA[r.rang]) r.rang = ANCIENS_RANGS_BEUFA[r.rang];
+  }
   // ancien emplacement du record de Greg
   try {
     const ancien = JSON.parse(localStorage.getItem('bracass_greg_record') || 'null');

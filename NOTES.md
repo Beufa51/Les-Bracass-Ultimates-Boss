@@ -121,10 +121,11 @@
 - Partout : `rangLisible(nom, lettre)` (`src/core/rangs.js`) → « BIG BOSS (S) ». Listes de chaque boss lues par
   `src/bosses/rangs.js` (`rangRecord`) pour le hub, le tableau PROGRÈS et les cartes de difficulté.
 - Records sauvegardés INCHANGÉS (lettre pour Greg / Kédric / Lionel / Rémi, nom pour Julien / Beufa) : rien n'est perdu.
-- Nouveaux noms (à valider par Fabien, dans les `reglages.js`) : Greg CEINTURE D'OR / POIDS LOURD / BOXEUR DU DIMANCHE /
-  SAC DE FRAPPE ; Kédric MVP DU SUPER BOWL / QUARTERBACK STAR / REMPLAÇANT / PORTEUR DE GOURDE ; Lionel DIEU DE LA PLAGE /
-  ROI DU SABLE / VACANCIER / TOURISTE EN TONGS. Lettres ajoutées : Julien (CHE S … FAYOT C ; MAJOR S … CANCRE C),
-  Beufa (`data/beufa_quiz.js` : BIG BOSS S, FOX / DOBERMAN A, HOUND / EAGLE B, PUMA / CROCODILE / CHICKEN C).
+- Noms CHOISIS PAR FABIEN (S / A / B / C) : Rémi DRUNKEN MASTER / PILIER DE BAR / C'EST MA DEUXIÈME MAISON / BUVEUR DE
+  DIABOLO ; Greg TAKAMURA / IPPO / AOKI / LUMI ; Kédric EYESHIELD 21 / SHIN / CERBERUS / MAMORI NI CHAN ; Lionel ULTIMATE
+  BOSS / KING OF THE BEACH / VACANCIER / TOURISTE EN TONG ; Beufa BIG BOSS (tout parfait) / FOX (≥ 130 pts) / HOUND
+  (≥ 110) / BOÎTE EN CARTON (`data/beufa_quiz.js`, 4 rangs au lieu de 8 : anciens records convertis au chargement par
+  `ANCIENS_RANGS_BEUFA` dans `core/sauvegarde.js`). Julien inchangé (CHE S … FAYOT C ; MAJOR S … CANCRE C).
 - Écran de victoire Greg / Kédric / Lionel : grosse lettre + le nom dessous. Le tampon du hub garde la lettre.
 
 ## MÉTA (audit d'une autre IA, 9 nov. 2026) : sauvegarde, progression, reprise

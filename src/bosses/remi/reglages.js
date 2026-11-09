@@ -51,9 +51,9 @@ export const POINTS = {
   porteEcart: 0.2,        // porte : points par point de dégâts d'avance sur Rémi
 };
 export const RANGS = [
-  { rang: 'S', nom: 'ROI DU COMPTOIR', seuil: 1700 },
+  { rang: 'S', nom: 'DRUNKEN MASTER', seuil: 1700 },
   { rang: 'A', nom: 'PILIER DE BAR', seuil: 1300 },
-  { rang: 'B', nom: 'HABITUÉ DU ZINC', seuil: 900 },
+  { rang: 'B', nom: 'C\'EST MA DEUXIÈME MAISON', seuil: 900 },
   { rang: 'C', nom: 'BUVEUR DE DIABOLO', seuil: -Infinity },
 ];
 

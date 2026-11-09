@@ -92,12 +92,10 @@ export const GAME_OVER = 'GAME OVER, soldat. Retourne réviser tes classiques.';
 // BIG BOSS seulement si TOUT est parfait : 0 alerte, 10/10, aucun CONTINUE. Sinon, le 1er rang dont le
 // minimum est atteint (du meilleur au moins bon).
 export const RANG_PARFAIT = { nom: 'BIG BOSS', lettre: 'S', phrase: 'La légende absolue. Même Beufa te salue.' };
+// nov. 2026 (Fabien) : 4 rangs (avant : 8). Anciens records convertis au chargement (ANCIENS_RANGS_BEUFA, core/sauvegarde.js).
 export const RANGS = [
-  { min: 140, nom: 'FOX', lettre: 'A', phrase: 'Un agent d\'élite. Presque parfait.' },
-  { min: 130, nom: 'DOBERMAN', lettre: 'A', phrase: 'Rapide, précis, redoutable.' },
-  { min: 120, nom: 'HOUND', lettre: 'B', phrase: 'Un bon limier. Encore un effort.' },
-  { min: 110, nom: 'EAGLE', lettre: 'B', phrase: 'Tu vois loin, mais tu te fais voir.' },
-  { min: 100, nom: 'PUMA', lettre: 'C', phrase: 'Du talent, mais trop de bruit.' },
-  { min: 90, nom: 'CROCODILE', lettre: 'C', phrase: 'Tu avances… à ta façon.' },
-  { min: -999, nom: 'CHICKEN', lettre: 'C', phrase: 'Tu as eu chaud, soldat. Très chaud.' },
+  { min: 130, nom: 'FOX', lettre: 'A', phrase: 'Un agent d\'élite. Presque parfait.' },
+  { min: 110, nom: 'HOUND', lettre: 'B', phrase: 'Un bon limier. Encore un effort.' },
+  { min: -999, nom: 'BOÎTE EN CARTON', lettre: 'C', phrase: 'Planqué sous ton carton… Beufa t\'a vu quand même.' },
 ];
+
