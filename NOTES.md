@@ -201,6 +201,8 @@
   (≥ 110) / BOÎTE EN CARTON (`data/beufa_quiz.js`, 4 rangs au lieu de 8 : anciens records convertis au chargement par
   `ANCIENS_RANGS_BEUFA` dans `core/sauvegarde.js`). Julien inchangé (CHE S … FAYOT C ; MAJOR S … CANCRE C).
 - Écran de victoire Greg / Kédric / Lionel : grosse lettre + le nom dessous. Le tampon du hub garde la lettre.
+- Beufa : la MÉDAILLE des résultats porte la LETTRE du rang (avant : un « B » fixe pour Beufa, pris pour le rang B),
+  gravure or / argent / bronze / gris pour S / A / B / C, titre « RANG x » (BIG BOSS si parfait).
 
 ## MÉTA (audit d'une autre IA, 9 nov. 2026) : sauvegarde, progression, reprise
 - Audit reçu (joueur / dev / game design) : P0 = sauvegarde exportable, difficulté Beufa (DÉJÀ là : 4 difficultés),

@@ -473,7 +473,7 @@ export class BeufaQuiz extends BossScene {
       if (nouveau) this.tweens.add({ targets: tr, alpha: 0.4, delay: 1100, duration: 500, yoyo: true, repeat: -1 });
     });
     // la MÉDAILLE de la mission (dessinée), qui se balance
-    const medaille = this.dessinerMedaille(P + 3, rang.parfait);
+    const medaille = this.dessinerMedaille(P + 3, rang.parfait, rang.lettre);
     medaille.setPosition(770, -260);
     this.tweens.add({ targets: medaille, y: 40, delay: 500, duration: 900, ease: 'Bounce.Out' });
     this.tweens.add({ targets: medaille, angle: { from: -4, to: 4 }, delay: 1400, duration: 1400, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
@@ -481,7 +481,8 @@ export class BeufaQuiz extends BossScene {
   }
 
   // La médaille : ruban rayé (vert / rouge / or), disque doré, étoile, « B » de Beufa. Or plus vif si BIG BOSS.
-  dessinerMedaille(prof, parfait) {
+  // lettre : la lettre du RANG (S, A, B, C) gravée sur la médaille (avant : un « B » fixe pour Beufa, confondu avec le rang B)
+  dessinerMedaille(prof, parfait, lettreRang = 'C') {
     const c = this.add.container(0, 0).setDepth(prof);
     const g = this.add.graphics();
     const rayures = [0x2e6b3a, 0xc8a040, 0xb3202c, 0xc8a040, 0x2e6b3a];
@@ -497,8 +498,9 @@ export class BeufaQuiz extends BossScene {
       g.fillStyle(orF).fillCircle(Math.cos(a) * 74, 230 + Math.sin(a) * 74, 3);
     }
     const etoile = this.add.star(0, 230, 5, 20, 46, parfait ? 0xfff3a8 : 0xf0d890).setStrokeStyle(3, orF);
-    const lettre = this.add.text(0, 232, 'B', { fontFamily: '"Arial Black", Impact, sans-serif', fontSize: '34px', color: '#8c6a20' }).setOrigin(0.5);
-    const titre = this.add.text(0, 320, parfait ? 'BIG BOSS' : 'MÉDAILLE DE BEUFA', { fontFamily: 'monospace', fontSize: '15px', color: '#ffd84a' }).setOrigin(0.5);
+    const COUL = { S: '#8c6a20', A: '#5a5f6b', B: '#7a3f1c', C: '#3c3c3c' };   // gravure : or, argent, bronze, gris
+    const lettre = this.add.text(0, 232, lettreRang, { fontFamily: '"Arial Black", Impact, sans-serif', fontSize: '34px', color: COUL[lettreRang] || '#8c6a20' }).setOrigin(0.5);
+    const titre = this.add.text(0, 320, parfait ? 'BIG BOSS' : `RANG ${lettreRang}`, { fontFamily: 'monospace', fontSize: '15px', color: '#ffd84a' }).setOrigin(0.5);
     c.add([g, etoile, lettre, titre]);
     return c;
   }
