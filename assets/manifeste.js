@@ -54,6 +54,7 @@ export const MANIFESTE = {
     intro_pose_julien: { fichier: 'sprites/intro/intro_pose_julien.png', largeur: 460, hauteur: 520, images: 1, vitesse: 1 },   // outils/intro/preparer_poses.py
     intro_pose_greg: { fichier: 'sprites/intro/intro_pose_greg.png', largeur: 460, hauteur: 520, images: 1, vitesse: 1 },   // outils/intro/preparer_poses.py
     intro_pose_remi: { fichier: 'sprites/intro/intro_pose_remi.png', largeur: 460, hauteur: 520, images: 1, vitesse: 1 },   // outils/intro/preparer_poses.py
+    intro_pose_lionel: { fichier: 'sprites/intro/intro_pose_lionel.png', largeur: 460, hauteur: 520, images: 1, vitesse: 1 },   // outils/intro/preparer_poses.py
     intro_logo: { fichier: 'sprites/intro/intro_logo.png', largeur: 900, hauteur: 300, images: 1, vitesse: 1 },   // outils/intro/preparer_logo.py
     badge_vide:   { fichier: null, largeur: 48, hauteur: 48, images: 1, vitesse: 1,
       provisoire: { forme: 'cercle', couleur: '#3a3a3a' } },

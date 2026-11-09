@@ -93,7 +93,8 @@
 - POSES façon Commando Ginyu (images de Fabien, fond blanc, `assets_inbox/intro/pose_<id>.jpg`) :
   `python3 outils/intro/preparer_poses.py` → `intro_pose_<id>.png` (boîte 460 x 520), prioritaires sur les bustes.
   REÇUES : Beufa, Kédric, Julien (nouvelle pose « Guldo » demandée), Greg, Rémi (v2 genou au sol ; l'ancienne au cœur gardée
-  en `ancienne_pose_remi_coeur.jpg`). MANQUE : Lionel (prompt dans `propositions/intro_prompts_images.md`).
+  en `ancienne_pose_remi_coeur.jpg`), Lionel (bras inversés sur l'image reçue : `outils/intro/miroir_lionel.py` la
+  retourne et remet NEO-SPORTS / logo / frisbee à l'endroit). À REFAIRE si Fabien l'envoie : Julien en pose « Guldo ».
 - TITRE = POSE DE GROUPE (demande de Fabien) : les 6 serrés et superposés comme le Commando (place de chacun :
   `INTRO.groupe`, du fond vers l'avant ; Beufa le chef au centre devant), puis le logo tombe 2 temps après, en haut.
 
