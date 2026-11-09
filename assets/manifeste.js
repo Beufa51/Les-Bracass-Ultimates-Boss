@@ -42,6 +42,13 @@ export const MANIFESTE = {
     select_remi_ombre: { fichier: 'sprites/hub/select_remi_ombre.png', largeur: 240, hauteur: 200, images: 1, vitesse: 1 },
     select_lionel:       { fichier: 'sprites/hub/select_lionel.png', largeur: 240, hauteur: 200, images: 1, vitesse: 1 },
     select_lionel_ombre: { fichier: 'sprites/hub/select_lionel_ombre.png', largeur: 240, hauteur: 200, images: 1, vitesse: 1 },
+    // Intro façon opening de Final Bout (src/hub/IntroScene.js) : grands bustes en couleur, l'ombre = même image teintée
+    intro_beufa: { fichier: 'sprites/intro/intro_beufa.png', largeur: 400, hauteur: 440, images: 1, vitesse: 1 },
+    intro_kedric: { fichier: 'sprites/intro/intro_kedric.png', largeur: 400, hauteur: 440, images: 1, vitesse: 1 },
+    intro_julien: { fichier: 'sprites/intro/intro_julien.png', largeur: 400, hauteur: 440, images: 1, vitesse: 1 },
+    intro_greg: { fichier: 'sprites/intro/intro_greg.png', largeur: 400, hauteur: 440, images: 1, vitesse: 1 },
+    intro_remi: { fichier: 'sprites/intro/intro_remi.png', largeur: 400, hauteur: 440, images: 1, vitesse: 1 },
+    intro_lionel: { fichier: 'sprites/intro/intro_lionel.png', largeur: 400, hauteur: 440, images: 1, vitesse: 1 },
     badge_vide:   { fichier: null, largeur: 48, hauteur: 48, images: 1, vitesse: 1,
       provisoire: { forme: 'cercle', couleur: '#3a3a3a' } },
     badge_beufa:  { fichier: 'sprites/hub/badge_beufa.png', largeur: 48, hauteur: 48, images: 1, vitesse: 1,
@@ -68,5 +75,6 @@ export const MANIFESTE = {
     hub_porte:  { fichier: null, provisoire: { frequence: 440, duree: 0.12 } },
     // musique de l'écran de sélection (fournie par le propriétaire : Street Fighter II, Character Select)
     hub_musique: { fichier: 'audio/hub/hub_selection.mp3', musique: true, volume: 0.4 },
+    intro_musique: { fichier: 'audio/intro/intro_musique.mp3', musique: true, volume: 0.45 },   // Dragon Ball Final Bout (opening), fournie par Fabien
   },
 };

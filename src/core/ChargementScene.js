@@ -1,4 +1,4 @@
-// Première scène : charge le hub et les badges (vite), puis ouvre le hub.
+// Première scène : charge le hub et les badges (vite), puis lance l'intro (src/hub/IntroScene.js) qui ouvre le hub.
 // Les fichiers de chaque boss sont chargés seulement en entrant chez lui (BossScene).
 import { chargerFichiers, preparerVisuels } from './ressources.js';
 import { texte } from './ui.js';
@@ -14,6 +14,6 @@ export class ChargementScene extends Phaser.Scene {
 
   create() {
     preparerVisuels(this);
-    this.scene.start('Hub');
+    this.scene.start('Intro');   // intro façon Final Bout, puis l'écran de sélection
   }
 }

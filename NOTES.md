@@ -78,6 +78,16 @@
 - Greg (gestes.js) : glisser ◀ ▶ = esquive sur TOUT l'écran ; à droite, le coup part au lever du doigt ou après
   `GESTES.coup` (0,09 s) doigt posé. Dempsey Roll au doigt : fenêtre BIEN x `dempsey.toleranceTactile` (1,3), frein aussi.
 
+## INTRO AU LANCEMENT façon opening de Final Bout (nov. 2026, demande de Fabien)
+- `src/hub/IntroScene.js` (Chargement → Intro → Hub). « Appuie pour lancer » (sans appui, la musique est bloquée), puis
+  chaque boss arrive en OMBRE avec un liseré de sa couleur et repart vers le haut dans un trait de lumière :
+  Beufa bleu, Kédric vert, Greg rouge, Julien orange, Rémi jaune, Lionel violet. Puis 6 traits, puis le TITRE
+  « LES BRACASS' / ULTIMATE BOSS » + les 6 bustes en ligne + « x / 6 dévoilés ». Un boss BATTU se DÉVOILE (flash blanc → couleurs).
+- Calé sur la musique (`intro_musique` = `assets/audio/intro/intro_musique.mp3`, 96 kbit/s ; original
+  `assets_inbox/hub/intro_final_bout.mp3`, 161 BPM) : 8 temps par boss, titre sur le gros coup à 22,41 s. Dates et
+  couleurs : `INTRO` en tête du fichier. Toucher pendant la séquence = sauter au titre ; sur le titre = écran de sélection.
+- Images : `python3 outils/intro/preparer_intro.py` (grands bustes 400 x 440 → `assets/sprites/intro/`), l'ombre = même image teintée.
+
 ## HUB = ÉCRAN DE SÉLECTION DES BOSS façon Mega Man (nov. 2026, remplace la salle aux portes)
 - `src/hub/HubScene.js` : grille 3 x 2 des 6 BOSS seulement (Beufa Kédric Julien / Greg Rémi Lionel), fond bleu vif.
   Pas battu = OMBRE (silhouette + liseré bleu, « ? »), même pendant l'entrée (on découvre son design en le battant) ;
