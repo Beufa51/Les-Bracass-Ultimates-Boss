@@ -233,7 +233,8 @@ export class FinaleMecha extends BossScene {
     if (this.recharge <= 0) {
       this.recharge = V.cadence;
       this.tirs.push({ x: v.x + 40, y: v.y - 7 }, { x: v.x + 40, y: v.y + 7 });
-      jouerSon(this, 'finale_tir', { volume: 0.35 });
+      this.salve = (this.salve || 0) + 1;
+      if (this.salve % 2) jouerSon(this, 'finale_tir', { volume: 0.18 });   // une salve sur deux, très bas (Fabien : sons insupportables)
       this.eclat(v.x + 44, v.y, 0xfff27a);   // éclair au bout du canon
     }
     const pas = V.vitesseTir * dt;
@@ -245,7 +246,7 @@ export class FinaleMecha extends BossScene {
         const p = this.partieEn(t.x, t.y, this.parties[this.actuelle]);
         if (p) {
           this.toucherPartie(p, V.degats); this.eclat(t.x, t.y, 0xffd84a);
-          if (!(this.T < this.prochainImpact)) { this.prochainImpact = this.T + 0.07; jouerSon(this, 'finale_impact', { volume: 0.5 }); }
+          if (!(this.T < this.prochainImpact)) { this.prochainImpact = this.T + 0.22; jouerSon(this, 'finale_impact', { volume: 0.3 }); }   // au plus ≈ 4 par seconde, discret
           return false;
         }
       }

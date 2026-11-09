@@ -156,6 +156,9 @@
     `outils/finale/preparer_images.py`) qui tombe ; 2. PHOTO DE GROUPE (poses de l'intro + vaisseau, « CLIC ! »,
     confettis) ; 3. PALMARÈS (meilleur rang de chaque boss toutes difficultés, défis x/21) ; 4. GÉNÉRIQUE (répliques des
     potes = `REGLAGES.parties[].replique` du mécha, musiques lues dans CREDITS.md). Musique : `intro_musique`.
+  - SONS ADOUCIS (Fabien : « insupportables, surtout les impacts ») : plus d'ondes carrées ; impact = petit « pok » grave
+    (≈ 530 Hz, volume 0,3, au plus toutes les 0,22 s) ; tir = « fuit » rond (une salve sur deux, volume 0,18) ; alerte et
+    touché filtrés. Réglages : `outils/finale/generer_sons.py` puis relancer le script ; volumes dans FinaleMecha (`tirer`).
   - Reste : tes retours.
 
 ## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)

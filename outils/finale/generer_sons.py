@@ -23,14 +23,15 @@ def ecrire(nom, x, gain=0.9):
     with wave.open(f'{out}/{nom}.wav', 'wb') as w:
         w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((x * 32767).astype(np.int16).tobytes())
 
-# TIR : « piou » laser court et sec (joué à chaque salve, doit rester discret)
-d = 0.09
-ecrire('finale_tir', carre(balayage(d, 2400, 700, 35)) * env(d, 0.001, 0.03) + 0.15 * passe_haut(bruit(d), 4000) * env(d, 0.0005, 0.01), 0.5)
+# TIR : petit « fuit » doux et rond (joué une salve sur deux : il doit rester en fond). Fabien : « insupportable » avec
+# l'ancien son carré aigu → onde ronde (sinus), plus grave, attaque adoucie, filtré
+d = 0.07
+ecrire('finale_tir', passe_bas(balayage(d, 1100, 420, 30) * env(d, 0.004, 0.02), 2500), 0.35)
 
-# IMPACT sur le mécha : « tink » métallique
-d = 0.1
-ecrire('finale_impact', (np.sin(2 * np.pi * 1850 * t(d)) + 0.6 * np.sin(2 * np.pi * 2730 * t(d))) * env(d, 0.0005, 0.025)
-       + 0.7 * passe_haut(bruit(d), 2500) * env(d, 0.0005, 0.008), 0.6)
+# IMPACT sur le mécha : petit « pok » sourd et grave (l'ancien « tink » aigu était insupportable à la longue)
+d = 0.08
+ecrire('finale_impact', passe_bas(np.sin(2 * np.pi * np.cumsum(260 * np.exp(-t(d) * 25) + 140) / SR) * env(d, 0.003, 0.025)
+       + 0.25 * passe_bas(bruit(d), 900) * env(d, 0.002, 0.012), 1500), 0.35)
 
 # EXPLOSION (pinte qui éclate, petits boums)
 d = 0.7
@@ -53,12 +54,12 @@ ecrire('finale_bombe', np.concatenate([monte * 0.5, boum]), 0.95)
 
 # TOUCHÉ : ton vaisseau prend un coup (« bzzt » qui descend + choc)
 d = 0.4
-ecrire('finale_touche', carre(balayage(d, 520, 110, 7)) * env(d, 0.002, 0.15) + 0.6 * passe_bas(bruit(d), 2500) * env(d, 0.001, 0.06), 0.85)
+ecrire('finale_touche', passe_bas(balayage(d, 520, 110, 7) * env(d, 0.004, 0.15) + 0.6 * passe_bas(bruit(d), 700) * env(d, 0.002, 0.05), 1000), 0.75)
 
 # ALERTE : « tu-tu » (une attaque spéciale arrive)
 d = 0.12
-bip = lambda f: carre(np.sin(2 * np.pi * f * t(d))) * env(d, 0.003, 0.08)
-ecrire('finale_alerte', np.concatenate([bip(988), np.zeros(int(0.03 * SR)), bip(740)]), 0.55)
+bip = lambda f: (np.sin(2 * np.pi * f * t(d)) + 0.3 * np.sin(2 * np.pi * 2 * f * t(d))) * env(d, 0.006, 0.07)
+ecrire('finale_alerte', np.concatenate([bip(880), np.zeros(int(0.03 * SR)), bip(660)]), 0.5)
 
 # DEMPSEY : souffle du poing qui tournoie (« wouf wouf »)
 d = 0.5
