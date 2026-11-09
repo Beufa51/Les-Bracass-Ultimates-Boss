@@ -117,6 +117,12 @@
 - Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
   allégée en 80 kbit/s ; original dans `assets_inbox/hub/`). Réglages de la grille : `src/hub/reglages.js`.
 
+## GREG — RUSH (étourdi) moins fort en NORMAL (9 nov. 2026, Fabien : « encore trop facile, je l'enchaîne trop étourdi »)
+- `DIFFICULTES.<diff>.etourdi` remplace une partie de `REGLAGES.etourdi` (accesseur `this.E` dans GregCombat). NORMAL :
+  RUSH 1 s (au lieu de 1,3), coups x2 (au lieu de x3), `protection` 6 s : après un RUSH il ne peut pas être ré-étourdi.
+- Bot (`greg_bot.mjs` affiche maintenant les dégâts du RUSH) NORMAL, avec le Dempsey réduit : expert 59 -> 75 s, moyen
+  76 -> 112 s, enfant 118 -> 153 s (round 3), tous gagnent encore ; spam / tortue perdent. RUSH ≈ 45 -> 22 dégâts / combat.
+
 ## GREG — Dempsey Roll moins fort en NORMAL (9 nov. 2026, Fabien : « un peu trop puissant »)
 - `DIFFICULTES.normal` : `dempsey: 0.7` (x dégâts du roll) et `finishTapis: 30` (au lieu de 50). Les autres difficultés
   inchangées (champs absents = 1 / réglage commun). Bot NORMAL 15 combats : expert 59 -> 77 s, moyen 76 -> 94 s, enfant 5/5 -> 4/5.

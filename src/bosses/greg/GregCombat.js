@@ -247,7 +247,7 @@ export class GregCombat extends BossScene {
       const c = R.coups[j.action.coup];
       j.action.t += dt;
       if (!j.action.fait && j.action.t >= c.impact) { j.action.fait = true; this.coupDuJoueur(j.action.coup); }
-      const rush = this.g.etat === 'etourdi' ? R.etourdi.coupRapide : 1;   // Greg étourdi : on enchaîne plus vite
+      const rush = this.g.etat === 'etourdi' ? this.E.coupRapide : 1;   // Greg étourdi : on enchaîne plus vite
       if (j.action && j.action.t >= c.duree * rush) j.action = null;
       // on peut couper la fin de son coup pour esquiver
       else if (j.action && j.action.fait && (this.memo('gauche') || this.memo('droite'))) j.action = null;   // on peut couper son coup dès l'impact
@@ -361,7 +361,7 @@ export class GregCombat extends BossScene {
       onomatopee(this, xImpact, yImpact - 50, 'BIEN VU !!', 46, '#ffd84a');
       this.arreter(R.arretImpact.contre);
     }
-    if (titube) degats *= R.etourdi.multiplicateur;   // RUSH : Greg sans défense, chaque coup fait très mal
+    if (titube) degats *= this.E.multiplicateur;   // RUSH : Greg sans défense, chaque coup fait très mal
     g.reculSens = null;
     if (contre) {
       degats *= R.contreMultiplicateur;
@@ -397,7 +397,8 @@ export class GregCombat extends BossScene {
     if (g.etat === 'essouffle') return;   // à bout de souffle : il encaisse SANS sortir de son essoufflement (sinon il ne reprenait jamais son souffle)
 
     // jauge d'étourdissement (cachée)
-    g.vertige += (contre ? R.etourdi.parContre : R.etourdi.parCoup) * (c.vertige || 1);
+    if (this.horloge < (g.protegeJusqua ?? -1)) { /* il vient de sortir d'un RUSH : on ne le ré-étourdit pas tout de suite */ }
+    else g.vertige += (contre ? this.E.parContre : this.E.parCoup) * (c.vertige || 1);
     if (g.vertige >= 100) { this.etourdirGreg(); return; }
 
     // Après plusieurs coups d'affilée, Greg se couvre puis riposte (pas de "coups gratuits" à l'infini)
@@ -436,6 +437,9 @@ export class GregCombat extends BossScene {
   }
   finSerie() { this.serie = 0; this.serieJusqua = -1; }
 
+  // réglages du RUSH (Greg étourdi) : réglage commun + celui de la difficulté (DIFFICULTES.x.etourdi)
+  get E() { return { ...R.etourdi, ...(this.diff.etourdi || {}) }; }
+
   // Greg étourdi : il titube, garde baissée, des étoiles autour de la tête
   etourdirGreg() {
     const g = this.g;
@@ -462,7 +466,7 @@ export class GregCombat extends BossScene {
     const g = this.g;
     g.t += dt;
     g.couvert -= dt;
-    g.vertige = Math.max(0, g.vertige - R.etourdi.baisse * dt);
+    g.vertige = Math.max(0, g.vertige - this.E.baisse * dt);
     if (g.poseForcee) { g.poseForcee.t -= dt; if (g.poseForcee.t <= 0) g.poseForcee = null; }
 
     if (g.souffle <= 0 && (g.etat === 'garde' || g.etat === 'touche' || g.etat === 'recup')) {
@@ -510,7 +514,7 @@ export class GregCombat extends BossScene {
         }
         break;
       case 'etourdi':
-        if (g.t >= R.etourdi.duree) { onomatopee(this, R.centreX + 170, 80, 'Il reprend ses esprits...', 20, '#cccccc'); this.retourGardeGreg(0.3); }
+        if (g.t >= this.E.duree) { onomatopee(this, R.centreX + 170, 80, 'Il reprend ses esprits...', 20, '#cccccc'); g.protegeJusqua = this.horloge + (this.E.protection || 0); this.retourGardeGreg(0.3); }
         break;
       case 'essouffle':
         if (g.t >= R.dureeEssoufflement) { g.souffle = R.souffleGregApresEssoufflement; this.retourGardeGreg(); }

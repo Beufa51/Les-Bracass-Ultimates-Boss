@@ -74,7 +74,7 @@ async function jouer({ P, nomDiff, graine, limite }) {
     contres: 0, libresTouches: 0, libresPares: 0, pareEnArmant: 0,
     dempsey: [], secrets: 0, nargues: 0, nargueVu: 0, nargueRate: 0,
     injustes: [], prepas: {}, gapsMax: 0, gaps3: 0, gaps: [],
-    enerve: false, etourdis: 0, essoufflements: 0, gardesBrisees: 0, ripostes: 0,
+    enerve: false, etourdis: 0, degatsRush: 0, essoufflements: 0, gardesBrisees: 0, ripostes: 0,
     rejouerOk: null, rejouerProblemes: [], erreursInternes: [],
   };
   // ---------- vérification « rejouer / nouvelle partie : tout repart à zéro » ----------
@@ -145,6 +145,7 @@ async function jouer({ P, nomDiff, graine, limite }) {
     else if (prep && d === 0) res.pareEnArmant++;
     else if (d > 0) res.libresTouches++;
     else if (etatAvant !== 'nargue') res.libresPares++;
+    if (etatAvant === 'etourdi') res.degatsRush += d;
     if (etatAvant === 'nargue') { if (d > 0) res.secrets++; else res.nargueRate++; }
     if (this.g.etat === 'etourdi' && etatAvant !== 'etourdi') res.etourdis++;
   });
@@ -441,7 +442,7 @@ console.log('\nDempsey Roll, moment secret, temps morts');
 for (const diff of DIFFS) for (const p of NOMS_P.filter((x) => !PROFILS[x].abus)) {
   const L = resultats.filter((r) => r.diff === diff && r.profil === p), D = L.flatMap((r) => r.dempsey);
   const fins = {}; D.forEach((d) => { const k = d.fin.split(' (')[0]; fins[k] = (fins[k] || 0) + 1; });
-  console.log(`${diff.padEnd(13)}${p.padEnd(8)} Dempsey ${D.length} (${Object.entries(fins).map(([k, v]) => k + ' ' + v).join(', ')}, ${moy(D.map((d) => d.coups)).toFixed(1)} coups, ${moy(D.map((d) => d.degats)).toFixed(0)} dégâts)  secret ${L.reduce((a, r) => a + r.secrets, 0)}/${L.reduce((a, r) => a + r.nargues, 0)} (vu ${L.reduce((a, r) => a + r.nargueVu, 0)})  contres ${moy(L.map((r) => r.contres)).toFixed(1)}  étourdi ${moy(L.map((r) => r.etourdis)).toFixed(1)}  essoufflé ${moy(L.map((r) => r.essoufflements)).toFixed(1)}  temps mort max ${Math.max(...L.map((r) => r.gapsMax)).toFixed(1)} s (>3 s : ${L.reduce((a, r) => a + r.gaps3, 0)})`);
+  console.log(`${diff.padEnd(13)}${p.padEnd(8)} Dempsey ${D.length} (${Object.entries(fins).map(([k, v]) => k + ' ' + v).join(', ')}, ${moy(D.map((d) => d.coups)).toFixed(1)} coups, ${moy(D.map((d) => d.degats)).toFixed(0)} dégâts)  secret ${L.reduce((a, r) => a + r.secrets, 0)}/${L.reduce((a, r) => a + r.nargues, 0)} (vu ${L.reduce((a, r) => a + r.nargueVu, 0)})  contres ${moy(L.map((r) => r.contres)).toFixed(1)}  étourdi ${moy(L.map((r) => r.etourdis)).toFixed(1)} (RUSH ${moy(L.map((r) => r.degatsRush)).toFixed(0)} dégâts)  essoufflé ${moy(L.map((r) => r.essoufflements)).toFixed(1)}  temps mort max ${Math.max(...L.map((r) => r.gapsMax)).toFixed(1)} s (>3 s : ${L.reduce((a, r) => a + r.gaps3, 0)})`);
 }
 const rej = resultats.filter((r) => r.viaRejouer);
 console.log(`\nREJOUER : ${rej.length} parties lancées par le bouton, ${rej.filter((r) => r.rejouerOk).length} repartent à zéro.` + [...new Set(resultats.flatMap((r) => r.rejouerProblemes))].map((x) => ' ' + x).join(';'));

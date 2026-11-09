@@ -7,6 +7,8 @@ export const IDENTITE = { id: 'greg', nom: 'Greg' };
 //  degatsGreg : x dégâts des coups de Greg ; vitesse : x durée de préparation de ses coups (plus petit = plus rapide)
 //  esquive : durée pendant laquelle ton esquive protège ; aides : flèche + cible d'aide
 //  degatsJoueur : x dégâts de TES coups (plus petit = Greg tient plus longtemps : on voit le round 3)
+//  etourdi : remplace une partie du réglage commun `etourdi` (RUSH) ; protection = secondes après un RUSH sans pouvoir
+//    être ré-étourdi (9 nov. 2026, Fabien : « je l'enchaîne trop quand il est étourdi »)
 //  dempsey : x dégâts du Dempsey Roll (absent = 1) ; finishTapis : remplace dempsey.finishTapis (absent = réglage commun)
 //  rangMax : meilleur rang possible dans ce mode ; sansRecord : ni record ni défis (mode découverte)
 export const DIFFICULTES = {
@@ -15,7 +17,7 @@ export const DIFFICULTES = {
     texte: 'Greg tape doucement et prévient longtemps. Pour apprendre les esquives et les contres.' },
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', degatsGreg: 0.65, vitesse: 1.25, esquive: 0.55, aides: true, degatsJoueur: 0.65, rangMax: 'A',
     texte: 'Greg frappe moins fort et plus lentement. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 0.75, vitesse: 1,    esquive: 0.5,  aides: true, degatsJoueur: 0.55, dempsey: 0.7, finishTapis: 30,   // dempsey / finishTapis : 9 nov. 2026 (Fabien : Dempsey « un peu trop puissant ») ; nov. 2026 (Fabien : « un peu trop facile ») : 0,6 / 0,6 avant
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 0.75, vitesse: 1,    esquive: 0.5,  aides: true, degatsJoueur: 0.55, dempsey: 0.7, finishTapis: 30, etourdi: { duree: 1.0, multiplicateur: 2, protection: 6 },   // dempsey / finishTapis : 9 nov. 2026 (Fabien : Dempsey « un peu trop puissant ») ; nov. 2026 (Fabien : « un peu trop facile ») : 0,6 / 0,6 avant
     texte: 'Le vrai combat.' },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', degatsGreg: 0.9,  vitesse: 0.85, esquive: 0.42, aides: false, degatsJoueur: 0.5,
     texte: 'Sans flèche ni cible, coups rapides et puissants. Pour les vrais.' },
@@ -172,7 +174,7 @@ export const REGLAGES = {
   // ---------- Étourdissement (comme dans Super Punch-Out) ----------
   // Chaque coup qui TOUCHE remplit une jauge cachée (qui se vide toute seule). Pleine => Greg titube,
   // sans défense pendant 'duree' secondes : tous tes coups passent !
-  etourdi: { parCoup: 15, parContre: 35, baisse: 16, duree: 1.3, multiplicateur: 3, coupRapide: 0.6 },   // RUSH : plus court, chaque coup x3, sans souffle, coups 40 % plus rapides   // baisse : 18 -> 16 (audit : il n'était jamais étourdi ; le visage étourdit 2x plus)
+  etourdi: { protection: 0, parCoup: 15, parContre: 35, baisse: 16, duree: 1.3, multiplicateur: 3, coupRapide: 0.6 },   // RUSH : plus court, chaque coup x3, sans souffle, coups 40 % plus rapides   // baisse : 18 -> 16 (audit : il n'était jamais étourdi ; le visage étourdit 2x plus)
   compteVocal: false,          // compte de l'arbitre à voix haute (japonais) ; false = seulement à l'écran
   annonceur: false,            // voix de synthèse retirées : pas assez punchy — tout passe par l'écran et les sons
 
