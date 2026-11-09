@@ -834,7 +834,7 @@ export class GregCombat extends BossScene {
     d.periode = Math.max(D.periodeMin, d.periode * D.acceleration);
     const final = d.coups >= D.coupsMax;
     const combo = 1 + D.bonusCombo * (d.coups - 1);
-    const degats = final ? D.degatsFinal * combo : (parfait ? D.degatsParfait : D.degatsBien) * combo;
+    const degats = (final ? D.degatsFinal * combo : (parfait ? D.degatsParfait : D.degatsBien) * combo) * (this.diff.dempsey ?? 1);
     const xImpact = R.centreX + (appui === 'g' ? -50 : 50), yImpact = VISAGE_GREG.y + Phaser.Math.Between(-10, 30);
     const taille = Math.min(70, 32 + d.coups * 4);
     onomatopee(this, xImpact, yImpact, final ? ONO.enorme : ONO.fort, final ? 72 : taille, final ? '#ffd84a' : '#ffffff');
@@ -852,14 +852,14 @@ export class GregCombat extends BossScene {
     const chiffre = texte(this, xImpact + (appui === 'g' ? -40 : 40), yImpact - 30, '-' + Math.round(degats), 22 + d.coups, '#ff5a6e', { stroke: '#000000', strokeThickness: 4 }).setDepth(47);
     this.tweens.add({ targets: chiffre, y: chiffre.y - 50, alpha: 0, duration: 600, onComplete: () => chiffre.destroy() });
     // FINISH : s'il est déjà bien entamé, il part au tapis
-    if (final && g.vie - degats <= D.finishTapis) {
+    if (final && g.vie - degats <= (this.diff.finishTapis ?? D.finishTapis)) {
       flash(this, 1, 0xffffff); this.arreter(0.35);
       onomatopee(this, R.centreX, 230, 'FINISH !!', 72, '#ff8a3d');
       this.delaiDown = 0.5; j.dempsey = null; this.finZoomDempsey();
       this.blesserGreg(g.vie);
       return;
     }
-    this.blesserGreg(degats);   // (le Dempsey Roll garde toute sa force à toutes les difficultés)
+    this.blesserGreg(degats);   // (pas de degatsJoueur ici : seul diff.dempsey règle sa force)
     if (g.etat === 'sol') { j.dempsey = null; this.finZoomDempsey(); return; }
     if (final) {
       flash(this, 0.9);

@@ -117,6 +117,10 @@
 - Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
   allégée en 80 kbit/s ; original dans `assets_inbox/hub/`). Réglages de la grille : `src/hub/reglages.js`.
 
+## GREG — Dempsey Roll moins fort en NORMAL (9 nov. 2026, Fabien : « un peu trop puissant »)
+- `DIFFICULTES.normal` : `dempsey: 0.7` (x dégâts du roll) et `finishTapis: 30` (au lieu de 50). Les autres difficultés
+  inchangées (champs absents = 1 / réglage commun). Bot NORMAL 15 combats : expert 59 -> 77 s, moyen 76 -> 94 s, enfant 5/5 -> 4/5.
+
 ## GREG — CORRECTIONS DE L'AUDIT (nov. 2026, choix 1 à 17 acceptés par Fabien) : `propositions/greg_audit.md`
 - Bugs : boxeur plus couché après REJOUER, aide du Dempsey recréée, esquive ENTRAÎNEMENT / FACILE vraiment plus longue,
   cadre blanc de garde toujours dessiné (texte « Garde HAUTE / BASSE » à gauche, plus gros), garde basse = `greg2_entier`
