@@ -117,6 +117,11 @@
 - Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
   allégée en 80 kbit/s ; original dans `assets_inbox/hub/`). Réglages de la grille : `src/hub/reglages.js`.
 
+## FINALE : mécha des Bracass' en shoot'em up (proposition, 9 nov. 2026) — EN ATTENTE des choix de Fabien
+- Choix de Fabien : le héros dans son vaisseau contre le mécha des 6. Proposition : `propositions/finale_mecha.md`
+  (5 questions ❓ en fin de fichier), prompts : `propositions/finale_prompts_images.md` (mécha complet = référence).
+- Rien n'est codé. Prochaine étape si validé : prototype au code dans `src/finale/`.
+
 ## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)
 - `showtime.rappel` 0,06 → 0,04 ; `gain` parfait 2,1 → 2,5, bien 1,3 → 1,5, raté 7 → 6. Avant, la jauge plafonnait vers
   45 % même en ne faisant QUE des PARFAITS (le rappel la ramenait au milieu) : le défi 80 % était impossible.
