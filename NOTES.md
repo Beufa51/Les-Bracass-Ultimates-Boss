@@ -111,7 +111,7 @@
 ## HUB = ÉCRAN DE SÉLECTION DES BOSS façon Mega Man (nov. 2026, remplace la salle aux portes)
 - `src/hub/HubScene.js` : grille 3 x 2 des 6 BOSS seulement (Beufa Kédric Julien / Greg Rémi Lionel), fond bleu vif.
   Pas battu = OMBRE (silhouette + liseré bleu, « ? »), même pendant l'entrée (on découvre son design en le battant) ;
-  battu = buste en couleur + badge + cadre doré. Bandeau du bas : badges (5 appuis = réglages dev) et ★ LA FIN. Flèches + Espace ; au doigt : toucher
+  battu = buste en couleur + badge + cadre doré. Bandeau du bas : badges (5 appuis = MENU DE TEST, 9 nov. 2026 : seul accès au menu de test sur téléphone au hub, qui n'a pas de bouton pause). Flèches + Espace ; au doigt : toucher
   une case la choisit, la retoucher = combattre. Entrée : bande façon Mega Man (buste qui glisse + nom lettre par lettre).
 - Images : `python3 outils/hub/preparer_selection.py` (bustes tirés des images détourées de chaque boss -> `assets/sprites/hub/select_*`).
 - Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
@@ -743,7 +743,7 @@
 - Greg : **vue Punch-Out** (ton boxeur de dos, Greg de face) + **règles façon Hajime no Ippo**.
   C'est le **premier boss développé**.
 - **RÉGLAGES DÉVELOPPEUR** (demande du propriétaire) : écran caché pour régler les chiffres de chaque boss sans ouvrir
-  les fichiers. Accès : **5 appuis rapides sur « Badges »** (en bas à gauche du hub), touche **D** dans le hub, ou le menu F1.
+  les fichiers. Accès : touche **D** dans le hub, ou le menu de test (F1 ; au hub sur téléphone : **5 appuis rapides sur les badges**).
   Chaque boss liste ses réglages dans SON `index.js` (`reglagesDev`) ; moteur : `src/core/reglagesDev.js` +
   `src/core/ReglagesDevScene.js`. Les valeurs changées sont gardées dans le navigateur (localStorage, clé
   `bracass_reglages_dev_v1`) et appliquées au démarrage ; « par défaut » = la valeur des fichiers. Greg et Lionel : seule

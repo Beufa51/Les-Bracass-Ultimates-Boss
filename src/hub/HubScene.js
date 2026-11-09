@@ -1,6 +1,6 @@
 // =====================================================================
 // HUB : écran de SÉLECTION DES BOSS, façon Mega Man (nov. 2026, remplace la salle aux 6 portes).
-// Grille 3 x 2 : les 6 boss, rien d'autre. Bandeau du bas : badges (5 appuis = réglages développeur) et LA FIN.
+// Grille 3 x 2 : les 6 boss, rien d'autre. Bandeau du bas : badges (5 appuis = MENU DE TEST, utile sur téléphone).
 // Un boss pas encore battu n'apparaît qu'en OMBRE (même à l'entrée) : on découvre son design en le battant.
 // Flèches = déplacer le curseur, Espace = combattre ; au doigt / à la souris : toucher une case = combattre direct (retour Fabien nov. 2026).
 // Musique : hub_musique (assets/audio/hub/). Images : outils/hub/preparer_selection.py.
@@ -18,6 +18,7 @@ import { BOSS } from '../bosses/liste.js';
 import { REGLAGES_HUB as R } from './reglages.js';
 import { estTactile, etiquettesTactiles, montrerBoutonPause } from '../core/tactile.js';
 import { ouvrirReglagesDev } from '../core/ReglagesDevScene.js';
+import { basculerMenuTest } from '../core/MenuTestScene.js';
 
 // place de chaque case (colonne 0 = gauche, 2 = droite ; ligne 0 à 2). La colonne 1 = la case du BOSS FINAL.
 const PLACES = { beufa: [0, 0], kedric: [0, 1], julien: [0, 2], greg: [2, 0], remi: [2, 1], lionel: [2, 2] };
@@ -211,7 +212,7 @@ export class HubScene extends Phaser.Scene {
     return { boss, x, y, w: this.cL, h: this.cH, img, info, action: () => this.entrer(boss) };
   }
 
-  // bandeau du bas : les badges (5 appuis rapides = réglages développeur) et LA FIN quand les 6 badges sont là
+  // bandeau du bas : les badges (5 appuis rapides = menu de test : boss, phases, trappe, réglages développeur)
   bandeauBas(nb) {
     const y = R.bandeauY;
     this.add.rectangle(LARGEUR / 2, y, LARGEUR, 40, 0x0a1440, 0.85);
@@ -222,7 +223,8 @@ export class HubScene extends Phaser.Scene {
     zoneBadges.on('pointerdown', () => {
       const t = this.time.now;
       appuis = [...appuis.filter(a => t - a < 2500), t];
-      if (appuis.length >= 5) { appuis = []; ouvrirReglagesDev(this.game); }
+      // téléphone : pas de bouton pause au hub → 5 appuis = le MENU DE TEST (il contient aussi les réglages développeur)
+      if (appuis.length >= 5) { appuis = []; basculerMenuTest(this.game); }
     });
   }
 
