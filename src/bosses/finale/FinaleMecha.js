@@ -94,7 +94,6 @@ export class FinaleMecha extends BossScene {
     if (!rapide) {
       this.cameras.main.shake(1400, 0.006);
       this.bandeau('LES BRACASS\' FUSIONNENT !', 1.6, '#ff6b6b');
-      jouerSon(this, 'finale_alerte');
       this.tweens.add({ targets: this.mecha, monte: 0, duration: 1500, ease: 'Cubic.Out' });
     }
   }
@@ -234,7 +233,7 @@ export class FinaleMecha extends BossScene {
       this.recharge = V.cadence;
       this.tirs.push({ x: v.x + 40, y: v.y - 7 }, { x: v.x + 40, y: v.y + 7 });
       this.salve = (this.salve || 0) + 1;
-      if (this.salve % 2) jouerSon(this, 'finale_laser_heros', { volume: 0.22 });   // une salve sur deux, très bas (Fabien : sons insupportables)
+      if (this.salve % 3 === 1) jouerSon(this, 'finale_laser_heros', { volume: 0.09 });   // une salve sur TROIS, très bas (Fabien : « trop fort, agaçant à la longue »)
       this.eclat(v.x + 44, v.y, 0xfff27a);   // éclair au bout du canon
     }
     const pas = V.vitesseTir * dt;
@@ -357,7 +356,6 @@ export class FinaleMecha extends BossScene {
     // SUPER LANCER : un trait rouge vers toi, puis un frisbee en feu très rapide sur ce trait
     if (this.minuteur('super', A.superLancer.toutesLes, 2.5)) {
       const S = A.superLancer, a = this.vise(o);
-      jouerSon(this, 'finale_alerte');
       this.traits.push({ x: o.x, y: o.y, a, t: 0, duree: S.preavis, fin: () => this.balle(o.x, o.y, a, S.vitesse, 'feu', 14) });
     }
   }
@@ -376,7 +374,6 @@ export class FinaleMecha extends BossScene {
   // On s'abrite DANS une boucle du ∞ ou loin de lui.
   dempsey(D, o) {
     this.bandeau('DEMPSEY ROLL !', 0.9, '#ff6b6b');
-    jouerSon(this, 'finale_alerte');
     const duree = D.duree / this.diff.vitesse, ch = { ...D, t: 0, preavis: D.preavis / Math.sqrt(this.diff.vitesse) };
     this.chemins.push(ch);
     this.att.poing = Math.max(this.att.poing || 0, ch.preavis + duree + 1.5);   // pas d'autre poing pendant le ∞
@@ -419,7 +416,6 @@ export class FinaleMecha extends BossScene {
     if (ecart < C.angle && Math.hypot(dx, dy) < C.portee) this.repere = (this.repere || 0) + this.dt; else this.repere = Math.max(0, (this.repere || 0) - this.dt);
     if (this.repere >= C.repere && !(this.att.rafale > 0)) {
       this.repere = 0; this.att.rafale = 1.3;
-      jouerSon(this, 'finale_alerte');
       this.alerte = { x: this.vaisseau.x, y: this.vaisseau.y - 50, t: 0.6 };
       this.time.delayedCall(C.delai * 1000, () => { if (this.etat === 'jeu') this.laserRouge(); });
       for (let k = 0; k < C.rafale; k++) this.time.delayedCall(C.delai * 1000 + k * 90, () => { if (this.etat === 'jeu') this.balle(o.x, o.y, this.vise(o), C.vitesse, 'balle', 8); });
@@ -437,6 +433,7 @@ export class FinaleMecha extends BossScene {
     }
   }
 
+  // (l'alerte « tu-tu » avant les attaques est RETIRÉE : Fabien la trouvait insupportable ; l'écran prévient déjà)
   // son des LASERS ROUGES ennemis (fourni par Fabien) : quand une attaque annoncée en rouge part ; pas deux à la fois
   laserRouge() {
     if (this.T < (this.prochainLaser || 0)) return;
@@ -446,7 +443,6 @@ export class FinaleMecha extends BossScene {
 
   alerteCouloir(y, hauteur, preavis, fin) {
     y = Phaser.Math.Clamp(y, 40, HAUTEUR - 40);
-    jouerSon(this, 'finale_alerte');
     this.couloirs.push({ y, h: hauteur, t: 0, duree: preavis / Math.sqrt(this.diff.vitesse), fin: () => { this.couloirY = y; fin(); } });
   }
 
