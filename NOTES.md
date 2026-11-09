@@ -1612,6 +1612,10 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   5 profils) : avec 4 / 2 les combats duraient 2x moins ; avec 3 / 1,5 temps proches d'avant (NORMAL expert 52 s,
   moyen 59 s, enfant 105 s ; avant 67 / 81 / 106) ; spam et tortue perdent toujours ; 0 erreur JavaScript.
 - `coups.corps` gardé dans les réglages (inutilisé) pour revenir en arrière.
+- Retour de Fabien (« un peu trop facile ; rang B sans être tombé ») : NORMAL `degatsGreg` 0,6 → 0,75, `degatsJoueur`
+  0,6 → 0,55 ; rang réglable (`rangCalcul` dans reglages.js) : 0,3 par dégât reçu (max 40, avant 0,4), 15 par tapis,
+  lenteur 0,15/s après 75 s (avant 60 s). Bot NORMAL (5 parties) : expert S (≈ 58 s), moyen S ou A, enfant S à C
+  (tombe parfois, jusqu'au round 3) ; spam et tortue perdent ; 0 erreur. Sans tomber, avec quelques coups reçus = A.
 
 ## LIONEL — AUDIT IMAGES / ANIMATIONS (nov. 2026, en attente des choix de Fabien)
 - Rapport : `propositions/lionel_audit_images.md` ; prompts : `propositions/lionel_prompts_images.md`.

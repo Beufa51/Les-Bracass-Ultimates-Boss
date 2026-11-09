@@ -14,7 +14,7 @@ export const DIFFICULTES = {
     texte: 'Greg tape doucement et prévient longtemps. Pour apprendre les esquives et les contres.' },
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', degatsGreg: 0.65, vitesse: 1.25, esquive: 0.55, aides: true, degatsJoueur: 0.65, rangMax: 'A',
     texte: 'Greg frappe moins fort et plus lentement. Idéal pour apprendre.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 0.6,  vitesse: 1,    esquive: 0.5,  aides: true, degatsJoueur: 0.6,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', degatsGreg: 0.75, vitesse: 1,    esquive: 0.5,  aides: true, degatsJoueur: 0.55,   // nov. 2026 (Fabien : « un peu trop facile ») : 0,6 / 0,6 avant
     texte: 'Le vrai combat.' },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', degatsGreg: 0.9,  vitesse: 0.85, esquive: 0.42, aides: false, degatsJoueur: 0.5,
     texte: 'Sans flèche ni cible, coups rapides et puissants. Pour les vrais.' },
@@ -182,6 +182,9 @@ export const REGLAGES = {
   nargue: { entre: [45, 15], duree: 0.7, coup: 'visage', multiplicateur: 3 },
 
   // ---------- Classement de fin (temps de K.O. + coups reçus + tapis) ----------
+  // score de fin = 100 - dégâts reçus x parRecu (au plus recusMax) - tapis x parTapis - secondes après tempsLibre x parSeconde
+  // nov. 2026 (Fabien : rang B sans être tombé) : avant 0,4 / 40 / 15 / 60 s / 0,15
+  rangCalcul: { parRecu: 0.3, recusMax: 40, parTapis: 15, tempsLibre: 75, parSeconde: 0.15 },
   rangs: [ // du meilleur au moins bon : il faut un score >= au seuil
     { rang: 'S', seuil: 90 }, { rang: 'A', seuil: 70 }, { rang: 'B', seuil: 45 }, { rang: 'C', seuil: 0 },
   ],

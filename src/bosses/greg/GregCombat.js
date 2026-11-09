@@ -1219,9 +1219,10 @@ export class GregCombat extends BossScene {
   // Classement de fin : rang S / A / B / C + record gardé dans le navigateur
   classement(debut, ko) {
     let score = 100;
-    score -= Math.min(40, this.stats.recus * 0.4);          // coups reçus
-    score -= this.j.downs * 15;                              // passages au tapis
-    score -= Math.max(0, this.tempsTotal - 60) * 0.15;       // lenteur (après 1 minute)
+    const C = R.rangCalcul;
+    score -= Math.min(C.recusMax, this.stats.recus * C.parRecu);   // dégâts reçus
+    score -= this.j.downs * C.parTapis;                            // passages au tapis
+    score -= Math.max(0, this.tempsTotal - C.tempsLibre) * C.parSeconde;   // lenteur
     if (!ko) score -= 20;
     let rang = R.rangs.find(r => score >= r.seuil).rang;
     // le rang dépend aussi de la difficulté (pas de rang S en ENTRAÎNEMENT / FACILE)
