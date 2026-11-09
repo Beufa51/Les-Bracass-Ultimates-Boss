@@ -61,7 +61,9 @@ export const REGLAGES = {
               dempsey: { toutesLes: 12, preavis: 1.3, duree: 2.6, cx: 320, cy: 275, largeur: 250, hauteur: 470 } },
     julien: { copies: { periode: 0.45, vitesse: 120 },
               interro: { toutesLes: 6.5, anneaux: 3, parAnneau: 12, vitesse: 135, ecart: 0.5 } },
-    beufa:  { cone: { angle: 0.3, balayage: 0.7, portee: 900, repere: 0.6, delai: 0.45, rafale: 3, vitesse: 430 },   // delai : entre le « ! » et la rafale
+    beufa:  { cone: { angle: 0.3, balayage: 0.7, portee: 900, repere: 0.6, delai: 0.45 },   // delai : entre le « ! » et le départ des missiles
+              // repéré par le cône : MISSILES à tête chercheuse (virage = rad/s, vie = s avant d'exploser seuls)
+              missiles: { nombre: 2, vitesse: 205, virage: 1.15, vie: 3.0, ecart: 0.35 },   // (bot : 240 / 1,7 / 3,6 doublait les coups chez Beufa)
               tirs: { periode: 1.5, vitesse: 200 },
               desespoir: 0.3 },   // sous 30 % de sa vie : il ajoute un peu des attaques des 5 autres
   },

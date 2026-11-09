@@ -3,7 +3,7 @@
 //  1. LE TAS : flash, les 6 Bracass' sonnés tombent du ciel (assets/sprites/finale/tas.png)
 //  2. LA PHOTO DE GROUPE : les 6 poses de l'intro arrivent une par une, ton vaisseau se pose, « CLIC ! »
 //  3. LE BILAN : ton meilleur rang chez chaque boss (format « NOM (lettre) ») et les défis réussis
-//  4. LE GÉNÉRIQUE qui défile (une réplique par pote, les musiques lues dans CREDITS.md), puis retour au hub
+//  4. LE GÉNÉRIQUE qui défile (texte de data/generique.txt, corrigé par Fabien), puis retour au hub
 // ESPACE / un toucher = passer au temps suivant. Musique : celle de l'intro (Dragon Ball Final Bout).
 // =====================================================================
 import { LARGEUR, HAUTEUR } from '../core/reglages.js';
@@ -16,7 +16,6 @@ import { rangLisible } from '../core/rangs.js';
 import { BOSS, FINALE } from '../bosses/liste.js';
 import { rangRecord } from '../bosses/rangs.js';
 import { DEFIS } from '../bosses/defis.js';
-import { REGLAGES as R_FINALE } from '../bosses/finale/reglages.js';
 
 const ORDRE_PHOTO = ['greg', 'julien', 'beufa', 'kedric', 'remi', 'lionel'];   // de gauche à droite sur la photo
 const LETTRES = ['S', 'A', 'B', 'C'];
@@ -29,7 +28,7 @@ export class FinaleScene extends Phaser.Scene {
     charger('fin_tas', 'assets/sprites/finale/tas.png');
     charger('fin_vaisseau', 'assets/sprites/finale/vaisseau.png');
     for (const id of ORDRE_PHOTO) charger('fin_pose_' + id, `assets/sprites/intro/intro_pose_${id}.png`);
-    if (!this.cache.text.exists('fin_credits')) this.load.text('fin_credits', 'CREDITS.md');
+    if (!this.cache.text.exists('fin_generique')) this.load.text('fin_generique', 'data/generique.txt');
   }
 
   create() {
@@ -151,22 +150,22 @@ export class FinaleScene extends Phaser.Scene {
   }
 
   // ---------- 4. le générique ----------
+  // le texte vient de data/generique.txt (Fabien le corrige lui-même) : « !! » grand titre, « ! » titre, « # » commentaire
   leGenerique() {
     this.tweens.add({ targets: this.rayons, alpha: 0.35, duration: 800 });
-    const repliques = Object.fromEntries(R_FINALE.parties.map(p => [p.id, p.replique]));
-    const lignes = ['LES BRACASS\'', 'ULTIMATE BOSS', '', 'Une idée et un jeu de FABIEN', '', '— LES BOSS —', ''];
-    for (const b of BOSS) lignes.push(b.nom.toUpperCase(), `« ${repliques[b.id] || '…'} »`, '');
-    lignes.push('— LES MUSIQUES —', '');
-    const credits = this.cache.text.get('fin_credits') || '';
-    for (const l of credits.split('\n')) {
-      const m = l.match(/^\|\s*Musique[^|]*\|\s*([^|]+)\|/);
-      if (m) lignes.push(m[1].trim().replace(/, réencodée.*$/, ''));
+    const brut = this.cache.text.get('fin_generique') || '!! MERCI D\'AVOIR JOUÉ !';
+    const bloc = this.ajout(this.add.container(0, HAUTEUR + 20));
+    let y = 0;
+    for (const ligne of brut.split('\n').map(l => l.replace(/\r$/, ''))) {
+      if (ligne.startsWith('# ') || ligne === '#') continue;
+      if (!ligne.trim()) { y += 22; continue; }
+      const [taille, couleur, txt] = ligne.startsWith('!! ') ? [36, '#ffd84a', ligne.slice(3)]
+        : ligne.startsWith('! ') ? [26, '#ffd84a', '— ' + ligne.slice(2) + ' —'] : [21, '#ffffff', ligne];
+      const t = texte(this, LARGEUR / 2, y, txt, taille, couleur, { align: 'center', stroke: '#000000', strokeThickness: 4, wordWrap: { width: LARGEUR - 80 } }).setOrigin(0.5, 0);
+      bloc.add(t); y += t.height + 8;
     }
-    lignes.push('', 'Merci aux Bracass\' d\'avoir prêté leur tête.', '', '', 'MERCI D\'AVOIR JOUÉ !');
-    const bloc = this.ajout(texte(this, LARGEUR / 2, HAUTEUR + 20, lignes.join('\n'), 22, '#ffffff',
-      { align: 'center', lineSpacing: 8, stroke: '#000000', strokeThickness: 4, wordWrap: { width: LARGEUR - 80 } }).setOrigin(0.5, 0));
-    const duree = (bloc.height + HAUTEUR) / 55;   // 55 px par seconde
-    this.tweens.add({ targets: bloc, y: HAUTEUR / 2 - bloc.height + 30, duration: duree * 1000, ease: 'Linear' });
+    const duree = (y + HAUTEUR) / 55;   // 55 px par seconde
+    this.tweens.add({ targets: bloc, y: HAUTEUR / 2 - y + 30, duration: duree * 1000, ease: 'Linear' });
     this.invite(); this.auto(duree + 2.5);
   }
 }

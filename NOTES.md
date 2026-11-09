@@ -164,6 +164,10 @@
     = les LASERS ROUGES (au départ d'un couloir rouge, d'un trait rouge, de la rafale du cône de Beufa ; `laserRouge()`).
   - Puis (Fabien) : alerte « tu-tu » avant les attaques RETIRÉE partout (insupportable ; l'écran prévient) ; ton tir encore
     plus discret (une salve sur trois, volume 0,09).
+  - BEUFA : repéré par le cône → « ! » puis 2 MISSILES à tête chercheuse (`attaques.beufa.missiles`, virage limité,
+    explosent seuls au bout de 3 s) au lieu de la rafale. Bot NORMAL : expert 0,7 continue, moyen 1,7, enfant perd.
+  - GÉNÉRIQUE : texte dans `data/generique.txt` (Fabien le corrige : « !! » grand titre, « ! » titre, « # » commentaire),
+    lu par `FinaleScene.leGenerique`.
   - Reste : tes retours.
 
 ## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)

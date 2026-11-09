@@ -1,0 +1,45 @@
+# Générique de fin (src/hub/FinaleScene.js le lit tel quel, de haut en bas).
+# Règles : une ligne commençant par « # » (avec une espace) = commentaire, ignorée.
+#   « !! texte » = GRAND titre jaune ;  « ! texte » = titre de partie (jaune) ;  ligne vide = un espace ;
+#   toute autre ligne = texte normal (blanc).
+!! LES BRACASS'
+!! ULTIMATE BOSS
+
+Une idée et un jeu de FABIEN
+
+! LES BOSS
+
+BEUFA
+« Ma base… MA BASE ! »
+
+KÉDRIC
+« TOUCHDOWN… dans le décor ! »
+
+JULIEN
+« COLLÉ ! …ah non, c'est moi. »
+
+GREG
+« Ok… t'as gagné ce round. »
+
+RÉMI
+« Ma tournée… elle est renversée ! »
+
+LIONEL
+« Faute ! Le frisbee était dedans ! »
+
+! LE HÉROS
+Toi, dans ton vaisseau rouge et blanc
+
+! LES MUSIQUES
+Street Fighter II, « Character Select » (Capcom)
+Dragon Ball Final Bout, opening (Bandai)
+« Inner Light », Shocking Lemon (opening 2 de Hajime no Ippo)
+« Lawn Court », Windjammers (Data East, 1994)
+« At Doom's Gate » (E1M1), Bobby Prince, DOOM (id Software, 1993)
+Chrono Trigger, « Boss Battle » (Square)
+
+! MERCI
+Aux Bracass' d'avoir prêté leur tête
+Aux copains qui ont testé
+
+!! MERCI D'AVOIR JOUÉ !

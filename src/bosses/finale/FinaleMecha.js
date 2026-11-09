@@ -409,7 +409,7 @@ export class FinaleMecha extends BossScene {
 
   beufa(A, o) {
     const p = this.parties[5], C = A.cone;
-    // CÔNE DE VISION qui balaie : dedans trop longtemps → « ! » et rafale ciblée ; dehors, rien
+    // CÔNE DE VISION qui balaie : dedans trop longtemps → « ! » et MISSILES à tête chercheuse ; dehors, rien
     this.cone = { x: o.x, y: o.y, a: Math.PI + Math.sin(this.T * C.balayage) * 0.75, demi: C.angle, portee: C.portee };
     const dx = this.px() - o.x, dy = this.vaisseau.y - o.y;
     const ecart = Math.abs(Phaser.Math.Angle.Wrap(Math.atan2(dy, dx) - this.cone.a));
@@ -418,7 +418,14 @@ export class FinaleMecha extends BossScene {
       this.repere = 0; this.att.rafale = 1.3;
       this.alerte = { x: this.vaisseau.x, y: this.vaisseau.y - 50, t: 0.6 };
       this.time.delayedCall(C.delai * 1000, () => { if (this.etat === 'jeu') this.laserRouge(); });
-      for (let k = 0; k < C.rafale; k++) this.time.delayedCall(C.delai * 1000 + k * 90, () => { if (this.etat === 'jeu') this.balle(o.x, o.y, this.vise(o), C.vitesse, 'balle', 8); });
+      const M = A.missiles;
+      this.time.delayedCall(C.delai * 1000, () => {
+        if (this.etat !== 'jeu') return;
+        for (let k = 0; k < M.nombre; k++) {   // ils partent en éventail puis tournent vers toi
+          const a = this.vise(o) + (k - (M.nombre - 1) / 2) * M.ecart * 2;
+          this.balle(o.x, o.y + (k - 0.5) * 30, a, M.vitesse, 'missile', 10, { virage: M.virage, vie: M.vie, fumee: [] });
+        }
+      });
     }
     if (this.att.rafale > 0) this.att.rafale -= this.dt;
     if (this.minuteur('tirsB', A.tirs.periode)) this.balle(o.x, o.y, this.vise(o, Phaser.Math.FloatBetween(-0.15, 0.15)), A.tirs.vitesse, 'balle', 8);
@@ -470,7 +477,17 @@ export class FinaleMecha extends BossScene {
     this.balles = this.balles.filter(b => {
       b.age += dt;
       if (b.chemin) this.suivreInfini(b, dt);
-      else { b.x += b.vx * dt; b.y += b.vy * dt; }
+      else {
+        if (b.type === 'missile') {   // tête chercheuse : tourne vers toi (pas plus vite que « virage »), explose au bout de « vie »
+          const v = Math.hypot(b.vx, b.vy), a = Math.atan2(b.vy, b.vx);
+          const voulu = Math.atan2(this.vaisseau.y - b.y, this.px() - b.x);
+          const na = a + Phaser.Math.Clamp(Phaser.Math.Angle.Wrap(voulu - a), -b.virage * dt, b.virage * dt);
+          b.vx = Math.cos(na) * v; b.vy = Math.sin(na) * v;
+          b.fumee.unshift({ x: b.x, y: b.y }); if (b.fumee.length > 8) b.fumee.pop();
+          if (b.age > b.vie) { this.explosion(b.x, b.y, 22, 0xffb347); return false; }
+        }
+        b.x += b.vx * dt; b.y += b.vy * dt;
+      }
       if (b.type === 'copie') b.x = b.balance + Math.sin(b.age * 3 + b.balance) * 28;
       if (b.type === 'frisbee' && b.rebonds > 0 && (b.y < 12 || b.y > HAUTEUR - 12)) { b.vy *= -1; b.rebonds--; b.y = Phaser.Math.Clamp(b.y, 12, HAUTEUR - 12); }
       if (!sansDegats && Math.hypot(b.x - px, b.y - py) < b.r + rayon) { this.blesse(); return false; }
@@ -673,6 +690,18 @@ export class FinaleMecha extends BossScene {
           g.fillStyle(0xd8202c, 1).fillCircle(b.x, b.y, b.r).strokeCircle(b.x, b.y, b.r);
           g.fillStyle(0xd8202c, 1).fillEllipse(b.x + b.r * 0.1, b.y + b.r * 0.62, b.r * 0.9, b.r * 0.55).strokeEllipse(b.x + b.r * 0.1, b.y + b.r * 0.62, b.r * 0.9, b.r * 0.55);
           g.fillStyle(0xffffff, 0.55).fillEllipse(b.x - b.r * 0.35, b.y - b.r * 0.4, b.r * 0.6, b.r * 0.35); break;
+        case 'missile': {
+          b.fumee.forEach((q, k) => g.fillStyle(0xcccccc, 0.35 - k * 0.04).fillCircle(q.x, q.y, 3 + k * 0.8));
+          const a = Math.atan2(b.vy, b.vx), c = Math.cos(a), s = Math.sin(a), L = 16, W = 5;
+          g.lineStyle(2, 0x000000, 0.9).fillStyle(0x6b7a4a, 1);   // corps vert kaki (base de Beufa), nez rouge
+          g.fillPoints([{ x: b.x - c * L - s * W, y: b.y - s * L + c * W }, { x: b.x + c * L * 0.6 - s * W, y: b.y + s * L * 0.6 + c * W },
+            { x: b.x + c * L * 0.6 + s * W, y: b.y + s * L * 0.6 - c * W }, { x: b.x - c * L + s * W, y: b.y - s * L - c * W }], true).strokePoints([
+            { x: b.x - c * L - s * W, y: b.y - s * L + c * W }, { x: b.x + c * L * 0.6 - s * W, y: b.y + s * L * 0.6 + c * W },
+            { x: b.x + c * L * 0.6 + s * W, y: b.y + s * L * 0.6 - c * W }, { x: b.x - c * L + s * W, y: b.y - s * L - c * W }], true);
+          g.fillStyle(0xd8202c, 1).fillTriangle(b.x + c * L * 0.6 - s * W, b.y + s * L * 0.6 + c * W, b.x + c * L * 0.6 + s * W, b.y + s * L * 0.6 - c * W, b.x + c * L * 1.3, b.y + s * L * 1.3);
+          g.fillStyle(0xffb347, 0.9).fillCircle(b.x - c * L * 1.1, b.y - s * L * 1.1, 4);   // flamme du réacteur
+          break;
+        }
         case 'jab': g.fillStyle(0xd8202c, 1).fillCircle(b.x, b.y, b.r).strokeCircle(b.x, b.y, b.r); break;
         case 'copie': g.fillStyle(0xffffff, 1).fillRect(b.x - 7, b.y - 9, 14, 18).strokeRect(b.x - 7, b.y - 9, 14, 18); g.lineStyle(1, 0x3060c0, 1).lineBetween(b.x - 4, b.y - 3, b.x + 4, b.y - 3).lineBetween(b.x - 4, b.y + 2, b.x + 4, b.y + 2); break;
         case 'note': g.fillStyle(0xff3a5a, 1).fillCircle(b.x, b.y, b.r).strokeCircle(b.x, b.y, b.r); g.fillStyle(0xffffff, 1).fillCircle(b.x, b.y, b.r * 0.45); break;
