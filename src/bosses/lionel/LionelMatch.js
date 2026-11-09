@@ -96,12 +96,15 @@ export class LionelMatch extends BossScene {
   constructor() { super('LionelMatch', IDENTITE); }
 
   create() {
-    // avis jouabilité : Lancer sert 5 fois plus que Lob => bouton plus gros (il déborde vers la gauche).
-    // (bug téléphone nov. 2026) Lob était à gauche de Lancer et se faisait recouvrir : il passe JUSTE AU-DESSUS,
-    // à la place du bouton X (caché pendant le match)
-    styleBouton('espace', { width: '150px', height: '86px', justifySelf: 'end', alignSelf: 'end', fontSize: '20px' });
-    styleBouton('z', { gridColumn: '2', gridRow: '1', width: '120px', height: '58px', justifySelf: 'end', alignSelf: 'start' });
-    styleBouton('x', { gridColumn: '1', gridRow: '1', width: '72px', height: '58px', justifySelf: 'start', alignSelf: 'start', fontSize: '14px' });   // « Passer » (entraînement) à côté
+    // avis jouabilité : Lancer sert 5 fois plus que Lob => bouton plus gros. (retour Fabien nov. 2026 : Lob et Lancer
+    // se touchaient) LANCER gros et ORANGE en bas à droite ; LOB plus petit et BLEU au-dessus, avec un VRAI écart
+    // (≈ 28 px), tous deux sur le bord (pas sur le terrain) ; « Passer » (entraînement) petit, à gauche de Lob.
+    styleBouton('espace', { width: '130px', height: '100px', justifySelf: 'end', alignSelf: 'end', fontSize: '22px',
+      background: 'rgba(255,140,30,0.45)', borderColor: '#ffb04a' });
+    styleBouton('z', { gridColumn: '2', gridRow: '1', width: '120px', height: '64px', justifySelf: 'end', alignSelf: 'start',
+      transform: 'translateY(-40px)', background: 'rgba(40,120,255,0.45)', borderColor: '#7fc4ff' });
+    styleBouton('x', { gridColumn: '1', gridRow: '1', width: '56px', height: '50px', justifySelf: 'start', alignSelf: 'start',
+      transform: 'translate(-30px, -40px)', fontSize: '12px' });
     this.events.once('shutdown', () => { styleBouton('espace'); styleBouton('z'); styleBouton('x'); boutonEnFeu('espace', false); });
     this.phase = this.donnees.phase || 'set1';
     this.etat = 'intro';          // intro | jeu | point | finSet | fin

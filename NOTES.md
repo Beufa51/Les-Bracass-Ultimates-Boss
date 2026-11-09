@@ -79,7 +79,8 @@
   `GESTES.coup` (0,09 s) doigt posé. Dempsey Roll au doigt : fenêtre BIEN x `dempsey.toleranceTactile` (1,3), frein aussi.
 
 ## BUGS TÉLÉPHONE (9 nov. 2026)
-- Lionel : Lancer (agrandi) recouvrait Lob -> Lob passe JUSTE AU-DESSUS de Lancer, « Passer » (entraînement) à sa gauche
+- Lionel : Lancer (agrandi) recouvrait Lob -> LANCER gros et ORANGE en bas à droite, LOB plus petit et BLEU au-dessus
+  avec un vrai écart (~28 px), « Passer » (entraînement) petit à gauche de Lob
   (`styleBouton` remet aussi la place dans la grille en partant). Touches tactiles CACHÉES à leur création (on les voyait
   un instant au démarrage, avant l'intro). Rémi : erreur 'radius' à la porte (animation sans fin du doigt du bandeau).
 

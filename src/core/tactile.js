@@ -118,7 +118,7 @@ export function etiquettesTactiles(etiquettes = {}) {
 // Ex. Lionel : le bouton Lancer plus gros que Lob (avis jouabilité nov. 2026).
 export function styleBouton(nom, styles = {}) {
   const b = boutons[nom]; if (!b) return;
-  for (const k of ['width', 'height', 'justifySelf', 'alignSelf', 'fontSize', 'zIndex']) b.style[k] = '';
+  for (const k of ['width', 'height', 'justifySelf', 'alignSelf', 'fontSize', 'zIndex', 'transform', 'background', 'borderColor']) b.style[k] = '';
   // place dans la grille (gridColumn / gridRow) : remise à la place normale, sauf si 'styles' en donne une autre
   if (placement && placement[nom]) { b.style.gridColumn = placement[nom][1]; b.style.gridRow = placement[nom][2]; }
   Object.assign(b.style, styles);
