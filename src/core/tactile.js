@@ -75,7 +75,9 @@ export function installerTactile() {
     const t = TOUCHES[nom];
     const b = document.createElement('button');
     b.textContent = t.texte;
-    if (t.optionnel) b.classList.add('cache');
+    // (bug nov. 2026) tous CACHÉS au démarrage : sinon on les voyait un instant pendant le chargement, avant que
+    // l'intro ne choisisse ses boutons (aucun). Chaque scène les montre avec etiquettesTactiles.
+    b.classList.add('cache');
     b.style.gridColumn = col; b.style.gridRow = ligne;
     let enfonce = false, debut = 0;
     const appuyer = (e) => {
@@ -117,6 +119,8 @@ export function etiquettesTactiles(etiquettes = {}) {
 export function styleBouton(nom, styles = {}) {
   const b = boutons[nom]; if (!b) return;
   for (const k of ['width', 'height', 'justifySelf', 'alignSelf', 'fontSize', 'zIndex']) b.style[k] = '';
+  // place dans la grille (gridColumn / gridRow) : remise à la place normale, sauf si 'styles' en donne une autre
+  if (placement && placement[nom]) { b.style.gridColumn = placement[nom][1]; b.style.gridRow = placement[nom][2]; }
   Object.assign(b.style, styles);
 }
 

@@ -78,6 +78,11 @@
 - Greg (gestes.js) : glisser ◀ ▶ = esquive sur TOUT l'écran ; à droite, le coup part au lever du doigt ou après
   `GESTES.coup` (0,09 s) doigt posé. Dempsey Roll au doigt : fenêtre BIEN x `dempsey.toleranceTactile` (1,3), frein aussi.
 
+## BUGS TÉLÉPHONE (9 nov. 2026)
+- Lionel : Lancer (agrandi) recouvrait Lob -> Lob passe JUSTE AU-DESSUS de Lancer, « Passer » (entraînement) à sa gauche
+  (`styleBouton` remet aussi la place dans la grille en partant). Touches tactiles CACHÉES à leur création (on les voyait
+  un instant au démarrage, avant l'intro). Rémi : erreur 'radius' à la porte (animation sans fin du doigt du bandeau).
+
 ## INTRO AU LANCEMENT façon opening de Final Bout (nov. 2026, demande de Fabien)
 - `src/hub/IntroScene.js` (Chargement → Intro → Hub). « Appuie pour lancer » (sans appui, la musique est bloquée), puis
   chaque boss arrive en OMBRE avec un liseré de sa couleur et repart vers le haut dans un trait de lumière :

@@ -96,10 +96,13 @@ export class LionelMatch extends BossScene {
   constructor() { super('LionelMatch', IDENTITE); }
 
   create() {
-    // avis jouabilité : Lancer sert 5 fois plus que Lob => bouton plus gros (il déborde vers la gauche, où il n'y a rien)
+    // avis jouabilité : Lancer sert 5 fois plus que Lob => bouton plus gros (il déborde vers la gauche).
+    // (bug téléphone nov. 2026) Lob était à gauche de Lancer et se faisait recouvrir : il passe JUSTE AU-DESSUS,
+    // à la place du bouton X (caché pendant le match)
     styleBouton('espace', { width: '150px', height: '86px', justifySelf: 'end', alignSelf: 'end', fontSize: '20px' });
-    styleBouton('z', { height: '60px', alignSelf: 'start' });
-    this.events.once('shutdown', () => { styleBouton('espace'); styleBouton('z'); boutonEnFeu('espace', false); });
+    styleBouton('z', { gridColumn: '2', gridRow: '1', width: '120px', height: '58px', justifySelf: 'end', alignSelf: 'start' });
+    styleBouton('x', { gridColumn: '1', gridRow: '1', width: '72px', height: '58px', justifySelf: 'start', alignSelf: 'start', fontSize: '14px' });   // « Passer » (entraînement) à côté
+    this.events.once('shutdown', () => { styleBouton('espace'); styleBouton('z'); styleBouton('x'); boutonEnFeu('espace', false); });
     this.phase = this.donnees.phase || 'set1';
     this.etat = 'intro';          // intro | jeu | point | finSet | fin
     this.attente = 0; this.apresAttente = null;   // pause chronométrée (après un point...)
