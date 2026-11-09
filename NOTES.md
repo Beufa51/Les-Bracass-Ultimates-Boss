@@ -168,6 +168,8 @@
     explosent seuls au bout de 3 s) au lieu de la rafale. Bot NORMAL : expert 0,7 continue, moyen 1,7, enfant perd.
   - GÉNÉRIQUE : texte dans `data/generique.txt` (Fabien le corrige : « !! » grand titre, « ! » titre, « # » commentaire),
     lu par `FinaleScene.leGenerique`.
+  - VAISSEAU remplacé (Fabien s'était trompé d'image) : soucoupe rouge et blanche, pilote au casque audio ; 200 x 130
+    (`manifeste.js`) ; l'ancien gardé dans `assets_inbox/finale/ancien_vaisseau.jpg`.
   - Reste : tes retours.
 
 ## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)
