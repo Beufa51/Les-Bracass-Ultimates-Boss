@@ -77,7 +77,7 @@ export class FinaleScene extends Phaser.Scene {
         onComplete: () => { this.cameras.main.shake(400, 0.015); jouerSon(this, 'finale_explosion'); } });
       this.tweens.add({ targets: tas, angle: { from: -1.5, to: 1.5 }, delay: 1300, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
     }
-    const l = this.ajout(texte(this, LARGEUR / 2, HAUTEUR - 44, 'Le mécha a sauté… les Bracass\' sont K.O. Mais ils sourient.', 22, '#ffffff',
+    const l = this.ajout(texte(this, LARGEUR / 2, HAUTEUR - 44, 'Les Bracass\' ont été vaincus.', 22, '#ffffff',
       { stroke: '#000000', strokeThickness: 5 }).setAlpha(0));
     this.tweens.add({ targets: l, alpha: 1, delay: 1500, duration: 500 });
     this.invite(); this.auto(6);

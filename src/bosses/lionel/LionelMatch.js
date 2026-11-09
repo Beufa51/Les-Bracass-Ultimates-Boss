@@ -183,7 +183,7 @@ export class LionelMatch extends BossScene {
       'BUT : vise le mur derrière Lionel (jaune = 3 points, rouge = 5)',
       `Set gagné à ${R.pointsSet} points, ou le meilleur au bout de ${R.dureeSet} s`,
       'Flèches : cours vers le CERCLE VERT pour attraper',
-      (tactile ? 'Lancer' : 'ESPACE') + ' : lancer (▲ ▼ = en biais)   ' + (tactile ? 'Lob' : 'Z') + ' : lob',
+      (tactile ? 'Lancer' : 'ESPACE') + ' : lancer (▲ ▼ = en biais)   ' + (tactile ? 'Lob' : 'ALT') + ' : lob',
       'Le reste (super, plongeon, contre parfait) : l\'entraînement te le montre !',
     ], () => this.presentation(() => this.choixDifficulte()));
   }
@@ -217,12 +217,12 @@ export class LionelMatch extends BossScene {
   // =================================================================
   debutEntrainement() {
     const tactile = estTactile();
-    this.boutons = { lancer: tactile ? 'Lancer' : 'ESPACE', lob: tactile ? 'Lob' : 'Z' };
+    this.boutons = { lancer: tactile ? 'Lancer' : 'ESPACE', lob: tactile ? 'Lob' : 'ALT' };
     this.tuto = {
       etape: 0, enAttente: false,
       banniere: texte(this, LARGEUR / 2, 120, '', 20, '#ffffff', { backgroundColor: '#000000cc', padding: { x: 12, y: 6 } }).setDepth(92),
       // sur téléphone, le bouton « Passer » suffit
-      passer: texte(this, LARGEUR - 12, HAUTEUR - 14, tactile ? '' : 'X : passer l\'entraînement', 14, '#aaaaaa')
+      passer: texte(this, LARGEUR - 12, HAUTEUR - 14, tactile ? '' : 'ENTRÉE : passer l\'entraînement', 14, '#aaaaaa')
         .setOrigin(1, 1).setDepth(92),
     };
     this.etiquettes({ ...ETIQUETTES_JEU, x: 'Passer' });
@@ -327,7 +327,7 @@ export class LionelMatch extends BossScene {
     const t = this.touches, jd = Phaser.Input.Keyboard.JustDown;
     return {
       haut: t.haut.isDown, bas: t.bas.isDown, gauche: t.gauche.isDown, droite: t.droite.isDown,
-      espace: jd(t.espace), z: jd(t.z), x: jd(t.x),
+      espace: jd(t.espace), z: jd(t.z) || jd(t.alt), x: jd(t.x) || jd(t.entree),   // PC : ALT = lob, ENTRÉE = passer
     };
   }
 

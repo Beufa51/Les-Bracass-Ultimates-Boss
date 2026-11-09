@@ -278,7 +278,7 @@ export class RemiBaby extends BossScene {
         if (B.regle10Active && reste <= 0) { this.txtDix.setVisible(false); annonce(this, '10 SECONDES !', '#ff6b6b', 0.8); bulle(this, 'Règle du bar : 10 s pour tirer. Balle à Rémi !', '#ff9a9a', 1.4, 300); this.suivant(0.6); }
         if (vientDAppuyer(this.touches.espace)) this.riposter(this.viseeVraie());
       }
-      if (vientDAppuyer(this.touches.z)) this.appelRoulette();
+      if (vientDAppuyer(this.touches.z) || vientDAppuyer(this.touches.alt)) this.appelRoulette();   // PC : ALT
       if (this.prochainHoquet && this.horloge > this.prochainHoquet && this.ivresse >= 2) this.hoquet();
     }
     this.dessiner();

@@ -381,7 +381,7 @@ export class KedricCourse extends BossScene {
 
   lireTouches() {
     const t = this.touches, jd = Phaser.Input.Keyboard.JustDown;
-    const e = { gauche: jd(t.gauche), droite: jd(t.droite), haut: jd(t.haut), bas: jd(t.bas), espace: jd(t.espace), z: jd(t.z), x: jd(t.x) };
+    const e = { gauche: jd(t.gauche), droite: jd(t.droite), haut: jd(t.haut), bas: jd(t.bas), espace: jd(t.espace), z: jd(t.z), x: jd(t.x) || jd(t.alt) };   // PC : ALT (au lieu de X)
     // glissements du doigt (téléphone)
     if (this.balaye) { e[this.balaye] = true; this.balaye = null; }
     return e;

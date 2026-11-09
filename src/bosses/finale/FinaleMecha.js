@@ -535,7 +535,7 @@ export class FinaleMecha extends BossScene {
     texte(this, LARGEUR / 2, 150, 'GAME OVER', 60, '#ff6b6b', { fontStyle: 'bold' }).setDepth(1001);
     texte(this, LARGEUR / 2, 235, `${this.parties[i].nom} et les autres te narguent… Parties détruites : ${i} / 6`, 22, '#ffffff').setDepth(1001);
     texte(this, LARGEUR / 2, 320, `${t ? 'Continuer' : 'ESPACE'} : CONTINUER (on reprend à ${this.parties[i].nom}, sans record)`, 22, '#7fff7f').setDepth(1001);
-    texte(this, LARGEUR / 2, 360, `${t ? 'Début' : 'Z'} : tout recommencer      ${t ? 'Hub' : 'X'} : retour au hub`, 20, '#aaaaaa').setDepth(1001);
+    texte(this, LARGEUR / 2, 360, `${t ? 'Début' : 'ENTRÉE'} : tout recommencer      ${t ? 'Hub' : 'ALT'} : retour au hub`, 20, '#aaaaaa').setDepth(1001);
     etiquettesTactiles({ espace: 'Continuer', z: 'Début', x: 'Hub', haut: null, bas: null, gauche: null, droite: null });
     const base = { rejouer: true, nomDiff: this.nomDiff, diffObjet: this.diff };
     this.time.delayedCall(800, () => {
@@ -543,8 +543,8 @@ export class FinaleMecha extends BossScene {
       const une = (f) => () => { if (fait) return; fait = true; f(); };
       const kb = this.input.keyboard;
       kb.once('keydown-SPACE', une(() => this.scene.restart({ ...base, reprise: i, continues: this.stats.continues + 1 })));
-      kb.once('keydown-Z', une(() => this.scene.restart(base)));
-      kb.once('keydown-X', une(() => this.retourHub()));
+      const debut = une(() => this.scene.restart(base)), hub = une(() => this.retourHub());
+      kb.once('keydown-Z', debut); kb.once('keydown-ENTER', debut); kb.once('keydown-X', hub); kb.once('keydown-ALT', hub);   // PC : ENTRÉE / ALT
     });
   }
   continuer() { this.input.keyboard.emit('keydown-SPACE'); }   // (bot)

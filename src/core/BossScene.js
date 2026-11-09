@@ -189,13 +189,13 @@ export class BossScene extends Phaser.Scene {
       // V18 : PERDU → REJOUER tout de suite (ESPACE / clic / OK) ou X / bouton Hub
       const t = estTactile();
       etiquettesTactiles({ espace: 'Rejouer', x: 'Hub', z: null, haut: null, bas: null, gauche: null, droite: null });
-      texte(this, LARGEUR / 2, HAUTEUR - 60, `${t ? 'Rejouer' : 'ESPACE ou clic'} : rejouer     ${t ? 'Hub' : 'X'} : retour au hub`, 22, '#7fff7f').setDepth(1001);
+      texte(this, LARGEUR / 2, HAUTEUR - 60, `${t ? 'Rejouer' : 'ESPACE ou clic'} : rejouer     ${t ? 'Hub' : 'ALT'} : retour au hub`, 22, '#7fff7f').setDepth(1001);
       this.time.delayedCall(700, () => {
         let fait = false;
         const une = (f) => () => { if (fait) return; fait = true; f(); };
         const rejouer = une(() => this.rejouer()), hub = une(() => this.retourHub());
         this.input.keyboard.once('keydown-SPACE', rejouer);
-        this.input.keyboard.once('keydown-X', hub);
+        this.input.keyboard.once('keydown-X', hub); this.input.keyboard.once('keydown-ALT', hub);   // PC : ALT (X marche encore)
         this.input.once('pointerdown', (p) => { if (!t) rejouer(); });   // (téléphone : les boutons Rejouer / Hub)
       });
       return;

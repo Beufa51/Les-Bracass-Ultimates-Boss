@@ -6,7 +6,7 @@
 //       rouge "!!" = SMASH (esquive sur le côté !)
 //   - Esquive réussie => fenêtre de CONTRE (dégâts x3) ; seules les esquives remplissent la jauge d'esprit
 //   - UN SEUL coup de poing (Espace ou Z) : plus de choix visage / corps (nov. 2026, demande de Fabien)
-//   - Jauge d'esprit pleine => X : DEMPSEY ROLL (boule sur un "∞", ◀ / ▶ en rythme)
+//   - Jauge d'esprit pleine => ALT (ou X) : DEMPSEY ROLL (boule sur un "∞", ◀ / ▶ en rythme)
 //   - Au tapis : alterner ◀ ▶ avant 10 !
 // Tous les chiffres sont dans reglages.js.
 // =====================================================================
@@ -155,7 +155,7 @@ export class GregCombat extends BossScene {
       '◀ / ▶ : esquive du côté OPPOSÉ au coup (puis frappe vite = CONTRE !)',
       tactile ? 'Coup : coup de poing' : 'Espace : coup de poing',
       tactile ? '▼ Garde (maintenu) : garde' : 'Bas (maintenu) : garde',
-      tactile ? 'Esquives réussies => jauge d\'esprit => bouton Dempsey' : 'Esquives réussies => jauge d\'esprit => X = DEMPSEY ROLL',
+      tactile ? 'Esquives réussies => jauge d\'esprit => bouton Dempsey' : 'Esquives réussies => jauge d\'esprit => ALT = DEMPSEY ROLL',
       'Au tapis : alterne ◀ ▶ très vite pour te relever !',
     ], () => this.presentation(() => this.choisirDifficulte(() => this.ouvrirCoin())));
   }
@@ -202,7 +202,7 @@ export class GregCombat extends BossScene {
   lireTouches() {
     const t = this.touches;
     this.appuis = {
-      espace: vientDAppuyer(t.espace), z: vientDAppuyer(t.z), x: vientDAppuyer(t.x),
+      espace: vientDAppuyer(t.espace), z: vientDAppuyer(t.z), x: vientDAppuyer(t.x) || vientDAppuyer(t.alt),   // PC : ALT = Dempsey
       haut: vientDAppuyer(t.haut), bas: vientDAppuyer(t.bas),
       gauche: vientDAppuyer(t.gauche), droite: vientDAppuyer(t.droite),
     };
@@ -1653,7 +1653,7 @@ export class GregCombat extends BossScene {
     this.texteRound = texte(this, LARGEUR / 2, 80, '', 18, '#dddddd').setDepth(41);
     this.texteGarde = texte(this, 20, 108, '', 17, '#ffffff', { stroke: '#000000', strokeThickness: 4 }).setOrigin(0, 0.5).setDepth(41);
     texte(this, 120, 76, 'ESPRIT', 16, '#ffd84a').setOrigin(1, 0.5).setDepth(41);
-    this.texteDempsey = texte(this, 80, 98, estTactile() ? 'Dempsey : DEMPSEY ROLL !' : 'X : DEMPSEY ROLL !', 18, '#ffd84a').setOrigin(0, 0.5).setDepth(41).setVisible(false);
+    this.texteDempsey = texte(this, 80, 98, estTactile() ? 'Dempsey : DEMPSEY ROLL !' : 'ALT : DEMPSEY ROLL !', 18, '#ffd84a').setOrigin(0, 0.5).setDepth(41).setVisible(false);
   }
 
   majHud() {

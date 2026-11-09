@@ -201,7 +201,7 @@ export class Showtime {
         (this.s.diff.flechesRouges ? '\nFLÈCHE ROUGE = fais l\'INVERSE !' : '');
     const regles = texte(s, LARGEUR / 2, HAUTEUR - 104, texteRegles, 17, '#ffffff',
       { align: 'center', lineSpacing: 6, backgroundColor: '#000000c8', padding: { x: 16, y: 10 } }).setDepth(P + 10);
-    this.invite = texte(s, LARGEUR / 2, HAUTEUR - 22, estTactile() ? 'Appuie sur une flèche quand tu es prêt !' : 'Appuie sur une flèche quand tu es prêt !      X = ENTRAÎNEMENT (aucune défaite)', 18, '#7fff7f', { fontStyle: 'bold' }).setDepth(P + 10).setAlpha(0);
+    this.invite = texte(s, LARGEUR / 2, HAUTEUR - 22, estTactile() ? 'Appuie sur une flèche quand tu es prêt !' : 'Appuie sur une flèche quand tu es prêt !      ALT = ENTRAÎNEMENT (aucune défaite)', 18, '#7fff7f', { fontStyle: 'bold' }).setDepth(P + 10).setAlpha(0);
     this.elAnnonce = [voile, titre, sous, bulle, regles, this.invite];
     // PLUS JAMAIS DE TEXTES SUPERPOSÉS : on place tout à partir des HAUTEURS MESURÉES —
     // l'invite SOUS les règles (jamais dessous... jamais DESSUS !), la bulle JAMAIS sur
@@ -310,11 +310,15 @@ export class Showtime {
       this.comptes.push(compte);
       this.tManches.push(debut);
       const attente = S.annonce + compte;   // les flèches attendent le DÉCOMPTE : pas de flèche direct à l'écran
-      const debutDoubles = (attente + n) * d - S.double.duree;
+      const BD = this.s.diff.battle || {};   // réglages du battle selon la difficulté (reglages.js)
+      const debutDoubles = (attente + n) * d - (BD.doublesDuree ?? S.double.duree);
+      let dernier = -99;
       let prec = null, prec2 = null;
       // les moments des flèches : sur les PAROLES (outils/kedric/caler_paroles.py) ou, sinon, une tous les 'd'
       const moments = M.paroles && PAROLES[M.musique] ? PAROLES[M.musique].filter(x => x < n * d) : Array.from({ length: n }, (_, j) => j * d);
       for (let j = 0; j < moments.length; j++) {
+        if (moments[j] - dernier < (BD.ecartMin || 0)) continue;   // FACILE : pas de flèches trop rapprochées
+        dernier = moments[j];
         const t = debut + attente * d + moments[j] + (S.latence || 0);   // latence : le son arrive en retard (Bluetooth)
         const slot = Math.round(moments[j] / d);   // le pas de musique (Kédric prend la pose de la flèche)
         const ajoute = (montre, double = false) => {
@@ -324,7 +328,7 @@ export class Showtime {
         let dir;
         do { dir = DIRS[Math.floor(Math.random() * 4)]; } while (j >= 2 && dir === prec && dir === prec2);
         ajoute(dir);
-        if (t - debut >= debutDoubles && j % 2 === 0 && j < moments.length - 1) {
+        if (BD.doubles !== false && t - debut >= debutDoubles && j % (BD.doublesTous || 2) === 0 && j < moments.length - 1) {
           let e;
           do { e = DIRS[Math.floor(Math.random() * 4)]; } while (e === dir);
           ajoute(e, true);
@@ -339,7 +343,7 @@ export class Showtime {
         const t1 = tEcran + ECRAN_POUVOIR, t2 = t1 + PG.duree;
         this.techs.push({ type, t: tEcran, fin: t2 });
         const dedans = this.pas.filter(p => p.manche === r && p.t >= t1 && p.t <= t2);
-        if (type === 'turbo') dedans.forEach(p => { p.chute = PISTE.chute / PG.turbo; });
+        if (type === 'turbo') dedans.forEach(p => { p.chute = PISTE.chute / (BD.turbo || PG.turbo); });
         if (type === 'leurres') dedans.forEach((p, q) => {
           // un leurre : jamais deux d'affilée, jamais une flèche doublée, jamais la 1re de la vague
           if (q > 0 && !p.double && !dedans[q - 1].leurre && Math.random() < PG.leurres) { p.leurre = true; p.rouge = false; p.attendu = null; }
@@ -619,7 +623,7 @@ export class Showtime {
     let pardonne = false;   // raté effacé par un JOKER
     if (note === 'parfait') {
       this.bilan.parfaits++;
-      this.public(S.gain.parfait * mult);
+      this.public(S.gain.parfait * mult * ((this.s.diff.battle || {}).gain || 1));
       this.retour.setText('PARFAIT !').setColor('#7fe8ff');
       lignesImpact(this.s, xc, this.c.cibleY, 0x9fe0ff, 10, 70); lignesImpact(this.s, xChoc, this.yJauge, 0xffffff, 12, 100);
       // le COMBO : 5 PARFAITS d'affilée et la foule est à toi !
@@ -630,7 +634,7 @@ export class Showtime {
         onomatopee(this.s, LARGEUR / 2, 150, 'COMBO !', 54, '#7fff7f');
       }
     } else if (note === 'bien') {
-      this.bilan.bien++; this.public(S.gain.bien * mult);
+      this.bilan.bien++; this.public(S.gain.bien * mult * ((this.s.diff.battle || {}).gain || 1));
       this.retour.setText('BIEN !').setColor('#7fff7f');
       this.consecParfaits = 0;   // un BIEN casse le combo (seuls les PARFAITS le montent)
     } else if (this.jokers > 0) {

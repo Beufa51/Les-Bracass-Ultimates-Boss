@@ -107,7 +107,7 @@ export class RemiVelo extends BossScene {
       `SAUTE : ${t ? 'touche à DROITE, en HAUT' : '▲ ou ESPACE'} (garde appuyé = plus haut)`,
       `   → verre cassé, flaque, tremplins... et attrape les PINTES (+${V.bonusPinte} s)`,
       `EN BAS : ${t ? 'touche à DROITE, en BAS' : '▼'} → tu passes DEVANT le bourré ALLONGÉ et les POUBELLES (garde appuyé = tu restes en bas)`,
-      `DRING : ${t ? 'touche à GAUCHE' : 'Z ou ◀'} quand le bourré est dans la zone jaune`,
+      `DRING : ${t ? 'touche à GAUCHE' : 'ALT ou ◀'} quand le bourré est dans la zone jaune`,
       '   → le bourré DEBOUT s\'écarte, celui qui TRAVERSE s\'arrête',
       `L'icône au-dessus de chaque obstacle te dit quoi faire. Série de 5 = +${V.bonusSerie} s.`,
     ], () => this.presentation(() => this.choixDifficulte()));
@@ -277,7 +277,7 @@ export class RemiVelo extends BossScene {
     // DEUX GROS BOUTONS dessinés en bas (toute la moitié d'écran marche, mais on voit où appuyer)
     const t = estTactile();
     this.gBoutons = this.add.graphics().setDepth(899);
-    this.zoneG = texte(this, BOUTON_G.x, BOUTON_G.y + 20, t ? 'DRING' : 'DRING (Z)', 18, '#ffe680', { fontStyle: 'bold' }).setDepth(900).setVisible(false);
+    this.zoneG = texte(this, BOUTON_G.x, BOUTON_G.y + 20, t ? 'DRING' : 'DRING (ALT)', 18, '#ffe680', { fontStyle: 'bold' }).setDepth(900).setVisible(false);
     this.zoneD = texte(this, BOUTON_D.x, BOUTON_D.y + 20, t ? 'SAUTE' : 'SAUTE (▲)', 18, '#9fe0ff', { fontStyle: 'bold' }).setDepth(900).setVisible(false);
     this.zoneB = texte(this, BOUTON_B.x, BOUTON_B.y + 20, t ? 'EN BAS' : 'EN BAS (▼)', 18, '#ffb060', { fontStyle: 'bold' }).setDepth(900).setVisible(false);
     this.appuiG = 0; this.appuiD = 0; this.appuiB = 0;
@@ -319,7 +319,7 @@ export class RemiVelo extends BossScene {
     if (!this.auSol || this.y > 1) this.esq = 0;
     this.dy += ((this.esq > 0 ? V.esquiveBas : 0) - this.dy) * Math.min(1, dt * 16);
     if (this.carrefourOuvert && !this.choix && vientDAppuyer(T.gauche)) this.toucheChoix = 0;
-    else if (vientDAppuyer(T.z) || vientDAppuyer(T.x) || vientDAppuyer(T.gauche)) this.demanderDring();
+    else if (vientDAppuyer(T.z) || vientDAppuyer(T.x) || vientDAppuyer(T.alt) || vientDAppuyer(T.gauche)) this.demanderDring();   // PC : ALT ou ◀
     const tenu = T.haut.isDown || T.espace.isDown || this.sautDoigt;
     if (this.chute > 0) {
       this.chute -= dt; this.v = 0;

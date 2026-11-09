@@ -153,7 +153,7 @@ export class BeufaInfiltration extends BossScene {
     this.hudTemps = texte(this, LARGEUR - 18, 20, '', 18, '#dff6ff').setOrigin(1, 0.5).setDepth(900);
     this.hudPierres = texte(this, 18, 44, '', 16, '#ffd84a').setOrigin(0, 0.5).setDepth(900).setVisible(R.joueur.pierres > 0);   // V28 : pierre supprimée → caché
     this.hudAlertes = texte(this, LARGEUR - 18, 44, '', 18, '#ff9a9a').setOrigin(1, 0.5).setDepth(900);
-    this.hintBas = texte(this, LARGEUR / 2, HAUTEUR - 12, (estTactile() ? 'Sprint = bruyant !   Va jusqu\'au QG' : 'Z : sprint (bruyant)   Va jusqu\'au QG'), 18, '#c8d0dc').setDepth(900);
+    this.hintBas = texte(this, LARGEUR / 2, HAUTEUR - 12, (estTactile() ? 'Sprint = bruyant !   Va jusqu\'au QG' : 'ESPACE : sprint (bruyant)   Va jusqu\'au QG'), 18, '#c8d0dc').setDepth(900);
     this.message = texte(this, LARGEUR / 2, 150, '', 40, '#ffffff', { fontStyle: 'bold', strokeThickness: 8 }).setOrigin(0.5).setDepth(950).setAlpha(0);
 
     this.nomDiff = Sauvegarde.difficulte('beufa') || 'normal'; this.diff = appliquerDifficulte(this.nomDiff);   // V18
@@ -164,7 +164,7 @@ export class BeufaInfiltration extends BossScene {
       'Nuit sur la base de BEUFA : 4 pièces, et au fond, SON QG.',
       'OBSERVE les rondes des gardes, puis file dans leur DOS.',
       '◀ ▶ ▲ ▼ : bouger (silencieux)',
-      (estTactile() ? 'Sprint' : 'Z') + ' : sprinter — mais les gardes proches T\'ENTENDENT',
+      (estTactile() ? 'Sprint' : 'ESPACE') + ' : sprinter — mais les gardes proches T\'ENTENDENT',
       'Conteneurs, sacs, véhicules : ils COUPENT LA VUE, cache-toi derrière.',
       'Le HALO des projecteurs te voit aussi : passe quand il repart.',
       'Dans un cône, la jauge « ? » monte : sors avant le « ! ».',
@@ -679,7 +679,7 @@ export class BeufaInfiltration extends BossScene {
     if (t.haut.isDown) dy -= 1;
     if (t.bas.isDown) dy += 1;
     if (dx && dy) { dx *= Math.SQRT1_2; dy *= Math.SQRT1_2; }
-    const sprint = t.z.isDown && (dx || dy);
+    const sprint = (t.espace.isDown || t.z.isDown) && (dx || dy);   // PC : ESPACE (Z marche encore)
     this.heroSprint = !!sprint;   // V51 : pour l'animation de course
     const v = (sprint ? R.joueur.sprint : R.joueur.vitesse) * dt;
     this.bouger(this.joueur, dx * v, dy * v, R.joueur.rayon);

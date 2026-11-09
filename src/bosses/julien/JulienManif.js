@@ -183,12 +183,12 @@ export class JulienManif extends BossScene {
     texte(this, LARGEUR / 2, 170, titre, 56, '#ff6b6b').setDepth(1001).setStroke('#000', 8);
     texte(this, LARGEUR / 2, 250, sous, 22, '#ffffff').setDepth(1001).setStroke('#000', 5);
     texte(this, LARGEUR / 2, 360, `${estTactile() ? 'REJOUER' : 'ESPACE'} : recommencer tout de suite`, 24, '#7fff7f').setDepth(1001).setStroke('#000', 5);
-    texte(this, LARGEUR / 2, 400, `${estTactile() ? 'HUB' : 'X'} : retour au hub`, 18, '#dddddd').setDepth(1001).setStroke('#000', 4);
+    texte(this, LARGEUR / 2, 400, `${estTactile() ? 'HUB' : 'ALT'} : retour au hub`, 18, '#dddddd').setDepth(1001).setStroke('#000', 4);
     this.time.delayedCall(600, () => {
       this.input.keyboard.once('keydown-SPACE', () => this.scene.restart(this.donneesRejouer()));
     });
     // HUB seulement après 1,5 s : LANCER (= X) tapé en rafale au moment de mourir ne renvoie plus au hub par erreur
-    this.time.delayedCall(1500, () => this.input.keyboard.once('keydown-X', () => this.retourHub()));
+    this.time.delayedCall(1500, () => { let p = false; const h = () => { if (!p) { p = true; this.retourHub(); } }; this.input.keyboard.once('keydown-X', h); this.input.keyboard.once('keydown-ALT', h); });
   }
 
   // Écran COMMANDES (PC) : préréglage, souris, toujours courir, et chaque touche à personnaliser

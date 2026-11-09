@@ -175,6 +175,19 @@
   - GÉNÉRIQUE corrigé par Fabien dans `data/generique.txt` ; les répliques d'éjection du mécha reprennent les mêmes.
   - Reste : tes retours.
 
+## KÉDRIC — battle selon la difficulté (9 nov. 2026, Fabien : « fin trop dure, FACILE trop dur par rapport au NORMAL »)
+- `DIFFICULTES.<diff>.battle` : FACILE / ENTRAÎNEMENT = pas de flèches doublées, flèches à moins de 0,7 s retirées
+  (`ecartMin`), TURBO x1,4 (au lieu de x2), gain x1,5 ; NORMAL = doublées seulement les 6 dernières s, 1 sur 4 (avant
+  12 s, 1 sur 2) ; CHAMPION inchangé. Flèches par manche : FACILE 47 / 49, NORMAL 74 / 71 (2 doublées), CHAMPION 81 / 78 (9).
+- Simulation de la jauge (400 matchs) : FACILE moyen médiane 60 % (NORMAL 25 %), enfant gagne 100 % (NORMAL 22 %).
+
+## TOUCHES PC sans Z / X (9 nov. 2026, Fabien) — `alt` et `entree` ajoutés dans `core/clavier.js` (Z / X restent actifs :
+## les boutons du téléphone envoient Z / X)
+- Beufa sprint = ESPACE ; Greg Dempsey = ALT ; Kédric entraînement du battle = ALT ; Lionel lob = ALT, passer
+  l'entraînement = ENTRÉE ; Rémi DRING / l'air de rien / roulette = ALT ; écrans PERDU retour au hub = ALT ; mécha GAME OVER :
+  ENTRÉE = tout recommencer, ALT = hub. (Julien : commandes PC personnalisables, non touchées.)
+- La FIN : phrase du tas = « Les Bracass' ont été vaincus. »
+
 ## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)
 - `showtime.rappel` 0,06 → 0,04 ; `gain` parfait 2,1 → 2,5, bien 1,3 → 1,5, raté 7 → 6. Avant, la jauge plafonnait vers
   45 % même en ne faisant QUE des PARFAITS (le rappel la ramenait au milieu) : le défi 80 % était impossible.

@@ -15,18 +15,22 @@ export const IDENTITE = { id: 'kedric', nom: 'Kédric' };
 //  poursuite : chance qu'un défenseur esquivé de côté se relève et te poursuive ;
 //  poursuiteEcart : il court ce nombre de yards / s plus vite que toi au moment où il part (le sprint le sème)
 //  fenetreShow : largeur des fenêtres de timing du SHOWTIME (x)
+// battle (9 nov. 2026, Fabien : « fin du battle trop dure, FACILE trop dur par rapport au NORMAL ») :
+//   doubles (false = jamais de flèches doublées), doublesDuree (s de fin de manche avec doubles), doublesTous (1 flèche sur N
+//   doublée), ecartMin (s : flèches plus rapprochées retirées), turbo (vitesse de chute pendant la technique TURBO),
+//   gain (x public gagné par PARFAIT / BIEN : moins de flèches en FACILE, donc chacune rapporte plus)
 export const DIFFICULTES = {
   entrainement: { nom: 'ENTRAÎNEMENT', couleur: '#9fe0ff', alerte: 1.8, parfait: 0.22, aide: true, feintes: 0, ghost: 8, vitesse: 0.9, murTardif: false,
-    charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, fenetreShow: 1.35, flechesRouges: false,
+    charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, fenetreShow: 1.35, flechesRouges: false, battle: { doubles: false, ecartMin: 0.7, turbo: 1.4, gain: 1.5 },
     texte: 'Idéal pour apprendre : FACILE + le panneau d\'aide + un RALENTI à chaque nouveau plaquage.' },
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', alerte: 1.8, parfait: 0.22, aide: false, feintes: 0, ghost: 8, vitesse: 0.9, murTardif: false,
-    charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, fenetreShow: 1.35, flechesRouges: false,
+    charge: 1.0, poursuite: 0.06, poursuiteEcart: 0.9, fenetreShow: 1.35, flechesRouges: false, battle: { doubles: false, ecartMin: 0.7, turbo: 1.4, gain: 1.5 },
     texte: 'Les défenseurs préviennent tôt, Kédric danse lentement. Sans explications.' },
   normal:   { nom: 'NORMAL',   couleur: '#ffd84a', alerte: 1.45, parfait: 0.17, aide: false, feintes: 0.3, ghost: 10, vitesse: 1, murTardif: false,
-    charge: 1.5, poursuite: 0.12, poursuiteEcart: 1.2, fenetreShow: 1, flechesRouges: false,
+    charge: 1.5, poursuite: 0.12, poursuiteEcart: 1.2, fenetreShow: 1, flechesRouges: false, battle: { doublesDuree: 6, doublesTous: 4 },
     texte: 'Le vrai match, et un vrai duel de frime contre Kédric.' },
   champion: { nom: 'CHAMPION', couleur: '#ff5a6e', alerte: 0.95, parfait: 0.12, aide: false, feintes: 0.45, ghost: 14, vitesse: 1.06, murTardif: true,
-    charge: 3.0, poursuite: 0.2, poursuiteEcart: 1.5, fenetreShow: 0.8, flechesRouges: true,
+    charge: 3.0, poursuite: 0.2, poursuiteEcart: 1.5, fenetreShow: 0.8, flechesRouges: true, battle: { doublesDuree: 12, doublesTous: 2 },
     texte: 'Pas d\'aide, défense rapide, timing serré au SHOWTIME. Pour les vrais.' },
 };
 

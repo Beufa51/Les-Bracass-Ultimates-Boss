@@ -99,11 +99,12 @@ export function ecranPerdu(scene, titre, message, nomDiff) {
   texte(scene, LARGEUR / 2, 160, titre, 52, '#ff6b6b').setDepth(1001);
   texte(scene, LARGEUR / 2, 260, message, 24, '#ffffff', { wordWrap: { width: 820 } }).setDepth(1001);
   const t = estTactile();
-  texte(scene, LARGEUR / 2, HAUTEUR - 80, `${t ? 'Rejouer' : 'ESPACE'} : rejouer ce jeu     ${t ? 'Hub' : 'X'} : retour au hub`, 22, '#7fff7f').setDepth(1001);
+  texte(scene, LARGEUR / 2, HAUTEUR - 80, `${t ? 'Rejouer' : 'ESPACE'} : rejouer ce jeu     ${t ? 'Hub' : 'ALT'} : retour au hub`, 22, '#7fff7f').setDepth(1001);
   scene.time.delayedCall(700, () => {
     const kb = scene.input.keyboard;
     kb.once('keydown-SPACE', () => scene.scene.restart({ phase: scene.donnees.phase, diff: nomDiff, bilan: scene.donnees.bilan }));
-    kb.once('keydown-X', () => scene.retourHub());
+    let parti = false; const hub = () => { if (!parti) { parti = true; scene.retourHub(); } };
+    kb.once('keydown-X', hub); kb.once('keydown-ALT', hub);   // PC : ALT
   });
 }
 

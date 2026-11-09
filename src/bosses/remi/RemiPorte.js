@@ -109,13 +109,13 @@ export class RemiPorte extends BossScene {
     const lancer = () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.tour('toi'); });
     if (this.donnees.bilan) {   // soirée enchaînée : un bandeau au lieu de l'écran de règles
       lancer();
-      bandeauRegle(this, `Maintiens ${t ? 'le doigt' : 'ESPACE'} pour armer, lâche sur le + . Quelqu'un arrive ? ${t ? 'L\'AIR DE RIEN' : 'Z'} !`, 3.5, 'COGNE !', 'maintenir');
+      bandeauRegle(this, `Maintiens ${t ? 'le doigt' : 'ESPACE'} pour armer, lâche sur le + . Quelqu'un arrive ? ${t ? 'L\'AIR DE RIEN' : 'ALT'} !`, 3.5, 'COGNE !', 'maintenir');
       return;
     }
     this.afficherIntro('RÉMI - La porte et le videur', [
       REPLIQUES.porteIntro,
       `MAINTIENS ${t ? 'le doigt' : 'ESPACE'} pour armer ton poing, LÂCHE quand la cible est sur le + : celui qui fait le PLUS DE DÉGÂTS gagne.`,
-      `Quelqu'un arrive (pas, ombre, bords rouges) ? ${t ? 'L\'AIR DE RIEN (pouce gauche)' : 'Z'} : tu caches ton poing. S'il te voit charger : ATTRAPÉ !`,
+      `Quelqu'un arrive (pas, ombre, bords rouges) ? ${t ? 'L\'AIR DE RIEN (pouce gauche)' : 'ALT'} : tu caches ton poing. S'il te voit charger : ATTRAPÉ !`,
       'Plus tu tiens, plus c\'est FORT... et plus ça fait de BRUIT.',
     ], () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.tour('toi'); }));
   }
@@ -167,7 +167,7 @@ export class RemiPorte extends BossScene {
       this.tCible += dt;
       this.bougerCible();
       this.pasVideur(dt);
-      if (this.etat === 'toi') this.pasToi(dt); else if (this.etat === 'remi') { if (vientDAppuyer(this.touches.z)) this.siffler(); this.pasRemi(dt); }
+      if (this.etat === 'toi') this.pasToi(dt); else if (this.etat === 'remi') { if ((vientDAppuyer(this.touches.z) || vientDAppuyer(this.touches.alt))) this.siffler(); this.pasRemi(dt); }
     } else if (this.etat === 'coup' || this.etat === 'pause') this.pasVideur(dt);
     this.dessiner(dt);
   }
@@ -200,7 +200,7 @@ export class RemiPorte extends BossScene {
     const tenu = this.doigt || this.touches.espace.isDown;
     const danger = this.videur.etat === 'annonce' || this.videur.etat === 'regarde';
     const maintiens = estTactile() ? 'REMETS le doigt' : 'REMAINTIENS ESPACE';
-    if (vientDAppuyer(this.touches.z)) this.rienDemande = true;   // (pendant le tour de Rémi, Z = SIFFLE : voir update)
+    if ((vientDAppuyer(this.touches.z) || vientDAppuyer(this.touches.alt))) this.rienDemande = true;   // (pendant le tour de Rémi, Z = SIFFLE : voir update)
     if (this.rienDemande) { this.rienDemande = false; if (this.charge) { this.faireGenre('toi'); this.attendreRelache = true; } }
     if (this.attendreRelache) { if (!tenu) this.attendreRelache = false; }   // poing caché : lever le doigt ne frappe pas
     else if (tenu) { this.poingCache = false; this.charger(dt); }
