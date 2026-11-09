@@ -117,7 +117,7 @@
 - Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
   allégée en 80 kbit/s ; original dans `assets_inbox/hub/`). Réglages de la grille : `src/hub/reglages.js`.
 
-## FINALE : mécha des Bracass' en shoot'em up (9 nov. 2026) — VALIDÉE, prototype à faire
+## FINALE : mécha des Bracass' en shoot'em up (9 nov. 2026) — JOUABLE, en réglages avec Fabien
 - Choix de Fabien : UN seul robot assemblé (je découpe les parties), ordre des attaques libre (celui de la proposition),
   rangs BOSS DES BOSS (S) / SUPER SAIYAN (A) / HUMAIN DE BASE (B) / YAMCHA (C), musique Chrono Trigger « Boss Battle »
   (`assets/audio/finale/finale_mecha.mp3` en 80 kbit/s, clé `finale_musique` dans `assets/manifeste.js` ; original dans
@@ -170,6 +170,9 @@
     lu par `FinaleScene.leGenerique`.
   - VAISSEAU remplacé (Fabien s'était trompé d'image) : soucoupe rouge et blanche, pilote au casque audio ; 200 x 130
     (`manifeste.js`) ; l'ancien gardé dans `assets_inbox/finale/ancien_vaisseau.jpg`.
+  - SURPRISE GARDÉE (Fabien) : avant les 6 badges, le hub reprend la GRILLE 3 x 2 d'origine (`REGLAGES_HUB.grille`,
+    `PLACES_GRILLE`), pas de case ni de ligne PROGRÈS « BOSS FINAL » ; après, disposition 3 / BOSS FINAL / 3 + flash.
+  - GÉNÉRIQUE corrigé par Fabien dans `data/generique.txt` ; les répliques d'éjection du mécha reprennent les mêmes.
   - Reste : tes retours.
 
 ## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)
@@ -1769,6 +1772,8 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   (`boutonsJeu` dans `create()`) sont remis après le choix. Vérifié en téléphone simulé : « Sprint | OK » + joystick.
 
 ## JULIEN — FPS FAÇON WOLFENSTEIN (décidé avec Fabien)
+- 9 nov. 2026 : `julien_main_tomates(_tir).png` étaient des mains GAUCHES (pouce à droite) → retournées en miroir (anciennes
+  dans `assets_inbox/julien/ancienne_*_main_gauche.png`).
 Histoire : tu es un étudiant en pleine manif, tu dois rejoindre le lycée (niveau 1), puis affronter Julien, prof, qui
 lance des livres à esquiver (niveau 2). Choix FPS plutôt que beat'em up : collisions en grille (simples) et peu d'images
 (ennemis toujours de face). Pas de visée en hauteur, un seul niveau par phase, pas de côté pour esquiver.

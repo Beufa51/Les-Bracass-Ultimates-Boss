@@ -37,11 +37,11 @@ export const REGLAGES = {
   // ordre des parties à détruire, leurs PV (x DIFFICULTES.pv) et ce que dit le pote éjecté
   parties: [
     { id: 'kedric', nom: 'KÉDRIC', pv: 330, replique: 'TOUCHDOWN… dans le décor !' },
-    { id: 'remi',   nom: 'RÉMI',   pv: 330, replique: 'Ma tournée… elle est renversée !' },
+    { id: 'remi',   nom: 'RÉMI',   pv: 330, replique: 'Mes binouzes adorées...par terre !' },
     { id: 'lionel', nom: 'LIONEL', pv: 350, replique: 'Faute ! Le frisbee était dedans !' },
-    { id: 'greg',   nom: 'GREG',   pv: 380, replique: 'Ok… t\'as gagné ce round.' },
-    { id: 'julien', nom: 'JULIEN', pv: 380, replique: 'COLLÉ ! …ah non, c\'est moi.' },
-    { id: 'beufa',  nom: 'BEUFA',  pv: 520, replique: 'Ma base… MA BASE !' },
+    { id: 'greg',   nom: 'GREG',   pv: 380, replique: 'Ok… t\'as gagné..... ce round.' },
+    { id: 'julien', nom: 'JULIEN', pv: 380, replique: '2h de colle ! .......Pour moi...😭' },
+    { id: 'beufa',  nom: 'BEUFA',  pv: 520, replique: 'Snaaaaaaaake !' },
   ],
   explosionPartie: 1.6,   // durée de l'explosion d'une partie (le jeu continue, les tirs s'effacent)
   pauseEntreParties: 1.2, // répit après une partie détruite

@@ -52,7 +52,8 @@ export function ouvrirProgression(scene, ferme) {
     18, restants.length ? '#9fd0ff' : '#ffd84a'));
 
   // les 6 boss + le BOSS FINAL (le mécha) en dernière ligne
-  [...BOSS, { ...FINALE, nom: 'BOSS FINAL' }].forEach((boss, k) => {
+  // (le BOSS FINAL n'apparaît qu'une fois les 6 battus : c'est une surprise)
+  [...BOSS, ...(restants.length ? [] : [{ ...FINALE, nom: 'BOSS FINAL' }])].forEach((boss, k) => {
     const y = P.hautY + k * P.ligneH, battu = Sauvegarde.aLeBadge(boss.id);
     ajout(scene.add.rectangle(LARGEUR / 2, y + 17, LARGEUR - 40, P.ligneH - 3, k % 2 ? 0x13235a : 0x0e1b48, 1));
     if (scene.textures.exists('badge_' + boss.id)) ajout(scene.add.image(48, y + 10, battu ? 'badge_' + boss.id : 'badge_vide').setScale(0.52).setY(y + 17));

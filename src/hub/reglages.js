@@ -5,7 +5,9 @@ export const REGLAGES_HUB = {
   caseH: 118,        // hauteur d'une case de boss
   ecart: 12,         // espace entre les cases
   grilleY: 116,      // milieu de la 1re ligne de cases
-  centre: { l: 300, h: 378 },   // la case du milieu (boss final) : largeur, hauteur
+  centre: { l: 300, h: 378 },
+  // AVANT les 6 badges : la grille d'origine 3 x 2 (le boss final reste une surprise, pas de trou au milieu)
+  grille: { caseL: 270, caseH: 180, ecart: 14, grilleY: 158 },   // la case du milieu (boss final) : largeur, hauteur
   infosY: 468,       // texte du boss choisi (2 lignes : nom + record, puis la fiche)
   bandeauY: 512,     // bandeau du bas (badges, la fin)
   // tableau de PROGRESSION (bouton 📋 PROGRÈS) : place des lignes

@@ -1,28 +1,28 @@
-# Générique de fin (src/hub/FinaleScene.js le lit tel quel, de haut en bas).
+# Générique de fin (src/hub/FinaleScene.js le lit tel quel, de haut en bas). Texte corrigé par Fabien (nov. 2026).
 # Règles : une ligne commençant par « # » (avec une espace) = commentaire, ignorée.
 #   « !! texte » = GRAND titre jaune ;  « ! texte » = titre de partie (jaune) ;  ligne vide = un espace ;
 #   toute autre ligne = texte normal (blanc).
 !! LES BRACASS'
 !! ULTIMATE BOSS
 
-Une idée et un jeu de FABIEN
+Une idée et un jeu de Beufa
 
 ! LES BOSS
 
 BEUFA
-« Ma base… MA BASE ! »
+« Snaaaaaaaake ! »
 
 KÉDRIC
 « TOUCHDOWN… dans le décor ! »
 
 JULIEN
-« COLLÉ ! …ah non, c'est moi. »
+« 2h de colle ! .......Pour moi...😭 »
 
 GREG
-« Ok… t'as gagné ce round. »
+« Ok… t'as gagné..... ce round. »
 
 RÉMI
-« Ma tournée… elle est renversée ! »
+« Mes binouzes adorées...par terre ! »
 
 LIONEL
 « Faute ! Le frisbee était dedans ! »
@@ -40,6 +40,6 @@ Chrono Trigger, « Boss Battle » (Square)
 
 ! MERCI
 Aux Bracass' d'avoir prêté leur tête
-Aux copains qui ont testé
+
 
 !! MERCI D'AVOIR JOUÉ !

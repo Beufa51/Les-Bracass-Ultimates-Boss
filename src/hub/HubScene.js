@@ -21,6 +21,8 @@ import { ouvrirReglagesDev } from '../core/ReglagesDevScene.js';
 
 // place de chaque case (colonne 0 = gauche, 2 = droite ; ligne 0 à 2). La colonne 1 = la case du BOSS FINAL.
 const PLACES = { beufa: [0, 0], kedric: [0, 1], julien: [0, 2], greg: [2, 0], remi: [2, 1], lionel: [2, 2] };
+// avant les 6 badges : grille 3 x 2 d'origine (colonne, ligne)
+const PLACES_GRILLE = { beufa: [0, 0], kedric: [1, 0], julien: [2, 0], greg: [0, 1], remi: [1, 1], lionel: [2, 1] };
 
 export class HubScene extends Phaser.Scene {
   constructor() { super('Hub'); }
@@ -36,6 +38,9 @@ export class HubScene extends Phaser.Scene {
     jouerMusique(this, 'hub_musique');
     const nb = BOSS.filter(b => Sauvegarde.aLeBadge(b.id)).length;
     this.complet = nb >= BOSS.length;
+    // disposition : grille 3 x 2 tant que le boss final est caché, puis 3 à gauche / BOSS FINAL / 3 à droite
+    const G = this.complet ? R : R.grille;
+    this.cL = G.caseL; this.cH = G.caseH; this.ecartC = G.ecart; this.grilleY = G.grilleY;
 
     // ---- fond : bleu vif + bandes claires qui défilent (façon Mega Man) ----
     this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x2d6fe0);
@@ -46,10 +51,11 @@ export class HubScene extends Phaser.Scene {
     // ---- les cases ----
     this.cases = [];
     for (const boss of BOSS) {
-      const p = PLACES[boss.id]; if (!p) continue;
+      const p = (this.complet ? PLACES : PLACES_GRILLE)[boss.id]; if (!p) continue;
       this.cases.push(this.caseBoss(boss, ...this.position(p)));
     }
-    this.cases.push(this.caseFinale(nb));
+    // le BOSS FINAL reste une SURPRISE : sa case n'apparaît qu'une fois les 6 battus (Fabien)
+    if (this.complet) this.cases.push(this.caseFinale(nb));
     this.bandeauBas(nb);
 
     // curseur : sur le boss d'où l'on revient, sinon sur le premier pas encore battu
@@ -76,17 +82,19 @@ export class HubScene extends Phaser.Scene {
     if (this.complet && !Sauvegarde.aLeBadge('finale') && !Sauvegarde.fait('mecha_alerte')) {
       Sauvegarde.marquerFait('mecha_alerte');
       this.choix = this.cases.find(c => c.finale); this.majChoix();
+      this.cameras.main.flash(400, 255, 80, 80); this.cameras.main.shake(900, 0.01);   // la case du milieu se révèle
       this.infos.setText('ALERTE : LES BRACASS\' FUSIONNENT !').setColor('#ff6b6b');
       this.time.delayedCall(1500, () => this.entrerFinale());
     }
   }
 
   position([col, ligne]) {
-    return [LARGEUR / 2 + (col - 1) * ((R.caseL + R.centre.l) / 2 + R.ecart), R.grilleY + ligne * (R.caseH + R.ecart)];
+    const pasX = this.complet ? (this.cL + R.centre.l) / 2 + this.ecartC : this.cL + this.ecartC;
+    return [LARGEUR / 2 + (col - 1) * pasX, this.grilleY + ligne * (this.cH + this.ecartC)];
   }
 
   // cadre « métal » d'une case
-  cadre(x, y, couleur = 0x3a5fcd, l = R.caseL, h = R.caseH) {
+  cadre(x, y, couleur = 0x3a5fcd, l = this.cL, h = this.cH) {
     const g = this.add.graphics();
     g.fillStyle(0x0b1638, 1).fillRect(x - l / 2, y - h / 2, l, h);
     g.lineStyle(4, couleur, 1).strokeRect(x - l / 2, y - h / 2, l, h);
@@ -96,7 +104,7 @@ export class HubScene extends Phaser.Scene {
 
   // la grande case du MILIEU : le BOSS FINAL (le mécha des Bracass'), verrouillée tant que les 6 ne sont pas battus
   caseFinale(nb) {
-    const { l, h } = R.centre, x = LARGEUR / 2, y = R.grilleY + R.caseH + R.ecart;
+    const { l, h } = R.centre, x = LARGEUR / 2, y = R.grilleY + this.cH + R.ecart;
     const ouvert = this.complet;
     this.cadre(x, y, ouvert ? 0xd4a52a : 0x7a3a9a, l, h);
     const cle = ouvert ? 'select_mecha' : 'select_mecha_ombre';
@@ -130,19 +138,19 @@ export class HubScene extends Phaser.Scene {
     const battu = Sauvegarde.aLeBadge(boss.id);
     this.cadre(x, y, battu ? 0xd4a52a : 0x3a5fcd);
     const cle = battu ? 'select_' + boss.id : 'select_' + boss.id + '_ombre';
-    const img = this.textures.exists(cle) ? this.add.image(x, y + R.caseH / 2 - 26, cle).setOrigin(0.5, 1) : null;   // (buste posé en bas)
-    if (img) img.setScale(Math.min((R.caseL - 16) / img.width, (R.caseH - 34) / img.height));
+    const img = this.textures.exists(cle) ? this.add.image(x, y + this.cH / 2 - 26, cle).setOrigin(0.5, 1) : null;   // (buste posé en bas)
+    if (img) img.setScale(Math.min((this.cL - 16) / img.width, (this.cH - 34) / img.height));
     // bandeau du nom
-    this.add.rectangle(x, y + R.caseH / 2 - 13, R.caseL - 8, 22, 0x000000, 0.85);
-    texte(this, x, y + R.caseH / 2 - 13, boss.nom.toUpperCase(), 17, battu ? '#ffd84a' : '#ffffff', { fontStyle: 'bold' });
-    if (battu) this.add.image(x + R.caseL / 2 - 22, y - R.caseH / 2 + 22, 'badge_' + boss.id).setScale(0.75);
+    this.add.rectangle(x, y + this.cH / 2 - 13, this.cL - 8, 22, 0x000000, 0.85);
+    texte(this, x, y + this.cH / 2 - 13, boss.nom.toUpperCase(), 17, battu ? '#ffd84a' : '#ffffff', { fontStyle: 'bold' });
+    if (battu) this.add.image(x + this.cL / 2 - 22, y - this.cH / 2 + 22, 'badge_' + boss.id).setScale(0.75);
     if (!boss.pret) texte(this, x, y - 10, 'BIENTÔT', 18, '#ffb347', { stroke: '#000000', strokeThickness: 4 });
-    else if (!battu) texte(this, x + R.caseL / 2 - 18, y - R.caseH / 2 + 18, '?', 22, '#5aa8ff', { fontStyle: 'bold' });
+    else if (!battu) texte(this, x + this.cL / 2 - 18, y - this.cH / 2 + 18, '?', 22, '#5aa8ff', { fontStyle: 'bold' });
     const rec = boss.pret && Sauvegarde.record(boss.id);
     // (analyse comparée) ta meilleure lettre de rang, en tampon dans le coin (comme les étoiles d'Angry Birds)
     const g = rec && rangRecord(boss.id, rec.rang);   // (le tampon garde la LETTRE ; le nom est dans la ligne d'infos)
     if (rec) {
-      const tampon = texte(this, x - R.caseL / 2 + 26, y - R.caseH / 2 + 26, g.lettre, 30, g.lettre === 'S' ? '#ffd84a' : '#ffffff',
+      const tampon = texte(this, x - this.cL / 2 + 26, y - this.cH / 2 + 26, g.lettre, 30, g.lettre === 'S' ? '#ffd84a' : '#ffffff',
         { fontStyle: 'bold', stroke: '#b3202c', strokeThickness: 6 }).setAngle(-12);
       if (g.lettre === 'S') this.tweens.add({ targets: tampon, scale: 1.12, yoyo: true, repeat: -1, duration: 700 });
     }
@@ -151,7 +159,7 @@ export class HubScene extends Phaser.Scene {
     const info = !boss.pret ? `${boss.nom} : bientôt...` : battu
       ? `${boss.nom} : battu !${rec ? ` Record ${rangLisible(g.nom, g.lettre)} en ${formatTemps(rec.temps)}` : ''}${fiche}`
       : `${boss.nom}${fiche}`;
-    return { boss, x, y, w: R.caseL, h: R.caseH, img, info, action: () => this.entrer(boss) };
+    return { boss, x, y, w: this.cL, h: this.cH, img, info, action: () => this.entrer(boss) };
   }
 
   // bandeau du bas : les badges (5 appuis rapides = réglages développeur) et LA FIN quand les 6 badges sont là
@@ -217,7 +225,7 @@ export class HubScene extends Phaser.Scene {
   // nov. 2026 (Fabien) : 1er toucher = choisir la case (on la voit), 2e toucher sur la MÊME case = l'affronter
   toucher(x, y) {
     if (this.entree) return;
-    const c = this.cases.find(k => Math.abs(k.x - x) < (k.w + R.ecart) / 2 && Math.abs(k.y - y) < (k.h + R.ecart) / 2);
+    const c = this.cases.find(k => Math.abs(k.x - x) < (k.w + this.ecartC) / 2 && Math.abs(k.y - y) < (k.h + this.ecartC) / 2);
     if (!c) return;
     if (c !== this.choix) { this.choix = c; jouerSon(this, 'ui_valider'); this.majChoix(); return; }
     this.valider(c);
