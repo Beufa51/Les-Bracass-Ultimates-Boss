@@ -1,6 +1,8 @@
 // Écran de choix de la difficulté (FACILE / NORMAL / CHAMPION) de Rémi (copie propre à ce boss, venue de Kédric).
 // Le dernier choix est retenu, et chaque difficulté a son propre record.
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
+import { rangLisible } from '../../core/rangs.js';
+import { rangRecord } from '../rangs.js';
 import { texte } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
@@ -24,7 +26,7 @@ export function choisirDifficulte(scene, idBoss, difficultes, ensuite, son = 'ui
     const titre = texte(scene, x, 190, D.nom, 28, D.couleur).setDepth(1102);
     const desc = texte(scene, x, 275, D.texte, 15, '#dddddd', { wordWrap: { width: taille - 24 } }).setDepth(1102);
     const rec = Sauvegarde.record(cleRecord(idBoss, n));
-    const r = texte(scene, x, 350, rec ? `Record : ${rec.rang} ${formatTemps(rec.temps)}` : 'Pas encore de record', 13, '#aaaaaa').setDepth(1102);
+    const r = texte(scene, x, 350, rec ? `Record : ${rangLisible(rangRecord(idBoss, rec.rang).nom, rangRecord(idBoss, rec.rang).lettre)}\n${formatTemps(rec.temps)}` : 'Pas encore de record', 13, '#aaaaaa', { align: 'center' }).setDepth(1102);
     el.push(fond, titre, desc, r);
     return fond;
   });

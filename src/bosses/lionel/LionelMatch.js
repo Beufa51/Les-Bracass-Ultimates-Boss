@@ -16,6 +16,7 @@ import { texte } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
+import { rangLisible, trouverRang } from '../../core/rangs.js';
 import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
 import { estTactile, etiquettesTactiles, styleBouton, boutonEnFeu } from '../../core/tactile.js';
 import { installerJoystick } from './joystick.js';
@@ -936,9 +937,9 @@ export class LionelMatch extends BossScene {
     const record = this.diff.perso ? null : complet ? Sauvegarde.proposerRecord(this.cleRecord(), rang, this.tempsTotal, R.rangs.map(r => r.rang)) : Sauvegarde.record(this.cleRecord());
     this.rang = rang;
     // LE BILAN DU COACH : réussites, erreurs + UN conseil pour progresser (et les défis de maîtrise)
-    return `Lionel est battu !\nRANG ${rang}   -   temps ${formatTemps(this.tempsTotal)}` +
+    return `Lionel est battu !\nRANG ${rangLisible(trouverRang(R.rangs, rang).nom, rang)}   -   temps ${formatTemps(this.tempsTotal)}` +
       `\nSets ${this.sets.j} - ${this.sets.l}   points marqués : ${this.stats.marques}   encaissés : ${this.stats.concedes}` +
-      (record ? `\nRecord : rang ${record.rang} en ${formatTemps(record.temps)}` : '') +
+      (record ? `\nRecord : ${rangLisible((trouverRang(R.rangs, record.rang) || {}).nom || record.rang, record.rang)} en ${formatTemps(record.temps)}` : '') +
       (this.stats.supers ? `\nSupers marqués : ${this.stats.supersMarques} / ${this.stats.supers}` : '') +
       (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '') +
       (this.diff.perso ? '' : '\n' + lignesDefis('lionel', [
@@ -1029,16 +1030,17 @@ export class LionelMatch extends BossScene {
     const titre = texte(this, 300, 70, 'VICTOIRE !!', 64, '#7fff7f', { fontStyle: 'bold italic', stroke: '#1f9a6a', strokeThickness: 12 }).setDepth(P + 5).setScale(3).setAlpha(0);
     this.tweens.add({ targets: titre, scale: 1, alpha: 1, duration: 300, ease: 'Back.Out', onComplete: () => this.cameras.main.shake(200, 0.01) });
     const lignes = message.split('\n');
-    const rang = (lignes[1] || '').match(/RANG (\w)/);
+    const rang = (lignes[1] || '').match(/RANG (.+?) \((\w)\)/);
     if (rang) {
-      const r = texte(this, 140, 440, rang[1], 96, '#ffffff', { fontStyle: 'bold', stroke: '#911eb4', strokeThickness: 12 }).setDepth(P + 5).setScale(0);
+      const r = texte(this, 140, 440, rang[2], 96, '#ffffff', { fontStyle: 'bold', stroke: '#911eb4', strokeThickness: 12 }).setDepth(P + 5).setScale(0);
       this.tweens.add({ targets: r, scale: 1, delay: 900, duration: 300, ease: 'Back.Out' });
       texte(this, 140, 375, 'RANG', 22, '#ffd84a').setDepth(P + 5);
+      texte(this, 140, 505, rang[1], 18, '#ffd84a', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4, wordWrap: { width: 250 }, align: 'center' }).setDepth(P + 5);   // le nom du rang sous la lettre
     }
     texte(this, 280, 135, lignes[0], 22, '#ffffff').setDepth(P + 5);
     // colonne entre le trophée et Lionel, avec retour à la ligne (sinon le conseil sort de l'écran)
     // (défis en version courte : ★ nouveau, ✓ déjà réussi, ☐ à débloquer)
-    const corps = lignes.slice(1).join('\n').replace(/RANG \w\s+-\s+/, '')
+    const corps = lignes.slice(1).join('\n').replace(/RANG .+? \(\w\)\s+-\s+/, '')
       .replace(/★ DÉFI RÉUSSI : /g, '★ ').replace(/Défi déjà réussi : /g, '✓ ').replace(/Défi à débloquer : /g, '☐ ')
       .replace(/   points marqués : (\d+)   encaissés : (\d+)/, '\nPoints : $1 - $2');
     const bloc = texte(this, 410, 165, corps, 14, '#ffffff',

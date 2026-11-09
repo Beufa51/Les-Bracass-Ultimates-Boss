@@ -14,18 +14,18 @@ export const DIFFICULTES = {
 };
 // Rang de fin (score sur 100 : policiers 50, secrets 20, objets 10, temps 20) ; court = affiché au hub
 export const RANGS = [
-  { mini: 85, nom: 'CHE GUEVARA DU LYCÉE', court: 'CHE' },
-  { mini: 65, nom: 'LEADER ÉTUDIANT', court: 'LEADER' },
-  { mini: 40, nom: 'DÉLÉGUÉ DE CLASSE', court: 'DÉLÉGUÉ' },
-  { mini: 0, nom: 'FAYOT', court: 'FAYOT' },
+  { mini: 85, nom: 'CHE GUEVARA DU LYCÉE', court: 'CHE', lettre: 'S' },
+  { mini: 65, nom: 'LEADER ÉTUDIANT', court: 'LEADER', lettre: 'A' },
+  { mini: 40, nom: 'DÉLÉGUÉ DE CLASSE', court: 'DÉLÉGUÉ', lettre: 'B' },
+  { mini: 0, nom: 'FAYOT', court: 'FAYOT', lettre: 'C' },
 ];
 
 // rang de fin de la CLASSE (vie restante 40, temps 25, coups de dos 20, notes 20/20 en vue du dessus 15)
 export const RANGS_CLASSE = [
-  { mini: 85, nom: 'MAJOR DE PROMO', court: 'MAJOR' },
-  { mini: 65, nom: 'TABLEAU D\'HONNEUR', court: 'HONNEUR' },
-  { mini: 40, nom: 'PEUT MIEUX FAIRE', court: 'MIEUX' },
-  { mini: 0, nom: 'CANCRE', court: 'CANCRE' },
+  { mini: 85, nom: 'MAJOR DE PROMO', court: 'MAJOR', lettre: 'S' },
+  { mini: 65, nom: 'TABLEAU D\'HONNEUR', court: 'HONNEUR', lettre: 'A' },
+  { mini: 40, nom: 'PEUT MIEUX FAIRE', court: 'MIEUX', lettre: 'B' },
+  { mini: 0, nom: 'CANCRE', court: 'CANCRE', lettre: 'C' },
 ];
 
 export const REGLAGES = {

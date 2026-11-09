@@ -11,6 +11,8 @@ import { jouerSon } from '../core/ressources.js';
 import { estTactile } from '../core/tactile.js';
 import { BOSS } from '../bosses/liste.js';
 import { REGLAGES_HUB as R } from './reglages.js';
+import { rangLisible } from '../core/rangs.js';
+import { rangRecord } from '../bosses/rangs.js';
 import { DIFFICULTES as D_BEUFA } from '../bosses/beufa/reglages.js';
 import { DIFFICULTES as D_KEDRIC } from '../bosses/kedric/reglages.js';
 import { DIFFICULTES as D_JULIEN } from '../bosses/julien/reglages.js';
@@ -23,8 +25,12 @@ const DIFFS = { beufa: D_BEUFA, kedric: D_KEDRIC, julien: D_JULIEN, greg: D_GREG
 // records d'un boss, lisibles : « NORMAL S 1'20"00 · CHAMPION A 2'03"10 » (Julien : manif + classe)
 function lignesRecords(id) {
   const recs = Sauvegarde.tout().records || {}, morceaux = [];
-  const ajouter = (nom, r) => { if (r) morceaux.push(`${nom} ${r.rang} ${formatTemps(r.temps)}`); };
-  if (id === 'julien') { ajouter('Manif', recs.julien); ajouter('Classe', recs.julien_classe); }
+  const ajouter = (nom, r, liste = id) => {
+    if (!r) return;
+    const g = rangRecord(liste, r.rang);
+    morceaux.push(`${nom} : ${rangLisible(g.nom, g.lettre)} ${formatTemps(r.temps)}`);
+  };
+  if (id === 'julien') { ajouter('Manif', recs.julien); ajouter('Classe', recs.julien_classe, 'julien_classe'); }
   else {
     const diffs = DIFFS[id] || {};
     for (const n of Object.keys(diffs)) ajouter(diffs[n].nom || n, recs[n === 'normal' ? id : id + '_' + n]);
@@ -54,7 +60,8 @@ export function ouvrirProgression(scene, ferme) {
     const r = Sauvegarde.reprise(boss.id), etape = r && SCENES_REPRISE[r.scene];
     if (etape) etat += `   ·   En cours : reprise ${etape.nom}`;
     ajout(texte(scene, 210, y, etat, 18, battu ? '#7fff7f' : '#c8d8ff').setOrigin(0, 0.5));
-    ajout(texte(scene, 80, y + 22, lignesRecords(boss.id), 16, '#aab8e0', { align: 'left' }).setOrigin(0, 0.5));
+    const recs = ajout(texte(scene, 80, y + 22, lignesRecords(boss.id), 16, '#aab8e0', { align: 'left' }).setOrigin(0, 0.5));
+    if (recs.width > LARGEUR - 110) recs.setScale((LARGEUR - 110) / recs.width);   // (Julien : manif + classe sur une ligne)
   });
 
   // ---- sauvegarde ----

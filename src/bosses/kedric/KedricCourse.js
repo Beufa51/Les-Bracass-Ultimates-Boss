@@ -17,6 +17,7 @@ import { texte } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique } from '../../core/musique.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
+import { rangLisible, trouverRang } from '../../core/rangs.js';
 import { onomatopee, flash, encart, bulle, lignesImpact } from './effets.js';
 import { estTactile, etiquettesTactiles, disposition } from '../../core/tactile.js';
 import { Sauvegarde, formatTemps, lignesDefis } from '../../core/sauvegarde.js';
@@ -983,14 +984,14 @@ export class KedricCourse extends BossScene {
       : (bd.pieges || 0) >= 2 ? 'Conseil : les flèches DORÉES sont des pièges : laisse-les tomber sans rien toucher.'
       : (bd.rates || 0) >= 15 ? 'Conseil : au battle, appuie quand la flèche est SUR la touche, pas avant.'
       : 'Conseil : enchaîne 5 PARFAITS d\'affilée : la foule est à toi (COMBO x1,5).';
-    return `Kédric est battu au battle de danse !\nRANG ${rang}   -   temps ${formatTemps(this.tempsTotal)}` +
+    return `Kédric est battu au battle de danse !\nRANG ${rangLisible(trouverRang(R.rangs, rang).nom, rang)}   -   temps ${formatTemps(this.tempsTotal)}` +
       `\nTouchdowns : ${this.stats.touchdowns} / ${R.courses}   plaqué : ${this.stats.plaquages}` +
       `\nEsquives : ${this.stats.esquives} (${parfaitsCourses} parfaites)   score de course : ${this.points || 0}` +
       (this.stats.ghosts ? `\nDevil Bat Ghost : ${this.stats.ghosts}` : '') +
       `\nBattle : ${bd.parfaits} parfaits, ${bd.bien} biens, ${bd.rates} ratés` + (bd.jokers ? `, ${bd.jokers} joker(s) utilisé(s)` : '') +
       `\nPublic gagné : ${publicPourToi} %` +
       (bd.nbEcarts ? `\nTon timing : en moyenne ${Math.round(1000 * Math.abs(bd.ecarts / bd.nbEcarts))} ms ${bd.ecarts > 0 ? 'en retard' : 'en avance'}` : '') +
-      (record ? `\nRecord : rang ${record.rang} en ${formatTemps(record.temps)}` : '') +
+      (record ? `\nRecord : ${rangLisible((trouverRang(R.rangs, record.rang) || {}).nom || record.rang, record.rang)} en ${formatTemps(record.temps)}` : '') +
       (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '') +
       (sansRecord ? '' : '\n' + lignesDefis('kedric', [
         { id: 'troisTD', nom: '3 TOUCHDOWNS sur 3', test: () => this.stats.touchdowns >= R.courses },
@@ -1111,16 +1112,17 @@ export class KedricCourse extends BossScene {
     const titre = texte(this, 300, 70, 'VICTOIRE !!', 64, '#7fff7f', { fontStyle: 'bold italic', stroke: '#1d8a4a', strokeThickness: 12 }).setDepth(P + 5).setScale(3).setAlpha(0);
     this.tweens.add({ targets: titre, scale: 1, alpha: 1, duration: 300, ease: 'Back.Out', onComplete: () => this.cameras.main.shake(200, 0.01) });
     const lignes = message.split('\n');
-    const rang = (lignes[1] || '').match(/RANG (\w)/);
+    const rang = (lignes[1] || '').match(/RANG (.+?) \((\w)\)/);
     if (rang) {
-      const r = texte(this, 140, 440, rang[1], 96, '#ffffff', { fontStyle: 'bold', stroke: '#1d8a4a', strokeThickness: 12 }).setDepth(P + 5).setScale(0);
+      const r = texte(this, 140, 440, rang[2], 96, '#ffffff', { fontStyle: 'bold', stroke: '#1d8a4a', strokeThickness: 12 }).setDepth(P + 5).setScale(0);
       this.tweens.add({ targets: r, scale: 1, delay: 900, duration: 300, ease: 'Back.Out' });
       texte(this, 140, 375, 'RANG', 22, '#ffd84a').setDepth(P + 5);
+      texte(this, 140, 505, rang[1], 18, '#ffd84a', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4, wordWrap: { width: 250 }, align: 'center' }).setDepth(P + 5);   // le nom du rang sous la lettre
     }
     texte(this, 300, 135, lignes[0], 20, '#ffffff', { wordWrap: { width: 520 } }).setDepth(P + 5);
     // colonne entre le trophée et Kédric, avec retour à la ligne (sinon le conseil sort de l'écran)
     // (défis en version courte : ★ nouveau, ✓ déjà réussi, ☐ à débloquer)
-    const corps = lignes.slice(1).join('\n').replace(/RANG \w\s+-\s+/, '')
+    const corps = lignes.slice(1).join('\n').replace(/RANG .+? \(\w\)\s+-\s+/, '')
       .replace(/★ DÉFI RÉUSSI : /g, '★ ').replace(/Défi déjà réussi : /g, '✓ ').replace(/Défi à débloquer : /g, '☐ ');
     const bloc = texte(this, 440, 170, corps, 14, '#ffffff',
       { align: 'left', lineSpacing: 3, wordWrap: { width: 295 }, backgroundColor: '#000000aa', padding: { x: 8, y: 6 } })

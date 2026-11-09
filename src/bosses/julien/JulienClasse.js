@@ -18,6 +18,7 @@ import { jouerMusique } from '../../core/musique.js';
 import { estTactile } from '../../core/tactile.js';
 import { REGLAGES as RG, DIFFICULTES, RANGS_CLASSE } from './reglages.js';
 import { Sauvegarde } from '../../core/sauvegarde.js';
+import { rangLisible } from '../../core/rangs.js';
 import { armeDe } from './armes.js';
 import { murEn, vueLibre } from './raycaster.js';
 import { PLAN_CLASSE, OBJETS_CLASSE, RAYONS_CLASSE, ESTRADE, BUREAU_RENVERSE, REPLIQUES, ELEVES } from './niveau_classe.js';
@@ -626,7 +627,7 @@ export class JulienClasse extends JulienManif {
     else { const r = Sauvegarde.proposerRecord('julien_classe', rang.court, t, RANGS_CLASSE.map(x => x.court)); if (r.rang === rang.court && Math.abs(r.temps - t) < 0.01) rec = '   ★ NOUVEAU RECORD ★'; }
     this.victoire(`Julien est vaincu ! Temps : ${mmss}   (${this.diff.nom})\n`
       + `Vie ${Math.round(Math.max(0, this.j.vie))} %  ·  Coups de dos ${Math.round(pdos * 100)} %  ·  20/20 : ${S.notes20} / ${S.rafales}\n`
-      + `RANG : ${rang.nom}${rec}`);
+      + `RANG : ${rangLisible(rang.nom, rang.lettre)}${rec}`);
   }
 
   // ------------------------------------------------------------------ dessin

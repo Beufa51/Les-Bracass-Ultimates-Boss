@@ -117,6 +117,16 @@
 - Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
   allégée en 80 kbit/s ; original dans `assets_inbox/hub/`). Réglages de la grille : `src/hub/reglages.js`.
 
+## RANGS : un seul format « NOM (lettre) » (9 nov. 2026, demande de Fabien)
+- Partout : `rangLisible(nom, lettre)` (`src/core/rangs.js`) → « BIG BOSS (S) ». Listes de chaque boss lues par
+  `src/bosses/rangs.js` (`rangRecord`) pour le hub, le tableau PROGRÈS et les cartes de difficulté.
+- Records sauvegardés INCHANGÉS (lettre pour Greg / Kédric / Lionel / Rémi, nom pour Julien / Beufa) : rien n'est perdu.
+- Nouveaux noms (à valider par Fabien, dans les `reglages.js`) : Greg CEINTURE D'OR / POIDS LOURD / BOXEUR DU DIMANCHE /
+  SAC DE FRAPPE ; Kédric MVP DU SUPER BOWL / QUARTERBACK STAR / REMPLAÇANT / PORTEUR DE GOURDE ; Lionel DIEU DE LA PLAGE /
+  ROI DU SABLE / VACANCIER / TOURISTE EN TONGS. Lettres ajoutées : Julien (CHE S … FAYOT C ; MAJOR S … CANCRE C),
+  Beufa (`data/beufa_quiz.js` : BIG BOSS S, FOX / DOBERMAN A, HOUND / EAGLE B, PUMA / CROCODILE / CHICKEN C).
+- Écran de victoire Greg / Kédric / Lionel : grosse lettre + le nom dessous. Le tampon du hub garde la lettre.
+
 ## MÉTA (audit d'une autre IA, 9 nov. 2026) : sauvegarde, progression, reprise
 - Audit reçu (joueur / dev / game design) : P0 = sauvegarde exportable, difficulté Beufa (DÉJÀ là : 4 difficultés),
   tableau de progression ; P1 = reprise par étape sans F1. Les 4 sont faits. Restent (P1/P2, pas demandés) : calibrage

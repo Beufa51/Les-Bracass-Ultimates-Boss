@@ -12,6 +12,7 @@ import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique, deverrouillerMusiques } from '../../core/musique.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, REGLAGES as RG, DIFFICULTES, RANGS } from './reglages.js';
+import { rangLisible } from '../../core/rangs.js';
 import { Sauvegarde } from '../../core/sauvegarde.js';
 const MUSIQUES_JULIEN = ['julien_musique', 'julien_foule', 'julien_lycee_musique', 'julien_boss_musique'];
 const FINS = ['julien_fin_gaze', 'julien_fin_attrape', 'julien_fin_colle', 'julien_fin_victoire'];   // outils/julien/decouper_audit21.py
@@ -1017,7 +1018,7 @@ export class JulienManif extends BossScene {
     Sauvegarde.marquerFait('julien_manif');   // la porte du hub propose ensuite d'aller directement en classe
     const record = Sauvegarde.proposerRecord(IDENTITE.id, rang.court, this.temps, RANGS.map(r => r.court));
     this.time.delayedCall(400 + lignes.length * 450, () => {
-      texte(this, LARGEUR / 2, 382, `RANG : ${rang.nom}`, 30, '#ffd84a').setDepth(1001);
+      texte(this, LARGEUR / 2, 382, `RANG : ${rangLisible(rang.nom, rang.lettre)}`, 30, '#ffd84a').setDepth(1001);
       texte(this, LARGEUR / 2, 416, `${this.diff.nom}${record.rang === rang.court && Math.abs(record.temps - this.temps) < 0.01 ? '   ★ NOUVEAU RECORD ★' : ''}`, 16, this.diff.couleur).setDepth(1001);
       jouerSon(this, 'julien_portail');
     });

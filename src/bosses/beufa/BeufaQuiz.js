@@ -13,6 +13,7 @@ import { Sauvegarde } from '../../core/sauvegarde.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, REGLAGES as R, DIFFICULTES, appliquerDifficulte } from './reglages.js';
 import { cleRecord } from './difficulte.js';
+import { rangLisible, trouverRang } from '../../core/rangs.js';
 import { QUESTIONS, LECTURE_DEBUT, LECTURES, MASQUE_CHAUD, DEBUT_QUIZ, MOQUERIES, TROP_TARD, BRAVOS, VICTOIRE, GAME_OVER, RANGS, RANG_PARFAIT } from '../../../data/beufa_quiz.js';
 
 const VERT = 0x38fc8c, VERT_TXT = '#7dffb0';
@@ -445,7 +446,8 @@ export class BeufaQuiz extends BossScene {
     // le RANG (« CODE NAME ») tombe en dernier
     const tDebut = 300 + lignes.length * 250 + 400;
     const titre = this.add.text(60, 340, 'CODE NAME', st(20)).setDepth(P + 2).setAlpha(0);
-    const nom = this.add.text(60, 368, rang.nom, { fontFamily: '"Arial Black", Impact, sans-serif', fontStyle: 'italic', fontSize: '64px', color: rang.parfait ? '#ffd84a' : '#bff4ff', stroke: rang.parfait ? '#b37a00' : '#1c8c5a', strokeThickness: 4 }).setDepth(P + 2).setAlpha(0).setScale(2);
+    const nom = this.add.text(60, 368, rangLisible(rang.nom, rang.lettre), { fontFamily: '"Arial Black", Impact, sans-serif', fontStyle: 'italic', fontSize: '64px', color: rang.parfait ? '#ffd84a' : '#bff4ff', stroke: rang.parfait ? '#b37a00' : '#1c8c5a', strokeThickness: 4 }).setDepth(P + 2).setAlpha(0).setScale(2);
+    if (nom.width > 640) nom.setFontSize(Math.floor(64 * 640 / nom.width));   // « CROCODILE (C) » : ne déborde pas
     const phrase = this.add.text(62, 450, rang.phrase, st(18, '#e8fff0')).setDepth(P + 2).setAlpha(0);
     this.time.delayedCall(tDebut, () => {
       jouerSon(this, 'beufa_reussi');
@@ -453,7 +455,7 @@ export class BeufaQuiz extends BossScene {
       this.tweens.add({ targets: titre, alpha: 1, duration: 200 });
       this.tweens.add({ targets: nom, alpha: 1, scale: 1, duration: 450, ease: 'Back.Out' });
       this.tweens.add({ targets: phrase, alpha: 1, delay: 400, duration: 300 });
-      const txtRecord = entrainement ? 'ENTRAÎNEMENT : pas de record' : nouveau ? '★ NOUVEAU RECORD ★' : record ? `MEILLEUR RANG : ${record.rang}` : '(joue l\'infiltration avant pour être classé)';
+      const txtRecord = entrainement ? 'ENTRAÎNEMENT : pas de record' : nouveau ? '★ NOUVEAU RECORD ★' : record ? `MEILLEUR RANG : ${rangLisible(record.rang, (trouverRang([RANG_PARFAIT, ...RANGS], record.rang) || {}).lettre)}` : '(joue l\'infiltration avant pour être classé)';
       const tr = this.add.text(62, 486, txtRecord, st(18, nouveau ? '#ffd84a' : '#4fbf80')).setDepth(P + 2).setAlpha(0);
       this.tweens.add({ targets: tr, alpha: 1, delay: 800, duration: 300 });
       if (nouveau) this.tweens.add({ targets: tr, alpha: 0.4, delay: 1100, duration: 500, yoyo: true, repeat: -1 });

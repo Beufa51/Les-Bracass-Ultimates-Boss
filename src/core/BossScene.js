@@ -164,7 +164,7 @@ export class BossScene extends Phaser.Scene {
   // téléphone sait partager (navigator.share) ; il disparaît en quittant l'écran.
   boutonPartager(gagne, message) {
     if (!navigator.share) return;
-    const rang = (message.match(/RANG (\w)/) || [])[1];
+    const rang = (message.match(/RANG :? ?(.+? \(\w\))/) || [])[1];   // ex. « BIG BOSS (S) »
     const texteP = gagne
       ? `J'ai battu ${this.identite.nom} dans Les Bracass'${rang ? ` avec le rang ${rang}` : ''} ! À toi de faire mieux 😎`
       : `${this.identite.nom} m'a battu dans Les Bracass'... Qui me venge ? 😤`;

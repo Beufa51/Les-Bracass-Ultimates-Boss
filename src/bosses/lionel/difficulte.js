@@ -1,6 +1,8 @@
 // Écran de choix de la difficulté (FACILE / NORMAL / CHAMPION / PERSO) de Lionel (copie propre à ce boss).
 // Le dernier choix est retenu, et chaque difficulté a son propre record.
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
+import { rangLisible } from '../../core/rangs.js';
+import { rangRecord } from '../rangs.js';
 import { texte } from '../../core/ui.js';
 import { jouerSon } from '../../core/ressources.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
@@ -27,7 +29,7 @@ export function choisirDifficulte(scene, idBoss, difficultes, ensuite, son = 'ui
     const titre = texte(scene, x, 190, D.nom, noms.length > 4 ? 20 : 28, D.couleur).setDepth(102);
     const desc = texte(scene, x, 275, D.texte, noms.length > 4 ? 14 : 15, '#dddddd', { wordWrap: { width: taille - 18 } }).setDepth(102);
     const rec = Sauvegarde.record(cleRecord(idBoss, n));
-    const r = texte(scene, x, 350, rec ? `Record : ${rec.rang} ${formatTemps(rec.temps)}` : 'Pas encore de record', 13, '#aaaaaa').setDepth(102);
+    const r = texte(scene, x, 350, rec ? `Record : ${rangLisible(rangRecord(idBoss, rec.rang).nom, rangRecord(idBoss, rec.rang).lettre)}\n${formatTemps(rec.temps)}` : 'Pas encore de record', 13, '#aaaaaa', { align: 'center' }).setDepth(102);
     el.push(fond, titre, desc, r);
     return fond;
   });
