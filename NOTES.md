@@ -92,7 +92,8 @@
   redessinée au code (rayons qui tournent). Sans l'image, le titre retombe en texte.
 - POSES façon Commando Ginyu (images de Fabien, fond blanc, `assets_inbox/intro/pose_<id>.jpg`) :
   `python3 outils/intro/preparer_poses.py` → `intro_pose_<id>.png` (boîte 460 x 520), prioritaires sur les bustes.
-  REÇUES : Beufa, Kédric, Julien, Greg, Rémi. MANQUE : Lionel (prompt dans `propositions/intro_prompts_images.md`).
+  REÇUES : Beufa, Kédric, Julien (nouvelle pose « Guldo » demandée), Greg, Rémi (v2 genou au sol ; l'ancienne au cœur gardée
+  en `ancienne_pose_remi_coeur.jpg`). MANQUE : Lionel (prompt dans `propositions/intro_prompts_images.md`).
 - TITRE = POSE DE GROUPE (demande de Fabien) : les 6 serrés et superposés comme le Commando (place de chacun :
   `INTRO.groupe`, du fond vers l'avant ; Beufa le chef au centre devant), puis le logo tombe 2 temps après, en haut.
 

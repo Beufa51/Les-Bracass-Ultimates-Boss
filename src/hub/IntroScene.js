@@ -31,7 +31,7 @@ export const INTRO = {
   groupe: [
     { id: 'kedric', x: 705, bas: 455, e: 0.56 },   // en l'air, au fond
     { id: 'greg',   x: 210, bas: 522, e: 0.64 },
-    { id: 'remi',   x: 845, bas: 530, e: 0.6 },
+    { id: 'remi',   x: 820, bas: 530, e: 0.58 },
     { id: 'lionel', x: 590, bas: 515, e: 0.58 },
     { id: 'julien', x: 345, bas: 540, e: 0.5 },    // accroupi, devant
     { id: 'beufa',  x: 485, bas: 545, e: 0.62 },   // le chef, au centre devant
