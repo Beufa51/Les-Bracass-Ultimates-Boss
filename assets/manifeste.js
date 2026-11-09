@@ -83,5 +83,6 @@ export const MANIFESTE = {
     // musique de l'écran de sélection (fournie par le propriétaire : Street Fighter II, Character Select)
     hub_musique: { fichier: 'audio/hub/hub_selection.mp3', musique: true, volume: 0.4 },
     intro_musique: { fichier: 'audio/intro/intro_musique.mp3', musique: true, volume: 0.45 },   // Dragon Ball Final Bout (opening), fournie par Fabien
+    finale_musique: { fichier: 'audio/finale/finale_mecha.mp3', musique: true, volume: 0.45 },   // BOSS FINAL : Chrono Trigger « Boss Battle », fournie par Fabien (80 kbit/s)
   },
 };

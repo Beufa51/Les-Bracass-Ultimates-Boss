@@ -1,7 +1,8 @@
 # FINALE : le MÉCHA DES BRACASS' (proposition, nov. 2026)
 
 Choix de Fabien : **le héros, dans son vaisseau, contre le mécha formé par les 6 Bracass'**, en shoot'em up.
-Ce document attend sa validation (points ❓ en fin de fichier). Prompts d'images : `propositions/finale_prompts_images.md`.
+**VALIDÉ par Fabien (9 nov. 2026)** : un seul robot assemblé (une image), ordre des attaques laissé à Claude (celui du
+§ 3), rangs choisis, musique Chrono Trigger « Boss Battle » (`assets/audio/finale/finale_mecha.mp3`, clé `finale_musique`). Prompts d'images : `propositions/finale_prompts_images.md`.
 
 ## 1. Quand et comment on y joue
 - Au retour au hub après le **6e badge** : l'écran tremble, sirène, bandeau « ALERTE : LES BRACASS' FUSIONNENT ! »,
@@ -41,8 +42,8 @@ Fin : le mécha explose, puis la **cinématique de fin** (§ 5).
 - **FACILE** (proposé par défaut la 1re fois) / **NORMAL** / **CHAMPION**. Pas d'entraînement.
 - **Reprise** : un GAME OVER propose « CONTINUER » à la partie du mécha atteinte (sans record), ou « tout recommencer ».
   Même logique que la reprise du hub.
-- **Rang** (format du jeu « NOM (lettre) ») : vie restante + temps + bombes gardées. Noms proposés ❓ :
-  S « ULTIME BRACASS' », A « RANGER ROUGE », B « CADET DE L'ESPACE », C « PILOTE DU DIMANCHE ».
+- **Rang** (format du jeu « NOM (lettre) ») : vie restante + temps + bombes gardées. noms choisis par Fabien :
+  BOSS DES BOSS (S), SUPER SAIYAN (A), HUMAIN DE BASE (B), YAMCHA (C).
 - **Défis** (dans PROGRÈS) : « Sans être touché », « Sans utiliser de bombe », « En moins de 3 minutes ».
 - Réglage au **bot** (méthode habituelle) : un pilote qui esquive (expert, moyen, enfant) et 30 parties par difficulté.
   But en NORMAL : le joueur moyen gagne en 1 à 3 essais.
@@ -65,9 +66,10 @@ Fin : le mécha explose, puis la **cinématique de fin** (§ 5).
 Fichiers prévus : `src/finale/` (`FinaleMecha.js`, `reglages.js`, `motifs.js`, `manifeste.js`), `FinaleScene.js` refaite,
 `outils/finale_bot.mjs`. Le mécha n'est PAS une 7e case du hub (la grille reste à 6).
 
-## ❓ À valider par Fabien
-1. Le défilement **horizontal** (vue du dessus) : OK ?
-2. L'**ordre des potes** et leurs **attaques** (tableau § 3) : à changer ?
-3. Les **noms de rang** (§ 4) : ceux-là ou les tiens ?
-4. **Musique** : laquelle ? (ex. un générique Power Rangers / Bioman / Goldorak ; tu fournis le mp3 comme pour les autres.)
-5. On lance l'étape 1 (prototype au code) ?
+## Images : UN SEUL robot assemblé (choix de Fabien)
+Pas d'image des pièces séparées : je découpe moi-même les 6 parties dans `mecha_complet.png` (zones repérées à la main
+dans un outil `outils/finale/decouper_mecha.py`). Une partie détruite : elle noircit, fume, puis tombe (au code).
+
+## Choix restants
+- Défilement horizontal vu du dessus : retenu (Fabien a laissé faire).
+- Prochaine étape : le prototype au code (étape 1 du § 6).

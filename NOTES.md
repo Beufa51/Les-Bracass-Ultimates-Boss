@@ -117,7 +117,11 @@
 - Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
   allégée en 80 kbit/s ; original dans `assets_inbox/hub/`). Réglages de la grille : `src/hub/reglages.js`.
 
-## FINALE : mécha des Bracass' en shoot'em up (proposition, 9 nov. 2026) — EN ATTENTE des choix de Fabien
+## FINALE : mécha des Bracass' en shoot'em up (9 nov. 2026) — VALIDÉE, prototype à faire
+- Choix de Fabien : UN seul robot assemblé (je découpe les parties), ordre des attaques libre (celui de la proposition),
+  rangs BOSS DES BOSS (S) / SUPER SAIYAN (A) / HUMAIN DE BASE (B) / YAMCHA (C), musique Chrono Trigger « Boss Battle »
+  (`assets/audio/finale/finale_mecha.mp3` en 80 kbit/s, clé `finale_musique` dans `assets/manifeste.js` ; original dans
+  `assets_inbox/finale/`).
 - Choix de Fabien : le héros dans son vaisseau contre le mécha des 6. Proposition : `propositions/finale_mecha.md`
   (5 questions ❓ en fin de fichier), prompts : `propositions/finale_prompts_images.md` (mécha complet = référence).
 - HUB : case du MILIEU = BOSS FINAL (`caseFinale` dans HubScene ; 3 boss à gauche, 3 à droite ; `REGLAGES_HUB.centre`).
