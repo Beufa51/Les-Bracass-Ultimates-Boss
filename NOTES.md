@@ -151,7 +151,12 @@
     (vitesse 1,1, cadence 1,15, pv 1,1) et CHAMPION (1,22 / 1,3 / 1,2).
   - Bot après ces retours : FACILE expert/moyen sans continue, enfant 0,8 ; NORMAL expert 1, moyen 1,5, enfant 5,5 (1/4) ;
     CHAMPION expert 2,5, moyen 3,5. Temps NORMAL ≈ 205 s. (Fabien trouvait le NORMAL facile : le bot est plus faible qu'un humain.)
-  - Reste : cinématique de fin (photo de groupe avec les poses de l'intro, bilan, générique), retours de Fabien.
+  - CINÉMATIQUE DE FIN FAITE (9 nov. 2026) : `src/hub/FinaleScene.js` refaite en 4 temps (ESPACE / toucher = suite) :
+    1. le TAS (image de Fabien `assets_inbox/finale/tas_bracass.jpg` → `assets/sprites/finale/tas.png` par
+    `outils/finale/preparer_images.py`) qui tombe ; 2. PHOTO DE GROUPE (poses de l'intro + vaisseau, « CLIC ! »,
+    confettis) ; 3. PALMARÈS (meilleur rang de chaque boss toutes difficultés, défis x/21) ; 4. GÉNÉRIQUE (répliques des
+    potes = `REGLAGES.parties[].replique` du mécha, musiques lues dans CREDITS.md). Musique : `intro_musique`.
+  - Reste : tes retours.
 
 ## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)
 - `showtime.rappel` 0,06 → 0,04 ; `gain` parfait 2,1 → 2,5, bien 1,3 → 1,5, raté 7 → 6. Avant, la jauge plafonnait vers

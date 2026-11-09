@@ -84,6 +84,13 @@ v = detourer(ENTREE + 'vaisseau.jpg'); v = v.crop(v.getbbox())
 v = v.resize((200, round(200 * v.height / v.width)), Image.LANCZOS); v.save(SORTIE + 'vaisseau.png', optimize=True)
 print('vaisseau', v.size)
 
+# ---- les 6 potes sonnés en tas (cinématique de fin, src/hub/FinaleScene.js) ----
+import os
+if os.path.exists(ENTREE + 'tas_bracass.jpg'):
+    tas = detourer(ENTREE + 'tas_bracass.jpg'); tas = tas.crop(tas.getbbox())
+    tas = tas.resize((760, round(760 * tas.height / tas.width)), Image.LANCZOS); tas.save(SORTIE + 'tas.png', optimize=True)
+    print('tas', tas.size)
+
 # ---- le décor (défile à l'horizontale) ----
 d = Image.open(ENTREE + 'fond_espace.jpg').convert('RGB')
 d = d.resize((round(d.width * 540 / d.height), 540), Image.LANCZOS); d.save(SORTIE + 'fond.jpg', quality=85)
