@@ -175,6 +175,7 @@
   - RÉVÉLATION (1re fois aux 6 badges, `devoilerFinale` dans HubScene) : TRAPPE blindée (bandes danger) sur la case du
     milieu, ALERTE rouge clignotante + secousse, la trappe s'ouvre haut / bas dans la fumée (masquée dans le cadre), flash,
     puis le combat (≈ 4,7 s). Les fois suivantes : la case est simplement là.
+    Pour la REVOIR : menu F1 (ou pause > Menu de test) « Hub : revoir la trappe du BOSS FINAL » (`testTrappe`, sauvegarde intacte).
   - GÉNÉRIQUE corrigé par Fabien dans `data/generique.txt` ; les répliques d'éjection du mécha reprennent les mêmes.
   - Reste : tes retours.
 

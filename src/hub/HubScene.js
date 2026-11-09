@@ -27,7 +27,7 @@ const PLACES_GRILLE = { beufa: [0, 0], kedric: [1, 0], julien: [2, 0], greg: [0,
 export class HubScene extends Phaser.Scene {
   constructor() { super('Hub'); }
 
-  init(donnees) { this.depuis = donnees && donnees.depuis; }
+  init(donnees) { this.depuis = donnees && donnees.depuis; this.testTrappe = !!(donnees && donnees.testTrappe); }   // testTrappe : menu F1
 
   create() {
     this.entree = false;
@@ -37,7 +37,7 @@ export class HubScene extends Phaser.Scene {
     this.events.once('shutdown', () => montrerBoutonPause(true));
     jouerMusique(this, 'hub_musique');
     const nb = BOSS.filter(b => Sauvegarde.aLeBadge(b.id)).length;
-    this.complet = nb >= BOSS.length;
+    this.complet = nb >= BOSS.length || this.testTrappe;   // (menu F1 : on fait comme si les 6 étaient battus, le temps de la trappe)
     // disposition : grille 3 x 2 tant que le boss final est caché, puis 3 à gauche / BOSS FINAL / 3 à droite
     const G = this.complet ? R : R.grille;
     this.cL = G.caseL; this.cH = G.caseH; this.ecartC = G.ecart; this.grilleY = G.grilleY;
@@ -79,7 +79,8 @@ export class HubScene extends Phaser.Scene {
     this.cameras.main.fadeIn(250);
     this.majChoix();
     // les 6 badges : la 1re fois, ALERTE ! le mécha arrive tout seul (la fin vient après l'avoir battu)
-    if (this.complet && !Sauvegarde.aLeBadge('finale') && !Sauvegarde.fait('mecha_alerte')) {
+    if (this.testTrappe) this.devoilerFinale();   // menu F1 : revoir la trappe (rien n'est enregistré)
+    else if (this.complet && !Sauvegarde.aLeBadge('finale') && !Sauvegarde.fait('mecha_alerte')) {
       Sauvegarde.marquerFait('mecha_alerte');
       this.devoilerFinale();
     }

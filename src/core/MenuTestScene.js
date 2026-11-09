@@ -28,6 +28,8 @@ export class MenuTestScene extends Phaser.Scene {
       }
     }
     this.choix.push({ libelle: 'Retour au hub', action: () => this.lancer('Hub', {}) });
+    // revoir la RÉVÉLATION du boss final (trappe) sans toucher à la sauvegarde, même sans les 6 badges
+    this.choix.push({ libelle: 'Hub : revoir la trappe du BOSS FINAL', action: () => this.lancer('Hub', { testTrappe: true }) });
     this.choix.push({ libelle: 'Réglages développeur (vitesses, jauges...)', action: () => this.scene.start('ReglagesDev', { enPause: this.enPause }) });
     this.choix.push({ libelle: 'Remettre la sauvegarde à zéro', action: () => this.reset() });
     this.tactile = estTactile();
