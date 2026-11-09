@@ -48,7 +48,11 @@ export function bandeauRegle(scene, message, duree = 3, verbe = null, geste = nu
     else scene.tweens.add({ targets: doigt, scale: 0.7, yoyo: true, repeat: -1, duration: 220 });
   }
   objets.forEach(o => { const a = o.alpha; o.setAlpha(0); scene.tweens.add({ targets: o, alpha: a, duration: 200 }); });
-  scene.time.delayedCall(duree * 1000, () => scene.tweens.add({ targets: objets, alpha: 0, duration: 300, onComplete: () => objets.forEach(o => o.destroy()) }));
+  scene.time.delayedCall(duree * 1000, () => scene.tweens.add({ targets: objets, alpha: 0, duration: 300, onComplete: () => {
+    // (bug nov. 2026) arrêter d'abord les animations SANS FIN du doigt : sinon elles touchent un rond détruit
+    scene.tweens.killTweensOf(objets);
+    objets.forEach(o => o.destroy());
+  } }));
 }
 
 export function annonce(scene, titre, couleur = '#ffd84a', duree = 1.1) {
