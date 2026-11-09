@@ -47,7 +47,17 @@ export class HubScene extends Phaser.Scene {
     this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0x2d6fe0);
     this.bandes = this.add.graphics();
     this.decalage = 0;
-    texte(this, LARGEUR / 2, 30, 'CHOISIS TON ADVERSAIRE', 30, '#ffd84a', { fontStyle: 'bold', stroke: '#b3202c', strokeThickness: 6 });
+    const titreHub = texte(this, LARGEUR / 2, 30, 'CHOISIS TON ADVERSAIRE', 30, '#ffd84a', { fontStyle: 'bold', stroke: '#b3202c', strokeThickness: 6 });
+    // MENU DE TEST au doigt (pas de bouton pause au hub) : APPUI LONG (1 s) sur le titre, ou 5 appuis rapides sur les badges
+    let appuiLong = null;
+    titreHub.setInteractive().on('pointerdown', () => { appuiLong = this.time.delayedCall(1000, () => { appuiLong = null; basculerMenuTest(this.game); }); });
+    const annuler = () => { if (appuiLong) { appuiLong.remove(); appuiLong = null; } };
+    titreHub.on('pointerup', annuler); titreHub.on('pointerout', annuler);
+    // sur téléphone, les blocs de boutons (en bas à gauche / à droite) restent posés sur l'écran même vides : ils
+    // « mangeaient » les touchers (les badges en bas à gauche). Au hub, ils laissent passer (comme chez Rémi).
+    const blocs = [...document.querySelectorAll('.tactile')];
+    for (const b of blocs) { b.style.pointerEvents = 'none'; for (const bt of b.querySelectorAll('button')) bt.style.pointerEvents = 'auto'; }
+    this.events.once('shutdown', () => { for (const b of blocs) { b.style.pointerEvents = ''; for (const bt of b.querySelectorAll('button')) bt.style.pointerEvents = ''; } });
 
     // ---- les cases ----
     this.cases = [];

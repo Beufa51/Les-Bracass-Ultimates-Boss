@@ -111,7 +111,7 @@
 ## HUB = ÉCRAN DE SÉLECTION DES BOSS façon Mega Man (nov. 2026, remplace la salle aux portes)
 - `src/hub/HubScene.js` : grille 3 x 2 des 6 BOSS seulement (Beufa Kédric Julien / Greg Rémi Lionel), fond bleu vif.
   Pas battu = OMBRE (silhouette + liseré bleu, « ? »), même pendant l'entrée (on découvre son design en le battant) ;
-  battu = buste en couleur + badge + cadre doré. Bandeau du bas : badges (5 appuis = MENU DE TEST, 9 nov. 2026 : seul accès au menu de test sur téléphone au hub, qui n'a pas de bouton pause). Flèches + Espace ; au doigt : toucher
+  battu = buste en couleur + badge + cadre doré. Bandeau du bas : badges (5 appuis = MENU DE TEST). Au hub sur téléphone (pas de bouton pause) : APPUI LONG 1 s sur le TITRE = menu de test ; les blocs de boutons tactiles laissent passer les touchers (ils avalaient les appuis sur les badges, comme chez Rémi). Flèches + Espace ; au doigt : toucher
   une case la choisit, la retoucher = combattre. Entrée : bande façon Mega Man (buste qui glisse + nom lettre par lettre).
 - Images : `python3 outils/hub/preparer_selection.py` (bustes tirés des images détourées de chaque boss -> `assets/sprites/hub/select_*`).
 - Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
