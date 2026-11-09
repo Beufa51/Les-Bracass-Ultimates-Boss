@@ -102,6 +102,9 @@
   en `ancienne_pose_remi_coeur.jpg`), Lionel (bras inversés sur l'image reçue : `outils/intro/miroir_lionel.py` la
   retourne et remet NEO-SPORTS / logo / frisbee à l'endroit). Julien refait en style BD, pose « Guldo » (l'ancien en pixel art :
   `ancienne_pose_julien_pixel.jpg`). LES 6 POSES SONT FAITES.
+  9 nov. 2026 : NOUVELLE pose de Julien (bras levés, genou à terre ; l'ancienne « Guldo » gardée en
+  `ancienne_pose_julien_guldo.jpg`). `preparer_poses.py` a des `RETOUCHES` par pose (Julien : trou blanc entre les
+  jambes rendu transparent, ombre grise au sol effacée).
 - TITRE = POSE DE GROUPE (demande de Fabien) : les 6 serrés et superposés comme le Commando (place de chacun :
   `INTRO.groupe`, du fond vers l'avant ; Beufa le chef au centre devant), puis le logo tombe 2 temps après, en haut.
 
