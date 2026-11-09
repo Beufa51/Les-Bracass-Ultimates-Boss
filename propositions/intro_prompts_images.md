@@ -27,3 +27,8 @@ format portrait 800 x 1100, rien d'autre.
 - Lionel (ref_pose_lionel_rouge) : jambes fléchies et écartées, bras droit levé poing fermé au-dessus de la tête, bras gauche plié poing devant la poitrine, buste un peu tourné, crie.
 - Julien (ref_pose_julien_vert_v2.png, nouvelle pose demandée par Fabien) : accroupi bas, genoux pliés serrés vers l'avant, les deux bras levés en V au-dessus des épaules, mains à plat cassées au poignet, tête rentrée et avancée, sourcils froncés, moue boudeuse.
 - Rémi (pose INVENTÉE, joindre reference_pose_commando.png pour le style) : un genou au sol, l'autre jambe tendue sur le côté droit, un bras tendu à l'horizontale vers la droite main à plat, l'autre bras levé en arc au-dessus de la tête main à plat, buste penché vers l'extérieur, grand sourire.
+
+### Julien à REFAIRE (nov. 2026) : sa pose actuelle est en pixel art, les 5 autres en dessin BD -> même style
+Joindre : 1) l'image actuelle de Julien (`assets_inbox/intro/pose_julien.jpg`, pour le visage et la tenue) ;
+2) la pose de Rémi (`assets_inbox/intro/pose_remi.png`, pour le STYLE) ; 3) `ref_pose_julien_vert_v2.png` (la POSE).
+Prompt : voir la réponse de Claude (même texte que ci-dessous dans le chat).
