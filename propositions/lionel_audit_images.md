@@ -1,7 +1,9 @@
 # Lionel — audit des IMAGES et ANIMATIONS (nov. 2026)
 
 Lionel est VALIDÉ côté jeu : cet audit ne touche pas aux règles, seulement à ce qu'on VOIT.
-Prompts prêts : `propositions/lionel_prompts_images.md`. Rien n'est encore modifié dans le code : on attend tes choix.
+Prompts prêts : `propositions/lionel_prompts_images.md`.
+**FAIT (nov. 2026)** : lancer de Lionel en 3 temps (image reçue), élan au code pour ton lancer, tremblement au touché,
+Lionel sur l'écran de défaite. Voir `NOTES.md` (« LIONEL — AUDIT IMAGES »).
 
 ## 1. Ce qui existe
 

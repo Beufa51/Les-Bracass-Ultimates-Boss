@@ -5,7 +5,7 @@ Fond BLANC uni (il est retiré ensuite par `outils/lionel/decouper_animation.py`
 les bords, poses rangées sur UNE ligne, bien séparées, pieds à la même hauteur, pas de texte, pas de ligne de sol.
 **Lionel regarde vers la GAUCHE, toi (blond) vers la DROITE.** Ranger les fichiers dans `assets_inbox/`.
 
-## lionel_lancer_3.jpg (priorité 1) — joindre `lionel_lance.png` + `lionel_attente.png`
+## lionel_lancer_3.jpg (priorité 1) — REÇUE ET BRANCHÉE — joindre `lionel_lance.png` + `lionel_attente.png`
 ```
 Same beach frisbee player as the attached images (green and cream jersey number 93, green shorts, green sneakers,
 short brown hair, beard), same manga style and colors. Animation sheet: 3 poses side by side on one row, all facing

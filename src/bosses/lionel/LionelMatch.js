@@ -648,7 +648,7 @@ export class LionelMatch extends BossScene {
     if (type !== 'super') jouerSon(this, 'frisbee_lancer');
     this.d = d; this.porteur = null;
     this.trainee = [];
-    this.poser(p, type === 'super' ? 'super' : 'lance', 0.28);
+    this.poser(p, type === 'super' ? 'super' : 'lance', R.dureePose.lance);
     if (p === this.j) this.actionTuto('lance', type);
   }
 
@@ -829,7 +829,7 @@ export class LionelMatch extends BossScene {
     const t = texte(this, x + (qui === 'j' ? -60 : 60), y - 40, `+${points}`, 48, points === 5 ? '#ff5a5a' : '#ffd84a', { fontStyle: 'bold' }).setDepth(900).setScale(0.3);
     this.tweens.add({ targets: t, scale: 1, duration: 150, ease: 'Back.Out' });
     this.tweens.add({ targets: t, alpha: 0, y: y - 90, delay: 900, duration: 400, onComplete: () => t.destroy() });
-    this.poser(perdant, 'touche', 0.9);
+    this.poser(perdant, 'touche', R.dureePose.touche);
     this.poser(qui === 'j' ? this.j : this.l, 'victoire', 0.9);
     // série de points d'affilée (pour le chambrage)
     this.serie = this.serie && this.serie.qui === qui ? { qui, n: this.serie.n + 1 } : { qui, n: 1 };
@@ -903,7 +903,14 @@ export class LionelMatch extends BossScene {
     this.etiquettes(ETIQUETTES_OK);   // (cache aussi le joystick)
     this.etat = 'fin';
     if (gagnant === 'j') this.victoire(this.classement());
-    else this.defaite(`Lionel : « ${REPLIQUES.defaite} »\nSets ${this.sets.j} - ${this.sets.l}   points ${this.stats.marques} - ${this.stats.concedes}\n${this.conseil()}`);
+    else {
+      this.defaite(`Lionel : « ${REPLIQUES.defaite} »\nSets ${this.sets.j} - ${this.sets.l}   points ${this.stats.marques} - ${this.stats.concedes}\n${this.conseil()}`);
+      // Lionel jubile à droite (sous les textes, au-dessus du voile)
+      const lionel = this.add.image(LARGEUR + 120, HAUTEUR - 80, 'lionel_victoire').setOrigin(0.5, 1).setDepth(1000.5);
+      lionel.setScale(280 / lionel.height).setFlipX(!this.estIllustre('lionel_victoire'));
+      this.tweens.add({ targets: lionel, x: LARGEUR - 72, duration: 450, ease: 'Cubic.Out' });
+      this.tweens.add({ targets: lionel, y: HAUTEUR - 92, delay: 600, duration: 500, yoyo: true, repeat: -1, ease: 'Sine.InOut' });
+    }
   }
 
   // UN conseil qui colle à ce qui s'est passé (comment tu as le plus encaissé)
@@ -1054,7 +1061,13 @@ export class LionelMatch extends BossScene {
   choisirPose(p) {
     if (p.poseTemps > 0 && p.pose) return p.pose;
     if (p.glisse > 0 || p.relever > 0) return 'plongeon';
-    if (p.tient) return p === this.l && p.nargue ? 'nargue' : 'tient';
+    if (p.tient) {
+      if (p !== this.l) return 'tient';
+      if (p.nargue) return 'nargue';
+      // 0,3 s avant de lancer, Lionel arme son bras (pose « arme » si l'image existe)
+      if (p.tenueVoulue - p.tenue < R.armeAvant && this.textures.exists('lionel_arme')) return 'arme';
+      return 'tient';
+    }
     if (Math.hypot(p.vx, p.vy) > 20) return 'course';
     return 'garde';
   }
@@ -1068,7 +1081,8 @@ export class LionelMatch extends BossScene {
       if (recul) cle = p.prefixe + '_recul';
       if (!this.textures.exists(cle)) cle = p.prefixe + '_garde';
       const anim = this.anims.exists(cle) && this.textures.get(cle).frameTotal > 2;
-      if (anim) { if (p.sprite.anims.currentAnim?.key !== cle || !p.sprite.anims.isPlaying) p.sprite.play(cle); }
+      const enBoucle = anim && this.anims.get(cle).repeat !== 0;
+      if (anim) { if (p.sprite.anims.currentAnim?.key !== cle || p.sprite.texture.key !== cle || (!p.sprite.anims.isPlaying && enBoucle)) p.sprite.play(cle); }
       else if (p.sprite.texture.key !== cle || p.sprite.anims.isPlaying) { p.sprite.stop(); p.sprite.setTexture(cle); }
       // en courant, il regarde dans le sens de sa course
       let versGauche = p === this.l;
@@ -1099,8 +1113,18 @@ export class LionelMatch extends BossScene {
           this.tweens.add({ targets: nuage, scaleX: 2.2, scaleY: 1.6, x: nuage.x - sens * 16, alpha: 0, duration: 380, onComplete: () => nuage.destroy() });
         }
       } else {
-        p.sprite.setScale(echelle).setAngle(0);
-        p.sprite.setPosition(p.x, p.y + 6).setDepth(profondeur(p.y));
+        let angle = 0, etire = 1, dx = 0;
+        const ecoule = R.dureePose.lance - p.poseTemps;
+        if (pose === 'lance' && !anim && ecoule < 0.12) {
+          // un lancer en une seule image : le corps part en arrière puis claque vers l'avant (élan simulé)
+          const avant = p.sprite.flipX === (illustre && p === this.l) ? 1 : -1, k = ecoule / 0.12;
+          angle = avant * (k < 0.4 ? -10 * (k / 0.4) : -10 + 14 * ((k - 0.4) / 0.6));
+          etire = 1 + 0.08 * Math.sin(k * Math.PI);
+        }
+        // touché : il tremble au début
+        if (pose === 'touche' && p.poseTemps > R.dureePose.touche - 0.25) dx = Math.sin(p.poseTemps * 70) * 4;
+        p.sprite.setScale(echelle * etire, echelle).setAngle(angle);
+        p.sprite.setPosition(p.x + dx, p.y + 6).setDepth(profondeur(p.y));
       }
       p.ombre.setPosition(p.x, p.y + 2).setDepth(4);
     }
@@ -1146,6 +1170,7 @@ export class LionelMatch extends BossScene {
         else this.disque.setPosition(p.x + 3, p.y - 72);
       } else if (p === this.l && illustre) {
         const avant = p.sprite.flipX ? 1 : -1;   // ses illustrations regardent vers la gauche
+        if (pose === 'arme') this.disque.setVisible(false);   // le frisbee est dans l'image
         const [mx, my] = MAINS_LIONEL[pose] || MAINS_LIONEL.tient;
         this.disque.setPosition(p.x + avant * mx, p.y + my);
       } else if (POSES_AVEC_DISQUE.includes(pose)) {

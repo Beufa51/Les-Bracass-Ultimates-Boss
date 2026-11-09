@@ -1605,7 +1605,14 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 ## LIONEL — AUDIT IMAGES / ANIMATIONS (nov. 2026, en attente des choix de Fabien)
 - Rapport : `propositions/lionel_audit_images.md` ; prompts : `propositions/lionel_prompts_images.md`.
 - Manques : lancer figé (1 image, aussi utilisée pour le LOB), toi « tient/rattrape » = pose de course, pas de relève
-  après plongeon, nargue = victoire, écran de DÉFAITE sans Lionel, public et arbitre figés. Rien n'est encore codé.
+  après plongeon, nargue = victoire, écran de DÉFAITE sans Lionel, public et arbitre figés.
+- FAIT : LANCER DE LIONEL EN 3 TEMPS (`assets_inbox/lionel_lancer_3.jpg` → `outils/lionel/preparer_lancer.py`
+  [frisbee jaune recoloré en rouge en pose 1, effacé ailleurs, planche retournée] → `decouper_animation.py --par-ligne 3`) :
+  `lionel_arme.png` (il arme, `R.armeAvant` = 0,3 s avant de lancer : aussi un indice pour le joueur) +
+  `lionel_lance2.png` (lâcher + accompagnement, 2 images jouées une fois, `boucle: false`). Ton joueur : élan simulé au
+  code (penche en arrière puis claque) ; touché : tremblement 0,25 s ; DÉFAITE : Lionel (pose victoire) jubile à droite.
+- RESTE : lob, toi qui tiens de côté, relève, nargue, arbitre, trophée (prompts prêts), public qui saute (non fait :
+  la bande du décor laisserait un double en bougeant).
 
 ## LIONEL — V101 : NORMAL UN PEU PLUS DUR (Fabien : « un peu trop simple »)
 - `DIFFICULTES.normal` (lionel/reglages.js) : vitesse 1.0 → 1.03, réaction 0.21 → 0.195 s, erreur 44 → 38,

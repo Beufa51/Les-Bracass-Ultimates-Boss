@@ -79,6 +79,8 @@ export const REGLAGES = {
   // tes lobs se visent : ▲ ▼ = côté, ◀ = COURT (près du filet), ▶ = PROFOND (près du mur de Lionel, 3 points)
   lobVise: { courtX: 95, profondX: 70, dureeCourt: 1.0, dureeProfond: 1.1, pointsProfond: 3 },
   rapide: { fenetre: 0.3, bonus: 1.22 },     // relancer très vite après avoir attrapé = lancer PUISSANT
+  armeAvant: 0.3,         // Lionel arme son bras (pose « arme ») ce temps avant de lancer : un indice pour toi
+  dureePose: { lance: 0.28, touche: 0.9 },   // durée des poses de lancer et de touché (s)
   echelleIllustre: 0.5,   // taille à l'écran des illustrations de Lionel (découpées à moitié de la planche)
   hauteurMain: 34,        // hauteur du frisbee en vol (au niveau de la main)
 

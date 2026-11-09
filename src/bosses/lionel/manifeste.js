@@ -35,7 +35,10 @@ export const MANIFESTE = {
     // course en 6 images (assets_inbox/lionel_course_6.jpg, découpée par outils/lionel/decouper_animation.py --par-ligne 3, cases retournées)
     lionel_course: { fichier: 'sprites/lionel/lionel_course6.png', largeur: 172, hauteur: 296, images: 6, vitesse: 12, provisoire: { forme: 'joueurFrisbee', pose: 'course', ...LIONEL } },
     lionel_tient: { fichier: 'sprites/lionel/lionel_tient.png', largeur: 178, hauteur: 266, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...LIONEL } },
-    lionel_lance: { fichier: 'sprites/lionel/lionel_lance.png', largeur: 228, hauteur: 269, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'lance', ...LIONEL } },
+    // lancer en 3 temps (assets_inbox/lionel_lancer_3.jpg, outils/lionel/preparer_lancer.py puis decouper_animation.py) :
+    // « arme » = il arme son bras (frisbee dans la main, 0,3 s avant de lancer) ; « lance » = lâcher + accompagnement
+    lionel_arme: { fichier: 'sprites/lionel/lionel_arme.png', largeur: 191, hauteur: 277, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'tient', ...LIONEL } },
+    lionel_lance: { fichier: 'sprites/lionel/lionel_lance2.png', largeur: 191, hauteur: 277, images: 2, vitesse: 7, boucle: false, provisoire: { forme: 'joueurFrisbee', pose: 'lance', ...LIONEL } },
     lionel_super: { fichier: 'sprites/lionel/lionel_super.png', largeur: 225, hauteur: 210, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'super', ...LIONEL } },
     lionel_rattrape: { fichier: 'sprites/lionel/lionel_rattrape.png', largeur: 147, hauteur: 299, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'rattrape', ...LIONEL } },
     lionel_plongeon: { fichier: 'sprites/lionel/lionel_plongeon.png', largeur: 300, hauteur: 170, images: 1, vitesse: 1, provisoire: { forme: 'joueurFrisbee', pose: 'plongeon', ...LIONEL } },
