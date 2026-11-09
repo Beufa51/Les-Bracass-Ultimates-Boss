@@ -10,9 +10,9 @@ export const IDENTITE = { id: 'finale', nom: 'le mécha des Bracass\'' };
 export const DIFFICULTES = {
   facile:   { nom: 'FACILE',   couleur: '#7fff7f', vies: 8, bombes: 3, vitesse: 0.72, cadence: 0.62, pv: 0.8,
     texte: 'Tirs lents et rares, 8 cœurs, 3 bombes. Pour profiter du spectacle.' },
-  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vies: 5, bombes: 2, vitesse: 1,    cadence: 1,    pv: 1,
+  normal:   { nom: 'NORMAL',   couleur: '#ffd84a', vies: 5, bombes: 2, vitesse: 1.1,  cadence: 1.15, pv: 1.1,   // Fabien : « un peu facile » (1 / 1 / 1 avant)
     texte: 'Le vrai combat final : 5 cœurs, 2 bombes.' },
-  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vies: 4, bombes: 1, vitesse: 1.1,  cadence: 1.15, pv: 1.1,
+  champion: { nom: 'CHAMPION', couleur: '#ff5a6e', vies: 4, bombes: 1, vitesse: 1.22, cadence: 1.3,  pv: 1.2,
     texte: '4 cœurs, 1 bombe, des tirs partout. Pour les vrais.' },
 };
 
@@ -56,7 +56,9 @@ export const REGLAGES = {
               superLancer: { toutesLes: 5.5, preavis: 0.9, vitesse: 950 } },
     greg:   { jabs: { periode: 1.25, vitesse: 270 },
               poing: { toutesLes: 5, preavis: 1.1, hauteur: 70, vitesse: 750, rafale: 1 },
-              dempsey: { toutesLes: 13, rafale: 3, preavis: 0.7 } },
+              // DEMPSEY ROLL : le poing parcourt un grand ∞ (dessiné en pointillés rouges pendant le préavis) ; cx, cy = milieu,
+              // largeur = demi-largeur, hauteur = facteur vertical (le ∞ fait ± 0,35 x hauteur)
+              dempsey: { toutesLes: 12, preavis: 1.3, duree: 2.6, cx: 320, cy: 275, largeur: 250, hauteur: 470 } },
     julien: { copies: { periode: 0.45, vitesse: 120 },
               interro: { toutesLes: 6.5, anneaux: 3, parAnneau: 12, vitesse: 135, ecart: 0.5 } },
     beufa:  { cone: { angle: 0.3, balayage: 0.7, portee: 900, repere: 0.6, delai: 0.45, rafale: 3, vitesse: 430 },   // delai : entre le « ! » et la rafale

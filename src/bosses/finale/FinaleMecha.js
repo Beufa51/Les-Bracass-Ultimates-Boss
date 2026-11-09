@@ -26,7 +26,7 @@ export class FinaleMecha extends BossScene {
   create() {
     const d = this.donnees;
     this.etat = 'intro'; this.T = 0; this.gagne = false;
-    this.balles = []; this.tirs = []; this.couloirs = []; this.traits = []; this.flaques = []; this.cibles = [];
+    this.balles = []; this.tirs = []; this.couloirs = []; this.traits = []; this.flaques = []; this.cibles = []; this.chemins = [];
     this.eclats = []; this.explos = []; this.att = {};
     this.stats = { coups: 0, bombes: 0, continues: d.continues || 0 };
     etiquettesTactiles({ espace: null, z: null, x: null, haut: null, bas: null, gauche: null, droite: null });
@@ -180,7 +180,7 @@ export class FinaleMecha extends BossScene {
     jouerSon(this, 'finale_bombe');
     this.cameras.main.flash(300, 255, 240, 200); this.cameras.main.shake(300, 0.01);
     for (const b of this.balles) this.eclat(b.x, b.y, 0xffffff);
-    this.balles = []; this.couloirs = []; this.traits = []; this.cibles = [];
+    this.balles = []; this.couloirs = []; this.traits = []; this.cibles = []; this.chemins = [];
     this.invincible = Math.max(this.invincible, R.bombe.invincible);
     this.toucherPartie(this.parties[this.actuelle], R.bombe.degats);
     this.bandeau('LE CRI DES BRACASS\' !', 0.8, '#ffffff');
@@ -233,6 +233,8 @@ export class FinaleMecha extends BossScene {
     if (this.recharge <= 0) {
       this.recharge = V.cadence;
       this.tirs.push({ x: v.x + 40, y: v.y - 7 }, { x: v.x + 40, y: v.y + 7 });
+      jouerSon(this, 'finale_tir', { volume: 0.35 });
+      this.eclat(v.x + 44, v.y, 0xfff27a);   // éclair au bout du canon
     }
     const pas = V.vitesseTir * dt;
     this.tirs = this.tirs.filter(t => {
@@ -241,7 +243,11 @@ export class FinaleMecha extends BossScene {
         t.x += pas / 3;
         // seule la partie VISÉE prend les tirs (les autres sont traversées : sinon le torse cachait le bras de Lionel)
         const p = this.partieEn(t.x, t.y, this.parties[this.actuelle]);
-        if (p) { this.toucherPartie(p, V.degats); this.eclat(t.x, t.y, 0xffd84a); return false; }
+        if (p) {
+          this.toucherPartie(p, V.degats); this.eclat(t.x, t.y, 0xffd84a);
+          if (!(this.T < this.prochainImpact)) { this.prochainImpact = this.T + 0.07; jouerSon(this, 'finale_impact', { volume: 0.5 }); }
+          return false;
+        }
       }
       return t.x < LARGEUR + 20;
     });
@@ -261,7 +267,7 @@ export class FinaleMecha extends BossScene {
 
   detruirePartie(p) {
     p.detruite = true; p.pv = 0;
-    jouerSon(this, 'finale_explosion');
+    jouerSon(this, 'finale_partie');
     this.cameras.main.shake(500, 0.012);
     const c = this.origine(p.id);
     for (let k = 0; k < 8; k++) this.time.delayedCall(k * 160, () => this.explosion(c.x + Phaser.Math.Between(-60, 60), c.y + Phaser.Math.Between(-70, 70), 50));
@@ -272,7 +278,7 @@ export class FinaleMecha extends BossScene {
     this.tweens.add({ targets: bulle, y: bulle.y - 90, alpha: 0, delay: 1600, duration: 1200, onComplete: () => bulle.destroy() });
     // tous les tirs s'effacent, la partie tombe
     for (const b of this.balles) this.eclat(b.x, b.y, 0xffffff);
-    this.balles = []; this.couloirs = []; this.traits = []; this.cibles = [];
+    this.balles = []; this.couloirs = []; this.traits = []; this.cibles = []; this.chemins = [];
     this.time.delayedCall(R.explosionPartie * 1000, () => {
       p.tombe = true;
       this.tweens.add({ targets: p.spr, y: p.spr.y + 500, angle: p.i % 2 ? 25 : -25, alpha: 0, duration: 1100, ease: 'Quad.In' });
@@ -362,11 +368,27 @@ export class FinaleMecha extends BossScene {
       this.balle(LARGEUR - 160, this.couloirY, Math.PI, A.poing.vitesse, 'poing', 32);
     });
     if (this.minuteur('poing', A.poing.toutesLes, 2.5)) poing(A.poing.preavis);
-    if (this.minuteur('dempsey', A.dempsey.toutesLes, 8)) {
-      this.bandeau('DEMPSEY ROLL !', 0.8, '#ff6b6b');
-      for (let k = 0; k < A.dempsey.rafale; k++) this.time.delayedCall(k * (A.dempsey.preavis + 0.35) * 1000, () => { if (this.etat === 'jeu' && this.actuelle === 3) poing(A.dempsey.preavis); });
-      this.att.poing = Math.max(this.att.poing, A.dempsey.rafale * (A.dempsey.preavis + 0.35) + 1);
-    }
+    if (this.minuteur('dempsey', A.dempsey.toutesLes, 7)) this.dempsey(A.dempsey, o);
+  }
+
+  // DEMPSEY ROLL : un grand ∞ en pointillés rouges (le chemin du poing), puis le poing le parcourt en entier et repart.
+  // On s'abrite DANS une boucle du ∞ ou loin de lui.
+  dempsey(D, o) {
+    this.bandeau('DEMPSEY ROLL !', 0.9, '#ff6b6b');
+    jouerSon(this, 'finale_alerte');
+    const duree = D.duree / this.diff.vitesse, ch = { ...D, t: 0, preavis: D.preavis / Math.sqrt(this.diff.vitesse) };
+    this.chemins.push(ch);
+    this.att.poing = Math.max(this.att.poing || 0, ch.preavis + duree + 1.5);   // pas d'autre poing pendant le ∞
+    this.att.jabs = Math.max(this.att.jabs || 0, ch.preavis + duree);
+    this.time.delayedCall(ch.preavis * 1000, () => {
+      if (this.etat !== 'jeu' || this.actuelle !== 3 || !this.chemins.includes(ch)) return;
+      ch.actif = true; jouerSon(this, 'finale_dempsey');
+      this.balles.push({ x: o.x, y: o.y, vx: 0, vy: 0, type: 'poing', r: 30, age: 0, chemin: ch, duree, x0: o.x, y0: o.y, approche: 0.35, trace: [] });
+    });
+  }
+  pointInfini(ch, u) {
+    const s = Math.sin(u), c = Math.cos(u), k = 1 + s * s;
+    return { x: ch.cx + ch.largeur * c / k, y: ch.cy + ch.hauteur * s * c / k };
   }
 
   julien(A, o) {
@@ -433,19 +455,38 @@ export class FinaleMecha extends BossScene {
       if (c.t >= c.duree && !c.fini) {
         c.fini = true;
         this.flaques.push({ x: c.x, y: c.y, r: M.rayon, t: 0, duree: M.duree });
-        this.explosion(c.x, c.y, 30, 0xfff2b0);
+        this.explosion(c.x, c.y, 30, 0xfff2b0); jouerSon(this, 'finale_explosion', { volume: 0.4 });
         if (!sansDegats && Math.hypot(c.x - px, c.y - py) < 28 + rayon) this.blesse();
       }
     }
     this.cibles = this.cibles.filter(c => !c.fini);
     this.flaques = this.flaques.filter(f => (f.t += dt) < f.duree);
+    for (const ch of this.chemins) ch.t += dt;
     this.balles = this.balles.filter(b => {
-      b.age += dt; b.x += b.vx * dt; b.y += b.vy * dt;
+      b.age += dt;
+      if (b.chemin) this.suivreInfini(b, dt);
+      else { b.x += b.vx * dt; b.y += b.vy * dt; }
       if (b.type === 'copie') b.x = b.balance + Math.sin(b.age * 3 + b.balance) * 28;
       if (b.type === 'frisbee' && b.rebonds > 0 && (b.y < 12 || b.y > HAUTEUR - 12)) { b.vy *= -1; b.rebonds--; b.y = Phaser.Math.Clamp(b.y, 12, HAUTEUR - 12); }
       if (!sansDegats && Math.hypot(b.x - px, b.y - py) < b.r + rayon) { this.blesse(); return false; }
       return b.x > -60 && b.x < LARGEUR + 60 && b.y > -60 && b.y < HAUTEUR + 60;
     });
+  }
+
+  // le poing du DEMPSEY : approche jusqu'au bout droit du ∞, le parcourt une fois, puis repart vers le mécha
+  suivreInfini(b, dt) {
+    const ch = b.chemin, ax = b.x, ay = b.y;
+    if (b.age < b.approche) {
+      const k = b.age / b.approche, d = this.pointInfini(ch, 0);
+      b.x = b.x0 + (d.x - b.x0) * k; b.y = b.y0 + (d.y - b.y0) * k;
+    } else {
+      const u = (b.age - b.approche) / b.duree * 2 * Math.PI;
+      if (u >= 2 * Math.PI) { b.chemin = null; b.vx = 700; b.vy = 0; this.chemins = this.chemins.filter(c => c !== ch); return; }
+      if (u > Math.PI && !b.mi) { b.mi = true; jouerSon(this, 'finale_dempsey'); }
+      const p = this.pointInfini(ch, u); b.x = p.x; b.y = p.y;
+    }
+    b.vx = (b.x - ax) / Math.max(dt, 1e-3); b.vy = (b.y - ay) / Math.max(dt, 1e-3);   // (pour le bot : où il va)
+    b.trace.unshift({ x: b.x, y: b.y }); if (b.trace.length > 6) b.trace.pop();
   }
 
   blesse() {
@@ -492,7 +533,7 @@ export class FinaleMecha extends BossScene {
     this.bandeau('LE MÉCHA EXPLOSE !', 2, '#ffd84a');
     for (let k = 0; k < 16; k++) this.time.delayedCall(k * 140, () => {
       this.explosion(this.mecha.x + Phaser.Math.Between(-150, 150), Phaser.Math.Between(80, 500), Phaser.Math.Between(40, 90));
-      if (k % 3 === 0) { jouerSon(this, 'finale_explosion'); this.cameras.main.shake(200, 0.015); }
+      if (k % 3 === 0) { jouerSon(this, k % 6 ? 'finale_explosion' : 'finale_partie'); this.cameras.main.shake(200, 0.015); }
     });
     this.time.delayedCall(2600, () => { this.cameras.main.flash(600, 255, 255, 255); this.parties.forEach(p => p.spr.setVisible(false)); });
     this.time.delayedCall(3400, () => { this.gagne = true; this.victoire(this.messageFin()); });
@@ -588,6 +629,11 @@ export class FinaleMecha extends BossScene {
       a.lineStyle(3 + 4 * tr.t / tr.duree, 0xff3030, 0.5 + 0.5 * (Math.floor(tr.t * 12) % 2));
       a.lineBetween(tr.x, tr.y, tr.x + Math.cos(tr.a) * 1200, tr.y + Math.sin(tr.a) * 1200);
     }
+    for (const ch of this.chemins) {
+      const clign = ch.actif ? 0.18 : (Math.floor(ch.t * 8) % 2 ? 0.95 : 0.45);
+      a.fillStyle(0xff2a3a, clign);
+      for (let k = 0; k < 64; k++) { const q = this.pointInfini(ch, k / 64 * 2 * Math.PI); a.fillCircle(q.x, q.y, ch.actif ? 4 : 6); }
+    }
     for (const f of this.flaques) a.fillStyle(0xfff2b0, 0.35 * (1 - f.t / f.duree) + 0.15).fillCircle(f.x, f.y, f.r);
     for (const c of this.cibles) {
       const k = c.t / c.duree;
@@ -614,7 +660,14 @@ export class FinaleMecha extends BossScene {
         case 'pinte': g.fillStyle(0xf2b630, 1).fillRect(b.x - 7, b.y - 9, 14, 18).strokeRect(b.x - 7, b.y - 9, 14, 18); g.fillStyle(0xffffff, 1).fillRect(b.x - 8, b.y - 12, 16, 5); break;
         case 'frisbee': g.fillStyle(0xff8a1c, 1).fillEllipse(b.x, b.y, b.r * 2.4, b.r * 1.3).strokeEllipse(b.x, b.y, b.r * 2.4, b.r * 1.3); break;
         case 'feu': g.fillStyle(0xff3b1c, 1).fillCircle(b.x, b.y, b.r).strokeCircle(b.x, b.y, b.r); g.fillStyle(0xffe14a, 0.8).fillCircle(b.x + 12, b.y, b.r * 0.8); break;
-        case 'poing': g.fillStyle(0xd8202c, 1).fillCircle(b.x, b.y, b.r).strokeCircle(b.x, b.y, b.r); g.fillStyle(0xffffff, 0.5).fillCircle(b.x - 8, b.y - 8, b.r * 0.3); break;
+        case 'poing':
+          if (b.trace) b.trace.forEach((q, k) => g.fillStyle(0xd8202c, 0.35 - k * 0.05).fillCircle(q.x, q.y, b.r * (1 - k * 0.08)));
+          // un GANT DE BOXE : poing rouge, pouce, poignet blanc (côté mécha, à droite), reflet
+          g.lineStyle(3, 0x000000, 0.9);
+          g.fillStyle(0xf2f2f2, 1).fillRect(b.x + b.r * 0.55, b.y - b.r * 0.55, b.r * 0.6, b.r * 1.1).strokeRect(b.x + b.r * 0.55, b.y - b.r * 0.55, b.r * 0.6, b.r * 1.1);
+          g.fillStyle(0xd8202c, 1).fillCircle(b.x, b.y, b.r).strokeCircle(b.x, b.y, b.r);
+          g.fillStyle(0xd8202c, 1).fillEllipse(b.x + b.r * 0.1, b.y + b.r * 0.62, b.r * 0.9, b.r * 0.55).strokeEllipse(b.x + b.r * 0.1, b.y + b.r * 0.62, b.r * 0.9, b.r * 0.55);
+          g.fillStyle(0xffffff, 0.55).fillEllipse(b.x - b.r * 0.35, b.y - b.r * 0.4, b.r * 0.6, b.r * 0.35); break;
         case 'jab': g.fillStyle(0xd8202c, 1).fillCircle(b.x, b.y, b.r).strokeCircle(b.x, b.y, b.r); break;
         case 'copie': g.fillStyle(0xffffff, 1).fillRect(b.x - 7, b.y - 9, 14, 18).strokeRect(b.x - 7, b.y - 9, 14, 18); g.lineStyle(1, 0x3060c0, 1).lineBetween(b.x - 4, b.y - 3, b.x + 4, b.y - 3).lineBetween(b.x - 4, b.y + 2, b.x + 4, b.y + 2); break;
         case 'note': g.fillStyle(0xff3a5a, 1).fillCircle(b.x, b.y, b.r).strokeCircle(b.x, b.y, b.r); g.fillStyle(0xffffff, 1).fillCircle(b.x, b.y, b.r * 0.45); break;

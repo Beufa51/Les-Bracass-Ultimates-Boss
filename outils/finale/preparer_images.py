@@ -67,13 +67,16 @@ if '--controle' in sys.argv:   # chaque partie teintée d'une couleur, pour vér
         sel = m & (A[:, :, 3] > 40); c[sel] = c[sel] * 0.45 + np.array(COUL[nom]) * 0.55
     Image.fromarray(c.astype(np.uint8)).save(sys.argv[sys.argv.index('--controle') + 1]); sys.exit()
 
+# Fabien : le robot doit être tourné VERS TON VAISSEAU (à gauche) : tout est retourné en MIROIR après la découpe
+# (les ZONES restent en coordonnées de l'image d'origine). Le lanceur de frisbees de Lionel vise ainsi à gauche.
+MIROIR = Image.FLIP_LEFT_RIGHT
 boite = robot.getbbox()
 f = 0.5
 taille = (round((boite[2] - boite[0]) * f), round((boite[3] - boite[1]) * f))
-robot.crop(boite).resize(taille, Image.LANCZOS).save(SORTIE + 'mecha.png', optimize=True)
+robot.crop(boite).resize(taille, Image.LANCZOS).transpose(MIROIR).save(SORTIE + 'mecha.png', optimize=True)
 for nom, m in parties.items():
     a = A.copy(); a[~m, 3] = 0
-    Image.fromarray(a, 'RGBA').crop(boite).resize(taille, Image.LANCZOS).save(SORTIE + f'mecha_{nom}.png', optimize=True)
+    Image.fromarray(a, 'RGBA').crop(boite).resize(taille, Image.LANCZOS).transpose(MIROIR).save(SORTIE + f'mecha_{nom}.png', optimize=True)
 print('mecha', taille)
 
 # ---- le vaisseau (nez vers la droite) ----
@@ -88,7 +91,7 @@ print('fond', d.size)
 
 # ---- la case du milieu du hub : le robot entier + son ombre ----
 L, H = 240, 338
-r = robot.crop(boite); r = r.resize((round(r.width * H / r.height), H), Image.LANCZOS)
+r = robot.crop(boite).transpose(MIROIR); r = r.resize((round(r.width * H / r.height), H), Image.LANCZOS)
 case = Image.new('RGBA', (L, H)); case.alpha_composite(r, ((L - r.width) // 2, 0))
 case.save('assets/sprites/hub/select_mecha.png', optimize=True)
 al = np.asarray(case)[:, :, 3] > 90

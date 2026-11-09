@@ -144,7 +144,14 @@
   - Bot `outils/finale_bot.mjs` (4 parties x 3 difficultés x 3 profils, ≈ 1 min) : FACILE expert/moyen gagnent sans
     continue (moyen 3/4), enfant 1 continue ; NORMAL expert 0,5 continue, moyen 1,8, enfant 3,5 (temps ≈ 170-220 s) ;
     CHAMPION expert 2,3, moyen 4, enfant perd. Le plus de coups : rafale du CÔNE de Beufa (le bot lit mal le « ! »).
-  - Reste : cinématique de fin (photo de groupe avec les poses de l'intro, bilan, générique), vrais sons, retours de Fabien.
+  - RETOURS DE FABIEN (9 nov. 2026) faits : robot retourné en MIROIR (tourné vers ton vaisseau ; `MIROIR` dans
+    `outils/finale/preparer_images.py`) ; BRUITAGES synthétisés `outils/finale/generer_sons.py` → `assets/audio/finale/*.wav`
+    (tir à chaque salve, impact métallique, explosions, bombe, touché, alerte, souffle du Dempsey) ; DEMPSEY ROLL de Greg =
+    le poing parcourt un grand ∞ annoncé en pointillés rouges (`attaques.greg.dempsey`, `pointInfini`) ; NORMAL plus dur
+    (vitesse 1,1, cadence 1,15, pv 1,1) et CHAMPION (1,22 / 1,3 / 1,2).
+  - Bot après ces retours : FACILE expert/moyen sans continue, enfant 0,8 ; NORMAL expert 1, moyen 1,5, enfant 5,5 (1/4) ;
+    CHAMPION expert 2,5, moyen 3,5. Temps NORMAL ≈ 205 s. (Fabien trouvait le NORMAL facile : le bot est plus faible qu'un humain.)
+  - Reste : cinématique de fin (photo de groupe avec les poses de l'intro, bilan, générique), retours de Fabien.
 
 ## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)
 - `showtime.rappel` 0,06 → 0,04 ; `gain` parfait 2,1 → 2,5, bien 1,3 → 1,5, raté 7 → 6. Avant, la jauge plafonnait vers

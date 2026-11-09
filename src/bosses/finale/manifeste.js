@@ -8,12 +8,15 @@ export const MANIFESTE = {
     finale_vaisseau: { fichier: 'sprites/finale/vaisseau.png', largeur: 200, hauteur: 116, images: 1, vitesse: 1 },
     finale_fond: { fichier: 'sprites/finale/fond.jpg', largeur: 2466, hauteur: 540, images: 1, vitesse: 1 },
   },
+  // bruitages synthétisés : python3 outils/finale/generer_sons.py assets/audio/finale
   sons: {
-    finale_tir:       { fichier: null, provisoire: { frequence: 1400, duree: 0.03 } },
-    finale_impact:    { fichier: null, provisoire: { frequence: 300, duree: 0.04 } },
-    finale_touche:    { fichier: null, provisoire: { frequence: 140, duree: 0.3 } },
-    finale_alerte:    { fichier: null, provisoire: { frequence: 880, duree: 0.12 } },
-    finale_bombe:     { fichier: null, provisoire: { frequence: 90, duree: 0.6 } },
-    finale_explosion: { fichier: null, provisoire: { frequence: 70, duree: 0.8 } },
+    finale_tir:       { fichier: 'audio/finale/finale_tir.wav' },
+    finale_impact:    { fichier: 'audio/finale/finale_impact.wav' },
+    finale_touche:    { fichier: 'audio/finale/finale_touche.wav' },
+    finale_alerte:    { fichier: 'audio/finale/finale_alerte.wav' },
+    finale_bombe:     { fichier: 'audio/finale/finale_bombe.wav' },
+    finale_explosion: { fichier: 'audio/finale/finale_explosion.wav' },
+    finale_partie:    { fichier: 'audio/finale/finale_partie.wav' },
+    finale_dempsey:   { fichier: 'audio/finale/finale_dempsey.wav' },
   },
 };

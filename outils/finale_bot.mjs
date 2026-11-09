@@ -70,6 +70,8 @@ async function jouer({ P, graine, limite }) {
       if (k > 0 && Math.abs((px - tr.x) * vy - (cy - tr.y) * vx) < 26 + P.marge) d += 35;
     }
     for (const c of sc.cibles) if (Math.hypot(c.x - px, c.y - cy) < 40 + P.marge) d += 25 * (c.t / c.duree + 0.3);
+    // le ∞ du Dempsey : rester loin du chemin (pointillés) tant que le poing peut y passer
+    for (const ch of sc.chemins) for (let k = 0; k < 32; k++) { const q = sc.pointInfini(ch, k / 32 * 2 * Math.PI); if (Math.hypot(q.x - px, q.y - cy) < 40 + P.marge) { d += 8; break; } }
     for (const f of sc.flaques) if (Math.hypot(f.x - px, f.y - cy) < f.r) d += 1.5;
     if (sc.cone && sc.parties[sc.actuelle] && sc.parties[sc.actuelle].id === 'beufa') {
       const c = sc.cone, a = Math.atan2(cy - c.y, px - c.x);
