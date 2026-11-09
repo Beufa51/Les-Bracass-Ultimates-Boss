@@ -117,6 +117,13 @@
 - Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
   allégée en 80 kbit/s ; original dans `assets_inbox/hub/`). Réglages de la grille : `src/hub/reglages.js`.
 
+## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)
+- `showtime.rappel` 0,06 → 0,04 ; `gain` parfait 2,1 → 2,5, bien 1,3 → 1,5, raté 7 → 6. Avant, la jauge plafonnait vers
+  45 % même en ne faisant QUE des PARFAITS (le rappel la ramenait au milieu) : le défi 80 % était impossible.
+- Simulation de la jauge (400 matchs, 2 TD, 2 jokers ; fichier jetable, pas de bot Kédric dans le dépôt) : médiane du public
+  expert 45 → 81 %, bon 23 → 49 %, moyen 6 → 23 % (gagne 68 → 95 %), enfant -18 → -12 % (gagne 8 → 20 %).
+  Défi 80 % : 0 % → environ 1 match sur 2 pour un expert (80 % de PARFAITS).
+
 ## DÉFIS pour les 6 boss + hub lisible (9 nov. 2026, Fabien : phrase du hub coupée, défis invisibles / absents)
 - `src/bosses/defis.js` = les NOMS des 3 défis de chaque boss (les tests restent dans les scènes : `lignesDefis` ou
   `defisNouveaux(idBoss, [{ id, test }])` de `core/sauvegarde.js`). Le tableau PROGRÈS liste chaque défi (✓ / ☐).

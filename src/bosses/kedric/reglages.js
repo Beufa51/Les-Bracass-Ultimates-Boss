@@ -118,10 +118,10 @@ export const REGLAGES = {
     ecartTech: 12,   // écart MINIMUM (s) entre deux techniques de Kédric : pas la mitraille
     double: { duree: 12 },
     combo: { nombre: 5, duree: 10, mult: 1.5 },
-    rappel: 0.06,   // AUDIT : la jauge revient vers le milieu de 6 % par seconde (des deux côtés) : fini les +100 / -100 d'avance
+    rappel: 0.04,   // AUDIT : la jauge revient vers le milieu de 4 % par seconde (9 nov. 2026 : 6 % → 4 %, à 6 % même 100 % de PARFAITS plafonnait vers 45 %) (des deux côtés) : fini les +100 / -100 d'avance
     // AUDIT (calé au bot, 36 matchs) : NORMAL joueur moyen gagne de justesse (19 à 51 % du public), joueur enfant
     // gagne en FACILE (5 à 40 %) et perd en NORMAL ; CHAMPION joueur moyen : une chance sur deux. (Avant : ±0,12 / ±0,28 s, +100 pour tous.)
-    parfait: 0.07, bien: 0.16, gain: { parfait: 2.1, bien: 1.3, rate: 7 },   // (Fabien perdait 2 fois de suite concentré : raté 8 → 7, bien 1,2 → 1,3)
+    parfait: 0.07, bien: 0.16, gain: { parfait: 2.5, bien: 1.5, rate: 6 },   // (Fabien perdait 2 fois de suite concentré : raté 8 → 7, bien 1,2 → 1,3 ; 9 nov. 2026 « pas assez de public » : parfait 2,1 → 2,5, bien 1,3 → 1,5, raté 7 → 6)
     parTouchdown: 15, avanceMax: 30,
     jokerParTouchdown: 1 },   // AUDIT : chaque touchdown = 1 JOKER au battle (un raté pardonné : le public ne bouge pas)
   // ---------- Kédric en personne sur le terrain (option : course avec kedric: true) ----------
