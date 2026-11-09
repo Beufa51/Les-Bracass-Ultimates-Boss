@@ -1602,6 +1602,13 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Résolution : l'image de Fabien fait 375×512 (le perso 162×488) ; elle est affichée à sa taille (500 px de haut sur
   un jeu de 540) : pour plus net, il faut un original plus grand (même prompt, « high resolution »).
 
+## HUB + INTRO (nov. 2026, demandes de Fabien)
+- Sélection des boss (`src/hub/HubScene.js`, `toucher`) : 1er toucher = choisir la case (cadre jaune, bip), 2e toucher
+  sur la MÊME case = l'affronter (avant : un seul toucher lançait direct). Clavier inchangé (flèches + Espace).
+- Intro (`src/hub/IntroScene.js`) : passer l'intro = la musique REPART DU DÉBUT (avant : sautée à la fin du morceau) ;
+  intro regardée jusqu'au bout = la musique continue. Le titre a sa propre horloge (`tTitre`) pour « appuie pour jouer ».
+- Vérifié dans le navigateur : saut → musique à 1 s, 3e appui → Hub ; hub : 1er toucher = choix, 2e = entrée ; 0 erreur.
+
 ## GREG — UN SEUL COUP DE POING (nov. 2026, demande de Fabien : « visage / corps en plus des esquives, trop compliqué »)
 - Espace et Z (téléphone : toucher n'importe où à DROITE) = le même coup. Plus de cadre gris « zone protégée », plus de
   « Garde HAUTE / BASSE : vise... », plus de ligne VISAGE / CORPS sur téléphone. Greg garde ses coups au corps (« ! ▼ »

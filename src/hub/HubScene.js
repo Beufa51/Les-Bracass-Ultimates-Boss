@@ -55,7 +55,7 @@ export class HubScene extends Phaser.Scene {
     this.cadreChoix = this.add.graphics().setDepth(5);
 
     this.aide = texte(this, 590, R.bandeauY,
-      estTactile() ? 'Touche le boss à affronter' : '◀ ▲ ▼ ▶ choisir   ESPACE combattre', 14, '#c8d8ff');
+      estTactile() ? 'Touche un boss pour le voir, touche-le encore pour combattre' : '◀ ▲ ▼ ▶ choisir   ESPACE combattre', 14, '#c8d8ff');
     this.infos = texte(this, LARGEUR / 2, R.infosY, '', 18, '#ffffff', { stroke: '#0a1440', strokeThickness: 5 });
     this.touches = creerTouches(this);
     this.input.on('pointerdown', (p) => this.toucher(p.x, p.y));
@@ -163,12 +163,12 @@ export class HubScene extends Phaser.Scene {
     else if (vientDAppuyer(t.espace)) this.valider();
   }
 
-  // toucher une case = l'affronter tout de suite (un seul toucher, comme on s'y attend)
+  // nov. 2026 (Fabien) : 1er toucher = choisir la case (on la voit), 2e toucher sur la MÊME case = l'affronter
   toucher(x, y) {
     if (this.entree) return;
     const c = this.cases.find(k => Math.abs(k.x - x) < (R.caseL + R.ecart) / 2 && Math.abs(k.y - y) < (R.caseH + R.ecart) / 2);
     if (!c) return;
-    if (c !== this.choix) { this.choix = c; this.majChoix(); }
+    if (c !== this.choix) { this.choix = c; jouerSon(this, 'ui_valider'); this.majChoix(); return; }
     this.valider(c);
   }
 

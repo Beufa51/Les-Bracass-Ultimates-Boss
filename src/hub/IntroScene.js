@@ -4,7 +4,7 @@
 // en OMBRE avec un liseré de sa couleur et repart vers le haut dans un trait de lumière ; à la fin, le titre.
 // Un boss BATTU se DÉVOILE (flash blanc puis couleurs) : l'intro se remplit au fur et à mesure de la partie.
 // Calée sur la musique (intro_musique, 161 BPM) : les dates sont lues sur la lecture réelle du morceau.
-// Toucher / touche pendant la séquence = sauter au titre ; sur le titre = aller à l'écran de sélection.
+// Toucher / touche pendant la séquence = sauter au titre (la musique repart du début) ; sur le titre = aller à l'écran de sélection.
 // Images : python3 outils/intro/preparer_intro.py (bustes) et preparer_poses.py (poses façon commando, prioritaires). Réglages : INTRO ci-dessous.
 // =====================================================================
 import { LARGEUR, HAUTEUR } from '../core/reglages.js';
@@ -68,7 +68,7 @@ export class IntroScene extends Phaser.Scene {
       jouerMusique(this, 'intro_musique');   // pendant l'appui : autorisé même sur téléphone
     } else if (this.etat === 'sequence') {
       this.sauterAuTitre();
-    } else if (this.etat === 'titre' && this.t > INTRO.titre + 0.6) {
+    } else if (this.etat === 'titre' && this.tTitre > 0.6) {
       this.etat = 'fin';
       this.cameras.main.fadeOut(400, 255, 255, 255);
       this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Hub'));
@@ -80,6 +80,7 @@ export class IntroScene extends Phaser.Scene {
     const dt = dtMs / 1000;
     this.dessinerFond(dt);
     if (this.etat === 'attente' || this.etat === 'fin') return;
+    if (this.etat === 'titre') { this.tTitre += dt; return; }   // titre : sa propre horloge (la musique a pu repartir de 0)
     const m = tempsMusique('intro_musique');
     if (m !== null) this.t = m;
     else if ((this.attente += dt) > 1.2) this.t += dt;   // musique bloquée ou absente : on avance quand même
@@ -205,7 +206,9 @@ export class IntroScene extends Phaser.Scene {
     this.cameras.main.resetFX();
     for (const p of INTRO.passages) this.faits.add('boss' + INTRO.passages.indexOf(p));
     this.faits.add('ouverture').add('rafale');
-    placerMusique('intro_musique', INTRO.titre - 0.05);
+    // nov. 2026 (Fabien) : intro passée = la musique REPART DU DÉBUT (avant : elle sautait à la fin du morceau) ;
+    // si on regarde l'intro jusqu'au bout, elle continue normalement
+    placerMusique('intro_musique', 0);
     this.t = INTRO.titre;
     this.vitesse = 1;
     this.montrerTitre();
@@ -214,7 +217,7 @@ export class IntroScene extends Phaser.Scene {
   montrerTitre() {
     if (this.etat === 'titre') return;
     this.faits.add('titre');
-    this.etat = 'titre';
+    this.etat = 'titre'; this.tTitre = 0;
     this.ambiance(0x1a2a6a, 0.35);
     this.cameras.main.flash(500, 255, 255, 255);
     this.cameras.main.shake(300, 0.012);
