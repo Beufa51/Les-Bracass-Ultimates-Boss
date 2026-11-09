@@ -751,6 +751,8 @@
   bloqué à l'horizontale), bouton ⛶ en haut à gauche pour y revenir ; sur iPhone (pas de plein écran dans Safari),
   astuce une fois : « Partager → Sur l'écran d'accueil » ; `manifest.webmanifest` + icônes `assets/ui/icone_*.png`
   => depuis l'écran d'accueil, le jeu s'ouvre en plein écran comme une appli.
+- PLEIN ÉCRAN sur PC (9 nov. 2026, Fabien) : petit bouton ⛶ discret en bas à droite (`boutonPC` dans `pleinEcran.js`),
+  entre / sort du plein écran (🗗 = sortir, ou Échap) ; F11 du navigateur marche aussi.
 - Allègement : musique de Greg en 64 kbit/s (2,5 Mo), clip du Dempsey en MP4 (190 Ko au lieu du GIF de 1 Mo).
 - Manifeste unique des visuels/sons : `assets/manifeste.js`. Tant qu'un visuel n'a pas de fichier,
   il est dessiné par le code dans `src/core/dessins.js` (style manga : contours, ombres, reflets).

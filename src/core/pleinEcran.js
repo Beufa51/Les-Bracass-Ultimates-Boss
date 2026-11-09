@@ -18,8 +18,37 @@ function passerEnPleinEcran() {
   }).catch(() => {});
 }
 
+// PC (demande de Fabien) : un petit bouton ⛶ discret en bas à droite, qui entre en plein écran ou en sort
+// (la touche F11 du navigateur marche aussi ; Échap sort du plein écran)
+function boutonPC(jeu) {
+  if (!peutPleinEcran()) return;
+  const b = document.createElement('button');
+  b.title = 'Plein écran';
+  Object.assign(b.style, {
+    position: 'fixed', right: '8px', bottom: '8px', width: '38px', height: '30px', zIndex: 11, cursor: 'pointer',
+    border: '2px solid rgba(255,255,255,0.5)', borderRadius: '8px', background: 'rgba(20,20,30,0.5)',
+    color: '#fff', font: 'bold 16px monospace', opacity: '0.45', transition: 'opacity 0.2s',
+  });
+  b.addEventListener('mouseenter', () => { b.style.opacity = '1'; });
+  b.addEventListener('mouseleave', () => { b.style.opacity = '0.45'; });
+  b.addEventListener('click', (e) => {
+    e.preventDefault(); e.stopPropagation(); b.blur();
+    if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else passerEnPleinEcran();
+  });
+  document.body.appendChild(b);
+  const maj = () => {
+    const plein = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    b.textContent = plein ? '🗗' : '⛶'; b.title = plein ? 'Quitter le plein écran (Échap)' : 'Plein écran';
+    setTimeout(() => jeu.scale.refresh(), 150);   // Phaser recalcule la taille du jeu
+  };
+  document.addEventListener('fullscreenchange', maj);
+  document.addEventListener('webkitfullscreenchange', maj);
+  maj();
+}
+
 export function installerPleinEcran(jeu) {
-  if (!estTactile()) return;
+  if (!estTactile()) { boutonPC(jeu); return; }
   // bouton ⛶ en haut à gauche
   const b = document.createElement('button');
   b.textContent = '⛶';
