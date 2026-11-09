@@ -8,7 +8,8 @@
 import { LARGEUR, HAUTEUR } from '../core/reglages.js';
 import { texte } from '../core/ui.js';
 import { creerTouches, vientDAppuyer } from '../core/clavier.js';
-import { Sauvegarde, formatTemps } from '../core/sauvegarde.js';
+import { Sauvegarde, formatTemps, SCENES_REPRISE } from '../core/sauvegarde.js';
+import { ouvrirProgression } from './progression.js';
 import { jouerSon } from '../core/ressources.js';
 import { jouerMusique } from '../core/musique.js';
 import { BOSS } from '../bosses/liste.js';
@@ -61,6 +62,11 @@ export class HubScene extends Phaser.Scene {
     this.input.on('pointerdown', (p) => this.toucher(p.x, p.y));
     this.input.keyboard.on('keydown-D', () => ouvrirReglagesDev(this.game));
     this.input.keyboard.on('keydown-F', () => { if (this.complet) this.voirFin(); });
+    // (audit méta) tableau de PROGRESSION + sauvegarde à recopier : bouton en haut à droite, ou T
+    const prog = texte(this, LARGEUR - 84, 30, estTactile() ? '📋 PROGRÈS' : '📋 PROGRÈS (T)', 18, '#ffffff',
+      { fontStyle: 'bold', backgroundColor: '#0a1440', padding: { x: 8, y: 6 } }).setInteractive().setDepth(6);
+    prog.on('pointerdown', (p, x, y, ev) => { ev.stopPropagation(); this.progression(); });
+    this.input.keyboard.on('keydown-T', () => this.progression());
     this.cameras.main.fadeIn(250);
     this.majChoix();
     if (this.complet && !Sauvegarde.fait('finale_vue')) { Sauvegarde.marquerFait('finale_vue'); this.time.delayedCall(700, () => this.voirFin()); }
@@ -172,6 +178,12 @@ export class HubScene extends Phaser.Scene {
     this.valider(c);
   }
 
+  progression() {
+    if (this.entree) return;
+    this.entree = true;
+    ouvrirProgression(this, () => { this.entree = false; });
+  }
+
   voirFin() { if (this.entree) return; this.entree = true; this.scene.start('Finale'); }
 
   // façon Mega Man : la case s'illumine, le boss apparaît en grand dans une bande, puis on part chez lui
@@ -191,11 +203,44 @@ export class HubScene extends Phaser.Scene {
     const lettres = boss.nom.toUpperCase();
     for (let i = 1; i <= lettres.length; i++) this.time.delayedCall(250 + i * 70, () => { nom.setText(lettres.slice(0, i)); jouerSon(this, 'ui_valider'); });
     this.time.delayedCall(250 + lettres.length * 70 + 700, () => {
-      this.cameras.main.fadeOut(250);
-      this.cameras.main.once('camerafadeoutcomplete', () => {
-        if (boss.pret) this.scene.start(boss.phases[0].scene, { phase: boss.phases[0].id });
-        else this.scene.start('Bientot', { bossId: boss.id });
-      });
+      const partir = (scene, donnees) => {
+        this.cameras.main.fadeOut(250);
+        this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start(scene, donnees));
+      };
+      if (!boss.pret) return partir('Bientot', { bossId: boss.id });
+      const debut = () => { Sauvegarde.oublierReprise(boss.id); partir(boss.phases[0].scene, { phase: boss.phases[0].id }); };
+      const r = Sauvegarde.reprise(boss.id), etape = r && SCENES_REPRISE[r.scene];
+      if (!etape) return debut();
+      this.choixReprise(etape, r, () => partir(r.scene, r.donnees), debut);
     });
+  }
+
+  // (audit méta) boss en plusieurs jeux laissé en cours : REPRENDRE à l'étape atteinte, ou repartir du DÉBUT
+  choixReprise(etape, r, reprendre, debut) {
+    const ph = r.donnees && r.donnees.reprise && r.donnees.reprise.phase;
+    const y = HAUTEUR / 2 + 140;
+    this.add.rectangle(LARGEUR / 2, y, LARGEUR, 110, 0x0a1440, 0.95).setDepth(22);
+    texte(this, LARGEUR / 2, y - 32, `Tu t'étais arrêté ${etape.nom}${ph ? ` (phase ${ph})` : ''}`, 20, '#ffffff').setDepth(23);
+    const options = [
+      { x: LARGEUR / 2 - 170, txt: '▶ REPRENDRE', f: reprendre },
+      { x: LARGEUR / 2 + 170, txt: '⟲ DEPUIS LE DÉBUT', f: debut },
+    ];
+    let i = 0, fait = false;
+    const boutons = options.map((o, k) => texte(this, o.x, y + 14, o.txt, 24, '#ffd84a',
+      { fontStyle: 'bold', backgroundColor: '#1d3a8a', padding: { x: 14, y: 8 } }).setDepth(23).setInteractive());
+    const maj = () => boutons.forEach((b, k) => b.setAlpha(k === i ? 1 : 0.5).setScale(k === i ? 1.08 : 1));
+    const choisir = (k) => {
+      if (fait) return; fait = true;
+      this.input.keyboard.off('keydown', touche);
+      jouerSon(this, 'ui_valider'); options[k].f();
+    };
+    const touche = (ev) => {
+      if (ev.key === 'ArrowLeft' || ev.key === 'ArrowRight') { i = 1 - i; maj(); jouerSon(this, 'ui_valider'); }
+      else if (ev.key === ' ' || ev.key === 'Enter') choisir(i);
+    };
+    boutons.forEach((b, k) => b.on('pointerdown', () => choisir(k)));
+    this.input.keyboard.on('keydown', touche);
+    this.events.once('shutdown', () => this.input.keyboard.off('keydown', touche));
+    maj();
   }
 }

@@ -30,7 +30,23 @@ let donnees = lire();
 export const Sauvegarde = {
   aLeBadge(id) { return !!donnees.badges[id]; },
   donnerBadge(id) { donnees.badges[id] = true; ecrire(donnees); },
+
+  // REPRISE (audit méta, nov. 2026) : la dernière étape atteinte d'un boss en plusieurs jeux (Rémi, Julien, Beufa).
+  // { scene, donnees } ; le hub propose « Reprendre » ou « Depuis le début ». Effacée quand le boss est battu.
+  reprise(id) { return (donnees.reprises || {})[id] || null; },
+  noterReprise(id, scene, d) {
+    let copie = {};
+    try { copie = JSON.parse(JSON.stringify(d || {})); } catch (e) { /* données non copiables : on garde l'étape seule */ }
+    donnees.reprises = { ...(donnees.reprises || {}), [id]: { scene, donnees: copie } }; ecrire(donnees);
+  },
+  oublierReprise(id) {
+    if (!this.reprise(id)) return;
+    const r = { ...donnees.reprises }; delete r[id]; donnees.reprises = r; ecrire(donnees);
+  },
   remettreAZero() { donnees = { badges: {}, volumes: donnees.volumes, records: {} }; ecrire(donnees); },
+
+  // tout l'état sauvegardé, en lecture (tableau de progression du hub)
+  tout() { return donnees; },
 
   // volumes de 0 à 1 : 'musique', 'sons', 'voix'
   volume(type) { return donnees.volumes[type] ?? 1; },
@@ -70,6 +86,47 @@ export const Sauvegarde = {
     return donnees.records[id];
   },
 };
+
+// Étapes qu'on peut reprendre depuis le hub : nom affiché + données ajoutées au départ de la scène
+export const SCENES_REPRISE = {
+  BeufaQuiz: { boss: 'beufa', nom: 'au QUIZ dans son bureau' },
+  JulienLycee: { boss: 'julien', nom: 'au LYCÉE', ajout: { depuisManif: true } },
+  JulienClasse: { boss: 'julien', nom: 'en CLASSE (niveau 2)', ajout: { depuisManif: true } },
+  RemiBaby: { boss: 'remi', nom: 'au BABYFOOT' },
+  RemiPorte: { boss: 'remi', nom: 'à LA PORTE du bar' },
+};
+
+// EXPORT / IMPORT de la sauvegarde (audit méta) : un CODE à recopier (tout ce que le jeu garde dans le navigateur :
+// badges, records, défis, réglages...). Changer de téléphone ou effacer les données du site ne fait plus tout perdre.
+const PREFIXE_CODE = 'BRACASS1-';
+export function codeSauvegarde() {
+  const tout = {};
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('bracass_')) tout[k] = localStorage.getItem(k);
+    }
+  } catch (e) { /* ignoré */ }
+  tout[CLE] = JSON.stringify(donnees);   // (même si le navigateur refuse d'écrire, on exporte ce qu'on a en mémoire)
+  const octets = new TextEncoder().encode(JSON.stringify(tout));
+  let bin = ''; octets.forEach(o => { bin += String.fromCharCode(o); });
+  return PREFIXE_CODE + btoa(bin);
+}
+// renvoie true si le code est bon (la sauvegarde est alors remplacée : il faut recharger la page)
+export function chargerCode(code) {
+  try {
+    const c = String(code || '').replace(/\s+/g, '');
+    if (!c.startsWith(PREFIXE_CODE)) return false;
+    const bin = atob(c.slice(PREFIXE_CODE.length));
+    const tout = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, ch => ch.charCodeAt(0))));
+    if (!tout || typeof tout !== 'object' || !tout[CLE]) return false;
+    const d = JSON.parse(tout[CLE]);
+    if (!d || typeof d.badges !== 'object') return false;
+    for (const k of Object.keys(tout)) if (k.startsWith('bracass_') && typeof tout[k] === 'string') localStorage.setItem(k, tout[k]);
+    donnees = lire();
+    return true;
+  } catch (e) { return false; }
+}
 
 // Lignes de DÉFIS DE MAÎTRISE pour un écran de victoire : un défi réussi POUR LA PREMIÈRE
 // FOIS est fêté en ★, les déjà réussis restent cochés, les autres sont proposés pour la revanche.

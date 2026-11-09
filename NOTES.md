@@ -117,6 +117,20 @@
 - Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
   allégée en 80 kbit/s ; original dans `assets_inbox/hub/`). Réglages de la grille : `src/hub/reglages.js`.
 
+## MÉTA (audit d'une autre IA, 9 nov. 2026) : sauvegarde, progression, reprise
+- Audit reçu (joueur / dev / game design) : P0 = sauvegarde exportable, difficulté Beufa (DÉJÀ là : 4 difficultés),
+  tableau de progression ; P1 = reprise par étape sans F1. Les 4 sont faits. Restent (P1/P2, pas demandés) : calibrage
+  audio partout, vérifs par boss dans la GitHub Action, Boss Rush, audio comprimé + écran de chargement, succès cachés.
+- Hub : bouton **📋 PROGRÈS** en haut à droite (touche T ; P et Échap = pause) → `src/hub/progression.js` : par boss
+  battu / à battre, défis x/3 (`REGLAGES_HUB.progression.defis`), records par difficulté (Julien : manif + classe),
+  étape en cours. En bas : **COPIER MA SAUVEGARDE** (C) et **CHARGER UN CODE** (V).
+- Code de sauvegarde : `codeSauvegarde()` / `chargerCode()` dans `src/core/sauvegarde.js` = toutes les clés
+  `bracass_*` du navigateur en base64, préfixe `BRACASS1-` (~700 caractères). Charger REMPLACE tout puis recharge la page.
+- REPRISE : `SCENES_REPRISE` (sauvegarde.js) = BeufaQuiz, JulienLycee, JulienClasse, RemiBaby, RemiPorte. `BossScene.init`
+  retient l'étape atteinte (+ ses données : bilan de Rémi, temps/alertes de Beufa ; Julien : `depuisManif` et la
+  phase de la classe via `changerPhase`). Au hub, en entrant chez ce boss : « ▶ REPRENDRE / ⟲ DEPUIS LE DÉBUT ».
+  Effacée à la victoire (`BossScene.victoire`) ou si on choisit le début.
+
 ## GREG — RUSH (étourdi) moins fort en NORMAL (9 nov. 2026, Fabien : « encore trop facile, je l'enchaîne trop étourdi »)
 - `DIFFICULTES.<diff>.etourdi` remplace une partie de `REGLAGES.etourdi` (accesseur `this.E` dans GregCombat). NORMAL :
   RUSH 1 s (au lieu de 1,3), coups x2 (au lieu de x3), `protection` 6 s : après un RUSH il ne peut pas être ré-étourdi.

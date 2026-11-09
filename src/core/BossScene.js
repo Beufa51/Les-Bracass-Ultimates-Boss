@@ -6,7 +6,7 @@
 //   - le retour au hub devant la porte du boss
 // =====================================================================
 import { LARGEUR, HAUTEUR } from './reglages.js';
-import { Sauvegarde } from './sauvegarde.js';
+import { Sauvegarde, SCENES_REPRISE } from './sauvegarde.js';
 import { texte, voile } from './ui.js';
 import { jouerSon, chargerFichiers, preparerVisuels } from './ressources.js';
 import { estTactile, etiquettesTactiles, etiquettesActuelles } from './tactile.js';
@@ -41,6 +41,12 @@ export class BossScene extends Phaser.Scene {
   init(donnees) {
     this.donnees = donnees || {};
     this.termine = false;
+    // REPRISE : arrivé à une étape qu'on peut reprendre depuis le hub (babyfoot, lycée, quiz...) → on la retient
+    const etape = SCENES_REPRISE[this.scene.key];
+    if (etape && etape.boss === this.identite.id) {
+      const { rejouer, nomDiff, diffObjet, ...reste } = this.donnees;
+      Sauvegarde.noterReprise(etape.boss, this.scene.key, { ...reste, ...(etape.ajout || {}) });
+    }
   }
 
   // Les visuels et sons de CE boss sont chargés en entrant chez lui (le démarrage du jeu ne charge que le hub).
@@ -136,6 +142,7 @@ export class BossScene extends Phaser.Scene {
     if (this.termine) return;
     this.termine = true;
     Sauvegarde.donnerBadge(this.identite.id);
+    Sauvegarde.oublierReprise(this.identite.id);   // boss battu : la prochaine visite repart du début
     jouerSon(this, 'ui_badge');
     this.ecranFin('VICTOIRE', message, '#ffd84a', true);
   }

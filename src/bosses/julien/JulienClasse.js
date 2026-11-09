@@ -540,6 +540,7 @@ export class JulienClasse extends JulienManif {
   changerPhase(ph) {
     const e = this.julien;
     this.reprise = { phase: ph, vie: e.vie };   // point de reprise
+    Sauvegarde.noterReprise('julien', 'JulienClasse', { depuisManif: true, reprise: this.reprise });   // (aussi depuis le hub)
     e.forcer = this.anarchiste ? 'murs' : 'mur';   // chaque phase commence par une rafale de murs (ANARCHISTE : un mur de plus)
     if (ph === 2) {   // INTERRO SURPRISE : copies, dictionnaire, « au tableau ! »
       this.txtAnnonce.setText('INTERRO SURPRISE !'); this.annonceT = 3;
