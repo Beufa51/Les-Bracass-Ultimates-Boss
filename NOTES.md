@@ -90,6 +90,9 @@
 - LOGO du titre (image de Fabien, `assets_inbox/intro/logo_titre_source.jpg`, faux damier dessiné dedans) :
   `python3 outils/intro/preparer_logo.py` garde les lettres + une lueur → `intro_logo.png` ; l'explosion derrière est
   redessinée au code (rayons qui tournent). Sans l'image, le titre retombe en texte.
+- POSES façon Commando Ginyu (images de Fabien, fond blanc, `assets_inbox/intro/pose_<id>.jpg`) :
+  `python3 outils/intro/preparer_poses.py` → `intro_pose_<id>.png` (boîte 460 x 520), prioritaires sur les bustes.
+  REÇUES : Beufa, Kédric, Julien, Greg, Rémi. MANQUE : Lionel (prompt dans `propositions/intro_prompts_images.md`).
 
 ## HUB = ÉCRAN DE SÉLECTION DES BOSS façon Mega Man (nov. 2026, remplace la salle aux portes)
 - `src/hub/HubScene.js` : grille 3 x 2 des 6 BOSS seulement (Beufa Kédric Julien / Greg Rémi Lionel), fond bleu vif.

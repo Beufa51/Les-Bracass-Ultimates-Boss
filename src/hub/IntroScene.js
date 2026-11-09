@@ -5,7 +5,7 @@
 // Un boss BATTU se DÉVOILE (flash blanc puis couleurs) : l'intro se remplit au fur et à mesure de la partie.
 // Calée sur la musique (intro_musique, 161 BPM) : les dates sont lues sur la lecture réelle du morceau.
 // Toucher / touche pendant la séquence = sauter au titre ; sur le titre = aller à l'écran de sélection.
-// Images : python3 outils/intro/preparer_intro.py. Réglages : INTRO ci-dessous.
+// Images : python3 outils/intro/preparer_intro.py (bustes) et preparer_poses.py (poses façon commando, prioritaires). Réglages : INTRO ci-dessous.
 // =====================================================================
 import { LARGEUR, HAUTEUR } from '../core/reglages.js';
 import { texte } from '../core/ui.js';
@@ -115,13 +115,18 @@ export class IntroScene extends Phaser.Scene {
       onComplete: () => this.tweens.add({ targets: fente, scaleY: 60, alpha: 0, duration: 450 }) });
   }
 
+  // pose façon commando (outils/intro/preparer_poses.py) si elle existe, sinon le grand buste
+  cleImage(id) {
+    return ['intro_pose_' + id, 'intro_' + id].find(k => this.textures.exists(k)) || null;
+  }
+
   passage(p, i) {
     const boss = BOSS.find(b => b.id === p.id);
     const battu = Sauvegarde.aLeBadge(p.id);
-    const cle = 'intro_' + p.id;
-    if (!this.textures.exists(cle)) return;
+    const cle = this.cleImage(p.id);
+    if (!cle) return;
     const gauche = i % 2 === 0;           // un coup à gauche, un coup à droite
-    const x = gauche ? 330 : 630, y = HAUTEUR + 10;
+    const x = gauche ? 330 : 630, y = cle.includes('pose') ? HAUTEUR - 4 : HAUTEUR + 10;
     const [r, v, b] = [(p.couleur >> 16) & 255, (p.couleur >> 8) & 255, p.couleur & 255];
     this.cameras.main.flash(160, r, v, b);
     this.ambiance(p.couleur);
@@ -129,6 +134,7 @@ export class IntroScene extends Phaser.Scene {
     // liseré lumineux (même image teintée de la couleur, un peu plus grande) puis l'ombre par-dessus
     const halo = this.add.image(gauche ? -300 : LARGEUR + 300, y, cle).setOrigin(0.5, 1).setTintFill(p.couleur)
       .setScale(1.05).setBlendMode(Phaser.BlendModes.ADD);
+    halo.y += halo.height * 0.025;   // liseré centré autour du corps (pas seulement au-dessus de la tête)
     const corps = this.add.image(halo.x, y, cle).setOrigin(0.5, 1).setTintFill(0x05060c);
     this.calque.add([halo, corps]);
     this.tweens.add({ targets: [halo, corps], x, duration: 260, ease: 'Back.Out' });
@@ -231,15 +237,17 @@ export class IntroScene extends Phaser.Scene {
 
     // les 6 boss en ligne : ombre tant qu'ils ne sont pas battus
     INTRO.passages.forEach((p, i) => {
-      const cle = 'intro_' + p.id;
-      if (!this.textures.exists(cle)) return;
+      const cle = this.cleImage(p.id);
+      if (!cle) return;
+      const e = cle.includes('pose') ? 0.3 : 0.34;   // pose en pied (boîte 460 x 520) ou buste (400 x 440)
       const x = 130 + i * 140;
-      const halo = this.add.image(x, HAUTEUR + 200, cle).setOrigin(0.5, 1).setScale(0.36).setTintFill(p.couleur)
+      const halo = this.add.image(x, HAUTEUR + 200, cle).setOrigin(0.5, 1).setScale(e * 1.06).setTintFill(p.couleur)
         .setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.8);
-      const img = this.add.image(x, HAUTEUR + 200, cle).setOrigin(0.5, 1).setScale(0.34);
+      const img = this.add.image(x, HAUTEUR + 200, cle).setOrigin(0.5, 1).setScale(e);
       if (!Sauvegarde.aLeBadge(p.id)) img.setTintFill(0x05060c);
       this.calque.add([halo, img]);
-      this.tweens.add({ targets: [halo, img], y: HAUTEUR - 52, duration: 350, delay: 400 + i * T * 500, ease: 'Back.Out' });
+      this.tweens.add({ targets: img, y: HAUTEUR - 52, duration: 350, delay: 400 + i * T * 500, ease: 'Back.Out' });
+      this.tweens.add({ targets: halo, y: HAUTEUR - 52 + halo.height * e * 0.03, duration: 350, delay: 400 + i * T * 500, ease: 'Back.Out' });
     });
     const nb = BOSS.filter(b => Sauvegarde.aLeBadge(b.id)).length;
     const appuie = texte(this, LARGEUR / 2, HAUTEUR - 26, `APPUIE POUR JOUER   ·   ${nb} / ${BOSS.length} dévoilés`, 20,
