@@ -234,7 +234,7 @@ export class FinaleMecha extends BossScene {
       this.recharge = V.cadence;
       this.tirs.push({ x: v.x + 40, y: v.y - 7 }, { x: v.x + 40, y: v.y + 7 });
       this.salve = (this.salve || 0) + 1;
-      if (this.salve % 2) jouerSon(this, 'finale_tir', { volume: 0.18 });   // une salve sur deux, très bas (Fabien : sons insupportables)
+      if (this.salve % 2) jouerSon(this, 'finale_laser_heros', { volume: 0.22 });   // une salve sur deux, très bas (Fabien : sons insupportables)
       this.eclat(v.x + 44, v.y, 0xfff27a);   // éclair au bout du canon
     }
     const pas = V.vitesseTir * dt;
@@ -421,6 +421,7 @@ export class FinaleMecha extends BossScene {
       this.repere = 0; this.att.rafale = 1.3;
       jouerSon(this, 'finale_alerte');
       this.alerte = { x: this.vaisseau.x, y: this.vaisseau.y - 50, t: 0.6 };
+      this.time.delayedCall(C.delai * 1000, () => { if (this.etat === 'jeu') this.laserRouge(); });
       for (let k = 0; k < C.rafale; k++) this.time.delayedCall(C.delai * 1000 + k * 90, () => { if (this.etat === 'jeu') this.balle(o.x, o.y, this.vise(o), C.vitesse, 'balle', 8); });
     }
     if (this.att.rafale > 0) this.att.rafale -= this.dt;
@@ -436,6 +437,13 @@ export class FinaleMecha extends BossScene {
     }
   }
 
+  // son des LASERS ROUGES ennemis (fourni par Fabien) : quand une attaque annoncée en rouge part ; pas deux à la fois
+  laserRouge() {
+    if (this.T < (this.prochainLaser || 0)) return;
+    this.prochainLaser = this.T + 0.35;
+    jouerSon(this, 'finale_laser_ennemi', { volume: 0.5 });
+  }
+
   alerteCouloir(y, hauteur, preavis, fin) {
     y = Phaser.Math.Clamp(y, 40, HAUTEUR - 40);
     jouerSon(this, 'finale_alerte');
@@ -445,9 +453,9 @@ export class FinaleMecha extends BossScene {
   // ---------- les tirs ennemis bougent, rebondissent, touchent ----------
   bougerBalles(dt, sansDegats = false) {
     const px = this.px(), py = this.vaisseau.y, rayon = R.vaisseau.rayon;
-    for (const c of this.couloirs) if ((c.t += dt) >= c.duree && !c.parti) { c.parti = true; c.fin(); }
+    for (const c of this.couloirs) if ((c.t += dt) >= c.duree && !c.parti) { c.parti = true; this.laserRouge(); c.fin(); }
     this.couloirs = this.couloirs.filter(c => !c.parti);
-    for (const t of this.traits) if ((t.t += dt) >= t.duree && !t.parti) { t.parti = true; t.fin(); }
+    for (const t of this.traits) if ((t.t += dt) >= t.duree && !t.parti) { t.parti = true; this.laserRouge(); t.fin(); }
     this.traits = this.traits.filter(t => !t.parti);
     // pintes en cloche : à l'arrivée, éclaboussure (touche) + flaque de mousse (ralentit)
     const M = R.attaques.remi.mousse;

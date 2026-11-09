@@ -10,7 +10,10 @@ export const MANIFESTE = {
   },
   // bruitages synthétisés : python3 outils/finale/generer_sons.py assets/audio/finale
   sons: {
-    finale_tir:       { fichier: 'audio/finale/finale_tir.wav' },
+    finale_tir:       { fichier: 'audio/finale/finale_tir.wav' },   // (remplacé par finale_laser_heros, gardé en réserve)
+    // sons fournis par Fabien (assets_inbox/finale/), blancs retirés : ton tir (début seulement) et les lasers rouges ennemis
+    finale_laser_heros:  { fichier: 'audio/finale/finale_laser_heros.mp3' },
+    finale_laser_ennemi: { fichier: 'audio/finale/finale_laser_ennemi.mp3' },
     finale_impact:    { fichier: 'audio/finale/finale_impact.wav' },
     finale_touche:    { fichier: 'audio/finale/finale_touche.wav' },
     finale_alerte:    { fichier: 'audio/finale/finale_alerte.wav' },

@@ -159,6 +159,9 @@
   - SONS ADOUCIS (Fabien : « insupportables, surtout les impacts ») : plus d'ondes carrées ; impact = petit « pok » grave
     (≈ 530 Hz, volume 0,3, au plus toutes les 0,22 s) ; tir = « fuit » rond (une salve sur deux, volume 0,18) ; alerte et
     touché filtrés. Réglages : `outils/finale/generer_sons.py` puis relancer le script ; volumes dans FinaleMecha (`tirer`).
+  - SONS DE FABIEN (originaux dans `assets_inbox/finale/laser_*.mp3`, 10 et 7 s de blanc retirés avec ffmpeg) :
+    `finale_laser_heros` = ton tir (seulement les 0,18 premières s, une salve sur deux, volume 0,22) ; `finale_laser_ennemi`
+    = les LASERS ROUGES (au départ d'un couloir rouge, d'un trait rouge, de la rafale du cône de Beufa ; `laserRouge()`).
   - Reste : tes retours.
 
 ## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)
