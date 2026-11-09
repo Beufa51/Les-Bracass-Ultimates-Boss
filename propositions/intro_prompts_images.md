@@ -31,4 +31,16 @@ format portrait 800 x 1100, rien d'autre.
 ### Julien à REFAIRE (nov. 2026) : sa pose actuelle est en pixel art, les 5 autres en dessin BD -> même style
 Joindre : 1) l'image actuelle de Julien (`assets_inbox/intro/pose_julien.jpg`, pour le visage et la tenue) ;
 2) la pose de Rémi (`assets_inbox/intro/pose_remi.png`, pour le STYLE) ; 3) `ref_pose_julien_vert_v2.png` (la POSE).
-Prompt : voir la réponse de Claude (même texte que ci-dessous dans le chat).
+```
+Image 1 = le personnage à dessiner (visage, coiffure, barbe, tenue). Image 2 = le STYLE de dessin à suivre.
+Image 3 = la POSE à copier.
+Redessine le personnage de l'image 1 (MÊME visage, même barbe grisonnante, même coiffure, même veste de survêtement
+verte à bandes blanches, même t-shirt noir imprimé, même jean, mêmes baskets) dans EXACTEMENT le style de dessin de
+l'image 2 : illustration façon bande dessinée / cartoon, traits noirs épais, couleurs franches, ombres en aplats.
+SURTOUT PAS de pixel art. Ne reprends rien d'autre de l'image 2 (ni son personnage, ni ses vêtements).
+POSE (celle de l'image 3, sans rien reprendre d'autre) : accroupi bas, genoux pliés et serrés vers l'avant, les deux
+bras levés en V au-dessus des épaules, mains à plat cassées au poignet, tête rentrée dans les épaules et avancée,
+sourcils froncés, moue boudeuse.
+Corps ENTIER de la tête aux pieds (pieds visibles), personnage seul, fond BLANC UNI (pas de damier), bien centré,
+format portrait 800 x 1100, rien d'autre.
+```
