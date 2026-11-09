@@ -10,17 +10,20 @@ logo, format paysage 1600 x 700, lettres bien lisibles, pas de personnage.
 ```
 
 ## 2. Poses du COMMANDO (une par boss) — fichiers attendus : `assets_inbox/intro/pose_<id>.png`
-Image de référence fournie par Fabien : `assets_inbox/intro/reference_pose_commando.png` (pose de groupe des 5).
-À joindre à chaque prompt : 1) l'image actuelle du personnage ; 2) cette image de référence.
-Placement dans le groupe (pour une future image de groupe sur le titre) : Greg à gauche, Julien en bas à gauche,
-Beufa au centre, Lionel au centre droit, Kédric en l'air à droite, Rémi tout à droite (pose inventée, en miroir de Greg).
-
-| Fichier | Boss | Modèle sur la référence | Pose |
-|---|---|---|---|
-| pose_greg.png | Greg | le grand roux à GAUCHE | grande fente, buste penché en arrière, un bras tendu à l'horizontale vers la droite main ouverte, l'autre bras tendu en bas derrière lui |
-| pose_julien.png | Julien | le petit vert EN BAS À GAUCHE | accroupi, genoux pliés écartés, bras pliés de chaque côté, mains ouvertes à hauteur des hanches |
-| pose_beufa.png | Beufa | le chef violet à cornes AU CENTRE | accroupi très bas, genoux grands écartés, coudes en dehors, poings près des genoux, tête en avant, air féroce |
-| pose_lionel.png | Lionel | le rouge aux cheveux blancs AU CENTRE DROIT | un genou levé, un poing levé au-dessus de la tête bras plié, l'autre main près de l'épaule, tête inclinée |
-| pose_kedric.png | Kédric | le grand bleu EN L'AIR À DROITE | en plein saut, un poing levé au-dessus de la tête, l'autre bras tendu en diagonale vers le bas, une jambe lancée en avant, l'autre pliée derrière |
-| pose_remi.png | Rémi | (inventée, 6e membre) | un genou au sol, l'autre jambe tendue sur le côté droit, un bras tendu à l'horizontale vers la droite main ouverte, l'autre bras levé en arc au-dessus de la tête, buste penché vers l'extérieur, grand sourire |
-Prompts complets : voir la réponse de Claude du 9 nov. 2026 (même texte, une ligne par boss ci-dessus).
+Références fournies par Fabien (une par membre) dans `assets_inbox/intro/` : `ref_pose_<boss>_<membre>.jpg`
+(+ la pose de groupe `reference_pose_commando.png`). À joindre : 1) l'image actuelle du boss ; 2) SA référence.
+Gabarit commun (seule la ligne POSE change) :
+```
+Image 1 = le personnage à dessiner. Image 2 = la pose à copier.
+Dessine le personnage de l'image 1 (MÊME visage, MÊME tenue, même style de dessin) EXACTEMENT dans la pose du
+personnage de l'image 2, même angle de vue. Ne reprends RIEN d'autre de l'image 2 (ni couleurs, ni armure, ni décor).
+POSE : <ligne ci-dessous>
+Corps ENTIER de la tête aux pieds, personnage seul, fond BLANC UNI (pas de damier, pas de rayons), bien centré,
+format portrait 800 x 1100, rien d'autre.
+```
+- Beufa (ref_pose_beufa_chef) : un genou au sol, l'autre jambe pliée devant, buste penché en avant, les deux bras tendus vers le bas et écartés de chaque côté, index pointés vers l'extérieur, bouche grande ouverte qui crie.
+- Greg (ref_pose_greg_roux) : vu de dos de trois-quarts, grande fente vers la droite, bras droit tendu en diagonale vers le haut à droite main à plat, bras gauche plié en l'air près de la tête main à plat, tête tournée vers nous par-dessus l'épaule, air ahuri.
+- Kédric (ref_pose_kedric_bleu) : de face sur une jambe tendue, l'autre genou levé à hauteur de hanche, les deux bras tendus à l'horizontale de chaque côté comme des ailes mains à plat, grand sourire.
+- Lionel (ref_pose_lionel_rouge) : jambes fléchies et écartées, bras droit levé poing fermé au-dessus de la tête, bras gauche plié poing devant la poitrine, buste un peu tourné, crie.
+- Julien (ref_pose_julien_vert) : jambes fléchies et écartées, un poing fermé collé contre la bouche, l'autre poing devant le ventre, épaules rentrées, regard en coin.
+- Rémi (pose INVENTÉE, joindre reference_pose_commando.png pour le style) : un genou au sol, l'autre jambe tendue sur le côté droit, un bras tendu à l'horizontale vers la droite main à plat, l'autre bras levé en arc au-dessus de la tête main à plat, buste penché vers l'extérieur, grand sourire.
