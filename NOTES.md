@@ -87,6 +87,9 @@
   `assets_inbox/hub/intro_final_bout.mp3`, 161 BPM) : 8 temps par boss, titre sur le gros coup à 22,41 s. Dates et
   couleurs : `INTRO` en tête du fichier. Toucher pendant la séquence = sauter au titre ; sur le titre = écran de sélection.
 - Images : `python3 outils/intro/preparer_intro.py` (grands bustes 400 x 440 → `assets/sprites/intro/`), l'ombre = même image teintée.
+- LOGO du titre (image de Fabien, `assets_inbox/intro/logo_titre_source.jpg`, faux damier dessiné dedans) :
+  `python3 outils/intro/preparer_logo.py` garde les lettres + une lueur → `intro_logo.png` ; l'explosion derrière est
+  redessinée au code (rayons qui tournent). Sans l'image, le titre retombe en texte.
 
 ## HUB = ÉCRAN DE SÉLECTION DES BOSS façon Mega Man (nov. 2026, remplace la salle aux portes)
 - `src/hub/HubScene.js` : grille 3 x 2 des 6 BOSS seulement (Beufa Kédric Julien / Greg Rémi Lionel), fond bleu vif.

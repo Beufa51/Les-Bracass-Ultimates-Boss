@@ -203,14 +203,31 @@ export class IntroScene extends Phaser.Scene {
     this.ambiance(0x1a2a6a, 0.35);
     this.cameras.main.flash(500, 255, 255, 255);
     this.cameras.main.shake(300, 0.012);
-    const t1 = texte(this, LARGEUR / 2, 150, "LES BRACASS'", 92, '#ffffff',
-      { fontStyle: 'bold italic', stroke: '#b3202c', strokeThickness: 12 }).setScale(3).setAlpha(0);
-    const t2 = texte(this, LARGEUR / 2, 245, 'ULTIMATE BOSS', 62, '#ffd84a',
-      { fontStyle: 'bold italic', stroke: '#0a1440', strokeThickness: 10 }).setScale(3).setAlpha(0);
-    this.calque.add([t1, t2]);
-    this.tweens.add({ targets: t1, scale: 1, alpha: 1, duration: 220, ease: 'Cubic.In' });
-    this.tweens.add({ targets: t2, scale: 1, alpha: 1, duration: 220, delay: T * 1000, ease: 'Cubic.In',
-      onComplete: () => this.cameras.main.shake(150, 0.008) });
+    if (this.textures.exists('intro_logo')) {
+      // explosion de rayons derrière le logo (dessinée ici : celle de l'image était mêlée au damier)
+      const rayons = this.add.graphics().setPosition(LARGEUR / 2, 190).setBlendMode(Phaser.BlendModes.ADD).setScale(0);
+      const couleurs = [0xffffff, 0x7fc4ff, 0xff9a3a];
+      for (let k = 0; k < 28; k++) {
+        const ang = k / 28 * Math.PI * 2 + Math.random() * 0.1, l = 200 + Math.random() * 240, e = 0.015 + Math.random() * 0.03;
+        rayons.fillStyle(couleurs[k % 3], 0.22);
+        rayons.fillTriangle(0, 0, Math.cos(ang - e) * l, Math.sin(ang - e) * l, Math.cos(ang + e) * l, Math.sin(ang + e) * l);
+      }
+      const logo = this.add.image(LARGEUR / 2, 190, 'intro_logo').setScale(2.6).setAlpha(0);
+      this.calque.add([rayons, logo]);
+      this.tweens.add({ targets: logo, scale: 0.82, alpha: 1, duration: 240, ease: 'Cubic.In',
+        onComplete: () => this.tweens.add({ targets: logo, scale: 0.85, duration: T * 1000, yoyo: true, repeat: -1 }) });
+      this.tweens.add({ targets: rayons, scale: 1, duration: 300, delay: 200, ease: 'Back.Out' });
+      this.tweens.add({ targets: rayons, angle: 360, duration: 30000, repeat: -1 });
+    } else {   // sans l'image : le titre en texte
+      const t1 = texte(this, LARGEUR / 2, 150, "LES BRACASS'", 92, '#ffffff',
+        { fontStyle: 'bold italic', stroke: '#b3202c', strokeThickness: 12 }).setScale(3).setAlpha(0);
+      const t2 = texte(this, LARGEUR / 2, 245, 'ULTIMATE BOSS', 62, '#ffd84a',
+        { fontStyle: 'bold italic', stroke: '#0a1440', strokeThickness: 10 }).setScale(3).setAlpha(0);
+      this.calque.add([t1, t2]);
+      this.tweens.add({ targets: t1, scale: 1, alpha: 1, duration: 220, ease: 'Cubic.In' });
+      this.tweens.add({ targets: t2, scale: 1, alpha: 1, duration: 220, delay: T * 1000, ease: 'Cubic.In',
+        onComplete: () => this.cameras.main.shake(150, 0.008) });
+    }
 
     // les 6 boss en ligne : ombre tant qu'ils ne sont pas battus
     INTRO.passages.forEach((p, i) => {
@@ -221,7 +238,7 @@ export class IntroScene extends Phaser.Scene {
         .setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.8);
       const img = this.add.image(x, HAUTEUR + 200, cle).setOrigin(0.5, 1).setScale(0.34);
       if (!Sauvegarde.aLeBadge(p.id)) img.setTintFill(0x05060c);
-      this.calque.addAt([halo, img], 0);
+      this.calque.add([halo, img]);
       this.tweens.add({ targets: [halo, img], y: HAUTEUR - 52, duration: 350, delay: 400 + i * T * 500, ease: 'Back.Out' });
     });
     const nb = BOSS.filter(b => Sauvegarde.aLeBadge(b.id)).length;

@@ -1,6 +1,6 @@
 # Intro (façon opening de Final Bout) : images qui l'amélioreraient
 
-## 1. Logo du titre — fichier attendu : `assets_inbox/intro/logo_titre.png`
+## 1. Logo du titre — REÇU et branché (nov. 2026) — fichier attendu : `assets_inbox/intro/logo_titre.png`
 Aujourd'hui le titre est du texte dessiné au code. À joindre : rien (ou une capture du titre actuel).
 ```
 Logo de jeu vidéo années 90 façon titre d'anime de combat (Dragon Ball Final Bout) : "LES BRACASS'" en grandes lettres
