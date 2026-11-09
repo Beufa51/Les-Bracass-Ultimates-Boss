@@ -6,7 +6,9 @@ Ce document attend sa validation (points ❓ en fin de fichier). Prompts d'image
 ## 1. Quand et comment on y joue
 - Au retour au hub après le **6e badge** : l'écran tremble, sirène, bandeau « ALERTE : LES BRACASS' FUSIONNENT ! »,
   puis départ direct vers la finale (au lieu de l'écran fixe actuel).
-- Ensuite, à rejouer depuis le hub : le bouton « ★ LA FIN » devient « ★ LE MÉCHA » (+ revoir la fin).
+- Ensuite, à rejouer depuis le hub : la **grande case du MILIEU** (FAIT, nov. 2026 : 3 boss à gauche, 3 à droite, façon
+  Mega Man). Verrouillée (« ? » + 🔒 x / 6) tant que les 6 ne sont pas battus ; en attendant le mécha, elle lance la fin
+  actuelle.
 - Durée visée : **3 à 4 min** en NORMAL. C'est la récompense, pas un mur.
 
 ## 2. Vue et commandes

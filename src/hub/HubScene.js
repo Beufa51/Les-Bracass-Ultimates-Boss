@@ -19,8 +19,8 @@ import { REGLAGES_HUB as R } from './reglages.js';
 import { estTactile, etiquettesTactiles, montrerBoutonPause } from '../core/tactile.js';
 import { ouvrirReglagesDev } from '../core/ReglagesDevScene.js';
 
-// place de chaque case dans la grille (colonne, ligne)
-const PLACES = { beufa: [0, 0], kedric: [1, 0], julien: [2, 0], greg: [0, 1], remi: [1, 1], lionel: [2, 1] };
+// place de chaque case (colonne 0 = gauche, 2 = droite ; ligne 0 à 2). La colonne 1 = la case du BOSS FINAL.
+const PLACES = { beufa: [0, 0], kedric: [0, 1], julien: [0, 2], greg: [2, 0], remi: [2, 1], lionel: [2, 2] };
 
 export class HubScene extends Phaser.Scene {
   constructor() { super('Hub'); }
@@ -49,6 +49,7 @@ export class HubScene extends Phaser.Scene {
       const p = PLACES[boss.id]; if (!p) continue;
       this.cases.push(this.caseBoss(boss, ...this.position(p)));
     }
+    this.cases.push(this.caseFinale(nb));
     this.bandeauBas(nb);
 
     // curseur : sur le boss d'où l'on revient, sinon sur le premier pas encore battu
@@ -75,23 +76,50 @@ export class HubScene extends Phaser.Scene {
   }
 
   position([col, ligne]) {
-    return [LARGEUR / 2 + (col - 1) * (R.caseL + R.ecart), R.grilleY + ligne * (R.caseH + R.ecart)];
+    return [LARGEUR / 2 + (col - 1) * ((R.caseL + R.centre.l) / 2 + R.ecart), R.grilleY + ligne * (R.caseH + R.ecart)];
   }
 
   // cadre « métal » d'une case
-  cadre(x, y, couleur = 0x3a5fcd) {
+  cadre(x, y, couleur = 0x3a5fcd, l = R.caseL, h = R.caseH) {
     const g = this.add.graphics();
-    g.fillStyle(0x0b1638, 1).fillRect(x - R.caseL / 2, y - R.caseH / 2, R.caseL, R.caseH);
-    g.lineStyle(4, couleur, 1).strokeRect(x - R.caseL / 2, y - R.caseH / 2, R.caseL, R.caseH);
-    g.lineStyle(1, 0xa8c4ff, 0.5).strokeRect(x - R.caseL / 2 + 5, y - R.caseH / 2 + 5, R.caseL - 10, R.caseH - 10);
+    g.fillStyle(0x0b1638, 1).fillRect(x - l / 2, y - h / 2, l, h);
+    g.lineStyle(4, couleur, 1).strokeRect(x - l / 2, y - h / 2, l, h);
+    g.lineStyle(1, 0xa8c4ff, 0.5).strokeRect(x - l / 2 + 5, y - h / 2 + 5, l - 10, h - 10);
     return g;
+  }
+
+  // la grande case du MILIEU : le BOSS FINAL (le mécha des Bracass'), verrouillée tant que les 6 ne sont pas battus
+  caseFinale(nb) {
+    const { l, h } = R.centre, x = LARGEUR / 2, y = R.grilleY + R.caseH + R.ecart;
+    const ouvert = this.complet;
+    this.cadre(x, y, ouvert ? 0xd4a52a : 0x7a3a9a, l, h);
+    const cle = ouvert ? 'select_mecha' : 'select_mecha_ombre';
+    let img = null;
+    if (this.textures.exists(cle)) {
+      img = this.add.image(x, y + h / 2 - 30, cle).setOrigin(0.5, 1);
+      img.setScale(Math.min((l - 16) / img.width, (h - 40) / img.height));
+    } else {   // (en attendant l'image du mécha : un grand « ? » ou un éclair)
+      texte(this, x, y - 30, ouvert ? '⚡' : '?', ouvert ? 110 : 130, ouvert ? '#ffd84a' : '#5a3a7a', { fontStyle: 'bold' });
+    }
+    this.add.rectangle(x, y + h / 2 - 15, l - 8, 26, 0x000000, 0.85);
+    texte(this, x, y + h / 2 - 15, ouvert ? 'BOSS FINAL' : '???', 19, ouvert ? '#ffd84a' : '#c9a0ff', { fontStyle: 'bold' });
+    if (!ouvert) texte(this, x, y + 70, `🔒 ${nb} / ${BOSS.length}`, 22, '#c9a0ff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 });
+    const info = ouvert ? `BOSS FINAL : le mécha des Bracass' !\n${R.ficheFinale}`
+      : `BOSS FINAL : ???\nBats les ${BOSS.length} Bracass' pour le débloquer (${nb} / ${BOSS.length})`;
+    return { finale: true, x, y, w: l, h, img, info, action: () => this.entrerFinale() };
+  }
+
+  // BOSS FINAL : verrouillé = petit refus ; ouvert = la finale (en attendant le mécha : la fin actuelle)
+  entrerFinale() {
+    if (!this.complet) { jouerSon(this, 'ui_valider'); this.cameras.main.shake(150, 0.006); return; }
+    this.voirFin();
   }
 
   caseBoss(boss, x, y) {
     const battu = Sauvegarde.aLeBadge(boss.id);
     this.cadre(x, y, battu ? 0xd4a52a : 0x3a5fcd);
     const cle = battu ? 'select_' + boss.id : 'select_' + boss.id + '_ombre';
-    const img = this.textures.exists(cle) ? this.add.image(x, y + R.caseH / 2 - 26, cle).setOrigin(0.5, 1) : null;
+    const img = this.textures.exists(cle) ? this.add.image(x, y + R.caseH / 2 - 26, cle).setOrigin(0.5, 1) : null;   // (buste posé en bas)
     if (img) img.setScale(Math.min((R.caseL - 16) / img.width, (R.caseH - 34) / img.height));
     // bandeau du nom
     this.add.rectangle(x, y + R.caseH / 2 - 13, R.caseL - 8, 22, 0x000000, 0.85);
@@ -112,7 +140,7 @@ export class HubScene extends Phaser.Scene {
     const info = !boss.pret ? `${boss.nom} : bientôt...` : battu
       ? `${boss.nom} : battu !${rec ? ` Record ${rangLisible(g.nom, g.lettre)} en ${formatTemps(rec.temps)}` : ''}${fiche}`
       : `${boss.nom}${fiche}`;
-    return { boss, x, y, img, info, action: () => this.entrer(boss) };
+    return { boss, x, y, w: R.caseL, h: R.caseH, img, info, action: () => this.entrer(boss) };
   }
 
   // bandeau du bas : les badges (5 appuis rapides = réglages développeur) et LA FIN quand les 6 badges sont là
@@ -128,28 +156,30 @@ export class HubScene extends Phaser.Scene {
       appuis = [...appuis.filter(a => t - a < 2500), t];
       if (appuis.length >= 5) { appuis = []; ouvrirReglagesDev(this.game); }
     });
-    if (this.complet) {
-      const fin = texte(this, LARGEUR - 110, y, `★ LA FIN ★${estTactile() ? '' : ' (F)'}`, 17, '#ffd84a', { fontStyle: 'bold' })
-        .setInteractive().on('pointerdown', () => this.voirFin());
-      this.tweens.add({ targets: fin, scale: 1.08, yoyo: true, repeat: -1, duration: 600 });
-    }
   }
 
   majChoix() {
     const c = this.choix, g = this.cadreChoix;
     g.clear();
-    g.lineStyle(9, 0xffd84a, 1).strokeRect(c.x - R.caseL / 2 - 5, c.y - R.caseH / 2 - 5, R.caseL + 10, R.caseH + 10);   // cadre jaune épais : bien visible sur le fond bleu
+    g.lineStyle(9, 0xffd84a, 1).strokeRect(c.x - c.w / 2 - 5, c.y - c.h / 2 - 5, c.w + 10, c.h + 10);   // cadre jaune épais : bien visible sur le fond bleu
     this.infos.setText(c.info || '').setScale(1);
     if (this.infos.width > LARGEUR - 30) this.infos.setScale((LARGEUR - 30) / this.infos.width);   // jamais coupée sur les côtés
-    this.cases.forEach(k => { if (k.img) { this.tweens.killTweensOf(k.img); k.img.setY(k.y + R.caseH / 2 - 26); } });
+    this.cases.forEach(k => { if (k.img) { this.tweens.killTweensOf(k.img); k.img.setY(k.y + k.h / 2 - (k.finale ? 30 : 26)); } });
     if (c.img) this.tweens.add({ targets: c.img, y: c.img.y - 5, yoyo: true, repeat: -1, duration: 260 });
   }
 
+  // la case la plus proche dans la direction demandée (gauche / droite passent par la case du milieu)
   bouger(dc, dl) {
-    const [col, ligne] = [Math.round((this.choix.x - LARGEUR / 2) / (R.caseL + R.ecart)) + 1, Math.round((this.choix.y - R.grilleY) / (R.caseH + R.ecart))];
-    const [x, y] = this.position([(col + dc + 3) % 3, (ligne + dl + 2) % 2]);
-    const c = this.cases.find(k => Math.abs(k.x - x) < 2 && Math.abs(k.y - y) < 2);
-    if (c) { this.choix = c; jouerSon(this, 'ui_valider'); this.majChoix(); }
+    const a = this.choix;
+    let meilleur = null, dMin = Infinity;
+    for (const c of this.cases) {
+      if (c === a) continue;
+      const dx = c.x - a.x, dy = c.y - a.y;
+      if ((dc && Math.sign(dx) !== dc) || (dl && (Math.sign(dy) !== dl || Math.abs(dx) > 5))) continue;
+      const d = dc ? 10 * Math.abs(dx) + Math.abs(dy) : Math.abs(dy);   // (d'abord la colonne voisine, puis la ligne la plus proche)
+      if (d < dMin) { dMin = d; meilleur = c; }
+    }
+    if (meilleur) { this.choix = meilleur; jouerSon(this, 'ui_valider'); this.majChoix(); }
   }
 
   valider(c = this.choix) {
@@ -176,7 +206,7 @@ export class HubScene extends Phaser.Scene {
   // nov. 2026 (Fabien) : 1er toucher = choisir la case (on la voit), 2e toucher sur la MÊME case = l'affronter
   toucher(x, y) {
     if (this.entree) return;
-    const c = this.cases.find(k => Math.abs(k.x - x) < (R.caseL + R.ecart) / 2 && Math.abs(k.y - y) < (R.caseH + R.ecart) / 2);
+    const c = this.cases.find(k => Math.abs(k.x - x) < (k.w + R.ecart) / 2 && Math.abs(k.y - y) < (k.h + R.ecart) / 2);
     if (!c) return;
     if (c !== this.choix) { this.choix = c; jouerSon(this, 'ui_valider'); this.majChoix(); return; }
     this.valider(c);

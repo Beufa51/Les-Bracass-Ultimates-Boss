@@ -120,7 +120,10 @@
 ## FINALE : mécha des Bracass' en shoot'em up (proposition, 9 nov. 2026) — EN ATTENTE des choix de Fabien
 - Choix de Fabien : le héros dans son vaisseau contre le mécha des 6. Proposition : `propositions/finale_mecha.md`
   (5 questions ❓ en fin de fichier), prompts : `propositions/finale_prompts_images.md` (mécha complet = référence).
-- Rien n'est codé. Prochaine étape si validé : prototype au code dans `src/finale/`.
+- HUB : case du MILIEU = BOSS FINAL (`caseFinale` dans HubScene ; 3 boss à gauche, 3 à droite ; `REGLAGES_HUB.centre`).
+  Verrouillée jusqu'aux 6 badges ; ouverte, elle lance pour l'instant `Finale` (la fin actuelle ; le bouton « LA FIN »
+  du bandeau est retiré, touche F gardée). Image : `select_mecha(_ombre)` à tirer du mécha n° 1 (sinon « ? » / éclair).
+- Le mécha n'est pas codé. Prochaine étape si validé : prototype au code dans `src/finale/`.
 
 ## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)
 - `showtime.rappel` 0,06 → 0,04 ; `gain` parfait 2,1 → 2,5, bien 1,3 → 1,5, raté 7 → 6. Avant, la jauge plafonnait vers

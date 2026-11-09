@@ -20,6 +20,9 @@ couleurs franches, ombres en aplats (le même style que les images jointes). Rob
 d'autre, format portrait 1000 x 1400.
 ```
 
+Ce n° 1 sert AUSSI à la case du milieu du hub : je le découpe moi-même en buste + ombre (`select_mecha.png`,
+`select_mecha_ombre.png`, comme `outils/hub/preparer_selection.py`). Rien d'autre à générer pour le hub.
+
 ## 2. Les 6 parties séparées (pour qu'elles explosent une par une) — `assets_inbox/finale/mecha_parties.png`
 Joindre : `mecha_complet.png` (n° 1).
 ```
