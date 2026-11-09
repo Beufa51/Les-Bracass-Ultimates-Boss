@@ -14,6 +14,7 @@ import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { IDENTITE, REGLAGES as R, DIFFICULTES, appliquerDifficulte } from './reglages.js';
 import { cleRecord } from './difficulte.js';
 import { rangLisible, trouverRang } from '../../core/rangs.js';
+import { defisNouveaux } from '../../core/sauvegarde.js';
 import { QUESTIONS, LECTURE_DEBUT, LECTURES, MASQUE_CHAUD, DEBUT_QUIZ, MOQUERIES, TROP_TARD, BRAVOS, VICTOIRE, GAME_OVER, RANGS, RANG_PARFAIT } from '../../../data/beufa_quiz.js';
 
 const VERT = 0x38fc8c, VERT_TXT = '#7dffb0';
@@ -458,6 +459,17 @@ export class BeufaQuiz extends BossScene {
       const txtRecord = entrainement ? 'ENTRAÎNEMENT : pas de record' : nouveau ? '★ NOUVEAU RECORD ★' : record ? `MEILLEUR RANG : ${rangLisible(record.rang, (trouverRang([RANG_PARFAIT, ...RANGS], record.rang) || {}).lettre)}` : '(joue l\'infiltration avant pour être classé)';
       const tr = this.add.text(62, 486, txtRecord, st(18, nouveau ? '#ffd84a' : '#4fbf80')).setDepth(P + 2).setAlpha(0);
       this.tweens.add({ targets: tr, alpha: 1, delay: 800, duration: 300 });
+      // DÉFIS DE MAÎTRISE (noms : src/bosses/defis.js) : les nouveaux réussis sont fêtés ici, tous visibles dans PROGRÈS
+      const nouveaux = entrainement ? [] : defisNouveaux('beufa', [
+        { id: 'fantome', test: () => d.alertes === 0 },
+        { id: 'sansFaute', test: () => this.erreurs === 0 && !(d.continues > 0) },
+        { id: 'eclair', test: () => (this.rapides || 0) >= 5 },
+      ]);
+      if (nouveaux.length) {
+        const td = this.add.text(62, 512, '★ DÉFI RÉUSSI : ' + nouveaux.join('  ★ '), st(16, '#ffd84a')).setDepth(P + 2).setAlpha(0);
+        if (td.width > 600) td.setScale(600 / td.width);
+        this.tweens.add({ targets: td, alpha: 1, delay: 1100, duration: 300 });
+      }
       if (nouveau) this.tweens.add({ targets: tr, alpha: 0.4, delay: 1100, duration: 500, yoyo: true, repeat: -1 });
     });
     // la MÉDAILLE de la mission (dessinée), qui se balance

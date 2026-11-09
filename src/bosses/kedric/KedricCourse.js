@@ -994,9 +994,9 @@ export class KedricCourse extends BossScene {
       (record ? `\nRecord : ${rangLisible((trouverRang(R.rangs, record.rang) || {}).nom || record.rang, record.rang)} en ${formatTemps(record.temps)}` : '') +
       (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '') +
       (sansRecord ? '' : '\n' + lignesDefis('kedric', [
-        { id: 'troisTD', nom: '3 TOUCHDOWNS sur 3', test: () => this.stats.touchdowns >= R.courses },
-        { id: 'public80', nom: 'Battle gagné avec 80 % du public pour toi', test: () => publicPourToi >= 80 },
-        { id: 'sansPiege', nom: 'Battle sans toucher une flèche DORÉE', test: () => (bd.pieges || 0) === 0 },
+        { id: 'troisTD', test: () => this.stats.touchdowns >= R.courses },
+        { id: 'public80', test: () => publicPourToi >= 80 },
+        { id: 'sansPiege', test: () => (bd.pieges || 0) === 0 },
       ]).join('\n')) +
       `\n${conseil}`;
   }

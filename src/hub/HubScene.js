@@ -59,7 +59,7 @@ export class HubScene extends Phaser.Scene {
 
     this.aide = texte(this, 590, R.bandeauY,
       estTactile() ? 'Touche un boss pour le voir, touche-le encore pour combattre' : '◀ ▲ ▼ ▶ choisir   ESPACE combattre', 14, '#c8d8ff');
-    this.infos = texte(this, LARGEUR / 2, R.infosY, '', 18, '#ffffff', { stroke: '#0a1440', strokeThickness: 5 });
+    this.infos = texte(this, LARGEUR / 2, R.infosY, '', 17, '#ffffff', { stroke: '#0a1440', strokeThickness: 5, align: 'center', lineSpacing: 0 });
     this.touches = creerTouches(this);
     this.input.on('pointerdown', (p) => this.toucher(p.x, p.y));
     this.input.keyboard.on('keydown-D', () => ouvrirReglagesDev(this.game));
@@ -108,7 +108,7 @@ export class HubScene extends Phaser.Scene {
       if (g.lettre === 'S') this.tweens.add({ targets: tampon, scale: 1.12, yoyo: true, repeat: -1, duration: 700 });
     }
     // (analyse comparée, façon Mario Party) une fiche d'une ligne : genre · durée · commandes
-    const fiche = R.fiches[boss.id] ? `   —   ${R.fiches[boss.id]}` : '';
+    const fiche = R.fiches[boss.id] ? `\n${R.fiches[boss.id]}` : '';   // (2e ligne : la phrase entière ne tenait pas)
     const info = !boss.pret ? `${boss.nom} : bientôt...` : battu
       ? `${boss.nom} : battu !${rec ? ` Record ${rangLisible(g.nom, g.lettre)} en ${formatTemps(rec.temps)}` : ''}${fiche}`
       : `${boss.nom}${fiche}`;
@@ -139,7 +139,8 @@ export class HubScene extends Phaser.Scene {
     const c = this.choix, g = this.cadreChoix;
     g.clear();
     g.lineStyle(9, 0xffd84a, 1).strokeRect(c.x - R.caseL / 2 - 5, c.y - R.caseH / 2 - 5, R.caseL + 10, R.caseH + 10);   // cadre jaune épais : bien visible sur le fond bleu
-    this.infos.setText(c.info || '');
+    this.infos.setText(c.info || '').setScale(1);
+    if (this.infos.width > LARGEUR - 30) this.infos.setScale((LARGEUR - 30) / this.infos.width);   // jamais coupée sur les côtés
     this.cases.forEach(k => { if (k.img) { this.tweens.killTweensOf(k.img); k.img.setY(k.y + R.caseH / 2 - 26); } });
     if (c.img) this.tweens.add({ targets: c.img, y: c.img.y - 5, yoyo: true, repeat: -1, duration: 260 });
   }

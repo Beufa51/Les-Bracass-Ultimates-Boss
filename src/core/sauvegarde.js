@@ -1,6 +1,7 @@
 // Sauvegarde dans le navigateur (localStorage) : badges, volumes, records.
 // Si le navigateur refuse (navigation privée...), le jeu marche quand même,
 // mais la sauvegarde est perdue à la fermeture de l'onglet.
+import { nomDefi } from '../bosses/defis.js';
 const CLE = 'bracass_sauvegarde_v1';
 const ANCIENS_RANGS_BEUFA = { DOBERMAN: 'FOX', EAGLE: 'HOUND', PUMA: 'BOÎTE EN CARTON', CROCODILE: 'BOÎTE EN CARTON', CHICKEN: 'BOÎTE EN CARTON' };
 const VOLUMES_DEFAUT = { musique: 1, sons: 1, voix: 1 };
@@ -135,17 +136,23 @@ export function chargerCode(code) {
 
 // Lignes de DÉFIS DE MAÎTRISE pour un écran de victoire : un défi réussi POUR LA PREMIÈRE
 // FOIS est fêté en ★, les déjà réussis restent cochés, les autres sont proposés pour la revanche.
+// (le nom de chaque défi vient de src/bosses/defis.js : liste = [{ id, test }])
 export function lignesDefis(idBoss, liste) {
   const lignes = [];
   for (const d of liste) {
+    const nom = d.nom || nomDefi(idBoss, d.id);
     if (d.test()) {
       const nouveau = Sauvegarde.reussirDefi(idBoss, d.id);
-      lignes.push(`${nouveau ? '★ DÉFI RÉUSSI : ' : 'Défi déjà réussi : '}${d.nom}`);
+      lignes.push(`${nouveau ? '★ DÉFI RÉUSSI : ' : 'Défi déjà réussi : '}${nom}`);
     } else {
-      lignes.push(`Défi à débloquer : ${d.nom}`);
+      lignes.push(`Défi à débloquer : ${nom}`);
     }
   }
   return lignes;
+}
+// version courte pour les écrans de fin déjà chargés : enregistre les défis réussis, renvoie les NOMS des nouveaux
+export function defisNouveaux(idBoss, liste) {
+  return liste.filter(d => d.test() && Sauvegarde.reussirDefi(idBoss, d.id)).map(d => nomDefi(idBoss, d.id));
 }
 
 // Temps au format 1'16"55

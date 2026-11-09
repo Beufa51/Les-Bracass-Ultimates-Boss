@@ -117,6 +117,15 @@
 - Musique : `hub_musique` = `assets/audio/hub/hub_selection.mp3` (Street Fighter II « Character Select », fournie par Fabien,
   allégée en 80 kbit/s ; original dans `assets_inbox/hub/`). Réglages de la grille : `src/hub/reglages.js`.
 
+## DÉFIS pour les 6 boss + hub lisible (9 nov. 2026, Fabien : phrase du hub coupée, défis invisibles / absents)
+- `src/bosses/defis.js` = les NOMS des 3 défis de chaque boss (les tests restent dans les scènes : `lignesDefis` ou
+  `defisNouveaux(idBoss, [{ id, test }])` de `core/sauvegarde.js`). Le tableau PROGRÈS liste chaque défi (✓ / ☐).
+- Nouveaux (à valider par Fabien) : Beufa (infiltration sans alerte, quiz sans erreur ni continue, 5 réponses ÉCLAIR) ;
+  Julien, en CLASSE hors reprise de phase (toutes les rafales à 20/20, 60 % de coups dans le dos, finir avec 75 % de vie) ;
+  Rémi, soirée complète hors DIABOLO (vélo sans chute, 3 arrêts au babyfoot, la porte sans se faire attraper). Les
+  nouveaux défis réussis s'affichent en ★ sur leur écran de fin.
+- Hub : la ligne d'infos passe sur 2 lignes (nom + record, puis la fiche) et rapetisse si elle déborde.
+
 ## RANGS : un seul format « NOM (lettre) » (9 nov. 2026, demande de Fabien)
 - Partout : `rangLisible(nom, lettre)` (`src/core/rangs.js`) → « BIG BOSS (S) ». Listes de chaque boss lues par
   `src/bosses/rangs.js` (`rangRecord`) pour le hub, le tableau PROGRÈS et les cartes de difficulté.

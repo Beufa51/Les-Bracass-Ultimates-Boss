@@ -18,6 +18,7 @@ import { texte, voile } from '../../core/ui.js';
 import { Sauvegarde, formatTemps } from '../../core/sauvegarde.js';
 import { cleRecord } from './difficulte.js';
 import { rangLisible, trouverRang } from '../../core/rangs.js';
+import { defisNouveaux } from '../../core/sauvegarde.js';
 import { LARGEUR, HAUTEUR } from '../../core/reglages.js';
 import { jouerSon } from '../../core/ressources.js';
 import { jouerMusique, facteurMusique } from '../../core/musique.js';
@@ -531,8 +532,18 @@ export class RemiPorte extends BossScene {
       texte(this, cx + 60, 430, nouveau ? '★ NOUVEAU RECORD ★' : `Record : ${rangLisible((trouverRang(RANGS, record.rang) || {}).nom || record.rang, record.rang)} en ${formatTemps(record.temps)}`, 18, nouveau ? '#7fff7f' : '#aaaaaa').setDepth(P + 1);
       const suivant = RANGS[RANGS.indexOf(r) - 1];
       if (suivant) texte(this, cx + 60, 460, `Rang ${rangLisible(suivant.nom, suivant.rang)} à ${suivant.seuil} pts`, 15, '#9fe0ff').setDepth(P + 1);
-      const etoiles = etoilesBonus(b);
-      if (etoiles.length) texte(this, cx + 60, 490, etoiles.map(t => '★ ' + t).join('     '), 17, '#ffd84a').setDepth(P + 1);
+      // DÉFIS DE MAÎTRISE (soirée complète ; noms : src/bosses/defis.js) : les nouveaux passent avant les étoiles bonus
+      const v = b.veloDetail || {}, f = b.babyDetail || {}, pd = b.porteDetail || {};
+      const nouveaux = this.nomDiff === 'entrainement' ? [] : defisNouveaux('remi', [
+        { id: 'zeroChute', test: () => v.chutes === 0 },
+        { id: 'mur', test: () => (f.arrets || 0) >= 3 },
+        { id: 'invisible', test: () => pd.attrapes === 0 },
+      ]);
+      const etoiles = [...nouveaux.map(n => 'DÉFI : ' + n), ...etoilesBonus(b)].slice(0, 2);
+      if (etoiles.length) {
+        const te = texte(this, cx + 60, 490, etoiles.map(t => '★ ' + t).join('     '), 17, '#ffd84a').setDepth(P + 1);
+        if (te.width > 640) te.setScale(640 / te.width);
+      }
       jouerSon(this, 'remi_foule');
     });
     texte(this, cx, HAUTEUR - 22, `${estTactile() ? 'OK' : 'ESPACE'} : retour au hub`, 18, '#aaaaaa').setDepth(P + 1);

@@ -13,6 +13,7 @@ import { BOSS } from '../bosses/liste.js';
 import { REGLAGES_HUB as R } from './reglages.js';
 import { rangLisible } from '../core/rangs.js';
 import { rangRecord } from '../bosses/rangs.js';
+import { DEFIS } from '../bosses/defis.js';
 import { DIFFICULTES as D_BEUFA } from '../bosses/beufa/reglages.js';
 import { DIFFICULTES as D_KEDRIC } from '../bosses/kedric/reglages.js';
 import { DIFFICULTES as D_JULIEN } from '../bosses/julien/reglages.js';
@@ -51,21 +52,28 @@ export function ouvrirProgression(scene, ferme) {
 
   BOSS.forEach((boss, k) => {
     const y = P.hautY + k * P.ligneH, battu = Sauvegarde.aLeBadge(boss.id);
-    ajout(scene.add.rectangle(LARGEUR / 2, y + 10, LARGEUR - 40, P.ligneH - 6, k % 2 ? 0x13235a : 0x0e1b48, 1));
-    if (scene.textures.exists('badge_' + boss.id)) ajout(scene.add.image(48, y + 10, battu ? 'badge_' + boss.id : 'badge_vide').setScale(0.6));
+    ajout(scene.add.rectangle(LARGEUR / 2, y + 20, LARGEUR - 40, P.ligneH - 4, k % 2 ? 0x13235a : 0x0e1b48, 1));
+    if (scene.textures.exists('badge_' + boss.id)) ajout(scene.add.image(48, y + 10, battu ? 'badge_' + boss.id : 'badge_vide').setScale(0.6).setY(y + 20));
     ajout(texte(scene, 80, y, boss.nom.toUpperCase(), 20, battu ? '#ffd84a' : '#ffffff', { fontStyle: 'bold' }).setOrigin(0, 0.5));
     let etat = !boss.pret ? 'bientôt' : battu ? 'BATTU ✓' : 'à battre';
-    const nbDefis = P.defis[boss.id];
-    if (nbDefis) etat += `   ·   Défis ${Object.keys(Sauvegarde.defis(boss.id)).length}/${nbDefis}`;
+    const liste = DEFIS[boss.id] || [], faits = Sauvegarde.defis(boss.id);
+    const nbFaits = liste.filter(d => faits[d.id]).length;
+    if (liste.length) etat += `   ·   Défis ${nbFaits}/${liste.length}`;
     const r = Sauvegarde.reprise(boss.id), etape = r && SCENES_REPRISE[r.scene];
     if (etape) etat += `   ·   En cours : reprise ${etape.nom}`;
     ajout(texte(scene, 210, y, etat, 18, battu ? '#7fff7f' : '#c8d8ff').setOrigin(0, 0.5));
     const recs = ajout(texte(scene, 80, y + 22, lignesRecords(boss.id), 16, '#aab8e0', { align: 'left' }).setOrigin(0, 0.5));
     if (recs.width > LARGEUR - 110) recs.setScale((LARGEUR - 110) / recs.width);   // (Julien : manif + classe sur une ligne)
+    // les DÉFIS en clair : ✓ réussi, ☐ à faire (noms : src/bosses/defis.js)
+    if (liste.length) {
+      const td = ajout(texte(scene, 80, y + 41, liste.map(d => `${faits[d.id] ? '✓' : '☐'} ${d.nom}`).join('    '), 15,
+        nbFaits === liste.length ? '#7fff7f' : '#ffe9a8', { align: 'left' }).setOrigin(0, 0.5));
+      if (td.width > LARGEUR - 110) td.setScale((LARGEUR - 110) / td.width);
+    }
   });
 
   // ---- sauvegarde ----
-  const message = ajout(texte(scene, LARGEUR / 2, P.basY - 34, 'Garde ton code de sauvegarde quelque part (notes, message à toi-même).', 16, '#c8d8ff'));
+  const message = ajout(texte(scene, LARGEUR / 2, P.basY - 30, 'Garde ton code de sauvegarde quelque part (notes, message à toi-même).', 16, '#c8d8ff'));
   const dire = (t, c = '#7fff7f') => message.setText(t).setColor(c);
   const bouton = (x, txt, f) => {
     const b = ajout(texte(scene, x, P.basY, txt, 19, '#ffffff', { fontStyle: 'bold', backgroundColor: '#1d3a8a', padding: { x: 10, y: 8 } }).setInteractive());

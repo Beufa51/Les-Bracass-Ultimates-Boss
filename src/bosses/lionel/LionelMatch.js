@@ -943,9 +943,9 @@ export class LionelMatch extends BossScene {
       (this.stats.supers ? `\nSupers marqués : ${this.stats.supersMarques} / ${this.stats.supers}` : '') +
       (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '') +
       (this.diff.perso ? '' : '\n' + lignesDefis('lionel', [
-        { id: 'sec', nom: 'Gagner sans perdre un seul set', test: () => (this.stats.setsPerdus || 0) === 0 },
-        { id: 'troisSupers', nom: 'Marquer 3 SUPER LANCERS', test: () => this.stats.supersMarques >= 3 },
-        { id: 'hermetique', nom: `Encaisser moins de ${R.defiHermetique} points`, test: () => this.stats.concedes < R.defiHermetique },
+        { id: 'sec', test: () => (this.stats.setsPerdus || 0) === 0 },
+        { id: 'troisSupers', test: () => this.stats.supersMarques >= 3 },
+        { id: 'hermetique', test: () => this.stats.concedes < R.defiHermetique },
       ]).join('\n')) +
       `\n${this.conseil()}`;
   }

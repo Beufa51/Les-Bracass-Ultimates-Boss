@@ -1249,9 +1249,9 @@ export class GregCombat extends BossScene {
       (this.nomDiff !== 'normal' ? `\nMode ${this.diff.nom}` : '') +
       `\nDégâts donnés : ${Math.round(this.stats.donnes)}   reçus : ${Math.round(this.stats.recus)}\nPassages au tapis : ${this.j.downs}` +
       (complet ? '\n' + lignesDefis('greg', [
-        { id: 'ko', nom: 'Gagner par K.O. (pas aux points)', test: () => ko },
-        { id: 'jamaisTapis', nom: 'Ne JAMAIS aller au tapis', test: () => this.j.downs === 0 },
-        { id: 'cuirasse', nom: 'Moins de 30 dégâts reçus', test: () => this.stats.recus < 30 },
+        { id: 'ko', test: () => ko },
+        { id: 'jamaisTapis', test: () => this.j.downs === 0 },
+        { id: 'cuirasse', test: () => this.stats.recus < 30 },
       ]).join('\n') : (this.diff.sansRecord ? '\n(Entraînement : ni record ni défis)' : '')) +
       `\n${conseil}`;
   }

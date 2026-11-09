@@ -4,10 +4,10 @@ export const REGLAGES_HUB = {
   caseH: 180,        // hauteur d'une case
   ecart: 14,         // espace entre les cases
   grilleY: 158,      // milieu de la 1re ligne de cases
-  infosY: 472,       // texte du boss choisi
+  infosY: 468,       // texte du boss choisi (2 lignes : nom + record, puis la fiche)
   bandeauY: 512,     // bandeau du bas (badges, la fin)
-  // tableau de PROGRESSION (bouton 📋 PROGRÈS) : place des lignes, nombre de défis de maîtrise par boss
-  progression: { hautY: 98, ligneH: 58, basY: 500, defis: { kedric: 3, greg: 3, lionel: 3 } },
+  // tableau de PROGRESSION (bouton 📋 PROGRÈS) : place des lignes
+  progression: { hautY: 84, ligneH: 64, basY: 512 },   // (défis : src/bosses/defis.js)
   // fiche d'une ligne du boss choisi (genre · durée · commandes au doigt)
   fiches: {
     beufa: 'Infiltration + quiz · ≈ 5 min · joystick',
