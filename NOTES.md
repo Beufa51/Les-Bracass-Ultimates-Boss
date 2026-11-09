@@ -118,6 +118,8 @@
   allégée en 80 kbit/s ; original dans `assets_inbox/hub/`). Réglages de la grille : `src/hub/reglages.js`.
 
 ## FINALE : mécha des Bracass' en shoot'em up (9 nov. 2026) — JOUABLE, en réglages avec Fabien
+- NOM du boss final : « GOLDO CASS' » (`NOM_BOSS_FINAL` dans `src/bosses/finale/reglages.js`) : case du milieu du hub,
+  ligne d'infos, PROGRÈS, palmarès de la fin, titre des règles du combat.
 - Choix de Fabien : UN seul robot assemblé (je découpe les parties), ordre des attaques libre (celui de la proposition),
   rangs BOSS DES BOSS (S) / SUPER SAIYAN (A) / HUMAIN DE BASE (B) / YAMCHA (C), musique Chrono Trigger « Boss Battle »
   (`assets/audio/finale/finale_mecha.mp3` en 80 kbit/s, clé `finale_musique` dans `assets/manifeste.js` ; original dans

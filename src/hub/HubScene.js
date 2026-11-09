@@ -11,6 +11,7 @@ import { creerTouches, vientDAppuyer } from '../core/clavier.js';
 import { Sauvegarde, formatTemps, SCENES_REPRISE } from '../core/sauvegarde.js';
 import { ouvrirProgression } from './progression.js';
 import { rangRecord } from '../bosses/rangs.js';
+import { NOM_BOSS_FINAL } from '../bosses/finale/reglages.js';
 import { rangLisible } from '../core/rangs.js';
 import { jouerSon } from '../core/ressources.js';
 import { jouerMusique } from '../core/musique.js';
@@ -187,7 +188,7 @@ export class HubScene extends Phaser.Scene {
       this.cameras.main.flash(500, 255, 255, 255); jouerSon(this, 'ui_badge');
       if (couleur) { couleur.destroy(); c.img.setTexture('select_mecha'); }
       lueur.destroy();
-      if (c.etiquette) c.etiquette.setText('BOSS FINAL').setColor('#ffd84a');
+      if (c.etiquette) c.etiquette.setText(NOM_BOSS_FINAL).setColor('#ffd84a');
       this.choix = c; this.majChoix();
       if (c.img) this.tweens.add({ targets: c.img, scale: c.img.scale * 1.08, yoyo: true, duration: 180, repeat: 1 });
     });
@@ -222,10 +223,10 @@ export class HubScene extends Phaser.Scene {
       texte(this, x, y - 30, ouvert ? '⚡' : '?', ouvert ? 110 : 130, ouvert ? '#ffd84a' : '#5a3a7a', { fontStyle: 'bold' });
     }
     this.add.rectangle(x, y + h / 2 - 15, l - 8, 26, 0x000000, 0.85);
-    const etiquette = texte(this, x, y + h / 2 - 15, ouvert ? 'BOSS FINAL' : '???', 19, ouvert ? '#ffd84a' : '#c9a0ff', { fontStyle: 'bold' });
+    const etiquette = texte(this, x, y + h / 2 - 15, ouvert ? NOM_BOSS_FINAL : '???', 19, ouvert ? '#ffd84a' : '#c9a0ff', { fontStyle: 'bold' });
     if (!ouvert) texte(this, x, y + 70, `🔒 ${nb} / ${BOSS.length}`, 22, '#c9a0ff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 });
-    const info = ouvert ? `BOSS FINAL : le mécha des Bracass' !\n${R.ficheFinale}`
-      : `BOSS FINAL : ???\nBats les ${BOSS.length} Bracass' pour le débloquer (${nb} / ${BOSS.length})`;
+    const info = ouvert ? `${NOM_BOSS_FINAL} : le mécha des Bracass' !\n${R.ficheFinale}`
+      : `??? :\nBats les ${BOSS.length} Bracass' pour le débloquer (${nb} / ${BOSS.length})`;
     return { finale: true, x, y, w: l, h, img, etiquette, info, action: () => this.entrerFinale() };
   }
 

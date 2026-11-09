@@ -15,7 +15,7 @@ import { creerTouches, vientDAppuyer } from '../../core/clavier.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { Sauvegarde, formatTemps, lignesDefis } from '../../core/sauvegarde.js';
 import { rangLisible, trouverRang } from '../../core/rangs.js';
-import { IDENTITE, DIFFICULTES, REGLAGES as R } from './reglages.js';
+import { IDENTITE, DIFFICULTES, REGLAGES as R, NOM_BOSS_FINAL } from './reglages.js';
 import { choisirDifficulte, cleRecord } from './difficulte.js';
 
 const PAS = 3;   // les masques des parties sont lus 1 pixel sur 3 (assez précis, très rapide)
@@ -78,7 +78,7 @@ export class FinaleMecha extends BossScene {
     });
     if (d.rejouer) { this.entree(true); lancer(); return; }
     this.entree(false);
-    this.time.delayedCall(1700, () => this.afficherIntro('BOSS FINAL : LE MÉCHA DES BRACASS\'', [
+    this.time.delayedCall(1700, () => this.afficherIntro(`${NOM_BOSS_FINAL} : LE MÉCHA DES BRACASS'`, [
       'Les 6 Bracass\' ont fusionné dans un robot géant : détruis ses 6 parties, une par une !',
       estTactile() ? 'Pose un doigt N\'IMPORTE OÙ : le vaisseau suit le mouvement du doigt.' : 'FLÈCHES : piloter le vaisseau.',
       'Le tir est AUTOMATIQUE. Seul le POINT BLANC du vaisseau craint les tirs.',

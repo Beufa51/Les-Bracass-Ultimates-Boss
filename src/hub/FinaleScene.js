@@ -16,6 +16,7 @@ import { rangLisible } from '../core/rangs.js';
 import { BOSS, FINALE } from '../bosses/liste.js';
 import { rangRecord } from '../bosses/rangs.js';
 import { DEFIS } from '../bosses/defis.js';
+import { NOM_BOSS_FINAL } from '../bosses/finale/reglages.js';
 
 const ORDRE_PHOTO = ['greg', 'julien', 'beufa', 'kedric', 'remi', 'lionel'];   // de gauche à droite sur la photo
 const LETTRES = ['S', 'A', 'B', 'C'];
@@ -128,7 +129,7 @@ export class FinaleScene extends Phaser.Scene {
   }
   leBilan() {
     this.ajout(texte(this, LARGEUR / 2, 40, 'TON PALMARÈS', 40, '#ffd84a', { fontStyle: 'bold', stroke: '#b3202c', strokeThickness: 8 }));
-    const liste = [...BOSS, { ...FINALE, nom: 'BOSS FINAL' }];
+    const liste = [...BOSS, { ...FINALE, nom: NOM_BOSS_FINAL }];
     let defisFaits = 0, defisTotal = 0;
     liste.forEach((b, i) => {
       const y = 100 + i * 46, g = this.meilleurRang(b.id);

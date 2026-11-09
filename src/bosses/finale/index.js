@@ -6,7 +6,7 @@ import { MANIFESTE } from './manifeste.js';
 export default {
   ...IDENTITE,
   pret: true,
-  phases: [{ id: 'mecha', nom: 'BOSS FINAL : le mécha des Bracass\'', scene: 'FinaleMecha' }],
+  phases: [{ id: 'mecha', nom: 'GOLDO CASS\' (boss final)', scene: 'FinaleMecha' }],
   manifeste: MANIFESTE,
   scenes: [FinaleMecha],
 };

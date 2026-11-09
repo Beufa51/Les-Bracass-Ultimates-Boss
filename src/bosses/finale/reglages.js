@@ -4,6 +4,8 @@
 // Tout ce qui se règle est ici (réglages = données, pas de logique).
 // =====================================================================
 export const IDENTITE = { id: 'finale', nom: 'le mécha des Bracass\'' };
+// son NOM affiché (case du milieu du hub, PROGRÈS, palmarès, titre du combat) : choisi par Fabien
+export const NOM_BOSS_FINAL = 'GOLDO CASS\'';
 
 // FACILE proposé par défaut la 1re fois (c'est la récompense, pas un mur)
 //  vies / bombes au départ ; vitesse = x vitesse des tirs ennemis ; cadence = x tirs ennemis par seconde ; pv = x vie des parties
