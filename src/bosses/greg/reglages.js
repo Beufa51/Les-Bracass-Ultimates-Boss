@@ -97,8 +97,9 @@ export const REGLAGES = {
   souffleRecup: 22,            // souffle regagné par seconde quand on ne frappe pas
   coups: {
     //          moment de l'impact, durée totale, dégâts, souffle dépensé, cible
-    // VISAGE = plus de dégâts et étourdit 2x plus vite ; CORPS = moins de dégâts mais vide son souffle
-    visage: { impact: 0.10, duree: 0.30, degats: 4, souffle: 8,  cible: 'tete', vertige: 2 },
+    // nov. 2026 (Fabien) : UN SEUL coup de poing (Espace ou Z) = « visage » ; il vide aussi un peu son souffle.
+    // (« corps » n'est plus utilisé par le joueur, gardé pour revenir en arrière)
+    visage: { impact: 0.10, duree: 0.30, degats: 3, souffle: 8,  cible: 'tete', vertige: 1.5, souffleGreg: 8 },   // (bot : 4 / 2 = combats 2x trop courts)
     corps:  { impact: 0.14, duree: 0.36, degats: 2, souffle: 11, cible: 'corps', souffleGreg: 15, vertige: 1 },
   },
   esquiveDuree: 0.5,           // durée de l'esquive (Gauche ou Droite)
@@ -110,7 +111,6 @@ export const REGLAGES = {
   toucheDuree: 0.38,           // temps sonné après un coup reçu
   contreFenetre: 0.8,          // après une esquive réussie, temps pour placer un contre
   contreMultiplicateur: 3,     // dégâts du contre : c'est LA stratégie
-  contreVisageOuvert: 4,       // contre AU VISAGE quand sa garde est BASSE (il protège le ventre) : x4
   esquiveParfaite: 0.12,       // esquive lancée moins de X s avant l'impact = PARFAITE (flash bleu, + esprit)
   espritParfait: 5,
   serie: { bonus: 0.1, oubli: 1.2 },   // « X HITS » : +10 % par coup enchaîné ; la série s'arrête après 1,2 s sans toucher
@@ -179,7 +179,7 @@ export const REGLAGES = {
   // Une fois par round, à un moment au hasard (entre 'entre' secondes restantes). Pour réussir :
   // un COUP AU CORPS lancé APRÈS qu'il a baissé la garde (marteler avant ne marche pas), en moins de 'duree'.
   // 1re fois du combat = COUP SECRET (tapis direct) ; ensuite = dégâts x3. Mauvais coup = il esquive.
-  nargue: { entre: [45, 15], duree: 0.7, coup: 'corps', multiplicateur: 3 },
+  nargue: { entre: [45, 15], duree: 0.7, coup: 'visage', multiplicateur: 3 },
 
   // ---------- Classement de fin (temps de K.O. + coups reçus + tapis) ----------
   rangs: [ // du meilleur au moins bon : il faut un score >= au seuil
@@ -262,10 +262,8 @@ export const CONSEIL_ROUND1 = 'Esquive du côté OPPOSÉ au coup... puis frappe 
 // Ce que dit le vieux coach dans le coin, entre les rounds
 export const CONSEILS = [
   [
-    'Regarde le cadre blanc : c\'est ce qu\'il protège.',
-    'Il protège le visage ? Tape au CORPS (il s\'essouffle). Le ventre ? Tape au VISAGE (plus fort, ça l\'étourdit).',
     'Son coup au foie (« ! » violet au milieu) : seule la GARDE (▼) marche.',
-    'Quand il baisse les bras pour te narguer (« hé... ») : COUP AU CORPS tout de suite !',
+    'Quand il baisse les bras pour te narguer (« hé... ») : FRAPPE tout de suite !',
   ],
   [
     'Coup de GAUCHE ? Esquive à DROITE (et inversement) !',

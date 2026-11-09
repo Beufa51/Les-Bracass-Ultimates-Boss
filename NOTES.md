@@ -1602,6 +1602,17 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Résolution : l'image de Fabien fait 375×512 (le perso 162×488) ; elle est affichée à sa taille (500 px de haut sur
   un jeu de 540) : pour plus net, il faut un original plus grand (même prompt, « high resolution »).
 
+## GREG — UN SEUL COUP DE POING (nov. 2026, demande de Fabien : « visage / corps en plus des esquives, trop compliqué »)
+- Espace et Z (téléphone : toucher n'importe où à DROITE) = le même coup. Plus de cadre gris « zone protégée », plus de
+  « Garde HAUTE / BASSE : vise... », plus de ligne VISAGE / CORPS sur téléphone. Greg garde ses coups au corps (« ! ▼ »
+  violet = GARDE) : c'est ta défense, pas ton attaque.
+- Règles : en garde, Greg pare seulement au hasard (`blocageLibre`) ; contre = x3 (plus de x4 « visage ouvert ») ;
+  moment secret = n'importe quel coup lancé après le « hé... » (`nargue.coup: 'visage'`).
+- Coup (`coups.visage`) : 3 dégâts, `vertige` 1,5, `souffleGreg` 8 (il s'essouffle encore). Bot (3 parties x 3 diff x
+  5 profils) : avec 4 / 2 les combats duraient 2x moins ; avec 3 / 1,5 temps proches d'avant (NORMAL expert 52 s,
+  moyen 59 s, enfant 105 s ; avant 67 / 81 / 106) ; spam et tortue perdent toujours ; 0 erreur JavaScript.
+- `coups.corps` gardé dans les réglages (inutilisé) pour revenir en arrière.
+
 ## LIONEL — AUDIT IMAGES / ANIMATIONS (nov. 2026, en attente des choix de Fabien)
 - Rapport : `propositions/lionel_audit_images.md` ; prompts : `propositions/lionel_prompts_images.md`.
 - Manques : lancer figé (1 image, aussi utilisée pour le LOB), toi « tient/rattrape » = pose de course, pas de relève

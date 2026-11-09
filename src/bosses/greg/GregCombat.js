@@ -5,7 +5,7 @@
 //       jaune = visage (esquive du côté opposé ou garde Bas), violet = corps (garde Bas),
 //       rouge "!!" = SMASH (esquive sur le côté !)
 //   - Esquive réussie => fenêtre de CONTRE (dégâts x3) ; seules les esquives remplissent la jauge d'esprit
-//   - Cadre blanc = zone que Greg protège => tape l'autre
+//   - UN SEUL coup de poing (Espace ou Z) : plus de choix visage / corps (nov. 2026, demande de Fabien)
 //   - Jauge d'esprit pleine => X : DEMPSEY ROLL (boule sur un "∞", ◀ / ▶ en rythme)
 //   - Au tapis : alterner ◀ ▶ avant 10 !
 // Tous les chiffres sont dans reglages.js.
@@ -42,7 +42,7 @@ const CORPS_GREG = { x: R.centreX, y: 215 };
 const TETE_JOUEUR_Y = 405;       // tête de ton boxeur à l'écran
 const VENTRE_JOUEUR = 70;        // le ventre est un peu plus bas
 // Boutons tactiles : pendant le combat / sur les écrans à valider
-const ETIQUETTES_COMBAT = { haut: null, bas: '▼\nGarde', espace: 'Visage', z: 'Corps', x: 'Dempsey' };
+const ETIQUETTES_COMBAT = { haut: null, bas: '▼\nGarde', espace: 'Coup', z: null, x: 'Dempsey' };
 const ETIQUETTES_OK = { haut: null, bas: null, gauche: null, droite: null, espace: 'OK', z: null, x: null };
 // téléphone : en combat, plus de boutons, des GESTES (gestes.js) ; R.gestesTactiles = false pour revenir aux boutons
 const SANS_BOUTONS = { haut: null, bas: null, gauche: null, droite: null, espace: null, z: null, x: null };
@@ -147,12 +147,12 @@ export class GregCombat extends BossScene {
     this.afficherIntro('GREG - Le Boxeur', this.gestes ? [
       'GAUCHE de l\'écran : glisse ◀ ▶ = esquive (côté OPPOSÉ au coup)',
       'GAUCHE de l\'écran : doigt posé = GARDE',
-      'DROITE de l\'écran : touche en HAUT = visage, en BAS = corps',
+      'DROITE de l\'écran : touche = COUP DE POING',
       'Esquives réussies => jauge => bouton doré DEMPSEY ROLL',
       'Au tapis : touche gauche / droite très vite pour te relever !',
     ] : [
       '◀ / ▶ : esquive du côté OPPOSÉ au coup (puis frappe vite = CONTRE !)',
-      tactile ? 'Visage : coup au visage      Corps : coup au corps' : 'Espace : coup au VISAGE      Z : coup au CORPS',
+      tactile ? 'Coup : coup de poing' : 'Espace : coup de poing',
       tactile ? '▼ Garde (maintenu) : garde' : 'Bas (maintenu) : garde',
       tactile ? 'Esquives réussies => jauge d\'esprit => bouton Dempsey' : 'Esquives réussies => jauge d\'esprit => X = DEMPSEY ROLL',
       'Au tapis : alterne ◀ ▶ très vite pour te relever !',
@@ -260,7 +260,7 @@ export class GregCombat extends BossScene {
       j.esquive.t += dt;
       const contrePossible = this.horloge < j.contreJusqua;
       if (contrePossible && (this.memo('espace') || this.memo('z'))) {
-        const coup = this.memo('z') ? 'corps' : 'visage';
+        const coup = 'visage';   // un seul coup (Espace ou Z)
         this.consommer('espace', 'z');
         const poing = j.esquive.cote < 0 ? 'd' : 'g';   // esquive à gauche => le poing DROIT part (et inversement)
         j.esquive = null; this.frapper(coup, poing); return;
@@ -281,9 +281,8 @@ export class GregCombat extends BossScene {
       return;
     }
     if (this.memo('espace') || this.memo('z')) {
-      const coup = this.memo('z') ? 'corps' : 'visage';
       this.consommer('espace', 'z');
-      this.frapper(coup);
+      this.frapper('visage');   // un seul coup (Espace ou Z)
     }
   }
 
@@ -318,12 +317,11 @@ export class GregCombat extends BossScene {
     this.coupsRecents = (this.coupsRecents || []).filter(t => this.horloge - t < R.martelage.fenetre);
     if (!contre) this.coupsRecents.push(this.horloge);
     const martele = this.coupsRecents.length > R.martelage.coups && (neutre || sonneGreg || g.etat === 'recup');   // (essoufflé = grande ouverture : on peut cogner)
-    const zoneProtegee = (g.garde === 'haute' && c.cible === 'tete') || (g.garde === 'basse' && c.cible === 'corps');
     // pendant qu'il ARME un coup (sauf SMASH), il pare : il faut esquiver puis contrer
     const pareEnArmant = g.etat === 'prepare' && g.attaque && g.attaque.cible !== 'smash';
     // même dans la zone ouverte, il pare parfois (les contres restent la vraie source de dégâts)
-    const pareLibre = (neutre || sonneGreg) && !zoneProtegee && Math.random() < R.blocageLibre[this.round - 1];
-    const bloque = !contre && !titube && ((neutre && zoneProtegee) || g.couvert > 0 || pareEnArmant || pareLibre || martele);
+    const pareLibre = (neutre || sonneGreg) && Math.random() < R.blocageLibre[this.round - 1];
+    const bloque = !contre && !titube && (g.couvert > 0 || pareEnArmant || pareLibre || martele);
 
     if (bloque) {
       jouerSon(this, 'greg_bloque');
@@ -338,7 +336,7 @@ export class GregCombat extends BossScene {
     }
 
     let degats = c.degats;
-    // il faut avoir lancé un COUP AU CORPS après qu'il a baissé la garde (pas en martelant avant)
+    // il faut avoir lancé un coup APRÈS qu'il a baissé la garde (pas en martelant avant)
     const secretValide = g.etat === 'nargue' && j.action && j.action.debut >= g.nargueDebut && coup === R.nargue.coup;
     if (g.etat === 'nargue' && !secretValide) {
       // mauvais coup ou coup lancé trop tôt : il esquive en rigolant et reprend sa garde
@@ -366,9 +364,7 @@ export class GregCombat extends BossScene {
     if (titube) degats *= R.etourdi.multiplicateur;   // RUSH : Greg sans défense, chaque coup fait très mal
     g.reculSens = null;
     if (contre) {
-      // contre AU VISAGE quand il protège le ventre (garde basse) : encore plus fort
-      const ouvert = c.cible === 'tete' && g.garde === 'basse';
-      degats *= ouvert ? R.contreVisageOuvert : R.contreMultiplicateur;
+      degats *= R.contreMultiplicateur;
       j.contreJusqua = -1;
       j.esprit += R.esprit.contre;
       this.ralentir(0.25, 0.35);
@@ -588,7 +584,7 @@ export class GregCombat extends BossScene {
     this.nargueRound = this.round;
     g.etat = 'nargue'; g.t = 0; g.attaque = null; g.nargueDebut = this.horloge;
     this.alerte.setVisible(false);
-    // bien visible (audit nov. 2026) : « hé... » + sifflement + éclat sur son ventre (là où il faut frapper)
+    // bien visible (audit nov. 2026) : « hé... » + sifflement + éclat sur son ventre (là où il est ouvert)
     onomatopee(this, R.centreX - 150, 150, 'hé hé...', 30, '#ffd84a');
     jouerSon(this, 'greg_esquive', { rate: 0.6 });
     const eclat = this.add.star(CORPS_GREG.x, CORPS_GREG.y + 20, 6, 8, 30, 0xfff3a8).setDepth(29).setAlpha(0.9);
@@ -1604,21 +1600,8 @@ export class GregCombat extends BossScene {
       }
     }
 
-    // le cadre blanc + bouclier montre ce qu'il protège (toujours : c'est LA décision visage / corps)
-    const z = this.zoneGarde;
-    z.clear();
-    if (g.etat === 'garde' && this.etat === 'combat' && !this.j.dempsey) {
-      const haut = g.garde === 'haute';
-      const x = R.centreX + v.dx, y = haut ? VISAGE_GREG.y : CORPS_GREG.y + 10, l = haut ? 120 : 150, h = haut ? 100 : 90;
-      const pulse = 0.5 + Math.sin(t / 200) * 0.2;
-      z.fillStyle(0xffffff, 0.16 * pulse + 0.08).fillRoundedRect(x - l / 2, y - h / 2, l, h, 18);
-      z.lineStyle(5, 0xffffff, 0.5 + pulse * 0.5).strokeRoundedRect(x - l / 2, y - h / 2, l, h, 18);
-      // petit bouclier sur le côté de la zone protégée
-      const bx = x + l / 2 + 4, by = y - 14;
-      z.fillStyle(0xffffff, 0.95).beginPath();
-      z.moveTo(bx, by); z.lineTo(bx + 22, by); z.lineTo(bx + 22, by + 14); z.lineTo(bx + 11, by + 28); z.lineTo(bx, by + 14);
-      z.closePath(); z.fillPath();
-    }
+    // (nov. 2026 : plus de cadre « zone protégée » : un seul coup de poing, plus de choix visage / corps)
+    this.zoneGarde.clear();
   }
 
   // Cible qui se resserre sur toi (là où le coup va frapper) + aura bleue du coup au corps
@@ -1700,6 +1683,6 @@ export class GregCombat extends BossScene {
     this.texteRound.setText(`ROUND ${this.round} / ${R.nbRounds}`);
     const reste = Math.max(0, Math.ceil(this.tempsRound ?? R.dureeRound));
     this.texteTemps.setText(`TIME ${Math.floor(reste / 60)}'${String(reste % 60).padStart(2, '0')}`);
-    this.texteGarde.setText(g.etat === 'garde' ? `Garde ${g.garde === 'haute' ? 'HAUTE : vise le corps' : 'BASSE : vise la tête'}` : '');
+    this.texteGarde.setText('');   // (plus de garde haute / basse à lire : un seul coup)
   }
 }

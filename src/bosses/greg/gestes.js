@@ -1,6 +1,6 @@
 // GREG sur téléphone : commandes par GESTES (proposition A, nov. 2026 — voir propositions/greg_maniabilite_mobile.md).
 //   Moitié GAUCHE de l'écran = défense : glisser ← / → = esquive ; doigt posé sans bouger = GARDE.
-//   Moitié DROITE = attaque : toucher en HAUT = coup au visage, en BAS = coup au corps.
+//   Moitié DROITE = attaque : toucher n'importe où = coup de poing (nov. 2026 : plus de visage / corps).
 //   (nov. 2026, retour Fabien : on peut aussi ESQUIVER en glissant sur la moitié DROITE ; le coup part au lever du doigt
 //    ou dès qu'il reste posé G.coup s, donc un glissé n'envoie pas de coup.)
 //   Jauge pleine : gros bouton doré DEMPSEY au milieu. Pendant le roll / au tapis : toucher à gauche / à droite.
@@ -37,17 +37,15 @@ export function installerGestes(scene, opts) {
 
   // ---- aides à l'écran (discrètes) ----
   const aide = scene.add.graphics().setDepth(38);
-  // round 1 : les deux moitiés de l'écran se voient (voile très léger), puis seulement la ligne visage / corps
+  // round 1 : les deux moitiés de l'écran se voient (voile très léger)
   const moities = scene.add.graphics().setDepth(37);
   moities.fillStyle(0x5ad1ff, 0.07).fillRect(0, 90, LARGEUR / 2, HAUTEUR - 90);
   moities.fillStyle(0xffd84a, 0.07).fillRect(LARGEUR / 2, 90, LARGEUR / 2, HAUTEUR - 90);
   aide.lineStyle(3, 0xffffff, 0.5);
-  for (let x = LARGEUR / 2 + 20; x < LARGEUR; x += 24) aide.lineBetween(x, G.ligne, x + 12, G.ligne);   // ligne VISAGE / CORPS
   aide.lineBetween(LARGEUR / 2, 120, LARGEUR / 2, 140); aide.lineBetween(LARGEUR / 2, HAUTEUR - 150, LARGEUR / 2, HAUTEUR - 130);
   const style = { stroke: '#000000', strokeThickness: 4 };
   const etiquettes = [
-    texte(scene, LARGEUR - 90, G.ligne - 30, 'VISAGE', 22, '#ffffff', style),
-    texte(scene, LARGEUR - 90, G.ligne + 30, 'CORPS', 22, '#5ad1ff', style),
+    texte(scene, LARGEUR - 150, G.ligne, 'touche : COUP', 22, '#ffffff', style),
     texte(scene, 150, HAUTEUR - 46, '◀ glisse ▶ : ESQUIVE (partout)\ndoigt posé : GARDE', 20, '#ffffff', { ...style, align: 'center' }),
   ].map(t => t.setDepth(38));
   const bouton = scene.add.container(G.bouton.x, G.bouton.y).setDepth(39).setVisible(false);
@@ -68,7 +66,7 @@ export function installerGestes(scene, opts) {
     if (m === 'tapis' || m === 'dempsey') { taper(p.x < LARGEUR / 2 ? 'gauche' : 'droite'); onde(p.x, p.y, 0xffffff); return; }
     if (p.x >= LARGEUR / 2) {   // attaque : le coup part au lever du doigt ou après G.coup s ; un glissé = esquive
       const d = { x0: p.x, fait: false, garde: false, attaque: true };
-      d.frapper = () => { if (d.fait) return; d.fait = true; if (d.minuterie) d.minuterie.remove(); taper(p.y < G.ligne ? 'espace' : 'z'); onde(p.x, p.y, p.y < G.ligne ? 0xffffff : 0x5ad1ff); };
+      d.frapper = () => { if (d.fait) return; d.fait = true; if (d.minuterie) d.minuterie.remove(); taper('espace'); onde(p.x, p.y, 0xffffff); };
       d.minuterie = scene.time.delayedCall(G.coup * 1000, () => { if (doigts.get(p.id) === d) d.frapper(); });
       doigts.set(p.id, d); return;
     }
