@@ -1611,6 +1611,9 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
   `lionel_arme.png` (il arme, `R.armeAvant` = 0,3 s avant de lancer : aussi un indice pour le joueur) +
   `lionel_lance2.png` (lâcher + accompagnement, 2 images jouées une fois, `boucle: false`). Ton joueur : élan simulé au
   code (penche en arrière puis claque) ; touché : tremblement 0,25 s ; DÉFAITE : Lionel (pose victoire) jubile à droite.
+- SENS DES IMAGES vérifié en jeu (toutes les poses des 2 joueurs, plongeon des 2 côtés, écrans de fin) : 3 fichiers
+  RETOURNÉS (le fichier lui-même) : `lionel_defaite.png` (tournait le dos au terrain et au trophée de l'écran de victoire),
+  `lionel_touche.png` et `heros_frisbee_touche.png` (ils partaient vers l'adversaire au lieu de reculer). Le reste était bon.
 - RESTE : lob, toi qui tiens de côté, relève, nargue, arbitre, trophée (prompts prêts), public qui saute (non fait :
   la bande du décor laisserait un double en bougeant).
 
