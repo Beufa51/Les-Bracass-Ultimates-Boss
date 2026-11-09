@@ -7,9 +7,13 @@ import greg from './greg/index.js';
 import remi from './remi/index.js';
 import lionel from './lionel/index.js';
 import modele from './modele/index.js';
+import finale from './finale/index.js';
 
 export const BOSS = [beufa, kedric, julien, greg, remi, lionel];
 
 // Boss "modèle" : pas de porte dans le hub, seulement dans le menu de test (F1).
 // Sert d'exemple pour créer un nouveau boss.
 export const MODELE = modele;
+
+// BOSS FINAL (le mécha des Bracass') : la case du MILIEU du hub, débloquée par les 6 badges.
+export const FINALE = finale;

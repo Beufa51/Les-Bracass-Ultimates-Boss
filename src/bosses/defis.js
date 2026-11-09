@@ -1,6 +1,7 @@
 // DÉFIS DE MAÎTRISE des 6 boss (3 chacun) : les NOMS sont ici, les tests dans la scène de chaque boss
 // (lignesDefis / defisNouveaux de core/sauvegarde.js, avec { id, test }). Le tableau PROGRÈS du hub lit cette liste.
 import { REGLAGES as R_LIONEL } from './lionel/reglages.js';
+import { REGLAGES as R_FINALE } from './finale/reglages.js';
 
 export const DEFIS = {
   beufa: [
@@ -32,6 +33,11 @@ export const DEFIS = {
     { id: 'sec', nom: 'Gagner sans perdre un seul set' },
     { id: 'troisSupers', nom: 'Marquer 3 SUPER LANCERS' },
     { id: 'hermetique', nom: `Encaisser moins de ${R_LIONEL.defiHermetique} points` },
+  ],
+  finale: [
+    { id: 'intouchable', nom: 'Détruire le mécha sans être touché' },
+    { id: 'sansBombe', nom: 'Sans utiliser de bombe' },
+    { id: 'rapide', nom: `En moins de ${Math.round(R_FINALE.defiTemps / 60)} minutes` },
   ],
 };
 

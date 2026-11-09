@@ -9,19 +9,20 @@ import { texte } from '../core/ui.js';
 import { Sauvegarde, formatTemps, SCENES_REPRISE, codeSauvegarde, chargerCode } from '../core/sauvegarde.js';
 import { jouerSon } from '../core/ressources.js';
 import { estTactile } from '../core/tactile.js';
-import { BOSS } from '../bosses/liste.js';
+import { BOSS, FINALE } from '../bosses/liste.js';
 import { REGLAGES_HUB as R } from './reglages.js';
 import { rangLisible } from '../core/rangs.js';
 import { rangRecord } from '../bosses/rangs.js';
 import { DEFIS } from '../bosses/defis.js';
 import { DIFFICULTES as D_BEUFA } from '../bosses/beufa/reglages.js';
+import { DIFFICULTES as D_FINALE } from '../bosses/finale/reglages.js';
 import { DIFFICULTES as D_KEDRIC } from '../bosses/kedric/reglages.js';
 import { DIFFICULTES as D_JULIEN } from '../bosses/julien/reglages.js';
 import { DIFFICULTES as D_GREG } from '../bosses/greg/reglages.js';
 import { DIFFICULTES as D_REMI } from '../bosses/remi/reglages.js';
 import { DIFFICULTES as D_LIONEL } from '../bosses/lionel/reglages.js';
 
-const DIFFS = { beufa: D_BEUFA, kedric: D_KEDRIC, julien: D_JULIEN, greg: D_GREG, remi: D_REMI, lionel: D_LIONEL };
+const DIFFS = { beufa: D_BEUFA, kedric: D_KEDRIC, julien: D_JULIEN, greg: D_GREG, remi: D_REMI, lionel: D_LIONEL, finale: D_FINALE };
 
 // records d'un boss, lisibles : « NORMAL S 1'20"00 · CHAMPION A 2'03"10 » (Julien : manif + classe)
 function lignesRecords(id) {
@@ -50,23 +51,24 @@ export function ouvrirProgression(scene, ferme) {
   ajout(texte(scene, LARGEUR / 2, 60, restants.length ? `À battre : ${restants.map(b => b.nom).join(', ')}` : '★ Les 6 sont battus : vise les rangs S et les défis ! ★',
     18, restants.length ? '#9fd0ff' : '#ffd84a'));
 
-  BOSS.forEach((boss, k) => {
+  // les 6 boss + le BOSS FINAL (le mécha) en dernière ligne
+  [...BOSS, { ...FINALE, nom: 'BOSS FINAL' }].forEach((boss, k) => {
     const y = P.hautY + k * P.ligneH, battu = Sauvegarde.aLeBadge(boss.id);
-    ajout(scene.add.rectangle(LARGEUR / 2, y + 20, LARGEUR - 40, P.ligneH - 4, k % 2 ? 0x13235a : 0x0e1b48, 1));
-    if (scene.textures.exists('badge_' + boss.id)) ajout(scene.add.image(48, y + 10, battu ? 'badge_' + boss.id : 'badge_vide').setScale(0.6).setY(y + 20));
-    ajout(texte(scene, 80, y, boss.nom.toUpperCase(), 20, battu ? '#ffd84a' : '#ffffff', { fontStyle: 'bold' }).setOrigin(0, 0.5));
-    let etat = !boss.pret ? 'bientôt' : battu ? 'BATTU ✓' : 'à battre';
+    ajout(scene.add.rectangle(LARGEUR / 2, y + 17, LARGEUR - 40, P.ligneH - 3, k % 2 ? 0x13235a : 0x0e1b48, 1));
+    if (scene.textures.exists('badge_' + boss.id)) ajout(scene.add.image(48, y + 10, battu ? 'badge_' + boss.id : 'badge_vide').setScale(0.52).setY(y + 17));
+    ajout(texte(scene, 80, y, boss.nom.toUpperCase(), 18, battu ? '#ffd84a' : '#ffffff', { fontStyle: 'bold' }).setOrigin(0, 0.5));
+    let etat = !boss.pret ? 'bientôt' : battu ? 'BATTU ✓' : boss.id === 'finale' && restants.length ? 'verrouillé 🔒' : 'à battre';
     const liste = DEFIS[boss.id] || [], faits = Sauvegarde.defis(boss.id);
     const nbFaits = liste.filter(d => faits[d.id]).length;
     if (liste.length) etat += `   ·   Défis ${nbFaits}/${liste.length}`;
     const r = Sauvegarde.reprise(boss.id), etape = r && SCENES_REPRISE[r.scene];
     if (etape) etat += `   ·   En cours : reprise ${etape.nom}`;
-    ajout(texte(scene, 210, y, etat, 18, battu ? '#7fff7f' : '#c8d8ff').setOrigin(0, 0.5));
-    const recs = ajout(texte(scene, 80, y + 22, lignesRecords(boss.id), 16, '#aab8e0', { align: 'left' }).setOrigin(0, 0.5));
+    ajout(texte(scene, 210, y, etat, 17, battu ? '#7fff7f' : '#c8d8ff').setOrigin(0, 0.5));
+    const recs = ajout(texte(scene, 80, y + 18, lignesRecords(boss.id), 15, '#aab8e0', { align: 'left' }).setOrigin(0, 0.5));
     if (recs.width > LARGEUR - 110) recs.setScale((LARGEUR - 110) / recs.width);   // (Julien : manif + classe sur une ligne)
     // les DÉFIS en clair : ✓ réussi, ☐ à faire (noms : src/bosses/defis.js)
     if (liste.length) {
-      const td = ajout(texte(scene, 80, y + 41, liste.map(d => `${faits[d.id] ? '✓' : '☐'} ${d.nom}`).join('    '), 15,
+      const td = ajout(texte(scene, 80, y + 35, liste.map(d => `${faits[d.id] ? '✓' : '☐'} ${d.nom}`).join('    '), 15,
         nbFaits === liste.length ? '#7fff7f' : '#ffe9a8', { align: 'left' }).setOrigin(0, 0.5));
       if (td.width > LARGEUR - 110) td.setScale((LARGEUR - 110) / td.width);
     }

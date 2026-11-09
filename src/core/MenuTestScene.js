@@ -5,7 +5,7 @@ import { texte, voile } from './ui.js';
 import { creerTouches, vientDAppuyer } from './clavier.js';
 import { Sauvegarde } from './sauvegarde.js';
 import { estTactile, etiquettesTactiles, etiquettesActuelles } from './tactile.js';
-import { BOSS, MODELE } from '../bosses/liste.js';
+import { BOSS, MODELE, FINALE } from '../bosses/liste.js';
 
 export class MenuTestScene extends Phaser.Scene {
   constructor() { super('MenuTest'); }
@@ -18,7 +18,7 @@ export class MenuTestScene extends Phaser.Scene {
 
   create() {
     this.choix = [];
-    for (const boss of [...BOSS, MODELE]) {
+    for (const boss of [...BOSS, FINALE, MODELE]) {
       if (!boss.pret) {
         this.choix.push({ libelle: `${boss.nom} (Bientôt)`, action: () => this.lancer('Bientot', { bossId: boss.id }) });
       } else {

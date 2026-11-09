@@ -72,7 +72,13 @@ export class HubScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-T', () => this.progression());
     this.cameras.main.fadeIn(250);
     this.majChoix();
-    if (this.complet && !Sauvegarde.fait('finale_vue')) { Sauvegarde.marquerFait('finale_vue'); this.time.delayedCall(700, () => this.voirFin()); }
+    // les 6 badges : la 1re fois, ALERTE ! le mécha arrive tout seul (la fin vient après l'avoir battu)
+    if (this.complet && !Sauvegarde.aLeBadge('finale') && !Sauvegarde.fait('mecha_alerte')) {
+      Sauvegarde.marquerFait('mecha_alerte');
+      this.choix = this.cases.find(c => c.finale); this.majChoix();
+      this.infos.setText('ALERTE : LES BRACASS\' FUSIONNENT !').setColor('#ff6b6b');
+      this.time.delayedCall(1500, () => this.entrerFinale());
+    }
   }
 
   position([col, ligne]) {
@@ -109,10 +115,15 @@ export class HubScene extends Phaser.Scene {
     return { finale: true, x, y, w: l, h, img, info, action: () => this.entrerFinale() };
   }
 
-  // BOSS FINAL : verrouillé = petit refus ; ouvert = la finale (en attendant le mécha : la fin actuelle)
+  // BOSS FINAL : verrouillé = petit refus ; ouvert = le combat contre le MÉCHA (src/bosses/finale/)
   entrerFinale() {
     if (!this.complet) { jouerSon(this, 'ui_valider'); this.cameras.main.shake(150, 0.006); return; }
-    this.voirFin();
+    if (this.entree) return;
+    this.entree = true;
+    jouerSon(this, 'hub_porte');
+    this.cameras.main.shake(500, 0.008);
+    this.cameras.main.fadeOut(500);
+    this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('FinaleMecha', { phase: 'mecha' }));
   }
 
   caseBoss(boss, x, y) {

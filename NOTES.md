@@ -132,7 +132,19 @@
   PARTIES, même taille, à superposer au même endroit ; zones `ZONES` du script, `--controle fichier.png` pour les voir),
   vaisseau.png (200 x 116, nez à droite), fond.jpg (2466 x 540) ; hub : select_mecha(_ombre).png (branchées).
   Le robot nous fait FACE : bras de Greg à gauche de l'image, Lionel à droite.
-- Le mécha n'est pas codé. Prochaine étape : prototype dans `src/finale/` (les images de jeu sont prêtes).
+- PROTOTYPE JOUABLE (9 nov. 2026) : `src/bosses/finale/` (FinaleMecha.js, reglages.js, manifeste.js, difficulte.js),
+  enregistré comme `FINALE` dans `src/bosses/liste.js` (pas dans BOSS : la grille reste à 6 ; menu F1 : oui).
+  - Hub : 6 badges → la 1re fois ALERTE puis le combat tout seul ; ensuite la case du milieu. Victoire = badge `finale`,
+    écran de rang, puis `Finale` (la fin actuelle, à refaire en cinématique : étape 3 de la proposition).
+  - Règle CHANGÉE après le bot : seule la partie encadrée en jaune prend les tirs, les autres sont TRAVERSÉES (sinon le
+    torse et le bras de Greg cachaient complètement le bras de Lionel : impossible à toucher).
+  - Ordre : Kédric, Rémi, Lionel, Greg, Julien, Beufa. Attaques et sons provisoires (bips) : `REGLAGES.attaques`.
+  - GAME OVER : CONTINUER (reprise à la partie atteinte, cœurs pleins, rang au mieux B, ni record ni défis), Z = début.
+  - FACILE proposé par défaut la 1re fois. Défis (PROGRÈS, 7e ligne) : sans être touché, sans bombe, en moins de 3 min.
+  - Bot `outils/finale_bot.mjs` (4 parties x 3 difficultés x 3 profils, ≈ 1 min) : FACILE expert/moyen gagnent sans
+    continue (moyen 3/4), enfant 1 continue ; NORMAL expert 0,5 continue, moyen 1,8, enfant 3,5 (temps ≈ 170-220 s) ;
+    CHAMPION expert 2,3, moyen 4, enfant perd. Le plus de coups : rafale du CÔNE de Beufa (le bot lit mal le « ! »).
+  - Reste : cinématique de fin (photo de groupe avec les poses de l'intro, bilan, générique), vrais sons, retours de Fabien.
 
 ## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)
 - `showtime.rappel` 0,06 → 0,04 ; `gain` parfait 2,1 → 2,5, bien 1,3 → 1,5, raté 7 → 6. Avant, la jauge plafonnait vers

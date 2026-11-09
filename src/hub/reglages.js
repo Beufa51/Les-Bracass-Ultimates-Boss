@@ -9,7 +9,7 @@ export const REGLAGES_HUB = {
   infosY: 468,       // texte du boss choisi (2 lignes : nom + record, puis la fiche)
   bandeauY: 512,     // bandeau du bas (badges, la fin)
   // tableau de PROGRESSION (bouton 📋 PROGRÈS) : place des lignes
-  progression: { hautY: 84, ligneH: 64, basY: 512 },   // (défis : src/bosses/defis.js)
+  progression: { hautY: 80, ligneH: 55, basY: 514 },   // 7 lignes (les 6 + le BOSS FINAL)   // (défis : src/bosses/defis.js)
   ficheFinale: 'Shoot\'em up · ≈ 4 min · un doigt',
   // fiche d'une ligne du boss choisi (genre · durée · commandes au doigt)
   fiches: {

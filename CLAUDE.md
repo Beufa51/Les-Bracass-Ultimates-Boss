@@ -23,6 +23,10 @@ Après tout passage de `outils/remi/preparer_images.py` ou changement de `src/bo
 Après tout changement du babyfoot (`src/bosses/remi/RemiBaby.js`, `src/bosses/remi/babyfoot/`, réglages `BABY` / `baby*`) :
 `node outils/remi_baby_bot.mjs` (≈ 2 min) doit finir par « Babyfoot : 0 problème » (tout tir VERT doit marquer).
 
+## Boss final (mécha)
+Après tout changement de `src/bosses/finale/` (réglages, attaques) : `node outils/finale_bot.mjs` (≈ 1 min) doit finir par
+« 0 erreur dans la page » ; comparer les chiffres à ceux de `NOTES.md` (section FINALE).
+
 ## Audits (demande du propriétaire)
 Méthode « comme Lionel » : relecture du code (bugs) + bot qui joue des parties complètes (équilibrage, plaisir),
 rapport dans `propositions/<boss>_audit.md`, puis on attend les choix du propriétaire. TOUJOURS une section
