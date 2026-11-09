@@ -1602,6 +1602,11 @@ Détourage du fond blanc, chaque image remise à la même hauteur (le coureur s'
 - Résolution : l'image de Fabien fait 375×512 (le perso 162×488) ; elle est affichée à sa taille (500 px de haut sur
   un jeu de 540) : pour plus net, il faut un original plus grand (même prompt, « high resolution »).
 
+## LIONEL — AUDIT IMAGES / ANIMATIONS (nov. 2026, en attente des choix de Fabien)
+- Rapport : `propositions/lionel_audit_images.md` ; prompts : `propositions/lionel_prompts_images.md`.
+- Manques : lancer figé (1 image, aussi utilisée pour le LOB), toi « tient/rattrape » = pose de course, pas de relève
+  après plongeon, nargue = victoire, écran de DÉFAITE sans Lionel, public et arbitre figés. Rien n'est encore codé.
+
 ## LIONEL — V101 : NORMAL UN PEU PLUS DUR (Fabien : « un peu trop simple »)
 - `DIFFICULTES.normal` (lionel/reglages.js) : vitesse 1.0 → 1.03, réaction 0.21 → 0.195 s, erreur 44 → 38,
   lancers 0.89 → 0.94. Toujours sous CHAMPION (1.06 / 0.18 / 32 / 1.04). PERSO garde les anciens chiffres de départ.
