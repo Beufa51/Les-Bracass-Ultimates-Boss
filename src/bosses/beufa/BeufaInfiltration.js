@@ -602,9 +602,7 @@ export class BeufaInfiltration extends BossScene {
         ? beufa.setFrame(Math.floor((y0 - beufa.y) / R.garde.pas * 8) % nbCases).setDepth(profondeurY(beufa.y + 25))
         : beufa.setFrame(Math.floor(tw.elapsed / 130) % nbCases),
     });
-    this.dans(0.6, () => {
-      this.cineTexte = texte(this, LARGEUR / 2, HAUTEUR - 60, 'BEUFA : « La cour est à moi… et MON QG est au fond. Bouge pas ! »', 19, '#ffd84a', { backgroundColor: '#000000cc', padding: { x: 14, y: 8 } }).setDepth(960);
-    });
+    // (nov. 2026, demande de Fabien) plus de réplique de Beufa ici : il file vers son QG sans rien dire
     this.dans(2.6, () => {
       jouerSon(this, 'beufa_verrou');
       beufa.destroy();
