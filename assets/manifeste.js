@@ -38,6 +38,9 @@ export const MANIFESTE = {
     select_julien_ombre: { fichier: 'sprites/hub/select_julien_ombre.png', largeur: 240, hauteur: 200, images: 1, vitesse: 1 },
     select_greg:       { fichier: 'sprites/hub/select_greg.png', largeur: 240, hauteur: 200, images: 1, vitesse: 1 },
     select_greg_ombre: { fichier: 'sprites/hub/select_greg_ombre.png', largeur: 240, hauteur: 200, images: 1, vitesse: 1 },
+    // BOSS FINAL (case du milieu) : le mécha des Bracass' entier (outils/finale/preparer_images.py)
+    select_mecha:       { fichier: 'sprites/hub/select_mecha.png', largeur: 240, hauteur: 338, images: 1, vitesse: 1 },
+    select_mecha_ombre: { fichier: 'sprites/hub/select_mecha_ombre.png', largeur: 240, hauteur: 338, images: 1, vitesse: 1 },
     select_remi:       { fichier: 'sprites/hub/select_remi.png', largeur: 240, hauteur: 200, images: 1, vitesse: 1 },
     select_remi_ombre: { fichier: 'sprites/hub/select_remi_ombre.png', largeur: 240, hauteur: 200, images: 1, vitesse: 1 },
     select_lionel:       { fichier: 'sprites/hub/select_lionel.png', largeur: 240, hauteur: 200, images: 1, vitesse: 1 },

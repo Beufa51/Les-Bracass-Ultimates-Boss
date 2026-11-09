@@ -127,7 +127,12 @@
 - HUB : case du MILIEU = BOSS FINAL (`caseFinale` dans HubScene ; 3 boss à gauche, 3 à droite ; `REGLAGES_HUB.centre`).
   Verrouillée jusqu'aux 6 badges ; ouverte, elle lance pour l'instant `Finale` (la fin actuelle ; le bouton « LA FIN »
   du bandeau est retiré, touche F gardée). Image : `select_mecha(_ombre)` à tirer du mécha n° 1 (sinon « ? » / éclair).
-- Le mécha n'est pas codé. Prochaine étape si validé : prototype au code dans `src/finale/`.
+- IMAGES REÇUES (9 nov. 2026) : `assets_inbox/finale/` (mecha_complet.jpg, vaisseau.jpg, fond_espace.jpg) →
+  `python3 outils/finale/preparer_images.py` → `assets/sprites/finale/` : mecha.png (406 x 594) + mecha_<pote>.png (les 6
+  PARTIES, même taille, à superposer au même endroit ; zones `ZONES` du script, `--controle fichier.png` pour les voir),
+  vaisseau.png (200 x 116, nez à droite), fond.jpg (2466 x 540) ; hub : select_mecha(_ombre).png (branchées).
+  Le robot nous fait FACE : bras de Greg à gauche de l'image, Lionel à droite.
+- Le mécha n'est pas codé. Prochaine étape : prototype dans `src/finale/` (les images de jeu sont prêtes).
 
 ## KÉDRIC — battle plus généreux (9 nov. 2026, Fabien : « on ne gagne pas assez de public, 80 % très dur »)
 - `showtime.rappel` 0,06 → 0,04 ; `gain` parfait 2,1 → 2,5, bien 1,3 → 1,5, raté 7 → 6. Avant, la jauge plafonnait vers
