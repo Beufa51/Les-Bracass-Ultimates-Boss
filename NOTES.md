@@ -172,9 +172,10 @@
     (`manifeste.js`) ; l'ancien gardé dans `assets_inbox/finale/ancien_vaisseau.jpg`.
   - SURPRISE GARDÉE (Fabien) : avant les 6 badges, le hub reprend la GRILLE 3 x 2 d'origine (`REGLAGES_HUB.grille`,
     `PLACES_GRILLE`), pas de case ni de ligne PROGRÈS « BOSS FINAL » ; après, disposition 3 / BOSS FINAL / 3 + flash.
-  - RÉVÉLATION (1re fois aux 6 badges, `devoilerFinale` dans HubScene) : TRAPPE blindée (bandes danger) sur la case du
-    milieu, ALERTE rouge clignotante + secousse, la trappe s'ouvre haut / bas dans la fumée (masquée dans le cadre), flash,
-    puis le combat (≈ 4,7 s). Les fois suivantes : la case est simplement là.
+  - RÉVÉLATION (1re fois aux 6 badges, `devoilerFinale` dans HubScene, ≈ 10 s, plus de suspens demandé par Fabien) :
+    TRAPPE blindée sur la case du milieu ; ALERTE rouge ; la trappe se FISSURE (jet de vapeur, se bloque) ; s'ouvre LENTEMENT
+    (3,2 s) en crachant de la fumée : on devine l'OMBRE (`select_mecha_ombre`) + lueur rouge ; la fumée se dissipe, les
+    COULEURS arrivent en fondu, « ??? » → « BOSS FINAL », flash, puis le combat. Les fois suivantes : la case est simplement là.
     Pour la REVOIR : menu F1 (ou pause > Menu de test) « Hub : revoir la trappe du BOSS FINAL » (`testTrappe`, sauvegarde intacte).
   - GÉNÉRIQUE corrigé par Fabien dans `data/generique.txt` ; les répliques d'éjection du mécha reprennent les mêmes.
   - Reste : tes retours.

@@ -97,8 +97,9 @@ export class HubScene extends Phaser.Scene {
     }
   }
 
-  // RÉVÉLATION du BOSS FINAL (1re fois seulement, Fabien) : une TRAPPE blindée cache la case du milieu ; alerte rouge,
-  // la trappe s'ouvre (haut / bas) dans la fumée, flash, la case apparaît, puis le combat se lance.
+  // RÉVÉLATION du BOSS FINAL (1re fois seulement, Fabien) : une TRAPPE blindée cache la case du milieu. Alerte rouge,
+  // la trappe se FISSURE (jet de vapeur), se bloque, puis s'ouvre LENTEMENT dans la fumée : on devine d'abord l'OMBRE du
+  // mécha (lueur rouge derrière), la fumée se dissipe, il prend ses COULEURS, flash, puis le combat (≈ 10 s).
   devoilerFinale() {
     this.entree = true;   // pas de choix au clavier / au doigt pendant la séquence
     const c = this.cases.find(k => k.finale), L = c.w + 14, H = c.h + 14, haut = c.y - H / 2;
@@ -117,35 +118,59 @@ export class HubScene extends Phaser.Scene {
     // les volets rentrent DANS le cadre de la case (masque) au lieu de passer par-dessus le titre et le bandeau
     const zone = this.make.graphics({ add: false }).fillStyle(0xffffff).fillRect(c.x - L / 2, haut, L, H);
     const masque = zone.createGeometryMask(); v1.setMask(masque); v2.setMask(masque);
+    // sous la trappe : d'abord l'OMBRE du mécha, une lueur rouge qui pulse derrière ; ses couleurs viendront à la fin
+    const ombreCle = 'select_mecha_ombre', avecImage = c.img && this.textures.exists(ombreCle);
+    if (avecImage) c.img.setTexture(ombreCle);
+    const couleur = avecImage ? this.add.image(c.img.x, c.img.y, 'select_mecha').setOrigin(0.5, 1).setScale(c.img.scale).setAlpha(0).setDepth(1) : null;
+    const lueur = this.add.circle(c.x, c.y - 30, 120, 0xff2030, 0).setDepth(0.5);
+    if (c.etiquette) c.etiquette.setText('???').setColor('#c9a0ff');
     const rouge = this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0xff0000, 0).setDepth(9);
     const alerte = texte(this, LARGEUR / 2, c.y, 'ALERTE !', 54, '#ffffff', { fontStyle: 'bold italic', stroke: '#b3202c', strokeThickness: 10 }).setDepth(10).setAlpha(0);
     this.infos.setText('ALERTE : LES BRACASS\' FUSIONNENT !').setColor('#ff6b6b');
-    // 1. alerte rouge qui clignote
+    // fumée : bouffées qui s'élargissent et montent lentement, posées sur la case (pas au-dessus des volets)
+    const fumee = (x, y, force = 1) => {
+      const f = this.add.circle(x, y, (18 + Math.random() * 22) * force, Math.random() < 0.5 ? 0xcfd4dc : 0xa9b0bb, 0.85).setDepth(7);
+      this.tweens.add({ targets: f, scale: 2.4 + Math.random() * 1.6, alpha: 0, x: x + (Math.random() - 0.5) * 70, y: y - 30 - Math.random() * 60,
+        duration: 2200 + Math.random() * 1600, ease: 'Sine.Out', onComplete: () => f.destroy() });
+    };
+    // 1. alerte rouge qui clignote (0,4 → 2,2 s)
     this.time.delayedCall(400, () => {
       this.tweens.add({ targets: rouge, fillAlpha: 0.28, yoyo: true, repeat: 3, duration: 220 });
       this.tweens.add({ targets: alerte, alpha: 1, yoyo: true, repeat: 3, duration: 220 });
       this.cameras.main.shake(1700, 0.006);
       for (let k = 0; k < 4; k++) this.time.delayedCall(k * 440, () => jouerSon(this, 'ui_valider'));
     });
-    // 2. la trappe s'ouvre dans la fumée
-    this.time.delayedCall(2200, () => {
+    // 2. la trappe se FISSURE : elle s'entrouvre à peine dans un jet de vapeur, se bloque et tremble (2,4 → 3,6 s)
+    this.time.delayedCall(2400, () => {
       jouerSon(this, 'hub_porte');
-      this.tweens.add({ targets: v1, y: haut - H / 2, duration: 900, ease: 'Cubic.In' });
-      this.tweens.add({ targets: v2, y: haut + H, duration: 900, ease: 'Cubic.In' });
-      for (let k = 0; k < 16; k++) {
-        const f = this.add.circle(c.x - L / 2 + Math.random() * L, c.y + (Math.random() - 0.5) * 16, 10 + Math.random() * 10, 0xcfd4dc, 0.8).setDepth(9);
-        this.tweens.add({ targets: f, scale: 3 + Math.random() * 2, alpha: 0, x: f.x + (Math.random() - 0.5) * 80, y: f.y + (Math.random() - 0.5) * 120,
-          delay: 150 + k * 25, duration: 1100, onComplete: () => f.destroy() });
-      }
+      this.tweens.add({ targets: v1, y: haut - 16, duration: 350, ease: 'Back.Out' });
+      this.tweens.add({ targets: v2, y: haut + H / 2 + 16, duration: 350, ease: 'Back.Out' });
+      for (let k = 0; k < 24; k++) this.time.delayedCall(k * 18, () => fumee(c.x - L / 2 + Math.random() * L, c.y + (Math.random() - 0.5) * 20, 0.8));
+      this.time.delayedCall(500, () => this.cameras.main.shake(500, 0.004));
     });
-    // 3. flash : la case est là, puis le combat
-    this.time.delayedCall(3200, () => {
+    // 3. elle s'ouvre LENTEMENT (3,6 → 6,8 s) en crachant de la fumée : sous la fumée, l'ombre et la lueur rouge
+    this.time.delayedCall(3600, () => {
+      jouerSon(this, 'hub_porte');
+      this.tweens.add({ targets: v1, y: haut - H / 2, duration: 3200, ease: 'Sine.InOut' });
+      this.tweens.add({ targets: v2, y: haut + H, duration: 3200, ease: 'Sine.InOut' });
+      this.tweens.add({ targets: lueur, fillAlpha: 0.35, yoyo: true, repeat: 4, duration: 600, ease: 'Sine.InOut' });
+      this.time.addEvent({ delay: 55, repeat: 70, callback: () => fumee(c.x + (Math.random() - 0.5) * L * 0.9, c.y + (Math.random() - 0.3) * H * 0.7) });
+    });
+    // 4. la fumée se dissipe : l'ombre prend ses COULEURS (7,4 → 8,8 s), « ??? » devient « BOSS FINAL »
+    this.time.delayedCall(7400, () => {
       v1.destroy(); v2.destroy(); zone.destroy(); rouge.destroy(); alerte.destroy();
-      this.cameras.main.flash(400, 255, 255, 255); jouerSon(this, 'ui_badge');
+      if (couleur) this.tweens.add({ targets: couleur, alpha: 1, duration: 1400, ease: 'Sine.In' });
+      this.tweens.add({ targets: lueur, fillAlpha: 0, duration: 1400 });
+    });
+    this.time.delayedCall(8800, () => {
+      this.cameras.main.flash(500, 255, 255, 255); jouerSon(this, 'ui_badge');
+      if (couleur) { couleur.destroy(); c.img.setTexture('select_mecha'); }
+      lueur.destroy();
+      if (c.etiquette) c.etiquette.setText('BOSS FINAL').setColor('#ffd84a');
       this.choix = c; this.majChoix();
       if (c.img) this.tweens.add({ targets: c.img, scale: c.img.scale * 1.08, yoyo: true, duration: 180, repeat: 1 });
     });
-    this.time.delayedCall(4700, () => { this.entree = false; this.entrerFinale(); });
+    this.time.delayedCall(10300, () => { this.entree = false; this.entrerFinale(); });
   }
 
   position([col, ligne]) {
@@ -176,11 +201,11 @@ export class HubScene extends Phaser.Scene {
       texte(this, x, y - 30, ouvert ? '⚡' : '?', ouvert ? 110 : 130, ouvert ? '#ffd84a' : '#5a3a7a', { fontStyle: 'bold' });
     }
     this.add.rectangle(x, y + h / 2 - 15, l - 8, 26, 0x000000, 0.85);
-    texte(this, x, y + h / 2 - 15, ouvert ? 'BOSS FINAL' : '???', 19, ouvert ? '#ffd84a' : '#c9a0ff', { fontStyle: 'bold' });
+    const etiquette = texte(this, x, y + h / 2 - 15, ouvert ? 'BOSS FINAL' : '???', 19, ouvert ? '#ffd84a' : '#c9a0ff', { fontStyle: 'bold' });
     if (!ouvert) texte(this, x, y + 70, `🔒 ${nb} / ${BOSS.length}`, 22, '#c9a0ff', { fontStyle: 'bold', stroke: '#000000', strokeThickness: 4 });
     const info = ouvert ? `BOSS FINAL : le mécha des Bracass' !\n${R.ficheFinale}`
       : `BOSS FINAL : ???\nBats les ${BOSS.length} Bracass' pour le débloquer (${nb} / ${BOSS.length})`;
-    return { finale: true, x, y, w: l, h, img, info, action: () => this.entrerFinale() };
+    return { finale: true, x, y, w: l, h, img, etiquette, info, action: () => this.entrerFinale() };
   }
 
   // BOSS FINAL : verrouillé = petit refus ; ouvert = le combat contre le MÉCHA (src/bosses/finale/)
