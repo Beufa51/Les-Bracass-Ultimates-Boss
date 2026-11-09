@@ -9,26 +9,22 @@ petites, contour bleu nuit épais, éclat de lumière et étincelles derrière. 
 logo, format paysage 1600 x 700, lettres bien lisibles, pas de personnage.
 ```
 
-## 2. Poses « Commando Ginyu » (une par boss) — fichiers attendus : `assets_inbox/intro/pose_<id>.png`
-Remplaceraient les bustes de l'intro (ombre + dévoilement inchangés). Corps ENTIER : la silhouette en ombre sera bien
-plus lisible. À joindre à chaque fois : l'image actuelle du personnage (`assets/sprites/<boss>/...presentation/portrait`).
-Même début de prompt pour les 6, seule la ligne POSE change :
+## 2. Poses du COMMANDO GINYU (une par boss) — fichiers attendus : `assets_inbox/intro/pose_<id>.png`
+Remplaceraient les bustes de l'intro (ombre + dévoilement inchangés). À joindre : 1) l'image actuelle du personnage ;
+2) une CAPTURE de la pose du membre dans l'anime (la description seule ne suffit pas à un générateur d'images).
+Prompt (changer seulement les 2 crochets) :
 ```
-Le personnage de l'image jointe, MÊME visage, MÊME tenue, même style de dessin (illustration semi-réaliste façon jeu
-vidéo). Corps ENTIER de la tête aux pieds, vu de face, fond blanc uni, rien d'autre, personnage seul, bien centré,
-format portrait 800 x 1100. Pose de présentation exagérée et théâtrale façon escouade de héros d'anime des années 90
-(pose de groupe de super-commando), énergique, fière, un peu ridicule.
-POSE : <ligne du boss ci-dessous>
+Image 1 = le personnage à dessiner. Image 2 = la pose à copier.
+Dessine le personnage de l'image 1 (MÊME visage, MÊME tenue, même style de dessin) exactement dans la pose de
+[MEMBRE] du Commando Ginyu (Dragon Ball Z, scène de présentation), telle que sur l'image 2 : [DESCRIPTION].
+Corps ENTIER de la tête aux pieds, de face, personnage seul, fond BLANC UNI (pas de damier), bien centré,
+format portrait 800 x 1100, rien d'autre.
 ```
-- `pose_beufa.png` : jambes très écartées et fléchies, bras droit levé en arc au-dessus de la tête, main gauche tendue
-  vers l'avant paume ouverte, regard sûr de lui, sourire en coin.
-- `pose_kedric.png` : sur une jambe, l'autre genou levé haut, les deux bras tendus sur le côté gauche en diagonale vers
-  le ciel, doigts écartés, ballon de football américain coincé sous un bras.
-- `pose_greg.png` : accroupi bas, poings gantés de boxe ramenés devant le visage puis un bras qui frappe vers le ciel,
-  muscles contractés, mâchoire serrée.
-- `pose_julien.png` : penché en avant, un bras replié derrière la tête, l'autre pointant l'index droit vers le
-  spectateur, un genou au sol.
-- `pose_remi.png` : debout de profil trois-quarts, bras arrondis au-dessus de la tête en forme de cœur, une jambe pliée
-  en arrière, clin d'œil.
-- `pose_lionel.png` : grand écart léger, bras tendus à l'horizontale de chaque côté, frisbee en équilibre sur un doigt,
-  tête tournée de côté, air très sérieux.
+| Fichier | Boss | MEMBRE | DESCRIPTION |
+|---|---|---|---|
+| pose_beufa.png | Beufa (le chef) | Ginyu, le capitaine | fléchi sur ses jambes, buste penché, les deux bras levés et écartés en V au-dessus de la tête, doigts tendus |
+| pose_greg.png | Greg (le costaud) | Recoome | jambes très écartées, le dos un peu tourné, un bras en arc au-dessus de la tête, l'autre plié devant lui |
+| pose_kedric.png | Kédric | Jeice | sur une jambe, l'autre genou levé, les deux bras tendus ensemble en diagonale vers le haut d'un côté |
+| pose_lionel.png | Lionel (le rapide) | Burter | accroupi bas, une jambe tendue sur le côté, un bras levé vers le ciel, l'autre tendu vers le sol |
+| pose_julien.png | Julien | Guldo | accroupi jambes écartées, genoux vers l'extérieur, bras pliés de chaque côté, mains ouvertes |
+| pose_remi.png | Rémi | la pose finale du groupe (place de Jeice ou de Burter à côté du chef) | penché vers le chef, bras tendus vers lui comme pour le mettre en valeur |
