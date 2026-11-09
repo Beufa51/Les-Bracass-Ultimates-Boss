@@ -81,11 +81,59 @@ export class HubScene extends Phaser.Scene {
     // les 6 badges : la 1re fois, ALERTE ! le mécha arrive tout seul (la fin vient après l'avoir battu)
     if (this.complet && !Sauvegarde.aLeBadge('finale') && !Sauvegarde.fait('mecha_alerte')) {
       Sauvegarde.marquerFait('mecha_alerte');
-      this.choix = this.cases.find(c => c.finale); this.majChoix();
-      this.cameras.main.flash(400, 255, 80, 80); this.cameras.main.shake(900, 0.01);   // la case du milieu se révèle
-      this.infos.setText('ALERTE : LES BRACASS\' FUSIONNENT !').setColor('#ff6b6b');
-      this.time.delayedCall(1500, () => this.entrerFinale());
+      this.devoilerFinale();
     }
+  }
+
+  // RÉVÉLATION du BOSS FINAL (1re fois seulement, Fabien) : une TRAPPE blindée cache la case du milieu ; alerte rouge,
+  // la trappe s'ouvre (haut / bas) dans la fumée, flash, la case apparaît, puis le combat se lance.
+  devoilerFinale() {
+    this.entree = true;   // pas de choix au clavier / au doigt pendant la séquence
+    const c = this.cases.find(k => k.finale), L = c.w + 14, H = c.h + 14, haut = c.y - H / 2;
+    const volet = (y0, hauteur, bandeEnBas) => {
+      const g = this.add.graphics();
+      g.fillStyle(0x3a3f4a, 1).fillRect(-L / 2, 0, L, hauteur);
+      g.lineStyle(4, 0x1c1f26, 1).strokeRect(-L / 2, 0, L, hauteur);
+      for (let k = 0; k < 4; k++) g.lineStyle(2, 0x555c69, 1).lineBetween(-L / 2 + 10, 20 + k * (hauteur - 40) / 3, L / 2 - 10, 20 + k * (hauteur - 40) / 3);   // tôles
+      for (const x of [-L / 2 + 12, L / 2 - 12]) for (let k = 0; k < 5; k++) g.fillStyle(0x8a909c, 1).fillCircle(x, 14 + k * (hauteur - 28) / 4, 4);   // rivets
+      const yb = bandeEnBas ? hauteur - 26 : 0;   // bande DANGER jaune et noire contre la fente
+      for (let x = -L / 2, k = 0; x < L / 2; x += 26, k++) g.fillStyle(k % 2 ? 0x111111 : 0xffc400, 1).fillRect(x, yb, Math.min(26, L / 2 - x), 26);
+      const t = texte(this, 0, bandeEnBas ? hauteur / 2 - 14 : hauteur / 2 + 14, '⚠', 46, '#ffc400', { stroke: '#000000', strokeThickness: 5 });
+      return this.add.container(c.x, y0, [g, t]).setDepth(8);
+    };
+    const v1 = volet(haut, H / 2, true), v2 = volet(haut + H / 2, H / 2, false);
+    // les volets rentrent DANS le cadre de la case (masque) au lieu de passer par-dessus le titre et le bandeau
+    const zone = this.make.graphics({ add: false }).fillStyle(0xffffff).fillRect(c.x - L / 2, haut, L, H);
+    const masque = zone.createGeometryMask(); v1.setMask(masque); v2.setMask(masque);
+    const rouge = this.add.rectangle(LARGEUR / 2, HAUTEUR / 2, LARGEUR, HAUTEUR, 0xff0000, 0).setDepth(9);
+    const alerte = texte(this, LARGEUR / 2, c.y, 'ALERTE !', 54, '#ffffff', { fontStyle: 'bold italic', stroke: '#b3202c', strokeThickness: 10 }).setDepth(10).setAlpha(0);
+    this.infos.setText('ALERTE : LES BRACASS\' FUSIONNENT !').setColor('#ff6b6b');
+    // 1. alerte rouge qui clignote
+    this.time.delayedCall(400, () => {
+      this.tweens.add({ targets: rouge, fillAlpha: 0.28, yoyo: true, repeat: 3, duration: 220 });
+      this.tweens.add({ targets: alerte, alpha: 1, yoyo: true, repeat: 3, duration: 220 });
+      this.cameras.main.shake(1700, 0.006);
+      for (let k = 0; k < 4; k++) this.time.delayedCall(k * 440, () => jouerSon(this, 'ui_valider'));
+    });
+    // 2. la trappe s'ouvre dans la fumée
+    this.time.delayedCall(2200, () => {
+      jouerSon(this, 'hub_porte');
+      this.tweens.add({ targets: v1, y: haut - H / 2, duration: 900, ease: 'Cubic.In' });
+      this.tweens.add({ targets: v2, y: haut + H, duration: 900, ease: 'Cubic.In' });
+      for (let k = 0; k < 16; k++) {
+        const f = this.add.circle(c.x - L / 2 + Math.random() * L, c.y + (Math.random() - 0.5) * 16, 10 + Math.random() * 10, 0xcfd4dc, 0.8).setDepth(9);
+        this.tweens.add({ targets: f, scale: 3 + Math.random() * 2, alpha: 0, x: f.x + (Math.random() - 0.5) * 80, y: f.y + (Math.random() - 0.5) * 120,
+          delay: 150 + k * 25, duration: 1100, onComplete: () => f.destroy() });
+      }
+    });
+    // 3. flash : la case est là, puis le combat
+    this.time.delayedCall(3200, () => {
+      v1.destroy(); v2.destroy(); zone.destroy(); rouge.destroy(); alerte.destroy();
+      this.cameras.main.flash(400, 255, 255, 255); jouerSon(this, 'ui_badge');
+      this.choix = c; this.majChoix();
+      if (c.img) this.tweens.add({ targets: c.img, scale: c.img.scale * 1.08, yoyo: true, duration: 180, repeat: 1 });
+    });
+    this.time.delayedCall(4700, () => { this.entree = false; this.entrerFinale(); });
   }
 
   position([col, ligne]) {
