@@ -9,22 +9,18 @@ petites, contour bleu nuit épais, éclat de lumière et étincelles derrière. 
 logo, format paysage 1600 x 700, lettres bien lisibles, pas de personnage.
 ```
 
-## 2. Poses du COMMANDO GINYU (une par boss) — fichiers attendus : `assets_inbox/intro/pose_<id>.png`
-Remplaceraient les bustes de l'intro (ombre + dévoilement inchangés). À joindre : 1) l'image actuelle du personnage ;
-2) une CAPTURE de la pose du membre dans l'anime (la description seule ne suffit pas à un générateur d'images).
-Prompt (changer seulement les 2 crochets) :
-```
-Image 1 = le personnage à dessiner. Image 2 = la pose à copier.
-Dessine le personnage de l'image 1 (MÊME visage, MÊME tenue, même style de dessin) exactement dans la pose de
-[MEMBRE] du Commando Ginyu (Dragon Ball Z, scène de présentation), telle que sur l'image 2 : [DESCRIPTION].
-Corps ENTIER de la tête aux pieds, de face, personnage seul, fond BLANC UNI (pas de damier), bien centré,
-format portrait 800 x 1100, rien d'autre.
-```
-| Fichier | Boss | MEMBRE | DESCRIPTION |
+## 2. Poses du COMMANDO (une par boss) — fichiers attendus : `assets_inbox/intro/pose_<id>.png`
+Image de référence fournie par Fabien : `assets_inbox/intro/reference_pose_commando.png` (pose de groupe des 5).
+À joindre à chaque prompt : 1) l'image actuelle du personnage ; 2) cette image de référence.
+Placement dans le groupe (pour une future image de groupe sur le titre) : Greg à gauche, Julien en bas à gauche,
+Beufa au centre, Lionel au centre droit, Kédric en l'air à droite, Rémi tout à droite (pose inventée, en miroir de Greg).
+
+| Fichier | Boss | Modèle sur la référence | Pose |
 |---|---|---|---|
-| pose_beufa.png | Beufa (le chef) | Ginyu, le capitaine | fléchi sur ses jambes, buste penché, les deux bras levés et écartés en V au-dessus de la tête, doigts tendus |
-| pose_greg.png | Greg (le costaud) | Recoome | jambes très écartées, le dos un peu tourné, un bras en arc au-dessus de la tête, l'autre plié devant lui |
-| pose_kedric.png | Kédric | Jeice | sur une jambe, l'autre genou levé, les deux bras tendus ensemble en diagonale vers le haut d'un côté |
-| pose_lionel.png | Lionel (le rapide) | Burter | accroupi bas, une jambe tendue sur le côté, un bras levé vers le ciel, l'autre tendu vers le sol |
-| pose_julien.png | Julien | Guldo | accroupi jambes écartées, genoux vers l'extérieur, bras pliés de chaque côté, mains ouvertes |
-| pose_remi.png | Rémi | la pose finale du groupe (place de Jeice ou de Burter à côté du chef) | penché vers le chef, bras tendus vers lui comme pour le mettre en valeur |
+| pose_greg.png | Greg | le grand roux à GAUCHE | grande fente, buste penché en arrière, un bras tendu à l'horizontale vers la droite main ouverte, l'autre bras tendu en bas derrière lui |
+| pose_julien.png | Julien | le petit vert EN BAS À GAUCHE | accroupi, genoux pliés écartés, bras pliés de chaque côté, mains ouvertes à hauteur des hanches |
+| pose_beufa.png | Beufa | le chef violet à cornes AU CENTRE | accroupi très bas, genoux grands écartés, coudes en dehors, poings près des genoux, tête en avant, air féroce |
+| pose_lionel.png | Lionel | le rouge aux cheveux blancs AU CENTRE DROIT | un genou levé, un poing levé au-dessus de la tête bras plié, l'autre main près de l'épaule, tête inclinée |
+| pose_kedric.png | Kédric | le grand bleu EN L'AIR À DROITE | en plein saut, un poing levé au-dessus de la tête, l'autre bras tendu en diagonale vers le bas, une jambe lancée en avant, l'autre pliée derrière |
+| pose_remi.png | Rémi | (inventée, 6e membre) | un genou au sol, l'autre jambe tendue sur le côté droit, un bras tendu à l'horizontale vers la droite main ouverte, l'autre bras levé en arc au-dessus de la tête, buste penché vers l'extérieur, grand sourire |
+Prompts complets : voir la réponse de Claude du 9 nov. 2026 (même texte, une ligne par boss ci-dessus).
