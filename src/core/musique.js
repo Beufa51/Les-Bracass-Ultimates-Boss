@@ -30,7 +30,7 @@ function piste(cle) {
 export function installerMusiques() {
   const relancer = () => {
     for (const p of Object.values(pistes)) {
-      if (p.voulue && p.audio.paused) p.audio.play().catch(() => {});
+      if (p.voulue && !p.enPause && p.audio.paused) p.audio.play().catch(() => {});   // (bug) pas pendant la PAUSE du jeu
     }
   };
   for (const type of ['pointerdown', 'pointerup', 'touchend', 'keydown', 'click']) {   // (pointerup : un toucher sur téléphone)
@@ -39,7 +39,7 @@ export function installerMusiques() {
   // onglet caché => musique en pause
   document.addEventListener('visibilitychange', () => {
     for (const p of Object.values(pistes)) {
-      if (document.hidden) p.audio.pause(); else if (p.voulue) p.audio.play().catch(() => {});
+      if (document.hidden) p.audio.pause(); else if (p.voulue && !p.enPause) p.audio.play().catch(() => {});
     }
   });
 }
@@ -49,12 +49,15 @@ export function installerMusiques() {
 export function jouerMusique(scene, cle, options = {}) {
   const p = piste(cle);
   if (!p) return;
-  p.voulue = true;
+  p.voulue = true; p.enPause = false;
   if (!options.reprendre) p.audio.currentTime = 0;
   p.audio.play().catch(() => { /* bloquée : relancée au prochain appui */ });
-  scene.events.once('shutdown', () => { p.voulue = false; p.audio.pause(); });
+  scene.events.once('shutdown', () => { p.voulue = false; p.enPause = false; p.audio.pause(); });
   // jeu en pause => musique en pause
-  const pause = () => p.audio.pause(), reprise = () => { if (p.voulue) p.audio.play().catch(() => {}); };
+  // (bug nov. 2026 : la musique repartait pendant la pause) enPause : le moindre appui dans le menu de pause relançait
+  // la musique (relance « musique bloquée » ci-dessus, déblocage du battle) ; ces relances l'ignorent maintenant
+  const pause = () => { p.enPause = true; p.audio.pause(); };
+  const reprise = () => { p.enPause = false; if (p.voulue) p.audio.play().catch(() => {}); };
   scene.events.on('pause', pause); scene.events.on('resume', reprise);
   scene.events.once('shutdown', () => { scene.events.off('pause', pause); scene.events.off('resume', reprise); });
 }
@@ -72,6 +75,7 @@ export function deverrouillerMusiques(cles) {
   for (const cle of cles) {
     const p = piste(cle);
     if (!p || p.debloquee) continue;
+    if (p.enPause) continue;   // (bug) pendant la pause du jeu : on ne relance rien
     if (p.voulue) { p.audio.play().then(() => { p.debloquee = true; }).catch(() => {}); continue; }
     const a = p.audio;
     a.muted = true;
