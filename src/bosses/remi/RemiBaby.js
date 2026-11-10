@@ -71,8 +71,7 @@ export class RemiBaby extends BossScene {
     const t = estTactile();
     const lancer = () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.demarrer(); });
     if (this.donnees.bilan) {   // soirée enchaînée : un bandeau au lieu de l'écran de règles
-      lancer();
-      bandeauRegle(this, `Premier à ${B.buts} buts : ton gardien du côté où Rémi se PENCHE, et tire sur la ligne VERTE (${t ? 'TIR' : 'ESPACE'})`, 3, 'ARRÊTE ! TIRE !', 'glisser');
+      bandeauRegle(this, `Premier à ${B.buts} buts : ton gardien du côté où Rémi se PENCHE, et tire sur la ligne VERTE (${t ? 'TIR' : 'ESPACE'})`, 3, 'ARRÊTE ! TIRE !', 'glisser', lancer);   // la partie attend ESPACE / toucher
       return;
     }
     this.afficherIntro('RÉMI - Le babyfoot', [

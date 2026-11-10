@@ -6,6 +6,7 @@ import { jouerSon } from '../../core/ressources.js';
 import { estTactile, etiquettesTactiles } from '../../core/tactile.js';
 import { DIFFICULTES } from './reglages.js';
 import { choisirDifficulte } from './difficulte.js';
+import { attendreOK } from '../../core/BossScene.js';
 
 export const ORDRE = [
   { id: 'velo', scene: 'RemiVelo' },
@@ -32,7 +33,8 @@ export function bulle(scene, message, couleur = '#ffffff', duree = 2.2, y = 70) 
 // en haut de l'écran (pas d'écran à fermer). L'écran complet reste pour un accès direct au jeu.
 // (analyse comparée, façon WarioWare) UN VERBE géant + un DOIGT dessiné qui mime le geste ('glisser', 'maintenir', 'taper'),
 // la phrase en petit dessous.
-export function bandeauRegle(scene, message, duree = 3, verbe = null, geste = null) {
+// (Fabien, nov. 2026) avec `ensuite` : le bandeau RESTE jusqu'à ESPACE / toucher (le temps de lire), puis ensuite() lance le jeu.
+export function bandeauRegle(scene, message, duree = 3, verbe = null, geste = null, ensuite = null) {
   const y = verbe ? 96 : 70, h = verbe ? 132 : 64;
   const fond = scene.add.rectangle(LARGEUR / 2, y, LARGEUR - 40, h, 0x000000, 0.8).setDepth(970).setStrokeStyle(2, 0xffd84a, 0.8);
   const objets = [fond];
@@ -47,12 +49,20 @@ export function bandeauRegle(scene, message, duree = 3, verbe = null, geste = nu
     else if (geste === 'maintenir') scene.tweens.add({ targets: trace, radius: 34, alpha: 0.2, repeat: -1, duration: 900 });
     else scene.tweens.add({ targets: doigt, scale: 0.7, yoyo: true, repeat: -1, duration: 220 });
   }
+  if (ensuite) {
+    const invite = texte(scene, LARGEUR / 2, y + h / 2 + 22, `${estTactile() ? 'Touche l\'écran' : 'Appuie sur ESPACE'} pour jouer`, 22, '#7fff7f',
+      { fontStyle: 'bold', backgroundColor: '#000000bb', padding: { x: 12, y: 4 } }).setDepth(971);
+    objets.push(invite);
+    scene.tweens.add({ targets: invite, scale: 1.08, yoyo: true, repeat: -1, duration: 500 });
+  }
   objets.forEach(o => { const a = o.alpha; o.setAlpha(0); scene.tweens.add({ targets: o, alpha: a, duration: 200 }); });
-  scene.time.delayedCall(duree * 1000, () => scene.tweens.add({ targets: objets, alpha: 0, duration: 300, onComplete: () => {
+  const fermer = () => scene.tweens.add({ targets: objets, alpha: 0, duration: 300, onComplete: () => {
     // (bug nov. 2026) arrêter d'abord les animations SANS FIN du doigt : sinon elles touchent un rond détruit
     scene.tweens.killTweensOf(objets);
     objets.forEach(o => o.destroy());
-  } }));
+  } });
+  if (!ensuite) { scene.time.delayedCall(duree * 1000, fermer); return; }
+  attendreOK(scene, () => { jouerSon(scene, 'ui_valider'); fermer(); ensuite(); }, 600);
 }
 
 export function annonce(scene, titre, couleur = '#ffd84a', duree = 1.1) {

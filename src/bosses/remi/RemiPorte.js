@@ -108,8 +108,7 @@ export class RemiPorte extends BossScene {
     const t = estTactile();
     const lancer = () => difficulteOuChoix(this, (nom, diff) => { this.nomDiff = nom; this.diff = diff; this.bilan = bilanDe(this); this.debutJeu = Date.now(); this.tour('toi'); });
     if (this.donnees.bilan) {   // soirée enchaînée : un bandeau au lieu de l'écran de règles
-      lancer();
-      bandeauRegle(this, `Maintiens ${t ? 'le doigt' : 'ESPACE'} pour armer, lâche sur le + . Quelqu'un arrive ? ${t ? 'L\'AIR DE RIEN' : 'ALT'} !`, 3.5, 'COGNE !', 'maintenir');
+      bandeauRegle(this, `Maintiens ${t ? 'le doigt' : 'ESPACE'} pour armer, lâche sur le + . Quelqu'un arrive ? ${t ? 'L\'AIR DE RIEN' : 'ALT'} !`, 3.5, 'COGNE !', 'maintenir', lancer);   // la partie attend ESPACE / toucher
       return;
     }
     this.afficherIntro('RÉMI - La porte et le videur', [
