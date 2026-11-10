@@ -776,6 +776,11 @@
   bloqué à l'horizontale), bouton ⛶ en haut à gauche pour y revenir ; sur iPhone (pas de plein écran dans Safari),
   astuce une fois : « Partager → Sur l'écran d'accueil » ; `manifest.webmanifest` + icônes `assets/ui/icone_*.png`
   => depuis l'écran d'accueil, le jeu s'ouvre en plein écran comme une appli.
+- START façon RESIDENT EVIL (10 nov. 2026, Fabien) : à l'écran titre de l'intro, l'appui coupe la musique, joue
+  `hub_start` (« clac », `assets_inbox/hub/start_40SW.wav`) puis 0,85 s après la voix `hub_voix_bracass`
+  (`assets_inbox/hub/voix_les_bracass.wav`, blancs retirés, ≈ 6 s) avec petites secousses ; la sélection arrive quand la
+  voix a fini (un 2e appui après 1,5 s pour passer). `IntroScene.demarrer` / `allerAuHub`.
+- GÉNÉRIQUE de fin : plus de retour automatique, la musique continue jusqu'à un appui.
 - PLEIN ÉCRAN sur PC (9 nov. 2026, Fabien) : petit bouton ⛶ discret en bas à droite (`boutonPC` dans `pleinEcran.js`),
   entre / sort du plein écran (🗗 = sortir, ou Échap) ; F11 du navigateur marche aussi.
 - Allègement : musique de Greg en 64 kbit/s (2,5 Mo), clip du Dempsey en MP4 (190 Ko au lieu du GIF de 1 Mo).

@@ -167,6 +167,7 @@ export class FinaleScene extends Phaser.Scene {
     }
     const duree = (y + HAUTEUR) / 55;   // 55 px par seconde
     this.tweens.add({ targets: bloc, y: HAUTEUR / 2 - y + 30, duration: duree * 1000, ease: 'Linear' });
-    this.invite(); this.auto(duree + 2.5);
+    // (Fabien) pas de retour automatique : le générique fini, la musique continue jusqu'à un appui
+    this.invite();
   }
 }

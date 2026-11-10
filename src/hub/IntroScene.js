@@ -10,7 +10,8 @@
 import { LARGEUR, HAUTEUR } from '../core/reglages.js';
 import { texte } from '../core/ui.js';
 import { Sauvegarde } from '../core/sauvegarde.js';
-import { jouerMusique, tempsMusique, placerMusique } from '../core/musique.js';
+import { jouerMusique, tempsMusique, placerMusique, arreterMusique } from '../core/musique.js';
+import { jouerSon } from '../core/ressources.js';
 import { etiquettesTactiles, montrerBoutonPause } from '../core/tactile.js';
 import { BOSS } from '../bosses/liste.js';
 
@@ -69,10 +70,33 @@ export class IntroScene extends Phaser.Scene {
     } else if (this.etat === 'sequence') {
       this.sauterAuTitre();
     } else if (this.etat === 'titre' && this.tTitre > 0.6) {
-      this.etat = 'fin';
-      this.cameras.main.fadeOut(400, 255, 255, 255);
-      this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Hub'));
+      this.demarrer();
+    } else if (this.etat === 'start' && this.time.now - this.tStart > 1500) {
+      this.allerAuHub();   // (un 2e appui pendant la voix : on passe)
     }
+  }
+
+  // START façon Resident Evil (Fabien) : la musique se coupe, « clac » (hub_start), puis la voix grave « Les Bracass' »
+  // sur l'écran titre qui tremble un peu ; on arrive à la sélection quand la voix a fini (un appui pour aller plus vite).
+  demarrer() {
+    this.etat = 'start'; this.tStart = this.time.now;
+    arreterMusique('intro_musique');
+    jouerSon(this, 'hub_start');
+    this.cameras.main.flash(250, 255, 255, 255);
+    this.cameras.main.shake(300, 0.006);
+    this.time.delayedCall(850, () => {
+      if (this.etat !== 'start') return;
+      jouerSon(this, 'hub_voix_bracass');
+      this.cameras.main.shake(500, 0.004);
+    });
+    this.time.delayedCall(850 + 6000, () => this.allerAuHub());
+  }
+
+  allerAuHub() {
+    if (this.etat === 'fin') return;
+    this.etat = 'fin';
+    this.cameras.main.fadeOut(600, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Hub'));
   }
 
   // ---------------- horloge calée sur la musique ----------------

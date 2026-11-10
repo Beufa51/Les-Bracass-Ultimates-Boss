@@ -83,6 +83,9 @@ export const MANIFESTE = {
     ui_badge:   { fichier: null, provisoire: { frequence: 990, duree: 0.25 } },
     ui_defaite: { fichier: null, provisoire: { frequence: 160, duree: 0.35 } },
     hub_porte:  { fichier: null, provisoire: { frequence: 440, duree: 0.12 } },
+    // START façon Resident Evil (sons de Fabien, assets_inbox/hub/, blancs retirés) : le « clac » puis la voix « Les Bracass' »
+    hub_start:        { fichier: 'audio/hub/hub_start.mp3' },
+    hub_voix_bracass: { fichier: 'audio/hub/hub_voix_bracass.mp3' },
     // musique de l'écran de sélection (fournie par le propriétaire : Street Fighter II, Character Select)
     hub_musique: { fichier: 'audio/hub/hub_selection.mp3', musique: true, volume: 0.4 },
     intro_musique: { fichier: 'audio/intro/intro_musique.mp3', musique: true, volume: 0.45 },   // Dragon Ball Final Bout (opening), fournie par Fabien

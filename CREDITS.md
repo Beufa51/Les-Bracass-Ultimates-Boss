@@ -11,6 +11,7 @@
 | Musique de l'écran de sélection (`assets/audio/hub/hub_selection.mp3`) | Street Fighter II, « Character Select » (Capcom) | © Capcom, ajoutée par le propriétaire du projet |
 | Musique de l'intro (`assets/audio/intro/intro_musique.mp3`) | Dragon Ball Final Bout, opening (Bandai) | © Bandai / Toei, ajoutée par le propriétaire du projet |
 | Musique du boss final (`assets/audio/finale/finale_mecha.mp3`) | Chrono Trigger, « Boss Battle » (Square), réencodée en 80 kbit/s | © Square Enix, ajoutée par le propriétaire du projet |
+| Son START et voix « Les Bracass' » (`assets/audio/hub/hub_start.mp3`, `hub_voix_bracass.mp3`) | fournis par le propriétaire du projet (40SW.WAV, Les_bracass_.wav), découpés | fournis par le propriétaire du projet |
 | Bruitages lasers du boss final (`assets/audio/finale/finale_laser_heros.mp3`, `finale_laser_ennemi.mp3`) | « attack laser » (soundreality, n° 128280) et « laser » (u_xg7ssi08yr, n° 381976), probablement Pixabay ; découpés (blancs retirés) | fournis par le propriétaire du projet |
 | Illustration de Greg (`assets/sprites/greg/greg_portrait.jpg`, `greg_visage.jpg`) | fournie par le propriétaire du projet | — |
 | Bruitages du combat (`assets/audio/greg/greg_*.wav`) | générés par `outils/greg/generer_sons.py` | — |
