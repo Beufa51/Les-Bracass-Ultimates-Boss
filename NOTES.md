@@ -77,6 +77,10 @@
 - Hub : UN toucher sur une case = combattre direct (plus de « toucher puis retoucher »), bouton « Combattre » retiré.
 - Greg (gestes.js) : glisser ◀ ▶ = esquive sur TOUT l'écran ; à droite, le coup part au lever du doigt ou après
   `GESTES.coup` (0,09 s) doigt posé. Dempsey Roll au doigt : fenêtre BIEN x `dempsey.toleranceTactile` (1,3), frein aussi.
+- Greg GARDE au doigt posé (11 nov. 2026, retour « marche mal ») : le pouce qui bouge un peu (≥ 26 px) lançait une
+  ESQUIVE et lâchait la garde. Garde levée : il faut glisser `GESTES.glisseGarde` (64 px) pour esquiver. Plusieurs doigts
+  en garde : on la lâche au DERNIER levé. Appui long du téléphone (menu / loupe / sélection) bloqué (index.html + gestes.js).
+  Test (téléphone simulé, pouce qui tremble de 30 px) : avant la garde tombait après 0,2 s, maintenant tenue 2 s.
 
 ## BUGS TÉLÉPHONE (9 nov. 2026)
 - Lionel : Lancer (agrandi) recouvrait Lob -> LANCER gros et ORANGE en bas à droite, LOB plus petit et BLEU au-dessus
