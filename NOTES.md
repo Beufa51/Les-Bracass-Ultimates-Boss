@@ -735,6 +735,9 @@
   (`videurSurRemi` 0,5) ; à chaque passage Rémi décide (`remiDecision`) : PRUDENT (`remiPrudent` de la difficulté) ou
   GOURMAND : il insiste et vise plus fort (`remiInsiste` +0,25, bulle « Il me voit pas, lui... »). Bot humain : Rémi
   attrapé 2 / 2 / 2 / 1 fois (PANACHÉ, PRESSION x2, CUL SEC).
+- V20f PORTE (retour : « le videur arrive trop vite, pas le temps d'anticiper » en PRESSION) : `videur` de la difficulté
+  1 → 1,4 (PRESSION), 1,3 → 1,7 (PANACHÉ), 1,6 → 2 (DIABOLO), CUL SEC inchangé. PRESSION : annonce (pas + ombre)
+  ~1,1-2 s (avant 0,85-1,4 s) et passages plus espacés (~2-5 s au lieu de 1,4-3,6 s).
 - V20e IMAGES : « L'AIR DE RIEN » (`remi_air_de_rien_planche.jpg`, prompt 28) → `remi_dos_rien.png` / `remi_toi_dos_rien.png`
   (`air_de_rien()` dans preparer_images.py : mêmes cases que remi_dos / remi_toi_dos ; pose coupée à mi-cuisse mise à
   l'échelle réelle, tête à la place de la garde, JAMBES de la garde recollées dessous) ; poing caché = une des 2 poses
