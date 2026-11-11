@@ -81,6 +81,10 @@
   ESQUIVE et lâchait la garde. Garde levée : il faut glisser `GESTES.glisseGarde` (64 px) pour esquiver. Plusieurs doigts
   en garde : on la lâche au DERNIER levé. Appui long du téléphone (menu / loupe / sélection) bloqué (index.html + gestes.js).
   Test (téléphone simulé, pouce qui tremble de 30 px) : avant la garde tombait après 0,2 s, maintenant tenue 2 s.
+- Greg GARDE (11 nov. 2026, 2e retour « je n'arrive pas à l'activer ») : un doigt posé PENDANT un encart (« ROUND »,
+  « BOX ! », « SMASH !! », reprise après le tapis) était oublié -> garde jamais levée tant qu'on ne relevait pas le doigt.
+  Maintenant le doigt attend la reprise du combat (`armerGarde` dans gestes.js). Après une esquive glissée, le doigt resté
+  posé relève la garde (après `GESTES.garde` + `GESTES.reGarde` 0,25 s) et peut glisser à nouveau pour une autre esquive.
 
 ## BUGS TÉLÉPHONE (9 nov. 2026)
 - Lionel : Lancer (agrandi) recouvrait Lob -> LANCER gros et ORANGE en bas à droite, LOB plus petit et BLEU au-dessus

@@ -28,6 +28,7 @@ export const GESTES = {
   glisse: 26,          // pixels à glisser pour une esquive
   glisseGarde: 64,     // ... quand la GARDE est levée : il faut glisser plus franchement (le pouce posé bouge un peu sans le vouloir)
   garde: 0.12,         // secondes de doigt immobile pour lever la garde
+  reGarde: 0.25,       // après une esquive au doigt resté posé : attente en plus avant de relever la garde
   coup: 0.09,          // moitié droite : doigt posé sans glisser pendant X s = le coup part (sinon au lever du doigt)
   bouton: { x: LARGEUR / 2, y: HAUTEUR - 70, r: 58 },   // bouton DEMPSEY
 };
@@ -66,8 +67,18 @@ export function installerGestes(scene, opts) {
     if (d.minuterie) d.minuterie.remove();
     if (d.garde) { d.garde = false; if (--gardes <= 0) { gardes = 0; envoyer('keyup', 'bas'); } }
   };
+  // garde : doigt immobile G.garde s. Si le combat est figé (encart « ROUND », « BOX ! », « SMASH !! »...), on attend
+  // qu'il reprenne au lieu d'oublier le doigt (retour Fabien 11 nov. 2026 : pouce posé d'avance = garde jamais levée).
+  const armerGarde = (id, d, delai) => {
+    if (d.minuterie) d.minuterie.remove();
+    d.minuterie = scene.time.delayedCall(delai, () => {
+      if (d.fait || d.garde || doigts.get(id) !== d) return;
+      if (opts.mode() === 'combat') { d.garde = true; lever(); } else armerGarde(id, d, 50);
+    });
+  };
   const bas = (p) => {
-    const m = opts.mode(); if (!m) return;
+    const m = opts.mode();
+    if (!m) { if (p.x < LARGEUR / 2) { const d = { x0: p.x, fait: false, garde: false }; doigts.set(p.id, d); armerGarde(p.id, d, G.garde * 1000); } return; }
     if (opts.dempseyPret() && Math.hypot(p.x - G.bouton.x, p.y - G.bouton.y) < G.bouton.r + 10) { taper('x'); onde(p.x, p.y, 0xffd84a); return; }
     if (m === 'frein') { taper('bas'); onde(p.x, p.y, 0x7fff7f); return; }
     if (m === 'tapis' || m === 'dempsey') { taper(p.x < LARGEUR / 2 ? 'gauche' : 'droite'); onde(p.x, p.y, 0xffffff); return; }
@@ -78,15 +89,18 @@ export function installerGestes(scene, opts) {
       doigts.set(p.id, d); return;
     }
     const d = { x0: p.x, fait: false, garde: false };
-    d.minuterie = scene.time.delayedCall(G.garde * 1000, () => { if (!d.fait && doigts.get(p.id) === d) { d.garde = true; lever(); } });
-    doigts.set(p.id, d);
+    doigts.set(p.id, d); armerGarde(p.id, d, G.garde * 1000);
   };
   const bouge = (p) => {
     const d = doigts.get(p.id); if (!d || d.glisse || (d.fait && !d.attaque) || !p.isDown) return;
+    if (opts.mode() !== 'combat') return;   // combat figé : pas d'esquive (le doigt reste prêt pour la garde)
     const dx = p.x - d.x0;
     if (Math.abs(dx) >= (d.garde ? G.glisseGarde : G.glisse)) {   // esquive (la garde éventuelle est relâchée ; à droite, elle coupe le coup déjà parti)
-      d.fait = true; d.glisse = true; lacher(d);
+      lacher(d);
       taper(dx < 0 ? 'gauche' : 'droite'); onde(p.x, p.y, 0xaaffff);
+      if (d.attaque) { d.fait = true; d.glisse = true; return; }
+      // doigt de défense resté posé après l'esquive : il pourra glisser à nouveau, ou relever la garde s'il s'arrête
+      d.x0 = p.x; armerGarde(p.id, d, G.garde * 1000 + G.reGarde * 1000);
     }
   };
   const haut = (p, annule) => { const d = doigts.get(p.id); if (d) { if (d.attaque && !annule) d.frapper(); lacher(d); doigts.delete(p.id); } };
